@@ -145,7 +145,7 @@ Les captures viennent du carnet d'exemple de Subsurface, jamais d'un carnet pers
 | --- | --- |
 | Clair | Conforme |
 | Sombre | Surfaces du système et sapin sombre conformes. **Colonne d'eau et tracé : voir « À trancher »** |
-| Texte à 200 % | Le texte grandit sans se superposer. Coupés : l'étiquette « Statistiq… » de la barre du bas, et les graduations du profil, qui restent petites |
+| Texte à 200 % | Le texte grandit sans se superposer. Les quatre étiquettes de la barre du bas tiennent, l'onglet Statistiques étant nommé « Stats ». Les graduations du profil restent petites |
 | TalkBack (arbre d'accessibilité relevé avec uiautomator) | Chaque ligne est lue « site, date, profondeur maximale, durée ». Profil et miniatures ont un texte de remplacement, la puce Gaz est un bouton à bascule, « + » et Retour ont un nom, et aucun nom d'icône n'est lu. TalkBack lui-même n'a pas été activé |
 | Carnet d'exemple, carnet du cloud | Les deux s'affichent, avec leurs unités respectives |
 
@@ -164,7 +164,6 @@ Les captures viennent du carnet d'exemple de Subsurface, jamais d'un carnet pers
   - Le dégradé ne code presque plus la profondeur : une plongée à 91 pieds ressemble à une plongée à 48 pieds.
   - Le tracé `--od-trace-profil` (#EAF5EF) sur ce fond a un contraste d'environ 1,3:1 à 1,6:1, sous le 3:1 attendu pour un graphique.
   - Le fond des miniatures disparaît sur la surface sombre.
-- **Étiquettes de la barre du bas :** à la plus grande taille de texte, « Statistiques » est coupé.
 - **Déjà ouverts dans la spécification :** couleurs Alarme et Attente en sombre (les valeurs claires sont gardées en attendant), distinction de l'oxygène et du sapin.
 
 **Ce qui manque :**

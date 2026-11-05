@@ -50,7 +50,7 @@
     <Toolbar tabbar icons bottom>
       <Link tabLink="#vue-carnet" tabLinkActive text="Carnet"><i class="icon"><Icone nom="carnet" /></i></Link>
       <Link tabLink="#vue-sites" text="Sites"><i class="icon"><Icone nom="sites" /></i></Link>
-      <Link tabLink="#vue-statistiques" text="Statistiques"><i class="icon"><Icone nom="statistiques" /></i></Link>
+      <Link tabLink="#vue-statistiques" text="Stats"><i class="icon"><Icone nom="statistiques" /></i></Link>
       <Link tabLink="#vue-outils" text="Outils"><i class="icon"><Icone nom="outils" /></i></Link>
     </Toolbar>
     <View id="vue-carnet" main tab tabActive url="/" />
