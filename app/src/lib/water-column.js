@@ -1,5 +1,5 @@
 // @ts-check
-// Water column (docs/specification-interface.md, section 4): vertical gradient
+// Water column (docs/ui-specification.md, section 4): vertical gradient
 // from --od-water-top to a mix of --od-water-top and --od-water-bottom, in the
 // ratio max depth / 60 m, capped at 1. The same scale applies to every dive.
 

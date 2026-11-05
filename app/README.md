@@ -188,11 +188,8 @@ The screenshots come from the Subsurface sample log, never from a personal log.
 
 ## Colour themes, compared on the phone (5 November 2026)
 
-A debug-only picker compares four palettes on the Pixel with the real cloud log. Only the `--od-*` token values change, never the layout.
+A debug-only picker compared four palettes on the Pixel with the real cloud log: "Pine and tangerine", "Black and white", "Black blocks" and "Color in the data". **"Color in the data" (finalist 3) was chosen, and the picker has since been removed:** `theme.css` now declares a single palette in `:root`, with its dark values under `html.dark`; `src/lib/theme.js`, the "Development" section of Settings and the plugin's `getAppInfo` are gone.
 
-- **Where:** Settings (gear icon in the Logbook navbar), section "Development", shown only when the app is debuggable (`getAppInfo` in the plugin reads `FLAG_DEBUGGABLE`).
-- **How:** the choice sets `<html data-theme>`, is applied at once (`f7.setColorTheme` with the theme's `--od-action`) and is kept in the WebView's `localStorage`.
-- **Themes:** "Pine and tangerine" (the specification's palette), "Black and white", "Black blocks" (the latest dive row and the profile become dark blocks, titles in weight 900) and "Color in the data" (black and white, the water column alone goes from #FBE3B2 to #B4530F). **"Color in the data" (finalist 3) is the default.**
 - **Tokens:** `--od-background`, `--od-surface`, `--od-surface-2`, `--od-text`, `--od-text-2`, `--od-separator`, `--od-action`, `--od-on-action`, `--od-water-top`, `--od-water-bottom`, `--od-trace`, `--od-block`, `--od-on-block`, `--od-trace-block`, plus `--od-primary-action`, `--od-cursor`, `--od-tint` and `--od-thumbnail-background`. Alarm, oxygen and pending stay common. Dark mode uses the same values for every theme.
 - **Bottom bar labels:** 12 px, and the WebView scales them with the system text size.
 
@@ -224,6 +221,19 @@ The comparison screenshots were taken with the real (personal) log, so they are 
 - **Buddies and tags:** separate rows of pills. A row is hidden when it is empty.
 - **Status bar:** the Android theme now asks for dark status bar icons in light mode (`values/styles.xml`) and light ones in dark mode (`values-night/styles.xml`). They were white on white before.
 - **Differences from the mock-up:** the profile keeps its axis labels, its touch read-out and its Gas layer. Only the Android boards were checked on the phone; the iOS variant is written but not seen.
+
+## Dive detail, complete (5 November 2026)
+
+The detail follows the "Détail complet" mock-ups (`detail3`). Checked on the Pixel with `TestDiveDivelogsDE.xml` (open circuit) and `test-apd-inspiration-reference.xml` (rebreather), in light and dark mode.
+
+- **Façade:** `get_dive` now also returns, per cylinder, the gas used computed by the core (`get_gas_used`, `gasUsedMl`); the site's taxonomy (`siteLocation`: city, region, country); and the weight systems (`weights`: grams and description). Neither the gas used nor the SAC is computed in JavaScript.
+- **Location line:** under the site title, "city or region, country", from the taxonomy; hidden when unknown. The sample files have no taxonomy, so this line was not seen on the phone.
+- **"Gas and equipment" block:** one entry per cylinder (long gas name such as "Nitrox 32", type and volume, "start → end" pressures, a 6 px bar of the pressure left, "<volume> used" and "<n> % left"); then SAC, only when computed and never on a rebreather; the suit; the weights (total, plus one line per entry with its translated position when there are several). On a rebreather, the gases stay as pills (rebreather gases, outlined bailout).
+- **Notes:** shown in full (`white-space: pre-line`).
+- **Dark mode:** water #E5B961 to #EF7625; line #F4F4F2, 2 px, over a #121314 outline of 4.5 px. Light mode is unchanged.
+- **Checked on the phone:** Sund Rock (#1): Nitrox 32, Steel 11.7 L, 165 → 69 bar, 1 080 L used, 42 % left, SAC 15.5 L/min, weights 16 kg. Northern Arch (#942): no SAC, rebreather and bailout pills.
+- **Pitfall:** Framework7 styles the global classes `.card` (margins, shadow) and `.panel` (hidden side panel); the block therefore uses the class `group`.
+- **Data shown as stored:** the cylinder description ("Steel") is diver data and is not translated.
 
 ## Reproduce
 

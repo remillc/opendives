@@ -14,14 +14,14 @@
   import { enableBackButton } from './lib/back-button.js';
   import { enableAccessibility } from './lib/accessibility.js';
   import { t } from './lib/i18n.js';
-  import { actionColor } from './lib/theme.js';
 
   const f7params = {
     name: 'OpenDives',
     theme: 'auto',
     darkMode: 'auto',
-    // The --od-action color of the saved theme (theme.css).
-    colors: { primary: actionColor() },
+    // Framework7 derives its palette from --od-action (theme.css); the mapped
+    // variables in theme.css then take precedence.
+    colors: { primary: getComputedStyle(document.documentElement).getPropertyValue('--od-action').trim() },
     routes: [
       { path: '/', component: Logbook },
       { path: '/dive/:id/', component: DiveDetail },

@@ -7,6 +7,8 @@
 #include "core/event.h"
 #include "core/profile.h"
 #include "core/sample.h"
+#include "core/statistics.h"
+#include "core/taxonomy.h"
 #include "core/errorhelper.h"
 #include "core/file.h"
 #include "core/git-access.h"
@@ -238,7 +240,8 @@ static void append_names(std::string &json, const std::string &list)
 
 int get_dive(int id, std::string &json, std::string &error)
 {
-	const struct dive *d = divelog.dives.get_by_uniq_id(id);
+	// Not const: the core's get_gas_used() takes a mutable dive (it does not change it).
+	struct dive *d = divelog.dives.get_by_uniq_id(id);
 	if (!d) {
 		error = "Dive not found";
 		return -1;
@@ -251,6 +254,20 @@ int get_dive(int id, std::string &json, std::string &error)
 	append_json_string(json, iso_date(d->when));
 	json += ",\"site\":";
 	append_json_string(json, site_name(*d));
+	// Location of the site from its taxonomy (GeoNames), as stored; empty when unknown.
+	json += ",\"siteLocation\":{\"city\":";
+	std::string city;
+	if (d->dive_site) {
+		city = taxonomy_get_value(d->dive_site->taxonomy, TC_LOCALNAME);
+		if (city.empty())
+			city = taxonomy_get_value(d->dive_site->taxonomy, TC_ADMIN_L3);
+	}
+	append_json_string(json, city);
+	json += ",\"region\":";
+	append_json_string(json, d->dive_site ? taxonomy_get_value(d->dive_site->taxonomy, TC_ADMIN_L1) : std::string());
+	json += ",\"country\":";
+	append_json_string(json, d->dive_site ? taxonomy_get_country(d->dive_site->taxonomy) : std::string());
+	json += '}';
 	json += ",\"maxDepthMm\":" + std::to_string(d->maxdepth.mm);
 	json += ",\"meanDepthMm\":" + std::to_string(d->meandepth.mm);
 	json += ",\"durationSeconds\":" + std::to_string(d->duration.seconds);
@@ -282,6 +299,20 @@ int get_dive(int id, std::string &json, std::string &error)
 	append_json_string(json, d->notes);
 	append_trip(json, *d);
 
+	json += ",\"weights\":[";
+	for (size_t i = 0; i < d->weightsystems.size(); i++) {
+		const weightsystem_t &w = d->weightsystems[i];
+		if (i)
+			json += ',';
+		json += "{\"grams\":" + std::to_string(w.weight.grams) + ",\"description\":";
+		append_json_string(json, w.description);
+		json += '}';
+	}
+	json += ']';
+
+	// Gas used per cylinder, computed by the core from the start and end
+	// pressures with gas compressibility (statistics.cpp).
+	std::vector<volume_t> gas_used = get_gas_used(d);
 	json += ",\"cylinders\":[";
 	for (size_t i = 0; i < d->cylinders.size(); i++) {
 		const cylinder_t &c = d->cylinders[i];
@@ -301,6 +332,7 @@ int get_dive(int id, std::string &json, std::string &error)
 		append_json_string(json, cylinderuse_text[c.cylinder_use]);
 		json += ",\"used\":";
 		json += d->is_cylinder_used(static_cast<int>(i)) ? "true" : "false";
+		json += ",\"gasUsedMl\":" + std::to_string(i < gas_used.size() ? gas_used[i].mliter : 0);
 		json += '}';
 	}
 	json += ']';

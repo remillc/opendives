@@ -155,6 +155,7 @@
 
       {#if paths}
         <path d={paths.water} fill="url(#water-{uid})" />
+        <path d={paths.line} class="trace-outline" />
         <path d={paths.line} class="trace" />
       {/if}
 
@@ -234,6 +235,14 @@
     .tick {
       font-size: 11px;
       fill: var(--od-text-2);
+    }
+
+    /* Dark mode: a 4.5 px outline under the 2 px line keeps it readable on the bright water. */
+    .trace-outline {
+      fill: none;
+      stroke: var(--od-trace-outline);
+      stroke-width: 4.5;
+      stroke-linejoin: round;
     }
 
     .trace {

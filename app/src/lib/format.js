@@ -1,5 +1,5 @@
 // @ts-check
-// Formats and units (docs/specification-interface.md, section 2).
+// Formats and units (docs/ui-specification.md, section 2).
 // Values come from the core in integer SI units; conversion happens here, at
 // display time, never in the data.
 
@@ -179,6 +179,43 @@ export function formatDiveDay(iso) {
  */
 export function formatTimeOfDay(iso, afterSeconds = 0) {
   return timeFormat.format(new Date(toDate(iso).getTime() + afterSeconds * 1000));
+}
+
+/**
+ * Full gas name, for the cylinder list: "Air", "Nitrox 32", "Trimix 18/45", "Oxygen".
+ * @param {number} o2Permille
+ * @param {number} hePermille
+ */
+export function formatGasLong(o2Permille, hePermille) {
+  const o2 = Math.round(o2Permille / 10);
+  const he = Math.round(hePermille / 10);
+  if (he > 0) return t('gasLong.trimix', { o2: String(o2), he: String(he) });
+  if (o2 >= 100) return t('gasLong.oxygen');
+  // The core stores air as 0 per mille (meaning 21 %).
+  if (o2 === 0 || o2 === 21) return t('gasLong.air');
+  return t('gasLong.nitrox', { o2: String(o2) });
+}
+
+/**
+ * Gas volume at surface pressure, as computed by the core: whole liters or cubic feet.
+ * @param {number} ml
+ * @param {Prefs} prefs
+ */
+export function formatGasVolume(ml, prefs) {
+  return prefs.volume === 'cuft'
+    ? `${formatNumber(ml / 28316.8466, 0)}${NBSP}${t('units.cubicFeet')}`
+    : `${formatNumber(ml / 1000, 0)}${NBSP}${t('units.liters')}`;
+}
+
+/**
+ * Weight (ballast): up to one decimal, in kilograms or pounds.
+ * @param {number} grams
+ * @param {Prefs} prefs
+ */
+export function formatWeight(grams, prefs) {
+  const value = prefs.weight === 'lbs' ? grams / 453.59237 : grams / 1000;
+  const text = new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }).format(value);
+  return `${text}${NBSP}${t(prefs.weight === 'lbs' ? 'units.pounds' : 'units.kilograms')}`;
 }
 
 /**

@@ -1,5 +1,5 @@
 // @ts-check
-// Interface languages (docs/specification-interface.md, section 2, "Langues").
+// Interface languages (docs/ui-specification.md, section 2, "Langues").
 // No visible text is hard-coded in a component: every text has a key, and its
 // translations live in src/i18n/<language>.json. French is the reference
 // language; an untranslated language falls back to English.

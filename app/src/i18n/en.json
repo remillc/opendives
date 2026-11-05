@@ -71,10 +71,7 @@
     "entry": "Entry",
     "exit": "Exit",
     "meanDepth": "Mean depth",
-    "sac": "SAC",
-    "suit": "Suit",
     "trip": "Trip",
-    "gases": "Gases",
     "rebreatherGases": "Rebreather gases",
     "bailout": "Bailout",
     "buddies": {
@@ -92,6 +89,23 @@
       "CCR": "CCR",
       "PSCR": "pSCR",
       "Freedive": "Freedive"
+    },
+    "airTemperature": "Air",
+    "gasAndEquipment": "Gas and equipment",
+    "pressureRange": "{start} → {end}",
+    "pressureLeft": "{percent} % of the start pressure was left",
+    "gasUsed": "{volume} used",
+    "left": "{percent} % left",
+    "sacFull": "Surface air consumption (SAC)",
+    "suitRow": "Suit",
+    "weights": "Weights",
+    "weightPlaces": {
+      "integrated": "Integrated",
+      "belt": "Belt",
+      "ankle": "Ankle",
+      "backplate": "Backplate",
+      "clip-on": "Clip-on",
+      "unknown": "Not specified"
     }
   },
   "profile": {
@@ -106,32 +120,32 @@
     "meters": "m",
     "feet": "ft",
     "minutes": "min",
-    "liters": "l",
-    "litersPerMinute": "l/min",
+    "liters": "L",
+    "litersPerMinute": "L/min",
     "cubicFeet": "cu ft",
     "cubicFeetPerMinute": "cu ft/min",
     "celsius": "°C",
     "fahrenheit": "°F",
     "bar": "bar",
     "psi": "psi",
-    "percent": "%"
+    "percent": "%",
+    "kilograms": "kg",
+    "pounds": "lb"
   },
   "settings": {
     "title": "Settings",
-    "comingSoon": "Settings will appear here.",
-    "development": "Development",
-    "developmentNote": "Only shown in debug builds. The chosen theme is kept on this device.",
-    "themes": {
-      "pine": "Pine and tangerine",
-      "blackWhite": "Black and white",
-      "blackBlocks": "Black blocks",
-      "dataColor": "Color in the data"
-    }
+    "comingSoon": "Settings will appear here."
   },
   "gas": {
     "air": "Air",
     "oxygen": "O2",
     "nitrox": "Nx {o2}",
     "trimix": "Tx {o2}/{he}"
+  },
+  "gasLong": {
+    "air": "Air",
+    "oxygen": "Oxygen",
+    "nitrox": "Nitrox {o2}",
+    "trimix": "Trimix {o2}/{he}"
   }
 }

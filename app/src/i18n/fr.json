@@ -70,11 +70,8 @@
     "otu": "OTU",
     "entry": "Entrée",
     "exit": "Sortie",
-    "meanDepth": "Profondeur moyenne",
-    "sac": "SAC",
-    "suit": "Combinaison",
+    "meanDepth": "Prof. moyenne",
     "trip": "Voyage",
-    "gases": "Gaz",
     "rebreatherGases": "Gaz du recycleur",
     "bailout": "Secours",
     "buddies": {
@@ -92,6 +89,23 @@
       "CCR": "Recycleur",
       "PSCR": "Recycleur semi-fermé",
       "Freedive": "Apnée"
+    },
+    "airTemperature": "Air",
+    "gasAndEquipment": "Gaz et équipement",
+    "pressureRange": "{start} → {end}",
+    "pressureLeft": "Il restait {percent} % de la pression de départ",
+    "gasUsed": "{volume} consommés",
+    "left": "reste {percent} %",
+    "sacFull": "Consommation en surface (SAC)",
+    "suitRow": "Combinaison",
+    "weights": "Lest",
+    "weightPlaces": {
+      "integrated": "Intégré au gilet",
+      "belt": "Ceinture",
+      "ankle": "Chevilles",
+      "backplate": "Plaque dorsale",
+      "clip-on": "Sur la bouteille",
+      "unknown": "Non précisé"
     }
   },
   "profile": {
@@ -106,32 +120,32 @@
     "meters": "m",
     "feet": "pi",
     "minutes": "min",
-    "liters": "l",
-    "litersPerMinute": "l/min",
+    "liters": "L",
+    "litersPerMinute": "L/min",
     "cubicFeet": "pi³",
     "cubicFeetPerMinute": "pi³/min",
     "celsius": "°C",
     "fahrenheit": "°F",
     "bar": "bar",
     "psi": "psi",
-    "percent": "%"
+    "percent": "%",
+    "kilograms": "kg",
+    "pounds": "lb"
   },
   "settings": {
     "title": "Réglages",
-    "comingSoon": "Les réglages viendront ici.",
-    "development": "Développement",
-    "developmentNote": "Visible seulement dans les compilations de débogage. Le thème choisi est gardé sur cet appareil.",
-    "themes": {
-      "pine": "Sapin et mandarine",
-      "blackWhite": "Noir et blanc",
-      "blackBlocks": "Blocs noirs",
-      "dataColor": "Couleur dans les données"
-    }
+    "comingSoon": "Les réglages viendront ici."
   },
   "gas": {
     "air": "Air",
     "oxygen": "O2",
     "nitrox": "Nx {o2}",
     "trimix": "Tx {o2}/{he}"
+  },
+  "gasLong": {
+    "air": "Air",
+    "oxygen": "Oxygène",
+    "nitrox": "Nitrox {o2}",
+    "trimix": "Trimix {o2}/{he}"
   }
 }

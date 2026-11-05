@@ -37,6 +37,7 @@ import { registerPlugin } from '@capacitor/core';
  * @property {string} gas mix name given by the core: Air, EAN32, (18/45)…
  * @property {string} use OC-gas, diluent, oxygen, not used
  * @property {boolean} used the cylinder is breathed during the dive
+ * @property {number} gasUsedMl gas used, computed by the core (compressibility included); 0 when unknown
  */
 
 /**
@@ -55,6 +56,7 @@ import { registerPlugin } from '@capacitor/core';
  * @property {number} number
  * @property {string} date
  * @property {string} site
+ * @property {{city: string, region: string, country: string}} siteLocation from the site's taxonomy; empty strings when unknown
  * @property {number} maxDepthMm
  * @property {number} meanDepthMm
  * @property {number} durationSeconds
@@ -71,6 +73,7 @@ import { registerPlugin } from '@capacitor/core';
  * @property {string[]} buddies
  * @property {string[]} guides
  * @property {string} suit
+ * @property {{grams: number, description: string}[]} weights description as stored, e.g. integrated, belt
  * @property {string[]} tags
  * @property {string} notes
  * @property {DiveTrip|null} trip
@@ -113,8 +116,6 @@ import { registerPlugin } from '@capacitor/core';
  *   Detail of one dive of the last loaded log.
  * @property {() => Promise<Prefs>} getPrefs
  *   Units of the last loaded log.
- * @property {() => Promise<{debug: boolean}>} getAppInfo
- *   Whether this is a debug build (development tools are only shown then).
  */
 
 /** @type {OpenDivesCorePlugin} */
