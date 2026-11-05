@@ -1,1 +1,5 @@
 * text=auto
+# Exécutés sous Linux ou WSL : jamais de CRLF.
+*.sh text eol=lf
+core/compat/core-files.txt text eol=lf
+gradlew text eol=lf
