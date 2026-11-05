@@ -99,6 +99,85 @@ Get-Content -Raw "$env:USERPROFILE\.opendives\cloud-dev.env" | & $adb shell "run
 
 **Écarts avec l'architecture :** la vérification du serveur utilise OpenSSL dans le natif plutôt que la pile réseau d'Android. Elle ne suit donc pas le proxy du système, ce qui est à revoir avec l'écran de connexion. La liste de 1 353 plongées est affichée d'un bloc, sans liste virtuelle.
 
+## Carnet et Détail d'une plongée (5 novembre 2026)
+
+Premiers vrais écrans, suivant `docs/specification-interface.md`, vérifiés sur le Pixel 10 Pro XL avec le carnet d'exemple et le carnet du cloud (1 353 plongées, en lecture seule).
+
+| Carnet (carnet d'exemple) | Détail, curseur posé |
+| --- | --- |
+| ![Carnet](captures/carnet.png) | ![Détail](captures/detail.png) |
+
+Les captures viennent du carnet d'exemple de Subsurface, jamais d'un carnet personnel.
+
+**Ce qui marche :**
+
+- **Façade :**
+  - `list_dives` donne pour chaque plongée un identifiant, une miniature d'environ 40 points (temps et profondeur) et le voyage.
+  - `get_dive` renvoie les faits, les bouteilles et les gaz, les changements de gaz, les compagnons, la combinaison, les étiquettes, les notes et l'ordinateur. Le profil est calculé par le cœur (`create_plot_info_new`), avec la bouteille respirée, la ppO2 et le plafond s'il existe.
+  - `get_prefs` donne les unités du carnet, une par mesure.
+- **Thème :**
+  - Les jetons `--od-*` sont déclarés, en clair et en sombre.
+  - `colors.primary` vaut `#1E4D3A`, avec les fonds crème en clair.
+  - Le CSS est rangé en couches : `framework7`, `od.jetons`, `od.base`, `od.composants`.
+  - Les surcharges `--f7-*` restent hors couche, sinon les couleurs que Framework7 injecte au démarrage les écraseraient. Elles ont été vérifiées dans la WebView : primary vaut #1e4d3a en clair et #8fcfae en sombre.
+- **Composants :** `<Miniature>`, `<LignePlongee>`, `<LigneVoyage>`, `<Profil>` (colonne d'eau, curseur au doigt, couche Gaz) et `<EtatSynchro>`, plus des icônes dessinées pour le projet.
+- **Carnet :**
+  - Liste du plus récent au plus ancien, voyages repliés que l'on déplie d'un toucher.
+  - Recherche sur le site, le voyage, le numéro ou la date.
+  - État de synchronisation : cloud, hors ligne ou appareil seulement.
+  - Bouton « + » ouvrant les trois choix, sans action pour l'instant.
+  - Lignes grisées pendant le chargement ; états vide et erreur.
+- **Détail :**
+  - Profil, faits, bouteilles et gaz.
+  - Compagnons et étiquettes en deux blocs séparés, puis notes.
+  - « Planifier à partir de cette plongée » en mandarine, sans action pour l'instant.
+- **Navigation :**
+  - Barre du bas avec quatre sections ; Sites, Statistiques et Outils sont vides.
+  - La touche Retour d'Android ferme une feuille, revient à l'écran précédent ou au Carnet, puis met l'app en arrière-plan (plugin `@capacitor/app`, MIT).
+- **Nombres et unités :**
+  - Le format suit la langue de l'appareil : « 4,1 m », « 11,5 l/min », « 1er juin 2013 ».
+  - Chaque mesure suit le réglage du carnet : pieds et °C dans le carnet du cloud, mètres dans le carnet d'exemple.
+  - Une profondeur inconnue (0) n'est pas affichée.
+
+**Vérifications faites sur le téléphone :**
+
+| Vérification | Résultat |
+| --- | --- |
+| Clair | Conforme |
+| Sombre | Surfaces du système et sapin sombre conformes. **Colonne d'eau et tracé : voir « À trancher »** |
+| Texte à 200 % | Le texte grandit sans se superposer. Coupés : l'étiquette « Statistiq… » de la barre du bas, et les graduations du profil, qui restent petites |
+| TalkBack (arbre d'accessibilité relevé avec uiautomator) | Chaque ligne est lue « site, date, profondeur maximale, durée ». Profil et miniatures ont un texte de remplacement, la puce Gaz est un bouton à bascule, « + » et Retour ont un nom, et aucun nom d'icône n'est lu. TalkBack lui-même n'a pas été activé |
+| Carnet d'exemple, carnet du cloud | Les deux s'affichent, avec leurs unités respectives |
+
+**Problèmes rencontrés et corrigés :**
+
+- **Icônes de Framework7 lues à voix haute :** ce sont des ligatures de police insérées par CSS, et TalkBack lisait « chevron_right ». Elles reçoivent maintenant un texte de remplacement vide (`content: … / ''`).
+- **Composant `Fab` de framework7-svelte 9 :** il appelle `onclick` deux fois et laisse le lien sans nom. Le bouton « + » est donc écrit à la main.
+- **Page précédente encore lisible :** Framework7 garde la page précédente dans le document, et TalkBack pouvait y aller. Elle reçoit maintenant `inert`.
+- **Lien de retour :** en MD3, Framework7 masque son texte, et il était lu « # ». Il est remplacé par un lien nommé « Retour au carnet ».
+- **Touche Retour d'Android :** elle fermait l'application. Elle est maintenant reliée au routeur.
+- **Erreur passagère de Capacitor :** « Cannot read properties of undefined (reading 'triggerEvent') » apparaît une fois, au premier lancement après une réinstallation. Elle vient de Capacitor, pas d'OpenDives.
+
+**À trancher (spécification) :**
+
+- **Colonne d'eau en sombre :** en sombre, `--od-sapin` (#8FCFAE) et `--od-sapin-clair` (#BFD9CB) sont deux verts clairs.
+  - Le dégradé ne code presque plus la profondeur : une plongée à 91 pieds ressemble à une plongée à 48 pieds.
+  - Le tracé `--od-trace-profil` (#EAF5EF) sur ce fond a un contraste d'environ 1,3:1 à 1,6:1, sous le 3:1 attendu pour un graphique.
+  - Le fond des miniatures disparaît sur la surface sombre.
+- **Étiquettes de la barre du bas :** à la plus grande taille de texte, « Statistiques » est coupé.
+- **Déjà ouverts dans la spécification :** couleurs Alarme et Attente en sombre (les valeurs claires sont gardées en attendant), distinction de l'oxygène et du sapin.
+
+**Ce qui manque :**
+
+- Couches Plafond, ppO2 et Tissus ; profil plein écran en paysage.
+- Mise en page tablette.
+- Rendu iOS, qui n'a pas pu être vu.
+- Actions du bouton « + » et du planificateur.
+- Liste virtuelle : les 1 353 plongées sont dessinées d'un bloc.
+- `svelte-check` dans l'intégration continue : un `jsconfig.json` est ajouté pour l'éditeur, mais celui-ci signale encore des erreurs de typage dans les composants de framework7-svelte.
+
+**Tailles :** APK de débogage de 27,7 Mo (deux architectures). `libopendives.so` fait 9,3 Mo en arm64 et 9,6 Mo en x86_64, OpenSSL compris.
+
 ## Reproduire
 
 Les commandes sont dans [AGENTS.md](../AGENTS.md#commandes).

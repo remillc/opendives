@@ -1,82 +1,61 @@
 <script>
   // @ts-check
+  // Navigation principale (spécification, section 3) : barre de navigation en
+  // bas avec quatre sections ; le Carnet ouvre le détail en plein écran.
   import { onMount } from 'svelte';
-  import { App, View, Page, Navbar, List, ListItem, BlockTitle, Block, Preloader } from 'framework7-svelte';
-  import { OpenDivesCore } from 'opendives-core';
-  import { groupByTrip, formatDate, formatDepth, formatDuration } from './carnet.js';
+  import { App, Views, View, Toolbar, Link } from 'framework7-svelte';
+  import Carnet from './pages/Carnet.svelte';
+  import Detail from './pages/Detail.svelte';
+  import Section from './pages/Section.svelte';
+  import Icone from './composants/Icone.svelte';
+  import { chargerCarnet } from './lib/carnet.svelte.js';
+  import { activerRetour } from './lib/retour.js';
+  import { activerAccessibilite } from './lib/accessibilite.js';
 
-  /** @type {import('opendives-core').Dive[]} */
-  let dives = $state([]);
-  let loading = $state(true);
-  let source = $state('');
-  let error = $state('');
-  const groups = $derived(groupByTrip(dives));
+  const f7params = {
+    name: 'OpenDives',
+    theme: 'auto',
+    darkMode: 'auto',
+    colors: { primary: '#1E4D3A' },
+    routes: [
+      { path: '/', component: Carnet },
+      { path: '/plongee/:id/', component: Detail },
+      {
+        path: '/sites/',
+        component: Section,
+        options: { props: { titre: 'Sites', phrase: 'La carte et la liste des sites viendront ici.' } },
+      },
+      {
+        path: '/statistiques/',
+        component: Section,
+        options: { props: { titre: 'Statistiques', phrase: 'Les statistiques du carnet viendront ici.' } },
+      },
+      {
+        path: '/outils/',
+        component: Section,
+        options: { props: { titre: 'Outils', phrase: 'Le calculateur de gaz et le planificateur viendront ici.' } },
+      },
+    ],
+  };
 
-  const f7params = { name: 'OpenDives', theme: 'auto', colors: { primary: '#1D5C6B' } };
-
-  onMount(async () => {
-    try {
-      const cloud = await OpenDivesCore.listCloudDives();
-      if (cloud.available && cloud.dives) {
-        dives = cloud.dives;
-        source = cloud.synced
-          ? `Lu depuis le cloud (${cloud.server}, ${cloud.head?.slice(0, 7)})`
-          : 'Copie locale du cloud : le serveur n\'a pas répondu';
-        return;
-      }
-      let result = await OpenDivesCore.listDives();
-      if (result.exists) {
-        source = 'Relu depuis le dépôt git';
-      } else {
-        await OpenDivesCore.importSample();
-        result = await OpenDivesCore.listDives();
-        source = 'Carnet d\'exemple importé dans le dépôt git';
-      }
-      dives = result.dives;
-    } catch (e) {
-      const err = /** @type {{code?: string, message?: string}} */ (e);
-      error = `${err.code ?? 'ERREUR'} : ${err.message ?? String(e)}`;
-    } finally {
-      loading = false;
-    }
+  onMount(() => {
+    activerRetour();
+    activerAccessibilite();
+    chargerCarnet();
   });
 </script>
 
 <App {...f7params}>
-  <View main>
-    <Page>
-      <Navbar title="Carnet" />
-      {#if loading}
-        <Block class="text-align-center"><Preloader /></Block>
-      {:else if error}
-        <Block>{error}</Block>
-      {:else}
-        <Block>{dives.length} plongées. {source}.</Block>
-        {#each groups as group (group.key + group.dives[0].date)}
-          {#if group.title}<BlockTitle>{group.title}</BlockTitle>{/if}
-          <List mediaList dividers>
-            {#each group.dives as dive (dive.date + dive.number)}
-              <ListItem title={dive.site || 'Site non renseigné'} subtitle={`N° ${dive.number}`} text={formatDate(dive.date)}>
-                {#snippet after()}
-                  <div class="dive-values">
-                    <span>{formatDepth(dive.maxDepthMm)}</span>
-                    <span>{formatDuration(dive.durationSeconds)}</span>
-                  </div>
-                {/snippet}
-              </ListItem>
-            {/each}
-          </List>
-        {/each}
-      {/if}
-    </Page>
-  </View>
+  <Views tabs class="safe-areas">
+    <Toolbar tabbar icons bottom>
+      <Link tabLink="#vue-carnet" tabLinkActive text="Carnet"><i class="icon"><Icone nom="carnet" /></i></Link>
+      <Link tabLink="#vue-sites" text="Sites"><i class="icon"><Icone nom="sites" /></i></Link>
+      <Link tabLink="#vue-statistiques" text="Statistiques"><i class="icon"><Icone nom="statistiques" /></i></Link>
+      <Link tabLink="#vue-outils" text="Outils"><i class="icon"><Icone nom="outils" /></i></Link>
+    </Toolbar>
+    <View id="vue-carnet" main tab tabActive url="/" />
+    <View id="vue-sites" tab url="/sites/" />
+    <View id="vue-statistiques" tab url="/statistiques/" />
+    <View id="vue-outils" tab url="/outils/" />
+  </Views>
 </App>
-
-<style>
-  .dive-values {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    font-variant-numeric: tabular-nums;
-  }
-</style>
