@@ -105,5 +105,6 @@ Gradle ne recompile pas le natif : relancez `native/build-android.sh` si le C++ 
 ## Conventions
 
 - Messages de commit en français, à l'impératif ou au résumé court.
+- Auteur de tous les commits : Christian Rémillard. Aucune ligne `Co-Authored-By` ni `Claude-Session` dans les messages de commit.
 - Fichiers de code repris ou dérivés de Subsurface : en-tête `SPDX-License-Identifier: GPL-2.0`. OpenDives est sous GPLv2, parce qu'il réutilise le cœur de Subsurface.
 - Ne jamais committer d'identifiants du cloud Subsurface ni de carnet de plongée personnel.
