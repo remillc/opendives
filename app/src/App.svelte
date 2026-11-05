@@ -26,6 +26,17 @@
       { path: '/', component: Logbook },
       { path: '/dive/:id/', component: DiveDetail },
       { path: '/settings/', component: Settings },
+      // Not built yet: editing a dive, and the planner prefilled from a dive.
+      {
+        path: '/dive/:id/edit/',
+        component: Placeholder,
+        options: { props: { title: t('detail.edit'), text: t('placeholders.editText') } },
+      },
+      {
+        path: '/plan/:id/',
+        component: Placeholder,
+        options: { props: { title: t('detail.plan'), text: t('placeholders.planText') } },
+      },
       {
         path: '/sites/',
         component: Placeholder,

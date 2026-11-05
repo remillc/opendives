@@ -212,6 +212,19 @@ The trace and the deepest water share a colour by design in three themes: the cu
 
 The comparison screenshots were taken with the real (personal) log, so they are not committed.
 
+## Dive detail, reworked (5 November 2026)
+
+`app/src/pages/DiveDetail.svelte` follows the "Détail d'une plongée, repensé" mock-ups (`detail2-android` and its open-menu board), with no new core data:
+
+- **Navbar:** back on the left. On the right, Edit (a pencil on Android, a text button on iOS) and an overflow menu (more_vert on Android, ellipsis.circle on iOS). The menu is a Framework7 popover styled as an MD3 menu. Its only item, "Plan from this dive", opens a placeholder page until the planner exists, and Edit does the same until the edit screen exists.
+- **Header:** the dive number in bold at the start of the date line, then the site as the large title. The "Number" row and the bottom "Plan" button are gone.
+- **Key figures:** max depth, duration and water temperature, then the profile in a rounded white block.
+- **Facts:** a three-column grid, in this order: entry, exit, mean depth, mode, computer, CNS, OTU, SAC, suit, trip. A fact without a value is hidden.
+- **Gases:** pills named the way divers write them (Air, O2, Nx 32, Tx 18/45). On a rebreather, the diluent and oxygen cylinders are the rebreather gases, and the open-circuit cylinders are bailout, shown as outlined pills.
+- **Buddies and tags:** separate rows of pills. A row is hidden when it is empty.
+- **Status bar:** the Android theme now asks for dark status bar icons in light mode (`values/styles.xml`) and light ones in dark mode (`values-night/styles.xml`). They were white on white before.
+- **Differences from the mock-up:** the profile keeps its axis labels, its touch read-out and its Gas layer. Only the Android boards were checked on the phone; the iOS variant is written but not seen.
+
 ## Reproduce
 
 The commands are in [AGENTS.md](../AGENTS.md#commands).

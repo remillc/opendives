@@ -9,7 +9,9 @@
   "placeholders": {
     "sitesText": "The map and the list of dive sites will appear here.",
     "statisticsText": "The logbook statistics will appear here.",
-    "toolsText": "The gas calculator and the dive planner will appear here."
+    "toolsText": "The gas calculator and the dive planner will appear here.",
+    "editText": "Editing a dive will appear here.",
+    "planText": "The planner, prefilled with this dive, will appear here."
   },
   "logbook": {
     "title": "Logbook",
@@ -55,41 +57,41 @@
     "loading": "Loading the dive",
     "errorTitle": "This dive could not be read",
     "errorText": "No dive was changed. Go back to the logbook and open the dive again.",
-    "date": "Date",
-    "number": "Number",
-    "maxDepth": "Max. depth",
-    "meanDepth": "Mean depth",
-    "duration": "Duration",
-    "waterTemperature": "Water temperature",
+    "edit": "Edit",
+    "moreOptions": "More options",
+    "plan": "Plan from this dive",
+    "number": "No. {number}",
+    "figureMaxDepth": "max depth",
+    "figureDuration": "underwater",
+    "figureWater": "water",
     "mode": "Dive mode",
+    "computer": "Computer",
+    "cns": "CNS",
+    "otu": "OTU",
+    "entry": "Entry",
+    "exit": "Exit",
+    "meanDepth": "Mean depth",
     "sac": "SAC",
     "suit": "Suit",
-    "computer": "Dive computer",
-    "computerOthers": {
-      "one": "{model} (and {n} other)",
-      "other": "{model} (and {n} others)"
-    },
-    "notSet": "Not set",
     "trip": "Trip",
-    "cylinders": "Cylinders and gases",
-    "pressures": "{start} to {end}",
-    "startPressure": "Start {pressure}",
-    "buddies": "Buddies",
+    "gases": "Gases",
+    "rebreatherGases": "Rebreather gases",
+    "bailout": "Bailout",
+    "buddies": {
+      "one": "Buddy",
+      "other": "Buddies"
+    },
     "guide": "{name}, dive guide",
-    "noBuddy": "No buddy noted.",
-    "tags": "Tags",
-    "noTags": "No tags.",
+    "tags": {
+      "one": "Tag",
+      "other": "Tags"
+    },
     "notes": "Notes",
-    "plan": "Plan from this dive",
     "modes": {
       "OC": "Open circuit",
       "CCR": "CCR",
       "PSCR": "pSCR",
       "Freedive": "Freedive"
-    },
-    "uses": {
-      "diluent": "Diluent",
-      "oxygen": "Rebreather oxygen"
     }
   },
   "profile": {
@@ -125,5 +127,11 @@
       "blackBlocks": "Black blocks",
       "dataColor": "Color in the data"
     }
+  },
+  "gas": {
+    "air": "Air",
+    "oxygen": "O2",
+    "nitrox": "Nx {o2}",
+    "trimix": "Tx {o2}/{he}"
   }
 }

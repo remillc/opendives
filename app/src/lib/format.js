@@ -162,3 +162,36 @@ function firstOfMonth(text) {
 export function formatFullDate(iso) {
   return firstOfMonth(fullFormat.format(toDate(iso)));
 }
+
+const dayFormat = new Intl.DateTimeFormat(locale, { dateStyle: 'full', timeZone: 'UTC' });
+const timeFormat = new Intl.DateTimeFormat(locale, { timeStyle: 'short', timeZone: 'UTC' });
+
+/** Date with the weekday, capitalised for the start of a line: "Dimanche 24 avril 2022". @param {string} iso */
+export function formatDiveDay(iso) {
+  const text = firstOfMonth(dayFormat.format(toDate(iso)));
+  return text.charAt(0).toLocaleUpperCase(locale) + text.slice(1);
+}
+
+/**
+ * Time of day, optionally some seconds after the given moment (exit time).
+ * @param {string} iso
+ * @param {number} [afterSeconds]
+ */
+export function formatTimeOfDay(iso, afterSeconds = 0) {
+  return timeFormat.format(new Date(toDate(iso).getTime() + afterSeconds * 1000));
+}
+
+/**
+ * Short gas name, as divers write it: "Air", "O2", "Nx 32", "Tx 18/45".
+ * @param {number} o2Permille
+ * @param {number} hePermille
+ */
+export function formatGas(o2Permille, hePermille) {
+  const o2 = Math.round(o2Permille / 10);
+  const he = Math.round(hePermille / 10);
+  if (he > 0) return t('gas.trimix', { o2: String(o2), he: String(he) });
+  if (o2 >= 100) return t('gas.oxygen');
+  // The core stores air as 0 per mille (meaning 21 %).
+  if (o2 === 0 || o2 === 21) return t('gas.air');
+  return t('gas.nitrox', { o2: String(o2) });
+}

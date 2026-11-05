@@ -9,7 +9,9 @@
   "placeholders": {
     "sitesText": "La carte et la liste des sites viendront ici.",
     "statisticsText": "Les statistiques du carnet viendront ici.",
-    "toolsText": "Le calculateur de gaz et le planificateur viendront ici."
+    "toolsText": "Le calculateur de gaz et le planificateur viendront ici.",
+    "editText": "La modification d'une plongée viendra ici.",
+    "planText": "Le planificateur, prérempli avec cette plongée, viendra ici."
   },
   "logbook": {
     "title": "Carnet",
@@ -55,41 +57,41 @@
     "loading": "Chargement de la plongée",
     "errorTitle": "Cette plongée n'a pas pu être lue",
     "errorText": "Aucune plongée n'a été modifiée. Revenez au carnet, puis rouvrez la plongée.",
-    "date": "Date",
-    "number": "Numéro",
-    "maxDepth": "Profondeur maximale",
-    "meanDepth": "Profondeur moyenne",
-    "duration": "Durée",
-    "waterTemperature": "Température de l'eau",
+    "edit": "Modifier",
+    "moreOptions": "Plus d'options",
+    "plan": "Planifier depuis cette plongée",
+    "number": "N° {number}",
+    "figureMaxDepth": "au plus profond",
+    "figureDuration": "sous l'eau",
+    "figureWater": "eau",
     "mode": "Mode",
-    "sac": "Consommation (SAC)",
+    "computer": "Ordinateur",
+    "cns": "CNS",
+    "otu": "OTU",
+    "entry": "Entrée",
+    "exit": "Sortie",
+    "meanDepth": "Profondeur moyenne",
+    "sac": "SAC",
     "suit": "Combinaison",
-    "computer": "Ordinateur de plongée",
-    "computerOthers": {
-      "one": "{model} (et {n} autre)",
-      "other": "{model} (et {n} autres)"
-    },
-    "notSet": "À préciser",
     "trip": "Voyage",
-    "cylinders": "Bouteilles et gaz",
-    "pressures": "{start} à {end}",
-    "startPressure": "Départ {pressure}",
-    "buddies": "Compagnons",
+    "gases": "Gaz",
+    "rebreatherGases": "Gaz du recycleur",
+    "bailout": "Secours",
+    "buddies": {
+      "one": "Compagnon",
+      "other": "Compagnons"
+    },
     "guide": "{name}, guide",
-    "noBuddy": "Aucun compagnon noté.",
-    "tags": "Étiquettes",
-    "noTags": "Aucune étiquette.",
+    "tags": {
+      "one": "Étiquette",
+      "other": "Étiquettes"
+    },
     "notes": "Notes",
-    "plan": "Planifier à partir de cette plongée",
     "modes": {
       "OC": "Circuit ouvert",
       "CCR": "Recycleur",
       "PSCR": "Recycleur semi-fermé",
       "Freedive": "Apnée"
-    },
-    "uses": {
-      "diluent": "Diluant",
-      "oxygen": "Oxygène du recycleur"
     }
   },
   "profile": {
@@ -125,5 +127,11 @@
       "blackBlocks": "Blocs noirs",
       "dataColor": "Couleur dans les données"
     }
+  },
+  "gas": {
+    "air": "Air",
+    "oxygen": "O2",
+    "nitrox": "Nx {o2}",
+    "trimix": "Tx {o2}/{he}"
   }
 }

@@ -191,8 +191,12 @@
 
 <style>
   @layer od.components {
+    /* The profile sits in a rounded block (white in the light themes). */
     .profile {
-      padding: 4px 16px 0;
+      margin: 14px 16px 0;
+      padding: 8px 12px 0;
+      border-radius: 16px;
+      overflow: hidden;
     }
 
     svg {

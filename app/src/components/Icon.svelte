@@ -5,8 +5,14 @@
   // architecture rules out because of the GPLv2.
   // Decorative by default: the neighboring text carries the meaning.
 
-  /** @type {{ name: 'logbook'|'sites'|'statistics'|'tools'|'plus'|'check'|'offline'|'device'|'expand'|'settings', size?: number }} */
-  let { name, size = 24 } = $props();
+  /**
+   * @type {{
+   *   name: 'logbook'|'sites'|'statistics'|'tools'|'plus'|'check'|'offline'|'device'|'expand'|'settings'|'edit'|'more'|'moreCircle'|'plan',
+   *   size?: number,
+   *   weight?: number,
+   * }}
+   */
+  let { name, size = 24, weight = 1.8 } = $props();
 
   /** @type {Record<string, string>} */
   const paths = {
@@ -19,6 +25,10 @@
     offline: 'M7 18h10a4 4 0 0 0 .6-8A6 6 0 0 0 6.5 9 4.5 4.5 0 0 0 7 18zM4 4l16 16',
     device: 'M8 3h8a1.5 1.5 0 0 1 1.5 1.5v15A1.5 1.5 0 0 1 16 21H8a1.5 1.5 0 0 1-1.5-1.5v-15A1.5 1.5 0 0 1 8 3zM11 18h2',
     expand: 'M6.5 9.5L12 15l5.5-5.5',
+    edit: 'M4 20h4L19 9l-4-4L4 16zM13.5 6.5l4 4',
+    more: 'M12 5.5h.01M12 12h.01M12 18.5h.01',
+    moreCircle: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM8 12h.01M12 12h.01M16 12h.01',
+    plan: 'M4 6h10M4 12h7M4 18h5M15 13l3 3 3-3M18 8v8',
     settings:
       'M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4zM10.6 3h2.8l.4 2.3 1.6.9 2.2-.8 1.4 2.4-1.8 1.5v1.8l1.8 1.5-1.4 2.4-2.2-.8-1.6.9-.4 2.3h-2.8l-.4-2.3-1.6-.9-2.2.8-1.4-2.4 1.8-1.5v-1.8L4.8 7.8l1.4-2.4 2.2.8 1.6-.9z',
   };
@@ -31,7 +41,7 @@
   viewBox="0 0 24 24"
   fill="none"
   stroke="currentColor"
-  stroke-width="1.8"
+  stroke-width={weight}
   stroke-linecap="round"
   stroke-linejoin="round"
   aria-hidden="true"
