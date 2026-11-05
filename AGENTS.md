@@ -43,6 +43,10 @@ OpenDives est une application mobile complète de carnet de plongée. Elle amél
   - Les autres équipements passent par les tags.
   - Les statistiques s'appliquent aux résultats filtrés.
 - **Onglet Statistiques :** il s'ouvre sur des statistiques précompilées et offre un bouton « Filtre libre ». Exemples : nombre de plongées par compagnon, heures de plongée par combinaison.
+- **Premier lancement :** trois choix (compte existant, créer un compte, sans compte), chacun avec sa conséquence écrite ; « sans compte » = carnet seulement sur l'appareil, envoi possible plus tard.
+- **Unités :** chaque mesure se règle à part (profondeur, température, pression, volume, poids), comme le mode « personnalisé » de Subsurface.
+- **Planificateur :** peut partir d'une plongée du carnet (gaz, bouteille, pression de départ, SAC mesuré) ; une réserve insuffisante s'affiche en couleur Alarme.
+- **États à prévoir :** carnet vide, téléchargement échoué, hors ligne avec modifications en attente, conflit de synchronisation (choix de version : à valider, ajout propre à OpenDives).
 - **Périmètre de la v1 :** toutes les fonctions classées « essentiel » et « adapté », et toutes les nouveautés mobiles (classement dans le document de rétro-ingénierie).
 
 ## Structure du dépôt

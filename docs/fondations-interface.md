@@ -113,3 +113,17 @@ S'ajoutent deux écrans, après la décision du 5 novembre 2026 sur les filtres 
 **Données utilisées.** Les profils viennent des fichiers d'exemple du dépôt Subsurface : par exemple une plongée au lac Coleridge (`test42.xml`), une série de trois plongées, dont une en Finlande (`test40-42.xml`) et une plongée au recycleur à Northern Arch (`test-apd-inspiration-reference.xml`). On utilise ainsi de vraies formes de profil et de vraies valeurs, pas des données inventées.
 
 **Ensuite.** Une fois ce document validé, je réalise ces maquettes dans un espace de design que vous pourrez commenter et modifier. On pourra comparer deux variantes pour les choix les plus incertains, comme la miniature du profil dans la liste et la place des données techniques.
+
+## 7. Décisions prises pendant les maquettes (5 novembre 2026)
+
+Les maquettes couvrent maintenant, sur iPhone et téléphone Android : premier lancement, sites et carte hors ligne, outils et calculateur de gaz, planificateur, modification d'une plongée, réglages, détail en mode sombre, et quatre états (carnet vide, téléchargement échoué, hors ligne avec modifications en attente, conflit de synchronisation). Sur iPad et tablette Android : sites, outils, modification d'une plongée et réglages.
+
+| Sujet | Décision |
+| --- | --- |
+| Premier lancement | Trois choix, chacun avec sa conséquence écrite : compte existant (sauvegarde dans le cloud, copie sur l'appareil consultable sans réseau), créer un compte (gratuit, partagé entre appareils), commencer sans compte (carnet seulement sur cet appareil, sans sauvegarde ; on peut créer un compte plus tard et y envoyer le carnet) |
+| Unités | Chaque mesure se règle à part : profondeur, température, pression, volume, poids (par exemple profondeur en pieds et température en °C). C'est le mode « personnalisé » de Subsurface, déjà synchronisé par le cloud |
+| Planificateur | Il peut partir d'une plongée du carnet : il en reprend le gaz, la bouteille, la pression de départ et la consommation (SAC) mesurée. Accès depuis Outils (« Nouvelle plongée ou à partir du carnet ») et depuis la fiche d'une plongée (« Planifier à partir de cette plongée ») |
+| Réserve de gaz | Quand il resterait moins que la réserve minimale pour remonter à deux, le planificateur l'affiche en couleur Alarme, avec l'écart en bar |
+| Conflit de synchronisation | Subsurface fusionne lui-même la plupart des modifications concurrentes ; quand il ne peut pas (« Remote storage and local data diverged »), OpenDives proposerait de garder la version de l'appareil ou celle du cloud, après comparaison, sans rien perdre avant le choix. **À valider** : c'est un ajout à la couche de synchronisation d'OpenDives, sans modifier Subsurface |
+
+Les valeurs des maquettes du planificateur viennent du vrai planificateur de Subsurface, compilé sans Qt dans la preuve de concept.
