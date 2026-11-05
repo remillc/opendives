@@ -8,6 +8,7 @@
   import Detail from './pages/Detail.svelte';
   import Section from './pages/Section.svelte';
   import Icone from './composants/Icone.svelte';
+  import LibelleAdaptatif from './composants/LibelleAdaptatif.svelte';
   import { chargerCarnet } from './lib/carnet.svelte.js';
   import { activerRetour } from './lib/retour.js';
   import { activerAccessibilite } from './lib/accessibilite.js';
@@ -50,7 +51,7 @@
     <Toolbar tabbar icons bottom>
       <Link tabLink="#vue-carnet" tabLinkActive text="Carnet"><i class="icon"><Icone nom="carnet" /></i></Link>
       <Link tabLink="#vue-sites" text="Sites"><i class="icon"><Icone nom="sites" /></i></Link>
-      <Link tabLink="#vue-statistiques" text="Stats"><i class="icon"><Icone nom="statistiques" /></i></Link>
+      <Link tabLink="#vue-statistiques"><i class="icon"><Icone nom="statistiques" /></i><LibelleAdaptatif complet="Statistiques" court="Stats" /></Link>
       <Link tabLink="#vue-outils" text="Outils"><i class="icon"><Icone nom="outils" /></i></Link>
     </Toolbar>
     <View id="vue-carnet" main tab tabActive url="/" />

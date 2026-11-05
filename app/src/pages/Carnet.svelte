@@ -93,7 +93,8 @@
     </Subnavbar>
   </Navbar>
 
-  <EtatSynchro synchro={carnet.synchro} />
+  <!-- Pendant le chargement, l'état n'est pas encore connu : rien n'est affiché. -->
+  {#if !carnet.chargement && !carnet.erreur}<EtatSynchro synchro={carnet.synchro} />{/if}
 
   {#if carnet.chargement}
     <!-- Chargement : les lignes gardent leur place, sans roue au centre (section 6). -->

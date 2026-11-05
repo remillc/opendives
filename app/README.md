@@ -145,7 +145,7 @@ Les captures viennent du carnet d'exemple de Subsurface, jamais d'un carnet pers
 | --- | --- |
 | Clair | Conforme |
 | Sombre | Surfaces du système et sapin sombre conformes. **Colonne d'eau et tracé : voir « À trancher »** |
-| Texte à 200 % | Le texte grandit sans se superposer. Les quatre étiquettes de la barre du bas tiennent, l'onglet Statistiques étant nommé « Stats ». Les graduations du profil restent petites |
+| Texte à 200 % | Le texte grandit sans se superposer. Les quatre étiquettes de la barre du bas tiennent : l'onglet affiche « Statistiques » quand la place le permet, « Stats » sinon, et se rajuste sans relancer l'app (`<LibelleAdaptatif>`). Changer la taille du texte relance toutefois l'écran Android, donc recharge le carnet. Les graduations du profil restent petites |
 | TalkBack (arbre d'accessibilité relevé avec uiautomator) | Chaque ligne est lue « site, date, profondeur maximale, durée ». Profil et miniatures ont un texte de remplacement, la puce Gaz est un bouton à bascule, « + » et Retour ont un nom, et aucun nom d'icône n'est lu. TalkBack lui-même n'a pas été activé |
 | Carnet d'exemple, carnet du cloud | Les deux s'affichent, avec leurs unités respectives |
 
