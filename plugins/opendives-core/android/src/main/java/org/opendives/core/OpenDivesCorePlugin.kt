@@ -56,6 +56,23 @@ class OpenDivesCorePlugin : Plugin() {
         call.resolve(JSObject().put("exists", exists).put("dives", dives))
     }
 
+    /** Détail d'une plongée du carnet chargé ; `id` vient de listDives ou listCloudDives. */
+    @PluginMethod
+    fun getDive(call: PluginCall) = onCoreThread(call) {
+        val id = call.getInt("id")
+        if (id == null) {
+            call.reject("Identifiant de plongée manquant", "BAD_ARGUMENT")
+            return@onCoreThread
+        }
+        call.resolve(JSObject(NativeCore.getDive(id)))
+    }
+
+    /** Unités du carnet chargé, une par mesure. */
+    @PluginMethod
+    fun getPrefs(call: PluginCall) = onCoreThread(call) {
+        call.resolve(JSObject(NativeCore.getPrefs()))
+    }
+
     /**
      * Lecture seule du cloud Subsurface. TEMPORAIRE, pour le développement :
      * les identifiants sont lus dans files/cloud-dev.env, copié par adb

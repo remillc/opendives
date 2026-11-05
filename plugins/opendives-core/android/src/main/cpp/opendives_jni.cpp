@@ -67,6 +67,25 @@ Java_org_opendives_core_NativeCore_cloudListDives(JNIEnv *env, jobject, jstring 
 }
 
 JNIEXPORT jstring JNICALL
+Java_org_opendives_core_NativeCore_getDive(JNIEnv *env, jobject, jint id)
+{
+	std::string json, error;
+	if (opendives::get_dive(id, json, error)) {
+		throw_core_error(env, error);
+		return nullptr;
+	}
+	return env->NewStringUTF(json.c_str());
+}
+
+JNIEXPORT jstring JNICALL
+Java_org_opendives_core_NativeCore_getPrefs(JNIEnv *env, jobject)
+{
+	std::string json;
+	opendives::get_prefs(json);
+	return env->NewStringUTF(json.c_str());
+}
+
+JNIEXPORT jstring JNICALL
 Java_org_opendives_core_NativeCore_listDives(JNIEnv *env, jobject, jstring repo)
 {
 	std::string json, error;

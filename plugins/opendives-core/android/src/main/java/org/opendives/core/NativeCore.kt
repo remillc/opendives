@@ -11,6 +11,8 @@ internal object NativeCore {
     external fun logExists(repo: String): Boolean
     external fun importFile(source: String, repo: String): Int
     external fun listDives(repo: String): String
+    external fun getDive(id: Int): String
+    external fun getPrefs(): String
     external fun setCaFile(path: String)
     external fun cloudListDives(email: String, password: String): String
 }
