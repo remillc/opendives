@@ -69,6 +69,15 @@ Les polices sont celles du système : SF Pro sur iOS, Roboto sur Android. Les ta
 
 **Chiffres.** Toute valeur de plongée (profondeur, durée, pression, température, volume, poids, pourcentages) utilise les chiffres tabulaires (`font-variant-numeric: tabular-nums`) et s'aligne à droite dans les listes et tableaux.
 
+**Langues (décidé le 5 novembre 2026).** L'app est multilingue dès le départ, en français et en anglais ; d'autres langues s'ajouteront sans toucher au code.
+
+- Aucun texte visible n'est écrit en dur dans un composant : chaque texte a une clé, et ses traductions vivent dans un fichier par langue (`app/src/i18n/fr.json`, `en.json`). Le français est la langue de référence pour écrire les textes.
+- La langue suit celle de l'appareil ; une langue non traduite retombe sur l'anglais. Un réglage permet de la choisir.
+- Les pluriels et les nombres passent par `Intl.PluralRules` et `Intl.NumberFormat` (« 1 plongée », « 3 plongées »).
+- Les messages du cœur de Subsurface arrivent en anglais (`trGettext` renvoie le texte tel quel) : la façade les transforme en codes, et l'app les traduit comme ses propres textes.
+- Les données du plongeur (noms de sites, notes, étiquettes comme « boat ») ne se traduisent jamais.
+- Le vocabulaire de plongée anglais suit celui de Subsurface (dive computer, buddy, ceiling, SAC, MOD), pour que les deux apps parlent la même langue.
+
 **Formats.** Ils suivent la langue de l'appareil, par `Intl.NumberFormat` et `Intl.DateTimeFormat` ; en français : virgule décimale (« 27,6 m »), espace insécable avant les unités et les deux-points, espace fine dans les milliers (« 1 013 mbar »). Le squelette affiche aujourd'hui « 4.1 m » : à corriger.
 
 **Unités.** Chaque mesure suit son propre réglage, lu dans les préférences du carnet Subsurface : profondeur (m ou pieds), température (°C ou °F), pression (bar ou psi), volume (litres ou pieds cubes), poids (kg ou livres). Le cœur stocke en unités SI entières (mm, mK, mbar, ml, g) ; la conversion se fait au moment de l'affichage, jamais dans les données.

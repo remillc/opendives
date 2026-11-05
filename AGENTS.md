@@ -48,6 +48,7 @@ OpenDives est une application mobile complète de carnet de plongée. Elle amél
 - **Planificateur :** peut partir d'une plongée du carnet (gaz, bouteille, pression de départ, SAC mesuré) ; une réserve insuffisante s'affiche en couleur Alarme.
 - **États à prévoir :** carnet vide, téléchargement échoué, hors ligne avec modifications en attente, conflit de synchronisation (choix de version : à valider, ajout propre à OpenDives).
 - **Référence pour coder l'interface :** `docs/specification-interface.md` (couleurs, textes, composants, écrans, données du cœur). Elle prime sur les maquettes.
+- **Langues :** multilingue dès le départ, français et anglais. Aucun texte visible en dur : une clé par texte, traductions dans `app/src/i18n/fr.json` et `en.json` ; la langue suit l'appareil, l'anglais sert de repli. Les données du plongeur ne se traduisent pas.
 - **Couleurs :** sapin et mandarine sur fond crème, déclarées en variables `--od-*` ; jamais de valeur en dur dans un composant.
 - **Carnet :** pas de bouton Télécharger permanent ; un bouton « + » ouvre télécharger, importer ou noter à la main.
 - **divelogs.de :** reprise unique du carnet à la création d'un compte ; les identifiants divelogs.de ne sont jamais conservés.
