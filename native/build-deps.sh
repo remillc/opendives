@@ -1,8 +1,8 @@
 #!/bin/bash
-# Compile les dépendances du cœur en bibliothèques statiques pour Android :
-# OpenSSL, libgit2 (HTTPS par OpenSSL, sans SSH), libxml2, libxslt, sqlite3,
+# Builds the core dependencies as static libraries for Android:
+# OpenSSL, libgit2 (HTTPS through OpenSSL, no SSH), libxml2, libxslt, sqlite3,
 # libzip, libdivecomputer.
-# La zlib est celle du NDK. Résultat : build/android/deps/<abi>/{include,lib}
+# zlib comes from the NDK. Output: build/android/deps/<abi>/{include,lib}
 # usage: native/build-deps.sh [abi...]
 set -euo pipefail
 source "$(dirname "$0")/env.sh"
@@ -10,7 +10,7 @@ ABIS=${*:-$ALL_ABIS}
 SRC=$OUT/src
 mkdir -p "$SRC"
 
-clone() { # nom url tag
+clone() { # name url tag
   [ -d "$SRC/$1/.git" ] || git clone -q --depth 1 --branch "$3" "$2" "$SRC/$1"
 }
 clone openssl https://github.com/openssl/openssl.git "$OPENSSL_TAG"
@@ -28,7 +28,7 @@ for ABI in $ABIS; do
   P=$OUT/deps/$ABI
   W=$OUT/work/$ABI
   mkdir -p "$P/lib" "$P/include" "$W"
-  cm() { # nom [options cmake...] — recompilé si les options changent
+  cm() { # name [cmake options...] — rebuilt if the options change
     local name=$1; shift
     [ -f "$W/$name.done" ] && [ "$(cat "$W/$name.done")" = "$*" ] && return 0
     rm -rf "$W/$name"
@@ -46,7 +46,7 @@ for ABI in $ABIS; do
   case $ABI in
     arm64-v8a) TRIPLE=aarch64-linux-android; OSSL_TARGET=android-arm64 ;;
     x86_64) TRIPLE=x86_64-linux-android; OSSL_TARGET=android-x86_64 ;;
-    *) echo "ABI inconnue : $ABI"; exit 1 ;;
+    *) echo "unknown ABI: $ABI"; exit 1 ;;
   esac
   CC_ABI="$TC/$TRIPLE$ANDROID_API-clang"
 
@@ -61,7 +61,7 @@ for ABI in $ABIS; do
       { tail -30 "$W/openssl.log"; exit 1; }
   fi
 
-  # libgit2 impose -std=c90, où les en-têtes du NDK ne connaissent pas « inline ».
+  # libgit2 forces -std=c90, where the NDK headers do not know "inline".
   cm libgit2 -DCMAKE_C_FLAGS=-Dinline=__inline__ -DUSE_HTTPS=OpenSSL -DOPENSSL_ROOT_DIR="$P" \
     -DOPENSSL_USE_STATIC_LIBS=TRUE -DUSE_SSH=OFF -DBUILD_TESTS=OFF -DBUILD_CLI=OFF -DBUILD_EXAMPLES=OFF \
     -DUSE_BUNDLED_ZLIB=OFF -DREGEX_BACKEND=builtin -DUSE_HTTP_PARSER=builtin -DUSE_NTLMCLIENT=OFF -DUSE_GSSAPI=OFF
@@ -90,4 +90,4 @@ for ABI in $ABIS; do
       { tail -30 "$W/libdc.log"; exit 1; }
   fi
 done
-echo "dépendances prêtes dans $OUT/deps"
+echo "dependencies ready in $OUT/deps"

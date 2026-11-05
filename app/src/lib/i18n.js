@@ -1,73 +1,71 @@
 // @ts-check
-// Langues de l'interface (spécification, section 2, « Langues »).
-// Aucun texte visible n'est écrit en dur dans un composant : chaque texte a une
-// clé, et ses traductions vivent dans src/i18n/<langue>.json. Le français est la
-// langue de référence ; une langue non traduite retombe sur l'anglais.
-// Les données du plongeur (sites, notes, étiquettes) ne passent jamais par ici.
+// Interface languages (docs/specification-interface.md, section 2, "Langues").
+// No visible text is hard-coded in a component: every text has a key, and its
+// translations live in src/i18n/<language>.json. French is the reference
+// language; an untranslated language falls back to English.
+// Diver data (site names, notes, tags) never goes through this module.
 import fr from '../i18n/fr.json';
 import en from '../i18n/en.json';
 
-/** @typedef {string | {[pluriel: string]: string} | {[cle: string]: any}} Entree */
-
 /** @type {Record<string, Record<string, any>>} */
-const catalogues = { fr, en };
-const REPLI = 'en';
+const catalogs = { fr, en };
+const FALLBACK = 'en';
 
-/** Langue de l'interface : la première langue de l'appareil qui est traduite. */
-export const langue = (() => {
-  const preferees = typeof navigator !== 'undefined' ? navigator.languages ?? [navigator.language] : [];
-  for (const l of preferees) {
-    const code = l.toLowerCase().split('-')[0];
-    if (code in catalogues) return code;
+/** Interface language: the first device language that has a translation. */
+export const language = (() => {
+  const preferred = typeof navigator !== 'undefined' ? navigator.languages ?? [navigator.language] : [];
+  for (const tag of preferred) {
+    const code = tag.toLowerCase().split('-')[0];
+    if (code in catalogs) return code;
   }
-  return REPLI;
+  return FALLBACK;
 })();
 
-/** Format des nombres : celui de l'appareil (« 1 353 » en français). */
-const nombres = new Intl.NumberFormat(typeof navigator !== 'undefined' ? navigator.language : langue);
-const pluriels = new Intl.PluralRules(langue);
+/** Number format: the device's ("1 353" in French). */
+const numbers = new Intl.NumberFormat(typeof navigator !== 'undefined' ? navigator.language : language);
+const plurals = new Intl.PluralRules(language);
 
 /**
- * @param {Record<string, any>} catalogue
- * @param {string} cle ex. « carnet.titre »
+ * @param {Record<string, any>} catalog
+ * @param {string} key e.g. "logbook.title"
  */
-function chercher(catalogue, cle) {
-  return cle.split('.').reduce((noeud, partie) => (noeud == null ? undefined : noeud[partie]), /** @type {any} */ (catalogue));
+function lookup(catalog, key) {
+  return key.split('.').reduce((node, part) => (node == null ? undefined : node[part]), /** @type {any} */ (catalog));
 }
 
 /**
- * Texte traduit. Les paramètres remplacent les {noms} ; le paramètre numérique
- * `n` choisit la forme du pluriel (Intl.PluralRules) et s'affiche au format de
- * l'appareil.
- * @param {string} cle
+ * Translated text. Parameters replace the {names}; the numeric parameter `n`
+ * selects the plural form (Intl.PluralRules) and is shown in the device's
+ * number format.
+ * @param {string} key
  * @param {Record<string, string|number>} [params]
  * @returns {string}
  */
-export function t(cle, params = {}) {
-  let valeur = chercher(catalogues[langue], cle) ?? chercher(catalogues[REPLI], cle);
-  if (valeur == null) {
-    console.warn(`Texte manquant : ${cle}`);
-    return cle;
+export function t(key, params = {}) {
+  let value = lookup(catalogs[language], key) ?? lookup(catalogs[FALLBACK], key);
+  if (value == null) {
+    console.warn(`Missing text: ${key}`);
+    return key;
   }
-  if (typeof valeur === 'object') {
+  if (typeof value === 'object') {
     const n = typeof params.n === 'number' ? params.n : 0;
-    valeur = valeur[pluriels.select(n)] ?? valeur.other;
+    value = value[plurals.select(n)] ?? value.other;
   }
-  return String(valeur).replace(/\{(\w+)\}/g, (tout, nom) => {
-    if (!(nom in params)) return tout;
-    const v = params[nom];
-    return typeof v === 'number' ? nombres.format(v) : v;
+  return String(value).replace(/\{(\w+)\}/g, (whole, name) => {
+    if (!(name in params)) return whole;
+    const v = params[name];
+    return typeof v === 'number' ? numbers.format(v) : v;
   });
 }
 
 /**
- * Texte traduit facultatif : undefined si la clé n'existe pas (ex. un mode de
- * plongée inconnu, affiché alors tel que le cœur le donne).
- * @param {string} cle
+ * Optional translated text: undefined when the key does not exist (e.g. an
+ * unknown dive mode, then shown as the core gives it).
+ * @param {string} key
  */
-export function tSiExiste(cle) {
-  const valeur = chercher(catalogues[langue], cle) ?? chercher(catalogues[REPLI], cle);
-  return typeof valeur === 'string' ? valeur : undefined;
+export function tIfExists(key) {
+  const value = lookup(catalogs[language], key) ?? lookup(catalogs[FALLBACK], key);
+  return typeof value === 'string' ? value : undefined;
 }
 
-if (typeof document !== 'undefined') document.documentElement.lang = langue;
+if (typeof document !== 'undefined') document.documentElement.lang = language;

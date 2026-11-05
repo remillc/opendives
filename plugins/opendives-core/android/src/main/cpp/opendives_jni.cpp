@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0
-// Pont JNI entre le plugin Kotlin et la façade C++.
+// JNI bridge between the Kotlin plugin and the C++ façade.
 #include "core/libopendives/opendives.h"
 
 #include <jni.h>
@@ -26,10 +26,10 @@ extern "C" {
 JNIEXPORT void JNICALL
 Java_org_opendives_core_NativeCore_init(JNIEnv *env, jobject, jstring home)
 {
-	// libgit2 et le cœur cherchent leur configuration sous $HOME.
+	// libgit2 and the core look for their configuration under $HOME.
 	setenv("HOME", to_string(env, home).c_str(), 1);
 	if (opendives::init())
-		throw_core_error(env, "Initialisation de libgit2 impossible");
+		throw_core_error(env, "Cannot initialize libgit2");
 }
 
 JNIEXPORT jboolean JNICALL
@@ -52,7 +52,7 @@ JNIEXPORT void JNICALL
 Java_org_opendives_core_NativeCore_setCaFile(JNIEnv *env, jobject, jstring path)
 {
 	if (opendives::set_ca_file(to_string(env, path)))
-		throw_core_error(env, "Autorités de certification refusées par libgit2");
+		throw_core_error(env, "Certificate authorities rejected by libgit2");
 }
 
 JNIEXPORT jstring JNICALL

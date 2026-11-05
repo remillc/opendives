@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0
-// Essai de la façade sur le poste de développement, sans téléphone.
-// usage: facade import <fichier> <chemin[branche]>
-//        facade list <chemin[branche]>
+// Exercises the façade on the development machine, without a phone.
+// usage: facade import <file> <path[branch]>
+//        facade list <path[branch]>
+//        facade dive <log> <number>
 #include "core/libopendives/opendives.h"
 #include <cstdio>
 #include <cstdlib>
@@ -31,7 +32,7 @@ int main(int argc, char **argv)
 		return 0;
 	}
 	if (argc == 4 && !strcmp(argv[1], "dive")) {
-		// dive <carnet> <numéro> : détail de la plongée portant ce numéro.
+		// dive <log> <number>: detail of the dive with this number.
 		if (opendives::list_dives(argv[2], json, error)) {
 			fprintf(stderr, "%s\n", error.c_str());
 			return 1;
@@ -40,7 +41,7 @@ int main(int argc, char **argv)
 		size_t pos = json.find(key);
 		size_t id_pos = pos == std::string::npos ? pos : json.rfind("{\"id\":", pos);
 		if (id_pos == std::string::npos) {
-			fprintf(stderr, "numéro introuvable\n");
+			fprintf(stderr, "dive number not found\n");
 			return 1;
 		}
 		int id = atoi(json.c_str() + id_pos + 6);
@@ -54,6 +55,6 @@ int main(int argc, char **argv)
 		printf("%s\n", json.c_str());
 		return 0;
 	}
-	fprintf(stderr, "usage: %s import <fichier> <dépôt[branche]> | list <dépôt[branche]> | dive <carnet> <numéro>\n", argv[0]);
+	fprintf(stderr, "usage: %s import <file> <repo[branch]> | list <repo[branch]> | dive <log> <number>\n", argv[0]);
 	return 2;
 }

@@ -1,19 +1,19 @@
 // SPDX-License-Identifier: GPL-2.0
-// OpenDives — requête HTTPS fournie par la plateforme (remplace QNetworkAccessManager).
-// Le certificat du serveur DOIT être validé (chaîne de confiance et nom d'hôte).
+// OpenDives — HTTPS request provided by the platform (replaces QNetworkAccessManager).
+// The server certificate MUST be validated (trust chain and host name).
 #ifndef OPENDIVES_PLATFORM_HTTPS_H
 #define OPENDIVES_PLATFORM_HTTPS_H
 
 #include <string>
 
-// GET sur `url` (https:// seulement). Renvoie 0 si une réponse HTTP a été reçue
-// sur une connexion TLS valide ; `status` et `body` sont alors remplis.
-// Renvoie une valeur négative en cas d'échec réseau, TLS ou de délai dépassé.
+// GET on `url` (https:// only). Returns 0 if an HTTP response was received
+// over a valid TLS connection; `status` and `body` are then filled in.
+// Returns a negative value on network failure, TLS failure or timeout.
 int opendives_https_get(const std::string &url, const std::string &user_agent,
 			int timeout_seconds, int &status, std::string &body);
 
-// Fichier PEM des autorités de confiance. Vide : magasin par défaut du système
-// (Linux). Android n'en a pas de lisible par OpenSSL : l'app en fournit un.
+// PEM file of trusted certificate authorities. Empty: the system default store
+// (Linux). Android has none that OpenSSL can read: the app provides one.
 void opendives_https_set_ca_file(const std::string &path);
 
 #endif

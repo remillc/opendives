@@ -44,7 +44,7 @@ static void append_json_string(std::string &out, const std::string &s)
 	out += '"';
 }
 
-// Le cœur garde l'heure locale de la plongée dans un timestamp_t, sans fuseau.
+// The core keeps the dive's local time in a timestamp_t, without a time zone.
 static std::string iso_date(timestamp_t when)
 {
 	time_t t = static_cast<time_t>(when);
@@ -65,14 +65,14 @@ static int load(const std::string &path, std::string &error)
 	divelog.clear();
 	int ret = parse_file(path.c_str(), &divelog);
 	if (ret) {
-		error = "Lecture impossible de " + path + " (" + std::to_string(ret) + ")";
+		error = "Cannot read " + path + " (" + std::to_string(ret) + ")";
 		return -1;
 	}
 	return 0;
 }
 
-// Port de QMLManager::consumeFinishedLoad() (mobile-widgets/qmlmanager.cpp),
-// sans la partie interface.
+// Port of QMLManager::consumeFinishedLoad() (mobile-widgets/qmlmanager.cpp),
+// without the UI part.
 void apply_log_prefs()
 {
 	/* Only apply unit system when the loaded file contained a "units" line.
@@ -112,12 +112,12 @@ int import_file(const std::string &source, const std::string &repo, std::string 
 	if (load(source, error))
 		return -1;
 	if (!log_exists(repo) && git_create_local_repo(repo)) {
-		error = "Création impossible du dépôt " + repo;
+		error = "Cannot create repository " + repo;
 		return -1;
 	}
 	int ret = save_dives(repo.c_str(), true);
 	if (ret) {
-		error = "Enregistrement impossible dans " + repo + " (" + std::to_string(ret) + ")";
+		error = "Cannot save to " + repo + " (" + std::to_string(ret) + ")";
 		return -1;
 	}
 	return static_cast<int>(divelog.dives.size());
@@ -135,9 +135,9 @@ static void append_json_array(std::string &out, const std::vector<T> &values)
 	out += ']';
 }
 
-// Miniature : environ `points` couples (temps s, profondeur mm) tirés des
-// échantillons du premier ordinateur. Dans chaque tranche de temps, on garde
-// l'échantillon le plus profond, pour conserver la forme du profil.
+// Thumbnail: about `points` pairs (time s, depth mm) taken from the samples
+// of the first dive computer. In each time slice, the deepest sample is kept,
+// to preserve the shape of the profile.
 static std::vector<int> profile_summary(const struct dive &d, size_t points = 40)
 {
 	std::vector<int> out;
@@ -215,7 +215,7 @@ static std::string dives_json()
 
 static void append_names(std::string &json, const std::string &list)
 {
-	// Subsurface sépare les compagnons et guides par des virgules.
+	// Subsurface separates buddies and guides with commas.
 	json += '[';
 	bool first = true;
 	size_t start = 0;
@@ -240,7 +240,7 @@ int get_dive(int id, std::string &json, std::string &error)
 {
 	const struct dive *d = divelog.dives.get_by_uniq_id(id);
 	if (!d) {
-		error = "Plongée introuvable";
+		error = "Dive not found";
 		return -1;
 	}
 	const struct divecomputer *dc = d->get_dc(0);
@@ -322,7 +322,7 @@ int get_dive(int id, std::string &json, std::string &error)
 	}
 	json += ']';
 
-	// Profil calculé par le cœur (profile.cpp), comme le dessine Subsurface.
+	// Profile computed by the core (profile.cpp), as Subsurface draws it.
 	std::vector<int> t, depth, ceiling, ppo2, cylinder;
 	bool has_ceiling = false;
 	if (dc) {
@@ -391,14 +391,14 @@ int cloud_list_dives(const std::string &email, const std::string &password, std:
 	std::string url, head;
 	bool exists = false;
 	if (cloud_configure(email, password, url)) {
-		error = "Identifiants du cloud incomplets";
+		error = "Incomplete cloud credentials";
 		return -1;
 	}
 	bool offline = false;
 	std::string probe_error;
 	if (cloud_branch_status(url, exists, head, probe_error)) {
-		// Serveur injoignable : on lit la copie locale, si elle existe, sans
-		// synchroniser (comme Subsurface hors ligne).
+		// Server unreachable: read the local copy, if there is one, without
+		// syncing (like Subsurface when offline).
 		struct git_info info;
 		if (!is_git_repository(url.c_str(), &info) || !log_exists(info.localdir)) {
 			error = probe_error;
@@ -406,8 +406,8 @@ int cloud_list_dives(const std::string &email, const std::string &password, std:
 		}
 		offline = true;
 	} else if (!exists) {
-		// Le cœur créerait la branche en poussant un commit vide : on s'arrête.
-		error = "Aucun carnet sur le serveur pour ce compte";
+		// The core would create the branch by pushing an empty commit: stop here.
+		error = "No dive log on the server for this account";
 		return -1;
 	}
 	bool was_local_only = git_local_only;
@@ -448,7 +448,7 @@ int cloud_configure(const std::string &email, const std::string &password, std::
 	return 0;
 }
 
-// Une seule tentative : un mauvais mot de passe ne doit pas être répété.
+// A single attempt: a wrong password must not be retried.
 static int probe_credentials(git_credential **out, const char *, const char *, unsigned int, void *payload)
 {
 	int *attempts = static_cast<int *>(payload);
@@ -464,7 +464,7 @@ int cloud_branch_status(const std::string &url, bool &exists, std::string &head,
 	head.clear();
 	size_t open = url.rfind('[');
 	if (open == std::string::npos || url.back() != ']') {
-		error = "Adresse de carnet invalide";
+		error = "Invalid dive log address";
 		return -1;
 	}
 	std::string remote_url = url.substr(0, open);
@@ -479,7 +479,7 @@ int cloud_branch_status(const std::string &url, bool &exists, std::string &head,
 	git_remote_callbacks callbacks = GIT_REMOTE_CALLBACKS_INIT;
 	callbacks.credentials = probe_credentials;
 	callbacks.payload = &attempts;
-	// Pas de certificate_check : libgit2 applique sa validation normale.
+	// No certificate_check: libgit2 applies its normal validation.
 	int ret = git_remote_connect(remote, GIT_DIRECTION_FETCH, &callbacks, nullptr, nullptr);
 	if (ret == 0) {
 		const git_remote_head **heads = nullptr;
@@ -496,8 +496,8 @@ int cloud_branch_status(const std::string &url, bool &exists, std::string &head,
 		git_remote_disconnect(remote);
 	}
 	if (ret) {
-		error = attempts > 1 ? "Identifiants refusés par le serveur"
-				     : (git_error_last() ? git_error_last()->message : "Connexion impossible");
+		error = attempts > 1 ? "Credentials rejected by the server"
+				     : (git_error_last() ? git_error_last()->message : "Cannot connect");
 	}
 	git_remote_free(remote);
 	return ret ? -1 : 0;

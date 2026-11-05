@@ -1,12 +1,12 @@
 #!/bin/bash
-# Compile libopendives.so pour Android et prépare ce que Gradle embarque :
+# Builds libopendives.so for Android and prepares what Gradle bundles:
 #   build/android/jniLibs/<abi>/libopendives.so
 #   build/android/assets/SampleDivesV2.ssrf
-# usage: native/build-android.sh [abi...]     (par défaut : arm64-v8a x86_64)
+# usage: native/build-android.sh [abi...]     (default: arm64-v8a x86_64)
 set -euo pipefail
 source "$(dirname "$0")/env.sh"
 ABIS=${*:-$ALL_ABIS}
-[ -f "$TOOLCHAIN_FILE" ] || { echo "NDK introuvable : lancez native/install-ndk.sh"; exit 1; }
+[ -f "$TOOLCHAIN_FILE" ] || { echo "NDK not found: run native/install-ndk.sh"; exit 1; }
 "$ROOT/native/build-deps.sh" $ABIS
 
 for ABI in $ABIS; do

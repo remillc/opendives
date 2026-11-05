@@ -1,17 +1,17 @@
 // @ts-check
-// Formats et unités (docs/specification-interface.md, section 2).
-// Les valeurs arrivent du cœur en unités SI entières ; la conversion se fait
-// ici, au moment de l'affichage, jamais dans les données.
+// Formats and units (docs/specification-interface.md, section 2).
+// Values come from the core in integer SI units; conversion happens here, at
+// display time, never in the data.
 
 import { t } from './i18n.js';
 
 /** @typedef {import('opendives-core').Prefs} Prefs */
 
-/** Langue de l'appareil ; les formats en découlent (virgule décimale en français). */
+/** Device language; formats follow it (decimal comma in French). */
 export const locale = typeof navigator !== 'undefined' ? navigator.language : 'fr';
 
-const NBSP = ' '; // espace insécable avant les unités
-const fr = locale.toLowerCase().startsWith('fr');
+const NBSP = ' '; // non-breaking space before units
+const isFrench = locale.toLowerCase().startsWith('fr');
 /** @type {Map<string, Intl.NumberFormat>} */
 const formats = new Map();
 
@@ -38,7 +38,7 @@ export function formatNumber(value, decimals = 0) {
 export const defaultPrefs = { length: 'm', temperature: 'C', pressure: 'bar', volume: 'l', weight: 'kg' };
 
 /**
- * Profondeur : 1 décimale en mètres, entier en pieds.
+ * Depth: 1 decimal in meters, integer in feet.
  * @param {number} mm
  * @param {Prefs} prefs
  */
@@ -48,7 +48,7 @@ export function depthValue(mm, prefs) {
 
 /** @param {Prefs} prefs */
 export function depthUnit(prefs) {
-  return prefs.length === 'ft' ? t('unites.pieds') : t('unites.metres');
+  return prefs.length === 'ft' ? t('units.feet') : t('units.meters');
 }
 
 /**
@@ -59,19 +59,19 @@ export function formatDepth(mm, prefs) {
   return `${depthValue(mm, prefs)}${NBSP}${depthUnit(prefs)}`;
 }
 
-/** Durée de plongée : minutes entières. @param {number} seconds */
+/** Dive duration: whole minutes. @param {number} seconds */
 export function formatDuration(seconds) {
-  return `${formatNumber(Math.round(seconds / 60), 0)}${NBSP}${t('unites.minutes')}`;
+  return `${formatNumber(Math.round(seconds / 60), 0)}${NBSP}${t('units.minutes')}`;
 }
 
-/** Temps dans le profil : min:s. @param {number} seconds */
+/** Time in the profile: min:s. @param {number} seconds */
 export function formatMinSec(seconds) {
   const s = Math.max(0, Math.round(seconds));
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 }
 
 /**
- * Température : 1 décimale. 0 mK signifie « inconnue » dans le cœur.
+ * Temperature: 1 decimal. 0 mK means "unknown" in the core.
  * @param {number} mk
  * @param {Prefs} prefs
  * @returns {string|null}
@@ -80,35 +80,35 @@ export function formatTemperature(mk, prefs) {
   if (!mk) return null;
   const c = (mk - 273150) / 1000;
   return prefs.temperature === 'F'
-    ? `${formatNumber(c * 9 / 5 + 32, 1)}${NBSP}${t('unites.fahrenheit')}`
-    : `${formatNumber(c, 1)}${NBSP}${t('unites.celsius')}`;
+    ? `${formatNumber(c * 9 / 5 + 32, 1)}${NBSP}${t('units.fahrenheit')}`
+    : `${formatNumber(c, 1)}${NBSP}${t('units.celsius')}`;
 }
 
 /**
- * Pression : entier.
+ * Pressure: integer.
  * @param {number} mbar
  * @param {Prefs} prefs
  */
 export function formatPressure(mbar, prefs) {
   return prefs.pressure === 'psi'
-    ? `${formatNumber(mbar / 68.947572932, 0)}${NBSP}${t('unites.psi')}`
-    : `${formatNumber(mbar / 1000, 0)}${NBSP}${t('unites.bar')}`;
+    ? `${formatNumber(mbar / 68.947572932, 0)}${NBSP}${t('units.psi')}`
+    : `${formatNumber(mbar / 1000, 0)}${NBSP}${t('units.bar')}`;
 }
 
 /**
- * Consommation (SAC) : 1 décimale, par minute.
+ * Gas consumption (SAC): 1 decimal, per minute.
  * @param {number} mlPerMin
  * @param {Prefs} prefs
  */
 export function formatSac(mlPerMin, prefs) {
   return prefs.volume === 'cuft'
-    ? `${formatNumber(mlPerMin / 28316.8466, 1)}${NBSP}${t('unites.piedsCubesMinute')}`
-    : `${formatNumber(mlPerMin / 1000, 1)}${NBSP}${t('unites.litresMinute')}`;
+    ? `${formatNumber(mlPerMin / 28316.8466, 1)}${NBSP}${t('units.cubicFeetPerMinute')}`
+    : `${formatNumber(mlPerMin / 1000, 1)}${NBSP}${t('units.litersPerMinute')}`;
 }
 
 /**
- * Volume d'une bouteille : 1 décimale. En pieds cubes, comme Subsurface, le
- * volume de gaz à la pression de service.
+ * Cylinder size: 1 decimal. In cubic feet, like Subsurface, the gas volume at
+ * working pressure.
  * @param {number} ml
  * @param {number} workingPressureMbar
  * @param {Prefs} prefs
@@ -118,18 +118,18 @@ export function formatCylinderSize(ml, workingPressureMbar, prefs) {
   if (!ml) return null;
   if (prefs.volume === 'cuft') {
     if (!workingPressureMbar) return null;
-    return `${formatNumber((ml / 28316.8466) * (workingPressureMbar / 1013.25), 1)}${NBSP}${t('unites.piedsCubes')}`;
+    return `${formatNumber((ml / 28316.8466) * (workingPressureMbar / 1013.25), 1)}${NBSP}${t('units.cubicFeet')}`;
   }
-  return `${formatNumber(ml / 1000, 1)}${NBSP}${t('unites.litres')}`;
+  return `${formatNumber(ml / 1000, 1)}${NBSP}${t('units.liters')}`;
 }
 
-/** Pourcentage depuis un pour mille. @param {number} permille */
+/** Percentage from a per-mille value. @param {number} permille */
 export function formatPercent(permille) {
-  return `${formatNumber(permille / 10, 0)}${NBSP}${t('unites.pourcent')}`;
+  return `${formatNumber(permille / 10, 0)}${NBSP}${t('units.percent')}`;
 }
 
-// Le cœur donne l'heure locale de la plongée, sans fuseau : on la lit et on
-// l'affiche en UTC pour qu'elle ne soit jamais décalée.
+// The core gives the dive's local time without a time zone: it is read and
+// shown in UTC so that it is never shifted.
 const dateTimeFormat = new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeStyle: 'short', timeZone: 'UTC' });
 const longDateFormat = new Intl.DateTimeFormat(locale, { dateStyle: 'long', timeZone: 'UTC' });
 const fullFormat = new Intl.DateTimeFormat(locale, { dateStyle: 'full', timeStyle: 'short', timeZone: 'UTC' });
@@ -139,22 +139,26 @@ function toDate(iso) {
   return new Date(`${iso}Z`);
 }
 
-/** Date et heure courtes, pour une ligne de liste. @param {string} iso */
+/** Short date and time, for a list row. @param {string} iso */
 export function formatDateTime(iso) {
   return dateTimeFormat.format(toDate(iso));
 }
 
-/** Date longue, sans l'heure : « 2 février 2013 », « 1er juillet 2016 ». @param {string} iso */
+/** Long date without the time: "2 février 2013", "1er juillet 2016". @param {string} iso */
 export function formatLongDate(iso) {
-  return premier(longDateFormat.format(toDate(iso)));
+  return firstOfMonth(longDateFormat.format(toDate(iso)));
 }
 
-/** Intl écrit « 1 juillet » ; l'usage français est « 1er juillet » (dates au format de l'appareil). @param {string} texte */
-function premier(texte) {
-  return fr ? texte.replace(/(^|\s)1 (?=\p{L})/u, '$11er ') : texte;
+/**
+ * Intl writes "1 juillet"; French usage is "1er juillet" (dates follow the
+ * device format).
+ * @param {string} text
+ */
+function firstOfMonth(text) {
+  return isFrench ? text.replace(/(^|\s)1 (?=\p{L})/u, '$11er ') : text;
 }
 
-/** Date complète, pour le détail. @param {string} iso */
+/** Full date, for the dive detail. @param {string} iso */
 export function formatFullDate(iso) {
-  return premier(fullFormat.format(toDate(iso)));
+  return firstOfMonth(fullFormat.format(toDate(iso)));
 }

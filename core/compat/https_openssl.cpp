@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
-// OpenDives — opendives_https_get() avec OpenSSL (Linux et Android).
-// Validation complète : autorités de confiance, chaîne et nom d'hôte.
+// OpenDives — opendives_https_get() with OpenSSL (Linux and Android).
+// Full validation: trusted authorities, chain and host name.
 #include "platform_https.h"
 
 #include <openssl/err.h>

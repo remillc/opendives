@@ -1,52 +1,52 @@
 /*
- * Feuille de style d'OpenDives (docs/specification-interface.md, section 1).
+ * OpenDives style sheet (docs/specification-interface.md, section 1).
  *
- * Couches, de la plus faible à la plus forte :
- *   framework7     le CSS de Framework7, importé ici et non dans main.js ;
- *   od.jetons      les couleurs d'OpenDives (--od-*), déclarées une seule fois ;
- *   od.base        les règles communes aux écrans ;
- *   od.composants  les styles des composants Svelte (chacun dans cette couche).
- * Une couche plus forte l'emporte quelle que soit la spécificité des sélecteurs.
+ * Layers, from weakest to strongest:
+ *   framework7     Framework7's CSS, imported here and not in main.js;
+ *   od.tokens      OpenDives colors (--od-*), each declared once;
+ *   od.base        rules shared by the screens;
+ *   od.components  styles of the Svelte components (each in this layer).
+ * A stronger layer wins whatever the specificity of the selectors.
  */
-@layer framework7, od.jetons, od.base, od.composants;
+@layer framework7, od.tokens, od.base, od.components;
 
 @import 'framework7/css/bundle' layer(framework7);
 
-@layer od.jetons {
+@layer od.tokens {
   :root {
-    --od-sapin: #1E4D3A;
-    --od-sapin-clair: #BFD9CB;
-    --od-mandarine: #F06A1D;
-    --od-sur-mandarine: #1A1A1A;
-    --od-teinte: #DDEBE3;
-    --od-sur-teinte: #153829;
-    --od-alarme: #C62828;
-    --od-oxygene: #2E7D32;
-    --od-attente: #8A4B00;
-    --od-trace-profil: #1E4D3A;
+    --od-pine: #1E4D3A;
+    --od-pine-light: #BFD9CB;
+    --od-tangerine: #F06A1D;
+    --od-on-tangerine: #1A1A1A;
+    --od-tint: #DDEBE3;
+    --od-on-tint: #153829;
+    --od-alarm: #C62828;
+    --od-oxygen: #2E7D32;
+    --od-pending: #8A4B00;
+    --od-profile-trace: #1E4D3A;
   }
 
   .dark {
-    --od-sapin: #8FCFAE;
-    --od-sapin-clair: #BFD9CB;
-    --od-mandarine: #F06A1D;
-    --od-sur-mandarine: #1A1A1A;
-    --od-teinte: #173528;
-    --od-sur-teinte: #CDEBDB;
-    /* À trancher dans la spécification : valeurs claires conservées en attendant. */
-    --od-alarme: #C62828;
-    --od-attente: #8A4B00;
-    --od-oxygene: #7FD283;
-    --od-trace-profil: #EAF5EF;
+    --od-pine: #8FCFAE;
+    --od-pine-light: #BFD9CB;
+    --od-tangerine: #F06A1D;
+    --od-on-tangerine: #1A1A1A;
+    --od-tint: #173528;
+    --od-on-tint: #CDEBDB;
+    /* To be decided in the spec: light values kept meanwhile. */
+    --od-alarm: #C62828;
+    --od-pending: #8A4B00;
+    --od-oxygen: #7FD283;
+    --od-profile-trace: #EAF5EF;
   }
 }
 
 /*
- * HORS COUCHE, volontairement. Framework7 injecte au démarrage une feuille sans
- * couche (« :root », « .dark », « .md », « .ios ») calculée depuis
- * colors.primary. Une règle placée dans une couche perdrait toujours contre
- * elle ; hors couche, ces sélecteurs plus précis l'emportent.
- * Couleur principale imposée par la spécification ; fonds crème en clair.
+ * NOT IN A LAYER, on purpose. At startup Framework7 injects an unlayered
+ * style sheet (":root", ".dark", ".md", ".ios") computed from colors.primary.
+ * A rule inside a layer would always lose against it; unlayered, these more
+ * specific selectors win.
+ * Primary color required by the spec; cream backgrounds in light mode.
  */
 html.md {
   &:not(.dark) {
@@ -58,12 +58,12 @@ html.md {
     --f7-md-surface-variant: #EAE4D8;
     --f7-md-outline-variant: #E2DACB;
     --f7-list-item-border-color: var(--f7-md-outline-variant);
-    --od-fond-miniature: var(--f7-md-surface-variant);
+    --od-thumbnail-background: var(--f7-md-surface-variant);
   }
 
   &.dark {
     --f7-md-primary: #8FCFAE;
-    --od-fond-miniature: var(--f7-md-surface-variant);
+    --od-thumbnail-background: var(--f7-md-surface-variant);
   }
 }
 
@@ -76,40 +76,40 @@ html.ios {
     --f7-bars-bg-color: #FBF7F0;
     --f7-list-item-border-color: #EAE3D6;
     --f7-list-outline-border-color: #DDD5C7;
-    --od-fond-miniature: #F7F2E8;
+    --od-thumbnail-background: #F7F2E8;
   }
 
   &.dark {
     --f7-ios-primary: #8FCFAE;
-    --od-fond-miniature: #1C1C1E;
+    --od-thumbnail-background: #1C1C1E;
   }
 }
 
 @layer od.base {
-  /* Section 2 : chiffres tabulaires pour toute valeur de plongée. */
-  .od-valeur {
+  /* Spec, section 2: tabular figures for every dive value. */
+  .od-value {
     font-variant-numeric: tabular-nums;
   }
 
-  /* Action principale d'un écran : mandarine, texte foncé (5,6:1), une fois par écran au plus. */
-  .button.od-bouton-principal {
-    --f7-button-fill-bg-color: var(--od-mandarine);
-    --f7-button-fill-text-color: var(--od-sur-mandarine);
-    --f7-button-fill-pressed-bg-color: var(--od-mandarine);
+  /* Main action of a screen: tangerine, dark text (5.6:1), at most once per screen. */
+  .button.od-primary-action {
+    --f7-button-fill-bg-color: var(--od-tangerine);
+    --f7-button-fill-text-color: var(--od-on-tangerine);
+    --f7-button-fill-pressed-bg-color: var(--od-tangerine);
   }
 
-  /* Bouton « + » sur Android : bouton d'action flottant en secondary-container. */
-  .md .od-fab-ajouter {
+  /* "+" button on Android: floating action button in secondary-container. */
+  .md .od-fab-add {
     --f7-fab-bg-color: var(--f7-md-secondary-container);
     --f7-fab-text-color: var(--f7-md-on-secondary-container);
   }
 
   /*
-   * Les icônes de Framework7 sont des ligatures de police insérées par CSS :
-   * sans texte de remplacement vide, TalkBack et VoiceOver liraient
-   * « chevron_right » ou « search_md ».
+   * Framework7 icons are font ligatures inserted by CSS: without an empty
+   * alternative text, TalkBack and VoiceOver would read "chevron_right" or
+   * "search_md".
    */
-  /* Framework7 place le chevron sur item-inner, ou sur item-title-row dans une liste média. */
+  /* Framework7 puts the chevron on item-inner, or on item-title-row in a media list. */
   .list:not(.media-list) .item-link .item-inner::before,
   .media-list .item-link .item-title-row::before {
     content: var(--f7-list-chevron-icon-right) / '';
@@ -128,8 +128,8 @@ html.ios {
     .input-clear-button::after { content: 'delete_round_ios' / ''; }
   }
 
-  /* Texte réservé aux lecteurs d'écran. */
-  .od-lecteur {
+  /* Text for screen readers only. */
+  .od-sr-only {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -138,8 +138,8 @@ html.ios {
     white-space: nowrap;
   }
 
-  /* Le bouton flottant ne doit pas masquer la dernière ligne du carnet. */
-  .md .page:has(.od-fab-ajouter) .list:last-of-type {
+  /* The floating button must not hide the last row of the logbook. */
+  .md .page:has(.od-fab-add) .list:last-of-type {
     margin-bottom: 96px;
   }
 

@@ -1,44 +1,44 @@
-# Preuve de concept : le cœur de Subsurface sans Qt
+# Proof of concept: the Subsurface core without Qt
 
-**But :** vérifier qu'OpenDives peut réutiliser le code métier de Subsurface tel quel, sans en modifier une ligne, pour lire et écrire le carnet de plongée au format git du cloud Subsurface.
+**Goal:** check that OpenDives can reuse Subsurface's business code as is, without changing a single line, to read and write the dive log in the Subsurface cloud git format.
 
-**Résultat (5 novembre 2026) :** le cœur se compile et le test d'aller-retour passe sur 97 des 98 carnets d'exemple de Subsurface.
+**Result (5 November 2026):** the core builds and the round-trip test passes on 97 of Subsurface's 98 sample logs.
 
-## Ce qui est compilé
+## What is built
 
-- **Subsurface** au commit `258beb4` (4 novembre 2026). 72 fichiers de `core/`, dont `load-git`, `save-git`, `git-access`, `parse-xml`, `save-xml`, `filterconstraint` et `fulltext`. Aucune modification.
-- **libdivecomputer**, version Subsurface-NG au commit `617ffd7`, celui que Subsurface épingle lui-même. Compilé en bibliothèque statique, sans USB ni Bluetooth : les transports seront fournis par la couche Capacitor.
-- **`core/compat/`** : tout ce qu'OpenDives ajoute.
-  - `qtshim/` : de faux en-têtes Qt (`QString`, `QDateTime`, `QRegularExpression`…) en C++ standard. Ils couvrent seulement ce que le cœur utilise. Le stockage interne est en UTF-32, et seule la locale « C » est gérée.
-  - `shadow/commands/command.h` : il remplace l'en-tête de la pile d'annulation Qt, que `save-git.cpp` inclut pour rédiger le message de commit.
-  - `qthelper_compat.cpp` : il réécrit les fonctions de `qthelper.cpp`, `string-format.cpp`, `metadata.cpp`, etc.
-    - Celles qui touchent aux données sont portées à l'identique : coordonnées GPS et feuilles XSLT.
-    - Les autres sont réduites au minimum.
-  - `notifier_compat.cpp` : il fournit le notificateur Qt des sélections, sans effet ici.
-  - `gen/` : en-têtes de version générés.
+- **Subsurface** at commit `258beb4` (4 November 2026). 72 files from `core/`, including `load-git`, `save-git`, `git-access`, `parse-xml`, `save-xml`, `filterconstraint` and `fulltext`. No modifications.
+- **libdivecomputer**, Subsurface-NG version at commit `617ffd7`, the one Subsurface pins itself. Built as a static library, without USB or Bluetooth: transports will be provided by the Capacitor layer.
+- **`core/compat/`**: everything OpenDives adds.
+  - `qtshim/`: fake Qt headers (`QString`, `QDateTime`, `QRegularExpression`…) in standard C++. They cover only what the core uses. Internal storage is UTF-32, and only the "C" locale is supported.
+  - `shadow/commands/command.h`: it replaces the header of the Qt undo stack, which `save-git.cpp` includes to write the commit message.
+  - `qthelper_compat.cpp`: it rewrites the functions of `qthelper.cpp`, `string-format.cpp`, `metadata.cpp`, etc.
+    - Those that affect data are ported faithfully: GPS coordinates and XSLT stylesheets.
+    - The others are kept to a minimum.
+  - `notifier_compat.cpp`: it provides the Qt selection notifier, with no effect here.
+  - `gen/`: generated version headers.
 
-## Le test
+## The test
 
-`tests/run-roundtrip.sh` fait passer chaque carnet d'exemple (`dives/*.xml`, `*.ssrf`) par les étapes suivantes :
+`tests/run-roundtrip.sh` runs each sample log (`dives/*.xml`, `*.ssrf`) through the following steps:
 
-1. Import du carnet vers un dépôt git A.
-2. Copie de A vers un nouveau dépôt B. Les écarts entre A et B sont **listés**, sans faire échouer le test.
-3. Copie de B vers un nouveau dépôt C. **Strict** : l'arbre git de C doit être identique, octet pour octet, à celui de B.
-4. Nouvel enregistrement de B par-dessus lui-même. **Strict** : l'arbre ne doit pas changer.
-5. Export de B et de C en XML. **Strict** : les deux fichiers doivent être identiques.
+1. Import of the log into a git repository A.
+2. Copy of A into a new repository B. Differences between A and B are **listed**, without failing the test.
+3. Copy of B into a new repository C. **Strict**: the git tree of C must be identical, byte for byte, to that of B.
+4. B saved again on top of itself. **Strict**: the tree must not change.
+5. Export of B and C to XML. **Strict**: the two files must be identical.
 
-Les écarts de l'étape 2 viennent du code de Subsurface, pas du POC :
+The differences in step 2 come from Subsurface's code, not from the POC:
 
-- **`deviceid`**, sur 23 carnets. `load-git.cpp` (`parse_dc_deviceid`) lit cette ligne comme une donnée obsolète et ne la garde pas.
-- **`meandepth`**, sur 18 carnets, de l'ordre de 1 à 2 mm. Le chargement depuis git recalcule la profondeur moyenne à partir des échantillons (`fixup_dc_duration`).
+- **`deviceid`**, in 23 logs. `load-git.cpp` (`parse_dc_deviceid`) reads this line as obsolete data and does not keep it.
+- **`meandepth`**, in 18 logs, on the order of 1 to 2 mm. Loading from git recomputes the mean depth from the samples (`fixup_dc_duration`).
 
-Ces deux écarts ont été repérés en lisant le code de Subsurface. Ils n'ont pas été comparés avec l'application Subsurface officielle, qui n'a pas été compilée ici.
+These two differences were found by reading Subsurface's code. They were not compared with the official Subsurface application, which was not built here.
 
-**Seul échec :** `TestDiveSeabearNewFormat.xml`. Ce fichier contient des paires de plongées qui portent le même numéro et la même heure de départ. À chaque enregistrement, leur ordre s'inverse, donc l'arbre git change. Aucune donnée n'est perdue. Ce cas limite vient du tri de Subsurface ; il est à surveiller, mais il ne bloque rien.
+**Only failure:** `TestDiveSeabearNewFormat.xml`. This file contains pairs of dives with the same number and the same start time. On every save, their order is reversed, so the git tree changes. No data is lost. This edge case comes from Subsurface's sorting; it should be watched, but it blocks nothing.
 
-## Reproduire
+## Reproduce
 
-Il faut Linux ou WSL. Les paquets nécessaires sont listés en tête de `poc/build.sh`.
+Linux or WSL is required. The required packages are listed at the top of `poc/build.sh`.
 
 ```sh
 git submodule update --init --recursive
@@ -46,51 +46,51 @@ poc/build.sh                      # → build/poc/roundtrip  (≈ 1 min 30)
 tests/run-roundtrip.sh build/poc/roundtrip build/rt third_party/subsurface/dives/*.xml third_party/subsurface/dives/*.ssrf
 ```
 
-Les dépôts `A[main]`, `B[main]`, etc. sont des dépôts git locaux : ce test ne contacte pas le cloud.
+The repositories `A[main]`, `B[main]`, etc. are local git repositories: this test does not contact the cloud.
 
-## Cloud réel, en lecture seule (5 novembre 2026)
+## Real cloud, read-only (5 November 2026)
 
-**But :** lire avec le cœur de Subsurface un vrai carnet du cloud, écrit par Subsurface, puis le réécrire localement sans rien envoyer au serveur.
+**Goal:** read, with the Subsurface core, a real cloud log written by Subsurface, then rewrite it locally without sending anything to the server.
 
-**Résultat :** sur un compte de développement de 1 353 plongées, le carnet est cloné et chargé. La réécriture est identique, octet pour octet, sauf pour 2 plongées (voir plus bas). Le serveur n'a pas changé : sa tête est la même avant et après.
+**Result:** on a development account with 1,353 dives, the log is cloned and loaded. The rewrite is identical, byte for byte, except for 2 dives (see below). The server did not change: its head is the same before and after.
 
-**Ce qui a été ajouté :**
+**What was added:**
 
-- **`core/compat/cloud_compat.cpp` :** portage sans Qt de `canReachCloudServer()`.
-  - Même requête « make-latte » vers les serveurs, avec réponse 418 attendue.
-  - Même ordre des serveurs et mêmes effets sur `prefs` et `git_local_only`.
-  - S'y ajoute `getCloudURL()`.
-- **`platform_https.h` :** la requête HTTPS est fournie par la plateforme, avec un certificat obligatoirement validé.
-  - `https_openssl.cpp` : la version Linux.
-  - Android utilise aussi `https_openssl.cpp`, avec un fichier d'autorités fourni par l'app (voir `app/README.md`).
-- **Façade :**
-  - `cloud_branch_status()` est une sonde en lecture seule, avec la validation TLS normale de libgit2.
-  - `apply_log_prefs()` est le portage de `QMLManager::consumeFinishedLoad()`.
-- **`tests/cloud.cpp` et `tests/run-cloud-readonly.sh` :**
-  - Le test refuse de charger si la branche n'existe pas sur le serveur.
-  - Il ne travaille que sur des copies sans distant `origin`.
-  - Il vérifie que la tête du serveur n'a pas changé.
+- **`core/compat/cloud_compat.cpp`:** Qt-free port of `canReachCloudServer()`.
+  - Same "make-latte" request to the servers, with a 418 response expected.
+  - Same server order and same effects on `prefs` and `git_local_only`.
+  - `getCloudURL()` is added as well.
+- **`platform_https.h`:** the HTTPS request is provided by the platform, with a certificate that must be validated.
+  - `https_openssl.cpp`: the Linux version.
+  - Android also uses `https_openssl.cpp`, with an authorities file provided by the app (see `app/README.md`).
+- **Façade:**
+  - `cloud_branch_status()` is a read-only probe, with libgit2's normal TLS validation.
+  - `apply_log_prefs()` is the port of `QMLManager::consumeFinishedLoad()`.
+- **`tests/cloud.cpp` and `tests/run-cloud-readonly.sh`:**
+  - The test refuses to load if the branch does not exist on the server.
+  - It only works on copies without an `origin` remote.
+  - It checks that the server head has not changed.
 
-**Ce qu'on a appris :**
+**What we learned:**
 
-- **Réglages du carnet :** les unités et les préférences de `00-Subsurface` sont lues dans `git_prefs`, mais `save-git` écrit `prefs`. Subsurface-mobile les recopie après chaque chargement. Sans cette étape, désormais dans `apply_log_prefs()`, le premier enregistrement aurait remplacé `units PERSONALIZE FEET CUFT PSI CELSIUS LBS MINUTES` par `units METRIC`. **L'app doit appeler `apply_log_prefs()` après chaque chargement.**
-- **Événements simultanés :** deux événements de même instant et de même nom sont jugés égaux (`divecomputer.cpp:337`). Comme `add_event_to_dc()` insère avec `lower_bound`, leur ordre s'inverse à chaque chargement, donc à chaque enregistrement. Deux plongées du compte ont deux `gaschange` à 0:10. Rien n'est perdu, mais leur fichier change à chaque sauvegarde, dans Subsurface comme dans OpenDives. Ce constat vient de la lecture du code, sans vérification avec l'application Subsurface.
-- **Bogue de Subsurface, `git-access.cpp:52` :** `includes_string_caseinsensitive()` renvoie vrai dès que les premiers caractères **diffèrent**. Presque tout échec de clone est alors traité comme « branche absente du serveur ». Le cœur crée un dépôt avec un commit vide, « Initial commit to create empty repo. », puis tente une synchronisation.
-  - Si la branche existe sur le serveur, il n'y a pas d'ancêtre commun : rien n'est poussé, et le cache est mis de côté.
-  - D'où la sonde préalable dans OpenDives.
-  - À signaler à Subsurface le jour où il y aura un contact.
-- **Certificats :** `certificate_check_cb()` accepte tout certificat X.509 pour les serveurs du cloud. Subsurface compte sur `canReachCloudServer()` pour avoir validé TLS juste avant. Notre portage valide bien le certificat, mais la connexion git elle-même reste sans validation, comme dans Subsurface.
-- **WSL :** libgit2 ne peut pas faire de `mmap` sur un disque Windows (`/mnt/c`, `/mnt/f`) : « failed to mmap. Could not write data ». Le dossier de travail du test doit être dans le système de fichiers de WSL.
+- **Log settings:** the units and preferences of `00-Subsurface` are read into `git_prefs`, but `save-git` writes `prefs`. Subsurface-mobile copies them over after every load. Without this step, now in `apply_log_prefs()`, the first save would have replaced `units PERSONALIZE FEET CUFT PSI CELSIUS LBS MINUTES` with `units METRIC`. **The app must call `apply_log_prefs()` after every load.**
+- **Simultaneous events:** two events at the same instant with the same name are considered equal (`divecomputer.cpp:337`). Since `add_event_to_dc()` inserts with `lower_bound`, their order is reversed on every load, and therefore on every save. Two dives of the account have two `gaschange` events at 0:10. Nothing is lost, but their file changes on every save, in Subsurface as in OpenDives. This finding comes from reading the code, without checking with the Subsurface application.
+- **Subsurface bug, `git-access.cpp:52`:** `includes_string_caseinsensitive()` returns true as soon as the first characters **differ**. Almost any clone failure is then treated as "branch missing on the server". The core creates a repository with an empty commit, "Initial commit to create empty repo.", then attempts a sync.
+  - If the branch exists on the server, there is no common ancestor: nothing is pushed, and the cache is set aside.
+  - Hence the prior probe in OpenDives.
+  - To be reported to Subsurface once there is a contact.
+- **Certificates:** `certificate_check_cb()` accepts any X.509 certificate for the cloud servers. Subsurface relies on `canReachCloudServer()` having validated TLS just before. Our port does validate the certificate, but the git connection itself remains without validation, as in Subsurface.
+- **WSL:** libgit2 cannot `mmap` on a Windows drive (`/mnt/c`, `/mnt/f`): "failed to mmap. Could not write data". The test's working directory must be on the WSL file system.
 
-**Reproduire.** Les identifiants sont dans un fichier hors du dépôt, avec `OPENDIVES_CLOUD_EMAIL=` et `OPENDIVES_CLOUD_PASSWORD=`. Le mot de passe n'est jamais affiché.
+**Reproduce.** The credentials are in a file outside the repository, with `OPENDIVES_CLOUD_EMAIL=` and `OPENDIVES_CLOUD_PASSWORD=`. The password is never displayed.
 
 ```sh
-tests/run-cloud-readonly.sh build/poc/cloud build/poc/roundtrip /mnt/c/Users/<vous>/.opendives/cloud-dev.env ~/opendives-cloud-rt
+tests/run-cloud-readonly.sh build/poc/cloud build/poc/roundtrip /mnt/c/Users/<you>/.opendives/cloud-dev.env ~/opendives-cloud-rt
 ```
 
-## Ce qui reste hors du POC
+## What remains outside the POC
 
 - iOS (Xcode).
-- L'envoi vers le cloud, c'est-à-dire l'enregistrement d'une modification puis la synchronisation.
-- Les imports qui dépendent encore de Qt : Suunto JSON et l'en-tête CSV Seabear, laissés vides ici.
-- Les traductions : `trGettext` renvoie le texte anglais.
+- Upload to the cloud, that is, saving a change and then syncing.
+- Imports that still depend on Qt: Suunto JSON and the Seabear CSV header, left empty here.
+- Translations: `trGettext` returns the English text.

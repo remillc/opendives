@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 package org.opendives.core
 
-/** Accès au cœur C++. Le cœur n'est pas réentrant : un seul fil doit l'appeler. */
+/** Access to the C++ core. The core is not reentrant: only one thread may call it. */
 internal object NativeCore {
     init {
         System.loadLibrary("opendives")

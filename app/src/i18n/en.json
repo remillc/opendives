@@ -1,111 +1,111 @@
 {
-  "onglets": {
-    "carnet": "Logbook",
+  "tabs": {
+    "logbook": "Logbook",
     "sites": "Sites",
-    "statistiques": "Statistics",
-    "statistiquesCourt": "Stats",
-    "outils": "Tools"
+    "statistics": "Statistics",
+    "statisticsShort": "Stats",
+    "tools": "Tools"
   },
-  "sections": {
-    "sitesPhrase": "The map and the list of dive sites will appear here.",
-    "statistiquesPhrase": "The logbook statistics will appear here.",
-    "outilsPhrase": "The gas calculator and the dive planner will appear here."
+  "placeholders": {
+    "sitesText": "The map and the list of dive sites will appear here.",
+    "statisticsText": "The logbook statistics will appear here.",
+    "toolsText": "The gas calculator and the dive planner will appear here."
   },
-  "carnet": {
-    "titre": "Logbook",
-    "rechercher": "Search",
-    "annuler": "Cancel",
-    "ajouter": "Add dives",
-    "ajouterTelecharger": "Download from dive computer",
-    "ajouterImporter": "Import a file",
-    "ajouterNoter": "Log a dive manually",
-    "chargement": "Loading the logbook",
-    "erreurTitre": "The logbook could not be read",
-    "erreurRien": "No dive was changed.",
-    "erreurVerifier": "Please check:",
-    "erreurInternet": "the device's Internet connection;",
-    "erreurEspace": "the free space on the device.",
-    "reessayer": "Try again",
-    "videTitre": "No dives yet",
-    "videPhrase": "Add your dives from your dive computer, from a file, or manually.",
-    "aucunResultat": "No dive matches “{recherche}”."
+  "logbook": {
+    "title": "Logbook",
+    "search": "Search",
+    "cancel": "Cancel",
+    "add": "Add dives",
+    "addDownload": "Download from dive computer",
+    "addImport": "Import a file",
+    "addManual": "Log a dive manually",
+    "loading": "Loading the logbook",
+    "errorTitle": "The logbook could not be read",
+    "errorNothingChanged": "No dive was changed.",
+    "errorCheck": "Please check:",
+    "errorInternet": "the device's Internet connection;",
+    "errorStorage": "the free space on the device.",
+    "retry": "Try again",
+    "emptyTitle": "No dives yet",
+    "emptyText": "Add your dives from your dive computer, from a file, or manually.",
+    "noResults": "No dive matches “{query}”."
   },
-  "synchro": {
+  "sync": {
     "cloud": "Synced with Subsurface cloud",
-    "horsLigne": "Offline: no changes waiting",
+    "offline": "Offline: no changes waiting",
     "local": "Logbook stored on this device only"
   },
-  "plongee": {
-    "siteAPreciser": "Dive site not set",
-    "lecteur": "{site}, {date}, max. depth {profondeur}, duration {duree}",
-    "lecteurSansProfondeur": "{site}, {date}, duration {duree}",
-    "miniature": "Profile, {profondeur} max. depth"
+  "dive": {
+    "siteNotSet": "Dive site not set",
+    "screenReader": "{site}, {date}, max. depth {depth}, duration {duration}",
+    "screenReaderNoDepth": "{site}, {date}, duration {duration}",
+    "thumbnail": "Profile, {depth} max. depth"
   },
-  "voyage": {
-    "du": "Trip starting {date}",
-    "plongees": { "one": "{n} dive", "other": "{n} dives" },
-    "resumeUne": "{plongees}, {profondeur}",
-    "resumeEcart": "{plongees}, {min} to {max}"
+  "trip": {
+    "startingOn": "Trip starting {date}",
+    "dives": { "one": "{n} dive", "other": "{n} dives" },
+    "summarySingle": "{dives}, {depth}",
+    "summaryRange": "{dives}, {min} to {max}"
   },
   "detail": {
-    "retour": "Back to logbook",
-    "chargement": "Loading the dive",
-    "erreurTitre": "This dive could not be read",
-    "erreurPhrase": "No dive was changed. Go back to the logbook and open the dive again.",
+    "back": "Back to logbook",
+    "loading": "Loading the dive",
+    "errorTitle": "This dive could not be read",
+    "errorText": "No dive was changed. Go back to the logbook and open the dive again.",
     "date": "Date",
-    "numero": "Number",
-    "profondeurMax": "Max. depth",
-    "profondeurMoyenne": "Mean depth",
-    "duree": "Duration",
-    "temperatureEau": "Water temperature",
+    "number": "Number",
+    "maxDepth": "Max. depth",
+    "meanDepth": "Mean depth",
+    "duration": "Duration",
+    "waterTemperature": "Water temperature",
     "mode": "Dive mode",
     "sac": "SAC",
-    "combinaison": "Suit",
-    "ordinateur": "Dive computer",
-    "ordinateurAutres": { "one": "{modele} (and {n} other)", "other": "{modele} (and {n} others)" },
-    "aPreciser": "Not set",
-    "voyage": "Trip",
-    "bouteilles": "Cylinders and gases",
-    "pressions": "{debut} to {fin}",
-    "pressionDepart": "Start {pression}",
-    "compagnons": "Buddies",
-    "guide": "{nom}, dive guide",
-    "aucunCompagnon": "No buddy noted.",
-    "etiquettes": "Tags",
-    "aucuneEtiquette": "No tags.",
+    "suit": "Suit",
+    "computer": "Dive computer",
+    "computerOthers": { "one": "{model} (and {n} other)", "other": "{model} (and {n} others)" },
+    "notSet": "Not set",
+    "trip": "Trip",
+    "cylinders": "Cylinders and gases",
+    "pressures": "{start} to {end}",
+    "startPressure": "Start {pressure}",
+    "buddies": "Buddies",
+    "guide": "{name}, dive guide",
+    "noBuddy": "No buddy noted.",
+    "tags": "Tags",
+    "noTags": "No tags.",
     "notes": "Notes",
-    "planifier": "Plan from this dive",
+    "plan": "Plan from this dive",
     "modes": {
       "OC": "Open circuit",
       "CCR": "CCR",
       "PSCR": "pSCR",
       "Freedive": "Freedive"
     },
-    "usages": {
+    "uses": {
       "diluent": "Diluent",
       "oxygen": "Rebreather oxygen"
     }
   },
-  "profil": {
-    "consigne": "Touch the profile to read time and depth.",
-    "temps": "Time",
-    "profondeur": "Depth",
-    "gaz": "Gas",
-    "recycleur": "Rebreather",
-    "description": "Dive profile: {profondeur} max. depth, {duree}"
+  "profile": {
+    "hint": "Touch the profile to read time and depth.",
+    "time": "Time",
+    "depth": "Depth",
+    "gas": "Gas",
+    "rebreather": "Rebreather",
+    "description": "Dive profile: {depth} max. depth, {duration}"
   },
-  "unites": {
-    "metres": "m",
-    "pieds": "ft",
+  "units": {
+    "meters": "m",
+    "feet": "ft",
     "minutes": "min",
-    "litres": "l",
-    "litresMinute": "l/min",
-    "piedsCubes": "cu ft",
-    "piedsCubesMinute": "cu ft/min",
+    "liters": "l",
+    "litersPerMinute": "l/min",
+    "cubicFeet": "cu ft",
+    "cubicFeetPerMinute": "cu ft/min",
     "celsius": "°C",
     "fahrenheit": "°F",
     "bar": "bar",
     "psi": "psi",
-    "pourcent": "%"
+    "percent": "%"
   }
 }

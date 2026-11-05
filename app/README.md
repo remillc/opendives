@@ -1,191 +1,191 @@
-# Squelette d'application Android
+# Android application skeleton
 
-**But :** vérifier que l'application tourne sur un vrai téléphone et affiche des plongées lues par le cœur C++ de Subsurface, non modifié, au format git. Ce n'est pas l'interface finale.
+**Goal:** check that the application runs on a real phone and shows dives read by the unmodified Subsurface C++ core, in git format. This is not the final interface.
 
-**Résultat (5 novembre 2026) :** le critère est atteint sur un Pixel 10 Pro XL sous Android 17. Les 29 plongées de `SampleDivesV2.ssrf` s'affichent, et un second lancement les relit depuis git.
+**Result (5 November 2026):** the criterion is met on a Pixel 10 Pro XL running Android 17. The 29 dives of `SampleDivesV2.ssrf` are displayed, and a second launch reads them back from git.
 
-## Ce qui marche
+## What works
 
-- **Application :** Capacitor 7, Svelte 5, Framework7 v9 et Vite, en JavaScript avec JSDoc. Le thème automatique donne le rendu Material sur Android. Un seul écran : le carnet, regroupé par voyage.
-- **Cœur :** les 69 fichiers du POC, compilés pour `arm64-v8a` et `x86_64`. Le sous-module Subsurface n'a aucune modification.
-- **Plugin `OpenDivesCore` (Kotlin + JNI) :**
-  - `importSample()` enregistre l'exemple comme dépôt git avec `parse_file` puis `save_dives("<chemin>[main]")`.
-  - `listDives()` relit ce dépôt avec `parse_file` et renvoie le JSON.
-  - Le cœur tourne sur un seul fil dédié.
+- **Application:** Capacitor 7, Svelte 5, Framework7 v9 and Vite, in JavaScript with JSDoc. The automatic theme gives the Material look on Android. A single screen: the logbook, grouped by trip.
+- **Core:** the 69 files of the POC, built for `arm64-v8a` and `x86_64`. The Subsurface submodule has no modifications.
+- **`OpenDivesCore` plugin (Kotlin + JNI):**
+  - `importSample()` saves the sample as a git repository with `parse_file` then `save_dives("<path>[main]")`.
+  - `listDives()` reads this repository back with `parse_file` and returns the JSON.
+  - The core runs on a single dedicated thread.
 
-## Vérifications faites
+## Checks performed
 
-| Vérification | Résultat |
+| Check | Result |
 | --- | --- |
-| Premier lancement (journal du téléphone) | Dépôt absent, 29 plongées enregistrées, puis 29 relues |
-| Second lancement après arrêt forcé | Dépôt présent, 29 plongées relues, sans import |
-| Dépôt copié du téléphone vers le poste | `git fsck` sans erreur ; 1 commit |
-| Comparaison avec le même import fait sur le poste | Arbre git identique (`9ed06c7`) |
-| Lecture de la copie par le programme du POC | 29 plongées, 16 sites, 4 voyages ; export XML identique à celui du poste |
-| Test d'aller-retour sous WSL (poste) | 97 réussis, 1 échec connu (`TestDiveSeabearNewFormat.xml`) |
+| First launch (phone log) | Repository missing, 29 dives saved, then 29 read back |
+| Second launch after a force stop | Repository present, 29 dives read back, no import |
+| Repository copied from the phone to the development machine | `git fsck` without errors; 1 commit |
+| Comparison with the same import done on the development machine | Identical git tree (`9ed06c7`) |
+| Reading the copy with the POC program | 29 dives, 16 sites, 4 trips; XML export identical to the development machine's |
+| Round-trip test under WSL (development machine) | 97 passed, 1 known failure (`TestDiveSeabearNewFormat.xml`) |
 
-L'application `x86_64` a été compilée et embarquée, mais pas lancée sur un émulateur.
+The `x86_64` application was built and bundled, but not launched on an emulator.
 
-## Tailles
+## Sizes
 
-| Élément | Taille |
+| Item | Size |
 | --- | --- |
-| APK de débogage, deux architectures | 12,9 Mo (12 949 731 octets) |
-| APK de débogage, `arm64-v8a` seule | 8,8 Mo (8 808 203 octets) |
-| `libopendives.so`, `arm64-v8a` | 4,1 Mo (4 103 240 octets) |
-| `libopendives.so`, `x86_64` | 4,1 Mo (4 137 944 octets) |
-| JavaScript, puis CSS (non compressés) | 897 Ko, puis 505 Ko |
-| Carnet d'exemple embarqué (non compressé) | 1,7 Mo |
+| Debug APK, two architectures | 12.9 MB (12,949,731 bytes) |
+| Debug APK, `arm64-v8a` only | 8.8 MB (8,808,203 bytes) |
+| `libopendives.so`, `arm64-v8a` | 4.1 MB (4,103,240 bytes) |
+| `libopendives.so`, `x86_64` | 4.1 MB (4,137,944 bytes) |
+| JavaScript, then CSS (uncompressed) | 897 KB, then 505 KB |
+| Bundled sample log (uncompressed) | 1.7 MB |
 
-Les bibliothèques contiennent déjà toutes les dépendances, sauf la zlib du système. Aucun APK de publication n'a été produit : il sera plus petit.
+The libraries already contain all dependencies, except the system zlib. No release APK has been produced: it will be smaller.
 
-## Problèmes rencontrés
+## Problems encountered
 
-- **libgit2 et le NDK :** libgit2 impose `-std=c90`, où les en-têtes du NDK ne connaissent pas `inline`. Corrigé par `-Dinline=__inline__` dans `native/build-deps.sh`, sans toucher à ses sources.
-- **Vite et le plugin local :** le plugin étant un lien vers `../plugins`, Vite ne trouvait pas `@capacitor/core`. Corrigé par `resolve.dedupe`.
-- **Java :** Android Studio 2026.2 embarque Java 25. Les compilations sont lancées avec un JDK 21, comme Capacitor 7 le demande. Dans Android Studio, il faut choisir ce JDK comme « Gradle JDK ».
-- **Compilation en deux temps :** libdivecomputer utilise autotools. Le natif se compile donc sous WSL et l'APK sous Windows. Gradle ne recompile pas le natif : relancez `native/build-android.sh` si le C++ change.
-- **API minimale :** elle passe de 23 (valeur de Capacitor) à 24, celle du natif.
+- **libgit2 and the NDK:** libgit2 forces `-std=c90`, where the NDK headers do not know `inline`. Fixed with `-Dinline=__inline__` in `native/build-deps.sh`, without touching its sources.
+- **Vite and the local plugin:** since the plugin is a link to `../plugins`, Vite could not find `@capacitor/core`. Fixed with `resolve.dedupe`.
+- **Java:** Android Studio 2026.2 bundles Java 25. Builds are run with a JDK 21, as Capacitor 7 requires. In Android Studio, this JDK must be selected as the "Gradle JDK".
+- **Two-stage build:** libdivecomputer uses autotools. The native part is therefore built under WSL and the APK under Windows. Gradle does not rebuild the native part: rerun `native/build-android.sh` if the C++ changes.
+- **Minimum API:** it goes from 23 (Capacitor's value) to 24, the native part's.
 
-## À savoir pour la suite
+## Worth knowing for later
 
-- **Signature des commits :** les commits sont signés « Subsurface », le comportement par défaut du cœur, alors que l'architecture prévoit « OpenDives ». Rien n'est encore réglé pour cela.
-- **Message d'erreur à l'enregistrement :** le cœur écrit `origin lookup failed` pour un dépôt sans distant, et l'enregistrement réussit quand même. Le mode local devra éviter d'afficher ce message.
-- **Branche `HEAD` :** `git_create_local_repo` laisse `HEAD` sur `master`, sans commit, alors que les données sont sur `main`. C'est le code de Subsurface, et le cœur lit bien `main`.
-- **Voyages à l'écran :** le fichier en déclare 4, mais il active aussi le regroupement automatique. `listDives` en renvoie donc 6, à 5 noms différents, car deux plongées isolées forment chacune un voyage automatique. Le lieu « Hoodsport » apparaît deux fois, car ce sont deux voyages distincts.
-- **Identifiants de voyage :** ils changent à chaque chargement et ne doivent pas être conservés.
-- **Écran :** l'heure et les icônes de la barre d'état, en blanc, sont peu lisibles sur le fond clair. Les valeurs s'écrivent « 4.1 m », pas « 4,1 m ». À reprendre avec la vraie interface.
-- **Identifiant de l'application :** `org.opendives.app` est provisoire, à confirmer avant toute publication.
-- **Hors de ce squelette :** iOS, téléchargement depuis un ordinateur de plongée, modification des plongées, envoi vers le cloud.
+- **Commit author:** commits are signed "Subsurface", the core's default behaviour, whereas the architecture calls for "OpenDives". Nothing is set up for this yet.
+- **Error message on save:** the core writes `origin lookup failed` for a repository without a remote, and the save still succeeds. Local mode will have to avoid showing this message.
+- **`HEAD` branch:** `git_create_local_repo` leaves `HEAD` on `master`, with no commit, whereas the data is on `main`. This is Subsurface's code, and the core does read `main`.
+- **Trips on screen:** the file declares 4, but it also enables automatic grouping. `listDives` therefore returns 6, with 5 different names, because two isolated dives each form an automatic trip. The location "Hoodsport" appears twice, because these are two separate trips.
+- **Trip identifiers:** they change on every load and must not be stored.
+- **Screen:** the time and the status bar icons, in white, are hard to read on the light background. Values are written "4.1 m", not "4,1 m" (French format). To be revisited with the real interface.
+- **Application identifier:** `org.opendives.app` is provisional, to be confirmed before any release.
+- **Outside this skeleton:** iOS, download from a dive computer, editing dives, upload to the cloud.
 
-## Cloud Subsurface en lecture seule (5 novembre 2026)
+## Read-only Subsurface cloud (5 November 2026)
 
-**Résultat :** sur le même téléphone, l'app lit le carnet d'un compte de développement : 1 353 plongées, sur `ssrf-cloud-eu.subsurface-divelog.org`.
+**Result:** on the same phone, the app reads the log of a development account: 1,353 dives, on `ssrf-cloud-eu.subsurface-divelog.org`.
 
-| Situation | Résultat |
+| Situation | Result |
 | --- | --- |
-| Premier lancement : clone par le cœur | 1 353 plongées affichées ; 3,7 s dans le natif, de la sonde jusqu'au JSON |
-| Lancements suivants : mise à jour du cache | 1 353 plongées, `synced=true`, de 4,0 à 5,4 s |
-| Erreur réseau passagère (« Software caused connection abort ») | Avant la correction : échec. Depuis : lecture de la copie locale |
-| Hors ligne avec cache (sur le poste, sans réseau) | 1 353 plongées, `synced=false`, raison affichée |
-| Hors ligne sans cache (sur le poste) | Erreur claire, rien n'est créé |
-| Cache du téléphone et serveur, avant et après | Même tête, `89a1e6a` : rien n'a été poussé |
+| First launch: clone by the core | 1,353 dives displayed; 3.7 s in native code, from the probe to the JSON |
+| Following launches: cache update | 1,353 dives, `synced=true`, 4.0 to 5.4 s |
+| Transient network error ("Software caused connection abort") | Before the fix: failure. Since then: the local copy is read |
+| Offline with cache (on the development machine, without network) | 1,353 dives, `synced=false`, reason displayed |
+| Offline without cache (on the development machine) | Clear error, nothing is created |
+| Phone cache and server, before and after | Same head, `89a1e6a`: nothing was pushed |
 
-**Comment ça marche :**
+**How it works:**
 
-- **Réseau :**
-  - libgit2 est compilé avec HTTPS par OpenSSL 3.4.4, la version que Subsurface utilise sur Android.
-  - La vérification du serveur (`canReachCloudServer`) reprend `https_openssl.cpp`, déjà testé sous Linux.
-- **Certificats :** Android ne fournit pas de fichier de certificats lisible par OpenSSL.
-  - Au lancement, le plugin exporte en PEM les autorités de confiance du système (`AndroidCAStore`), soit 120 sur ce téléphone.
-  - Ce fichier est remis à libgit2 et à la vérification du serveur.
-- **Façade :** `cloud_list_dives()` enchaîne les étapes suivantes.
-  1. Sonde de la branche en lecture seule. Si la branche est absente du serveur, la façade refuse de charger, car le cœur la créerait en poussant.
-  2. Chargement par le cœur.
-  3. Recopie des réglages du carnet (`apply_log_prefs`).
-  4. Production du JSON.
-  - Si le serveur ne répond pas, la façade lit la copie locale avec `git_local_only`, comme Subsurface hors ligne.
-- **Écritures :** l'app n'enregistre jamais dans le cache du cloud. Rien ne peut donc être poussé.
+- **Network:**
+  - libgit2 is built with HTTPS through OpenSSL 3.4.4, the version Subsurface uses on Android.
+  - The server check (`canReachCloudServer`) reuses `https_openssl.cpp`, already tested under Linux.
+- **Certificates:** Android does not provide a certificate file readable by OpenSSL.
+  - At launch, the plugin exports the system's trusted authorities (`AndroidCAStore`) as PEM: 120 on this phone.
+  - This file is handed to libgit2 and to the server check.
+- **Façade:** `cloud_list_dives()` chains the following steps.
+  1. Read-only probe of the branch. If the branch is missing on the server, the façade refuses to load, because the core would create it by pushing.
+  2. Load by the core.
+  3. Copy of the log's settings (`apply_log_prefs`).
+  4. Production of the JSON.
+  - If the server does not respond, the façade reads the local copy with `git_local_only`, like Subsurface when offline.
+- **Writes:** the app never saves into the cloud cache. So nothing can be pushed.
 
-**Identifiants : solution TEMPORAIRE de développement.** Le plugin lit `files/cloud-dev.env`, dans l'espace privé de l'app. Ce fichier n'est ni dans l'APK ni dans git, et le mot de passe n'est jamais journalisé. Sans ce fichier, l'app revient au carnet d'exemple. Le vrai écran de connexion, avec le trousseau Android, reste à faire.
+**Credentials: TEMPORARY development solution.** The plugin reads `files/cloud-dev.env`, in the app's private storage. This file is neither in the APK nor in git, and the password is never logged. Without this file, the app falls back to the sample log. The real sign-in screen, with the Android keystore, remains to be done.
 
 ```powershell
 $adb = "$env:LOCALAPPDATA\Android\Sdk\platform-tools\adb.exe"
-# installer (le fichier est lu sur le poste, jamais affiché)
+# install (the file is read on the development machine, never displayed)
 Get-Content -Raw "$env:USERPROFILE\.opendives\cloud-dev.env" | & $adb shell "run-as org.opendives.app sh -c 'umask 077; cat > files/cloud-dev.env'"
-# retirer
+# remove
 & $adb shell "run-as org.opendives.app rm files/cloud-dev.env"
 ```
 
-**Écarts avec l'architecture :** la vérification du serveur utilise OpenSSL dans le natif plutôt que la pile réseau d'Android. Elle ne suit donc pas le proxy du système, ce qui est à revoir avec l'écran de connexion. La liste de 1 353 plongées est affichée d'un bloc, sans liste virtuelle.
+**Deviations from the architecture:** the server check uses OpenSSL in native code rather than Android's network stack. It therefore does not follow the system proxy, which must be revisited with the sign-in screen. The list of 1,353 dives is rendered in one block, without a virtual list.
 
-## Carnet et Détail d'une plongée (5 novembre 2026)
+## Logbook and Dive detail (5 November 2026)
 
-Premiers vrais écrans, suivant `docs/specification-interface.md`, vérifiés sur le Pixel 10 Pro XL avec le carnet d'exemple et le carnet du cloud (1 353 plongées, en lecture seule).
+First real screens, following `docs/specification-interface.md`, checked on the Pixel 10 Pro XL with the sample log and the cloud log (1,353 dives, read-only).
 
-| Carnet (carnet d'exemple) | Détail, curseur posé |
+| Logbook (sample log) | Detail, cursor placed |
 | --- | --- |
-| ![Carnet](captures/carnet.png) | ![Détail](captures/detail.png) |
+| ![Logbook](captures/carnet.png) | ![Detail](captures/detail.png) |
 
-Les captures viennent du carnet d'exemple de Subsurface, jamais d'un carnet personnel.
+The screenshots come from the Subsurface sample log, never from a personal log.
 
-**Ce qui marche :**
+**What works:**
 
-- **Façade :**
-  - `list_dives` donne pour chaque plongée un identifiant, une miniature d'environ 40 points (temps et profondeur) et le voyage.
-  - `get_dive` renvoie les faits, les bouteilles et les gaz, les changements de gaz, les compagnons, la combinaison, les étiquettes, les notes et l'ordinateur. Le profil est calculé par le cœur (`create_plot_info_new`), avec la bouteille respirée, la ppO2 et le plafond s'il existe.
-  - `get_prefs` donne les unités du carnet, une par mesure.
-- **Thème :**
-  - Les jetons `--od-*` sont déclarés, en clair et en sombre.
-  - `colors.primary` vaut `#1E4D3A`, avec les fonds crème en clair.
-  - Le CSS est rangé en couches : `framework7`, `od.jetons`, `od.base`, `od.composants`.
-  - Les surcharges `--f7-*` restent hors couche, sinon les couleurs que Framework7 injecte au démarrage les écraseraient. Elles ont été vérifiées dans la WebView : primary vaut #1e4d3a en clair et #8fcfae en sombre.
-- **Composants :** `<Miniature>`, `<LignePlongee>`, `<LigneVoyage>`, `<Profil>` (colonne d'eau, curseur au doigt, couche Gaz) et `<EtatSynchro>`, plus des icônes dessinées pour le projet.
-- **Carnet :**
-  - Liste du plus récent au plus ancien, voyages repliés que l'on déplie d'un toucher.
-  - Recherche sur le site, le voyage, le numéro ou la date.
-  - État de synchronisation : cloud, hors ligne ou appareil seulement.
-  - Bouton « + » ouvrant les trois choix, sans action pour l'instant.
-  - Lignes grisées pendant le chargement ; états vide et erreur.
-- **Détail :**
-  - Profil, faits, bouteilles et gaz.
-  - Compagnons et étiquettes en deux blocs séparés, puis notes.
-  - « Planifier à partir de cette plongée » en mandarine, sans action pour l'instant.
-- **Navigation :**
-  - Barre du bas avec quatre sections ; Sites, Statistiques et Outils sont vides.
-  - La touche Retour d'Android ferme une feuille, revient à l'écran précédent ou au Carnet, puis met l'app en arrière-plan (plugin `@capacitor/app`, MIT).
-- **Nombres et unités :**
-  - Le format suit la langue de l'appareil : « 4,1 m », « 11,5 l/min », « 1er juin 2013 ».
-  - Chaque mesure suit le réglage du carnet : pieds et °C dans le carnet du cloud, mètres dans le carnet d'exemple.
-  - Une profondeur inconnue (0) n'est pas affichée.
+- **Façade:**
+  - `list_dives` gives, for each dive, an identifier, a thumbnail of about 40 points (time and depth) and the trip.
+  - `get_dive` returns the facts, the cylinders and gases, the gas changes, the buddies, the suit, the tags, the notes and the dive computer. The profile is computed by the core (`create_plot_info_new`), with the cylinder breathed, the ppO2 and the ceiling if there is one.
+  - `get_prefs` gives the log's units, one per quantity.
+- **Theme:**
+  - The `--od-*` color tokens are declared, in light and dark.
+  - `colors.primary` is `#1E4D3A`, with cream backgrounds in light mode.
+  - The CSS is organised in layers: `framework7`, `od.tokens`, `od.base`, `od.components`.
+  - The `--f7-*` overrides stay outside any layer, otherwise the colors Framework7 injects at startup would override them. They were checked in the WebView: primary is #1e4d3a in light and #8fcfae in dark.
+- **Components:** `<ProfileThumbnail>`, `<DiveRow>`, `<TripRow>`, `<DiveProfile>` (water column, finger cursor, Gas layer) and `<SyncStatus>`, plus icons drawn for the project.
+- **Logbook:**
+  - List from newest to oldest, collapsed trips that expand with a tap.
+  - Search on site, trip, number or date.
+  - Sync status: cloud, offline or device only.
+  - "+" button opening the three choices, with no action for now.
+  - Greyed-out rows while loading; empty and error states.
+- **Detail:**
+  - Profile, facts, cylinders and gases.
+  - Buddies and tags in two separate blocks, then notes.
+  - "Plan from this dive" in mandarin, with no action for now.
+- **Navigation:**
+  - Bottom bar with four sections; Sites, Statistics and Tools are empty.
+  - The Android Back key closes a sheet, goes back to the previous screen or to the Logbook, then sends the app to the background (`@capacitor/app` plugin, MIT).
+- **Numbers and units:**
+  - The format follows the device language: in French, « 4,1 m », « 11,5 l/min », « 1er juin 2013 ».
+  - Each quantity follows the log's setting: feet and °C in the cloud log, metres in the sample log.
+  - An unknown depth (0) is not displayed.
 
-**Vérifications faites sur le téléphone :**
+**Checks performed on the phone:**
 
-| Vérification | Résultat |
+| Check | Result |
 | --- | --- |
-| Clair | Conforme |
-| Sombre | Surfaces du système et sapin sombre conformes. **Colonne d'eau et tracé : voir « À trancher »** |
-| Texte à 200 % | Le texte grandit sans se superposer. Les quatre étiquettes de la barre du bas tiennent : l'onglet affiche « Statistiques » quand la place le permet, « Stats » sinon, et se rajuste sans relancer l'app (`<LibelleAdaptatif>`). Changer la taille du texte relance toutefois l'écran Android, donc recharge le carnet. Les graduations du profil restent petites |
-| TalkBack (arbre d'accessibilité relevé avec uiautomator) | Chaque ligne est lue « site, date, profondeur maximale, durée ». Profil et miniatures ont un texte de remplacement, la puce Gaz est un bouton à bascule, « + » et Retour ont un nom, et aucun nom d'icône n'est lu. TalkBack lui-même n'a pas été activé |
-| Carnet d'exemple, carnet du cloud | Les deux s'affichent, avec leurs unités respectives |
+| Light | Compliant |
+| Dark | System surfaces and dark fir green compliant. **Water column and trace: see "To be decided"** |
+| Text at 200% | Text grows without overlapping. The four labels of the bottom bar fit: in French the tab shows « Statistiques » when there is room, « Stats » otherwise, and adjusts without restarting the app (`<AdaptiveLabel>`). Changing the text size does restart the Android screen, however, and so reloads the logbook. The profile's tick labels stay small |
+| TalkBack (accessibility tree captured with uiautomator) | Each row is read "site, date, maximum depth, duration". Profile and thumbnails have alternative text, the Gas chip is a toggle button, "+" and Back have a name, and no icon name is read. TalkBack itself was not turned on |
+| Sample log, cloud log | Both are displayed, with their respective units |
 
-**Problèmes rencontrés et corrigés :**
+**Problems encountered and fixed:**
 
-- **Icônes de Framework7 lues à voix haute :** ce sont des ligatures de police insérées par CSS, et TalkBack lisait « chevron_right ». Elles reçoivent maintenant un texte de remplacement vide (`content: … / ''`).
-- **Composant `Fab` de framework7-svelte 9 :** il appelle `onclick` deux fois et laisse le lien sans nom. Le bouton « + » est donc écrit à la main.
-- **Page précédente encore lisible :** Framework7 garde la page précédente dans le document, et TalkBack pouvait y aller. Elle reçoit maintenant `inert`.
-- **Lien de retour :** en MD3, Framework7 masque son texte, et il était lu « # ». Il est remplacé par un lien nommé « Retour au carnet ».
-- **Touche Retour d'Android :** elle fermait l'application. Elle est maintenant reliée au routeur.
-- **Erreur passagère de Capacitor :** « Cannot read properties of undefined (reading 'triggerEvent') » apparaît une fois, au premier lancement après une réinstallation. Elle vient de Capacitor, pas d'OpenDives.
+- **Framework7 icons read aloud:** they are font ligatures inserted by CSS, and TalkBack read "chevron_right". They now get empty alternative text (`content: … / ''`).
+- **`Fab` component of framework7-svelte 9:** it calls `onclick` twice and leaves the link without a name. The "+" button is therefore written by hand.
+- **Previous page still readable:** Framework7 keeps the previous page in the document, and TalkBack could go there. It now gets `inert`.
+- **Back link:** in MD3, Framework7 hides its text, and it was read "#". It is replaced by a link named "back to the logbook" (« Retour au carnet » in French).
+- **Android Back key:** it closed the application. It is now wired to the router.
+- **Transient Capacitor error:** "Cannot read properties of undefined (reading 'triggerEvent')" appears once, on the first launch after a reinstall. It comes from Capacitor, not from OpenDives.
 
-**Langues (règle du 5 novembre 2026) :**
+**Languages (rule of 5 November 2026):**
 
-- **Catalogues :** aucun texte visible n'est écrit en dur. Chaque texte a une clé dans `src/i18n/fr.json` (référence) et `src/i18n/en.json` ; les deux ont 87 clés, et un contrôle vérifie qu'elles sont identiques.
-- **Langue :** `src/lib/i18n.js` choisit la première langue traduite de l'appareil, avec l'anglais en repli. Les pluriels passent par `Intl.PluralRules` (« 1 plongée », « 27 plongées »).
-- **Formats :** les nombres et les dates suivent la langue de l'appareil, et les unités viennent du catalogue (« pi » en français, « ft » en anglais).
-- **Données du plongeur :** les noms des sites, les notes, les étiquettes et les noms de gaz donnés par le cœur ne sont pas traduits.
-- **Vérification :** l'anglais a été vérifié sur le téléphone avec la langue propre à l'app d'Android (`cmd locale set-app-locales`), sans changer celle du téléphone.
-- **Reste à faire :** le réglage de la langue dans l'app n'existe pas encore.
+- **Catalogs:** no visible text is hard-coded. Each text has a key in `src/i18n/fr.json` (reference) and `src/i18n/en.json`; both have 87 keys, and a check verifies that they are identical.
+- **Language:** `src/lib/i18n.js` picks the first translated language of the device, with English as the fallback. Plurals go through `Intl.PluralRules` (in French, « 1 plongée », « 27 plongées »).
+- **Formats:** numbers and dates follow the device language, and units come from the catalog (« pi » in French, "ft" in English).
+- **Diver data:** site names, notes, tags and gas names given by the core are not translated.
+- **Check:** English was checked on the phone with Android's per-app language (`cmd locale set-app-locales`), without changing the phone's language.
+- **Still to do:** the language setting inside the app does not exist yet.
 
-**À trancher (spécification) :**
+**To be decided (specification):**
 
-- **Colonne d'eau en sombre (thème en cours de révision avec Claude Desktop) :** en sombre, `--od-sapin` (#8FCFAE) et `--od-sapin-clair` (#BFD9CB) sont deux verts clairs.
-  - Le dégradé ne code presque plus la profondeur : une plongée à 91 pieds ressemble à une plongée à 48 pieds.
-  - Le tracé `--od-trace-profil` (#EAF5EF) sur ce fond a un contraste d'environ 1,3:1 à 1,6:1, sous le 3:1 attendu pour un graphique.
-  - Le fond des miniatures disparaît sur la surface sombre.
-- **Déjà ouverts dans la spécification :** couleurs Alarme et Attente en sombre (les valeurs claires sont gardées en attendant), distinction de l'oxygène et du sapin.
+- **Water column in dark mode (theme under revision with Claude Desktop):** in dark mode, the two fir-green color tokens (#8FCFAE and #BFD9CB) are two light greens.
+  - The gradient barely encodes depth any more: a dive to 91 feet looks like a dive to 48 feet.
+  - The profile trace color token (#EAF5EF) on this background has a contrast of about 1.3:1 to 1.6:1, below the 3:1 expected for a graph.
+  - The thumbnail background disappears on the dark surface.
+- **Already open in the specification:** Alarm and Waiting colors in dark mode (the light values are kept in the meantime), distinguishing oxygen from fir green.
 
-**Ce qui manque :**
+**What is missing:**
 
-- Couches Plafond, ppO2 et Tissus ; profil plein écran en paysage.
-- Mise en page tablette.
-- Rendu iOS, qui n'a pas pu être vu.
-- Actions du bouton « + » et du planificateur.
-- Liste virtuelle : les 1 353 plongées sont dessinées d'un bloc.
-- `svelte-check` dans l'intégration continue : un `jsconfig.json` est ajouté pour l'éditeur, mais celui-ci signale encore des erreurs de typage dans les composants de framework7-svelte.
+- Ceiling, ppO2 and Tissues layers; full-screen profile in landscape.
+- Tablet layout.
+- iOS rendering, which could not be seen.
+- Actions of the "+" button and of the planner.
+- Virtual list: the 1,353 dives are rendered in one block.
+- `svelte-check` in continuous integration: a `jsconfig.json` was added for the editor, but it still reports typing errors in the framework7-svelte components.
 
-**Tailles :** APK de débogage de 27,7 Mo (deux architectures). `libopendives.so` fait 9,3 Mo en arm64 et 9,6 Mo en x86_64, OpenSSL compris.
+**Sizes:** debug APK of 27.7 MB (two architectures). `libopendives.so` is 9.3 MB on arm64 and 9.6 MB on x86_64, OpenSSL included.
 
-## Reproduire
+## Reproduce
 
-Les commandes sont dans [AGENTS.md](../AGENTS.md#commandes).
+The commands are in [AGENTS.md](../AGENTS.md#commands).

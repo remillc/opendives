@@ -1,5 +1,5 @@
-// Plugin Capacitor local OpenDivesCore. Les bibliothèques natives et l'asset
-// d'exemple sont produits par native/build-android.sh dans build/android/ (non versionné).
+// Local Capacitor plugin OpenDivesCore. The native libraries and the sample
+// asset are produced by native/build-android.sh in build/android/ (not versioned).
 buildscript {
     repositories {
         google()

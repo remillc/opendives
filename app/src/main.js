@@ -2,7 +2,7 @@
 import { mount } from 'svelte';
 import Framework7 from 'framework7/lite-bundle';
 import Framework7Svelte from 'framework7-svelte';
-// Le CSS de Framework7 est importé par theme.css, dans la couche « framework7 ».
+// Framework7's CSS is imported by theme.css, in the "framework7" layer.
 import './theme.css';
 import App from './App.svelte';
 

@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
-# Cœur de Subsurface (non modifié) + core/compat + façade + pont JNI, pour le NDK.
-# Lancé par native/build-android.sh. Options reprises de poc/build.sh.
+# Subsurface core (unmodified) + core/compat + façade + JNI bridge, for the NDK.
+# Run by native/build-android.sh. Options taken from poc/build.sh.
 cmake_minimum_required(VERSION 3.22)
 project(opendives LANGUAGES C CXX)
 
@@ -8,7 +8,7 @@ get_filename_component(ROOT "${CMAKE_CURRENT_SOURCE_DIR}/.." ABSOLUTE)
 set(SS "${ROOT}/third_party/subsurface")
 set(COMPAT "${ROOT}/core/compat")
 
-# Liste partagée avec poc/build.sh.
+# List shared with poc/build.sh.
 file(STRINGS "${COMPAT}/core-files.txt" CORE_FILES)
 set(SOURCES "")
 foreach(f ${CORE_FILES})

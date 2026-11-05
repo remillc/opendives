@@ -29,9 +29,9 @@ class OpenDivesCorePlugin : Plugin() {
             try {
                 val count = exportSystemCertificates(caFile)
                 NativeCore.setCaFile(caFile.absolutePath)
-                Log.i(TAG, "$count autorités de certification du système exportées")
+                Log.i(TAG, "$count system certificate authorities exported")
             } catch (e: Exception) {
-                Log.e(TAG, "Export des autorités de certification impossible", e)
+                Log.e(TAG, "Cannot export the certificate authorities", e)
             }
         }
     }
@@ -44,7 +44,7 @@ class OpenDivesCorePlugin : Plugin() {
         }
         val count = NativeCore.importFile(sample.absolutePath, repo)
         sample.delete()
-        Log.i(TAG, "importSample: $count plongées enregistrées dans $repo")
+        Log.i(TAG, "importSample: $count dives saved to $repo")
         call.resolve(JSObject().put("count", count))
     }
 
@@ -52,31 +52,31 @@ class OpenDivesCorePlugin : Plugin() {
     fun listDives(call: PluginCall) = onCoreThread(call) {
         val exists = NativeCore.logExists(repo)
         val dives = if (exists) JSArray(NativeCore.listDives(repo)) else JSArray()
-        Log.i(TAG, "listDives: exists=$exists, ${dives.length()} plongées lues depuis $repo")
+        Log.i(TAG, "listDives: exists=$exists, ${dives.length()} dives read from $repo")
         call.resolve(JSObject().put("exists", exists).put("dives", dives))
     }
 
-    /** Détail d'une plongée du carnet chargé ; `id` vient de listDives ou listCloudDives. */
+    /** Detail of one dive of the loaded log; `id` comes from listDives or listCloudDives. */
     @PluginMethod
     fun getDive(call: PluginCall) = onCoreThread(call) {
         val id = call.getInt("id")
         if (id == null) {
-            call.reject("Identifiant de plongée manquant", "BAD_ARGUMENT")
+            call.reject("Missing dive id", "BAD_ARGUMENT")
             return@onCoreThread
         }
         call.resolve(JSObject(NativeCore.getDive(id)))
     }
 
-    /** Unités du carnet chargé, une par mesure. */
+    /** Units of the loaded log, one per quantity. */
     @PluginMethod
     fun getPrefs(call: PluginCall) = onCoreThread(call) {
         call.resolve(JSObject(NativeCore.getPrefs()))
     }
 
     /**
-     * Lecture seule du cloud Subsurface. TEMPORAIRE, pour le développement :
-     * les identifiants sont lus dans files/cloud-dev.env, copié par adb
-     * (voir app/README.md). Ils ne sont ni dans l'APK ni journalisés.
+     * Read-only access to the Subsurface cloud. TEMPORARY, for development:
+     * the credentials are read from files/cloud-dev.env, copied with adb
+     * (see app/README.md). They are neither in the APK nor logged.
      */
     @PluginMethod
     fun listCloudDives(call: PluginCall) = onCoreThread(call) {
@@ -90,7 +90,7 @@ class OpenDivesCorePlugin : Plugin() {
         val dives = result.getJSONArray("dives")
         Log.i(
             TAG,
-            "listCloudDives: ${dives.length()} plongées, serveur ${result.getString("server")}, " +
+            "listCloudDives: ${dives.length()} dives, server ${result.getString("server")}, " +
                 "synced=${result.getBoolean("synced")}, ${System.currentTimeMillis() - start} ms",
         )
         result.put("available", true)
@@ -109,7 +109,7 @@ class OpenDivesCorePlugin : Plugin() {
         return if (email.isEmpty() || password.isEmpty()) null else email to password
     }
 
-    /** Écrit en PEM les autorités de confiance d'Android (système et utilisateur). */
+    /** Writes Android's trusted authorities (system and user) as PEM. */
     private fun exportSystemCertificates(target: File): Int {
         val store = KeyStore.getInstance("AndroidCAStore")
         store.load(null, null)
@@ -133,7 +133,7 @@ class OpenDivesCorePlugin : Plugin() {
             try {
                 block()
             } catch (e: Exception) {
-                Log.e(TAG, "Erreur du cœur", e)
+                Log.e(TAG, "Core error", e)
                 call.reject(e.message, "CORE_ERROR", e)
             }
         }

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
-// Façade d'OpenDives au-dessus du cœur de Subsurface. Le reste de l'application
-// ne voit jamais les structures internes de Subsurface.
-// Ces fonctions ne sont pas réentrantes : le cœur doit tourner sur un seul fil.
+// OpenDives façade over the Subsurface core. The rest of the application
+// never sees Subsurface's internal structures.
+// These functions are not reentrant: the core must run on a single thread.
 #ifndef OPENDIVES_H
 #define OPENDIVES_H
 
@@ -9,56 +9,56 @@
 
 namespace opendives {
 
-// À appeler une fois avant toute autre fonction. Renvoie 0 si tout va bien.
+// Call once before any other function. Returns 0 on success.
 int init();
 
-// Vrai si `repo` (au format "chemin[branche]") désigne un dépôt déjà enregistré.
+// True if `repo` (in "path[branch]" format) names an already saved repository.
 bool log_exists(const std::string &repo);
 
-// Détail d'une plongée du carnet chargé (identifiant `id` de list_dives) :
-// faits, bouteilles et gaz, changements de gaz, compagnons, étiquettes, notes,
-// et profil calculé par le cœur (profondeur, bouteille active, ppO2, plafond
-// si présent). Unités SI entières. Renvoie 0, ou -1 avec `error`.
-// Les identifiants ne valent que jusqu'au prochain chargement.
+// Detail of one dive of the loaded log (identifier `id` from list_dives):
+// facts, cylinders and gases, gas changes, buddies, tags, notes,
+// and the profile computed by the core (depth, active cylinder, ppO2, ceiling
+// if present). Integer SI units. Returns 0, or -1 with `error`.
+// Identifiers are only valid until the next load.
 int get_dive(int id, std::string &json, std::string &error);
 
-// Unités du carnet, une par mesure : {"length":"m"|"ft", "temperature":"C"|"F",
+// Units of the log, one per quantity: {"length":"m"|"ft", "temperature":"C"|"F",
 // "pressure":"bar"|"psi", "volume":"l"|"cuft", "weight":"kg"|"lbs"}.
 int get_prefs(std::string &json);
 
-// Après un chargement : reprend dans les préférences les réglages lus dans le
-// carnet (unités, etc.), comme Subsurface-mobile (QMLManager::consumeFinishedLoad).
-// Indispensable avant d'enregistrer : save-git réécrit ces réglages depuis prefs.
+// After a load: copies the settings read from the log (units, etc.) into the
+// preferences, like Subsurface-mobile (QMLManager::consumeFinishedLoad).
+// Required before saving: save-git rewrites these settings from prefs.
 void apply_log_prefs();
 
-// Lit `source` (.xml, .ssrf…) et l'enregistre dans le dépôt git local `repo`,
-// créé au besoin. Renvoie le nombre de plongées, ou -1 avec `error` renseigné.
+// Reads `source` (.xml, .ssrf…) and saves it into the local git repository `repo`,
+// created if needed. Returns the number of dives, or -1 with `error` set.
 int import_file(const std::string &source, const std::string &repo, std::string &error);
 
-// Charge `log` ("chemin[branche]" ou fichier) et écrit dans `json` un tableau
-// de plongées. Renvoie 0, ou -1 avec `error` renseigné.
+// Loads `log` ("path[branch]" or a file) and writes a JSON array of dives
+// into `json`. Returns 0, or -1 with `error` set.
 int list_dives(const std::string &log, std::string &json, std::string &error);
 
-// Règle le compte du cloud Subsurface et écrit dans `url` l'adresse du carnet,
-// au format de Subsurface : "https://<serveur>/git/<courriel>[<courriel>]".
+// Sets the Subsurface cloud account and writes the log address into `url`,
+// in Subsurface's format: "https://<server>/git/<email>[<email>]".
 int cloud_configure(const std::string &email, const std::string &password, std::string &url);
 
-// Fichier PEM des autorités de confiance, pour libgit2 et la vérification du
-// serveur. Sous Android, il est obligatoire : le système n'en fournit pas.
+// PEM file of trusted certificate authorities, for libgit2 and server
+// verification. Required on Android: the system does not provide one.
 int set_ca_file(const std::string &path);
 
-// Lecture seule : vérifie que la branche du carnet existe sur le serveur, puis
-// charge le carnet par le cœur (clone, ou mise à jour du cache local sous
-// $HOME/.subsurface). Écrit dans `json` un objet :
+// Read-only: checks that the log branch exists on the server, then loads
+// the log through the core (clone, or update of the local cache under
+// $HOME/.subsurface). Writes an object into `json`:
 //   {"server":…, "head":…, "synced":true|false, "offlineReason":…, "dives":[…]}
-// Serveur injoignable : lit la copie locale sans synchroniser (synced=false,
-// offlineReason renseigné), ou échoue s'il n'y en a pas.
-// Refuse de charger si la branche est absente : le cœur la créerait en poussant.
+// Server unreachable: reads the local copy without syncing (synced=false,
+// offlineReason set), or fails if there is none.
+// Refuses to load if the branch is missing: the core would create it by pushing.
 int cloud_list_dives(const std::string &email, const std::string &password, std::string &json, std::string &error);
 
-// Lecture seule : demande au serveur la liste de ses branches, avec la
-// validation TLS normale de libgit2, et dit si la branche du carnet existe.
-// Ne clone rien, n'écrit rien, ne pousse rien.
+// Read-only: asks the server for its list of branches, with libgit2's normal
+// TLS validation, and tells whether the log branch exists.
+// Clones nothing, writes nothing, pushes nothing.
 int cloud_branch_status(const std::string &url, bool &exists, std::string &head, std::string &error);
 
 } // namespace opendives

@@ -1,51 +1,51 @@
 // @ts-check
-// Contrat entre l'interface et le plugin natif OpenDivesCore.
-// Toutes les valeurs sont en unités SI entières, comme dans le cœur :
-// mm, s, mK, mbar, ml, pour mille. La conversion se fait à l'affichage.
+// Contract between the interface and the native OpenDivesCore plugin.
+// All values are in integer SI units, as in the core:
+// mm, s, mK, mbar, ml, per mille. Conversion happens at display time.
 import { registerPlugin } from '@capacitor/core';
 
 /**
- * Les identifiants de voyage changent à chaque chargement : ne jamais les conserver.
+ * Trip identifiers change on every load: never store them.
  * @typedef {Object} DiveTrip
  * @property {number} id
- * @property {string} location chaîne vide si le voyage n'a pas de nom
- * @property {boolean} autogen voyage créé par le regroupement automatique du cœur
+ * @property {string} location empty string when the trip has no name
+ * @property {boolean} autogen trip created by the core's automatic grouping
  */
 
 /**
- * Une plongée dans la liste du carnet.
+ * A dive in the logbook list.
  * @typedef {Object} Dive
- * @property {number} id identifiant valable jusqu'au prochain chargement (pour getDive)
+ * @property {number} id identifier valid until the next load (for getDive)
  * @property {number} number
- * @property {string} date heure locale de la plongée, ex. 2012-11-05T10:15:00
- * @property {string} site chaîne vide si aucun site
+ * @property {string} date local time of the dive, e.g. 2012-11-05T10:15:00
+ * @property {string} site empty string when there is no site
  * @property {number} maxDepthMm
  * @property {number} durationSeconds
- * @property {number[]} profile miniature : couples [temps s, profondeur mm] à plat, environ 40
+ * @property {number[]} profile thumbnail: flat [time s, depth mm] pairs, about 40
  * @property {DiveTrip|null} trip
  */
 
 /**
  * @typedef {Object} Cylinder
- * @property {string} description ex. AL80 ; chaîne vide si inconnue
+ * @property {string} description e.g. AL80; empty string when unknown
  * @property {number} sizeMl
  * @property {number} workingPressureMbar
- * @property {number} startMbar 0 si inconnue
- * @property {number} endMbar 0 si inconnue
+ * @property {number} startMbar 0 when unknown
+ * @property {number} endMbar 0 when unknown
  * @property {number} o2Permille
  * @property {number} hePermille
- * @property {string} gas nom du mélange donné par le cœur : Air, EAN32, (18/45)…
+ * @property {string} gas mix name given by the core: Air, EAN32, (18/45)…
  * @property {string} use OC-gas, diluent, oxygen, not used
- * @property {boolean} used la bouteille sert pendant la plongée
+ * @property {boolean} used the cylinder is breathed during the dive
  */
 
 /**
- * Profil calculé par le cœur (profile.cpp), un point par entrée du tracé.
+ * Profile computed by the core (profile.cpp), one point per plot entry.
  * @typedef {Object} DiveSamples
  * @property {number[]} timeSeconds
  * @property {number[]} depthMm
- * @property {number[]} cylinder bouteille respirée en circuit ouvert ; -1 si inconnue ou recycleur
- * @property {number[]|null} ceilingMm plafond calculé ; null s'il est nul sur toute la plongée
+ * @property {number[]} cylinder open-circuit cylinder being breathed; -1 when unknown or rebreather
+ * @property {number[]|null} ceilingMm computed ceiling; null when zero for the whole dive
  * @property {number[]} ppo2Mbar
  */
 
@@ -58,16 +58,16 @@ import { registerPlugin } from '@capacitor/core';
  * @property {number} maxDepthMm
  * @property {number} meanDepthMm
  * @property {number} durationSeconds
- * @property {number} waterTempMk 0 si inconnue
- * @property {number} airTempMk 0 si inconnue
- * @property {number} sacMlMin 0 si inconnu
+ * @property {number} waterTempMk 0 when unknown
+ * @property {number} airTempMk 0 when unknown
+ * @property {number} sacMlMin 0 when unknown
  * @property {number} cns
  * @property {number} otu
  * @property {number} rating
  * @property {number} visibility
  * @property {string} divemode OC, CCR, PSCR, Freedive
- * @property {string} computer modèle du premier ordinateur
- * @property {number} computers nombre d'ordinateurs
+ * @property {string} computer model of the first dive computer
+ * @property {number} computers number of dive computers
  * @property {string[]} buddies
  * @property {string[]} guides
  * @property {string} suit
@@ -80,7 +80,7 @@ import { registerPlugin } from '@capacitor/core';
  */
 
 /**
- * Unités du carnet, une par mesure.
+ * Units of the log, one per quantity.
  * @typedef {Object} Prefs
  * @property {'m'|'ft'} length
  * @property {'C'|'F'} temperature
@@ -90,29 +90,29 @@ import { registerPlugin } from '@capacitor/core';
  */
 
 /**
- * Résultat de la lecture du cloud. `available` vaut false quand aucun
- * identifiant n'est configuré ; les autres champs sont alors absents.
+ * Result of reading the cloud. `available` is false when no credentials are
+ * configured; the other fields are then absent.
  * @typedef {Object} CloudDives
  * @property {boolean} available
- * @property {string} [server] ex. ssrf-cloud-eu.subsurface-divelog.org
- * @property {string} [head] commit de la branche sur le serveur
- * @property {boolean} [synced] false : copie locale, le serveur n'a pas répondu
- * @property {string} [offlineReason] raison, quand le serveur n'a pas répondu
+ * @property {string} [server] e.g. ssrf-cloud-eu.subsurface-divelog.org
+ * @property {string} [head] commit of the branch on the server
+ * @property {boolean} [synced] false: local copy, the server did not answer
+ * @property {string} [offlineReason] reason, when the server did not answer
  * @property {Dive[]} [dives]
  */
 
 /**
  * @typedef {Object} OpenDivesCorePlugin
  * @property {() => Promise<{count: number}>} importSample
- *   Enregistre le carnet d'exemple comme dépôt git local.
+ *   Saves the sample log as a local git repository.
  * @property {() => Promise<{exists: boolean, dives: Dive[]}>} listDives
- *   Relit le dépôt git local. `exists` vaut false tant qu'aucun dépôt n'a été créé.
+ *   Reads the local git repository again. `exists` is false until a repository has been created.
  * @property {() => Promise<CloudDives>} listCloudDives
- *   Lecture seule du carnet du cloud Subsurface (identifiants de développement).
+ *   Read-only access to the Subsurface cloud log (development credentials).
  * @property {(options: {id: number}) => Promise<DiveDetail>} getDive
- *   Détail d'une plongée du dernier carnet chargé.
+ *   Detail of one dive of the last loaded log.
  * @property {() => Promise<Prefs>} getPrefs
- *   Unités du dernier carnet chargé.
+ *   Units of the last loaded log.
  */
 
 /** @type {OpenDivesCorePlugin} */
