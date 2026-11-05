@@ -10,48 +10,32 @@ Ce document traduit les maquettes en règles que le code applique telles quelles
 
 ## 1. Couleurs
 
-La palette retenue le 5 novembre 2026 est **sapin et mandarine sur fond crème** : le sapin donne la confiance et la maîtrise, la mandarine l'envie de replonger. Elle n'évoque ni l'eau ni le ciel. Le code déclare chaque couleur une seule fois, comme variable CSS `--od-*`, et ne met jamais de valeur en dur dans un composant.
+Le thème retenu le 5 novembre 2026 est **noir et blanc, couleur réservée aux données** : un fond clair neutre, une action sans couleur vive (#1F2124), un contraste fort et des titres sans empattements. La seule couleur vive de l'interface est celle des données de plongée : la colonne d'eau du profil et des miniatures passe du sable au rouille avec la profondeur. Le code déclare chaque couleur une seule fois, comme variable CSS `--od-*`, et ne met jamais de valeur en dur dans un composant.
 
 | Jeton | Clair | Sombre | Usage, et seulement celui-là |
 | --- | --- | --- | --- |
-| `--od-sapin` | #1E4D3A | #8FCFAE | Couleur principale : liens, boutons, onglet actif ; bas de la colonne d'eau |
-| `--od-sapin-clair` | #BFD9CB | #BFD9CB | Haut de la colonne d'eau |
-| `--od-mandarine` | #F06A1D, texte et icônes #1A1A1A dessus (5,6:1) | #F06A1D | Action principale d'un écran (Télécharger dans l'écran de téléchargement, Réessayer, Planifier) ; curseur du profil ; une fois par écran au plus |
-| `--od-teinte` | #DDEBE3, texte #153829 | #173528, texte #CDEBDB | Fond d'un bouton secondaire, d'une puce de compagnon, de l'élément sélectionné de la barre latérale |
-| `--od-alarme` | #C62828 | **À trancher** | Plafond dépassé, remontée rapide, réserve de gaz insuffisante, erreurs ; jamais ailleurs |
-| `--od-oxygene` | #2E7D32 | #7FD283 | Courbe de ppO2, mélanges nitrox et oxygène ; **à vérifier** : il doit rester distinct du sapin dans le profil |
-| `--od-attente` | #8A4B00 | **À trancher** | État « hors ligne, en attente d'envoi » ; texte seulement, toujours avec une icône, pour ne pas être confondu avec la mandarine |
-| `--od-trace-profil` | #1E4D3A | #EAF5EF | Ligne du profil sur la colonne d'eau |
+| `--od-encre` | #1F2124 (14,7:1 sur le fond) | #F4F4F2 | Texte principal, liens, boutons, onglet actif, curseur du profil ; un bouton plein porte du texte #FFFFFF (16,1:1), en sombre #1F2124 |
+| `--od-texte-2` | #4A4D52 (7,7:1) | #B5B8BC (9,3:1) | Texte secondaire, libellés |
+| `--od-fond` | #F4F4F2 | #121314 | Fond de l'écran |
+| `--od-surface` | #FFFFFF | #1C1D1F | Cellule, bloc, profil |
+| `--od-teinte` | #E8E8E5 | #2E3033 | Puces (gaz, compagnons, étiquettes), bouton secondaire, élément sélectionné |
+| `--od-separateur` | #DADAD6 | #3A3C40 | Séparateurs et contours |
+| `--od-eau-haut` | #FBE3B2 | #3A2A1E | Haut de la colonne d'eau |
+| `--od-eau-bas` | #B4530F | #B4530F | Colonne d'eau à 60 m et plus ; entre les deux, la couleur se mélange selon la profondeur maximale |
+| `--od-trace-profil` | #1F2124 (3,2:1 sur le bas de l'eau) | #F4F4F2 (5,0:1) | Ligne du profil |
+| `--od-alarme` | #C62828 (5,1:1) | À trancher | Plafond dépassé, remontée rapide, réserve de gaz insuffisante, erreurs ; jamais ailleurs |
+| `--od-oxygene` | #2E7D32 (4,7:1) | #7FD283 | Courbe de ppO2, mélanges nitrox et oxygène |
+| `--od-attente` | #8A4B00 (6,2:1) | À trancher | État « hors ligne, en attente d'envoi » ; texte seulement, toujours avec une icône |
 
-**Fonds crème.**
+**Une seule couleur pour les données.** Le rouille de l'eau n'apparaît jamais sur un bouton, un lien ou un état. À vérifier à l'écran : l'attente (#8A4B00) est de la même famille ; elle reste lisible parce qu'elle est un texte accompagné d'une icône, jamais une surface.
 
-| Surface | iOS | Android |
-| --- | --- | --- |
-| Fond de l'écran | #F6F1E7 | #FAF6EE (surface) |
-| Cellule, bloc | #FFFDF9 | #F0EADF (surface-container) |
-| Barres | #FBF7F0 | #F0EADF |
-| Séparateur | #DDD5C7, intérieur #EAE3D6 | #E2DACB (outline-variant) |
-| Fond d'une miniature de profil | #F7F2E8 | #EAE4D8 (surface-variant) |
+**Mode sombre.** Les fonds sont neutres et presque noirs ; l'encre devient #F4F4F2. Le haut de l'eau s'assombrit (#3A2A1E) pour que la ligne claire du profil garde 5:1 sur le bas de l'eau.
 
-En mode sombre, les fonds restent ceux du système (noir et gris d'iOS, surfaces sombres de MD3) : le crème n'existe qu'en clair.
+**Framework7.** Le thème se règle par `colors: { primary: '#1F2124' }` à la création de l'app ; en sombre, la couleur principale doit être surchargée à #F4F4F2, car celle que Framework7 déduit d'un quasi-noir n'est pas lisible sur un fond sombre. Les maquettes Android utilisent ces rôles MD3 : primary #1F2124 / #F4F4F2 ; surface #F4F4F2 / #121314 ; surface-container #EEEEEC / #1C1D1F ; secondary-container #E8E8E5 / #3A3C40 ; on-secondary-container #1F2124 / #F4F4F2 ; outline-variant #DADAD6 / #3A3C40. Sur iOS, `--f7-ios-primary` vaut l'encre ; le texte secondaire reste celui du système (#3C3C43).
 
-**Framework7.** Le thème se règle par `colors: { primary: '#1``E4D3A``' }` à la création de l'app : Framework7 en déduit la couleur iOS (`--f7-ios-primary`) et toute la palette MD3 (`--f7-md-primary`, `--f7-md-surface`, `--f7-md-secondary-container`…) en clair et en sombre. Les maquettes Android utilisent les rôles suivants ; les valeurs générées par Framework7 peuvent légèrement différer, et ce sont elles qui priment, sauf pour `primary`.
+**Attention :** Framework7 réinjecte ses variables à l'initialisation, ce qui peut écraser une surcharge placée dans le CSS. Les jetons `--od-*` ne posent pas ce problème ; une surcharge de `--f7-*` doit être vérifiée à l'écran, en clair et en sombre.
 
-| Rôle MD3 | Clair | Sombre |
-| --- | --- | --- |
-| primary | #1E4D3A | #8FCFAE |
-| surface | #FAF6EE | système |
-| surface-container | #F0EADF | système |
-| surface-variant | #EAE4D8 | système |
-| outline-variant | #E2DACB | système |
-| secondary-container | #CFE9D9 | #2C4A3B |
-| on-secondary-container | #0B3A23 | #CFE9D9 |
-
-Sur iOS, `--f7-ios-primary` vaut le sapin ; les fonds crème remplacent le gris groupé d'Apple en clair, et le texte secondaire reste celui du système (#3C3C43, 9,7:1 sur le crème). Les surfaces crème sont des surcharges des variables de Framework7 : à vérifier à l'écran (paragraphe suivant).
-
-**Attention :** Framework7 réinjecte ses variables à l'initialisation, ce qui peut écraser une surcharge placée dans le CSS ([forum Framework7](https://forum.framework7.io/t/fully-custom-colors-by-overriding-css-variables/17429)). Les jetons `--od-*` ne posent pas ce problème ; une surcharge de `--f7-*` doit être vérifiée à l'écran, en clair et en sombre.
-
-**Contraste :** tout texte à 4,5:1 minimum sur son fond, 3:1 pour un texte de 24 px et plus. Une couleur ne porte jamais seule une information : l'alarme et l'attente ont toujours un texte qui dit le problème.
+**Contraste :** tout texte à 4,5:1 minimum sur son fond, 3:1 pour un texte de 24 px et plus et pour les traits d'un graphique. Une couleur ne porte jamais seule une information : l'alarme et l'attente ont toujours un texte qui dit le problème.
 
 ## 2. Textes, chiffres et unités
 
@@ -106,6 +90,8 @@ La largeur décide de la mise en page, pas le type d'appareil : sous 768 px de l
 
 **Cibles tactiles :** 44 × 44 pt minimum sur iOS, 48 × 48 dp sur Android ; 56 px pour les lignes de liste utilisées sur le bateau (choix du site, compagnons).
 
+**Libellés de la barre d'onglets (iOS) et de la barre de navigation (Android) :** 12 px minimum, plus que les 10 pt d'Apple, et ils suivent la taille de texte du système. Quand ils ne tiennent plus, l'icône reste seule avec son nom lu par VoiceOver ou TalkBack, et un appui long l'affiche en grand (visionneuse de contenu agrandi sur iOS).
+
 **Espacements :** ceux des listes et blocs Framework7 ; marges latérales de 16 px sur téléphone, 24 à 32 px dans les volets de tablette. Pas de cartes à ombre : des listes natives pleine largeur, ou les listes groupées d'iOS.
 
 **Retour :** le geste natif (balayage depuis le bord sur iOS, retour système sur Android) fonctionne partout ; une feuille se ferme aussi en la glissant vers le bas.
@@ -119,8 +105,8 @@ Six composants n'existent pas dans Framework7 ; chacun est un composant Svelte u
 **`<Profil>` : le profil de plongée et sa colonne d'eau.**
 
 - **Tracé :** profondeur en fonction du temps, à partir des échantillons du premier ordinateur ; la surface en haut, la profondeur vers le bas.
-- **Colonne d'eau :** la zone entre la surface et la courbe est remplie d'un dégradé vertical, de `--od-``sapin-clair` en haut à une couleur de fond qui dépend de la profondeur maximale : mélange de `--od-``sapin-clair` et `--od-sapin` dans la proportion profondeur max / 60 m, plafonnée à 1. La même échelle vaut pour toutes les plongées : une plongée à 40 m est visiblement plus sombre qu'une à 12 m.
-- **Exploration :** un doigt posé sur le profil place un curseur vertical en `--od-``mandarin``e` et affiche le temps et la profondeur à cet instant, au-dessus du graphe.
+- **Colonne d'eau :** la zone entre la surface et la courbe est remplie d'un dégradé vertical, de `--od-``eau-haut` en haut à une couleur de fond qui dépend de la profondeur maximale : mélange de `--od-``eau-haut` et `--od-``eau-bas` dans la proportion profondeur max / 60 m, plafonnée à 1. La même échelle vaut pour toutes les plongées : une plongée à 40 m est visiblement plus rouille qu'une à 12 m.
+- **Exploration :** un doigt posé sur le profil place un curseur vertical en `--od-``encr``e` et affiche le temps et la profondeur à cet instant, au-dessus du graphe.
 - **Couches techniques :** Gaz, Plafond, ppO2, Tissus, en puces à cocher (filtres MD3, boutons iOS) ; une couche n'est proposée que si la plongée en contient les données. Gaz affiche une bande par mélange sous le profil ; ppO2 utilise `--od-oxygene` ; un plafond dépassé utilise `--od-alarme`.
 - **Paysage :** sur téléphone, le passage en paysage ouvre le profil en plein écran.
 
@@ -145,7 +131,7 @@ Chaque écran lit et écrit par la façade `libopendives` (via le plugin `OpenDi
 | Premier lancement | Trois choix expliqués : compte existant, créer un compte, commencer sans compte | `cloud_configure` ; **`cloud_create_account`** et **`cloud_verify_pin`** (validation par PIN envoyé par courriel) |
 | Nouveau compte, reprendre un carnet | divelogs.de (identifiants, jamais conservés), fichier, ou carnet vide | `import_file` ; le téléchargement depuis divelogs.de se fait côté app, puis `import_file` sur le fichier .dld reçu |
 | Carnet | Liste par voyage, recherche, état de synchronisation, bouton « + » (télécharger, importer, noter à la main) | `list_dives` (ajouter la miniature : **`samples_summary`** par plongée, quelques dizaines de points) ; **`sync_status`** |
-| Détail d'une plongée | Profil explorable, couches techniques, faits, compagnons, étiquettes, Planifier à partir de cette plongée | **`get_dive`** : échantillons, bouteilles, gaz, événements, plafond, ppO2, ordinateurs, compagnons, combinaison, notes |
+| Détail d'une plongée | En-tête : numéro en gras au début de la ligne de date, puis le site en grand titre (le numéro n'a pas de ligne à lui) ; trois chiffres clés (profondeur max, durée, eau) ; profil explorable, couches techniques ; faits secondaires en grille de trois colonnes ; gaz en pastilles (secours en contour) ; compagnons et étiquettes. En haut à droite : Modifier et un menu (iOS : bouton « … » cerclé, menu déroulant ; Android : trois points verticaux, menu MD3) qui contient « Planifier depuis cette plongée ». Aucun bouton en bas de page. | **`get_dive`** : échantillons, bouteilles, gaz, événements, plafond, ppO2, ordinateurs, compagnons, combinaison, notes |
 | Modifier une plongée, saisie rapide | Champs de la plongée, compagnons, mode circuit ouvert ou recycleur, bouteilles ; Enregistrer | **`update_dive`** puis enregistrement git ; les commandes d'annulation de Subsurface dépendent de Qt, donc l'annulation est à refaire dans la façade |
 | Téléchargement | Association la première fois, puis un geste ; progression ; échec expliqué | **`download_start`** avec un transport fourni par l'app (`dc_custom_open` de libdivecomputer branché sur le Bluetooth du système) ; liste des modèles reconnus |
 | Sites | Carte hors ligne (PMTiles), liste, sites sans position, plongées sans site | **`list_sites`** (nom, position, nombre de plongées, profondeur max) |
@@ -156,6 +142,22 @@ Chaque écran lit et écrit par la façade `libopendives` (via le plugin `OpenDi
 | Réglages | Compte, unités une par une, apparence, cartes hors ligne, ordinateurs | **`get_prefs`** / **`set_prefs`** pour les unités, enregistrées dans le carnet comme le fait Subsurface |
 
 Toutes ces fonctions s'exécutent sur le fil unique du cœur et renvoient du JSON ; aucune ne bloque l'interface. Un appel long (synchronisation, téléchargement) envoie sa progression par événements du plugin.
+
+**Critères du filtre (décidé le 5 novembre 2026).** On filtre sur presque tous les champs de la fiche d'une plongée ; les critères se combinent sans limite, et un filtre s'enregistre pour être réutilisé. Le même filtre s'applique au Carnet, aux Statistiques et à la carte.
+
+| Groupe | Critères | Dans le filtre de Subsurface |
+| --- | --- | --- |
+| Quand | Date ou période, année, jour de la semaine, heure de la journée | Oui |
+| Où | Site | Oui |
+| Où | Pays, région (d'après les données du site) | Non, à ajouter dans la façade |
+| Où | Voyage | Non, à ajouter dans la façade |
+| Avec qui | Compagnons, guide | Oui |
+| La plongée | Profondeur max, durée, mode (circuit ouvert ou recycleur), consommation (SAC), note de 1 à 5, plongée réelle ou planifiée | Oui |
+| Conditions | Température de l'eau et de l'air, visibilité, courant, houle, ressac, sensation de froid | Oui |
+| Matériel | Combinaison, ordinateur de plongée, type et taille de bouteille, gaz (% d'oxygène et d'hélium) | Oui |
+| Texte | Étiquettes, notes, recherche libre dans toute la fiche | Oui |
+
+**Jamais proposés :** poids et type de lest, pressions de départ et de fin, densité de l'eau, pourcentage d'azote (il découle de l'oxygène et de l'hélium). Le mode de plongée est mis en avant en tête de l'éditeur. Un critère qui ne concerne aucune plongée du carnet n'est pas affiché (pas de critère « hélium » pour un carnet sans trimix).
 
 ## 6. États et messages
 
@@ -200,4 +202,4 @@ Chaque écran a cinq états à construire, en plus de l'état normal : chargemen
 - [ ] Les cinq états de la section 6
 - [ ] Un carnet réel lu depuis le cloud (le tien), et le carnet d'exemple de Subsurface
 
-**Points ouverts à trancher :** couleurs Alarme et Attente en sombre ; distinction de l'oxygène et du sapin dans le profil ; choix de version en cas de conflit.
+**Points ouverts à trancher :** couleurs Alarme et Attente en sombre ; distinction de l'attente et du rouille de l'eau, à vérifier à l'écran ; choix de version en cas de conflit.
