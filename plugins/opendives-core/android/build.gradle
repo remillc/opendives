@@ -1,0 +1,47 @@
+// Plugin Capacitor local OpenDivesCore. Les bibliothèques natives et l'asset
+// d'exemple sont produits par native/build-android.sh dans build/android/ (non versionné).
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.25'
+    }
+}
+
+apply plugin: 'com.android.library'
+apply plugin: 'org.jetbrains.kotlin.android'
+
+def nativeOut = new File(rootProject.projectDir, '../../build/android')
+
+android {
+    namespace 'org.opendives.core'
+    compileSdk rootProject.ext.compileSdkVersion
+    defaultConfig {
+        minSdk rootProject.ext.minSdkVersion
+        targetSdk rootProject.ext.targetSdkVersion
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_21
+        targetCompatibility JavaVersion.VERSION_21
+    }
+    kotlinOptions {
+        jvmTarget = '21'
+    }
+    sourceSets {
+        main {
+            jniLibs.srcDirs += new File(nativeOut, 'jniLibs')
+            assets.srcDirs += new File(nativeOut, 'assets')
+        }
+    }
+}
+
+repositories {
+    google()
+    mavenCentral()
+}
+
+dependencies {
+    implementation project(':capacitor-android')
+}

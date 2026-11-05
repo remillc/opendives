@@ -1,0 +1,25 @@
+{
+  "name": "opendives-app",
+  "version": "0.0.1",
+  "private": true,
+  "license": "GPL-2.0-only",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "android:sync": "vite build && cap sync android"
+  },
+  "dependencies": {
+    "@capacitor/android": "^7.6.10",
+    "@capacitor/core": "^7.6.10",
+    "framework7": "^9.3.0",
+    "framework7-svelte": "^9.3.0",
+    "opendives-core": "file:../plugins/opendives-core",
+    "svelte": "^5.57.3"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.6.10",
+    "@sveltejs/vite-plugin-svelte": "^7.3.1",
+    "vite": "^8.3.6"
+  }
+}

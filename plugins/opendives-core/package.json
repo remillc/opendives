@@ -1,0 +1,11 @@
+{
+  "name": "opendives-core",
+  "version": "0.0.1",
+  "private": true,
+  "license": "GPL-2.0-only",
+  "type": "module",
+  "main": "core-api.js",
+  "exports": "./core-api.js",
+  "capacitor": { "android": { "src": "android" } },
+  "peerDependencies": { "@capacitor/core": "^7.0.0" }
+}

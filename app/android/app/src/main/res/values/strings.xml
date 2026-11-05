@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">OpenDives</string>
+    <string name="title_activity_main">OpenDives</string>
+    <string name="package_name">org.opendives.app</string>
+    <string name="custom_url_scheme">org.opendives.app</string>
+</resources>
