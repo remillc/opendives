@@ -9,3 +9,5 @@ OpenDives vise à offrir une application mobile moderne pour consigner, consulte
 ## État
 
 Projet en démarrage.
+
+- [Preuve de concept : le cœur de Subsurface sans Qt](poc/README.md) — 97 carnets d'exemple sur 98 réussissent l'aller-retour git.
