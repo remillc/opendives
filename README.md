@@ -1,13 +1,14 @@
 # OpenDives
 
-Une version améliorée de l'application Subsurface Mobile.
+An improved version of the Subsurface Mobile app.
 
-## À propos
+## About
 
-OpenDives vise à offrir une application mobile moderne pour consigner, consulter et partager ses plongées, en s'inspirant de Subsurface Mobile.
+OpenDives aims to offer a modern mobile app to log, review and share dives, building on Subsurface Mobile.
 
-## État
+## Status
 
-Projet en démarrage.
+Early-stage project.
 
-- [Preuve de concept : le cœur de Subsurface sans Qt](poc/README.md) — 97 carnets d'exemple sur 98 réussissent l'aller-retour git.
+- [Proof of concept: the Subsurface core without Qt](poc/README.md) — 97 of 98 sample logs pass the git round trip.
+- [Design documents](docs/README.md) — analysis, architecture, UI foundations and UI specification.
