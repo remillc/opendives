@@ -43,7 +43,10 @@
   },
   "trip": {
     "startingOn": "Voyage du {date}",
-    "dives": { "one": "{n} plongée", "other": "{n} plongées" },
+    "dives": {
+      "one": "{n} plongée",
+      "other": "{n} plongées"
+    },
     "summarySingle": "{dives}, {depth}",
     "summaryRange": "{dives}, de {min} à {max}"
   },
@@ -62,7 +65,10 @@
     "sac": "Consommation (SAC)",
     "suit": "Combinaison",
     "computer": "Ordinateur de plongée",
-    "computerOthers": { "one": "{model} (et {n} autre)", "other": "{model} (et {n} autres)" },
+    "computerOthers": {
+      "one": "{model} (et {n} autre)",
+      "other": "{model} (et {n} autres)"
+    },
     "notSet": "À préciser",
     "trip": "Voyage",
     "cylinders": "Bouteilles et gaz",
@@ -107,5 +113,17 @@
     "bar": "bar",
     "psi": "psi",
     "percent": "%"
+  },
+  "settings": {
+    "title": "Réglages",
+    "comingSoon": "Les réglages viendront ici.",
+    "development": "Développement",
+    "developmentNote": "Visible seulement dans les compilations de débogage. Le thème choisi est gardé sur cet appareil.",
+    "themes": {
+      "pine": "Sapin et mandarine",
+      "blackWhite": "Noir et blanc",
+      "blackBlocks": "Blocs noirs",
+      "dataColor": "Couleur dans les données"
+    }
   }
 }

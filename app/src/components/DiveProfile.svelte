@@ -117,7 +117,7 @@
   );
 </script>
 
-<div class="profile">
+<div class="profile od-block">
   <div class="readout od-value" aria-hidden="true">
     {#if cursor !== null}
       <span>{t('profile.time')} <strong>{formatMinSec(times[cursor])}</strong></span>
@@ -138,7 +138,7 @@
     >
       <defs>
         <linearGradient id="water-{uid}" x1="0" y1={y(0)} x2="0" y2={y(dMax)} gradientUnits="userSpaceOnUse">
-          <stop offset="0" style="stop-color: var(--od-pine-light)" />
+          <stop offset="0" style="stop-color: var(--od-water-top)" />
           <stop offset="1" style="stop-color: {waterBottomColor(maxDepthMm)}" />
         </linearGradient>
       </defs>
@@ -172,6 +172,8 @@
       {/if}
 
       {#if cursor !== null}
+        <!-- Halo in the block color, so that the cursor stays visible on any water color. -->
+        <line class="cursor-halo" x1={x(times[cursor])} x2={x(times[cursor])} y1={MARGIN_TOP} y2={MARGIN_TOP + plotHeight} />
         <line class="cursor" x1={x(times[cursor])} x2={x(times[cursor])} y1={MARGIN_TOP} y2={MARGIN_TOP + plotHeight} />
       {/if}
     </svg>
@@ -190,7 +192,7 @@
 <style>
   @layer od.components {
     .profile {
-      padding: 0 16px;
+      padding: 4px 16px 0;
     }
 
     svg {
@@ -203,10 +205,10 @@
       min-height: 24px;
       align-items: baseline;
       font-size: 14px;
-      color: var(--f7-md-on-surface-variant, var(--f7-list-item-text-text-color));
+      color: var(--od-text-2);
 
       strong {
-        color: var(--f7-md-on-surface, inherit);
+        color: var(--od-text);
       }
     }
 
@@ -227,19 +229,24 @@
 
     .tick {
       font-size: 11px;
-      fill: var(--f7-md-on-surface-variant, var(--f7-list-item-text-text-color));
+      fill: var(--od-text-2);
     }
 
     .trace {
       fill: none;
-      stroke: var(--od-profile-trace);
+      stroke: var(--od-trace);
       stroke-width: 2;
       stroke-linejoin: round;
     }
 
     .cursor {
-      stroke: var(--od-tangerine);
+      stroke: var(--od-cursor);
       stroke-width: 2;
+    }
+
+    .cursor-halo {
+      stroke: var(--od-block);
+      stroke-width: 5;
     }
 
     .gas {

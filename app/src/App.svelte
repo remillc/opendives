@@ -7,21 +7,25 @@
   import Logbook from './pages/Logbook.svelte';
   import DiveDetail from './pages/DiveDetail.svelte';
   import Placeholder from './pages/Placeholder.svelte';
+  import Settings from './pages/Settings.svelte';
   import Icon from './components/Icon.svelte';
   import AdaptiveLabel from './components/AdaptiveLabel.svelte';
   import { loadLogbook } from './lib/logbook.svelte.js';
   import { enableBackButton } from './lib/back-button.js';
   import { enableAccessibility } from './lib/accessibility.js';
   import { t } from './lib/i18n.js';
+  import { actionColor } from './lib/theme.js';
 
   const f7params = {
     name: 'OpenDives',
     theme: 'auto',
     darkMode: 'auto',
-    colors: { primary: '#1E4D3A' },
+    // The --od-action color of the saved theme (theme.css).
+    colors: { primary: actionColor() },
     routes: [
       { path: '/', component: Logbook },
       { path: '/dive/:id/', component: DiveDetail },
+      { path: '/settings/', component: Settings },
       {
         path: '/sites/',
         component: Placeholder,

@@ -3,41 +3,132 @@
  *
  * Layers, from weakest to strongest:
  *   framework7     Framework7's CSS, imported here and not in main.js;
- *   od.tokens      OpenDives colors (--od-*), each declared once;
+ *   od.tokens      OpenDives colors (--od-*), each declared once per theme;
  *   od.base        rules shared by the screens;
  *   od.components  styles of the Svelte components (each in this layer).
  * A stronger layer wins whatever the specificity of the selectors.
+ *
+ * Themes: <html data-theme="..."> selects the token values (light mode only for
+ * now; dark mode uses the same values for every theme). The theme picker is a
+ * development tool to compare palettes on a real phone (Settings, debug builds).
  */
 @layer framework7, od.tokens, od.base, od.components;
 
 @import 'framework7/css/bundle' layer(framework7);
 
 @layer od.tokens {
+  /* Meaning colors: common to every theme. */
   :root {
-    --od-pine: #1E4D3A;
-    --od-pine-light: #BFD9CB;
-    --od-tangerine: #F06A1D;
-    --od-on-tangerine: #1A1A1A;
-    --od-tint: #DDEBE3;
-    --od-on-tint: #153829;
     --od-alarm: #C62828;
     --od-oxygen: #2E7D32;
     --od-pending: #8A4B00;
-    --od-profile-trace: #1E4D3A;
   }
 
-  .dark {
-    --od-pine: #8FCFAE;
-    --od-pine-light: #BFD9CB;
-    --od-tangerine: #F06A1D;
-    --od-on-tangerine: #1A1A1A;
+  /* Pine and tangerine on cream (the palette of the specification). */
+  [data-theme="pine"] {
+    --od-background: #FAF6EE;
+    --od-surface: #F0EADF;
+    --od-surface-2: #EAE4D8;
+    --od-text: var(--f7-md-on-surface, #1D1B16);
+    --od-text-2: var(--f7-md-on-surface-variant, #4A463F);
+    --od-separator: #E2DACB;
+    --od-action: #1E4D3A;
+    --od-on-action: #FFFFFF;
+    --od-primary-action: #F06A1D;
+    --od-on-primary-action: #1A1A1A;
+    --od-cursor: #F06A1D;
+    --od-water-top: #BFD9CB;
+    --od-water-bottom: #1E4D3A;
+    --od-trace: #1E4D3A;
+    --od-block: var(--od-background);
+    --od-on-block: var(--od-text);
+    --od-trace-block: var(--od-trace);
+    --od-tint: #DDEBE3;
+    --od-on-tint: #153829;
+    --od-thumbnail-background: var(--od-surface-2);
+  }
+
+  /* Black and white: no accent color, the blocks are plain surfaces. */
+  [data-theme="black-white"],
+  [data-theme="black-blocks"],
+  [data-theme="data-color"] {
+    --od-background: #F4F4F2;
+    --od-surface: #FFFFFF;
+    --od-surface-2: #E8E8E5;
+    --od-text: #1F2124;
+    --od-text-2: #4A4D52;
+    --od-separator: #DADAD6;
+    --od-action: #1F2124;
+    --od-on-action: #FFFFFF;
+    --od-primary-action: var(--od-action);
+    --od-on-primary-action: var(--od-on-action);
+    --od-cursor: var(--od-action);
+    --od-water-top: #E8E8E5;
+    --od-water-bottom: #1F2124;
+    --od-trace: #1F2124;
+    --od-block: var(--od-surface);
+    --od-on-block: var(--od-text);
+    --od-trace-block: var(--od-trace);
+    --od-tint: var(--od-surface-2);
+    --od-on-tint: var(--od-text);
+    --od-thumbnail-background: var(--od-surface);
+  }
+
+  /* Black blocks: the latest dive and the profile become dark blocks. */
+  [data-theme="black-blocks"] {
+    --od-block: #1F2124;
+    --od-on-block: #F4F4F2;
+    --od-trace-block: #FFFFFF;
+  }
+
+  html:not(.dark)[data-theme="black-blocks"] .od-block {
+    --od-water-top: #5A5E63;
+    --od-water-bottom: #F4F4F2;
+    --od-trace: var(--od-trace-block);
+    --od-cursor: var(--od-on-block);
+    --od-text: var(--od-on-block);
+    --od-text-2: color-mix(in srgb, var(--od-on-block) 78%, var(--od-block));
+    --od-thumbnail-background: color-mix(in srgb, var(--od-on-block) 12%, var(--od-block));
+    --f7-md-on-surface: var(--od-on-block);
+    --f7-md-on-surface-variant: var(--od-text-2);
+    /* Framework7 computes the list text colors on the whole list: set them again here. */
+    --f7-list-item-title-text-color: var(--od-on-block);
+    --f7-list-item-subtitle-text-color: var(--od-on-block);
+    --f7-list-item-text-text-color: var(--od-text-2);
+    --f7-list-item-after-text-color: var(--od-text-2);
+    --f7-list-item-border-color: color-mix(in srgb, var(--od-on-block) 22%, var(--od-block));
+    --f7-list-chevron-icon-color: var(--od-text-2);
+  }
+
+  /* Color in the data: black and white, the water column alone is colored. */
+  [data-theme="data-color"] {
+    --od-water-top: #FBE3B2;
+    --od-water-bottom: #B4530F;
+  }
+
+  /* Dark mode: same values for every theme (only the light mode is compared). */
+  html.dark[data-theme] {
+    --od-background: var(--f7-md-surface);
+    --od-surface: var(--f7-md-surface-1);
+    --od-surface-2: var(--f7-md-surface-variant);
+    --od-text: var(--f7-md-on-surface);
+    --od-text-2: var(--f7-md-on-surface-variant);
+    --od-separator: var(--f7-md-outline-variant);
+    --od-action: #8FCFAE;
+    --od-on-action: #0B3A23;
+    --od-primary-action: #F06A1D;
+    --od-on-primary-action: #1A1A1A;
+    --od-cursor: #F06A1D;
+    --od-water-top: #BFD9CB;
+    --od-water-bottom: #8FCFAE;
+    --od-trace: #EAF5EF;
+    --od-block: transparent;
+    --od-on-block: var(--od-text);
+    --od-trace-block: var(--od-trace);
     --od-tint: #173528;
     --od-on-tint: #CDEBDB;
-    /* To be decided in the spec: light values kept meanwhile. */
-    --od-alarm: #C62828;
-    --od-pending: #8A4B00;
     --od-oxygen: #7FD283;
-    --od-profile-trace: #EAF5EF;
+    --od-thumbnail-background: var(--f7-md-surface-variant);
   }
 }
 
@@ -45,43 +136,49 @@
  * NOT IN A LAYER, on purpose. At startup Framework7 injects an unlayered
  * style sheet (":root", ".dark", ".md", ".ios") computed from colors.primary.
  * A rule inside a layer would always lose against it; unlayered, these more
- * specific selectors win.
- * Primary color required by the spec; cream backgrounds in light mode.
+ * specific selectors win. They only map Framework7's variables onto the
+ * --od-* tokens of the current theme.
  */
 html.md {
   &:not(.dark) {
-    --f7-md-primary: #1E4D3A;
-    --f7-md-surface: #FAF6EE;
-    --f7-md-surface-1: #F0EADF;
-    --f7-md-surface-2: #F0EADF;
-    --f7-md-surface-3: #F0EADF;
-    --f7-md-surface-variant: #EAE4D8;
-    --f7-md-outline-variant: #E2DACB;
-    --f7-list-item-border-color: var(--f7-md-outline-variant);
-    --od-thumbnail-background: var(--f7-md-surface-variant);
+    --f7-md-primary: var(--od-action);
+    --f7-md-on-primary: var(--od-on-action);
+    --f7-md-surface: var(--od-background);
+    --f7-md-surface-1: var(--od-surface);
+    --f7-md-surface-2: var(--od-surface);
+    --f7-md-surface-3: var(--od-surface);
+    --f7-md-surface-variant: var(--od-surface-2);
+    --f7-md-outline-variant: var(--od-separator);
+    --f7-list-item-border-color: var(--od-separator);
+  }
+
+  /* The pine theme keeps the text and container colors generated by Framework7. */
+  &:not(.dark):not([data-theme="pine"]) {
+    --f7-md-on-surface: var(--od-text);
+    --f7-md-on-surface-variant: var(--od-text-2);
+    --f7-md-outline: var(--od-text-2);
+    --f7-md-secondary-container: var(--od-surface-2);
+    --f7-md-on-secondary-container: var(--od-text);
   }
 
   &.dark {
-    --f7-md-primary: #8FCFAE;
-    --od-thumbnail-background: var(--f7-md-surface-variant);
+    --f7-md-primary: var(--od-action);
   }
 }
 
 html.ios {
   &:not(.dark) {
-    --f7-ios-primary: #1E4D3A;
-    --f7-page-bg-color: #F6F1E7;
-    --f7-list-strong-bg-color: #FFFDF9;
-    --f7-block-strong-bg-color: #FFFDF9;
-    --f7-bars-bg-color: #FBF7F0;
-    --f7-list-item-border-color: #EAE3D6;
-    --f7-list-outline-border-color: #DDD5C7;
-    --od-thumbnail-background: #F7F2E8;
+    --f7-ios-primary: var(--od-action);
+    --f7-page-bg-color: var(--od-background);
+    --f7-list-strong-bg-color: var(--od-surface);
+    --f7-block-strong-bg-color: var(--od-surface);
+    --f7-bars-bg-color: var(--od-surface);
+    --f7-list-item-border-color: var(--od-separator);
+    --f7-list-outline-border-color: var(--od-separator);
   }
 
   &.dark {
-    --f7-ios-primary: #8FCFAE;
-    --od-thumbnail-background: #1C1C1E;
+    --f7-ios-primary: var(--od-action);
   }
 }
 
@@ -91,11 +188,34 @@ html.ios {
     font-variant-numeric: tabular-nums;
   }
 
-  /* Main action of a screen: tangerine, dark text (5.6:1), at most once per screen. */
+  /* Title of an empty or error state. */
+  .od-state-title {
+    font-size: 22px;
+    font-weight: 400;
+    margin: 16px 0 8px;
+  }
+
+  /* A highlighted block (latest dive, profile): dark in the "black blocks" theme. */
+  .od-block {
+    background: var(--od-block);
+    color: var(--od-on-block);
+  }
+
+  /* Titles: heavier in the "black blocks" theme. */
+  html:not(.dark)[data-theme="black-blocks"] :is(.navbar .title, .navbar .title-large-text, .block-title, .od-state-title) {
+    font-weight: 900;
+  }
+
+  /* Bottom bar labels: 12 px minimum (spec, section 3); the WebView scales them with the system text size. */
+  .toolbar {
+    --f7-tabbar-label-font-size: 12px;
+  }
+
+  /* Main action of a screen, at most once per screen. */
   .button.od-primary-action {
-    --f7-button-fill-bg-color: var(--od-tangerine);
-    --f7-button-fill-text-color: var(--od-on-tangerine);
-    --f7-button-fill-pressed-bg-color: var(--od-tangerine);
+    --f7-button-fill-bg-color: var(--od-primary-action);
+    --f7-button-fill-text-color: var(--od-on-primary-action);
+    --f7-button-fill-pressed-bg-color: var(--od-primary-action);
   }
 
   /* "+" button on Android: floating action button in secondary-container. */

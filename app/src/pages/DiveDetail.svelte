@@ -74,7 +74,7 @@
 
   {#if failed}
     <Block>
-      <h2 class="state-title">{t('detail.errorTitle')}</h2>
+      <h2 class="od-state-title">{t('detail.errorTitle')}</h2>
       <p>{t('detail.errorText')}</p>
     </Block>
   {:else if !dive}
@@ -165,12 +165,6 @@
 
 <style>
   @layer od.components {
-    .state-title {
-      font-size: 22px;
-      font-weight: 400;
-      margin: 16px 0 8px;
-    }
-
     .skeleton-profile {
       height: 180px;
       margin: 32px 16px 8px;

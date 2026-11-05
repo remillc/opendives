@@ -43,7 +43,10 @@
   },
   "trip": {
     "startingOn": "Trip starting {date}",
-    "dives": { "one": "{n} dive", "other": "{n} dives" },
+    "dives": {
+      "one": "{n} dive",
+      "other": "{n} dives"
+    },
     "summarySingle": "{dives}, {depth}",
     "summaryRange": "{dives}, {min} to {max}"
   },
@@ -62,7 +65,10 @@
     "sac": "SAC",
     "suit": "Suit",
     "computer": "Dive computer",
-    "computerOthers": { "one": "{model} (and {n} other)", "other": "{model} (and {n} others)" },
+    "computerOthers": {
+      "one": "{model} (and {n} other)",
+      "other": "{model} (and {n} others)"
+    },
     "notSet": "Not set",
     "trip": "Trip",
     "cylinders": "Cylinders and gases",
@@ -107,5 +113,17 @@
     "bar": "bar",
     "psi": "psi",
     "percent": "%"
+  },
+  "settings": {
+    "title": "Settings",
+    "comingSoon": "Settings will appear here.",
+    "development": "Development",
+    "developmentNote": "Only shown in debug builds. The chosen theme is kept on this device.",
+    "themes": {
+      "pine": "Pine and tangerine",
+      "blackWhite": "Black and white",
+      "blackBlocks": "Black blocks",
+      "dataColor": "Color in the data"
+    }
   }
 }

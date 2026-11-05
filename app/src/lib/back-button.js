@@ -14,6 +14,7 @@ export function enableBackButton() {
       else if (modal.classList.contains('dialog')) f7.dialog.close();
       else if (modal.classList.contains('sheet-modal')) f7.sheet.close();
       else if (modal.classList.contains('popup')) f7.popup.close();
+      else if (modal.classList.contains('popover')) f7.popover.close();
       return;
     }
     // 2. An active search closes.

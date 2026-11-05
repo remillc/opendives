@@ -186,6 +186,32 @@ The screenshots come from the Subsurface sample log, never from a personal log.
 
 **Sizes:** debug APK of 27.7 MB (two architectures). `libopendives.so` is 9.3 MB on arm64 and 9.6 MB on x86_64, OpenSSL included.
 
+## Colour themes, compared on the phone (5 November 2026)
+
+A debug-only picker compares four palettes on the Pixel with the real cloud log. Only the `--od-*` token values change, never the layout.
+
+- **Where:** Settings (gear icon in the Logbook navbar), section "Development", shown only when the app is debuggable (`getAppInfo` in the plugin reads `FLAG_DEBUGGABLE`).
+- **How:** the choice sets `<html data-theme>`, is applied at once (`f7.setColorTheme` with the theme's `--od-action`) and is kept in the WebView's `localStorage`.
+- **Themes:** "Pine and tangerine" (the specification's palette), "Black and white", "Black blocks" (the latest dive row and the profile become dark blocks, titles in weight 900) and "Color in the data" (black and white, the water column alone goes from #FBE3B2 to #B4530F). **"Color in the data" (finalist 3) is the default.**
+- **Tokens:** `--od-background`, `--od-surface`, `--od-surface-2`, `--od-text`, `--od-text-2`, `--od-separator`, `--od-action`, `--od-on-action`, `--od-water-top`, `--od-water-bottom`, `--od-trace`, `--od-block`, `--od-on-block`, `--od-trace-block`, plus `--od-primary-action`, `--od-cursor`, `--od-tint` and `--od-thumbnail-background`. Alarm, oxygen and pending stay common. Dark mode uses the same values for every theme.
+- **Bottom bar labels:** 12 px, and the WebView scales them with the system text size.
+
+**Contrast, measured in the WebView** (each text against its actual opaque background; 4.5:1 for text, 3:1 for graphics). Every text passed in "Black and white" and "Color in the data". Below the threshold:
+
+| Theme | Element | Ratio |
+| --- | --- | --- |
+| Black blocks | Latest dive row: site, date and depth (black on the black block) | 1.0 to 1.9. **Fixed** (Framework7 computes the list text colours on the whole list; they are now set again inside `.od-block`), not re-measured since |
+| Black blocks | Water top (#5A5E63) on the black block | 2.5 |
+| Black blocks | White trace on the deepest water (#F4F4F2) | 1.1 |
+| Black and white | Trace (#1F2124) on the deepest water (#1F2124) | 1.0 |
+| Pine | Trace on the deepest water (both #1E4D3A) | 1.0 |
+| Pine | Tangerine cursor on the cream background | 2.9 |
+| All | Water top on the background around the profile | 1.2 to 1.4 |
+
+The trace and the deepest water share a colour by design in three themes: the curve stays visible against the background below it, not against the water above it. "Color in the data" passes both. The pale top of the water column is only an area edge, not information. The pine measurement was taken once; a second pass was interrupted.
+
+The comparison screenshots were taken with the real (personal) log, so they are not committed.
+
 ## Reproduce
 
 The commands are in [AGENTS.md](../AGENTS.md#commands).

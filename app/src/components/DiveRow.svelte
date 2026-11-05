@@ -8,9 +8,10 @@
 
   /**
    * `inTrip`: the row belongs to an expanded trip and is shifted to the right.
-   * @type {{ dive: import('opendives-core').Dive, prefs: import('opendives-core').Prefs, inTrip?: boolean }}
+   * `highlight`: the latest dive, shown as a block (dark in the "black blocks" theme).
+   * @type {{ dive: import('opendives-core').Dive, prefs: import('opendives-core').Prefs, inTrip?: boolean, highlight?: boolean }}
    */
-  let { dive, prefs, inTrip = false } = $props();
+  let { dive, prefs, inTrip = false, highlight = false } = $props();
 
   // Name read by TalkBack and VoiceOver: site, date, then the values.
   // A zero depth means "unknown" in the core: it is not read.
@@ -24,7 +25,7 @@
   );
 </script>
 
-<li class:in-trip={inTrip}>
+<li class:in-trip={inTrip} class:od-block={highlight}>
   <a href="/dive/{dive.id}/" class="item-link item-content dive-row" aria-label={label}>
     <div class="item-media">
       <ProfileThumbnail profile={dive.profile} maxDepthMm={dive.maxDepthMm} {prefs} />

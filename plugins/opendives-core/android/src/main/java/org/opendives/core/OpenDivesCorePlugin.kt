@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 package org.opendives.core
 
+import android.content.pm.ApplicationInfo
 import android.util.Base64
 import android.util.Log
 import com.getcapacitor.JSArray
@@ -71,6 +72,13 @@ class OpenDivesCorePlugin : Plugin() {
     @PluginMethod
     fun getPrefs(call: PluginCall) = onCoreThread(call) {
         call.resolve(JSObject(NativeCore.getPrefs()))
+    }
+
+    /** Whether this is a debug build: development tools are only shown then. */
+    @PluginMethod
+    fun getAppInfo(call: PluginCall) {
+        val debug = (context.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
+        call.resolve(JSObject().put("debug", debug))
     }
 
     /**

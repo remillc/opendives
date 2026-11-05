@@ -113,6 +113,8 @@ import { registerPlugin } from '@capacitor/core';
  *   Detail of one dive of the last loaded log.
  * @property {() => Promise<Prefs>} getPrefs
  *   Units of the last loaded log.
+ * @property {() => Promise<{debug: boolean}>} getAppInfo
+ *   Whether this is a debug build (development tools are only shown then).
  */
 
 /** @type {OpenDivesCorePlugin} */

@@ -52,7 +52,7 @@
 >
   <defs>
     <linearGradient id="water-{uid}" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" style="stop-color: var(--od-pine-light)" />
+      <stop offset="0" style="stop-color: var(--od-water-top)" />
       <stop offset="1" style="stop-color: {waterBottomColor(maxDepthMm)}" />
     </linearGradient>
   </defs>
@@ -87,7 +87,7 @@
 
     .line {
       fill: none;
-      stroke: var(--od-profile-trace);
+      stroke: var(--od-trace);
       stroke-width: 1.5;
       stroke-linejoin: round;
     }

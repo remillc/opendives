@@ -22,6 +22,8 @@
   let expanded = $state(/** @type {Record<number, boolean>} */ ({}));
 
   const sorted = $derived([...logbook.dives].sort((a, b) => b.date.localeCompare(a.date)));
+  /** The latest dive is shown as a block. */
+  const latestId = $derived(sorted[0]?.id);
 
   /** Dives outside trips and trips, from the most recent to the oldest. */
   const entries = $derived.by(() => {
@@ -78,11 +80,13 @@
 
 <Page>
   <Navbar large title={t('logbook.title')}>
-    {#if theme.ios}
-      <NavRight>
+    <NavRight>
+      <!-- Settings open from the Logbook (spec, section 3). -->
+      <Link iconOnly href="/settings/"><Icon name="settings" /><span class="od-sr-only">{t('settings.title')}</span></Link>
+      {#if theme.ios}
         <Link iconOnly onClick={add}><Icon name="plus" /><span class="od-sr-only">{t('logbook.add')}</span></Link>
-      </NavRight>
-    {/if}
+      {/if}
+    </NavRight>
     <Subnavbar inner={false}>
       <Searchbar
         customSearch
@@ -115,7 +119,7 @@
     </List>
   {:else if logbook.error}
     <Block>
-      <h2 class="state-title">{t('logbook.errorTitle')}</h2>
+      <h2 class="od-state-title">{t('logbook.errorTitle')}</h2>
       <p>{t('logbook.errorNothingChanged')}</p>
       <p>{t('logbook.errorCheck')}</p>
       <ol>
@@ -126,7 +130,7 @@
     </Block>
   {:else if logbook.dives.length === 0}
     <Block>
-      <h2 class="state-title">{t('logbook.emptyTitle')}</h2>
+      <h2 class="od-state-title">{t('logbook.emptyTitle')}</h2>
       <p>{t('logbook.emptyText')}</p>
       <Button tonal onClick={add}>{t('logbook.add')}</Button>
     </Block>
@@ -144,7 +148,7 @@
     <List mediaList dividers>
       {#each entries as entry (entry.key)}
         {#if entry.type === 'dive'}
-          <DiveRow dive={entry.dive} prefs={logbook.prefs} />
+          <DiveRow dive={entry.dive} prefs={logbook.prefs} highlight={entry.dive.id === latestId} />
         {:else}
           {@const id = entry.dives[0].trip?.id ?? 0}
           <TripRow
@@ -156,7 +160,7 @@
           />
           {#if expanded[id]}
             {#each entry.dives as dive (dive.id)}
-              <DiveRow {dive} prefs={logbook.prefs} inTrip />
+              <DiveRow {dive} prefs={logbook.prefs} inTrip highlight={dive.id === latestId} />
             {/each}
           {/if}
         {/if}
@@ -182,12 +186,6 @@
 
 <style>
   @layer od.components {
-    .state-title {
-      font-size: 22px;
-      font-weight: 400;
-      margin: 16px 0 8px;
-    }
-
     .skeleton-thumbnail {
       width: 56px;
       height: 40px;
