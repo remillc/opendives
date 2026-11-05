@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "target": "es2022",
+    "checkJs": true,
+    "allowJs": true,
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "paths": {
+      "opendives-core": ["../plugins/opendives-core/core-api.js"]
+    }
+  },
+  "include": ["src/**/*.js", "src/**/*.svelte", "../plugins/opendives-core/core-api.js"]
+}

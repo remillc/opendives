@@ -1,0 +1,152 @@
+/*
+ * Feuille de style d'OpenDives (docs/specification-interface.md, section 1).
+ *
+ * Couches, de la plus faible à la plus forte :
+ *   framework7     le CSS de Framework7, importé ici et non dans main.js ;
+ *   od.jetons      les couleurs d'OpenDives (--od-*), déclarées une seule fois ;
+ *   od.base        les règles communes aux écrans ;
+ *   od.composants  les styles des composants Svelte (chacun dans cette couche).
+ * Une couche plus forte l'emporte quelle que soit la spécificité des sélecteurs.
+ */
+@layer framework7, od.jetons, od.base, od.composants;
+
+@import 'framework7/css/bundle' layer(framework7);
+
+@layer od.jetons {
+  :root {
+    --od-sapin: #1E4D3A;
+    --od-sapin-clair: #BFD9CB;
+    --od-mandarine: #F06A1D;
+    --od-sur-mandarine: #1A1A1A;
+    --od-teinte: #DDEBE3;
+    --od-sur-teinte: #153829;
+    --od-alarme: #C62828;
+    --od-oxygene: #2E7D32;
+    --od-attente: #8A4B00;
+    --od-trace-profil: #1E4D3A;
+  }
+
+  .dark {
+    --od-sapin: #8FCFAE;
+    --od-sapin-clair: #BFD9CB;
+    --od-mandarine: #F06A1D;
+    --od-sur-mandarine: #1A1A1A;
+    --od-teinte: #173528;
+    --od-sur-teinte: #CDEBDB;
+    /* À trancher dans la spécification : valeurs claires conservées en attendant. */
+    --od-alarme: #C62828;
+    --od-attente: #8A4B00;
+    --od-oxygene: #7FD283;
+    --od-trace-profil: #EAF5EF;
+  }
+}
+
+/*
+ * HORS COUCHE, volontairement. Framework7 injecte au démarrage une feuille sans
+ * couche (« :root », « .dark », « .md », « .ios ») calculée depuis
+ * colors.primary. Une règle placée dans une couche perdrait toujours contre
+ * elle ; hors couche, ces sélecteurs plus précis l'emportent.
+ * Couleur principale imposée par la spécification ; fonds crème en clair.
+ */
+html.md {
+  &:not(.dark) {
+    --f7-md-primary: #1E4D3A;
+    --f7-md-surface: #FAF6EE;
+    --f7-md-surface-1: #F0EADF;
+    --f7-md-surface-2: #F0EADF;
+    --f7-md-surface-3: #F0EADF;
+    --f7-md-surface-variant: #EAE4D8;
+    --f7-md-outline-variant: #E2DACB;
+    --f7-list-item-border-color: var(--f7-md-outline-variant);
+    --od-fond-miniature: var(--f7-md-surface-variant);
+  }
+
+  &.dark {
+    --f7-md-primary: #8FCFAE;
+    --od-fond-miniature: var(--f7-md-surface-variant);
+  }
+}
+
+html.ios {
+  &:not(.dark) {
+    --f7-ios-primary: #1E4D3A;
+    --f7-page-bg-color: #F6F1E7;
+    --f7-list-strong-bg-color: #FFFDF9;
+    --f7-block-strong-bg-color: #FFFDF9;
+    --f7-bars-bg-color: #FBF7F0;
+    --f7-list-item-border-color: #EAE3D6;
+    --f7-list-outline-border-color: #DDD5C7;
+    --od-fond-miniature: #F7F2E8;
+  }
+
+  &.dark {
+    --f7-ios-primary: #8FCFAE;
+    --od-fond-miniature: #1C1C1E;
+  }
+}
+
+@layer od.base {
+  /* Section 2 : chiffres tabulaires pour toute valeur de plongée. */
+  .od-valeur {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Action principale d'un écran : mandarine, texte foncé (5,6:1), une fois par écran au plus. */
+  .button.od-bouton-principal {
+    --f7-button-fill-bg-color: var(--od-mandarine);
+    --f7-button-fill-text-color: var(--od-sur-mandarine);
+    --f7-button-fill-pressed-bg-color: var(--od-mandarine);
+  }
+
+  /* Bouton « + » sur Android : bouton d'action flottant en secondary-container. */
+  .md .od-fab-ajouter {
+    --f7-fab-bg-color: var(--f7-md-secondary-container);
+    --f7-fab-text-color: var(--f7-md-on-secondary-container);
+  }
+
+  /*
+   * Les icônes de Framework7 sont des ligatures de police insérées par CSS :
+   * sans texte de remplacement vide, TalkBack et VoiceOver liraient
+   * « chevron_right » ou « search_md ».
+   */
+  /* Framework7 place le chevron sur item-inner, ou sur item-title-row dans une liste média. */
+  .list:not(.media-list) .item-link .item-inner::before,
+  .media-list .item-link .item-title-row::before {
+    content: var(--f7-list-chevron-icon-right) / '';
+  }
+
+  .md {
+    .icon-back::after { content: 'arrow_left_md' / ''; }
+    .searchbar-disable-button::after { content: 'arrow_left_md' / ''; }
+    .searchbar-icon::after { content: 'search_md' / ''; }
+    .input-clear-button::after { content: 'delete_round_md' / ''; }
+  }
+
+  .ios {
+    .icon-back::after { content: 'chevron_left_ios' / ''; }
+    .searchbar-icon::after { content: 'search_ios' / ''; }
+    .input-clear-button::after { content: 'delete_round_ios' / ''; }
+  }
+
+  /* Texte réservé aux lecteurs d'écran. */
+  .od-lecteur {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  /* Le bouton flottant ne doit pas masquer la dernière ligne du carnet. */
+  .md .page:has(.od-fab-ajouter) .list:last-of-type {
+    margin-bottom: 96px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      transition-duration: 0.01ms !important;
+      animation-duration: 0.01ms !important;
+    }
+  }
+}
