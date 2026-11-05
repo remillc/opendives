@@ -6,6 +6,7 @@
   import Icone from './Icone.svelte';
   import Miniature from './Miniature.svelte';
   import { depthValue, formatDepth, formatLongDate } from '../lib/format.js';
+  import { t } from '../lib/i18n.js';
 
   /**
    * @type {{
@@ -20,18 +21,17 @@
 
   // Les plongées arrivent de la plus récente à la plus ancienne.
   const debut = $derived(dives[dives.length - 1].date);
-  const titre = $derived(location || `Voyage du ${formatLongDate(debut)}`);
+  const titre = $derived(location || t('voyage.du', { date: formatLongDate(debut) }));
   const resume = $derived.by(() => {
-    const n = dives.length;
-    if (n === 1) return dives[0].maxDepthMm ? `1 plongée, ${formatDepth(dives[0].maxDepthMm, prefs)}` : '1 plongée';
+    const plongees = t('voyage.plongees', { n: dives.length });
     // Une profondeur nulle signifie « inconnue » : elle n'entre pas dans l'écart.
     const p = dives.map((d) => d.maxDepthMm).filter((mm) => mm > 0);
-    if (!p.length) return `${n} plongées`;
+    if (!p.length) return plongees;
     const min = Math.min(...p);
     const max = Math.max(...p);
     return min === max
-      ? `${n} plongées, ${formatDepth(max, prefs)}`
-      : `${n} plongées, de ${depthValue(min, prefs)} à ${formatDepth(max, prefs)}`;
+      ? t('voyage.resumeUne', { plongees, profondeur: formatDepth(max, prefs) })
+      : t('voyage.resumeEcart', { plongees, min: depthValue(min, prefs), max: formatDepth(max, prefs) });
   });
   const apercu = $derived(dives.slice(0, 4));
 
@@ -72,7 +72,7 @@
         <div class="item-after"><span class="fleche" class:ouvert><Icone nom="deplier" /></span></div>
       </div>
       <div class="item-text od-valeur">{resume}</div>
-      {#if location}<div class="item-text">Voyage du {formatLongDate(debut)}</div>{/if}
+      {#if location}<div class="item-text">{t('voyage.du', { date: formatLongDate(debut) })}</div>{/if}
     </div>
   </div>
 </li>

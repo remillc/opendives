@@ -3,15 +3,15 @@
 // Les valeurs arrivent du cœur en unités SI entières ; la conversion se fait
 // ici, au moment de l'affichage, jamais dans les données.
 
+import { t } from './i18n.js';
+
 /** @typedef {import('opendives-core').Prefs} Prefs */
 
 /** Langue de l'appareil ; les formats en découlent (virgule décimale en français). */
 export const locale = typeof navigator !== 'undefined' ? navigator.language : 'fr';
 
-const NBSP = ' ';
+const NBSP = ' '; // espace insécable avant les unités
 const fr = locale.toLowerCase().startsWith('fr');
-const FEET = fr ? 'pi' : 'ft';
-const CUFT = fr ? 'pi³' : 'cu ft';
 /** @type {Map<string, Intl.NumberFormat>} */
 const formats = new Map();
 
@@ -48,7 +48,7 @@ export function depthValue(mm, prefs) {
 
 /** @param {Prefs} prefs */
 export function depthUnit(prefs) {
-  return prefs.length === 'ft' ? FEET : 'm';
+  return prefs.length === 'ft' ? t('unites.pieds') : t('unites.metres');
 }
 
 /**
@@ -61,7 +61,7 @@ export function formatDepth(mm, prefs) {
 
 /** Durée de plongée : minutes entières. @param {number} seconds */
 export function formatDuration(seconds) {
-  return `${formatNumber(Math.round(seconds / 60), 0)}${NBSP}min`;
+  return `${formatNumber(Math.round(seconds / 60), 0)}${NBSP}${t('unites.minutes')}`;
 }
 
 /** Temps dans le profil : min:s. @param {number} seconds */
@@ -80,8 +80,8 @@ export function formatTemperature(mk, prefs) {
   if (!mk) return null;
   const c = (mk - 273150) / 1000;
   return prefs.temperature === 'F'
-    ? `${formatNumber(c * 9 / 5 + 32, 1)}${NBSP}°F`
-    : `${formatNumber(c, 1)}${NBSP}°C`;
+    ? `${formatNumber(c * 9 / 5 + 32, 1)}${NBSP}${t('unites.fahrenheit')}`
+    : `${formatNumber(c, 1)}${NBSP}${t('unites.celsius')}`;
 }
 
 /**
@@ -91,8 +91,8 @@ export function formatTemperature(mk, prefs) {
  */
 export function formatPressure(mbar, prefs) {
   return prefs.pressure === 'psi'
-    ? `${formatNumber(mbar / 68.947572932, 0)}${NBSP}psi`
-    : `${formatNumber(mbar / 1000, 0)}${NBSP}bar`;
+    ? `${formatNumber(mbar / 68.947572932, 0)}${NBSP}${t('unites.psi')}`
+    : `${formatNumber(mbar / 1000, 0)}${NBSP}${t('unites.bar')}`;
 }
 
 /**
@@ -102,8 +102,8 @@ export function formatPressure(mbar, prefs) {
  */
 export function formatSac(mlPerMin, prefs) {
   return prefs.volume === 'cuft'
-    ? `${formatNumber(mlPerMin / 28316.8466, 1)}${NBSP}${CUFT}/min`
-    : `${formatNumber(mlPerMin / 1000, 1)}${NBSP}l/min`;
+    ? `${formatNumber(mlPerMin / 28316.8466, 1)}${NBSP}${t('unites.piedsCubesMinute')}`
+    : `${formatNumber(mlPerMin / 1000, 1)}${NBSP}${t('unites.litresMinute')}`;
 }
 
 /**
@@ -118,14 +118,14 @@ export function formatCylinderSize(ml, workingPressureMbar, prefs) {
   if (!ml) return null;
   if (prefs.volume === 'cuft') {
     if (!workingPressureMbar) return null;
-    return `${formatNumber((ml / 28316.8466) * (workingPressureMbar / 1013.25), 1)}${NBSP}${CUFT}`;
+    return `${formatNumber((ml / 28316.8466) * (workingPressureMbar / 1013.25), 1)}${NBSP}${t('unites.piedsCubes')}`;
   }
-  return `${formatNumber(ml / 1000, 1)}${NBSP}l`;
+  return `${formatNumber(ml / 1000, 1)}${NBSP}${t('unites.litres')}`;
 }
 
 /** Pourcentage depuis un pour mille. @param {number} permille */
 export function formatPercent(permille) {
-  return `${formatNumber(permille / 10, 0)}${NBSP}%`;
+  return `${formatNumber(permille / 10, 0)}${NBSP}${t('unites.pourcent')}`;
 }
 
 // Le cœur donne l'heure locale de la plongée, sans fuseau : on la lit et on
@@ -149,7 +149,7 @@ export function formatLongDate(iso) {
   return premier(longDateFormat.format(toDate(iso)));
 }
 
-/** Intl écrit « 1 juillet » ; l'usage français est « 1er juillet ». @param {string} texte */
+/** Intl écrit « 1 juillet » ; l'usage français est « 1er juillet » (dates au format de l'appareil). @param {string} texte */
 function premier(texte) {
   return fr ? texte.replace(/(^|\s)1 (?=\p{L})/u, '$11er ') : texte;
 }

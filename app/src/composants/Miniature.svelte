@@ -5,6 +5,7 @@
   // la colonne d'eau suit l'échelle commune, donc la profondeur reste lisible.
   import { couleurFond } from '../lib/colonne.js';
   import { formatDepth } from '../lib/format.js';
+  import { t } from '../lib/i18n.js';
 
   /**
    * @type {{
@@ -47,7 +48,7 @@
   preserveAspectRatio="none"
   role={reduite ? undefined : 'img'}
   aria-hidden={reduite ? 'true' : undefined}
-  aria-label={reduite ? undefined : `Profil, ${formatDepth(maxDepthMm, prefs)} au plus profond`}
+  aria-label={reduite ? undefined : t('plongee.miniature', { profondeur: formatDepth(maxDepthMm, prefs) })}
 >
   <defs>
     <linearGradient id="eau-{uid}" x1="0" y1="0" x2="0" y2="1">

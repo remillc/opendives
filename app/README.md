@@ -158,9 +158,18 @@ Les captures viennent du carnet d'exemple de Subsurface, jamais d'un carnet pers
 - **Touche Retour d'Android :** elle fermait l'application. Elle est maintenant reliée au routeur.
 - **Erreur passagère de Capacitor :** « Cannot read properties of undefined (reading 'triggerEvent') » apparaît une fois, au premier lancement après une réinstallation. Elle vient de Capacitor, pas d'OpenDives.
 
+**Langues (règle du 5 novembre 2026) :**
+
+- **Catalogues :** aucun texte visible n'est écrit en dur. Chaque texte a une clé dans `src/i18n/fr.json` (référence) et `src/i18n/en.json` ; les deux ont 87 clés, et un contrôle vérifie qu'elles sont identiques.
+- **Langue :** `src/lib/i18n.js` choisit la première langue traduite de l'appareil, avec l'anglais en repli. Les pluriels passent par `Intl.PluralRules` (« 1 plongée », « 27 plongées »).
+- **Formats :** les nombres et les dates suivent la langue de l'appareil, et les unités viennent du catalogue (« pi » en français, « ft » en anglais).
+- **Données du plongeur :** les noms des sites, les notes, les étiquettes et les noms de gaz donnés par le cœur ne sont pas traduits.
+- **Vérification :** l'anglais a été vérifié sur le téléphone avec la langue propre à l'app d'Android (`cmd locale set-app-locales`), sans changer celle du téléphone.
+- **Reste à faire :** le réglage de la langue dans l'app n'existe pas encore.
+
 **À trancher (spécification) :**
 
-- **Colonne d'eau en sombre :** en sombre, `--od-sapin` (#8FCFAE) et `--od-sapin-clair` (#BFD9CB) sont deux verts clairs.
+- **Colonne d'eau en sombre (thème en cours de révision avec Claude Desktop) :** en sombre, `--od-sapin` (#8FCFAE) et `--od-sapin-clair` (#BFD9CB) sont deux verts clairs.
   - Le dégradé ne code presque plus la profondeur : une plongée à 91 pieds ressemble à une plongée à 48 pieds.
   - Le tracé `--od-trace-profil` (#EAF5EF) sur ce fond a un contraste d'environ 1,3:1 à 1,6:1, sous le 3:1 attendu pour un graphique.
   - Le fond des miniatures disparaît sur la surface sombre.

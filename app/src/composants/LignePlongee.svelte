@@ -4,6 +4,7 @@
   // préciser »), date et heure ; à droite la profondeur maximale puis la durée.
   import Miniature from './Miniature.svelte';
   import { formatDateTime, formatDepth, formatDuration } from '../lib/format.js';
+  import { t } from '../lib/i18n.js';
 
   /**
    * `dansVoyage` : la ligne appartient à un voyage déplié et se décale vers la droite.
@@ -14,14 +15,12 @@
   // Nom lu par TalkBack et VoiceOver : site, date, puis les valeurs.
   // Une profondeur nulle signifie « inconnue » dans le cœur : elle n'est pas lue.
   const nom = $derived(
-    [
-      dive.site || 'Site à préciser',
-      formatDateTime(dive.date),
-      dive.maxDepthMm ? `profondeur maximale ${formatDepth(dive.maxDepthMm, prefs)}` : '',
-      `durée ${formatDuration(dive.durationSeconds)}`,
-    ]
-      .filter(Boolean)
-      .join(', '),
+    t(dive.maxDepthMm ? 'plongee.lecteur' : 'plongee.lecteurSansProfondeur', {
+      site: dive.site || t('plongee.siteAPreciser'),
+      date: formatDateTime(dive.date),
+      profondeur: formatDepth(dive.maxDepthMm, prefs),
+      duree: formatDuration(dive.durationSeconds),
+    }),
   );
 </script>
 
@@ -33,7 +32,7 @@
     <div class="item-inner">
       <div class="item-title-row">
         <div class="item-title">
-          {#if dive.site}{dive.site}{:else}<span class="a-preciser">Site à préciser</span>{/if}
+          {#if dive.site}{dive.site}{:else}<span class="a-preciser">{t('plongee.siteAPreciser')}</span>{/if}
         </div>
         <div class="item-after valeurs od-valeur">
           {#if dive.maxDepthMm}<strong>{formatDepth(dive.maxDepthMm, prefs)}</strong>{/if}

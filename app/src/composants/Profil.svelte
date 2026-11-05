@@ -5,6 +5,8 @@
   // plongée en contient. Les autres couches (plafond, ppO2, tissus) viendront.
   import { couleurFond } from '../lib/colonne.js';
   import { depthUnit, formatDepth, formatDuration, formatMinSec } from '../lib/format.js';
+  // « t » désigne ici les temps du profil : la traduction s'appelle « texte ».
+  import { t as texte } from '../lib/i18n.js';
 
   /**
    * @type {{
@@ -74,7 +76,7 @@
     for (let i = 0; i < t.length; i++) {
       const c = samples.cylinder[i];
       const cyl = c >= 0 ? cylinders[c] : null;
-      const nom = cyl ? cyl.gas : recycleur ? 'Recycleur' : '';
+      const nom = cyl ? cyl.gas : recycleur ? texte('profil.recycleur') : '';
       const oxygene = cyl ? cyl.o2Permille > 210 : false;
       const dernier = res[res.length - 1];
       if (dernier && dernier.nom === nom) dernier.fin = t[i];
@@ -111,17 +113,17 @@
   }
 
   const description = $derived(
-    `Profil de plongée : ${formatDepth(maxDepthMm, prefs)} au plus profond, ${formatDuration(durationSeconds)}`,
+    texte('profil.description', { profondeur: formatDepth(maxDepthMm, prefs), duree: formatDuration(durationSeconds) }),
   );
 </script>
 
 <div class="profil">
   <div class="lecture od-valeur" aria-hidden="true">
     {#if curseur !== null}
-      <span>Temps <strong>{formatMinSec(t[curseur])}</strong></span>
-      <span>Profondeur <strong>{formatDepth(d[curseur], prefs)}</strong></span>
+      <span>{texte('profil.temps')} <strong>{formatMinSec(t[curseur])}</strong></span>
+      <span>{texte('profil.profondeur')} <strong>{formatDepth(d[curseur], prefs)}</strong></span>
     {:else}
-      <span class="consigne">Posez le doigt sur le profil pour lire temps et profondeur.</span>
+      <span class="consigne">{texte('profil.consigne')}</span>
     {/if}
   </div>
 
@@ -149,7 +151,7 @@
       {#each reperesTemps as m (m)}
         <text class="etiquette od-valeur" x={x(m * 60)} y={HAUTEUR - 6} text-anchor="middle">{m}</text>
       {/each}
-      <text class="etiquette" x={MARGE_G + larg} y={HAUTEUR - 6} text-anchor="end">min</text>
+      <text class="etiquette" x={MARGE_G + larg} y={HAUTEUR - 6} text-anchor="end">{texte('unites.minutes')}</text>
 
       {#if chemins}
         <path d={chemins.eau} fill="url(#eau-{uid})" />
@@ -179,7 +181,7 @@
     <div class="couches">
       <!-- Cible de 48 px autour d'une puce de 32 px (spécification, section 3). -->
       <button type="button" class="filtre" aria-pressed={coucheGaz} onclick={() => (coucheGaz = !coucheGaz)}>
-        <span class="chip" class:chip-outline={!coucheGaz}><span class="chip-label">Gaz</span></span>
+        <span class="chip" class:chip-outline={!coucheGaz}><span class="chip-label">{texte('profil.gaz')}</span></span>
       </button>
     </div>
   {/if}

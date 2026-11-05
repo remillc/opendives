@@ -12,6 +12,7 @@
   import { chargerCarnet } from './lib/carnet.svelte.js';
   import { activerRetour } from './lib/retour.js';
   import { activerAccessibilite } from './lib/accessibilite.js';
+  import { t } from './lib/i18n.js';
 
   const f7params = {
     name: 'OpenDives',
@@ -24,17 +25,17 @@
       {
         path: '/sites/',
         component: Section,
-        options: { props: { titre: 'Sites', phrase: 'La carte et la liste des sites viendront ici.' } },
+        options: { props: { titre: t('onglets.sites'), phrase: t('sections.sitesPhrase') } },
       },
       {
         path: '/statistiques/',
         component: Section,
-        options: { props: { titre: 'Statistiques', phrase: 'Les statistiques du carnet viendront ici.' } },
+        options: { props: { titre: t('onglets.statistiques'), phrase: t('sections.statistiquesPhrase') } },
       },
       {
         path: '/outils/',
         component: Section,
-        options: { props: { titre: 'Outils', phrase: 'Le calculateur de gaz et le planificateur viendront ici.' } },
+        options: { props: { titre: t('onglets.outils'), phrase: t('sections.outilsPhrase') } },
       },
     ],
   };
@@ -49,10 +50,10 @@
 <App {...f7params}>
   <Views tabs class="safe-areas">
     <Toolbar tabbar icons bottom>
-      <Link tabLink="#vue-carnet" tabLinkActive text="Carnet"><i class="icon"><Icone nom="carnet" /></i></Link>
-      <Link tabLink="#vue-sites" text="Sites"><i class="icon"><Icone nom="sites" /></i></Link>
-      <Link tabLink="#vue-statistiques"><i class="icon"><Icone nom="statistiques" /></i><LibelleAdaptatif complet="Statistiques" court="Stats" /></Link>
-      <Link tabLink="#vue-outils" text="Outils"><i class="icon"><Icone nom="outils" /></i></Link>
+      <Link tabLink="#vue-carnet" tabLinkActive text={t('onglets.carnet')}><i class="icon"><Icone nom="carnet" /></i></Link>
+      <Link tabLink="#vue-sites" text={t('onglets.sites')}><i class="icon"><Icone nom="sites" /></i></Link>
+      <Link tabLink="#vue-statistiques"><i class="icon"><Icone nom="statistiques" /></i><LibelleAdaptatif complet={t('onglets.statistiques')} court={t('onglets.statistiquesCourt')} /></Link>
+      <Link tabLink="#vue-outils" text={t('onglets.outils')}><i class="icon"><Icone nom="outils" /></i></Link>
     </Toolbar>
     <View id="vue-carnet" main tab tabActive url="/" />
     <View id="vue-sites" tab url="/sites/" />

@@ -1,0 +1,111 @@
+{
+  "onglets": {
+    "carnet": "Carnet",
+    "sites": "Sites",
+    "statistiques": "Statistiques",
+    "statistiquesCourt": "Stats",
+    "outils": "Outils"
+  },
+  "sections": {
+    "sitesPhrase": "La carte et la liste des sites viendront ici.",
+    "statistiquesPhrase": "Les statistiques du carnet viendront ici.",
+    "outilsPhrase": "Le calculateur de gaz et le planificateur viendront ici."
+  },
+  "carnet": {
+    "titre": "Carnet",
+    "rechercher": "Rechercher",
+    "annuler": "Annuler",
+    "ajouter": "Ajouter des plongées",
+    "ajouterTelecharger": "Télécharger depuis l'ordinateur de plongée",
+    "ajouterImporter": "Importer un fichier",
+    "ajouterNoter": "Noter une plongée à la main",
+    "chargement": "Chargement du carnet",
+    "erreurTitre": "Le carnet n'a pas pu être lu",
+    "erreurRien": "Aucune plongée n'a été modifiée.",
+    "erreurVerifier": "À vérifier :",
+    "erreurInternet": "la connexion de l'appareil à Internet ;",
+    "erreurEspace": "l'espace libre sur l'appareil.",
+    "reessayer": "Réessayer",
+    "videTitre": "Aucune plongée pour l'instant",
+    "videPhrase": "Ajoutez vos plongées depuis votre ordinateur de plongée, un fichier, ou à la main.",
+    "aucunResultat": "Aucune plongée ne correspond à « {recherche} »."
+  },
+  "synchro": {
+    "cloud": "Synchronisé avec le cloud Subsurface",
+    "horsLigne": "Hors ligne : aucune modification en attente",
+    "local": "Carnet enregistré sur cet appareil seulement"
+  },
+  "plongee": {
+    "siteAPreciser": "Site à préciser",
+    "lecteur": "{site}, {date}, profondeur maximale {profondeur}, durée {duree}",
+    "lecteurSansProfondeur": "{site}, {date}, durée {duree}",
+    "miniature": "Profil, {profondeur} au plus profond"
+  },
+  "voyage": {
+    "du": "Voyage du {date}",
+    "plongees": { "one": "{n} plongée", "other": "{n} plongées" },
+    "resumeUne": "{plongees}, {profondeur}",
+    "resumeEcart": "{plongees}, de {min} à {max}"
+  },
+  "detail": {
+    "retour": "Retour au carnet",
+    "chargement": "Chargement de la plongée",
+    "erreurTitre": "Cette plongée n'a pas pu être lue",
+    "erreurPhrase": "Aucune plongée n'a été modifiée. Revenez au carnet, puis rouvrez la plongée.",
+    "date": "Date",
+    "numero": "Numéro",
+    "profondeurMax": "Profondeur maximale",
+    "profondeurMoyenne": "Profondeur moyenne",
+    "duree": "Durée",
+    "temperatureEau": "Température de l'eau",
+    "mode": "Mode",
+    "sac": "Consommation (SAC)",
+    "combinaison": "Combinaison",
+    "ordinateur": "Ordinateur de plongée",
+    "ordinateurAutres": { "one": "{modele} (et {n} autre)", "other": "{modele} (et {n} autres)" },
+    "aPreciser": "À préciser",
+    "voyage": "Voyage",
+    "bouteilles": "Bouteilles et gaz",
+    "pressions": "{debut} à {fin}",
+    "pressionDepart": "Départ {pression}",
+    "compagnons": "Compagnons",
+    "guide": "{nom}, guide",
+    "aucunCompagnon": "Aucun compagnon noté.",
+    "etiquettes": "Étiquettes",
+    "aucuneEtiquette": "Aucune étiquette.",
+    "notes": "Notes",
+    "planifier": "Planifier à partir de cette plongée",
+    "modes": {
+      "OC": "Circuit ouvert",
+      "CCR": "Recycleur",
+      "PSCR": "Recycleur semi-fermé",
+      "Freedive": "Apnée"
+    },
+    "usages": {
+      "diluent": "Diluant",
+      "oxygen": "Oxygène du recycleur"
+    }
+  },
+  "profil": {
+    "consigne": "Posez le doigt sur le profil pour lire temps et profondeur.",
+    "temps": "Temps",
+    "profondeur": "Profondeur",
+    "gaz": "Gaz",
+    "recycleur": "Recycleur",
+    "description": "Profil de plongée : {profondeur} au plus profond, {duree}"
+  },
+  "unites": {
+    "metres": "m",
+    "pieds": "pi",
+    "minutes": "min",
+    "litres": "l",
+    "litresMinute": "l/min",
+    "piedsCubes": "pi³",
+    "piedsCubesMinute": "pi³/min",
+    "celsius": "°C",
+    "fahrenheit": "°F",
+    "bar": "bar",
+    "psi": "psi",
+    "pourcent": "%"
+  }
+}

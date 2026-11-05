@@ -17,6 +17,7 @@
     formatSac,
     formatTemperature,
   } from '../lib/format.js';
+  import { t, tSiExiste } from '../lib/i18n.js';
 
   /** @type {{ f7route: { params: { id: string } } }} */
   let { f7route } = $props();
@@ -35,24 +36,26 @@
     }
   });
 
-  /** @type {Record<string, string>} */
-  const modes = { OC: 'Circuit ouvert', CCR: 'Recycleur', PSCR: 'Recycleur semi-fermé', Freedive: 'Apnée' };
-  /** @type {Record<string, string>} */
-  const usages = { 'OC-gas': '', diluent: 'Diluant', oxygen: 'Oxygène du recycleur' };
+  // Mode et usage d'une bouteille : traduits quand la clé existe, sinon tels que le cœur les donne.
+  /** @param {string} mode */
+  const nomMode = (mode) => tSiExiste(`detail.modes.${mode}`) ?? mode;
+  /** @param {string} usage */
+  const nomUsage = (usage) => tSiExiste(`detail.usages.${usage}`) ?? '';
 
   const bouteilles = $derived(plongee ? plongee.cylinders.filter((c) => c.used) : []);
-  const titre = $derived(plongee ? plongee.site || 'Site à préciser' : '');
+  const titre = $derived(plongee ? plongee.site || t('plongee.siteAPreciser') : '');
 
   /** @param {import('opendives-core').Cylinder} c */
   function pressions(c) {
-    if (c.startMbar && c.endMbar) return `${formatPressure(c.startMbar, prefs)} à ${formatPressure(c.endMbar, prefs)}`;
-    if (c.startMbar) return `Départ ${formatPressure(c.startMbar, prefs)}`;
+    if (c.startMbar && c.endMbar)
+      return t('detail.pressions', { debut: formatPressure(c.startMbar, prefs), fin: formatPressure(c.endMbar, prefs) });
+    if (c.startMbar) return t('detail.pressionDepart', { pression: formatPressure(c.startMbar, prefs) });
     return '';
   }
 
   /** @param {import('opendives-core').Cylinder} c */
   function detailBouteille(c) {
-    return [c.description, formatCylinderSize(c.sizeMl, c.workingPressureMbar, prefs), usages[c.use]]
+    return [c.description, formatCylinderSize(c.sizeMl, c.workingPressureMbar, prefs), nomUsage(c.use)]
       .filter(Boolean)
       .join(', ');
   }
@@ -64,22 +67,22 @@
     {#snippet left()}
       <Link back iconOnly>
         <i class="icon icon-back"></i>
-        <span class="od-lecteur">Retour au carnet</span>
+        <span class="od-lecteur">{t('detail.retour')}</span>
       </Link>
     {/snippet}
   </Navbar>
 
   {#if erreur}
     <Block>
-      <h2 class="titre-etat">Cette plongée n'a pas pu être lue</h2>
-      <p>Aucune plongée n'a été modifiée. Revenez au carnet, puis rouvrez la plongée.</p>
+      <h2 class="titre-etat">{t('detail.erreurTitre')}</h2>
+      <p>{t('detail.erreurPhrase')}</p>
     </Block>
   {:else if !plongee}
-    <div class="skeleton-text" aria-busy="true" aria-label="Chargement de la plongée">
+    <div class="skeleton-text" aria-busy="true" aria-label={t('detail.chargement')}>
       <div class="skeleton-block squelette-profil"></div>
       <List>
         {#each Array(5) as _, i (i)}
-          <ListItem title="Profondeur maximale" after="00,0 m" />
+          <ListItem title="––––––––––––––" after="––––––" aria-hidden="true" />
         {/each}
       </List>
     </div>
@@ -94,30 +97,30 @@
     />
 
     <List dividers class="faits">
-      <ListItem title="Date" after={formatFullDate(plongee.date)} />
-      {#if plongee.number}<ListItem title="Numéro" after={String(plongee.number)} />{/if}
-      {#if plongee.maxDepthMm}<ListItem title="Profondeur maximale" after={formatDepth(plongee.maxDepthMm, prefs)} />{/if}
-      {#if plongee.meanDepthMm}<ListItem title="Profondeur moyenne" after={formatDepth(plongee.meanDepthMm, prefs)} />{/if}
-      <ListItem title="Durée" after={formatDuration(plongee.durationSeconds)} />
+      <ListItem title={t('detail.date')} after={formatFullDate(plongee.date)} />
+      {#if plongee.number}<ListItem title={t('detail.numero')} after={String(plongee.number)} />{/if}
+      {#if plongee.maxDepthMm}<ListItem title={t('detail.profondeurMax')} after={formatDepth(plongee.maxDepthMm, prefs)} />{/if}
+      {#if plongee.meanDepthMm}<ListItem title={t('detail.profondeurMoyenne')} after={formatDepth(plongee.meanDepthMm, prefs)} />{/if}
+      <ListItem title={t('detail.duree')} after={formatDuration(plongee.durationSeconds)} />
       {#if formatTemperature(plongee.waterTempMk, prefs)}
-        <ListItem title="Température de l'eau" after={formatTemperature(plongee.waterTempMk, prefs) ?? ''} />
+        <ListItem title={t('detail.temperatureEau')} after={formatTemperature(plongee.waterTempMk, prefs) ?? ''} />
       {/if}
-      <ListItem title="Mode" after={modes[plongee.divemode] ?? plongee.divemode} />
-      {#if plongee.sacMlMin}<ListItem title="Consommation (SAC)" after={formatSac(plongee.sacMlMin, prefs)} />{/if}
-      {#if plongee.suit}<ListItem title="Combinaison" after={plongee.suit} />{/if}
+      <ListItem title={t('detail.mode')} after={nomMode(plongee.divemode)} />
+      {#if plongee.sacMlMin}<ListItem title={t('detail.sac')} after={formatSac(plongee.sacMlMin, prefs)} />{/if}
+      {#if plongee.suit}<ListItem title={t('detail.combinaison')} after={plongee.suit} />{/if}
       <ListItem
-        title="Ordinateur de plongée"
+        title={t('detail.ordinateur')}
         after={plongee.computer
           ? plongee.computers > 1
-            ? `${plongee.computer} (et ${plongee.computers - 1} autre${plongee.computers > 2 ? 's' : ''})`
+            ? t('detail.ordinateurAutres', { modele: plongee.computer, n: plongee.computers - 1 })
             : plongee.computer
-          : 'À préciser'}
+          : t('detail.aPreciser')}
       />
-      {#if plongee.trip?.location}<ListItem title="Voyage" after={plongee.trip.location} />{/if}
+      {#if plongee.trip?.location}<ListItem title={t('detail.voyage')} after={plongee.trip.location} />{/if}
     </List>
 
     {#if bouteilles.length}
-      <BlockTitle>Bouteilles et gaz</BlockTitle>
+      <BlockTitle>{t('detail.bouteilles')}</BlockTitle>
       <List dividers>
         {#each bouteilles as c, i (i)}
           <ListItem title={c.gas} after={pressions(c)} footer={detailBouteille(c)} />
@@ -125,37 +128,37 @@
       </List>
     {/if}
 
-    <BlockTitle>Compagnons</BlockTitle>
+    <BlockTitle>{t('detail.compagnons')}</BlockTitle>
     <Block>
       {#if plongee.buddies.length || plongee.guides.length}
-        <ul class="puces" aria-label="Compagnons">
+        <ul class="puces" aria-label={t('detail.compagnons')}>
           {#each plongee.buddies as nom (nom)}<li class="puce">{nom}</li>{/each}
-          {#each plongee.guides as nom (nom)}<li class="puce">{nom}, guide</li>{/each}
+          {#each plongee.guides as nom (nom)}<li class="puce">{t('detail.guide', { nom })}</li>{/each}
         </ul>
       {:else}
-        <p class="absent">Aucun compagnon noté.</p>
+        <p class="absent">{t('detail.aucunCompagnon')}</p>
       {/if}
     </Block>
 
-    <BlockTitle>Étiquettes</BlockTitle>
+    <BlockTitle>{t('detail.etiquettes')}</BlockTitle>
     <Block>
       {#if plongee.tags.length}
-        <ul class="puces" aria-label="Étiquettes">
+        <ul class="puces" aria-label={t('detail.etiquettes')}>
           {#each plongee.tags as tag (tag)}<li class="puce puce-contour">{tag}</li>{/each}
         </ul>
       {:else}
-        <p class="absent">Aucune étiquette.</p>
+        <p class="absent">{t('detail.aucuneEtiquette')}</p>
       {/if}
     </Block>
 
     {#if plongee.notes.trim()}
-      <BlockTitle>Notes</BlockTitle>
+      <BlockTitle>{t('detail.notes')}</BlockTitle>
       <Block><p class="notes">{plongee.notes}</p></Block>
     {/if}
 
     <Block>
       <!-- Sans action pour l'instant : le planificateur viendra plus tard. -->
-      <Button fill large class="od-bouton-principal">Planifier à partir de cette plongée</Button>
+      <Button fill large class="od-bouton-principal">{t('detail.planifier')}</Button>
     </Block>
   {/if}
 </Page>

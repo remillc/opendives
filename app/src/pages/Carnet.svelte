@@ -9,6 +9,7 @@
   import Icone from '../composants/Icone.svelte';
   import { carnet, chargerCarnet } from '../lib/carnet.svelte.js';
   import { formatDateTime } from '../lib/format.js';
+  import { t } from '../lib/i18n.js';
 
   /** @typedef {import('opendives-core').Dive} Dive */
   /**
@@ -63,12 +64,12 @@
       .create({
         buttons: [
           [
-            { text: 'Ajouter des plongées', label: true },
-            { text: 'Télécharger depuis l\'ordinateur de plongée' },
-            { text: 'Importer un fichier' },
-            { text: 'Noter une plongée à la main' },
+            { text: t('carnet.ajouter'), label: true },
+            { text: t('carnet.ajouterTelecharger') },
+            { text: t('carnet.ajouterImporter') },
+            { text: t('carnet.ajouterNoter') },
           ],
-          [{ text: 'Annuler', bold: true }],
+          [{ text: t('carnet.annuler'), bold: true }],
         ],
       })
       .open();
@@ -76,17 +77,17 @@
 </script>
 
 <Page>
-  <Navbar large title="Carnet">
+  <Navbar large title={t('carnet.titre')}>
     {#if theme.ios}
       <NavRight>
-        <Link iconOnly onClick={ajouter}><Icone nom="plus" /><span class="od-lecteur">Ajouter des plongées</span></Link>
+        <Link iconOnly onClick={ajouter}><Icone nom="plus" /><span class="od-lecteur">{t('carnet.ajouter')}</span></Link>
       </NavRight>
     {/if}
     <Subnavbar inner={false}>
       <Searchbar
         customSearch
-        disableButtonText="Annuler"
-        placeholder="Rechercher"
+        disableButtonText={t('carnet.annuler')}
+        placeholder={t('carnet.rechercher')}
         onSearchbarSearch={(/** @type {any} */ _sb, /** @type {string} */ q) => (recherche = q)}
         onSearchbarClear={() => (recherche = '')}
       />
@@ -98,14 +99,15 @@
 
   {#if carnet.chargement}
     <!-- Chargement : les lignes gardent leur place, sans roue au centre (section 6). -->
-    <List mediaList dividers class="skeleton-text" aria-busy="true" aria-label="Chargement du carnet">
+    <List mediaList dividers class="skeleton-text" aria-busy="true" aria-label={t('carnet.chargement')}>
       {#each Array(8) as _, i (i)}
-        <li>
+        <!-- Lignes grisées : les tirets ne servent qu'à donner une largeur aux blocs. -->
+        <li aria-hidden="true">
           <div class="item-content">
             <div class="item-media"><div class="skeleton-block squelette-miniature"></div></div>
             <div class="item-inner">
-              <div class="item-title-row"><div class="item-title">Site de plongée</div><div class="item-after">00,0 m</div></div>
-              <div class="item-text">1 janv. 2000, 00:00</div>
+              <div class="item-title-row"><div class="item-title">––––––––––––––</div><div class="item-after">––––––</div></div>
+              <div class="item-text">––––––––––––––––––</div>
             </div>
           </div>
         </li>
@@ -113,20 +115,20 @@
     </List>
   {:else if carnet.erreur}
     <Block>
-      <h2 class="titre-etat">Le carnet n'a pas pu être lu</h2>
-      <p>Aucune plongée n'a été modifiée.</p>
-      <p>À vérifier :</p>
+      <h2 class="titre-etat">{t('carnet.erreurTitre')}</h2>
+      <p>{t('carnet.erreurRien')}</p>
+      <p>{t('carnet.erreurVerifier')}</p>
       <ol>
-        <li>la connexion de l'appareil à Internet ;</li>
-        <li>l'espace libre sur l'appareil.</li>
+        <li>{t('carnet.erreurInternet')}</li>
+        <li>{t('carnet.erreurEspace')}</li>
       </ol>
-      <Button fill class="od-bouton-principal" onClick={chargerCarnet}>Réessayer</Button>
+      <Button fill class="od-bouton-principal" onClick={chargerCarnet}>{t('carnet.reessayer')}</Button>
     </Block>
   {:else if carnet.dives.length === 0}
     <Block>
-      <h2 class="titre-etat">Aucune plongée pour l'instant</h2>
-      <p>Ajoutez vos plongées depuis votre ordinateur de plongée, un fichier, ou à la main.</p>
-      <Button tonal onClick={ajouter}>Ajouter des plongées</Button>
+      <h2 class="titre-etat">{t('carnet.videTitre')}</h2>
+      <p>{t('carnet.videPhrase')}</p>
+      <Button tonal onClick={ajouter}>{t('carnet.ajouter')}</Button>
     </Block>
   {:else if resultats}
     {#if resultats.length}
@@ -136,7 +138,7 @@
         {/each}
       </List>
     {:else}
-      <Block><p>Aucune plongée ne correspond à « {recherche} ».</p></Block>
+      <Block><p>{t('carnet.aucunResultat', { recherche })}</p></Block>
     {/if}
   {:else}
     <List mediaList dividers>
@@ -171,7 +173,7 @@
       <div class="fab fab-right-bottom od-fab-ajouter">
         <a href="#ajouter" class="external" role="button" onclick={(e) => { e.preventDefault(); ajouter(); }}>
           <Icone nom="plus" />
-          <span class="od-lecteur">Ajouter des plongées</span>
+          <span class="od-lecteur">{t('carnet.ajouter')}</span>
         </a>
       </div>
     {/if}

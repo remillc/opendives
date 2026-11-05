@@ -1,0 +1,111 @@
+{
+  "onglets": {
+    "carnet": "Logbook",
+    "sites": "Sites",
+    "statistiques": "Statistics",
+    "statistiquesCourt": "Stats",
+    "outils": "Tools"
+  },
+  "sections": {
+    "sitesPhrase": "The map and the list of dive sites will appear here.",
+    "statistiquesPhrase": "The logbook statistics will appear here.",
+    "outilsPhrase": "The gas calculator and the dive planner will appear here."
+  },
+  "carnet": {
+    "titre": "Logbook",
+    "rechercher": "Search",
+    "annuler": "Cancel",
+    "ajouter": "Add dives",
+    "ajouterTelecharger": "Download from dive computer",
+    "ajouterImporter": "Import a file",
+    "ajouterNoter": "Log a dive manually",
+    "chargement": "Loading the logbook",
+    "erreurTitre": "The logbook could not be read",
+    "erreurRien": "No dive was changed.",
+    "erreurVerifier": "Please check:",
+    "erreurInternet": "the device's Internet connection;",
+    "erreurEspace": "the free space on the device.",
+    "reessayer": "Try again",
+    "videTitre": "No dives yet",
+    "videPhrase": "Add your dives from your dive computer, from a file, or manually.",
+    "aucunResultat": "No dive matches “{recherche}”."
+  },
+  "synchro": {
+    "cloud": "Synced with Subsurface cloud",
+    "horsLigne": "Offline: no changes waiting",
+    "local": "Logbook stored on this device only"
+  },
+  "plongee": {
+    "siteAPreciser": "Dive site not set",
+    "lecteur": "{site}, {date}, max. depth {profondeur}, duration {duree}",
+    "lecteurSansProfondeur": "{site}, {date}, duration {duree}",
+    "miniature": "Profile, {profondeur} max. depth"
+  },
+  "voyage": {
+    "du": "Trip starting {date}",
+    "plongees": { "one": "{n} dive", "other": "{n} dives" },
+    "resumeUne": "{plongees}, {profondeur}",
+    "resumeEcart": "{plongees}, {min} to {max}"
+  },
+  "detail": {
+    "retour": "Back to logbook",
+    "chargement": "Loading the dive",
+    "erreurTitre": "This dive could not be read",
+    "erreurPhrase": "No dive was changed. Go back to the logbook and open the dive again.",
+    "date": "Date",
+    "numero": "Number",
+    "profondeurMax": "Max. depth",
+    "profondeurMoyenne": "Mean depth",
+    "duree": "Duration",
+    "temperatureEau": "Water temperature",
+    "mode": "Dive mode",
+    "sac": "SAC",
+    "combinaison": "Suit",
+    "ordinateur": "Dive computer",
+    "ordinateurAutres": { "one": "{modele} (and {n} other)", "other": "{modele} (and {n} others)" },
+    "aPreciser": "Not set",
+    "voyage": "Trip",
+    "bouteilles": "Cylinders and gases",
+    "pressions": "{debut} to {fin}",
+    "pressionDepart": "Start {pression}",
+    "compagnons": "Buddies",
+    "guide": "{nom}, dive guide",
+    "aucunCompagnon": "No buddy noted.",
+    "etiquettes": "Tags",
+    "aucuneEtiquette": "No tags.",
+    "notes": "Notes",
+    "planifier": "Plan from this dive",
+    "modes": {
+      "OC": "Open circuit",
+      "CCR": "CCR",
+      "PSCR": "pSCR",
+      "Freedive": "Freedive"
+    },
+    "usages": {
+      "diluent": "Diluent",
+      "oxygen": "Rebreather oxygen"
+    }
+  },
+  "profil": {
+    "consigne": "Touch the profile to read time and depth.",
+    "temps": "Time",
+    "profondeur": "Depth",
+    "gaz": "Gas",
+    "recycleur": "Rebreather",
+    "description": "Dive profile: {profondeur} max. depth, {duree}"
+  },
+  "unites": {
+    "metres": "m",
+    "pieds": "ft",
+    "minutes": "min",
+    "litres": "l",
+    "litresMinute": "l/min",
+    "piedsCubes": "cu ft",
+    "piedsCubesMinute": "cu ft/min",
+    "celsius": "°C",
+    "fahrenheit": "°F",
+    "bar": "bar",
+    "psi": "psi",
+    "pourcent": "%"
+  }
+}
