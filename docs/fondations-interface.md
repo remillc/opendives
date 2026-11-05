@@ -78,6 +78,8 @@ L'identité d'OpenDives tient dans **le profil de plongée**, pas dans un habill
 
 **Couleurs**
 
+**Remplacé le 5 novembre 2026.** Cette première piste « eau et bouée » est abandonnée : les couleurs ne doivent pas évoquer l'eau ou le ciel, mais provoquer l'envie de replonger, avec confiance et maîtrise. La palette retenue est **sapin et mandarine sur fond crème** ; ses valeurs sont dans la [spécification de l'interface](specification-interface.md). Le principe de la colonne d'eau reste : plus c'est profond, plus c'est foncé, dans la teinte sapin.
+
 | Nom | Valeur | Usage |
 | --- | --- | --- |
 | Eau profonde | #1D5C6B | Couleur principale : sert de base au thème Material You sur Android et de teinte d'accent sur iOS ; fond de la colonne d'eau |
@@ -125,5 +127,7 @@ Les maquettes couvrent maintenant, sur iPhone et téléphone Android : premier l
 | Planificateur | Il peut partir d'une plongée du carnet : il en reprend le gaz, la bouteille, la pression de départ et la consommation (SAC) mesurée. Accès depuis Outils (« Nouvelle plongée ou à partir du carnet ») et depuis la fiche d'une plongée (« Planifier à partir de cette plongée ») |
 | Réserve de gaz | Quand il resterait moins que la réserve minimale pour remonter à deux, le planificateur l'affiche en couleur Alarme, avec l'écart en bar |
 | Conflit de synchronisation | Subsurface fusionne lui-même la plupart des modifications concurrentes ; quand il ne peut pas (« Remote storage and local data diverged »), OpenDives proposerait de garder la version de l'appareil ou celle du cloud, après comparaison, sans rien perdre avant le choix. **À valider** : c'est un ajout à la couche de synchronisation d'OpenDives, sans modifier Subsurface |
+
+**divelogs.de (décidé le 5 novembre 2026).** À la création d'un compte, on peut reprendre son carnet divelogs.de : les plongées sont téléchargées une seule fois dans le compte Subsurface, sans synchronisation ensuite. OpenDives ne conserve pas les identifiants divelogs.de.
 
 Les valeurs des maquettes du planificateur viennent du vrai planificateur de Subsurface, compilé sans Qt dans la preuve de concept.

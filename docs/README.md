@@ -8,6 +8,7 @@ Copies en Markdown des documents de conception d'OpenDives (5 novembre 2026). Le
 | [Rétro-ingénierie fonctionnelle](retro-ingenierie.md) | Fonctions de Subsurface, classement de leur pertinence sur mobile, nouveautés mobiles, décisions | [en ligne](https://claude.ai/artifact/JoAhr3WfF5DVPiJabCuE2D) |
 | [Architecture proposée](architecture.md) | Couches, plugin natif, synchronisation, coexistence avec Subsurface-mobile | [en ligne](https://claude.ai/artifact/Q3xMEsTfLkAqTnwT4m33Z9) |
 | [Fondations de l'interface](fondations-interface.md) | Principes, iOS et MD3, navigation, filtres et statistiques, couleurs | [en ligne](https://claude.ai/artifact/8goh1sZMXM9npSVThnA61r) |
+| [Spécification de l'interface](specification-interface.md) | Couleurs, textes, mise en page, composants, écrans et données du cœur : la référence pour le code | [en ligne](https://claude.ai/artifact/TJU7voFbP6zeNaSUci5p7i) |
 | Maquettes des écrans clés | iPhone, Android, tablettes iOS et Android | [en ligne](https://claude.ai/artifact/Jpuj8pGER3xz8n383JvYep) |
 | [Preuve de concept](../poc/README.md) | Cœur Subsurface sans Qt, aller-retour git | — |
 
