@@ -16,6 +16,14 @@
 
   onMount(async () => {
     try {
+      const cloud = await OpenDivesCore.listCloudDives();
+      if (cloud.available && cloud.dives) {
+        dives = cloud.dives;
+        source = cloud.synced
+          ? `Lu depuis le cloud (${cloud.server}, ${cloud.head?.slice(0, 7)})`
+          : 'Copie locale du cloud : le serveur n\'a pas répondu';
+        return;
+      }
       let result = await OpenDivesCore.listDives();
       if (result.exists) {
         source = 'Relu depuis le dépôt git';

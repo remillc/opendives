@@ -48,6 +48,24 @@ Java_org_opendives_core_NativeCore_importFile(JNIEnv *env, jobject, jstring sour
 	return count;
 }
 
+JNIEXPORT void JNICALL
+Java_org_opendives_core_NativeCore_setCaFile(JNIEnv *env, jobject, jstring path)
+{
+	if (opendives::set_ca_file(to_string(env, path)))
+		throw_core_error(env, "Autorités de certification refusées par libgit2");
+}
+
+JNIEXPORT jstring JNICALL
+Java_org_opendives_core_NativeCore_cloudListDives(JNIEnv *env, jobject, jstring email, jstring password)
+{
+	std::string json, error;
+	if (opendives::cloud_list_dives(to_string(env, email), to_string(env, password), json, error)) {
+		throw_core_error(env, error);
+		return nullptr;
+	}
+	return env->NewStringUTF(json.c_str());
+}
+
 JNIEXPORT jstring JNICALL
 Java_org_opendives_core_NativeCore_listDives(JNIEnv *env, jobject, jstring repo)
 {

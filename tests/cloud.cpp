@@ -30,8 +30,8 @@ int main(int argc, char **argv)
 {
 	const char *email = getenv("OPENDIVES_CLOUD_EMAIL");
 	const char *password = getenv("OPENDIVES_CLOUD_PASSWORD");
-	if (argc != 2 || (strcmp(argv[1], "probe") && strcmp(argv[1], "load"))) {
-		fprintf(stderr, "usage: %s probe|load\n", argv[0]);
+	if (argc != 2 || (strcmp(argv[1], "probe") && strcmp(argv[1], "load") && strcmp(argv[1], "list"))) {
+		fprintf(stderr, "usage: %s probe|load|list\n", argv[0]);
 		return 2;
 	}
 	if (!email || !*email || !password || !*password) {
@@ -42,6 +42,21 @@ int main(int argc, char **argv)
 		return 2;
 
 	std::string url, error, head;
+	if (!strcmp(argv[1], "list")) {
+		// Même chemin que l'app : opendives::cloud_list_dives().
+		std::string json;
+		if (opendives::cloud_list_dives(email, password, json, error)) {
+			fprintf(stderr, "échec: %s\n", error.c_str());
+			return 1;
+		}
+		size_t dives = json.find("\"dives\":");
+		printf("%s\n", json.substr(0, dives).c_str());
+		size_t count = 0;
+		for (size_t p = json.find("\"number\":"); p != std::string::npos; p = json.find("\"number\":", p + 1))
+			count++;
+		printf("plongées: %zu\n", count);
+		return 0;
+	}
 	if (opendives::cloud_configure(email, password, url))
 		return 1;
 	bool exists = false;

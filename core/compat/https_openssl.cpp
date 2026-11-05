@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
-// OpenDives — opendives_https_get() pour Linux (POC et tests), avec OpenSSL.
-// Validation complète : magasin de certificats du système, chaîne et nom d'hôte.
+// OpenDives — opendives_https_get() avec OpenSSL (Linux et Android).
+// Validation complète : autorités de confiance, chaîne et nom d'hôte.
 #include "platform_https.h"
 
 #include <openssl/err.h>
@@ -14,6 +14,13 @@
 
 #include <cstring>
 #include <strings.h>
+
+static std::string ca_file;
+
+void opendives_https_set_ca_file(const std::string &path)
+{
+	ca_file = path;
+}
 
 static int connect_tcp(const std::string &host, int timeout_seconds)
 {
@@ -73,7 +80,9 @@ int opendives_https_get(const std::string &url, const std::string &user_agent,
 		return -2;
 	SSL_CTX_set_min_proto_version(ctx, TLS1_2_VERSION);
 	SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER, nullptr);
-	if (SSL_CTX_set_default_verify_paths(ctx) != 1) {
+	int loaded = ca_file.empty() ? SSL_CTX_set_default_verify_paths(ctx)
+				     : SSL_CTX_load_verify_locations(ctx, ca_file.c_str(), nullptr);
+	if (loaded != 1) {
 		SSL_CTX_free(ctx);
 		return -3;
 	}

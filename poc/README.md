@@ -62,7 +62,7 @@ Les dépôts `A[main]`, `B[main]`, etc. sont des dépôts git locaux : ce test n
   - S'y ajoute `getCloudURL()`.
 - **`platform_https.h` :** la requête HTTPS est fournie par la plateforme, avec un certificat obligatoirement validé.
   - `https_openssl.cpp` : la version Linux.
-  - `https_unavailable.cpp` : la version Android, en attendant le réseau natif ; le cloud y est injoignable.
+  - Android utilise aussi `https_openssl.cpp`, avec un fichier d'autorités fourni par l'app (voir `app/README.md`).
 - **Façade :**
   - `cloud_branch_status()` est une sonde en lecture seule, avec la validation TLS normale de libgit2.
   - `apply_log_prefs()` est le portage de `QMLManager::consumeFinishedLoad()`.
@@ -92,6 +92,5 @@ tests/run-cloud-readonly.sh build/poc/cloud build/poc/roundtrip /mnt/c/Users/<vo
 
 - iOS (Xcode).
 - L'envoi vers le cloud, c'est-à-dire l'enregistrement d'une modification puis la synchronisation.
-- Le réseau sur Android : HTTPS dans libgit2 et `opendives_https_get()` natif.
 - Les imports qui dépendent encore de Qt : Suunto JSON et l'en-tête CSV Seabear, laissés vides ici.
 - Les traductions : `trGettext` renvoie le texte anglais.

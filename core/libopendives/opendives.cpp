@@ -4,12 +4,16 @@
 #include "core/dive.h"
 #include "core/divelog.h"
 #include "core/divesite.h"
+#include "core/event.h"
+#include "core/profile.h"
+#include "core/sample.h"
 #include "core/errorhelper.h"
 #include "core/file.h"
 #include "core/git-access.h"
 #include "core/pref.h"
 #include "core/qthelper.h"
 #include "core/trip.h"
+#include "core/compat/platform_https.h"
 
 #include <git2.h>
 #include <cstdio>
@@ -119,37 +123,317 @@ int import_file(const std::string &source, const std::string &repo, std::string 
 	return static_cast<int>(divelog.dives.size());
 }
 
+template <typename T>
+static void append_json_array(std::string &out, const std::vector<T> &values)
+{
+	out += '[';
+	for (size_t i = 0; i < values.size(); i++) {
+		if (i)
+			out += ',';
+		out += std::to_string(values[i]);
+	}
+	out += ']';
+}
+
+// Miniature : environ `points` couples (temps s, profondeur mm) tirés des
+// échantillons du premier ordinateur. Dans chaque tranche de temps, on garde
+// l'échantillon le plus profond, pour conserver la forme du profil.
+static std::vector<int> profile_summary(const struct dive &d, size_t points = 40)
+{
+	std::vector<int> out;
+	if (d.dcs.empty() || d.dcs[0].samples.empty())
+		return out;
+	const auto &samples = d.dcs[0].samples;
+	int end = samples.back().time.seconds;
+	if (end <= 0)
+		return out;
+	out.push_back(0);
+	out.push_back(0);
+	size_t i = 0;
+	for (size_t b = 1; b <= points; b++) {
+		int limit = static_cast<int>((int64_t)end * b / points);
+		const struct sample *best = nullptr;
+		for (; i < samples.size() && samples[i].time.seconds <= limit; i++) {
+			if (!best || samples[i].depth.mm > best->depth.mm)
+				best = &samples[i];
+		}
+		if (best && best->time.seconds > out[out.size() - 2]) {
+			out.push_back(best->time.seconds);
+			out.push_back(best->depth.mm);
+		}
+	}
+	if (out[out.size() - 2] != end) {
+		out.push_back(end);
+		out.push_back(samples.back().depth.mm);
+	}
+	return out;
+}
+
+static std::string site_name(const struct dive &d)
+{
+	return d.dive_site ? d.dive_site->name : std::string();
+}
+
+static void append_trip(std::string &json, const struct dive &d)
+{
+	json += ",\"trip\":";
+	if (!d.divetrip) {
+		json += "null";
+		return;
+	}
+	json += "{\"id\":" + std::to_string(d.divetrip->id) + ",\"location\":";
+	append_json_string(json, d.divetrip->location);
+	json += ",\"autogen\":";
+	json += d.divetrip->autogen ? "true" : "false";
+	json += '}';
+}
+
+static std::string dives_json()
+{
+	std::string json = "[";
+	bool first = true;
+	for (const auto &d: divelog.dives) {
+		if (!first)
+			json += ',';
+		first = false;
+		json += "{\"id\":" + std::to_string(d->id);
+		json += ",\"number\":" + std::to_string(d->number);
+		json += ",\"date\":";
+		append_json_string(json, iso_date(d->when));
+		json += ",\"site\":";
+		append_json_string(json, site_name(*d));
+		json += ",\"maxDepthMm\":" + std::to_string(d->maxdepth.mm);
+		json += ",\"durationSeconds\":" + std::to_string(d->duration.seconds);
+		json += ",\"profile\":";
+		append_json_array(json, profile_summary(*d));
+		append_trip(json, *d);
+		json += '}';
+	}
+	json += ']';
+	return json;
+}
+
+static void append_names(std::string &json, const std::string &list)
+{
+	// Subsurface sépare les compagnons et guides par des virgules.
+	json += '[';
+	bool first = true;
+	size_t start = 0;
+	while (start <= list.size()) {
+		size_t comma = list.find(',', start);
+		std::string name = list.substr(start, comma == std::string::npos ? std::string::npos : comma - start);
+		size_t a = name.find_first_not_of(" \t"), b = name.find_last_not_of(" \t");
+		if (a != std::string::npos) {
+			if (!first)
+				json += ',';
+			first = false;
+			append_json_string(json, name.substr(a, b - a + 1));
+		}
+		if (comma == std::string::npos)
+			break;
+		start = comma + 1;
+	}
+	json += ']';
+}
+
+int get_dive(int id, std::string &json, std::string &error)
+{
+	const struct dive *d = divelog.dives.get_by_uniq_id(id);
+	if (!d) {
+		error = "Plongée introuvable";
+		return -1;
+	}
+	const struct divecomputer *dc = d->get_dc(0);
+
+	json = "{\"id\":" + std::to_string(d->id);
+	json += ",\"number\":" + std::to_string(d->number);
+	json += ",\"date\":";
+	append_json_string(json, iso_date(d->when));
+	json += ",\"site\":";
+	append_json_string(json, site_name(*d));
+	json += ",\"maxDepthMm\":" + std::to_string(d->maxdepth.mm);
+	json += ",\"meanDepthMm\":" + std::to_string(d->meandepth.mm);
+	json += ",\"durationSeconds\":" + std::to_string(d->duration.seconds);
+	json += ",\"waterTempMk\":" + std::to_string(d->watertemp.mkelvin);
+	json += ",\"airTempMk\":" + std::to_string(d->airtemp.mkelvin);
+	json += ",\"sacMlMin\":" + std::to_string(d->sac);
+	json += ",\"cns\":" + std::to_string(d->maxcns);
+	json += ",\"otu\":" + std::to_string(d->otu);
+	json += ",\"rating\":" + std::to_string(d->rating);
+	json += ",\"visibility\":" + std::to_string(d->visibility);
+	json += ",\"divemode\":";
+	append_json_string(json, dc ? divemode_text[dc->divemode] : "OC");
+	json += ",\"computer\":";
+	append_json_string(json, dc ? dc->model : std::string());
+	json += ",\"computers\":" + std::to_string(d->dcs.size());
+	json += ",\"buddies\":";
+	append_names(json, d->buddy);
+	json += ",\"guides\":";
+	append_names(json, d->diveguide);
+	json += ",\"suit\":";
+	append_json_string(json, d->suit);
+	json += ",\"tags\":[";
+	for (size_t i = 0; i < d->tags.size(); i++) {
+		if (i)
+			json += ',';
+		append_json_string(json, d->tags[i]->name);
+	}
+	json += "],\"notes\":";
+	append_json_string(json, d->notes);
+	append_trip(json, *d);
+
+	json += ",\"cylinders\":[";
+	for (size_t i = 0; i < d->cylinders.size(); i++) {
+		const cylinder_t &c = d->cylinders[i];
+		if (i)
+			json += ',';
+		json += "{\"description\":";
+		append_json_string(json, c.type.description);
+		json += ",\"sizeMl\":" + std::to_string(c.type.size.mliter);
+		json += ",\"workingPressureMbar\":" + std::to_string(c.type.workingpressure.mbar);
+		json += ",\"startMbar\":" + std::to_string(c.start.mbar ? c.start.mbar : c.sample_start.mbar);
+		json += ",\"endMbar\":" + std::to_string(c.end.mbar ? c.end.mbar : c.sample_end.mbar);
+		json += ",\"o2Permille\":" + std::to_string(c.gasmix.o2.permille);
+		json += ",\"hePermille\":" + std::to_string(c.gasmix.he.permille);
+		json += ",\"gas\":";
+		append_json_string(json, c.gasmix.name());
+		json += ",\"use\":";
+		append_json_string(json, cylinderuse_text[c.cylinder_use]);
+		json += ",\"used\":";
+		json += d->is_cylinder_used(static_cast<int>(i)) ? "true" : "false";
+		json += '}';
+	}
+	json += ']';
+
+	json += ",\"events\":[";
+	bool first = true;
+	if (dc) {
+		for (const auto &ev: dc->events) {
+			if (!ev.is_gaschange())
+				continue;
+			if (!first)
+				json += ',';
+			first = false;
+			int cyl = d->get_cylinder_index(ev, *dc);
+			json += "{\"type\":\"gaschange\",\"timeSeconds\":" + std::to_string(ev.time.seconds);
+			json += ",\"cylinder\":" + std::to_string(cyl);
+			json += '}';
+		}
+	}
+	json += ']';
+
+	// Profil calculé par le cœur (profile.cpp), comme le dessine Subsurface.
+	std::vector<int> t, depth, ceiling, ppo2, cylinder;
+	bool has_ceiling = false;
+	if (dc) {
+		struct plot_info pi = create_plot_info_new(d, dc, nullptr);
+		for (const auto &e: pi.entry) {
+			t.push_back(e.sec);
+			depth.push_back(e.depth.mm);
+			ceiling.push_back(e.ceiling.mm);
+			ppo2.push_back(static_cast<int>(e.pressures.o2 * 1000.0 + 0.5));
+			cylinder.push_back(e.ruler_cylinder);
+			has_ceiling = has_ceiling || e.ceiling.mm > 0;
+		}
+	}
+	json += ",\"samples\":{\"timeSeconds\":";
+	append_json_array(json, t);
+	json += ",\"depthMm\":";
+	append_json_array(json, depth);
+	json += ",\"cylinder\":";
+	append_json_array(json, cylinder);
+	json += ",\"ceilingMm\":";
+	if (has_ceiling)
+		append_json_array(json, ceiling);
+	else
+		json += "null";
+	json += ",\"ppo2Mbar\":";
+	append_json_array(json, ppo2);
+	json += "}}";
+	return 0;
+}
+
+int get_prefs(std::string &json)
+{
+	const struct units &u = prefs.units;
+	json = "{\"length\":";
+	json += u.length == units::FEET ? "\"ft\"" : "\"m\"";
+	json += ",\"temperature\":";
+	json += u.temperature == units::FAHRENHEIT ? "\"F\"" : "\"C\"";
+	json += ",\"pressure\":";
+	json += u.pressure == units::PSI ? "\"psi\"" : "\"bar\"";
+	json += ",\"volume\":";
+	json += u.volume == units::CUFT ? "\"cuft\"" : "\"l\"";
+	json += ",\"weight\":";
+	json += u.weight == units::LBS ? "\"lbs\"" : "\"kg\"";
+	json += '}';
+	return 0;
+}
+
 int list_dives(const std::string &log, std::string &json, std::string &error)
 {
 	if (load(log, error))
 		return -1;
 	apply_log_prefs();
 	divelog.process_loaded_dives();
+	json = dives_json();
+	return 0;
+}
 
-	json = "[";
-	bool first = true;
-	for (const auto &d: divelog.dives) {
-		if (!first)
-			json += ',';
-		first = false;
-		json += "{\"number\":" + std::to_string(d->number);
-		json += ",\"date\":";
-		append_json_string(json, iso_date(d->when));
-		json += ",\"site\":";
-		append_json_string(json, d->dive_site ? d->dive_site->name : std::string());
-		json += ",\"maxDepthMm\":" + std::to_string(d->maxdepth.mm);
-		json += ",\"durationSeconds\":" + std::to_string(d->duration.seconds);
-		json += ",\"trip\":";
-		if (d->divetrip) {
-			json += "{\"id\":" + std::to_string(d->divetrip->id) + ",\"location\":";
-			append_json_string(json, d->divetrip->location);
-			json += '}';
-		} else {
-			json += "null";
-		}
-		json += '}';
+int set_ca_file(const std::string &path)
+{
+	opendives_https_set_ca_file(path);
+	return git_libgit2_opts(GIT_OPT_SET_SSL_CERT_LOCATIONS, path.c_str(), nullptr) < 0 ? -1 : 0;
+}
+
+int cloud_list_dives(const std::string &email, const std::string &password, std::string &json, std::string &error)
+{
+	std::string url, head;
+	bool exists = false;
+	if (cloud_configure(email, password, url)) {
+		error = "Identifiants du cloud incomplets";
+		return -1;
 	}
-	json += ']';
+	bool offline = false;
+	std::string probe_error;
+	if (cloud_branch_status(url, exists, head, probe_error)) {
+		// Serveur injoignable : on lit la copie locale, si elle existe, sans
+		// synchroniser (comme Subsurface hors ligne).
+		struct git_info info;
+		if (!is_git_repository(url.c_str(), &info) || !log_exists(info.localdir)) {
+			error = probe_error;
+			return -1;
+		}
+		offline = true;
+	} else if (!exists) {
+		// Le cœur créerait la branche en poussant un commit vide : on s'arrête.
+		error = "Aucun carnet sur le serveur pour ce compte";
+		return -1;
+	}
+	bool was_local_only = git_local_only;
+	if (offline)
+		git_local_only = true;
+	int ret = load(url, error);
+	git_local_only = was_local_only;
+	if (ret)
+		return -1;
+	apply_log_prefs();
+	divelog.process_loaded_dives();
+
+	size_t host_start = prefs.cloud_base_url.find("://");
+	host_start = host_start == std::string::npos ? 0 : host_start + 3;
+	std::string host = prefs.cloud_base_url.substr(host_start);
+	if (!host.empty() && host.back() == '/')
+		host.pop_back();
+	json = "{\"server\":";
+	append_json_string(json, host);
+	json += ",\"head\":";
+	append_json_string(json, head);
+	json += ",\"synced\":";
+	json += !offline && git_remote_sync_successful ? "true" : "false";
+	json += ",\"offlineReason\":";
+	append_json_string(json, offline ? probe_error : std::string());
+	json += ",\"dives\":" + dives_json() + "}";
 	return 0;
 }
 

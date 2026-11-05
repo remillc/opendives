@@ -20,11 +20,25 @@ import { registerPlugin } from '@capacitor/core';
  */
 
 /**
+ * Résultat de la lecture du cloud. `available` vaut false quand aucun
+ * identifiant n'est configuré ; les autres champs sont alors absents.
+ * @typedef {Object} CloudDives
+ * @property {boolean} available
+ * @property {string} [server] ex. ssrf-cloud-eu.subsurface-divelog.org
+ * @property {string} [head] commit de la branche sur le serveur
+ * @property {boolean} [synced] false : copie locale, le serveur n'a pas répondu
+ * @property {string} [offlineReason] raison, quand le serveur n'a pas répondu
+ * @property {Dive[]} [dives]
+ */
+
+/**
  * @typedef {Object} OpenDivesCorePlugin
  * @property {() => Promise<{count: number}>} importSample
  *   Enregistre le carnet d'exemple comme dépôt git local.
  * @property {() => Promise<{exists: boolean, dives: Dive[]}>} listDives
  *   Relit le dépôt git local. `exists` vaut false tant qu'aucun dépôt n'a été créé.
+ * @property {() => Promise<CloudDives>} listCloudDives
+ *   Lecture seule du carnet du cloud Subsurface (identifiants de développement).
  */
 
 /** @type {OpenDivesCorePlugin} */

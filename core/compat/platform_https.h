@@ -12,4 +12,8 @@
 int opendives_https_get(const std::string &url, const std::string &user_agent,
 			int timeout_seconds, int &status, std::string &body);
 
+// Fichier PEM des autorités de confiance. Vide : magasin par défaut du système
+// (Linux). Android n'en a pas de lisible par OpenSSL : l'app en fournit un.
+void opendives_https_set_ca_file(const std::string &path);
+
 #endif

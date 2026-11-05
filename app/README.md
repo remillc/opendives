@@ -56,7 +56,48 @@ Les bibliothèques contiennent déjà toutes les dépendances, sauf la zlib du s
 - **Identifiants de voyage :** ils changent à chaque chargement et ne doivent pas être conservés.
 - **Écran :** l'heure et les icônes de la barre d'état, en blanc, sont peu lisibles sur le fond clair. Les valeurs s'écrivent « 4.1 m », pas « 4,1 m ». À reprendre avec la vraie interface.
 - **Identifiant de l'application :** `org.opendives.app` est provisoire, à confirmer avant toute publication.
-- **Hors de ce squelette :** cloud (libgit2 est compilé sans HTTPS), iOS, téléchargement depuis un ordinateur de plongée, modification des plongées.
+- **Hors de ce squelette :** iOS, téléchargement depuis un ordinateur de plongée, modification des plongées, envoi vers le cloud.
+
+## Cloud Subsurface en lecture seule (5 novembre 2026)
+
+**Résultat :** sur le même téléphone, l'app lit le carnet d'un compte de développement : 1 353 plongées, sur `ssrf-cloud-eu.subsurface-divelog.org`.
+
+| Situation | Résultat |
+| --- | --- |
+| Premier lancement : clone par le cœur | 1 353 plongées affichées ; 3,7 s dans le natif, de la sonde jusqu'au JSON |
+| Lancements suivants : mise à jour du cache | 1 353 plongées, `synced=true`, de 4,0 à 5,4 s |
+| Erreur réseau passagère (« Software caused connection abort ») | Avant la correction : échec. Depuis : lecture de la copie locale |
+| Hors ligne avec cache (sur le poste, sans réseau) | 1 353 plongées, `synced=false`, raison affichée |
+| Hors ligne sans cache (sur le poste) | Erreur claire, rien n'est créé |
+| Cache du téléphone et serveur, avant et après | Même tête, `89a1e6a` : rien n'a été poussé |
+
+**Comment ça marche :**
+
+- **Réseau :**
+  - libgit2 est compilé avec HTTPS par OpenSSL 3.4.4, la version que Subsurface utilise sur Android.
+  - La vérification du serveur (`canReachCloudServer`) reprend `https_openssl.cpp`, déjà testé sous Linux.
+- **Certificats :** Android ne fournit pas de fichier de certificats lisible par OpenSSL.
+  - Au lancement, le plugin exporte en PEM les autorités de confiance du système (`AndroidCAStore`), soit 120 sur ce téléphone.
+  - Ce fichier est remis à libgit2 et à la vérification du serveur.
+- **Façade :** `cloud_list_dives()` enchaîne les étapes suivantes.
+  1. Sonde de la branche en lecture seule. Si la branche est absente du serveur, la façade refuse de charger, car le cœur la créerait en poussant.
+  2. Chargement par le cœur.
+  3. Recopie des réglages du carnet (`apply_log_prefs`).
+  4. Production du JSON.
+  - Si le serveur ne répond pas, la façade lit la copie locale avec `git_local_only`, comme Subsurface hors ligne.
+- **Écritures :** l'app n'enregistre jamais dans le cache du cloud. Rien ne peut donc être poussé.
+
+**Identifiants : solution TEMPORAIRE de développement.** Le plugin lit `files/cloud-dev.env`, dans l'espace privé de l'app. Ce fichier n'est ni dans l'APK ni dans git, et le mot de passe n'est jamais journalisé. Sans ce fichier, l'app revient au carnet d'exemple. Le vrai écran de connexion, avec le trousseau Android, reste à faire.
+
+```powershell
+$adb = "$env:LOCALAPPDATA\Android\Sdk\platform-tools\adb.exe"
+# installer (le fichier est lu sur le poste, jamais affiché)
+Get-Content -Raw "$env:USERPROFILE\.opendives\cloud-dev.env" | & $adb shell "run-as org.opendives.app sh -c 'umask 077; cat > files/cloud-dev.env'"
+# retirer
+& $adb shell "run-as org.opendives.app rm files/cloud-dev.env"
+```
+
+**Écarts avec l'architecture :** la vérification du serveur utilise OpenSSL dans le natif plutôt que la pile réseau d'Android. Elle ne suit donc pas le proxy du système, ce qui est à revoir avec l'écran de connexion. La liste de 1 353 plongées est affichée d'un bloc, sans liste virtuelle.
 
 ## Reproduire
 
