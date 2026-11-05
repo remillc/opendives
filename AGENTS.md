@@ -49,9 +49,13 @@ OpenDives est une application mobile complète de carnet de plongée. Elle amél
 
 ```
 AGENTS.md                 ce fichier
+app/                      application Capacitor (Svelte 5, Framework7) + rapport (README.md)
+plugins/opendives-core/   plugin Capacitor local : contrat JSDoc, Kotlin, JNI
 core/compat/              ajouts d'OpenDives pour compiler le cœur Subsurface sans Qt
+core/libopendives/        façade C++ au-dessus du cœur
+native/                   compilation Android du cœur et de ses dépendances
 poc/                      preuve de concept : build.sh + rapport (README.md)
-tests/                    roundtrip.cpp + run-roundtrip.sh
+tests/                    roundtrip.cpp, run-roundtrip.sh, facade.cpp
 third_party/subsurface/   sous-module Subsurface épinglé (+ son sous-module libdivecomputer)
 docs/                     documents de conception
 ```
@@ -63,12 +67,36 @@ Sous Linux ou WSL ; les dépendances sont listées en tête de `poc/build.sh`.
 ```sh
 git submodule update --init third_party/subsurface
 git -C third_party/subsurface submodule update --init libdivecomputer
-poc/build.sh                      # compile le cœur + build/poc/roundtrip
+poc/build.sh                      # compile le cœur + build/poc/{roundtrip,facade}
 tests/run-roundtrip.sh build/poc/roundtrip build/rt \
   third_party/subsurface/dives/*.xml third_party/subsurface/dives/*.ssrf
 ```
 
 Le test attendu est **97 réussis, 1 échec connu** (`TestDiveSeabearNewFormat.xml`), expliqué dans `poc/README.md`. Toute nouvelle régression doit être corrigée avant de livrer.
+
+### Application Android
+
+Le code natif se compile sous WSL, avec le NDK Linux ; il faut aussi `cmake`, `ninja-build` et `unzip`. Le résultat va dans `build/android/`, jamais dans git.
+
+```sh
+native/install-ndk.sh             # une seule fois : installe le NDK dans ~
+native/build-android.sh           # dépendances + libopendives.so (arm64-v8a et x86_64)
+```
+
+L'APK se construit ensuite sous Windows, dans PowerShell, avec un **JDK 21** (pas celui d'Android Studio) et le SDK API 35 :
+
+```powershell
+cd app
+npm ci
+npm run android:sync
+cd android
+$env:JAVA_HOME = "C:\Program Files\Java\jdk-21"
+$env:ANDROID_HOME = "$env:LOCALAPPDATA\Android\Sdk"
+.\gradlew.bat assembleDebug
+& "$env:ANDROID_HOME\platform-tools\adb.exe" install -r app\build\outputs\apk\debug\app-debug.apk
+```
+
+Gradle ne recompile pas le natif : relancez `native/build-android.sh` si le C++ change. Rapport : `app/README.md`.
 
 ## Conventions
 
