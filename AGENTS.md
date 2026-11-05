@@ -34,14 +34,14 @@ OpenDives is a full dive log app for mobile. It improves on Subsurface-mobile, b
 
 ## User interface
 
-- **Reference for coding the UI:** `docs/specification-interface.md` (colours, texts, components, screens, core data). It takes precedence over the mock-ups. (The design documents in `docs/` are currently in French.)
+- **Reference for coding the UI:** `docs/ui-specification.md` (colours, texts, components, screens, core data). It takes precedence over the mock-ups. The design documents in `docs/` are in English; their French originals are kept on claude.ai, and a change there must be carried over here in English.
 - **iPhone and iPad:** iOS conventions (Human Interface Guidelines).
 - **Android:** **standard Material Design 3**, not Expressive.
 - **Tablets:** an iOS variant and an Android variant.
 - **No UI patterns or features typical of AI agents:** no chat assistant, no "magic" summary, no sparkle button, etc.
 - **Do not copy Subsurface-mobile's screens:** they are its main weakness.
 - **Languages:** multilingual from the start, French and English. No hard-coded visible text: one key per text, translations in `app/src/i18n/fr.json` and `en.json`; the language follows the device, English is the fallback. The diver's own data is never translated.
-- **Colours:** declared as `--od-*` variables, never hard-coded in a component. The chosen theme is finalist 3: black and white, colour reserved for data (neutral light UI, ink #1F2124, strong contrast, sans-serif titles; only the dive profile's water column is coloured, sand #FBE3B2 to rust #B4530F by depth). Values for light and dark are in docs/specification-interface.md, section 1. The debug theme picker can be removed. Meaning colours stay common: alarm, oxygen, pending.
+- **Colours:** declared as `--od-*` variables, never hard-coded in a component. The chosen theme is finalist 3: black and white, colour reserved for data (neutral light UI, ink #1F2124, strong contrast, sans-serif titles; only the dive profile's water column is coloured, sand #FBE3B2 to rust #B4530F by depth; in dark mode honey #E5B961 to amber #EF7625). Values for light and dark are in docs/ui-specification.md, section 1. The debug theme picker can be removed. Meaning colours stay common: alarm, oxygen, pending.
 - **Filters:** on almost every field of a dive, gear included (full list in the specification).
   - Dive mode (open circuit or rebreather) is shown first.
   - Never offered: weight and weight type, start and end pressures, water density, nitrogen percentage.

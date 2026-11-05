@@ -1,15 +1,15 @@
-# Documents de conception
+# Design documents
 
-Copies en Markdown des documents de conception d'OpenDives (5 novembre 2026). Les originaux sont dans Claude ; les schémas n'y sont visibles qu'en ligne.
+English copies of OpenDives' design documents (5 November 2026). The French originals are kept on claude.ai; diagrams are only visible online.
 
-| Document | Contenu | Original |
+| Document | Content | Original (French) |
 | --- | --- | --- |
-| [Analyse du projet Subsurface](analyse-subsurface.md) | Code, formats, cloud, ordinateurs de plongée, app mobile actuelle, test CORS | [en ligne](https://claude.ai/artifact/PVHar8ng8ax2Cibm3JkAwN) |
-| [Rétro-ingénierie fonctionnelle](retro-ingenierie.md) | Fonctions de Subsurface, classement de leur pertinence sur mobile, nouveautés mobiles, décisions | [en ligne](https://claude.ai/artifact/JoAhr3WfF5DVPiJabCuE2D) |
-| [Architecture proposée](architecture.md) | Couches, plugin natif, synchronisation, coexistence avec Subsurface-mobile | [en ligne](https://claude.ai/artifact/Q3xMEsTfLkAqTnwT4m33Z9) |
-| [Fondations de l'interface](fondations-interface.md) | Principes, iOS et MD3, navigation, filtres et statistiques, couleurs | [en ligne](https://claude.ai/artifact/8goh1sZMXM9npSVThnA61r) |
-| [Spécification de l'interface](specification-interface.md) | Couleurs, textes, mise en page, composants, écrans et données du cœur : la référence pour le code | [en ligne](https://claude.ai/artifact/TJU7voFbP6zeNaSUci5p7i) |
-| Maquettes des écrans clés | iPhone, Android, tablettes iOS et Android | [en ligne](https://claude.ai/artifact/Jpuj8pGER3xz8n383JvYep) |
-| [Preuve de concept](../poc/README.md) | Cœur Subsurface sans Qt, aller-retour git | — |
+| [Analysis of the Subsurface project](subsurface-analysis.md) | Code, formats, cloud, dive computers, current mobile app, CORS test | [online](https://claude.ai/artifact/PVHar8ng8ax2Cibm3JkAwN) |
+| [Functional reverse engineering](reverse-engineering.md) | Subsurface's features, their relevance on mobile, new mobile features, decisions | [online](https://claude.ai/artifact/JoAhr3WfF5DVPiJabCuE2D) |
+| [Proposed architecture](architecture.md) | Layers, native plugin, synchronisation, coexistence with Subsurface-mobile | [online](https://claude.ai/artifact/Q3xMEsTfLkAqTnwT4m33Z9) |
+| [UI foundations](ui-foundations.md) | Principles, iOS and MD3, navigation, filters and statistics, visual identity | [online](https://claude.ai/artifact/8goh1sZMXM9npSVThnA61r) |
+| [UI specification](ui-specification.md) | Colours, text, layout, components, screens and core data: the reference for the code | [online](https://claude.ai/artifact/TJU7voFbP6zeNaSUci5p7i) |
+| Key screen mock-ups | iPhone, Android, iOS and Android tablets | [online](https://claude.ai/artifact/Jpuj8pGER3xz8n383JvYep) |
+| [Proof of concept](../poc/README.md) | Subsurface core without Qt, Git round trip | — |
 
-Si un document change dans Claude, la copie ici doit être mise à jour. Les décisions qui servent au code sont résumées dans [AGENTS.md](../AGENTS.md).
+When a document changes on claude.ai, its copy here must be updated in English. The decisions that matter for the code are summarised in [AGENTS.md](../AGENTS.md).

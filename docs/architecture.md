@@ -1,190 +1,192 @@
-# OpenDives — Architecture proposée
+# OpenDives — Proposed architecture
 
 2026-11-05 · Christian Rémillard
 
-## 1. Résumé
+English copy of the French original kept on claude.ai ([online](https://claude.ai/artifact/Q3xMEsTfLkAqTnwT4m33Z9)).
 
-OpenDives se construit en **trois couches**. En haut, une interface Web en JavaScript dans Capacitor, pensée pour le téléphone et la tablette. Au milieu, un mince pont natif en Swift (iOS) et en Kotlin (Android). En bas, un **cœur C++ partagé** qui reprend le code métier de Subsurface, débarrassé de Qt, avec libdivecomputer et libgit2. Tous les calculs, le format Git et le téléchargement depuis les ordinateurs de plongée sont dans le cœur. L'interface ne fait qu'afficher et envoyer des commandes.
+## 1. Summary
 
-**Décisions prises (5 novembre 2026)**
+OpenDives is built in **three layers**. At the top, a JavaScript web interface in Capacitor, designed for phone and tablet. In the middle, a thin native bridge in Swift (iOS) and Kotlin (Android). At the bottom, a **shared C++ core** that reuses Subsurface's business code, freed from Qt, with libdivecomputer and libgit2. All calculations, the Git format and downloading from dive computers live in the core. The interface only displays and sends commands.
 
-| Sujet | Décision |
+**Decisions made (5 November 2026)**
+
+| Topic | Decision |
 | --- | --- |
-| Données | Connexion au cloud Subsurface existant, qui reste la seule source de données ; mode local sans compte aussi pris en charge |
-| Technologie | Capacitor : interface Web en JavaScript documenté par JSDoc (pas TypeScript) dans une app native iOS et Android |
-| Périmètre de la première version | Toutes les fonctions « essentielles » et « adaptées », toutes les nouveautés mobiles, et la version tablette |
-| Photos | Restent sur l'appareil ; seule la référence est synchronisée |
-| Services | GeoNames (lieux), divelogs.de (import et envoi, sans synchronisation), OpenStreetMap (cartes, aussi hors ligne) |
-| Coexistence avec Subsurface-mobile | Gérée explicitement (fidélité du format, conflits, version, Bluetooth, doublons, commits signés) |
-| Relation avec le projet Subsurface | Aucune démarche pour l'instant ; à revoir avant la publication |
+| Data | Connection to the existing Subsurface cloud, which remains the only data source; local mode without an account also supported |
+| Technology | Capacitor: web interface in JavaScript documented with JSDoc (not TypeScript) inside a native iOS and Android app |
+| Scope of the first version | All "essential" and "adapted" features, all new mobile features, and the tablet version |
+| Photos | Stay on the device; only the reference is synchronised |
+| Services | GeoNames (places), divelogs.de (import and upload, no synchronisation), OpenStreetMap (maps, offline too) |
+| Coexistence with Subsurface-mobile | Handled explicitly (format fidelity, conflicts, version, Bluetooth, duplicates, signed commits) |
+| Relationship with the Subsurface project | No approach for now; to revisit before publication |
 
-Interface : Svelte 5 + Framework7 v9 (décidé). Le code venant de Subsurface reste à jour avec Subsurface (décidé). Cartes : paquets OpenStreetMap hébergés par OpenDives (décidé). Toutes les décisions d'architecture sont prises.
+Interface: Svelte 5 + Framework7 v9 (decided). The code coming from Subsurface stays up to date with Subsurface (decided). Maps: OpenStreetMap packages hosted by OpenDives (decided). All architecture decisions are made.
 
-## 2. Vue d'ensemble
+## 2. Overview
 
-> *Schéma : architecture d'OpenDives · 4 couches, 4 services externes — visible dans [le document en ligne](https://claude.ai/artifact/Q3xMEsTfLkAqTnwT4m33Z9).*
+> *Diagram: OpenDives architecture · 4 layers, 4 external services — visible in [the online document](https://claude.ai/artifact/Q3xMEsTfLkAqTnwT4m33Z9).*
 
-L'interface ne parle qu'au plugin OpenDivesCore. Le plugin traduit chaque appel pour le cœur C++ et gère ce qui dépend du système : Bluetooth, USB, trousseau, widget. Le cœur parle seul au cloud Subsurface et aux services Web. Seules les tuiles de carte sont chargées directement par l'interface. Ce découpage garantit qu'une plongée donne les mêmes chiffres que dans Subsurface, puisque c'est le même code qui calcule.
+The interface only talks to the OpenDivesCore plugin. The plugin translates each call for the C++ core and handles what depends on the system: Bluetooth, USB, keychain, widget. Only the core talks to the Subsurface cloud and web services. Only map tiles are loaded directly by the interface. This split guarantees that a dive gives the same figures as in Subsurface, since the same code does the calculation.
 
-## 3. Le cœur C++ partagé
+## 3. The shared C++ core
 
-Le cœur de Subsurface est déjà écrit en grande partie en C++ standard. Il peut donc être extrait de Qt sans réécriture : il suffit de remplacer quelques fonctions utilitaires et les accès au système. J'ai mesuré dans `core/` (commit `258beb4`) que 89 fichiers sur 200 utilisent Qt. Les fichiers essentiels, eux, n'en dépendent pas ou presque.
+Subsurface's core is already largely written in standard C++. It can therefore be extracted from Qt without a rewrite: a few utility functions and system accesses just need replacing. Measured in `core/` (commit `258beb4`), 89 files out of 200 use Qt. The essential files depend on it little or not at all.
 
-| Partie du cœur | Dépendance à Qt | Traitement |
+| Part of the core | Qt dependency | Handling |
 | --- | --- | --- |
-| Lecture Git, modèle, plongée, ordinateur, voyages, sites, déco, planificateur, pressions des bouteilles, statistiques, unités | Aucune | Repris tel quel |
-| Écriture Git, XML (lecture et écriture), profil, liste et journal, gaz, notes du planificateur | Un en-tête utilitaire (`qthelper.h`) ou un verrou (`QMutex`) | Petit module de remplacement en C++ standard (traduction, dates, notifications) |
-| Accès Git distant | Expressions régulières et proxy Qt | `std::regex` ; proxy fourni par la plateforme |
-| Filtres et recherche plein texte | `QString` utilisé en profondeur | Version minimale de `QString` fournie par `compat/`, sans toucher au code de Subsurface (le plus gros morceau de `c``ompat/`) |
-| Téléchargement (`libdivecomputer.cpp`) | Noms d'appareils en `QString` | Adaptation légère |
-| Bluetooth, série, réseau, compte cloud, réglages, Android | Qt Bluetooth, Qt Network, QSettings, JNI Qt | **Non repris** : remplacés par des adaptateurs fournis par le pont natif |
-| Annuler et rétablir (`commands/`) | `QUndoCommand` | Logique des commandes reprise, pile réécrite en C++ standard |
+| Git reading, model, dive, dive computer, trips, sites, deco, planner, cylinder pressures, statistics, units | None | Reused as is |
+| Git writing, XML (reading and writing), profile, list and log, gas, planner notes | A utility header (`qthelper.h`) or a lock (`QMutex`) | Small replacement module in standard C++ (translation, dates, notifications) |
+| Remote Git access | Qt regular expressions and proxy | `std::regex`; proxy provided by the platform |
+| Filters and full-text search | `QString` used throughout | Minimal `QString` provided by `compat/`, without touching Subsurface's code (the largest part of `compat/`) |
+| Download (`libdivecomputer.cpp`) | Device names as `QString` | Light adaptation |
+| Bluetooth, serial, network, cloud account, settings, Android | Qt Bluetooth, Qt Network, QSettings, Qt JNI | **Not reused**: replaced by adapters provided by the native bridge |
+| Undo and redo (`commands/`) | `QUndoCommand` | Command logic reused, stack rewritten in standard C++ |
 
-**Organisation proposée.** Le code de Subsurface est inclus tel quel comme sous-module Git, épinglé à un commit précis. Les remplacements vivent dans un dossier `compat/` d'OpenDives qui fournit les mêmes fonctions que `qthelper.h`. On réduit ainsi au minimum les modifications du code de Subsurface. Suivre ses évolutions, notamment le format Git, revient alors à mettre à jour le sous-module et relancer les tests.
+**Proposed organisation.** Subsurface's code is included as is as a Git submodule, pinned to a precise commit. Replacements live in an OpenDives `compat/` folder that provides the same functions as `qthelper.h`. Changes to Subsurface's code are thus kept to a minimum. Following its evolution, including the Git format, then means updating the submodule and rerunning the tests.
 
-**Suivre Subsurface (décision du 5 novembre 2026).** Le code de Subsurface n'est jamais modifié dans OpenDives. Tout ce qui diffère passe par `compat/` ou par la façade. S'il faut absolument toucher à un fichier de Subsurface, le changement est gardé sous forme de **correctif séparé** (dossier `patches/`), réappliqué automatiquement à chaque mise à jour. Ces correctifs sont écrits pour pouvoir être proposés plus tard à Subsurface. Chaque semaine, l'intégration continue compile OpenDives avec la dernière version de Subsurface et lance les tests (aller-retour Git et calculs). On sait ainsi tout de suite si une amélioration de Subsurface peut être reprise, et ce qu'elle casse. La mise à jour elle-même reste un geste volontaire : on avance le sous-module, on relit les changements de format, on publie.
+**Following Subsurface (decision of 5 November 2026).** Subsurface's code is never modified in OpenDives. Everything that differs goes through `compat/` or the facade. If a Subsurface file absolutely must be touched, the change is kept as a **separate patch** (`patches/` folder), reapplied automatically at each update. These patches are written so they can later be offered to Subsurface. Every week, continuous integration builds OpenDives with the latest Subsurface and runs the tests (Git round trip and calculations). This shows immediately whether a Subsurface improvement can be taken in, and what it breaks. The update itself stays a deliberate act: advance the submodule, review format changes, release.
 
-**La façade.** Au-dessus du code Subsurface, une petite couche (`libopendives`) expose une API stable et simple au pont natif. Elle convertit les données en JSON, garde l'état du journal ouvert, exécute les commandes avec annuler/rétablir et signale les progressions. Le reste d'OpenDives ne voit jamais les structures internes de Subsurface.
+**The facade.** Above Subsurface's code, a small layer (`libopendives`) exposes a stable and simple API to the native bridge. It converts data to JSON, keeps the state of the open log, runs commands with undo/redo and reports progress. The rest of OpenDives never sees Subsurface's internal structures.
 
-## 4. Le pont natif : l'API entre l'interface et le cœur
+## 4. The native bridge: the API between the interface and the core
 
-L'interface appelle un seul plugin, **OpenDivesCore**, avec des commandes asynchrones (promesses JavaScript) et reçoit des **événements** pour les opérations longues. Les formes des données échangées sont décrites en JSDoc (`@typedef`) dans un seul fichier, `core-api.js`, qui sert de contrat entre les équipes Web et natives.
+The interface calls a single plugin, **OpenDivesCore**, with asynchronous commands (JavaScript promises) and receives **events** for long operations. The shapes of the exchanged data are described in JSDoc (`@typedef`) in a single file, `core-api.js`, which serves as the contract between the web and native sides.
 
-| Groupe | Commandes principales | Remarques |
+| Group | Main commands | Notes |
 | --- | --- | --- |
-| Journal | `openLog`, `closeLog`, `getLogInfo` | Ouvre le dépôt local (cloud ou local seul) |
-| Compte et synchro | `signIn`, `createAccount`, `verifyPin`, `resetPassword`, `deleteAccount`, `sync`, `attachCloud` | Identifiants gardés par le pont dans le trousseau, jamais transmis à l'interface |
-| Lecture | `listDives(page, filtre, tri)`, `getDive(id)`, `getProfile(id, dc)`, `listTrips`, `listSites`, `searchSites(proche de)`, `getStats(requête)` | Pagination pour les gros carnets ; le profil arrive calculé (courbes, plafond, ppO2, événements), prêt à dessiner |
-| Écriture | `applyEdit(type, cible, valeurs)`, `undo`, `redo`, `canUndo` | Chaque modification passe par une commande annulable, reprise de `commands/` |
-| Opérations | `mergeDives`, `splitDive`, `shiftTime`, `renumber`, `mergeSites`, `groupTrip`… | Elles aussi annulables |
-| Ordinateurs | `scanDevices`, `listKnownDevices`, `downloadDives(appareil, options)`, `cancelDownload` | Progression et plongées reçues envoyées en événements |
-| Planification et gaz | `planDive(paramètres)`, `gasMod`, `bestMix` | Calcul dans le cœur, résultat structuré et texte du plan |
-| Fichiers | `importFile(chemin, format)`, `exportDives(sélection, format)` | XML, UDDF, FIT, CSV… ; partage via la feuille de partage du système |
-| Services | `reverseGeocode(gps)`, `divelogsUpload`, `divelogsImport` | GeoNames et divelogs.de appelés côté natif |
-| Événements | `downloadProgress`, `syncProgress`, `logChanged`, `conflictResolved`, `error` | `logChanged` précise ce qui a changé pour ne rafraîchir que le nécessaire |
+| Log | `openLog`, `closeLog`, `getLogInfo` | Opens the local repository (cloud or local only) |
+| Account and sync | `signIn`, `createAccount`, `verifyPin`, `resetPassword`, `deleteAccount`, `sync`, `attachCloud` | Credentials kept by the bridge in the keychain, never passed to the interface |
+| Reading | `listDives(page, filter, sort)`, `getDive(id)`, `getProfile(id, dc)`, `listTrips`, `listSites`, `searchSites(near)`, `getStats(query)` | Pagination for large logbooks; the profile arrives computed (curves, ceiling, ppO2, events), ready to draw |
+| Writing | `applyEdit(type, target, values)`, `undo`, `redo`, `canUndo` | Every change goes through an undoable command, taken from `commands/` |
+| Operations | `mergeDives`, `splitDive`, `shiftTime`, `renumber`, `mergeSites`, `groupTrip`… | Also undoable |
+| Dive computers | `scanDevices`, `listKnownDevices`, `downloadDives(device, options)`, `cancelDownload` | Progress and received dives sent as events |
+| Planning and gas | `planDive(parameters)`, `gasMod`, `bestMix` | Calculated in the core, structured result and plan text |
+| Files | `importFile(path, format)`, `exportDives(selection, format)` | XML, UDDF, FIT, CSV…; sharing through the system share sheet |
+| Services | `reverseGeocode(gps)`, `divelogsUpload`, `divelogsImport` | GeoNames and divelogs.de called on the native side |
+| Events | `downloadProgress`, `syncProgress`, `logChanged`, `conflictResolved`, `error` | `logChanged` says what changed so that only what is needed is refreshed |
 
-**Règles du pont.**
+**Bridge rules.**
 
-- Les valeurs restent en unités SI entières, comme dans le cœur (mm, mbar, mK, s). La conversion en m/pi, bar/psi, °C/°F se fait dans l'interface, au moment de l'affichage.
-- Le cœur tourne sur un fil d'exécution dédié ; aucun appel ne bloque l'interface.
-- Les données volumineuses (profil, liste) sont envoyées en tableaux compacts plutôt qu'en objets, pour limiter la taille du JSON.
-- Une erreur porte un code stable (`AUTH_FAILED`, `FORMAT_NEWER`, `DEVICE_BUSY`…) que l'interface traduit.
+- Values stay in whole SI units, as in the core (mm, mbar, mK, s). Conversion to m/ft, bar/psi, °C/°F happens in the interface, at display time.
+- The core runs on a dedicated thread; no call blocks the interface.
+- Large data (profile, list) is sent as compact arrays rather than objects, to limit JSON size.
+- An error carries a stable code (`AUTH_FAILED`, `FORMAT_NEWER`, `DEVICE_BUSY`…) that the interface translates.
 
-## 5. Ordinateurs de plongée
+## 5. Dive computers
 
-libdivecomputer connaît le protocole de chaque ordinateur, mais pas le transport. Il délègue la lecture et l'écriture des octets à des fonctions qu'on lui fournit (`dc_custom_open`), et Subsurface s'en sert déjà pour le BLE et l'USB Android. OpenDives fait pareil : le **transport est écrit en natif** dans le pont, et le **protocole reste dans le cœur**. Les octets ne passent jamais par l'interface Web.
+libdivecomputer knows each dive computer's protocol, but not the transport. It delegates reading and writing bytes to functions it is given (`dc_custom_open`), and Subsurface already uses this for BLE and Android USB. OpenDives does the same: the **transport is written natively** in the bridge, and the **protocol stays in the core**. Bytes never go through the web interface.
 
-| Transport | iOS | Android | Mise en œuvre |
+| Transport | iOS | Android | Implementation |
 | --- | --- | --- | --- |
-| Bluetooth LE | Oui | Oui | Core Bluetooth (Swift), BluetoothGatt (Kotlin) ; choix du service et des caractéristiques repris de `qt-ble.cpp` (Telit, u-blox, services série connus) |
-| Bluetooth classique | Non (limite d'iOS) | Oui | Socket RFCOMM (Kotlin) |
-| USB série | Non | Oui | Bibliothèque usb-serial-for-android (FTDI, CP210x, CDC…), déjà utilisée par Subsurface |
-| Fichiers (FIT, journaux) | Oui | Oui | Import de fichiers, sans transport |
+| Bluetooth LE | Yes | Yes | Core Bluetooth (Swift), BluetoothGatt (Kotlin); choice of service and characteristics taken from `qt-ble.cpp` (Telit, u-blox, known serial services) |
+| Classic Bluetooth | No (iOS limit) | Yes | RFCOMM socket (Kotlin) |
+| USB serial | No | Yes | usb-serial-for-android library (FTDI, CP210x, CDC…), already used by Subsurface |
+| Files (FIT, logs) | Yes | Yes | File import, no transport |
 
-**Déroulement d'un téléchargement**
+**How a download runs**
 
-1. Le pont cherche les appareils proches. Le cœur reconnaît le fabricant et le modèle d'après le nom Bluetooth (tables de `btdiscovery.cpp`).
-2. L'utilisateur confirme une fois ; l'appareil est mémorisé avec son surnom.
-3. Le cœur lance libdivecomputer sur un fil dédié. Les lectures sont bloquantes, avec délai : le pont les sert depuis une file d'octets alimentée par le Bluetooth.
-4. L'**empreinte** de la dernière plongée téléchargée (enregistrée dans le dépôt Git) arrête le téléchargement aux plongées déjà connues, même si elles ont été téléchargées par Subsurface sur un autre appareil.
-5. Les plongées reçues sont fusionnées par les règles d'import de Subsurface (doublons, voyages), puis sauvegardées en un seul commit annulable.
-6. Le pont **libère la connexion** à la fin ou en cas d'erreur, pour que Subsurface-mobile ou une autre app puisse s'y connecter (décision de coexistence).
+1. The bridge looks for nearby devices. The core recognises the manufacturer and model from the Bluetooth name (tables from `btdiscovery.cpp`).
+2. The user confirms once; the device is remembered with its nickname.
+3. The core starts libdivecomputer on a dedicated thread. Reads are blocking, with a timeout: the bridge serves them from a byte queue fed by Bluetooth.
+4. The **fingerprint** of the last downloaded dive (saved in the Git repository) stops the download at dives already known, even if they were downloaded by Subsurface on another device.
+5. Received dives are merged with Subsurface's import rules (duplicates, trips), then saved in a single undoable commit.
+6. The bridge **releases the connection** at the end or on error, so Subsurface-mobile or another app can connect (coexistence decision).
 
-**Contraintes de plateforme.** L'écran reste allumé pendant le téléchargement : iOS et Android coupent le Bluetooth des apps en arrière-plan. Les permissions Bluetooth sont demandées au premier usage, pas au lancement. Le simulateur iOS n'a pas de Bluetooth : les tests se font sur un vrai appareil, ou avec un transport simulé qui rejoue des captures d'octets.
+**Platform constraints.** The screen stays on during the download: iOS and Android cut Bluetooth for background apps. Bluetooth permissions are requested on first use, not at launch. The iOS simulator has no Bluetooth: tests run on a real device, or with a simulated transport that replays byte captures.
 
-## 6. Stockage, synchronisation, mode local et coexistence
+## 6. Storage, synchronisation, local mode and coexistence
 
-Tout le carnet vit dans **un dépôt Git local**, dans l'espace privé de l'app, au format exact de Subsurface. Le cloud n'est qu'un dépôt distant de plus. Le mode local et le mode cloud partagent donc le même code : la seule différence est la présence d'un dépôt distant.
+The whole logbook lives in **a local Git repository**, in the app's private storage, in Subsurface's exact format. The cloud is just one more remote. Local mode and cloud mode therefore share the same code: the only difference is the presence of a remote.
 
-| Situation | Comportement |
+| Situation | Behaviour |
 | --- | --- |
-| Mode local (sans compte) | Dépôt Git sans distant ; import et export manuels possibles |
-| Passage au cloud | Si le compte est vide : envoi du dépôt local tel quel. S'il contient déjà des plongées : les plongées locales y sont **importées** avec les règles de doublons, jamais écrasées (`classify_git_save`) |
-| Enregistrement | Chaque commande validée donne un commit local, signé « OpenDives », avec le texte de l'action comme message |
-| Synchronisation | À l'ouverture, au retour au premier plan, quelques secondes après une modification, et à la demande. Hors ligne, les commits attendent le réseau |
-| Conflit | Fusion de libgit2 comme dans Subsurface ; si un côté l'a emporté, l'utilisateur en est averti et la plongée est signalée |
-| Format plus récent | Si la version du format dans `00-Subsurface` dépasse celle que connaît OpenDives, le carnet s'ouvre **en lecture seule**, avec un message invitant à mettre à jour l'app |
-| Identifiants | Mot de passe cloud dans le trousseau iOS ou le Keystore Android, lu par le pont seulement |
+| Local mode (no account) | Git repository without a remote; manual import and export possible |
+| Moving to the cloud | If the account is empty: the local repository is sent as is. If it already holds dives: the local dives are **imported** into it with the duplicate rules, never overwritten (`classify_git_save`) |
+| Saving | Each validated command produces a local commit, signed "OpenDives", with the text of the action as the message |
+| Synchronisation | On opening, when returning to the foreground, a few seconds after a change, and on demand. Offline, commits wait for the network |
+| Conflict | libgit2 merge as in Subsurface; if one side won, the user is told and the dive is flagged |
+| Newer format | If the format version in `00-Subsurface` is newer than the one OpenDives knows, the logbook opens **read only**, with a message asking to update the app |
+| Credentials | Cloud password in the iOS keychain or the Android Keystore, read only by the bridge |
 
-**Fidélité du format.** Comme la lecture et l'écriture Git sont le code même de Subsurface, tout ce que Subsurface écrit est relu et réécrit à l'identique. C'est vrai pour la version de Subsurface incluse dans OpenDives ; la garde de version couvre les formats plus récents. Un test automatique le vérifie : chargement puis sauvegarde de dépôts réels, sans aucune différence.
+**Format fidelity.** Since Git reading and writing are Subsurface's own code, everything Subsurface writes is read back and rewritten identically. This holds for the Subsurface version included in OpenDives; the version guard covers newer formats. An automatic test checks it: loading then saving real repositories, without any difference.
 
-**Photos et vidéos.** Le dépôt ne garde que la référence de chaque média (nom du fichier et décalage dans la plongée), comme Subsurface. OpenDives tient en plus, localement et hors du dépôt, une table qui relie chaque référence à la photo de la galerie de l'appareil. Sur un autre appareil, la plongée indique qu'un média existe sans pouvoir l'afficher.
+**Photos and videos.** The repository only keeps the reference of each media item (file name and offset within the dive), like Subsurface. OpenDives also keeps, locally and outside the repository, a table linking each reference to the photo in the device gallery. On another device, the dive shows that a media item exists without being able to display it.
 
-**Réglages.** Les réglages qui changent les calculs (GF, ppO2 max, SAC par défaut) et les unités suivent Subsurface : enregistrés dans le dépôt quand Subsurface le fait, sinon sur l'appareil. Les réglages d'affichage d'OpenDives restent sur l'appareil.
+**Settings.** Settings that change calculations (GF, max ppO2, default SAC) and units follow Subsurface: saved in the repository when Subsurface does so, otherwise on the device. OpenDives' display settings stay on the device.
 
-## 7. L'interface
+## 7. The interface
 
-L'interface est une app Web monopage en **JavaScript moderne (modules ES) documenté par JSDoc**, empaquetée par Vite et embarquée par Capacitor. Elle ne contient aucune règle métier : elle affiche ce que renvoie le cœur et lui envoie des commandes. Sa conception visuelle sera faite à l'étape 5, sur une page blanche.
+The interface is a single-page web app in **modern JavaScript (ES modules) documented with JSDoc**, bundled by Vite and embedded by Capacitor. It contains no business rule: it displays what the core returns and sends it commands. Its visual design is set out in the [UI foundations](ui-foundations.md) and the [UI specification](ui-specification.md).
 
-| Besoin | Proposition | Pourquoi |
+| Need | Proposal | Why |
 | --- | --- | --- |
-| Composants mobiles | Framework7 v9 (décidé) | Rendu natif iOS 26 et Material You (MD3), navigation par pile avec retour par balayage, liste + détail pour la tablette ; prise en charge officielle de Svelte 5 |
-| Cadre applicatif | Svelte 5 (décidé) | Code concis et compilé, léger, qui s'écrit bien en JavaScript avec JSDoc. Préféré à Vue 3 + Ionic, qui n'offre pas de rendu MD3 ni iOS 26 sans thèmes tiers |
-| Vérification des types | JSDoc + `// @ts-check`, vérifié dans l'éditeur et dans l'intégration continue | On garde du JavaScript pur, avec les erreurs de types détectées avant l'exécution |
-| Profil de plongée | Dessin sur `canvas` 2D, écrit pour OpenDives | Des milliers de points, plusieurs courbes, zoom au doigt : un graphique générique ne suffit pas |
-| Statistiques | Chart.js (licence MIT) | Barres et nuages de points prêts à l'emploi ; licence compatible avec la GPLv2 (voir section 8) |
-| Cartes | MapLibre GL JS avec tuiles vectorielles OpenStreetMap | Rapide, hors ligne possible, sans compte Google |
-| Langues | Fichiers de traduction JSON (français et anglais au départ) | Format simple pour les traducteurs |
-| Unités | Module de conversion unique, à partir des valeurs SI du cœur | Mêmes règles d'arrondi partout |
+| Mobile components | Framework7 v9 (decided) | Native iOS 26 and Material You (MD3) rendering, stack navigation with swipe back, list + detail for tablets; official Svelte 5 support |
+| App framework | Svelte 5 (decided) | Concise, compiled, light code that writes well in JavaScript with JSDoc. Preferred to Vue 3 + Ionic, which offers no MD3 or iOS 26 rendering without third-party themes |
+| Type checking | JSDoc + `// @ts-check`, checked in the editor and in continuous integration | Plain JavaScript is kept, with type errors caught before running |
+| Dive profile | 2D `canvas` drawing, written for OpenDives | Thousands of points, several curves, pinch zoom: a generic chart is not enough |
+| Statistics | Chart.js (MIT licence) | Ready-made bars and scatter plots; licence compatible with GPLv2 (see section 8) |
+| Maps | MapLibre GL JS with OpenStreetMap vector tiles | Fast, offline possible, no Google account |
+| Languages | JSON translation files (French and English to start) | Simple format for translators |
+| Units | A single conversion module, from the core's SI values | Same rounding rules everywhere |
 
-**Cartes hors ligne : une contrainte à connaître.** La [politique d'utilisation des tuile](https://operations.osmfoundation.org/policies/tiles/)[s de la fondation OpenStreetMap](https://operations.osmfoundation.org/policies/tiles/) interdit l'usage hors ligne sur ses serveurs, y compris les fonctions du type « télécharger une ville pour plus tard ». Elle recommande des tuiles hébergées soi-même ou un fournisseur qui autorise explicitement le hors ligne. Décision C : OpenDives héberge ses propres paquets de tuiles vectorielles par région (format PMTiles), construits à partir des données OpenStreetMap. L'app les utilise en ligne et les télécharge pour le hors ligne, sans jamais solliciter les serveurs de la fondation OpenStreetMap.
+**Offline maps: a constraint to know.** The [OpenStreetMap Foundation tile usage policy](https://operations.osmfoundation.org/policies/tiles/) forbids offline use on its servers, including "download a city for later" features. It recommends self-hosted tiles or a provider that explicitly allows offline use. Decision C: OpenDives hosts its own vector tile packages per region (PMTiles format), built from OpenStreetMap data. The app uses them online and downloads them for offline use, without ever calling the OpenStreetMap Foundation's servers.
 
-**Tablette.** Les mêmes écrans s'adaptent à la largeur : liste et détail côte à côte sur tablette, l'un après l'autre sur téléphone. Les fonctions marquées « version plus complète » sur tablette (statistiques, planificateur, édition groupée) gagnent des panneaux supplémentaires, pas des écrans différents.
+**Tablet.** The same screens adapt to the width: list and detail side by side on tablets, one after the other on phones. Features marked "more complete version" on tablets (statistics, planner, bulk editing) gain extra panels, not different screens.
 
-**Nouveautés mobiles**
+**New mobile features**
 
-| Fonction | Réalisation |
+| Feature | Implementation |
 | --- | --- |
-| Position GPS du site | Plugin Capacitor de géolocalisation, puis GeoNames pour le pays et la région |
-| Photos de la galerie | Plugin de sélection de médias ; l'heure de prise de vue place la photo sur le profil |
-| Partage en image | Le profil est rendu en PNG par l'interface, puis la feuille de partage du système prend le relais |
-| Widget d'écran d'accueil | Code natif séparé (WidgetKit sur iOS, Glance sur Android), alimenté par un petit résumé écrit par le cœur |
-| Carte hors ligne | Paquets PMTiles par région hébergés par OpenDives, téléchargés à la demande (par exemple la région d'un voyage) |
-| Rappels | Notifications locales calculées par le cœur (fin de désaturation, délai avant un vol), sans serveur |
+| GPS position of the site | Capacitor geolocation plugin, then GeoNames for country and region |
+| Gallery photos | Media picker plugin; the capture time places the photo on the profile |
+| Sharing as an image | The profile is rendered to PNG by the interface, then the system share sheet takes over |
+| Home-screen widget | Separate native code (WidgetKit on iOS, Glance on Android), fed by a small summary written by the core |
+| Offline map | PMTiles packages per region hosted by OpenDives, downloaded on demand (for example a trip's region) |
+| Reminders | Local notifications computed by the core (end of desaturation, no-fly time), without a server |
 
-## 8. Dépôt, build, tests et licence
+## 8. Repository, build, tests and licence
 
-**Organisation du dépôt ****`remillc/opendives`**
+**Organisation of the `remillc/opendives` repository**
 
-| Dossier | Contenu |
+| Folder | Content |
 | --- | --- |
-| `app/` | Interface Web : sources JavaScript, traductions, configuration Vite |
-| `plugins/opendives-core/` | Plugin Capacitor : `ios/` (Swift), `android/` (Kotlin), `core-api.js` (contrat JSDoc) |
-| `core/` | Façade C++ `libopendives`, module `compat/` qui remplace Qt, tests du cœur |
-| `third_party/` | Sous-modules épinglés : Subsurface, libdivecomputer (branche de Subsurface), libgit2, libxml2, libxslt, SQLite, libzip |
-| `ios/`, `android/` | Projets natifs générés par Capacitor, avec les widgets (WidgetKit, Glance) |
-| `docs/` | Analyse, rétro-ingénierie, architecture, décisions |
+| `app/` | Web interface: JavaScript sources, translations, Vite configuration |
+| `plugins/opendives-core/` | Capacitor plugin: `ios/` (Swift), `android/` (Kotlin), `core-api.js` (JSDoc contract) |
+| `core/` | C++ facade `libopendives`, `compat/` module that replaces Qt, core tests |
+| `third_party/` | Pinned submodules: Subsurface, libdivecomputer (Subsurface branch), libgit2, libxml2, libxslt, SQLite, libzip |
+| `ios/`, `android/` | Native projects generated by Capacitor, with the widgets (WidgetKit, Glance) |
+| `docs/` | Analysis, reverse engineering, architecture, decisions |
 
-**Build.** Le cœur se compile avec CMake : en bibliothèques `.so` par architecture pour Android (NDK, arm64 et x86_64), en XCFramework pour iOS (appareil et simulateur). **Attention : la compilation iOS exige un Mac.** Depuis votre poste Windows, Android se compile en local, et iOS passe par un Mac ou par l'intégration continue (GitHub Actions, machines macOS). L'intégration continue compile le cœur et lance ses tests sous Linux, construit les deux apps et vérifie le JavaScript (lint et `@ts-check`).
+**Build.** The core builds with CMake: as `.so` libraries per architecture for Android (NDK, arm64 and x86_64), as an XCFramework for iOS (device and simulator). **Warning: building for iOS requires a Mac.** From a Windows machine, Android builds locally, and iOS goes through a Mac or continuous integration (GitHub Actions, macOS runners). Continuous integration builds the core and runs its tests on Linux, builds both apps and checks the JavaScript (lint and `@ts-check`).
 
-**Tests, par ordre d'importance**
+**Tests, in order of importance**
 
-1. **Aller-retour Git** : charger puis réécrire des dépôts réels de Subsurface, et vérifier qu'il n'y a **aucune différence**. C'est la garantie de compatibilité avec le cloud.
-2. **Calculs** : comparer SAC, déco, CNS et plans aux résultats de Subsurface sur les fichiers d'exemple de son dépôt (159 fichiers dans `dives/`), en reprenant ses tests (`tests/`, 17 600 lignes).
-3. **Coexistence** : scénarios automatisés avec Subsurface de bureau sur un compte de test (modifications des deux côtés, conflits, format plus récent).
-4. **Téléchargement** : transport simulé qui rejoue des captures Bluetooth, puis essais sur de vrais ordinateurs de plongée.
-5. **Interface** : tests unitaires (Vitest) et parcours de bout en bout sur émulateurs.
+1. **Git round trip:** load then rewrite real Subsurface repositories, and check there is **no difference**. This is the guarantee of compatibility with the cloud.
+2. **Calculations:** compare SAC, deco, CNS and plans with Subsurface's results on the sample files in its repository (159 files in `dives/`), reusing its tests (`tests/`, 17,600 lines).
+3. **Coexistence:** automated scenarios with desktop Subsurface on a test account (changes on both sides, conflicts, newer format).
+4. **Download:** simulated transport replaying Bluetooth captures, then trials on real dive computers.
+5. **Interface:** unit tests (Vitest) and end-to-end flows on emulators.
 
-**Licence.** En reprenant le code de Subsurface, publié sous **GPLv2 seulement** (« GPL-2.0 », sans « ou version ultérieure »), OpenDives doit lui-même être publié sous GPLv2. Les autres briques sont compatibles : libdivecomputer (LGPL-2.1 ou ultérieure), libgit2 (GPLv2 avec exception de liaison), Capacitor, Framework7 et Svelte (MIT), MapLibre (BSD), Chart.js (MIT). Il faut éviter les bibliothèques sous Apache-2.0, souvent jugée incompatible avec la GPLv2 seule. Deux points délicats sont à faire vérifier par un juriste avant la publication : la distribution sur l'App Store (Subsurface-mobile y est pourtant publié) et la liaison statique de libdivecomputer sur iOS. Je ne suis pas juriste.
+**Licence.** By reusing Subsurface's code, published under **GPLv2 only** ("GPL-2.0", without "or later"), OpenDives must itself be published under GPLv2. The other components are compatible: libdivecomputer (LGPL-2.1 or later), libgit2 (GPLv2 with a linking exception), Capacitor, Framework7 and Svelte (MIT), MapLibre (BSD), Chart.js (MIT). Libraries under Apache-2.0, often considered incompatible with GPLv2 only, must be avoided. Two delicate points need checking by a lawyer before publication: distribution on the App Store (Subsurface-mobile is published there, though) and static linking of libdivecomputer on iOS. This is not legal advice.
 
-## 9. Décisions à prendre et risques
+## 9. Decisions and risks
 
-**D****écisions avant de coder**
+**Decisions before coding**
 
-- [x] **A. Cadre applicatif de l'interface** : décidé le 5 novembre 2026 : Svelte 5 + Framework7 v9. Risque accepté : Framework7 repose surtout sur un mainteneur ; l'interface reste mince pour pouvoir être remplacée. À valider par un essai d'une journée sur un vrai téléphone Android et un iPhone.
-- [x] **B. Reprise du code Subsurface** : décidé le 5 novembre 2026 : le code venant de Subsurface doit pouvoir être mis à jour quand Subsurface s'améliore. Donc sous-module épinglé + module `compat/`, sans copie modifiée du code.
-- [x] **C. Tuiles pour la carte hors ligne** : décidé le 5 novembre 2026 : paquets PMTiles par région, construits à partir des données OpenStreetMap et hébergés par OpenDives, utilisés en ligne comme hors ligne. À prévoir : un hébergement de fichiers statiques, la régénération périodique des paquets et la mention « © contributeurs OpenStreetMap ».
+- [x] **A. Interface app framework:** decided on 5 November 2026: Svelte 5 + Framework7 v9. Accepted risk: Framework7 relies mostly on one maintainer; the interface stays thin so it can be replaced. To validate with a one-day trial on a real Android phone and an iPhone.
+- [x] **B. Reusing Subsurface's code:** decided on 5 November 2026: the code coming from Subsurface must be updatable when Subsurface improves. Hence a pinned submodule + `compat/` module, with no modified copy of the code.
+- [x] **C. Tiles for the offline map:** decided on 5 November 2026: PMTiles packages per region, built from OpenStreetMap data and hosted by OpenDives, used online and offline. To plan: static file hosting, periodic regeneration of the packages and the "© OpenStreetMap contributors" credit.
 
-**Risques**
+**Risks**
 
-| Risque | Conséquence | Parade |
+| Risk | Consequence | Mitigation |
 | --- | --- | --- |
-| Perte de données lors d'une écriture Git | Carnets corrompus pour les utilisateurs de Subsurface | Code Git de Subsurface réutilisé tel quel, test d'aller-retour obligatoire avant chaque version, garde de version de format |
-| Évolution du format par Subsurface | OpenDives bloqué en lecture seule | Suivre les versions de Subsurface, mettre à jour le sous-module, tests automatiques |
-| Serveurs Subsurface | Le projet pourrait limiter un client inconnu ; aucune démarche n'est prévue pour l'instant | Client bien identifié (User-Agent, commits signés), synchronisation sobre ; décision à revoir avant publication |
-| Particularités Bluetooth de chaque fabricant | Téléchargements qui échouent sur certains modèles | Reprendre les réglages BLE de Subsurface, transport simulé, bêtas avec des plongeurs équipés de modèles variés |
-| Licence GPLv2 et App Store | Publication iOS contestée | Avis juridique avant publication ; Subsurface-mobile sert de précédent |
-| Volume de données dans le pont | Lenteurs sur les gros carnets | Pagination, tableaux compacts, profils calculés dans le cœur |
-| Compilation iOS | Impossible depuis Windows | Mac d'appoint ou intégration continue macOS |
+| Data loss during a Git write | Corrupted logbooks for Subsurface users | Subsurface's Git code reused as is, round-trip test mandatory before each release, format version guard |
+| Format changes by Subsurface | OpenDives stuck in read-only mode | Follow Subsurface releases, update the submodule, automatic tests |
+| Subsurface servers | The project could restrict an unknown client; no approach is planned for now | Clearly identified client (User-Agent, signed commits), sparing synchronisation; decision to revisit before publication |
+| Bluetooth quirks of each manufacturer | Downloads failing on some models | Reuse Subsurface's BLE settings, simulated transport, betas with divers using varied models |
+| GPLv2 licence and App Store | iOS publication challenged | Legal advice before publication; Subsurface-mobile serves as a precedent |
+| Data volume across the bridge | Slowness on large logbooks | Pagination, compact arrays, profiles computed in the core |
+| iOS build | Impossible from Windows | Spare Mac or macOS continuous integration |
 
-**Suite proposée.** A, B et C étant tranchées, l'étape 5 (conception de l'interface) peut démarrer en parallèle d'une première **preuve de concept technique** : compiler le cœur sans Qt pour Android, ouvrir un vrai carnet cloud, l'afficher dans une liste, et réussir l'aller-retour Git sans différence.
+**Proposed next step.** With A, B and C settled, interface design could start in parallel with a first **technical proof of concept**: build the core without Qt for Android, open a real cloud logbook, show it in a list, and achieve the Git round trip without differences. Both have since been done (see [the proof of concept](../poc/README.md)).
