@@ -6,6 +6,7 @@
 #include "core/dive.h"
 #include "core/file.h"
 #include "core/errorhelper.h"
+#include "core/libopendives/opendives.h"
 #include <git2.h>
 #include <cstdio>
 
@@ -21,6 +22,8 @@ int main(int argc, char **argv)
 		fprintf(stderr, "load failed (%d): %s\n", ret, argv[1]);
 		return 1;
 	}
+	// As the app does after every load: keep the log's own settings (units...).
+	opendives::apply_log_prefs();
 	fprintf(stderr, "loaded %zu dives, %zu sites, %zu trips\n", divelog.dives.size(), divelog.sites.size(), divelog.trips.size());
 	ret = save_dives(argv[2], true);
 	if (ret) {

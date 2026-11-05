@@ -4,7 +4,7 @@
 # pkg-config, libgit2, libxml2, libxslt, libzip, sqlite3, zlib.
 #   Debian/Ubuntu: apt install build-essential autoconf automake libtool \
 #                  pkg-config libgit2-dev libxml2-dev libxslt1-dev libzip-dev \
-#                  libsqlite3-dev zlib1g-dev
+#                  libsqlite3-dev zlib1g-dev libssl-dev
 # usage: poc/build.sh [build-dir]     (default: build/poc)
 set -euo pipefail
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
@@ -40,15 +40,17 @@ FLAGS="-std=c++20 -O1 -w
 
 { for f in $CORE; do echo "$SS/core/$f.cpp"; done
   echo "$COMPAT/qthelper_compat.cpp"; echo "$COMPAT/notifier_compat.cpp"
-  echo "$ROOT/tests/roundtrip.cpp"; echo "$ROOT/tests/facade.cpp"
+  echo "$COMPAT/cloud_compat.cpp"; echo "$COMPAT/https_openssl.cpp"
+  echo "$ROOT/tests/roundtrip.cpp"; echo "$ROOT/tests/facade.cpp"; echo "$ROOT/tests/cloud.cpp"
   echo "$ROOT/core/libopendives/opendives.cpp"; } > "$B/sources.txt"
 
 export FLAGS B
 xargs -P"$JOBS" -I{} bash -c 'o="$B/obj/$(basename {} .cpp).o"; [ "$o" -nt {} ] || g++ $FLAGS -c {} -o "$o"' < "$B/sources.txt"
 
 # 4. Link.
-OBJS=$(ls "$B"/obj/*.o | grep -Ev '/(roundtrip|facade|opendives)\.o$')
-LIBS="$B/libdc/lib/libdivecomputer.a $(pkg-config --libs libgit2 libxml-2.0 libxslt libzip sqlite3) -lz -lm"
-g++ $OBJS "$B/obj/roundtrip.o" -o "$B/roundtrip" $LIBS
+OBJS=$(ls "$B"/obj/*.o | grep -Ev '/(roundtrip|facade|cloud|opendives)\.o$')
+LIBS="$B/libdc/lib/libdivecomputer.a $(pkg-config --libs libgit2 libxml-2.0 libxslt libzip sqlite3) -lssl -lcrypto -lz -lm"
+g++ $OBJS "$B/obj/opendives.o" "$B/obj/roundtrip.o" -o "$B/roundtrip" $LIBS
 g++ $OBJS "$B/obj/opendives.o" "$B/obj/facade.o" -o "$B/facade" $LIBS
-echo "built $B/roundtrip $B/facade"
+g++ $OBJS "$B/obj/opendives.o" "$B/obj/cloud.o" -o "$B/cloud" $LIBS
+echo "built $B/roundtrip $B/facade $B/cloud"

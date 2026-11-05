@@ -7,6 +7,8 @@
 #include "core/errorhelper.h"
 #include "core/file.h"
 #include "core/git-access.h"
+#include "core/pref.h"
+#include "core/qthelper.h"
 #include "core/trip.h"
 
 #include <git2.h>
@@ -65,6 +67,27 @@ static int load(const std::string &path, std::string &error)
 	return 0;
 }
 
+// Port de QMLManager::consumeFinishedLoad() (mobile-widgets/qmlmanager.cpp),
+// sans la partie interface.
+void apply_log_prefs()
+{
+	/* Only apply unit system when the loaded file contained a "units" line.
+	 * Without this guard, git_prefs.unit_system defaults to METRIC and would
+	 * clobber the correct preference already loaded from the settings. */
+	if (git_prefs_units_set) {
+		prefs.unit_system = git_prefs.unit_system;
+		if (git_prefs.unit_system == IMPERIAL)
+			git_prefs.units = IMPERIAL_units;
+		else if (git_prefs.unit_system == METRIC)
+			git_prefs.units = SI_units;
+		prefs.units = git_prefs.units;
+	}
+	prefs.tankbar = git_prefs.tankbar;
+	prefs.show_ccr_setpoint = git_prefs.show_ccr_setpoint;
+	prefs.show_ccr_sensors = git_prefs.show_ccr_sensors;
+	prefs.pp_graphs.po2 = git_prefs.pp_graphs.po2;
+}
+
 int init()
 {
 	int ret = git_libgit2_init();
@@ -100,6 +123,7 @@ int list_dives(const std::string &log, std::string &json, std::string &error)
 {
 	if (load(log, error))
 		return -1;
+	apply_log_prefs();
 	divelog.process_loaded_dives();
 
 	json = "[";
@@ -127,6 +151,72 @@ int list_dives(const std::string &log, std::string &json, std::string &error)
 	}
 	json += ']';
 	return 0;
+}
+
+int cloud_configure(const std::string &email, const std::string &password, std::string &url)
+{
+	prefs.cloud_storage_email = email;
+	prefs.cloud_storage_password = password;
+	auto cloud_url = getCloudURL();
+	if (!cloud_url)
+		return -1;
+	url = *cloud_url;
+	return 0;
+}
+
+// Une seule tentative : un mauvais mot de passe ne doit pas être répété.
+static int probe_credentials(git_credential **out, const char *, const char *, unsigned int, void *payload)
+{
+	int *attempts = static_cast<int *>(payload);
+	if ((*attempts)++ > 0)
+		return GIT_EUSER;
+	return git_credential_userpass_plaintext_new(out, prefs.cloud_storage_email_encoded.c_str(),
+						     prefs.cloud_storage_password.c_str());
+}
+
+int cloud_branch_status(const std::string &url, bool &exists, std::string &head, std::string &error)
+{
+	exists = false;
+	head.clear();
+	size_t open = url.rfind('[');
+	if (open == std::string::npos || url.back() != ']') {
+		error = "Adresse de carnet invalide";
+		return -1;
+	}
+	std::string remote_url = url.substr(0, open);
+	std::string branch_ref = "refs/heads/" + url.substr(open + 1, url.size() - open - 2);
+
+	git_remote *remote = nullptr;
+	if (git_remote_create_detached(&remote, remote_url.c_str())) {
+		error = git_error_last() ? git_error_last()->message : "git_remote_create_detached";
+		return -1;
+	}
+	int attempts = 0;
+	git_remote_callbacks callbacks = GIT_REMOTE_CALLBACKS_INIT;
+	callbacks.credentials = probe_credentials;
+	callbacks.payload = &attempts;
+	// Pas de certificate_check : libgit2 applique sa validation normale.
+	int ret = git_remote_connect(remote, GIT_DIRECTION_FETCH, &callbacks, nullptr, nullptr);
+	if (ret == 0) {
+		const git_remote_head **heads = nullptr;
+		size_t count = 0;
+		ret = git_remote_ls(&heads, &count, remote);
+		for (size_t i = 0; ret == 0 && i < count; i++) {
+			if (branch_ref == heads[i]->name) {
+				char sha[41];
+				git_oid_tostr(sha, sizeof(sha), &heads[i]->oid);
+				head = sha;
+				exists = true;
+			}
+		}
+		git_remote_disconnect(remote);
+	}
+	if (ret) {
+		error = attempts > 1 ? "Identifiants refusés par le serveur"
+				     : (git_error_last() ? git_error_last()->message : "Connexion impossible");
+	}
+	git_remote_free(remote);
+	return ret ? -1 : 0;
 }
 
 } // namespace opendives

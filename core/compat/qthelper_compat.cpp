@@ -209,13 +209,7 @@ xsltStylesheetPtr get_stylesheet(const char *name)
 	return xslt;
 }
 
-// --- checkcloudconnection.cpp --------------------------------------------
-// The POC works on local repositories only; the real app does this check
-// through the Capacitor network layer.
-bool canReachCloudServer(struct git_info *)
-{
-	return false;
-}
+// --- checkcloudconnection.cpp: see cloud_compat.cpp ----------------------
 
 // --- metadata.cpp (photo EXIF/video metadata): handled by the app layer ---
 enum mediatype_t get_metadata(const char *, struct metadata *data)

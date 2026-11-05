@@ -17,6 +17,8 @@ endforeach()
 list(APPEND SOURCES
   "${COMPAT}/qthelper_compat.cpp"
   "${COMPAT}/notifier_compat.cpp"
+  "${COMPAT}/cloud_compat.cpp"
+  "${COMPAT}/https_unavailable.cpp"
   "${ROOT}/core/libopendives/opendives.cpp"
   "${ROOT}/plugins/opendives-core/android/src/main/cpp/opendives_jni.cpp")
 

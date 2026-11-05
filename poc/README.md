@@ -46,11 +46,52 @@ poc/build.sh                      # → build/poc/roundtrip  (≈ 1 min 30)
 tests/run-roundtrip.sh build/poc/roundtrip build/rt third_party/subsurface/dives/*.xml third_party/subsurface/dives/*.ssrf
 ```
 
-Les dépôts `A[main]`, `B[main]`, etc. sont des dépôts git locaux : le POC ne contacte pas le cloud.
+Les dépôts `A[main]`, `B[main]`, etc. sont des dépôts git locaux : ce test ne contacte pas le cloud.
+
+## Cloud réel, en lecture seule (5 novembre 2026)
+
+**But :** lire avec le cœur de Subsurface un vrai carnet du cloud, écrit par Subsurface, puis le réécrire localement sans rien envoyer au serveur.
+
+**Résultat :** sur un compte de développement de 1 353 plongées, le carnet est cloné et chargé. La réécriture est identique, octet pour octet, sauf pour 2 plongées (voir plus bas). Le serveur n'a pas changé : sa tête est la même avant et après.
+
+**Ce qui a été ajouté :**
+
+- **`core/compat/cloud_compat.cpp` :** portage sans Qt de `canReachCloudServer()`.
+  - Même requête « make-latte » vers les serveurs, avec réponse 418 attendue.
+  - Même ordre des serveurs et mêmes effets sur `prefs` et `git_local_only`.
+  - S'y ajoute `getCloudURL()`.
+- **`platform_https.h` :** la requête HTTPS est fournie par la plateforme, avec un certificat obligatoirement validé.
+  - `https_openssl.cpp` : la version Linux.
+  - `https_unavailable.cpp` : la version Android, en attendant le réseau natif ; le cloud y est injoignable.
+- **Façade :**
+  - `cloud_branch_status()` est une sonde en lecture seule, avec la validation TLS normale de libgit2.
+  - `apply_log_prefs()` est le portage de `QMLManager::consumeFinishedLoad()`.
+- **`tests/cloud.cpp` et `tests/run-cloud-readonly.sh` :**
+  - Le test refuse de charger si la branche n'existe pas sur le serveur.
+  - Il ne travaille que sur des copies sans distant `origin`.
+  - Il vérifie que la tête du serveur n'a pas changé.
+
+**Ce qu'on a appris :**
+
+- **Réglages du carnet :** les unités et les préférences de `00-Subsurface` sont lues dans `git_prefs`, mais `save-git` écrit `prefs`. Subsurface-mobile les recopie après chaque chargement. Sans cette étape, désormais dans `apply_log_prefs()`, le premier enregistrement aurait remplacé `units PERSONALIZE FEET CUFT PSI CELSIUS LBS MINUTES` par `units METRIC`. **L'app doit appeler `apply_log_prefs()` après chaque chargement.**
+- **Événements simultanés :** deux événements de même instant et de même nom sont jugés égaux (`divecomputer.cpp:337`). Comme `add_event_to_dc()` insère avec `lower_bound`, leur ordre s'inverse à chaque chargement, donc à chaque enregistrement. Deux plongées du compte ont deux `gaschange` à 0:10. Rien n'est perdu, mais leur fichier change à chaque sauvegarde, dans Subsurface comme dans OpenDives. Ce constat vient de la lecture du code, sans vérification avec l'application Subsurface.
+- **Bogue de Subsurface, `git-access.cpp:52` :** `includes_string_caseinsensitive()` renvoie vrai dès que les premiers caractères **diffèrent**. Presque tout échec de clone est alors traité comme « branche absente du serveur ». Le cœur crée un dépôt avec un commit vide, « Initial commit to create empty repo. », puis tente une synchronisation.
+  - Si la branche existe sur le serveur, il n'y a pas d'ancêtre commun : rien n'est poussé, et le cache est mis de côté.
+  - D'où la sonde préalable dans OpenDives.
+  - À signaler à Subsurface le jour où il y aura un contact.
+- **Certificats :** `certificate_check_cb()` accepte tout certificat X.509 pour les serveurs du cloud. Subsurface compte sur `canReachCloudServer()` pour avoir validé TLS juste avant. Notre portage valide bien le certificat, mais la connexion git elle-même reste sans validation, comme dans Subsurface.
+- **WSL :** libgit2 ne peut pas faire de `mmap` sur un disque Windows (`/mnt/c`, `/mnt/f`) : « failed to mmap. Could not write data ». Le dossier de travail du test doit être dans le système de fichiers de WSL.
+
+**Reproduire.** Les identifiants sont dans un fichier hors du dépôt, avec `OPENDIVES_CLOUD_EMAIL=` et `OPENDIVES_CLOUD_PASSWORD=`. Le mot de passe n'est jamais affiché.
+
+```sh
+tests/run-cloud-readonly.sh build/poc/cloud build/poc/roundtrip /mnt/c/Users/<vous>/.opendives/cloud-dev.env ~/opendives-cloud-rt
+```
 
 ## Ce qui reste hors du POC
 
-- La compilation pour Android et iOS (NDK et Xcode), puis l'appel depuis Capacitor.
-- La synchronisation avec le cloud réel : `canReachCloudServer` renvoie `false` dans ce build.
+- iOS (Xcode).
+- L'envoi vers le cloud, c'est-à-dire l'enregistrement d'une modification puis la synchronisation.
+- Le réseau sur Android : HTTPS dans libgit2 et `opendives_https_get()` natif.
 - Les imports qui dépendent encore de Qt : Suunto JSON et l'en-tête CSV Seabear, laissés vides ici.
 - Les traductions : `trGettext` renvoie le texte anglais.
