@@ -181,10 +181,11 @@ import { registerPlugin } from '@capacitor/core';
  * @property {(options: {id: number, changes: Record<string, string|number|string[]>}) => Promise<EditResult>} editDive
  *   One undoable step; only the fields named change (edit_dive in opendives.h).
  * @property {(options?: {redo?: boolean}) => Promise<EditResult>} undo
- * @property {(options: {kind: 'list'|'site'|'nearby'|'duplicates'|'without', uuid?: number, lat?: number, lon?: number, a?: number, b?: number}) => Promise<any>} siteQuery
+ * @property {(options: {kind: 'list'|'site'|'nearby'|'duplicates'|'without'|'place', uuid?: number, lat?: number, lon?: number, a?: number, b?: number, text?: string}) => Promise<any>} siteQuery
  *   Read-only site queries (opendives.h): list of SiteSummary, a SiteDetail, the site
  *   within a metres of lat/lon (or null), possible duplicates (a: same name within a m,
- *   b: other names within b m), dives without a site.
+ *   b: other names within b m), dives without a site, and place: {country, region, city,
+ *   offline} at lat/lon in the language text (Nominatim, else offline Natural Earth), or null.
  * @property {(options: {action: 'create'|'edit'|'geocode'|'merge'|'delete', uuid?: number, other?: number, uuids?: number[], field?: string, value?: string, lat?: number, lon?: number}) => Promise<EditResult>} siteAction
  *   One undoable site change, as Subsurface's site commands.
  * @property {(options: {tripId: number}) => Promise<TripDetail>} getTrip

@@ -287,6 +287,39 @@ html.ios {
   }
 
   /*
+   * Filled button (the "Save" of an Android edit screen, MD3): ink on light,
+   * the main action of the screen. On iOS a bold text button, as the HIG.
+   */
+  .od-filled-button {
+    width: auto;
+    height: 40px;
+    padding: 0 20px;
+    border: none;
+    border-radius: 20px;
+    background: var(--od-primary-action);
+    color: var(--od-on-primary-action);
+    font: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.1px;
+    cursor: pointer;
+
+    &:disabled {
+      opacity: 0.5;
+    }
+
+    .ios & {
+      height: 44px;
+      padding: 0 8px;
+      background: none;
+      color: var(--od-action);
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: 0;
+    }
+  }
+
+  /*
    * Outlined button ("Sign out", "Delete the account"): same sizes as the
    * tonal button; ink, or --od-alarm with .danger (text and border).
    */

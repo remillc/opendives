@@ -33,9 +33,13 @@
 #include <git2.h>
 #include <algorithm>
 #include <cctype>
+#include <chrono>
 #include <cstdlib>
 #include <ctime>
+#include <initializer_list>
+#include <map>
 #include <memory>
+#include <thread>
 #include <vector>
 
 namespace opendives {
@@ -1120,13 +1124,6 @@ int trip_add_dives(int trip_id, const std::vector<int> &dive_ids, std::string &j
 // ---------------------------------------------------------------------------
 // Dive sites (spec, section 4, "Sites"). Sites are identified by their uuid.
 
-static std::string geonames_username;
-
-void set_geonames_username(const std::string &username)
-{
-	geonames_username = username;
-}
-
 static std::string iso_time(timestamp_t when);
 
 static void append_site_summary(std::string &json, const dive_site &ds)
@@ -1328,59 +1325,108 @@ static std::string json_value(const std::string &text, const std::string &key, s
 	return out;
 }
 
-// Port of reverseGeoLookup() (core/divesitehelpers.cpp, Qt): GeoNames' ocean,
-// then nearby place name, else nearby, with OpenDives' own GeoNames account.
-static int reverse_geo_lookup(location_t loc, const std::string &lang, taxonomy_data &taxonomy, std::string &error)
+// Nominatim's usage policy (operations.osmfoundation.org/policies/nominatim):
+// an identifying User-Agent, at most one request per second, results cached.
+static const char *nominatim_user_agent = "OpenDives (dive log app; https://github.com/remillc/opendives)";
+static std::chrono::steady_clock::time_point last_nominatim_request;
+static std::map<std::string, taxonomy_data> nominatim_cache;
+
+// The first of these keys of Nominatim's "address" object that has a value.
+static std::string address_value(const std::string &body, size_t address, std::initializer_list<const char *> keys)
 {
-	if (geonames_username.empty()) {
-		error = "NO_GEONAMES_ACCOUNT";
-		return -1;
+	for (const char *key: keys) {
+		std::string value = json_value(body, key, address);
+		if (!value.empty())
+			return value;
 	}
-	char coords[96];
-	snprintf(coords, sizeof(coords), "lat=%.6f&lng=%.6f", loc.lat.udeg / 1000000.0, loc.lon.udeg / 1000000.0);
-	std::string query = "?lang=" + lang + "&" + coords + "&radius=50&username=" + geonames_username;
-	const std::string base = "https://secure.geonames.org/";
+	return std::string();
+}
+
+// Nominatim's reverse lookup. Returns 0 with the taxonomy filled in, 1 when
+// the server answered without a place (open sea), -1 when it did not answer.
+static int nominatim_lookup(location_t loc, const std::string &lang, taxonomy_data &taxonomy)
+{
+	char query[160];
+	snprintf(query, sizeof(query), "lat=%.6f&lon=%.6f", loc.lat.udeg / 1000000.0, loc.lon.udeg / 1000000.0);
+	std::string key = std::string(query) + "&" + lang;
+	auto cached = nominatim_cache.find(key);
+	if (cached != nominatim_cache.end()) {
+		taxonomy = cached->second;
+		return 0;
+	}
+	auto wait = last_nominatim_request + std::chrono::seconds(1) - std::chrono::steady_clock::now();
+	if (wait > std::chrono::steady_clock::duration::zero())
+		std::this_thread::sleep_for(wait);
+	last_nominatim_request = std::chrono::steady_clock::now();
+	std::string url = "https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=14&addressdetails=1&" +
+			  std::string(query) + "&accept-language=" + lang;
 	int status = 0;
 	std::string body;
-	if (opendives_https_get(base + "oceanJSON" + query, subsurface_user_agent(), 5, status, body)) {
-		error = "OFFLINE";
+	if (opendives_https_get(url, nominatim_user_agent, 5, status, body) || status != 200)
 		return -1;
-	}
-	size_t ocean = body.find("\"ocean\"");
-	if (ocean != std::string::npos) {
-		std::string name = json_value(body, "name", ocean);
-		if (!name.empty())
-			taxonomy_set_category(taxonomy, TC_OCEAN, name, GEOCODED);
-	}
-	body.clear();
-	if (opendives_https_get(base + "findNearbyPlaceNameJSON" + query, subsurface_user_agent(), 5, status, body)) {
-		error = "OFFLINE";
-		return -1;
-	}
-	size_t list = body.find("\"geonames\":[{");
-	if (list == std::string::npos) {
-		body.clear();
-		if (opendives_https_get(base + "findNearbyJSON" + query, subsurface_user_agent(), 5, status, body)) {
-			error = "OFFLINE";
-			return -1;
-		}
-		list = body.find("\"geonames\":[{");
-	}
-	if (list == std::string::npos) {
+	size_t address = body.find("\"address\":{");
+	if (address == std::string::npos)
+		return 1;
+	std::string country = json_value(body, "country", address);
+	std::string region = address_value(body, address, { "state", "province", "region", "state_district" });
+	std::string county = json_value(body, "county", address);
+	std::string town = address_value(body, address, { "city", "town", "village", "hamlet", "municipality" });
+	if (!country.empty())
+		taxonomy_set_country(taxonomy, country, GEOCODED);
+	if (!region.empty())
+		taxonomy_set_category(taxonomy, TC_ADMIN_L1, region, GEOCODED);
+	if (!county.empty())
+		taxonomy_set_category(taxonomy, TC_ADMIN_L2, county, GEOCODED);
+	if (!town.empty())
+		taxonomy_set_category(taxonomy, TC_LOCALNAME, town, GEOCODED);
+	nominatim_cache[key] = taxonomy;
+	return 0;
+}
+
+// In place of reverseGeoLookup() (core/divesitehelpers.cpp, Qt, GeoNames):
+// the same taxonomy categories, from Nominatim, else from the offline Natural
+// Earth file (country and region only).
+static int reverse_geo_lookup(location_t loc, const std::string &lang, taxonomy_data &taxonomy, std::string &error,
+			      bool *offline = nullptr)
+{
+	if (offline)
+		*offline = false;
+	if (nominatim_lookup(loc, lang, taxonomy) == 0 && !taxonomy.empty())
+		return 0;
+	taxonomy.clear();
+	if (offline)
+		*offline = true;
+	std::string country, region;
+	if (!offline_region(loc.lat.udeg, loc.lon.udeg, lang, country, region)) {
 		error = "NO_RESULT";
 		return -1;
 	}
-	size_t end = body.find('}', list);
-	std::string first = body.substr(list, end == std::string::npos ? std::string::npos : end - list);
-	for (int idx = TC_COUNTRY; idx < TC_NR_CATEGORIES; idx++) {
-		std::string value = json_value(first, taxonomy_api_names[idx]);
-		if (!value.empty())
-			taxonomy_set_category(taxonomy, static_cast<taxonomy_category>(idx), value, GEOCODED);
+	taxonomy_set_country(taxonomy, country, GEOCODED);
+	if (!region.empty())
+		taxonomy_set_category(taxonomy, TC_ADMIN_L1, region, GEOCODED);
+	return 0;
+}
+
+int place_at(int lat_udeg, int lon_udeg, const std::string &lang, std::string &json)
+{
+	location_t loc;
+	loc.lat.udeg = lat_udeg;
+	loc.lon.udeg = lon_udeg;
+	taxonomy_data found;
+	std::string error;
+	bool offline = false;
+	if (reverse_geo_lookup(loc, lang, found, error, &offline)) {
+		json = "null";
+		return 0;
 	}
-	std::string l3 = taxonomy_get_value(taxonomy, TC_ADMIN_L3);
-	std::string lt = taxonomy_get_value(taxonomy, TC_LOCALNAME);
-	if (!l3.empty() && !lt.empty())
-		taxonomy_set_category(taxonomy, TC_ADMIN_L3, lt, GEOCOPIED); // as Subsurface does
+	json = "{\"country\":";
+	append_json_string(json, taxonomy_get_country(found));
+	json += ",\"region\":";
+	append_json_string(json, taxonomy_get_value(found, TC_ADMIN_L1));
+	json += ",\"city\":";
+	append_json_string(json, taxonomy_get_value(found, TC_LOCALNAME));
+	json += ",\"offline\":";
+	json += offline ? "true}" : "false}";
 	return 0;
 }
 

@@ -1,38 +1,43 @@
 <script>
   // @ts-check
   // New or edited site (docs/mockups/sites-edition-android.dc.html): name;
-  // position by moving the pin, by typing coordinates or from the device;
-  // country and region from GeoNames at each change of position (a corrected
-  // value is never replaced); description and notes. A site within 100 m is
-  // offered instead of a duplicate. With ?dive=<id>, the new site is set on
-  // that dive (dives without a site).
+  // position by moving the pin (the map can go full screen), by typing
+  // coordinates or from the device; country and region looked up at each
+  // change of position (OpenStreetMap, else the offline Natural Earth file),
+  // a corrected value is never replaced; description and notes. A site
+  // within 100 m is offered instead of a duplicate. With ?dive=<id>, the new
+  // site is set on that dive (dives without a site).
   import { onMount } from 'svelte';
   import { Page, Navbar, Link, f7 } from 'framework7-svelte';
   import { OpenDivesCore } from 'opendives-core';
+  import Icon from '../components/Icon.svelte';
+  import OutlinedField from '../components/OutlinedField.svelte';
   import SiteMap from '../components/SiteMap.svelte';
   import { saveDiveChanges } from '../lib/logbook.svelte.js';
   import { formatCoordinates, geocodeSite, parseCoordinates, siteChange } from '../lib/sites.svelte.js';
-  import { t } from '../lib/i18n.js';
+  import { language, t } from '../lib/i18n.js';
 
   /** @type {{ f7route: { params: { uuid?: string }, query: { dive?: string } }, f7router: any }} */
   let { f7route, f7router } = $props();
   const editing = f7route.params.uuid ? Number(f7route.params.uuid) : 0;
   const forDive = f7route.query?.dive ? Number(f7route.query.dive) : 0;
 
-  /** @type {import('opendives-core').SiteDetail|null} */
-  let original = $state(null);
+  let original = $state(/** @type {import('opendives-core').SiteDetail|null} */ (null));
   let name = $state('');
   let description = $state('');
   let notes = $state('');
   let country = $state('');
   let region = $state('');
-  /** @type {{latUdeg: number, lonUdeg: number}|null} */
-  let position = $state(null);
+  /** The values last filled in from the position: shown as "automatic". */
+  let autoCountry = $state('');
+  let autoRegion = $state('');
+  let position = $state(/** @type {{latUdeg: number, lonUdeg: number}|null} */ (null));
   let coordsText = $state('');
   let coordsError = $state(false);
-  /** @type {import('opendives-core').SiteSummary|null} */
-  let nearby = $state(null);
+  let nearby = $state(/** @type {import('opendives-core').SiteSummary|null} */ (null));
   let saving = $state(false);
+  let fullscreen = $state(false);
+  let lookups = 0;
 
   onMount(async () => {
     if (!editing) return;
@@ -43,6 +48,8 @@
     notes = s.notes;
     country = s.country;
     region = s.region.value;
+    autoCountry = s.countryTaxonomy.manual ? '' : s.country;
+    autoRegion = s.region.manual ? '' : s.region.value;
     if (s.hasLocation) {
       position = { latUdeg: s.latUdeg, lonUdeg: s.lonUdeg };
       coordsText = formatCoordinates(s.latUdeg, s.lonUdeg);
@@ -51,16 +58,24 @@
 
   /** @param {{latUdeg: number, lonUdeg: number}} p */
   async function setPosition(p) {
+    const asked = ++lookups;
     position = p;
     coordsText = formatCoordinates(p.latUdeg, p.lonUdeg);
     coordsError = false;
     const near = await OpenDivesCore.siteQuery({ kind: 'nearby', lat: p.latUdeg, lon: p.lonUdeg, a: 100 });
     nearby = near && near.uuid !== editing ? near : null;
+    // Country and region of the new position, unless the diver corrected them.
+    const place = await OpenDivesCore.siteQuery({ kind: 'place', lat: p.latUdeg, lon: p.lonUdeg, text: language });
+    // Only the answer for the latest position counts.
+    if (asked !== lookups || !place) return;
+    if (!country || country === autoCountry) country = autoCountry = place.country;
+    if (!region || region === autoRegion) region = autoRegion = place.region;
   }
 
   function typedCoordinates() {
     if (!coordsText.trim()) {
       position = null;
+      coordsError = false;
       return;
     }
     const p = parseCoordinates(coordsText);
@@ -69,10 +84,11 @@
   }
 
   function useDevicePosition() {
-    if (!navigator.geolocation) return f7.toast.create({ text: t('sites.noDevicePosition'), closeTimeout: 3000 }).open();
+    const failed = () => f7.toast.create({ text: t('sites.noDevicePosition'), closeTimeout: 3000 }).open();
+    if (!navigator.geolocation) return failed();
     navigator.geolocation.getCurrentPosition(
       (pos) => setPosition({ latUdeg: Math.round(pos.coords.latitude * 1e6), lonUdeg: Math.round(pos.coords.longitude * 1e6) }),
-      () => f7.toast.create({ text: t('sites.noDevicePosition'), closeTimeout: 3000 }).open(),
+      failed,
       { enableHighAccuracy: true, timeout: 15000 },
     );
   }
@@ -98,10 +114,12 @@
       }
       if (description !== (original?.description ?? '')) await siteChange({ action: 'edit', uuid, field: 'description', value: description });
       if (notes !== (original?.notes ?? '')) await siteChange({ action: 'edit', uuid, field: 'notes', value: notes });
-      // Country and region from the position, then the diver's corrections.
+      // Country and region found from the position, then what the diver
+      // typed where it differs (kept as a correction).
       if (moved) await geocodeSite(uuid);
-      if (country.trim() !== (original?.country ?? '')) await siteChange({ action: 'edit', uuid, field: 'country', value: country.trim() });
-      if (region.trim() !== (original?.region.value ?? '')) await siteChange({ action: 'edit', uuid, field: 'region', value: region.trim() });
+      const now = await OpenDivesCore.siteQuery({ kind: 'site', uuid });
+      if (country.trim() !== now.country) await siteChange({ action: 'edit', uuid, field: 'country', value: country.trim() });
+      if (region.trim() !== now.region.value) await siteChange({ action: 'edit', uuid, field: 'region', value: region.trim() });
       if (forDive) await saveDiveChanges(forDive, { site: uuid });
       f7router.back();
     } catch (e) {
@@ -113,119 +131,209 @@
     }
   }
 
-  async function useNearby() {
+  /** The existing site instead of a duplicate. */
+  async function useNearby(/** @type {MouseEvent} */ e) {
+    e.preventDefault();
     if (!nearby) return;
-    if (forDive) await saveDiveChanges(forDive, { site: nearby.uuid });
-    f7router.back();
+    if (forDive) {
+      await saveDiveChanges(forDive, { site: nearby.uuid });
+      f7router.back();
+    } else {
+      f7router.navigate(`/site/${nearby.uuid}/`, { reloadCurrent: true });
+    }
+  }
+
+  /**
+   * Full screen: the map card moves to the end of <body>, above the pages,
+   * and comes back to its place after.
+   * @param {HTMLElement} node
+   * @param {boolean} on
+   */
+  function lift(node, on) {
+    const home = document.createComment('map');
+    node.before(home);
+    const place = (/** @type {boolean} */ up) => (up ? document.body.append(node) : home.after(node));
+    place(on);
+    return {
+      update: place,
+      destroy() {
+        home.remove();
+        node.remove();
+      },
+    };
   }
 </script>
 
 <Page>
   <Navbar title={editing ? t('sites.editTitle') : t('sites.newSite')}>
     {#snippet left()}
-      <Link back iconOnly><i class="icon icon-back"></i><span class="od-sr-only">{t('common.back')}</span></Link>
+      <Link back iconOnly><Icon name="close" /><span class="od-sr-only">{t('sites.close')}</span></Link>
     {/snippet}
     {#snippet right()}
-      <Link onClick={save} class={saving ? 'disabled' : ''}>{t('edit.save')}</Link>
+      <button type="button" class="od-filled-button save" disabled={saving} onclick={save}>{t('edit.save')}</button>
     {/snippet}
   </Navbar>
 
-  <div class="list list-strong inset">
-    <ul>
-      <li class="item-content item-input">
-        <div class="item-inner">
-          <div class="item-title item-label">{t('sites.name')}</div>
-          <div class="item-input-wrap"><input type="text" bind:value={name} /></div>
-        </div>
-      </li>
-    </ul>
+  <OutlinedField label={t('sites.name')} bind:value={name} />
+
+  <div class="map-card" class:fullscreen use:lift={fullscreen}>
+    <SiteMap pin={position} editable onmove={setPosition} height={fullscreen ? '100%' : '190px'} />
+    <span class="chip">{t('sites.movePin')}</span>
+    <button type="button" class="map-button" onclick={() => (fullscreen = !fullscreen)}>
+      <Icon name={fullscreen ? 'exitFullscreen' : 'fullscreen'} size={20} weight={2} />
+      <span class="od-sr-only">{fullscreen ? t('sites.exitFullscreen') : t('sites.fullscreen')}</span>
+    </button>
+    {#if fullscreen && coordsText}<span class="coords od-value">{coordsText}</span>{/if}
   </div>
 
-  <SiteMap pin={position} draggable onmove={setPosition} height="220px" />
-  <p class="hint">{t('sites.movePin')}</p>
+  <OutlinedField
+    label={t('sites.coordinates')}
+    bind:value={coordsText}
+    onchange={typedCoordinates}
+    invalid={coordsError}
+    supporting={coordsError ? t('sites.coordinatesInvalid') : t('sites.coordinatesHint')}
+  >
+    {#snippet trailing()}
+      <button type="button" class="locate" onclick={useDevicePosition}>
+        <Icon name="locate" size={20} weight={2} />
+        <span class="od-sr-only">{t('sites.useDevicePosition')}</span>
+      </button>
+    {/snippet}
+  </OutlinedField>
+
+  <p class="hint"><Icon name="place" size={16} />{t('sites.placeHint')}</p>
+
+  <OutlinedField label={t('sites.country')} bind:value={country}>
+    {#snippet trailing()}
+      {#if country && country === autoCountry}<span class="auto">{t('sites.automatic')}</span>{/if}
+    {/snippet}
+  </OutlinedField>
+  <OutlinedField label={t('sites.region')} bind:value={region} supporting={t('sites.correctionHint')}>
+    {#snippet trailing()}
+      {#if region && region === autoRegion}<span class="auto">{t('sites.automatic')}</span>{/if}
+    {/snippet}
+  </OutlinedField>
+
+  <OutlinedField label={t('sites.description')} bind:value={description} placeholder={t('sites.descriptionPlaceholder')} multiline />
+  <OutlinedField label={t('sites.notes')} bind:value={notes} placeholder={t('sites.notesPlaceholder')} multiline />
 
   {#if nearby}
-    <div class="nearby" role="status">
-      <span>{t('sites.nearby')} <strong>{nearby.name || t('sites.noName')}</strong></span>
-      <button type="button" class="od-tonal-button" onclick={useNearby}>{t('sites.useNearby')}</button>
-    </div>
+    <p class="nearby" role="status">
+      {t('sites.nearby')}
+      <a href="/site/{nearby.uuid}/" onclick={useNearby}>{nearby.name || t('sites.noName')}</a>. {t('sites.nearbyAdvice')}
+    </p>
   {/if}
-
-  <div class="list list-strong inset">
-    <ul>
-      <li class="item-content item-input" class:item-input-invalid={coordsError}>
-        <div class="item-inner">
-          <div class="item-title item-label">{t('sites.coordinates')}</div>
-          <div class="item-input-wrap"><input type="text" bind:value={coordsText} onchange={typedCoordinates} /></div>
-          <div class="item-footer">{coordsError ? t('sites.coordinatesInvalid') : t('sites.coordinatesHint')}</div>
-        </div>
-      </li>
-    </ul>
-  </div>
-  <div class="device"><button type="button" class="od-outlined-button" onclick={useDevicePosition}>{t('sites.useDevicePosition')}</button></div>
-
-  <p class="hint">{t('sites.geonamesHint')}</p>
-  <div class="list list-strong inset">
-    <ul>
-      <li class="item-content item-input">
-        <div class="item-inner">
-          <div class="item-title item-label">{t('sites.country')}{#if original && country && !original.countryTaxonomy.manual}{` · ${t('sites.automatic')}`}{/if}</div>
-          <div class="item-input-wrap"><input type="text" bind:value={country} /></div>
-        </div>
-      </li>
-      <li class="item-content item-input">
-        <div class="item-inner">
-          <div class="item-title item-label">{t('sites.region')}{#if original && region && !original.region.manual}{` · ${t('sites.automatic')}`}{/if}</div>
-          <div class="item-input-wrap"><input type="text" bind:value={region} /></div>
-        </div>
-      </li>
-    </ul>
-  </div>
-  <p class="hint">{t('sites.correctionHint')}</p>
-
-  <div class="list list-strong inset">
-    <ul>
-      <li class="item-content item-input">
-        <div class="item-inner">
-          <div class="item-title item-label">{t('sites.description')}</div>
-          <div class="item-input-wrap"><textarea rows="3" placeholder={t('sites.descriptionPlaceholder')} bind:value={description}></textarea></div>
-        </div>
-      </li>
-      <li class="item-content item-input">
-        <div class="item-inner">
-          <div class="item-title item-label">{t('sites.notes')}</div>
-          <div class="item-input-wrap"><textarea rows="3" placeholder={t('sites.notesPlaceholder')} bind:value={notes}></textarea></div>
-        </div>
-      </li>
-    </ul>
-  </div>
   <div class="end"></div>
 </Page>
 
 <style>
   @layer od.components {
-    .hint {
-      margin: 8px 20px 0;
+    .save {
+      margin-right: 8px;
+    }
+
+    .map-card {
+      position: relative;
+      margin: 18px 16px 0;
+      border-radius: 16px;
+      overflow: hidden;
+
+      &.fullscreen {
+        position: fixed;
+        inset: 0;
+        z-index: 12000;
+        margin: 0;
+        border-radius: 0;
+      }
+    }
+
+    .chip {
+      position: absolute;
+      left: 12px;
+      top: 12px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      background: var(--od-surface);
       font-size: 13px;
-      line-height: 18px;
+      color: var(--od-text-2);
+      pointer-events: none;
+
+      .fullscreen & {
+        top: calc(12px + env(safe-area-inset-top));
+      }
+    }
+
+    .map-button {
+      position: absolute;
+      right: 10px;
+      top: 10px;
+      width: 40px;
+      height: 40px;
+      border: none;
+      border-radius: 20px;
+      background: var(--od-surface);
+      color: var(--od-text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 1px 3px rgb(0 0 0 / 0.2);
+
+      .fullscreen & {
+        top: calc(10px + env(safe-area-inset-top));
+      }
+    }
+
+    .coords {
+      position: absolute;
+      left: 50%;
+      bottom: calc(40px + env(safe-area-inset-bottom));
+      transform: translateX(-50%);
+      padding: 8px 14px;
+      border-radius: 8px;
+      background: var(--od-surface);
+      font-size: 15px;
+      white-space: nowrap;
+    }
+
+    .locate {
+      flex: none;
+      width: 40px;
+      height: 40px;
+      border: none;
+      border-radius: 20px;
+      background: var(--od-tint);
+      color: var(--od-on-tint);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .auto {
+      flex: none;
+      font-size: 12px;
       color: var(--od-text-2);
     }
 
-    .nearby {
-      margin: 12px 16px 0;
-      padding: 12px 14px;
-      border-radius: 12px;
-      background: var(--od-surface-2);
-      font-size: 14px;
-      line-height: 20px;
+    .hint {
+      margin: 18px 20px 0;
+      font-size: 13px;
+      line-height: 18px;
+      color: var(--od-text-2);
       display: flex;
-      flex-direction: column;
-      align-items: flex-start;
       gap: 8px;
+      align-items: center;
     }
 
-    .device {
-      margin: 10px 16px 0;
+    .nearby {
+      margin: 16px 20px 0;
+      font-size: 13px;
+      line-height: 18px;
+      color: var(--od-text-2);
+
+      a {
+        color: var(--od-text);
+        font-weight: 600;
+      }
     }
 
     .end {

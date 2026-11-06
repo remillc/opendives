@@ -148,10 +148,17 @@ int site_create(const std::string &name, int lat_udeg, int lon_udeg, std::string
 // country, region, city (corrected values, never replaced by a lookup).
 int site_edit(uint32_t uuid, const std::string &field, const std::string &value, int lat_udeg, int lon_udeg,
 	      std::string &json, std::string &error);
-// Country, region and city from GeoNames for the site's position (port of
-// reverseGeoLookup); keeps corrected values. Needs set_geonames_username().
+// Country, region and city for the site's position, written in the taxonomy
+// as Subsurface's reverseGeoLookup does; keeps corrected values. From
+// OpenStreetMap's Nominatim when the network answers, else country and region
+// from the offline Natural Earth file (set_regions_file).
 int site_geocode(uint32_t uuid, const std::string &lang, std::string &json, std::string &error);
-void set_geonames_username(const std::string &username);
+// Read-only: what site_geocode would find at a position, without writing:
+// {"country", "region", "city", "offline"} or null.
+int place_at(int lat_udeg, int lon_udeg, const std::string &lang, std::string &json);
+// regions.cpp: the offline file (core/data/regions.txt), read on first use.
+void set_regions_file(const std::string &path);
+bool offline_region(int lat_udeg, int lon_udeg, const std::string &lang, std::string &country, std::string &region);
 // Possible duplicates: same name ignoring case within same_name_m, or
 // different names within same_place_m: [{"a":…, "b":…, "distanceM":…}].
 int sites_duplicates(int same_name_m, int same_place_m, std::string &json);

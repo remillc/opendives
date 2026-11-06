@@ -181,10 +181,11 @@ Java_org_opendives_core_NativeCore_tripAction(JNIEnv *env, jobject, jstring acti
 	return edit_result(env, json);
 }
 
-// Read-only site queries: list, site, nearby, duplicates, without (dives without a site).
+// Read-only site queries: list, site, nearby, duplicates, without (dives without
+// a site), place (country, region and city at a position, in the language `text`).
 JNIEXPORT jstring JNICALL
 Java_org_opendives_core_NativeCore_siteQuery(JNIEnv *env, jobject, jstring kindIn, jlong uuid, jint lat, jint lon,
-					     jint a, jint b)
+					     jint a, jint b, jstring textIn)
 {
 	std::string kind = to_string(env, kindIn), json, error;
 	if (kind == "list")
@@ -197,6 +198,8 @@ Java_org_opendives_core_NativeCore_siteQuery(JNIEnv *env, jobject, jstring kindI
 		opendives::sites_duplicates(a, b, json);
 	else if (kind == "without")
 		opendives::dives_without_site(json);
+	else if (kind == "place")
+		opendives::place_at(lat, lon, to_string(env, textIn), json);
 	else
 		json = "null";
 	return env->NewStringUTF(json.c_str());
@@ -241,9 +244,9 @@ Java_org_opendives_core_NativeCore_siteAction(JNIEnv *env, jobject, jstring acti
 }
 
 JNIEXPORT void JNICALL
-Java_org_opendives_core_NativeCore_setGeonamesUsername(JNIEnv *env, jobject, jstring username)
+Java_org_opendives_core_NativeCore_setRegionsFile(JNIEnv *env, jobject, jstring path)
 {
-	opendives::set_geonames_username(to_string(env, username));
+	opendives::set_regions_file(to_string(env, path));
 }
 
 JNIEXPORT jstring JNICALL

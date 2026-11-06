@@ -35,6 +35,17 @@ class OpenDivesCorePlugin : Plugin() {
             } catch (e: Exception) {
                 Log.e(TAG, "Cannot export the certificate authorities", e)
             }
+            try {
+                // Copied once per app version: the core reads it as a file.
+                val regions = File(context.filesDir, REGIONS_ASSET)
+                val version = context.packageManager.getPackageInfo(context.packageName, 0).lastUpdateTime
+                if (!regions.exists() || regions.lastModified() < version) {
+                    context.assets.open(REGIONS_ASSET).use { input -> regions.outputStream().use { input.copyTo(it) } }
+                }
+                NativeCore.setRegionsFile(regions.absolutePath)
+            } catch (e: Exception) {
+                Log.e(TAG, "Cannot install the offline regions", e)
+            }
         }
     }
 
@@ -98,8 +109,6 @@ class OpenDivesCorePlugin : Plugin() {
         // Write lock (docs/editing-and-sync-plan.md, section 4): writing to the
         // cloud is allowed only for the test account named in files/cloud-test.env.
         NativeCore.setCloudTestEmail(readTestEmail())
-        // OpenDives' own GeoNames account (files/geonames.env), never Subsurface's.
-        NativeCore.setGeonamesUsername(readSetting(GEONAMES, "GEONAMES_USERNAME"))
         // The account email is shown on the Account screen; the password never leaves the plugin.
         call.resolve(JSObject().put("available", credentials != null).put("email", credentials?.first ?: ""))
     }
@@ -269,6 +278,7 @@ class OpenDivesCorePlugin : Plugin() {
             call.getInt("lon") ?: 0,
             call.getInt("a") ?: 0,
             call.getInt("b") ?: 0,
+            call.getString("text").orEmpty(),
         )
         call.resolve(JSObject().put("json", json))
     }
@@ -349,8 +359,9 @@ class OpenDivesCorePlugin : Plugin() {
     private companion object {
         const val TAG = "OpenDives"
         const val SAMPLE_ASSET = "SampleDivesV2.ssrf"
+        // Offline country and region (core/data/regions.txt, Natural Earth).
+        const val REGIONS_ASSET = "regions.txt"
         const val DEV_CREDENTIALS = "cloud-dev.env"
         const val TEST_ACCOUNT = "cloud-test.env"
-        const val GEONAMES = "geonames.env"
     }
 }

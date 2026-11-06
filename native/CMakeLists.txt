@@ -21,6 +21,7 @@ list(APPEND SOURCES
   "${COMPAT}/https_openssl.cpp"
   "${ROOT}/core/libopendives/opendives.cpp"
   "${ROOT}/core/libopendives/edit.cpp"
+  "${ROOT}/core/libopendives/regions.cpp"
   "${ROOT}/plugins/opendives-core/android/src/main/cpp/opendives_jni.cpp")
 
 file(WRITE "${CMAKE_BINARY_DIR}/gen/build-defs.h" "#define SUBSURFACE_SOURCE \"\"\n")

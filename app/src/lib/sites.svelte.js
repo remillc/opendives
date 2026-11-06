@@ -46,7 +46,7 @@ export function pairKey(a, b) {
 }
 
 /** Thresholds of the possible duplicates, in metres (to be confirmed). */
-const SAME_NAME_M = 500;
+const SAME_NAME_M = 100;
 const SAME_PLACE_M = 50;
 
 /**
