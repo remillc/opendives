@@ -2,6 +2,7 @@
 // Shared logbook state: dives, the log's units, sync status.
 import { OpenDivesCore } from 'opendives-core';
 import { defaultPrefs } from './format.js';
+import { keepCylinderLibrary } from './settings.svelte.js';
 
 /** @typedef {import('opendives-core').Dive} Dive */
 /** @typedef {import('opendives-core').Prefs} Prefs */
@@ -19,8 +20,8 @@ import { defaultPrefs } from './format.js';
 export const logbook = $state({
   /** @type {Dive[]} */
   dives: [],
-  /** @type {Prefs} */
-  prefs: { ...defaultPrefs },
+  /** The core's preferences (units, Settings); only the units until the first read. */
+  prefs: /** @type {Prefs} */ ({ ...defaultPrefs }),
   /** @type {SyncState} */
   sync: 'local',
   loading: true,
@@ -58,6 +59,33 @@ export async function tripChange(options) {
   logbook.editedTrip = result.trip ?? null;
   logbook.undoText = result.undo;
   logbook.dives = await OpenDivesCore.listLoadedDives();
+  await persistChanges();
+  return result;
+}
+
+/**
+ * "Group dives into trips" (Settings), the logbook's autogroup: one undoable
+ * step, saved and synced like a trip change.
+ * @param {boolean} on
+ */
+export async function setAutogroup(on) {
+  const result = await OpenDivesCore.tripAction({ action: 'autogroup', value: on ? 'on' : 'off' });
+  logbook.undoText = result.undo;
+  logbook.dives = await OpenDivesCore.listLoadedDives();
+  logbook.prefs = await OpenDivesCore.getPrefs();
+  await persistChanges();
+}
+
+/**
+ * Renames a cylinder type (Settings, cylinder types): the cylinders of that
+ * type in the logbook too, one undoable step, saved and synced like an edit.
+ * @param {string} name
+ * @param {string} newName
+ */
+export async function renameCylinderType(name, newName) {
+  const result = await OpenDivesCore.cylinderTypes({ action: 'rename', name, value: newName });
+  keepCylinderLibrary(result.library);
+  logbook.undoText = result.undo;
   await persistChanges();
   return result;
 }
@@ -105,6 +133,7 @@ export async function undoLastChange() {
     logbook.dives = await OpenDivesCore.listLoadedDives();
     logbook.sitesVersion++;
   }
+  if (result.cylinderTypes) keepCylinderLibrary(result.cylinderTypes.library);
   logbook.undoText = result.undo;
   await persistChanges();
   return result;

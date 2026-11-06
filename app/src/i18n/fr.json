@@ -137,9 +137,9 @@
     "conditions": "Conditions",
     "conditionNames": {
       "visibility": "Visibilité",
-      "wavesize": "Houle",
+      "wavesize": "Vagues de surface",
       "current": "Courant",
-      "surge": "Ressac",
+      "surge": "Flux-reflux",
       "chill": "Froid"
     },
     "starsLabel": "{name} : {n} sur 5",
@@ -206,9 +206,236 @@
   },
   "settings": {
     "title": "Réglages",
-    "comingSoon": "Les réglages viendront ici.",
-    "extraConditions": "Houle, ressac et froid",
-    "extraConditionsText": "Ajoute ces trois conditions quand on modifie une plongée. Désactivé par défaut, comme dans Subsurface"
+    "search": "Rechercher dans les réglages",
+    "noResult": "Aucun réglage ne correspond à « {text} »",
+    "system": "Système",
+    "error": "Le réglage n’a pas pu être enregistré",
+    "defaults": "Valeurs par défaut",
+    "defaultValue": "Par défaut {value}",
+    "groups": {
+      "language": "Langue et formats",
+      "units": "Unités",
+      "logbook": "Carnet",
+      "equipment": "Équipement",
+      "profile": "Profil de plongée",
+      "deco": "Décompression",
+      "partialPressures": "Pressions partielles",
+      "rebreather": "Recycleur",
+      "computers": "Ordinateurs de plongée",
+      "display": "Affichage",
+      "maps": "Cartes hors ligne",
+      "advanced": "Avancé"
+    },
+    "language": {
+      "label": "Langue de l’app",
+      "systemText": "{language}, comme l’appareil"
+    },
+    "dateFormat": {
+      "label": "Format de la date"
+    },
+    "timeFormat": {
+      "label": "Format de l’heure",
+      "h24": "24 heures",
+      "h12": "12 heures",
+      "text": "{name}, {example}"
+    },
+    "unitSystem": {
+      "label": "Système d’unités",
+      "metric": "Métrique",
+      "imperial": "Impérial",
+      "personalize": "Personnalisé",
+      "note": "Métrique et Impérial règlent toutes les unités d’un coup. Changer une unité passe en Personnalisé."
+    },
+    "depth": "Profondeur",
+    "meters": "Mètres",
+    "feet": "Pieds",
+    "pressure": "Pression",
+    "volume": "Volume",
+    "liters": "Litres",
+    "cubicFeet": "Pieds cubes",
+    "temperature": "Température",
+    "weight": "Poids",
+    "verticalSpeed": {
+      "label": "Vitesses de remontée et de descente",
+      "perMinute": "Par minute",
+      "perSecond": "Par seconde",
+      "perMinuteValue": "par minute",
+      "perSecondValue": "par seconde"
+    },
+    "duration": {
+      "label": "Durée",
+      "mixed": "Automatique",
+      "mixedText": "En minutes sous une heure, sinon en heures et minutes",
+      "hours": "Heures et minutes",
+      "hoursText": "Toujours en heures et minutes",
+      "minutes": "Minutes",
+      "minutesText": "Toujours en minutes"
+    },
+    "coordinates": {
+      "label": "Coordonnées GPS",
+      "decimal": "Décimales",
+      "minutes": "Degrés, minutes",
+      "seconds": "Degrés, minutes, secondes"
+    },
+    "autogroup": {
+      "label": "Regrouper les plongées en voyages",
+      "text": "Enregistré dans le carnet, partagé avec vos autres appareils"
+    },
+    "invalidDives": {
+      "label": "Afficher les plongées invalides",
+      "text": "Par exemple les plongées en piscine marquées invalides"
+    },
+    "extraConditions": {
+      "label": "Vagues de surface, flux-reflux et froid",
+      "text": "Ajoute ces trois conditions quand on modifie une plongée"
+    },
+    "salinity": {
+      "label": "Modifier la salinité de l’eau",
+      "text": "Sinon, le type d’eau vient de l’ordinateur de plongée"
+    },
+    "defaultCylinder": {
+      "label": "Bouteille par défaut",
+      "text": "Ajoutée aux plongées saisies à la main",
+      "none": "Aucune"
+    },
+    "unusedTanks": {
+      "label": "Afficher les bouteilles inutilisées",
+      "text": "Et les inclure à l’export, la copie et la fusion"
+    },
+    "standardSizes": {
+      "label": "Proposer les tailles standard",
+      "text": "Dans le choix du type de bouteille"
+    },
+    "cylinderTypes": {
+      "label": "Types de bouteilles",
+      "text": "Ajouter, renommer, retirer"
+    },
+    "averageDepth": "Profondeur moyenne",
+    "depthGrid": {
+      "label": "Grille de profondeur",
+      "text": "Ou par multiples de 3 : 3, 6, 15",
+      "textThree": "Ou de 1, 2, 5 ou 10",
+      "standard": "1, 2, 5, 10",
+      "three": "3, 6, 15",
+      "standardText": "Lignes à 1, 2, 5 ou 10",
+      "threeText": "Lignes à des multiples de 3"
+    },
+    "dcCeiling": "Plafond donné par l’ordinateur",
+    "redCeiling": "Plafond en rouge",
+    "calcCeiling": {
+      "label": "Plafond calculé",
+      "text": "Selon le modèle de décompression ci-dessous"
+    },
+    "tankbar": {
+      "label": "Bande des bouteilles",
+      "text": "Sous le profil, montre quelle bouteille est utilisée à chaque moment"
+    },
+    "deco": {
+      "warning": "Ces réglages changent les paliers et les limites calculés par l’app. Des valeurs mal choisies exposent à un accident de décompression. Ne les modifiez que si vous savez ce que vous faites.",
+      "model": "Modèle",
+      "orVpmb": "Ou VPM-B",
+      "orBuehlmann": "Ou Bühlmann ZH-L16",
+      "buehlmann": "Bühlmann ZH-L16",
+      "vpmb": "VPM-B",
+      "gf": "Facteurs de gradient",
+      "gfText": "GF bas / GF haut, de 10 à 150 %",
+      "gfDialog": "En pourcentage. Utilisés par le modèle Bühlmann.",
+      "gfLow": "GF bas",
+      "gfHigh": "GF haut",
+      "vpmbConservatism": "Conservatisme VPM-B",
+      "vpmbText": "Utilisé seulement avec VPM-B",
+      "vpmbDialog": "De 0 à +4. Plus la valeur est haute, plus les paliers sont longs.",
+      "o2narcotic": "Oxygène narcotique",
+      "o2narcoticText": "Compté dans la profondeur narcotique équivalente (END)",
+      "bestMixEnd": "END maximale du meilleur mélange",
+      "bestMixEndDialog": "Profondeur narcotique équivalente la plus grande admise pour choisir le meilleur mélange.",
+      "note": "Utilisés par le plafond calculé du profil, le planificateur, la désaturation et le calculateur de gaz."
+    },
+    "pp": {
+      "po2": "Seuils de pO₂",
+      "po2Text": "Minimum et maximum",
+      "po2Dialog": "En bar. Le graphique de pO₂ du profil est coloré en dehors de ces limites.",
+      "minimum": "Minimum",
+      "maximum": "Maximum",
+      "pn2": "Seuil de pN₂",
+      "phe": "Seuil de pHe",
+      "thresholdDialog": "En bar. Le graphique du profil est coloré au-dessus de ce seuil.",
+      "mod": "pO₂ pour la profondeur maximale (MOD)",
+      "modDialog": "En bar. Sert à calculer la profondeur maximale d’utilisation d’un gaz."
+    },
+    "rebreather": {
+      "setpoint": "Consigne par défaut (CCR)",
+      "setpointText": "Utilisée par le planificateur",
+      "setpointDialog": "En bar.",
+      "sensors": "Afficher les capteurs d’O₂",
+      "setpoints": "Afficher les consignes",
+      "ocDiluent": "Gaz en circuit ouvert comme diluant",
+      "o2consumption": "Consommation métabolique d’O₂ (pSCR)",
+      "o2consumptionDialog": "En litres par minute.",
+      "dilution": "Rapport de dilution (pSCR)",
+      "dilutionDialog": "Une part rejetée pour N parts respirées (1:N).",
+      "ocPo2": "pO₂ équivalente en circuit ouvert (pSCR)"
+    },
+    "computers": {
+      "remembered": "Mémorisé",
+      "none": "Aucun ordinateur mémorisé",
+      "more": "Plus d’options pour {name}",
+      "rename": "Renommer",
+      "forgetOne": "Oublier cet ordinateur",
+      "forgetOneTitle": "Oublier {name} ?",
+      "forgetOneText": "Il ne sera plus proposé au téléchargement. Les plongées déjà téléchargées ne changent pas.",
+      "showAll": "Montrer tous les appareils Bluetooth",
+      "showAllText": "Même ceux qui ne sont pas reconnus comme ordinateurs de plongée",
+      "forgetAll": "Oublier les ordinateurs mémorisés",
+      "forgetAllTitle": "Oublier les ordinateurs mémorisés ?",
+      "forgetAllText": "Ils ne seront plus proposés au téléchargement. Les plongées déjà téléchargées ne changent pas.",
+      "forget": "Oublier"
+    },
+    "display": {
+      "theme": "Thème",
+      "themeText": "Clair ou sombre, comme l’appareil",
+      "light": "Clair",
+      "dark": "Sombre",
+      "textSize": "Taille du texte",
+      "textSizeValue": "Comme l’appareil"
+    },
+    "maps": {
+      "regions": "Régions téléchargées",
+      "none": "Aucune"
+    },
+    "advanced": {
+      "resetText": "Revient aux valeurs par défaut pour tous les réglages de cet appareil",
+      "reset": "Réinitialiser tous les réglages",
+      "resetTitle": "Réinitialiser tous les réglages ?",
+      "resetConfirm": "Tous les réglages de cet appareil reviennent aux valeurs par défaut de Subsurface. Les plongées ne changent pas.",
+      "resetAction": "Réinitialiser",
+      "note": "Les paramètres de planification (vitesses, réserve, SAC, ppO₂, déco) ainsi que le regroupement en voyages ne sont pas modifiés."
+    },
+    "cylinders": {
+      "title": "Types de bouteilles",
+      "intro": "Proposés quand on choisit le type d’une bouteille. Renommer un type renomme aussi les bouteilles de ce type dans le carnet. Changer sa taille ou le retirer ne modifie pas les plongées existantes.",
+      "yours": "Vos types",
+      "standard": "Standard",
+      "standardNote": "Toucher un type ouvre sa fiche (nom, volume, pression de service). Un type standard se modifie comme les autres.",
+      "hidden": "Les tailles standard sont masquées : le réglage « Proposer les tailles standard » est désactivé.",
+      "add": "Ajouter un type",
+      "newTitle": "Nouveau type",
+      "editTitle": "Type de bouteille",
+      "name": "Nom",
+      "volume": "Volume ({unit})",
+      "pressure": "Pression de service ({unit})",
+      "pressureHelp": "Facultative pour un volume en litres",
+      "delete": "Retirer ce type",
+      "deleteTitle": "Retirer {name} ?",
+      "deleteText": "Le type n’est plus proposé. Les plongées existantes ne changent pas.",
+      "deleteAction": "Retirer",
+      "fromLogbook": "Ce type vient des plongées du carnet. Il reste proposé tant qu’une plongée l’utilise.",
+      "nameInUse": "Ce nom est déjà celui d’un type",
+      "nameMissing": "Indiquez un nom",
+      "volumeInvalid": "Indiquez un volume plus grand que 0",
+      "pressureInvalid": "Indiquez une pression valide",
+      "renamed": "Type renommé"
+    }
   },
   "gas": {
     "air": "Air",

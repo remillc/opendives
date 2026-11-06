@@ -1,31 +1,175 @@
 // @ts-check
-// Settings kept on this device (not in the logbook).
+// Settings of this device (docs/ui-specification.md, section 4, "Settings,
+// modelled on Subsurface"). As in Subsurface, they belong to the device, not
+// to the logbook: the values of the core's preferences changed by the diver
+// are kept here and set again in the core at each start (applyDeviceSettings),
+// before the logbook is loaded. Only trip grouping is the logbook's
+// (autogroup), changed through the logbook (logbook.svelte.js).
+//
+// The app's own settings (language, theme, date and time formats, GPS
+// coordinates, Bluetooth filter) live here only.
+import { OpenDivesCore } from 'opendives-core';
 
-/** @param {string} key @param {boolean} fallback */
-function readFlag(key, fallback) {
+const CORE_KEY = 'od.corePrefs';
+const LIBRARY_KEY = 'od.cylinderLibrary';
+const APP_KEY = 'od.appSettings';
+
+/** @typedef {import('opendives-core').CorePrefValues} CorePrefValues */
+
+/**
+ * @typedef {Object} AppSettings
+ * @property {'system'|'fr'|'en'} language
+ * @property {'system'|'light'|'dark'} theme
+ * @property {'system'|'iso'|'medium'|'dmy'|'mdy'} dateFormat
+ * @property {'system'|'24'|'12'} timeFormat
+ * @property {'decimal'|'minutes'|'seconds'} coordinatesFormat GPS coordinates, formatted by
+ *   OpenDives itself (the core only knows seconds and decimal): -35.4485, 35° 26.9′ S, 35° 26′ 54.6″ S
+ * @property {boolean} showAllBluetooth the Bluetooth scan shows every device, not only dive computers
+ */
+
+/** @type {AppSettings} */
+const APP_DEFAULTS = {
+  language: 'system',
+  theme: 'system',
+  dateFormat: 'system',
+  timeFormat: 'system',
+  coordinatesFormat: 'decimal',
+  showAllBluetooth: false,
+};
+
+/**
+ * Qt format strings written in the core's date_format and time_format, as
+ * Subsurface's language page stores them.
+ */
+export const DATE_PATTERNS = { iso: 'yyyy-MM-dd', medium: 'd MMM yyyy', dmy: 'dd/MM/yyyy', mdy: 'MM/dd/yyyy' };
+export const TIME_PATTERNS = { 24: 'HH:mm', 12: 'h:mm AP' };
+
+/** @param {string} key */
+function readJson(key) {
   try {
-    const value = localStorage.getItem(key);
-    return value === null ? fallback : value === 'true';
+    const text = localStorage.getItem(key);
+    return text ? JSON.parse(text) : null;
   } catch {
-    return fallback;
+    return null;
   }
 }
 
-export const settings = $state({
-  /**
-   * "Wave size, surge and chill" (spec, section 4, "Conditions"): off by
-   * default, as Subsurface's extraEnvironmentalDefault. On, editing adds these
-   * three conditions; the detail shows filled-in conditions either way.
-   */
-  extraConditions: readFlag('od.extraConditions', false),
-});
-
-/** @param {boolean} value */
-export function setExtraConditions(value) {
-  settings.extraConditions = value;
+/** @param {string} key @param {unknown} value */
+function writeJson(key, value) {
   try {
-    localStorage.setItem('od.extraConditions', String(value));
+    if (value == null) localStorage.removeItem(key);
+    else localStorage.setItem(key, JSON.stringify(value));
   } catch {
     // Not fatal: the setting lasts until the app closes.
   }
+}
+
+/** The core values changed on this device: {key: value}. @type {Partial<CorePrefValues>} */
+const storedCore = readJson(CORE_KEY) ?? {};
+// Before Settings followed Subsurface, the conditions switch had its own key.
+try {
+  if (!('extraEnvironmental' in storedCore) && localStorage.getItem('od.extraConditions') === 'true')
+    storedCore.extraEnvironmental = true;
+} catch {
+  // Not fatal.
+}
+
+export const settings = $state({
+  ...APP_DEFAULTS,
+  ...(/** @type {Partial<AppSettings>} */ (readJson(APP_KEY) ?? {})),
+  /**
+   * "Surface waves, surge and chill" (spec, section 4, "Conditions"), the
+   * core's extraEnvironmentalDefault: off by default. On, editing adds these
+   * three conditions; the detail shows filled-in conditions either way.
+   */
+  extraConditions: storedCore.extraEnvironmental === true,
+  /** Dive durations (the core's units.duration_units), not stored in the logbook. */
+  duration: /** @type {'mixed'|'minutes'|'hours'} */ (storedCore.duration ?? 'mixed'),
+});
+
+/**
+ * At start, before the logbook is loaded: the device's values go back into
+ * the core, and its cylinder types library.
+ */
+export async function applyDeviceSettings() {
+  try {
+    if (Object.keys(storedCore).length) await OpenDivesCore.setPrefs({ changes: storedCore });
+  } catch (e) {
+    // A value refused by this core (an older version kept something else): the others are kept.
+    console.error('Restoring the settings of this device', e);
+  }
+  const library = readJson(LIBRARY_KEY);
+  if (Array.isArray(library)) {
+    try {
+      await OpenDivesCore.cylinderTypes({ action: 'library', value: JSON.stringify({ library }) });
+    } catch (e) {
+      console.error('Restoring the cylinder types of this device', e);
+    }
+  }
+}
+
+/**
+ * Sets core preferences and keeps them as this device's values.
+ * @param {Partial<CorePrefValues>} changes
+ */
+export async function setCorePrefs(changes) {
+  await OpenDivesCore.setPrefs({ changes });
+  // Changing one unit makes the system "personalize" in the core: kept too.
+  const prefs = await OpenDivesCore.getPrefs();
+  Object.assign(storedCore, changes);
+  if (['length', 'temperature', 'pressure', 'volume', 'weight'].some((k) => k in changes)) storedCore.unitSystem = prefs.unitSystem;
+  writeJson(CORE_KEY, storedCore);
+  if ('extraEnvironmental' in changes) settings.extraConditions = changes.extraEnvironmental === true;
+  if (changes.duration) settings.duration = changes.duration;
+  return prefs;
+}
+
+/** Forgets one remembered dive computer (slot 1 to 4), or all of them (0). @param {number} slot */
+export async function forgetDiveComputers(slot) {
+  await OpenDivesCore.setPrefs({ changes: { forgetDiveComputer: slot } });
+  return OpenDivesCore.getPrefs();
+}
+
+/**
+ * Keeps the device's cylinder types library after a change.
+ * @param {string[]} library
+ */
+export function keepCylinderLibrary(library) {
+  writeJson(LIBRARY_KEY, library);
+}
+
+/**
+ * @template {keyof AppSettings} K
+ * @param {K} key
+ * @param {AppSettings[K]} value
+ */
+export function setAppSetting(key, value) {
+  /** @type {any} */ (settings)[key] = value;
+  /** @type {Record<string, unknown>} */
+  const app = {};
+  for (const k of /** @type {(keyof AppSettings)[]} */ (Object.keys(APP_DEFAULTS))) app[k] = settings[k];
+  writeJson(APP_KEY, app);
+  if (key === 'language') location.reload(); // the texts are chosen at start (i18n.js)
+}
+
+/**
+ * "Reset all settings": every setting of the device back to Subsurface's
+ * default (the core's `defaults`) and the app's own. The planner's own
+ * parameters and trip grouping (the logbook's) are not touched.
+ * @param {Partial<CorePrefValues>} defaults
+ */
+export async function resetAllSettings(defaults) {
+  await OpenDivesCore.setPrefs({ changes: defaults });
+  for (const key of Object.keys(storedCore)) delete storedCore[/** @type {keyof CorePrefValues} */ (key)];
+  writeJson(CORE_KEY, null);
+  try {
+    localStorage.removeItem('od.extraConditions');
+  } catch {
+    // Not fatal.
+  }
+  const languageChanged = settings.language !== APP_DEFAULTS.language;
+  Object.assign(settings, APP_DEFAULTS, { extraConditions: defaults.extraEnvironmental === true, duration: defaults.duration ?? 'mixed' });
+  writeJson(APP_KEY, null);
+  if (languageChanged) location.reload();
+  return OpenDivesCore.getPrefs();
 }
