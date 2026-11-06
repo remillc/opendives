@@ -34,6 +34,7 @@
 #include "core/subsurface-time.h"
 #include "core/units.h"
 
+#include <algorithm>
 #include <cctype>
 #include <cmath>
 #include <cstdlib>
@@ -468,6 +469,8 @@ int plan_dive(const std::string &request, std::string &json, std::string &error)
 		cyl.type.workingpressure.mbar = get(cylinders[i], "startMbar", 0);
 		cyl.cylinder_use = OC_GAS;
 		cyl.manually_added = true;
+		// 0: the MOD at the ppO2 for deco, set by reset_cylinders() below.
+		cyl.depth.mm = static_cast<int32_t>(std::max(0L, get(cylinders[i], "switchDepthMm", 0)));
 	}
 
 	diveplan dp;

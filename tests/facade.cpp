@@ -75,6 +75,14 @@ int main(int argc, char **argv)
 		check(0, "after set");
 		check(opendives::set_prefs("{\"gfLow\":5}", error), "out of range");
 		check(opendives::set_prefs("{\"unknown\":1}", error), "unknown key");
+		// The planner's own settings: 10 m/min is stored as 166 mm/s, read as 9960 mm/min.
+		check(opendives::set_prefs("{\"ascent75MmMin\":10000,\"descentMmMin\":20000,\"lastStop6m\":true,"
+					   "\"safetyStop\":false,\"sacFactor\":500,\"reserveMbar\":50000,\"decoSacMlMin\":15000,"
+					   "\"minSwitchSeconds\":120,\"o2Breaks\":true}", error), "set planner");
+		opendives::planner_setup(json);
+		check(0, "planner setup");
+		check(opendives::set_prefs("{\"ascent50MmMin\":500}", error), "planner rate out of range");
+		check(opendives::set_prefs("{\"bottomPo2Mbar\":2500}", error), "planner ppO2 out of range");
 		check(opendives::trips_autogroup(false, json, error), "autogroup off");
 		check(opendives::undo(json, error), "undo");
 		check(opendives::trips_autogroup(true, json, error), "autogroup on");
