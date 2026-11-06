@@ -38,3 +38,7 @@ Build the Account screen from `docs/mockups/compte-*.dc.html` (iOS and Android, 
 Done in Add tests 2 and 3 of the editing plan, keep the sync flag (Christian said to go on, on the development account)
 
 **Wait.** Test 1 of `docs/editing-and-sync-plan.md` is reported done (commit "Add dive editing, local save and sync to the façade, with test 1"). Do not start test 2 or anything that writes to a cloud account until Christian has read the report and says to go on.
+
+## [ ] 2026-11-06-04 Top margin above the dive detail header
+
+In `DiveDetail.svelte`, add a 16 px top margin between the top bar and the header line (number and date), on iOS and Android, as in the refreshed `docs/mockups/detail3-*.dc.html`.
