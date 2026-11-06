@@ -158,3 +158,7 @@ Christian asked for every Android screen to be MD3-compliant. Read "Android foll
 6. Clean up sites (`sites-nettoyer-android.dc.html`): button labels on one line ("Pas des doublons").
 7. Site sheet (`sites-fiche-android.dc.html`): "Ouvrir dans Cartes" as an MD3 text button with the "open in new" icon (task 20 and the spec).
 Then go through every Android screen already built with the reference values of the spec, fix what does not match, and list what you changed in your report.
+
+## [ ] 2026-11-06-22 Statistics section
+
+Build the Statistics section from `docs/ui-specification.md`, section 4, "Statistics", and the mock-ups `docs/mockups/android-stats.dc.html`, `stats-annee-android.dc.html`, `stats-filtre-android.dc.html`, `stats-nouvelle-android.dc.html` (MD3). This supersedes the older statistics boards (`ios-stats*`, `android-stats` before today, tablets): remove the totals by dive computer, add the three ready-made charts, *My statistics* with "New statistic", *By year* and the year screen. No chart builder. Compute every figure with the core (`stats`, yearly statistics); if the core does not expose something the screens need, stop and ask Christian before adding it to the facade.
