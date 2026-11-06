@@ -116,6 +116,13 @@
 >
   <input type="file" class="od-sr-only" tabindex="-1" aria-hidden="true" bind:this={fileInput} onchange={fileChosen} />
   <div class="sources" role="radiogroup" aria-label={t('bringLogbook.sourceLabel')}>
+    <!-- Order of the mock-ups: empty logbook, divelogs.de, file (divelogs.de stays the default). -->
+    <label class="source">
+      <span class="radio"><input type="radio" name="od-source" value="empty" bind:group={source} disabled={busy} /><i class="icon-radio"></i></span>
+      <span class="text">
+        <span class="label">{t('bringLogbook.empty')}</span>
+      </span>
+    </label>
     <label class="source">
       <span class="radio"><input type="radio" name="od-source" value="divelogs" bind:group={source} disabled={busy} /><i class="icon-radio"></i></span>
       <span class="text">
@@ -142,12 +149,6 @@
       <span class="text">
         <span class="label">{t('bringLogbook.file')}</span>
         <span class="consequence">{t('bringLogbook.fileText')}</span>
-      </span>
-    </label>
-    <label class="source">
-      <span class="radio"><input type="radio" name="od-source" value="empty" bind:group={source} disabled={busy} /><i class="icon-radio"></i></span>
-      <span class="text">
-        <span class="label">{t('bringLogbook.empty')}</span>
       </span>
     </label>
   </div>
