@@ -20,6 +20,7 @@
    *   type?: 'text'|'password',
    *   autocomplete?: import('svelte/elements').FullAutoFill,
    *   onchange?: () => void,
+   *   oninput?: (e: Event) => void,
    *   trailing?: import('svelte').Snippet,
    * }}
    */
@@ -33,6 +34,7 @@
     type = 'text',
     autocomplete,
     onchange,
+    oninput,
     trailing,
   } = $props();
 
@@ -50,7 +52,7 @@
     <div class="text">
       <label class="label" for={id}>{label}</label>
       {#if multiline}
-        <textarea {id} bind:this={input} bind:value {onchange} onfocus={() => (focused = true)} onblur={() => (focused = false)} aria-invalid={invalid}></textarea>
+        <textarea {id} bind:this={input} bind:value {onchange} {oninput} onfocus={() => (focused = true)} onblur={() => (focused = false)} aria-invalid={invalid}></textarea>
       {:else}
         <input
           {id}
@@ -60,6 +62,7 @@
           {autocomplete}
           bind:value
           {onchange}
+          {oninput}
           onfocus={() => (focused = true)}
           onblur={() => (focused = false)}
           aria-invalid={invalid}

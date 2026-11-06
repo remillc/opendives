@@ -10,6 +10,7 @@
   import { Popup, View, Page, Navbar, Link, f7, theme } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
   import KeyFigures from '../components/KeyFigures.svelte';
+  import TextField from '../components/TextField.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
   import {
     CRITERIA,
@@ -221,14 +222,7 @@
         </div>
         <p class="note">{t('stats.nameHint')} {t('stats.rules')}</p>
       {:else}
-        <!-- MD3 filled text field (spec, "Text fields"). TODO: the shared TextField.svelte at merge. -->
-        <div class="filled-field">
-          <label class="filled-box" class:filled={name !== ''}>
-            <span class="filled-label">{t('stats.name')}</span>
-            <input type="text" value={name} oninput={onName} />
-          </label>
-          <span class="supporting">{t('stats.nameHintShort')}</span>
-        </div>
+        <TextField label={t('stats.name')} bind:value={name} oninput={() => (nameTyped = true)} supporting={t('stats.nameHintShort')} />
         <p class="note rules">{t('stats.rulesValues')} {t('stats.rules')}</p>
       {/if}
       <div class="end"></div>
@@ -258,8 +252,8 @@
      * MD3 filled text field and exposed dropdown (spec, "Text fields"):
      * surface-container-highest, 4 dp top corners, 1 dp bottom indicator, 2 dp
      * in the primary colour on focus; the label fills the empty field and
-     * moves above the value on focus or once filled. To be replaced by the
-     * shared TextField.svelte at merge.
+     * moves above the value on focus or once filled. Used for the criterion
+     * dropdown (a select); the name uses TextField.svelte.
      */
     .filled-field {
       margin: 18px 16px 0;
@@ -283,19 +277,6 @@
       &:focus-within {
         box-shadow: inset 0 -1px 0 var(--od-action);
         border-bottom-color: var(--od-action);
-      }
-
-      input {
-        flex: 1;
-        min-width: 0;
-        padding: 0;
-        border: none;
-        outline: none;
-        background: none;
-        color: var(--od-text);
-        font: inherit;
-        font-size: 16px;
-        line-height: 24px;
       }
 
       select {
