@@ -25,6 +25,7 @@ import com.getcapacitor.annotation.PermissionCallback
 import java.io.File
 import java.security.KeyStore
 import java.security.cert.X509Certificate
+import java.util.concurrent.CountDownLatch
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -56,28 +57,61 @@ class OpenDivesCorePlugin : Plugin() {
      */
     private var pendingAccount: Pair<String, String>? = null
 
+    /**
+     * Released once the system certificate authorities and the offline regions
+     * are set up. Calls that can reach the network or use the regions wait for
+     * it; the ones that start the logbook (see onCoreThread) do not, so that
+     * the log is read while this work runs on its own thread.
+     */
+    private val setupDone = CountDownLatch(1)
+    private val setupThread: ExecutorService = Executors.newSingleThreadExecutor()
+
     override fun load() {
         val home = context.filesDir.absolutePath
         val caFile = File(context.cacheDir, "cacerts.pem")
         coreThread.execute {
             NativeCore.init(home)
-            try {
-                val count = exportSystemCertificates(caFile)
-                NativeCore.setCaFile(caFile.absolutePath)
-                Log.i(TAG, "$count system certificate authorities exported")
-            } catch (e: Exception) {
-                Log.e(TAG, "Cannot export the certificate authorities", e)
-            }
-            try {
-                // Copied once per app version: the core reads it as a file.
-                val regions = File(context.filesDir, REGIONS_ASSET)
-                val version = context.packageManager.getPackageInfo(context.packageName, 0).lastUpdateTime
-                if (!regions.exists() || regions.lastModified() < version) {
-                    context.assets.open(REGIONS_ASSET).use { input -> regions.outputStream().use { input.copyTo(it) } }
+            setupThread.execute {
+                val start = System.currentTimeMillis()
+                // The file of the last start is used at once: reading Android's store
+                // takes about half a second, which the start cannot wait for.
+                val cached = caFile.length() > 0
+                try {
+                    try {
+                        if (!cached) exportSystemCertificates(caFile)
+                        NativeCore.setCaFile(caFile.absolutePath)
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Cannot export the certificate authorities", e)
+                    }
+                    try {
+                        // Copied once per app version: the core reads it as a file.
+                        val regions = File(context.filesDir, REGIONS_ASSET)
+                        val version = context.packageManager.getPackageInfo(context.packageName, 0).lastUpdateTime
+                        if (!regions.exists() || regions.lastModified() < version) {
+                            context.assets.open(REGIONS_ASSET).use { input -> regions.outputStream().use { input.copyTo(it) } }
+                        }
+                        NativeCore.setRegionsFile(regions.absolutePath)
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Cannot install the offline regions", e)
+                    }
+                } finally {
+                    setupDone.countDown()
+                    Log.i(TAG, "perf: certificates and regions set up in ${System.currentTimeMillis() - start} ms (file kept: $cached)")
                 }
-                NativeCore.setRegionsFile(regions.absolutePath)
-            } catch (e: Exception) {
-                Log.e(TAG, "Cannot install the offline regions", e)
+                if (cached) {
+                    // A system update or an authority installed by the diver changes the
+                    // list: checked once the start is over, the new file used from then on.
+                    try {
+                        Thread.sleep(CERTIFICATES_RECHECK_MS)
+                        val count = exportSystemCertificates(caFile)
+                        if (count >= 0) {
+                            NativeCore.setCaFile(caFile.absolutePath)
+                            Log.i(TAG, "$count system certificate authorities exported")
+                        }
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Cannot export the certificate authorities", e)
+                    }
+                }
             }
         }
     }
@@ -138,13 +172,13 @@ class OpenDivesCorePlugin : Plugin() {
 
     /** The core's preferences shown in Settings (see get_prefs in opendives.h). */
     @PluginMethod
-    fun getPrefs(call: PluginCall) = onCoreThread(call) {
+    fun getPrefs(call: PluginCall) = onCoreThread(call, afterSetup = false) {
         call.resolve(JSObject().put("json", NativeCore.getPrefs()))
     }
 
     /** Sets core preferences; `changes` is the flat JSON object of set_prefs(). */
     @PluginMethod
-    fun setPrefs(call: PluginCall) = onCoreThread(call) {
+    fun setPrefs(call: PluginCall) = onCoreThread(call, afterSetup = false) {
         val changes = call.getObject("changes")
         if (changes == null) {
             call.reject("Missing changes", "BAD_ARGUMENT")
@@ -156,7 +190,7 @@ class OpenDivesCorePlugin : Plugin() {
 
     /** Cylinder types of Settings: list, library, add, size, remove, rename (see opendives.h). */
     @PluginMethod
-    fun cylinderTypes(call: PluginCall) = onCoreThread(call) {
+    fun cylinderTypes(call: PluginCall) = onCoreThread(call, afterSetup = false) {
         val json = NativeCore.cylinderTypes(
             call.getString("action").orEmpty(),
             call.getString("name").orEmpty(),
@@ -179,7 +213,7 @@ class OpenDivesCorePlugin : Plugin() {
      * device's copy, no network) can run at the same time.
      */
     @PluginMethod
-    fun configureCloud(call: PluginCall) = onCoreThread(call) {
+    fun configureCloud(call: PluginCall) = onCoreThread(call, afterSetup = false) {
         val credentials = accountCredentials()
         if (credentials != null) NativeCore.cloudConfigure(credentials.first, credentials.second)
         // Write lock (docs/editing-and-sync-plan.md, section 4): writing to the
@@ -193,6 +227,7 @@ class OpenDivesCorePlugin : Plugin() {
     fun probeCloud(call: PluginCall) {
         networkThread.execute {
             try {
+                setupDone.await()
                 val start = System.currentTimeMillis()
                 val json = NativeCore.cloudProbe()
                 val steps = JSObject(json)
@@ -215,7 +250,7 @@ class OpenDivesCorePlugin : Plugin() {
      * Otherwise syncs with the server, then reads the log.
      */
     @PluginMethod
-    fun listCloudDives(call: PluginCall) = onCoreThread(call) {
+    fun listCloudDives(call: PluginCall) = onCoreThread(call, afterSetup = call.getBoolean("cached", false) != true) {
         val cached = call.getBoolean("cached", false) == true
         val start = System.currentTimeMillis()
         val json = if (cached) {
@@ -234,7 +269,7 @@ class OpenDivesCorePlugin : Plugin() {
 
     /** Local commits of the loaded cloud log not yet on the server (manual synchronisation). */
     @PluginMethod
-    fun pendingChanges(call: PluginCall) = onCoreThread(call) {
+    fun pendingChanges(call: PluginCall) = onCoreThread(call, afterSetup = false) {
         call.resolve(JSObject().put("json", NativeCore.pendingChanges()))
     }
 
@@ -694,7 +729,7 @@ class OpenDivesCorePlugin : Plugin() {
 
     /** Sync conflict after an automatic merge (read-only). */
     @PluginMethod
-    fun syncConflicts(call: PluginCall) = onCoreThread(call) {
+    fun syncConflicts(call: PluginCall) = onCoreThread(call, afterSetup = false) {
         call.resolve(JSObject().put("json", NativeCore.syncConflicts()))
     }
 
@@ -799,6 +834,13 @@ class OpenDivesCorePlugin : Plugin() {
     @ActivityCallback
     private fun enableBluetoothResult(call: PluginCall, result: ActivityResult) {
         call.resolve(bluetoothStatusObject())
+    }
+
+    /** The first screen is drawn: the launch screen can go (see SplashGate). */
+    @PluginMethod
+    fun contentShown(call: PluginCall) {
+        SplashGate.contentShown = true
+        call.resolve()
     }
 
     /** This app's page of the system settings, where a refused permission can be given. */
@@ -963,13 +1005,23 @@ class OpenDivesCorePlugin : Plugin() {
         return if (email.isEmpty() || password.isEmpty()) null else email to password
     }
 
-    /** Writes Android's trusted authorities (system and user) as PEM. */
+    /**
+     * Writes Android's trusted authorities (system and user) as PEM; -1 when the
+     * file already holds them.
+     */
     private fun exportSystemCertificates(target: File): Int {
         val store = KeyStore.getInstance("AndroidCAStore")
         store.load(null, null)
+        // Converting the certificates is what takes time (about 0.5 s). The aliases name
+        // each authority by its hash, so the same list on the same system build
+        // means the same file: it is kept from one start to the next.
+        val aliases = store.aliases().toList().sorted()
+        val key = Build.FINGERPRINT + "\n" + aliases.joinToString("\n")
+        val keyFile = File(target.parentFile, target.name + ".key")
+        if (target.length() > 0 && keyFile.exists() && keyFile.readText() == key) return -1
         var count = 0
         val pem = StringBuilder()
-        for (alias in store.aliases()) {
+        for (alias in aliases) {
             val cert = store.getCertificate(alias) as? X509Certificate ?: continue
             pem.append("-----BEGIN CERTIFICATE-----\n")
             pem.append(Base64.encodeToString(cert.encoded, Base64.DEFAULT))
@@ -979,12 +1031,18 @@ class OpenDivesCorePlugin : Plugin() {
         val tmp = File(target.parentFile, target.name + ".tmp")
         tmp.writeText(pem.toString())
         tmp.renameTo(target)
+        keyFile.writeText(key)
         return count
     }
 
-    private fun onCoreThread(call: PluginCall, block: () -> Unit) {
+    /**
+     * `afterSetup` false: the call neither reaches the network nor needs the
+     * regions, and does not wait for the certificates (start of the logbook).
+     */
+    private fun onCoreThread(call: PluginCall, afterSetup: Boolean = true, block: () -> Unit) {
         coreThread.execute {
             try {
+                if (afterSetup) setupDone.await()
                 block()
             } catch (e: Exception) {
                 Log.e(TAG, "Core error", e)
@@ -995,6 +1053,7 @@ class OpenDivesCorePlugin : Plugin() {
 
     private companion object {
         const val TAG = "OpenDives"
+        const val CERTIFICATES_RECHECK_MS = 20_000L
         const val SAMPLE_ASSET = "SampleDivesV2.ssrf"
         // Offline country and region (core/data/regions.txt, Natural Earth).
         const val REGIONS_ASSET = "regions.txt"

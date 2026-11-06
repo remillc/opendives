@@ -45,11 +45,11 @@
   import Welcome from './components/Welcome.svelte';
   import { layout, ios, listWidth, splitBreakpoint } from './lib/layout.svelte.js';
   import { trackSection } from './lib/navigation.svelte.js';
-  import { startApp } from './lib/logbook.svelte.js';
   import { enableBackButton } from './lib/back-button.js';
   import { enableAccessibility } from './lib/accessibility.js';
   import { t } from './lib/i18n.js';
-  import { settings, applyDeviceSettings } from './lib/settings.svelte.js';
+  import { mark } from './lib/perf.js';
+  import { settings } from './lib/settings.svelte.js';
   import CylinderTypes from './pages/CylinderTypes.svelte';
   import CylinderType from './pages/CylinderType.svelte';
 
@@ -118,10 +118,9 @@
     enableBackButton();
     enableAccessibility();
     trackSection();
-    // The settings of this device go into the core before anything is read.
-    // Then, on the first start and after signing out, first launch is shown
-    // and nothing is loaded until a choice.
-    applyDeviceSettings().then(() => startApp());
+    // The settings are applied and the logbook is loaded from main.js, before
+    // the screens are built.
+    mark('onMount');
   });
 </script>
 

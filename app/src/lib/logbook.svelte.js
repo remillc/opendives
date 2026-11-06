@@ -2,7 +2,9 @@
 // Shared logbook state: dives, the log's units, sync status.
 import { OpenDivesCore } from 'opendives-core';
 import { defaultPrefs } from './format.js';
-import { keepCylinderLibrary, keepDiveComputers } from './settings.svelte.js';
+import { mark } from './perf.js';
+import { readSnapshot, saveSnapshot } from './snapshot.js';
+import { applyDeviceSettings, keepCylinderLibrary, keepDiveComputers } from './settings.svelte.js';
 
 /** @typedef {import('opendives-core').Dive} Dive */
 /** @typedef {import('opendives-core').Prefs} Prefs */
@@ -31,6 +33,12 @@ export const logbook = $state({
   /** @type {SyncState} */
   sync: 'local',
   loading: true,
+  /**
+   * The top of the list as it was at the last load (lib/snapshot.js): drawn
+   * while the dives are read at start, never used as data.
+   * @type {import('./snapshot.js').Snapshot|null}
+   */
+  preview: readWelcome() ? null : readSnapshot(),
   /** @type {string|null} */
   error: null,
   /** Cloud account email; empty without an account. */
@@ -344,11 +352,58 @@ function writeWelcomeState(value) {
 }
 
 /**
+ * Calls sent at the very start, before the screens are built, so that the
+ * core reads the device copy while the interface starts; the first load
+ * takes their answers instead of asking again. The core runs the calls in the
+ * order they were sent: settings, account, device copy.
+ * @type {{ configure: Promise<any>, cached: Promise<any>, probe: Promise<any>|null }|null}
+ */
+let early = null;
+
+/** Set when an account was found: lets the next start send the probe at once. */
+const ACCOUNT_HINT = 'od.cloudAccount';
+
+/** @param {boolean} has */
+function rememberAccount(has) {
+  try {
+    if (has) localStorage.setItem(ACCOUNT_HINT, '1');
+    else localStorage.removeItem(ACCOUNT_HINT);
+  } catch {
+    // Not fatal: the probe is then sent after the account is read.
+  }
+}
+
+/**
+ * First thing the app does (main.js): the settings of this device go into the
+ * core first, then, when this is not a first launch, the account and the
+ * device copy are asked for without waiting, then startApp.
+ * @returns {Promise<void>}
+ */
+export function boot() {
+  const settingsApplied = applyDeviceSettings().then(() => mark('settings'));
+  if (readWelcomeState() === 'done') {
+    const configure = OpenDivesCore.configureCloud();
+    const cached = OpenDivesCore.listCloudDives({ cached: true });
+    let probe = null;
+    try {
+      if (logbook.autoSync && localStorage.getItem(ACCOUNT_HINT)) probe = OpenDivesCore.probeCloud();
+    } catch {
+      // No hint: loadCloud sends the probe.
+    }
+    // Answers not taken (no account here): nothing to report.
+    for (const call of [configure, cached, probe]) call?.catch(() => {});
+    early = { configure, cached, probe };
+  }
+  return settingsApplied.then(() => startApp());
+}
+
+/**
  * At start: first launch is shown on the very first start, unless a cloud
  * account is already configured on this device (development credentials);
  * otherwise the logbook is loaded.
  */
 export async function startApp() {
+  mark('startApp');
   if (logbook.welcome) return;
   if (readWelcomeState() === null) {
     let configured = false;
@@ -391,6 +446,8 @@ export async function accountDeleted({ keepDives }) {
 
 /** @param {boolean} showWelcome */
 function forgetAccount(showWelcome) {
+  logbook.preview = null;
+  saveSnapshot(null);
   logbook.dives = [];
   logbook.email = '';
   logbook.server = '';
@@ -526,10 +583,13 @@ function markSynced() {
  * With automatic synchronisation off, only the device's copy is read, unless
  * `force` ("Sync now") or there is no copy yet.
  * @param {boolean} force
+ * @param {typeof early} [pre] answers of the calls sent at start (boot), for the first load
  * @returns {Promise<boolean>} false when no cloud account is configured
  */
-async function loadCloud(force) {
-  const account = await OpenDivesCore.configureCloud();
+async function loadCloud(force, pre = null) {
+  const account = await (pre?.configure ?? OpenDivesCore.configureCloud());
+  rememberAccount(account.available);
+  mark('configured');
   if (!account.available) {
     logbook.email = '';
     logbook.server = '';
@@ -539,7 +599,7 @@ async function loadCloud(force) {
 
   if (!logbook.autoSync && !force) {
     try {
-      const cached = await OpenDivesCore.listCloudDives({ cached: true });
+      const cached = await (pre?.cached ?? OpenDivesCore.listCloudDives({ cached: true }));
       if (cached.dives) {
         if (cached.server) logbook.server = cached.server;
         logbook.dives = cached.dives;
@@ -554,7 +614,7 @@ async function loadCloud(force) {
     // No copy on this device yet: the first one has to be fetched.
   }
 
-  const probe = OpenDivesCore.probeCloud().then(
+  const probe = (pre?.probe ?? OpenDivesCore.probeCloud()).then(
     (head) => ({ ok: true, ...head }),
     (/** @type {unknown} */ error) => ({ ok: false, exists: false, head: '', error }),
   );
@@ -562,7 +622,8 @@ async function loadCloud(force) {
   /** @type {string|null} commit of the copy shown */
   let shownHead = null;
   try {
-    const cached = await OpenDivesCore.listCloudDives({ cached: true });
+    const cached = await (pre?.cached ?? OpenDivesCore.listCloudDives({ cached: true }));
+    mark('cachedRead');
     if (cached.server) logbook.server = cached.server;
     if (cached.dives) {
       logbook.dives = cached.dives;
@@ -577,6 +638,7 @@ async function loadCloud(force) {
   }
 
   const server = await probe;
+  mark('probeDone');
   if (shownHead !== null) {
     if (server.ok && server.exists && server.head === shownHead) {
       logbook.sync = 'cloud';
@@ -608,6 +670,8 @@ async function loadCloud(force) {
   return true;
 }
 
+let loadStarted = false;
+
 /**
  * Loads the logbook: the cloud log when an account is configured, otherwise
  * the log on this device.
@@ -616,10 +680,15 @@ async function loadCloud(force) {
  */
 export async function loadLogbook({ force = false } = {}) {
   undoCleared();
+  // The snapshot is for the first load only; a reload shows the loading bars.
+  if (loadStarted) logbook.preview = null;
+  const pre = early;
+  early = null;
+  loadStarted = true;
   logbook.loading = true;
   logbook.error = null;
   try {
-    if (await loadCloud(force)) {
+    if (await loadCloud(force, pre)) {
       // Manual synchronisation: the state says so at all times, after a
       // "Sync now" too (spec, section 4).
       if (!logbook.autoSync) logbook.sync = 'manual';

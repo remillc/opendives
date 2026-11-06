@@ -6,8 +6,11 @@
   // with `editable`, a pin fixed at the centre: the diver moves the map under
   // it, and onmove gets the centre (micro-degrees) when the map stops.
   import { onMount, onDestroy } from 'svelte';
-  import maplibregl from 'maplibre-gl';
   import { language, t } from '../lib/i18n.js';
+
+  // Loaded when a map is first shown: about 800 KB the start-up does not need.
+  /** @type {typeof import('maplibre-gl')} */
+  let maplibregl;
 
   /**
    * @type {{
@@ -28,10 +31,10 @@
   /** @type {HTMLElement|undefined} */
   let container = $state();
   /** Reactive (not deeply): the pin's effect runs again once it exists. */
-  let map = $state.raw(/** @type {maplibregl.Map|undefined} */ (undefined));
-  /** @type {maplibregl.Marker[]} */
+  let map = $state.raw(/** @type {import('maplibre-gl').Map|undefined} */ (undefined));
+  /** @type {import('maplibre-gl').Marker[]} */
   let markers = [];
-  /** @type {maplibregl.Marker|undefined} */
+  /** @type {import('maplibre-gl').Marker|undefined} */
   let pinMarker;
 
   /** @param {{latUdeg: number, lonUdeg: number}} p */
@@ -46,7 +49,7 @@
       el.className = 'od-site-marker';
       el.setAttribute('aria-label', site.name || t('sites.noName'));
       el.addEventListener('click', () => onselect?.(site.uuid));
-      return new maplibregl.Marker({ element: el }).setLngLat(lngLat(site)).addTo(/** @type {maplibregl.Map} */ (map));
+      return new maplibregl.Marker({ element: el }).setLngLat(lngLat(site)).addTo(/** @type {import('maplibre-gl').Map} */ (map));
     });
   }
 
@@ -61,9 +64,12 @@
     }
   }
 
-  onMount(() => {
+  onMount(async () => {
     if (!container) return;
-    map = new maplibregl.Map({
+    const module = await import('maplibre-gl');
+    maplibregl = /** @type {any} */ (module).default ?? module;
+    if (!container?.isConnected) return;
+    const m = new maplibregl.Map({
       container,
       style: STYLE,
       center: [0, 20],
@@ -72,12 +78,13 @@
       dragRotate: false,
       pitchWithRotate: false,
     });
-    map.touchZoomRotate.disableRotation();
+    map = m;
+    m.touchZoomRotate.disableRotation();
     // Follow the size of the container (full screen on the edit screen).
     const resize = new ResizeObserver(() => map?.resize({ programmatic: true }));
     resize.observe(container);
-    map.once('remove', () => resize.disconnect());
-    map.on('load', () => {
+    m.once('remove', () => resize.disconnect());
+    m.on('load', () => {
       // The credits stay one tap away, behind the ⓘ button (OpenStreetMap's
       // licence asks for them to be reachable), but start collapsed.
       const credits = container?.querySelector('.maplibregl-ctrl-attrib');
@@ -90,13 +97,13 @@
     if (editable) {
       // The position under the pin, once the map stops; moves made by the
       // code (typed coordinates, device position) are not sent back.
-      map.on('moveend', (e) => {
-        if (/** @type {any} */ (e).programmatic || !map) return;
-        const c = map.getCenter();
+      m.on('moveend', (e) => {
+        if (/** @type {any} */ (e).programmatic) return;
+        const c = m.getCenter();
         onmove?.({ latUdeg: Math.round(c.lat * 1e6), lonUdeg: Math.round(c.lng * 1e6) });
       });
       // A tap brings that point under the pin.
-      map.on('click', (e) => map?.easeTo({ center: e.lngLat }));
+      m.on('click', (e) => m.easeTo({ center: e.lngLat }));
     }
   });
 
