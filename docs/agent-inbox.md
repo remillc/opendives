@@ -10,7 +10,9 @@ Tasks for the coding agent, written from the design sessions with Christian on c
 - Never delete or rewrite a task; if a task is unclear or contradicts the specification, stop and ask Christian.
 - Only the design side (claude.ai) adds tasks. The agent does not add tasks here.
 
-## [ ] 2026-11-06-00 Register the inbox hooks
+## [x] 2026-11-06-00 Register the inbox hooks
+
+Done in Register the agent inbox hooks
 
 Create `.claude/settings.json` (committed) with two command hooks that run `tools/agent-inbox.mjs`: `SessionStart` with the argument `start`, and `UserPromptSubmit` with the argument `prompt`. The command is `node "$CLAUDE_PROJECT_DIR/tools/agent-inbox.mjs" start` (or `prompt`), timeout 10 seconds. Add `.claude/inbox-seen.json` and `.claude/settings.local.json` to `.gitignore`. Then check, in a new session, that the open tasks of this file appear by themselves; if the VS Code extension does not show the hook's output, say so to Christian.
 
