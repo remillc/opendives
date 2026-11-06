@@ -50,6 +50,9 @@
 
   /* Dark mode: system surfaces from Framework7, bright water with an outlined line. */
   html.dark {
+    /* Meaning colours, lighter to keep their contrast on the dark background (spec, section 1). */
+    --od-alarm: #FF8A80;
+    --od-pending: #F2B84B;
     --od-background: var(--f7-md-surface);
     --od-surface: var(--f7-md-surface-1);
     --od-surface-2: var(--f7-md-surface-variant);
