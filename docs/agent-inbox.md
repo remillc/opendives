@@ -129,3 +129,7 @@ Rebuild Settings from `docs/mockups/android-reglages.dc.html` and `docs/ui-speci
 ## [ ] 2026-11-06-17 Settings: behaviour of every row
 
 Part of task 16. Wire every Settings row as in `docs/ui-specification.md`, section 4, "Settings: what each row does": the four row kinds (switch, single-choice dialog, number dialog, chevron), the two action buttons with their confirmation dialogs, the ⋮ menu of a remembered dive computer, and the cylinder types sub-screen. Mock-ups: `docs/mockups/android-reglages.dc.html`, `reglages-choix-android.dc.html`, `reglages-nombre-android.dc.html`, `reglages-menu-android.dc.html`, `reglages-bouteilles-android.dc.html`. Check each preference name in `core/pref.h` before using it; if one in the table does not exist or behaves differently, stop and ask Christian. The offline maps sub-screen is not designed yet: leave the row disabled.
+
+## [ ] 2026-11-06-18 Settings: dialogs and layout, updated
+
+Follow the updated paragraph "Settings: what each row does" in `docs/ui-specification.md`, section 4 (it replaces the earlier version used by task 17): chevrons on value rows, date choices shown as dates with the device's format first, wheel pickers instead of number fields, the speeds / duration / coordinates dialogs, the split Units group, and the layout rules. Mock-ups: `docs/mockups/android-reglages.dc.html` and `docs/mockups/reglages-*-android.dc.html`.
