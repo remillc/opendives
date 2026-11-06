@@ -433,6 +433,29 @@ int main(int argc, char **argv)
 		}
 		if (!undo_and_save("delete") || divelog.trips.size() != trips0)
 			return 1;
+		// Renumber: all the dives from 100, then the last half only from 7; the
+		// numbers are consecutive in date order; each saved and undone.
+		for (int pass = 0; pass < 2; pass++) {
+			std::vector<int> ids;
+			int start = pass ? 7 : 100;
+			if (pass)
+				for (size_t i = divelog.dives.size() / 2; i < divelog.dives.size(); i++)
+					ids.push_back(divelog.dives[i]->id);
+			if (renumber_dives(ids, start, json, error) || undo_text().rfind("renumber ", 0) != 0) {
+				printf("error=renumber: %s\n", error.c_str());
+				return 1;
+			}
+			int expected = start;
+			for (size_t i = pass ? divelog.dives.size() / 2 : 0; i < divelog.dives.size(); i++) {
+				if (divelog.dives[i]->number != expected++) {
+					printf("error=renumber: dive %zu has number %d, expected %d\n", i, divelog.dives[i]->number,
+					       expected - 1);
+					return 1;
+				}
+			}
+			if (!undo_and_save("renumber"))
+				return 1;
+		}
 		if (import_dives(arg, "import-test", json, error)) {
 			if (error == "NO_NEW_DIVES") {
 				printf("import=nothing new\n");

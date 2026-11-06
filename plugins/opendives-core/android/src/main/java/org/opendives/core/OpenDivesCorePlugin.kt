@@ -617,6 +617,18 @@ class OpenDivesCorePlugin : Plugin() {
         call.resolve(JSObject().put("json", NativeCore.deleteDive(id)))
     }
 
+    /** Renumbers dives in date order (renumber_dives): all of them if no ids, one undoable step. */
+    @PluginMethod
+    fun renumberDives(call: PluginCall) = onCoreThread(call) {
+        val start = call.getInt("start")
+        if (start == null) {
+            call.reject("Missing start", "BAD_ARGUMENT")
+            return@onCoreThread
+        }
+        val ids = call.getArray("ids")?.toList<Int>()?.toIntArray() ?: IntArray(0)
+        call.resolve(JSObject().put("json", NativeCore.renumberDives(ids, start)))
+    }
+
     /**
      * Imports a file chosen in the WebView (import_dives): its bytes arrive in
      * base64, are written to a temporary file with the original name (the core

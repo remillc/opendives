@@ -409,6 +409,12 @@ int create_dive(const std::string &fields_json, std::string &result_json, std::s
 // too if it was the last one; undo puts both back.
 int delete_dive(int id, std::string &result_json, std::string &error);
 
+// Renumbers dives as Subsurface's Renumber dialog (RenumberDialog, then
+// RenumberDives in commands/command_divelist.cpp): the listed dives (all of
+// them if `ids` is empty), in date order, get consecutive numbers from
+// `start`. One undoable step; error NOTHING_TO_DO if no dive is concerned.
+int renumber_dives(const std::vector<int> &ids, int start, std::string &result_json, std::string &error);
+
 // Imports a file (.ssrf, .xml and the other formats the core reads) into the
 // log: parse_file(), then ImportDives with merge_all_trips, as
 // QMLManager::importDivesFromFile() does; `source` names the file in the

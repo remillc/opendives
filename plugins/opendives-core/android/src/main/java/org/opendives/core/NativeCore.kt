@@ -30,6 +30,7 @@ internal object NativeCore {
     external fun filterQuery(kind: String, fulltext: String, mode: String, rules: Array<String>): String
     external fun createDive(fields: String): String
     external fun deleteDive(id: Int): String
+    external fun renumberDives(ids: IntArray, start: Int): String
     external fun importDives(file: String, source: String): String
     external fun filterPresets(action: String, name: String, fulltext: String, mode: String, rules: Array<String>, index: Int): String
     external fun syncConflicts(): String
