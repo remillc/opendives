@@ -13,7 +13,7 @@
   import Icon from '../components/Icon.svelte';
   import TextField from '../components/TextField.svelte';
   import SiteMap from '../components/SiteMap.svelte';
-  import { saveDiveChanges } from '../lib/logbook.svelte.js';
+  import { logbook, saveDiveChanges } from '../lib/logbook.svelte.js';
   import { formatCoordinates, geocodeSite, parseCoordinates, siteChange } from '../lib/sites.svelte.js';
   import { language, t } from '../lib/i18n.js';
   import { confirmAction } from '../lib/dialogs.js';
@@ -132,7 +132,11 @@
       const now = await OpenDivesCore.siteQuery({ kind: 'site', uuid });
       if (country.trim() !== now.country) await siteChange({ action: 'edit', uuid, field: 'country', value: country.trim() });
       if (region.trim() !== now.region.value) await siteChange({ action: 'edit', uuid, field: 'region', value: region.trim() });
-      if (forDive) await saveDiveChanges(forDive, { site: uuid });
+      if (forDive) {
+        await saveDiveChanges(forDive, { site: uuid });
+        // The site lists change once the dive has its site.
+        logbook.sitesVersion++;
+      }
       f7router.back();
     } catch (e) {
       const code = String(/** @type {any} */ (e)?.message ?? '');
@@ -173,6 +177,7 @@
     if (!nearby) return;
     if (forDive) {
       await saveDiveChanges(forDive, { site: nearby.uuid });
+      logbook.sitesVersion++;
       f7router.back();
     } else {
       f7router.navigate(`/site/${nearby.uuid}/`, { reloadCurrent: true });

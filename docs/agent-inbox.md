@@ -177,10 +177,14 @@ Follow "Tools" in `docs/ui-specification.md`, section 4. Build the Desaturation 
 
 Add the "Décompression" group to Settings, after "Profil de plongée" (`docs/mockups/android-reglages.dc.html`, rows in the settings table of `docs/ui-specification.md`): model, gradient factors, VPM-B conservatism, oxygen narcotic, best-mix END. They are shared by the profile's calculated ceiling, the planner, the desaturation tool and the gas calculator: read them from the same preferences everywhere, and remove any copy of them from the planner's own settings. One model setting drives both `display_deco_mode` and `planner_deco_mode`.
 
-## [ ] 2026-11-06-26 Edit a site
+## [x] 2026-11-06-26 Edit a site
+
+Done in Delete a site from its edit screen, filled fields everywhere
 
 Add the edit mode of the site form from `docs/mockups/sites-modifier-android.dc.html` and "Edit a site" in `docs/ui-specification.md` (section 4, Sites): title, prefilled fields, no duplicate note, "Supprimer le site" with a confirmation; deleting keeps the dives and removes their site. Test deletion on the test account only.
 
-## [ ] 2026-11-06-27 Filled text fields everywhere
+## [x] 2026-11-06-27 Filled text fields everywhere
+
+Done in Delete a site from its edit screen, filled fields everywhere
 
 Every text field of the app now uses the MD3 filled variant (`docs/ui-specification.md`, "Text fields", which replaces the outlined rule of task 20). Change every form already built: dive editing, account deletion, divelogs.de takeover, gas calculator, new statistic, site forms. Mock-ups updated: `android-edition`, `compte-android-suppression`, `android-compte-import`, `android-outils`, `stats-nouvelle-android`, `sites-edition-android`, `sites-modifier-android`.
