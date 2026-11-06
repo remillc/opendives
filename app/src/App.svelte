@@ -38,6 +38,7 @@
   import FilterCriterion from './pages/FilterCriterion.svelte';
   import AddUnavailable from './pages/AddUnavailable.svelte';
   import DownloadFailed from './pages/DownloadFailed.svelte';
+  import Download from './pages/Download.svelte';
   import Icon from './components/Icon.svelte';
   import AdaptiveLabel from './components/AdaptiveLabel.svelte';
   import NavMenu from './components/NavMenu.svelte';
@@ -69,6 +70,7 @@
       { path: '/filter/', component: Filter },
       { path: '/filter/:key/', component: FilterCriterion },
       { path: '/add/:what/', component: AddUnavailable },
+      { path: '/download/', component: Download },
       { path: '/download/failed/', component: DownloadFailed },
       { path: '/settings/', component: Settings },
       { path: '/settings/cylinders/', component: CylinderTypes },

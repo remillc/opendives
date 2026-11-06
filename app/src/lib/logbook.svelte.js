@@ -2,7 +2,7 @@
 // Shared logbook state: dives, the log's units, sync status.
 import { OpenDivesCore } from 'opendives-core';
 import { defaultPrefs } from './format.js';
-import { keepCylinderLibrary } from './settings.svelte.js';
+import { keepCylinderLibrary, keepDiveComputers } from './settings.svelte.js';
 
 /** @typedef {import('opendives-core').Dive} Dive */
 /** @typedef {import('opendives-core').Prefs} Prefs */
@@ -184,6 +184,27 @@ export async function importFile(file) {
   logbook.sitesVersion++;
   await persistChanges();
   return Math.max(0, logbook.dives.length - before);
+}
+
+/**
+ * After a download from a dive computer (OpenDivesCore.downloadDives): the
+ * new dives are one undoable step already made by the core; it is saved and
+ * synced like an edit. The remembered computers, updated by the core after
+ * every attempt as Subsurface does, are kept on this device.
+ * @param {import('opendives-core').DownloadResult|null} result null after a failed attempt
+ */
+export async function afterDownload(result) {
+  try {
+    logbook.prefs = await OpenDivesCore.getPrefs();
+    if (logbook.prefs.diveComputerList) keepDiveComputers(logbook.prefs.diveComputerList);
+  } catch (e) {
+    console.error('Reading the remembered dive computers', e);
+  }
+  if (!result?.downloaded) return;
+  logbook.undoText = result.undo;
+  logbook.dives = await OpenDivesCore.listLoadedDives();
+  logbook.sitesVersion++;
+  await persistChanges();
 }
 
 /**

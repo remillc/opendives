@@ -131,10 +131,12 @@ import { registerPlugin } from '@capacitor/core';
  * @typedef {CorePrefValues & {
  *   autogroup?: boolean,
  *   diveComputers?: {slot: number, vendor: string, product: string, device: string, name: string}[],
+ *   diveComputerList?: string[],
  *   planner?: {bottomPo2Mbar: number, decoPo2Mbar: number, bottomSacMlMin: number, decoSacMlMin: number},
  *   defaults?: CorePrefValues,
  * }} Prefs
- * `autogroup` is the log's; `diveComputers` the remembered ones; `defaults`
+ * `autogroup` is the log's; `diveComputers` the remembered ones (`diveComputerList`: the last
+ * one used then the four remembered, vendor, product, device, name each, as setPrefs takes it); `defaults`
  * Subsurface's default of each value.
  */
 
@@ -365,6 +367,43 @@ import { registerPlugin } from '@capacitor/core';
  */
 
 /**
+ * Bluetooth on this device: `bluetooth` "none" (no adapter, e.g. the
+ * emulator), "off" or "on"; `permission` for the scan and the connection.
+ * @typedef {{bluetooth: 'none'|'off'|'on', permission: 'granted'|'denied'|'prompt'}} BluetoothStatus
+ */
+
+/**
+ * A device found by the Bluetooth scan or paired with the phone, by MAC
+ * address; reported again when what is known of it changes. `le`: reached
+ * over Bluetooth Low Energy (seen by the scan, or paired as LE); `classic`:
+ * paired as Bluetooth Classic. `computer`: the dive computer its name stands
+ * for (Subsurface's list of names), or null.
+ * @typedef {{mac: string, name: string, le: boolean, classic: boolean, bonded: boolean, rssi: number,
+ *   computer: {vendor: string, product: string}|null}} BluetoothDevice
+ */
+
+/**
+ * @typedef {{vendor: string, products: {name: string, ble: boolean, classic: boolean}[]}} BluetoothVendor
+ */
+
+/**
+ * A dive received during a download (not in the logbook yet).
+ * @typedef {{date: string, maxDepthMm: number, durationSeconds: number, profile: number[]}} ReceivedDive
+ */
+
+/**
+ * @typedef {{state: 'connecting'|'connected', fraction: number, dives: number, newDives: ReceivedDive[]}} DownloadProgress
+ */
+
+/**
+ * End of a download: `downloaded` new dives added to the logbook as one
+ * undoable step (`list`, `undo`), the computer as it identified itself, and
+ * the remembered computers to keep (setPrefs diveComputerList).
+ * @typedef {{downloaded: number, vendor: string, product: string, serial: number, firmware: number,
+ *   list?: {listChange: true, dives: number, id: number}, undo: string, diveComputerList: string[]}} DownloadResult
+ */
+
+/**
  * @typedef {Object} OpenDivesCorePlugin
  * @property {() => Promise<{count: number}>} importSample
  *   Saves the sample log as a local git repository.
@@ -460,7 +499,7 @@ import { registerPlugin } from '@capacitor/core';
  *   Detail of one dive of the last loaded log.
  * @property {() => Promise<Prefs>} getPrefs
  *   The core's preferences: units (the loaded log's when it has them), the Settings values.
- * @property {(options: {changes: Partial<CorePrefValues> & {forgetDiveComputer?: number}}) => Promise<void>} setPrefs
+ * @property {(options: {changes: Partial<CorePrefValues> & {forgetDiveComputer?: number, diveComputerList?: string[]}}) => Promise<void>} setPrefs
  *   Sets core preferences (set_prefs in opendives.h); a device setting, kept by the app.
  * @property {(options: {action: 'list'|'library'|'standard'|'add'|'size'|'remove'|'rename', name?: string, value?: string, ml?: number, mbar?: number}) => Promise<CylinderTypes>} cylinderTypes
  *   Cylinder types of Settings; "rename" (to value) changes the log as one undoable step,
@@ -469,6 +508,28 @@ import { registerPlugin } from '@capacitor/core';
  *   The planner's settings as the core's preferences hold them.
  * @property {(request: PlanRequest) => Promise<PlanResult>} planDive
  *   Runs Subsurface's planner; read only, nothing is added to the logbook.
+ * @property {() => Promise<BluetoothStatus>} bluetoothStatus
+ * @property {() => Promise<BluetoothStatus>} requestBluetoothPermission
+ *   Asks for the Bluetooth permissions (Android 12+: nearby devices; before: location).
+ * @property {() => Promise<BluetoothStatus>} enableBluetooth
+ *   The system dialog that turns Bluetooth on.
+ * @property {() => Promise<void>} openAppSettings
+ *   The app's page of the system settings (a permission refused for good).
+ * @property {(options?: {durationMs?: number}) => Promise<void>} startBluetoothScan
+ *   Looks for devices (default 60 s): "bluetoothDevice" events, then "bluetoothScanStopped".
+ *   Rejects with NO_BLUETOOTH, BLUETOOTH_OFF, PERMISSION.
+ * @property {() => Promise<void>} stopBluetoothScan
+ * @property {() => Promise<BluetoothVendor[]>} bluetoothModels
+ *   The models that download over Bluetooth, for a device whose name says nothing.
+ * @property {(options: {vendor: string, product: string, address: string, name: string, forceDownload?: boolean}) => Promise<DownloadResult>} downloadDives
+ *   Downloads the new dives and adds them as one undoable step (download_dives in
+ *   opendives.h); "downloadProgress" events meanwhile. `address`: "LE:" + MAC for
+ *   Bluetooth Low Energy, the MAC for Classic. Rejects with the core's code first in
+ *   the message: NOT_FOUND, FAILED, CANCELLED, UNKNOWN_COMPUTER, WRITE_LOCKED…, or
+ *   NO_BLUETOOTH, BLUETOOTH_OFF, PERMISSION.
+ * @property {() => Promise<void>} cancelDownload
+ * @property {(event: 'bluetoothDevice'|'bluetoothScanStopped'|'downloadProgress', listener: (data: any) => void) => Promise<{remove: () => Promise<void>}>} addListener
+ *   bluetoothDevice gives a BluetoothDevice, downloadProgress a DownloadProgress.
  */
 
 /** @type {any} */
@@ -581,5 +642,24 @@ export const OpenDivesCore = {
   },
   async planDive(request) {
     return JSON.parse((await native.planDive({ request })).json);
+  },
+  bluetoothStatus: () => native.bluetoothStatus(),
+  requestBluetoothPermission: () => native.requestBluetoothPermission(),
+  enableBluetooth: () => native.enableBluetooth(),
+  openAppSettings: () => native.openAppSettings(),
+  startBluetoothScan: (options = {}) => native.startBluetoothScan(options),
+  stopBluetoothScan: () => native.stopBluetoothScan(),
+  async bluetoothModels() {
+    return JSON.parse((await native.bluetoothModels()).json);
+  },
+  async downloadDives(options) {
+    return JSON.parse((await native.downloadDives(options)).json);
+  },
+  cancelDownload: () => native.cancelDownload(),
+  addListener(event, listener) {
+    if (event === 'bluetoothDevice')
+      return native.addListener(event, (/** @type {any} */ d) => listener({ ...d, computer: JSON.parse(d.computer || 'null') }));
+    if (event === 'downloadProgress') return native.addListener(event, (/** @type {any} */ p) => listener(JSON.parse(p.json)));
+    return native.addListener(event, listener);
   },
 };

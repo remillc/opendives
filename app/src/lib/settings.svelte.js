@@ -13,6 +13,8 @@ import { OpenDivesCore } from 'opendives-core';
 const CORE_KEY = 'od.corePrefs';
 const LIBRARY_KEY = 'od.cylinderLibrary';
 const APP_KEY = 'od.appSettings';
+/** The last dive computer used and the four remembered ones (setPrefs diveComputerList). */
+const COMPUTERS_KEY = 'od.diveComputers';
 
 /** @typedef {import('opendives-core').CorePrefValues} CorePrefValues */
 
@@ -98,6 +100,14 @@ export async function applyDeviceSettings() {
     // A value refused by this core (an older version kept something else): the others are kept.
     console.error('Restoring the settings of this device', e);
   }
+  const computers = readJson(COMPUTERS_KEY);
+  if (Array.isArray(computers)) {
+    try {
+      await OpenDivesCore.setPrefs({ changes: { diveComputerList: computers } });
+    } catch (e) {
+      console.error('Restoring the dive computers of this device', e);
+    }
+  }
   const library = readJson(LIBRARY_KEY);
   if (Array.isArray(library)) {
     try {
@@ -142,7 +152,18 @@ export async function resetCorePrefs(keys) {
 /** Forgets one remembered dive computer (slot 1 to 4), or all of them (0). @param {number} slot */
 export async function forgetDiveComputers(slot) {
   await OpenDivesCore.setPrefs({ changes: { forgetDiveComputer: slot } });
-  return OpenDivesCore.getPrefs();
+  const prefs = await OpenDivesCore.getPrefs();
+  if (prefs.diveComputerList) keepDiveComputers(prefs.diveComputerList);
+  return prefs;
+}
+
+/**
+ * Keeps the remembered dive computers after a download (the core updates
+ * them as Subsurface does), set again at each start.
+ * @param {string[]} list
+ */
+export function keepDiveComputers(list) {
+  writeJson(COMPUTERS_KEY, list);
 }
 
 /**

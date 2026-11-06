@@ -1,9 +1,13 @@
 // SPDX-License-Identifier: GPL-2.0
 // JNI bridge between the Kotlin plugin and the C++ façade.
 #include "core/libopendives/opendives.h"
+#include "core/compat/bt_transport.h"
 
+#include <android/log.h>
 #include <jni.h>
 #include <cstdlib>
+#include <cstring>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -21,6 +25,236 @@ static void throw_core_error(JNIEnv *env, const std::string &message)
 	if (cls)
 		env->ThrowNew(cls, message.c_str());
 }
+
+// --- Bluetooth transport for the download (core/compat/bt_transport.h) ------
+//
+// Each primitive calls the Kotlin BluetoothTransport, which blocks until the
+// Android Bluetooth stack answers or the timeout expires. Every call happens
+// during NativeCore.downloadDives(), on its thread: the JNIEnv of that call
+// is used throughout. Local references are freed at once: a download makes
+// thousands of calls.
+namespace {
+
+class JniBtTransport : public opendives_compat::BtTransport {
+public:
+	JniBtTransport(JNIEnv *env, jobject transport) : env(env), obj(transport)
+	{
+		jclass cls = env->GetObjectClass(transport);
+		m_ble_connect = env->GetMethodID(cls, "bleConnect", "(Ljava/lang/String;ZI)Z");
+		m_ble_discover = env->GetMethodID(cls, "bleDiscover", "(I)Ljava/lang/String;");
+		m_ble_write_descriptor = env->GetMethodID(
+			cls, "bleWriteDescriptor", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[BI)Z");
+		m_ble_write = env->GetMethodID(cls, "bleWrite", "(Ljava/lang/String;Ljava/lang/String;[BZI)Z");
+		m_ble_read = env->GetMethodID(cls, "bleRead", "(Ljava/lang/String;Ljava/lang/String;I)[B");
+		m_ble_receive = env->GetMethodID(cls, "bleReceive", "(I)[B");
+		m_ble_close = env->GetMethodID(cls, "bleClose", "()V");
+		m_rfcomm_connect = env->GetMethodID(cls, "rfcommConnect", "(Ljava/lang/String;I)Z");
+		m_rfcomm_read = env->GetMethodID(cls, "rfcommRead", "(II)[B");
+		m_rfcomm_write = env->GetMethodID(cls, "rfcommWrite", "([B)I");
+		m_rfcomm_available = env->GetMethodID(cls, "rfcommAvailable", "()I");
+		m_rfcomm_close = env->GetMethodID(cls, "rfcommClose", "()V");
+		m_last_error = env->GetMethodID(cls, "lastError", "()Ljava/lang/String;");
+		env->DeleteLocalRef(cls);
+	}
+
+	bool ble_connect(const std::string &address, bool random_address, int timeout_ms) override
+	{
+		jstring a = env->NewStringUTF(address.c_str());
+		jboolean r = env->CallBooleanMethod(obj, m_ble_connect, a, random_address ? JNI_TRUE : JNI_FALSE, timeout_ms);
+		env->DeleteLocalRef(a);
+		return !failed() && r;
+	}
+
+	// The Kotlin side writes one line per item: "S <uuid>", "C <uuid> <properties>", "D <uuid>".
+	bool ble_discover(std::vector<opendives_compat::BleService> &services, int timeout_ms) override
+	{
+		auto s = static_cast<jstring>(env->CallObjectMethod(obj, m_ble_discover, timeout_ms));
+		if (failed() || !s)
+			return false;
+		std::istringstream lines(to_string(env, s));
+		env->DeleteLocalRef(s);
+		std::string kind, uuid;
+		while (lines >> kind >> uuid) {
+			if (kind == "S") {
+				services.push_back({ uuid, {} });
+			} else if (kind == "C" && !services.empty()) {
+				unsigned props = 0;
+				lines >> props;
+				services.back().characteristics.push_back({ uuid, props, {} });
+			} else if (kind == "D" && !services.empty() && !services.back().characteristics.empty()) {
+				services.back().characteristics.back().descriptors.push_back(uuid);
+			}
+		}
+		return true;
+	}
+
+	bool ble_write_descriptor(const std::string &service, const std::string &characteristic,
+				  const std::string &descriptor, const opendives_compat::Bytes &value, int timeout_ms) override
+	{
+		jstring s = env->NewStringUTF(service.c_str()), c = env->NewStringUTF(characteristic.c_str()),
+			d = env->NewStringUTF(descriptor.c_str());
+		jbyteArray v = bytes(value.data(), value.size());
+		jboolean r = env->CallBooleanMethod(obj, m_ble_write_descriptor, s, c, d, v, timeout_ms);
+		env->DeleteLocalRef(s);
+		env->DeleteLocalRef(c);
+		env->DeleteLocalRef(d);
+		env->DeleteLocalRef(v);
+		return !failed() && r;
+	}
+
+	bool ble_write(const std::string &service, const std::string &characteristic, const opendives_compat::Bytes &data,
+		       bool with_response, int timeout_ms) override
+	{
+		jstring s = env->NewStringUTF(service.c_str()), c = env->NewStringUTF(characteristic.c_str());
+		jbyteArray v = bytes(data.data(), data.size());
+		jboolean r = env->CallBooleanMethod(obj, m_ble_write, s, c, v, with_response ? JNI_TRUE : JNI_FALSE, timeout_ms);
+		env->DeleteLocalRef(s);
+		env->DeleteLocalRef(c);
+		env->DeleteLocalRef(v);
+		return !failed() && r;
+	}
+
+	bool ble_read(const std::string &service, const std::string &characteristic, opendives_compat::Bytes &value,
+		      int timeout_ms) override
+	{
+		jstring s = env->NewStringUTF(service.c_str()), c = env->NewStringUTF(characteristic.c_str());
+		auto v = static_cast<jbyteArray>(env->CallObjectMethod(obj, m_ble_read, s, c, timeout_ms));
+		env->DeleteLocalRef(s);
+		env->DeleteLocalRef(c);
+		if (failed() || !v)
+			return false;
+		value = to_bytes(v);
+		env->DeleteLocalRef(v);
+		return true;
+	}
+
+	// Kotlin's bleReceive: null when disconnected or cancelled, empty after
+	// the timeout, else the characteristic's UUID (36 bytes) then the data.
+	int ble_receive(std::string &characteristic, opendives_compat::Bytes &data, int timeout_ms) override
+	{
+		auto v = static_cast<jbyteArray>(env->CallObjectMethod(obj, m_ble_receive, timeout_ms));
+		if (failed() || !v)
+			return -1;
+		opendives_compat::Bytes all = to_bytes(v);
+		env->DeleteLocalRef(v);
+		if (all.empty())
+			return 0;
+		if (all.size() < 36)
+			return -1;
+		characteristic.assign(all.begin(), all.begin() + 36);
+		data.assign(all.begin() + 36, all.end());
+		return 1;
+	}
+
+	void ble_close() override
+	{
+		env->CallVoidMethod(obj, m_ble_close);
+		failed();
+	}
+
+	bool rfcomm_connect(const std::string &address, int timeout_ms) override
+	{
+		jstring a = env->NewStringUTF(address.c_str());
+		jboolean r = env->CallBooleanMethod(obj, m_rfcomm_connect, a, timeout_ms);
+		env->DeleteLocalRef(a);
+		return !failed() && r;
+	}
+
+	int rfcomm_read(unsigned char *data, size_t size, int timeout_ms) override
+	{
+		auto v = static_cast<jbyteArray>(env->CallObjectMethod(obj, m_rfcomm_read, static_cast<jint>(size), timeout_ms));
+		if (failed() || !v)
+			return -1;
+		jsize n = env->GetArrayLength(v);
+		if (static_cast<size_t>(n) > size)
+			n = static_cast<jsize>(size);
+		env->GetByteArrayRegion(v, 0, n, reinterpret_cast<jbyte *>(data));
+		env->DeleteLocalRef(v);
+		return n;
+	}
+
+	int rfcomm_write(const unsigned char *data, size_t size) override
+	{
+		jbyteArray v = bytes(data, size);
+		jint r = env->CallIntMethod(obj, m_rfcomm_write, v);
+		env->DeleteLocalRef(v);
+		return failed() ? -1 : r;
+	}
+
+	size_t rfcomm_available() override
+	{
+		jint r = env->CallIntMethod(obj, m_rfcomm_available);
+		return failed() || r < 0 ? 0 : static_cast<size_t>(r);
+	}
+
+	void rfcomm_close() override
+	{
+		env->CallVoidMethod(obj, m_rfcomm_close);
+		failed();
+	}
+
+	std::string last_error() override
+	{
+		auto s = static_cast<jstring>(env->CallObjectMethod(obj, m_last_error));
+		if (failed() || !s)
+			return std::string();
+		std::string r = to_string(env, s);
+		env->DeleteLocalRef(s);
+		return r;
+	}
+
+private:
+	// A Kotlin exception: logged and cleared, and the call fails.
+	bool failed()
+	{
+		if (!env->ExceptionCheck())
+			return false;
+		env->ExceptionDescribe();
+		env->ExceptionClear();
+		__android_log_print(ANDROID_LOG_ERROR, "OpenDives", "Bluetooth transport: exception in Kotlin");
+		return true;
+	}
+	jbyteArray bytes(const unsigned char *data, size_t size)
+	{
+		jbyteArray v = env->NewByteArray(static_cast<jsize>(size));
+		if (size)
+			env->SetByteArrayRegion(v, 0, static_cast<jsize>(size), reinterpret_cast<const jbyte *>(data));
+		return v;
+	}
+	opendives_compat::Bytes to_bytes(jbyteArray v)
+	{
+		jsize n = env->GetArrayLength(v);
+		opendives_compat::Bytes out(n);
+		if (n)
+			env->GetByteArrayRegion(v, 0, n, reinterpret_cast<jbyte *>(out.data()));
+		return out;
+	}
+
+	JNIEnv *env;
+	jobject obj;
+	jmethodID m_ble_connect, m_ble_discover, m_ble_write_descriptor, m_ble_write, m_ble_read, m_ble_receive, m_ble_close;
+	jmethodID m_rfcomm_connect, m_rfcomm_read, m_rfcomm_write, m_rfcomm_available, m_rfcomm_close, m_last_error;
+};
+
+struct ProgressTarget {
+	JNIEnv *env;
+	jobject listener;
+	jmethodID on_progress;
+};
+
+void send_progress(const std::string &json, void *userdata)
+{
+	auto *target = static_cast<ProgressTarget *>(userdata);
+	jstring s = target->env->NewStringUTF(json.c_str());
+	target->env->CallVoidMethod(target->listener, target->on_progress, s);
+	target->env->DeleteLocalRef(s);
+	if (target->env->ExceptionCheck()) {
+		target->env->ExceptionDescribe();
+		target->env->ExceptionClear();
+	}
+}
+
+} // namespace
 
 extern "C" {
 
@@ -627,6 +861,48 @@ Java_org_opendives_core_NativeCore_statsQuery(JNIEnv *env, jobject, jstring kind
 		return nullptr;
 	}
 	return env->NewStringUTF(json.c_str());
+}
+
+// Download from a dive computer (download.cpp). The name lookups are
+// reentrant: the Bluetooth scan calls them from its own thread.
+JNIEXPORT jstring JNICALL
+Java_org_opendives_core_NativeCore_dcFromBluetoothName(JNIEnv *env, jobject, jstring name)
+{
+	return env->NewStringUTF(opendives::dc_from_bluetooth_name(to_string(env, name)).c_str());
+}
+
+JNIEXPORT jstring JNICALL
+Java_org_opendives_core_NativeCore_dcBluetoothModels(JNIEnv *env, jobject)
+{
+	return env->NewStringUTF(opendives::dc_bluetooth_models().c_str());
+}
+
+// Blocks for the whole download, on the core's thread; `transport` is the
+// Kotlin BluetoothTransport, `listener` gets the progress (onProgress).
+JNIEXPORT jstring JNICALL
+Java_org_opendives_core_NativeCore_downloadDives(JNIEnv *env, jobject, jstring request, jobject transport,
+						 jobject listener)
+{
+	JniBtTransport bt(env, transport);
+	jclass cls = env->GetObjectClass(listener);
+	ProgressTarget target { env, listener, env->GetMethodID(cls, "onProgress", "(Ljava/lang/String;)V") };
+	env->DeleteLocalRef(cls);
+	opendives_compat::set_bt_transport(&bt);
+	std::string json, error;
+	int ret = opendives::download_dives(to_string(env, request), send_progress, &target, json, error);
+	opendives_compat::set_bt_transport(nullptr);
+	if (ret) {
+		throw_core_error(env, error);
+		return nullptr;
+	}
+	return env->NewStringUTF(json.c_str());
+}
+
+// Off the core's thread, while downloadDives() runs.
+JNIEXPORT void JNICALL
+Java_org_opendives_core_NativeCore_downloadCancel(JNIEnv *, jobject)
+{
+	opendives::download_cancel();
 }
 
 } // extern "C"

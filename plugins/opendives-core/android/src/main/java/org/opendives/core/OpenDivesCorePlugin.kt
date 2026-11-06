@@ -1,20 +1,46 @@
 // SPDX-License-Identifier: GPL-2.0
 package org.opendives.core
 
+import android.Manifest
+import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothManager
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
+import android.provider.Settings
 import android.util.Base64
 import android.util.Log
+import android.view.WindowManager
+import androidx.activity.result.ActivityResult
 import com.getcapacitor.JSObject
+import com.getcapacitor.PermissionState
 import com.getcapacitor.Plugin
 import com.getcapacitor.PluginCall
 import com.getcapacitor.PluginMethod
+import com.getcapacitor.annotation.ActivityCallback
 import com.getcapacitor.annotation.CapacitorPlugin
+import com.getcapacitor.annotation.Permission
+import com.getcapacitor.annotation.PermissionCallback
 import java.io.File
 import java.security.KeyStore
 import java.security.cert.X509Certificate
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
-@CapacitorPlugin(name = "OpenDivesCore")
+/**
+ * Bluetooth permissions, asked when the diver opens the download (never at
+ * start): Android 12 and later, "Nearby devices" (scan, never used for
+ * location, and connect); before, the location, without which Android
+ * finds no Bluetooth Low Energy device.
+ */
+@CapacitorPlugin(
+    name = "OpenDivesCore",
+    permissions = [
+        Permission(strings = [Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT], alias = "bluetooth"),
+        Permission(strings = [Manifest.permission.ACCESS_FINE_LOCATION], alias = "bluetoothLocation"),
+    ],
+)
 class OpenDivesCorePlugin : Plugin() {
     private val coreThread: ExecutorService = Executors.newSingleThreadExecutor()
 
@@ -701,6 +727,191 @@ class OpenDivesCorePlugin : Plugin() {
         call.resolve(JSObject().put("json", json))
     }
 
+    // --- Download from a dive computer (Bluetooth) ------------------------------
+
+    private val bluetoothAdapter: BluetoothAdapter? by lazy {
+        (context.getSystemService(Context.BLUETOOTH_SERVICE) as? BluetoothManager)?.adapter
+    }
+
+    private val permissionAlias: String
+        get() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) "bluetooth" else "bluetoothLocation"
+
+    private var scan: BluetoothScan? = null
+    private var transport: BluetoothTransport? = null
+
+    private fun bluetoothStatusObject(): JSObject {
+        val adapter = bluetoothAdapter
+        val state = getPermissionState(permissionAlias)
+        return JSObject()
+            .put("bluetooth", if (adapter == null) "none" else if (adapter.isEnabled) "on" else "off")
+            .put("permission", when (state) {
+                PermissionState.GRANTED -> "granted"
+                PermissionState.DENIED -> "denied"
+                else -> "prompt"
+            })
+    }
+
+    /** {bluetooth: "none"|"off"|"on", permission: "granted"|"denied"|"prompt"}. */
+    @PluginMethod
+    fun bluetoothStatus(call: PluginCall) {
+        call.resolve(bluetoothStatusObject())
+    }
+
+    /** Asks for the Bluetooth permissions of this Android version; resolves with bluetoothStatus. */
+    @PluginMethod
+    fun requestBluetoothPermission(call: PluginCall) {
+        if (getPermissionState(permissionAlias) == PermissionState.GRANTED) {
+            call.resolve(bluetoothStatusObject())
+            return
+        }
+        requestPermissionForAlias(permissionAlias, call, "bluetoothPermissionResult")
+    }
+
+    @PermissionCallback
+    private fun bluetoothPermissionResult(call: PluginCall) {
+        val status = bluetoothStatusObject()
+        Log.i(TAG, "Bluetooth permission: ${status.optString("permission")}")
+        call.resolve(status)
+    }
+
+    /** The system dialog that turns Bluetooth on; resolves with bluetoothStatus. */
+    @PluginMethod
+    fun enableBluetooth(call: PluginCall) {
+        if (bluetoothAdapter == null || bluetoothAdapter?.isEnabled == true) {
+            call.resolve(bluetoothStatusObject())
+            return
+        }
+        startActivityForResult(call, Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), "enableBluetoothResult")
+    }
+
+    @ActivityCallback
+    private fun enableBluetoothResult(call: PluginCall, result: ActivityResult) {
+        call.resolve(bluetoothStatusObject())
+    }
+
+    /** This app's page of the system settings, where a refused permission can be given. */
+    @PluginMethod
+    fun openAppSettings(call: PluginCall) {
+        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", context.packageName, null))
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        context.startActivity(intent)
+        call.resolve()
+    }
+
+    /**
+     * Looks for dive computers for `durationMs` (default 60 s): each device
+     * found comes as a "bluetoothDevice" event, {mac, name, le, classic,
+     * bonded, rssi, computer (JSON: {vendor, product} or null)}; the end of
+     * the scan as "bluetoothScanStopped". Rejects with NO_BLUETOOTH,
+     * BLUETOOTH_OFF, PERMISSION.
+     */
+    @PluginMethod
+    fun startBluetoothScan(call: PluginCall) {
+        val adapter = bluetoothAdapter
+        if (adapter == null) return call.reject("NO_BLUETOOTH", "NO_BLUETOOTH")
+        if (getPermissionState(permissionAlias) != PermissionState.GRANTED) return call.reject("PERMISSION", "PERMISSION")
+        if (!adapter.isEnabled) return call.reject("BLUETOOTH_OFF", "BLUETOOTH_OFF")
+        val s = scan ?: BluetoothScan(
+            adapter,
+            onDevice = { notifyListeners("bluetoothDevice", it) },
+            onStopped = { notifyListeners("bluetoothScanStopped", JSObject()) },
+        ).also { scan = it }
+        try {
+            s.start(call.getLong("durationMs") ?: 60_000L)
+            call.resolve()
+        } catch (e: SecurityException) {
+            call.reject("PERMISSION", "PERMISSION", e)
+        }
+    }
+
+    @PluginMethod
+    fun stopBluetoothScan(call: PluginCall) {
+        scan?.stop()
+        call.resolve()
+    }
+
+    /** Models that download over Bluetooth (dc_bluetooth_models), for a device whose name says nothing. */
+    @PluginMethod
+    fun bluetoothModels(call: PluginCall) {
+        call.resolve(JSObject().put("json", NativeCore.dcBluetoothModels()))
+    }
+
+    /**
+     * Downloads the new dives of a dive computer and adds them to the logbook
+     * as one undoable step (download_dives in opendives.h): {vendor, product,
+     * address ("LE:" + MAC, or the MAC for Bluetooth Classic), name,
+     * forceDownload}. Progress comes as "downloadProgress" events ({json}).
+     * The screen stays on meanwhile. libdivecomputer's log is written to
+     * files/libdivecomputer.log; after a failure, its end goes to logcat.
+     */
+    @PluginMethod
+    fun downloadDives(call: PluginCall) {
+        val adapter = bluetoothAdapter
+        if (adapter == null) return call.reject("NO_BLUETOOTH", "NO_BLUETOOTH")
+        if (getPermissionState(permissionAlias) != PermissionState.GRANTED) return call.reject("PERMISSION", "PERMISSION")
+        if (!adapter.isEnabled) return call.reject("BLUETOOTH_OFF", "BLUETOOTH_OFF")
+        // As Subsurface (getBtDeviceInfo): the scan stops before connecting.
+        val s = scan
+        s?.stop()
+        val t = transport ?: BluetoothTransport(context, adapter) { mac -> scan?.device(mac) }.also { transport = it }
+        t.reset()
+        val request = JSObject()
+            .put("vendor", call.getString("vendor").orEmpty())
+            .put("product", call.getString("product").orEmpty())
+            .put("address", call.getString("address").orEmpty())
+            .put("name", call.getString("name").orEmpty())
+            .put("forceDownload", call.getBoolean("forceDownload", false) == true)
+        val logFile = File(context.filesDir, LIBDC_LOG)
+        request.put("logFile", logFile.absolutePath)
+        keepScreenOn(true)
+        coreThread.execute {
+            val start = System.currentTimeMillis()
+            try {
+                Log.i(TAG, "downloadDives: $request")
+                val json = NativeCore.downloadDives(request.toString(), t) { progress ->
+                    notifyListeners("downloadProgress", JSObject().put("json", progress))
+                }
+                Log.i(TAG, "downloadDives: done in ${System.currentTimeMillis() - start} ms: $json")
+                call.resolve(JSObject().put("json", json))
+            } catch (e: Exception) {
+                Log.e(TAG, "downloadDives failed after ${System.currentTimeMillis() - start} ms: ${e.message}")
+                logTail(logFile)
+                call.reject(e.message, "CORE_ERROR", e)
+            } finally {
+                keepScreenOn(false)
+            }
+        }
+    }
+
+    /** Stops the running download (off the core thread, which is busy with it). */
+    @PluginMethod
+    fun cancelDownload(call: PluginCall) {
+        Log.i(TAG, "cancelDownload")
+        NativeCore.downloadCancel()
+        transport?.cancel()
+        call.resolve()
+    }
+
+    private fun keepScreenOn(on: Boolean) {
+        val activity = activity ?: return
+        activity.runOnUiThread {
+            if (on) activity.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            else activity.window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        }
+    }
+
+    /** The end of libdivecomputer's log, to diagnose a failed download with `adb logcat -s OpenDives`. */
+    private fun logTail(file: File) {
+        if (!file.exists()) return
+        try {
+            val lines = file.readLines()
+            Log.i(TAG, "--- end of ${file.name} (${lines.size} lines) ---")
+            for (line in lines.takeLast(200)) Log.i(TAG, "libdc: $line")
+        } catch (e: Exception) {
+            Log.w(TAG, "Cannot read ${file.name}", e)
+        }
+    }
+
     private fun readSetting(fileName: String, key: String): String {
         val file = File(context.filesDir, fileName)
         if (!file.exists()) return ""
@@ -778,5 +989,6 @@ class OpenDivesCorePlugin : Plugin() {
         const val DEV_CREDENTIALS = "cloud-dev.env"
         const val TEST_ACCOUNT = "cloud-test.env"
         const val IMPORT_PREFIX = "import-"
+        const val LIBDC_LOG = "libdivecomputer.log"
     }
 }

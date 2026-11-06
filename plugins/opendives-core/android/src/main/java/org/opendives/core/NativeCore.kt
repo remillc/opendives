@@ -53,4 +53,21 @@ internal object NativeCore {
 
     /** The one call allowed off the core thread, even during a load (see opendives.h). */
     external fun cloudProbe(): String
+
+    /** Dive computer of a Bluetooth name ({vendor, product} or null, as JSON); any thread. */
+    external fun dcFromBluetoothName(name: String): String
+
+    /** Models that download over Bluetooth (JSON); any thread. */
+    external fun dcBluetoothModels(): String
+
+    /** Blocks for the whole download (download_dives in opendives.h); on the core thread. */
+    external fun downloadDives(request: String, transport: BluetoothTransport, listener: DownloadListener): String
+
+    /** Asks the running download to stop; from any thread. */
+    external fun downloadCancel()
+}
+
+/** Progress of a download, called on the core thread (see download_progress in opendives.h). */
+internal fun interface DownloadListener {
+    fun onProgress(json: String)
 }

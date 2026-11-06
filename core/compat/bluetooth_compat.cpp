@@ -1022,6 +1022,16 @@ static dc_status_t qt_ble_ioctl(void *io, unsigned int request, void *data, size
 	}
 }
 
+#ifdef __ANDROID__
+// --- core/serial_usb_android.cpp: USB serial cables, not supported -----------
+// Only reached when device_data_t.androidUsbDeviceDescriptor is set, which
+// OpenDives never does: downloads go over Bluetooth only.
+dc_status_t serial_usb_android_open(dc_iostream_t **, dc_context_t *, void *)
+{
+	return DC_STATUS_UNSUPPORTED;
+}
+#endif
+
 // --- core/qtserialbluetooth.cpp ----------------------------------------------
 
 struct qt_serial_t {

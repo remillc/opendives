@@ -18,6 +18,7 @@
   import { formatDateTime } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
   import { offerUndo } from '../lib/undo.js';
+  import { Capacitor } from '@capacitor/core';
 
   /** @typedef {import('opendives-core').Dive} Dive */
   /**
@@ -33,6 +34,9 @@
 
   /** @type {{ f7router: any }} */
   let { f7router } = $props();
+
+  /** Download from the dive computer: Android only for now (Bluetooth). */
+  const downloadRoute = Capacitor.getPlatform() === 'android' ? '/download/' : '/add/download/';
 
   let query = $state('');
   /** Expanded trips, by trip identifier of the current load. */
@@ -211,9 +215,12 @@
     { key: 'manual', icon: 'edit', text: t('logbook.addManual') },
   ];
 
-  /** Where each choice leads; download from the dive computer is not built yet. */
+  /**
+   * Where each choice leads. The download from the dive computer is built
+   * for Android only: elsewhere it still says it is not available.
+   */
   const routes = /** @type {Record<string, string>} */ ({
-    download: '/add/download/',
+    download: downloadRoute,
     manual: '/dive/new/',
     divelogs: '/welcome/import/',
   });
@@ -394,7 +401,7 @@
       </List>
     {:else}
       <div class="empty-buttons">
-        <a href="/add/download/" class="filled">
+        <a href={downloadRoute} class="filled">
           <Icon name="download" size={18} weight={2} />{t('logbook.emptyPair')}
         </a>
         <button type="button" class="od-outlined-button" onclick={() => choose('import')}>{t('logbook.addImport')}</button>

@@ -46,4 +46,7 @@ repositories {
 
 dependencies {
     implementation project(':capacitor-android')
+    // The plugin's activity (window flags, the system dialog that turns Bluetooth on).
+    implementation "androidx.appcompat:appcompat:${rootProject.ext.androidxAppCompatVersion}"
+    implementation "androidx.activity:activity:${rootProject.ext.androidxActivityVersion}"
 }

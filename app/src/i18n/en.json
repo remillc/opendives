@@ -1279,6 +1279,63 @@
       "text": "Bringing a divelogs.de logbook will come in a later version. Your divelogs.de credentials will never be stored."
     }
   },
+  "download": {
+    "title": "Download",
+    "cancel": "Cancel",
+    "close": "Close",
+    "intro": "Turn the dive computer on, put it in Bluetooth transfer mode and keep it near the phone.",
+    "pairingNote": "The first time, the phone may ask for the code shown by the dive computer.",
+    "remembered": "Remembered dive computers",
+    "nearby": "Nearby",
+    "seen": "In range",
+    "searching": "Looking for dive computers…",
+    "noneFound": "No dive computer found.",
+    "searchAgain": "Search again",
+    "vendorBluetooth": "{vendor}, Bluetooth",
+    "unknownModel": "Model to choose",
+    "chooseVendor": "Dive computer brand",
+    "chooseProduct": "{vendor} model",
+    "forceAll": "Download all dives again",
+    "forceAllText": "Only if dives are missing from the logbook.",
+    "computer": "Dive computer",
+    "connecting": "Connecting…",
+    "connected": "Connected",
+    "reading": "Reading the new dives",
+    "readingAll": "Reading all the dives",
+    "percent": "{n}%",
+    "progressLabel": "Download progress",
+    "keepNear": "Keep the screen on and the phone near the dive computer.",
+    "notAgain": "Dives already in the logbook are not downloaded again.",
+    "received": "Received so far",
+    "newDive": "New dive",
+    "done": {
+      "one": "{n} dive downloaded",
+      "other": "{n} dives downloaded"
+    },
+    "noneNew": "No new dive on the {computer}.",
+    "cancelled": "Download cancelled. No dive was added.",
+    "cannotAdd": "The dives could not be added to the logbook. No dive was changed.",
+    "none": {
+      "title": "No Bluetooth",
+      "text": "This device has no Bluetooth. Downloading from the dive computer is not possible here."
+    },
+    "permission": {
+      "title": "Allow Bluetooth",
+      "text": "To find the dive computer and connect to it, Android asks for the \"Nearby devices\" permission (location before Android 12). OpenDives uses it for nothing else.",
+      "button": "Allow"
+    },
+    "denied": {
+      "title": "Permission refused",
+      "text": "Without the Bluetooth permission, OpenDives cannot find the dive computer. You can give it in the Android settings, under Permissions.",
+      "button": "Open settings",
+      "again": "Ask again"
+    },
+    "off": {
+      "title": "Bluetooth is off",
+      "text": "Turn Bluetooth on to find the dive computer.",
+      "button": "Turn Bluetooth on"
+    }
+  },
   "downloadFailed": {
     "title": "Download",
     "close": "Close",
@@ -1286,6 +1343,11 @@
       "title": "{computer} not found",
       "titleNoName": "Dive computer not found",
       "text": "The phone did not find the dive computer."
+    },
+    "lost": {
+      "title": "Download from the {computer} interrupted",
+      "titleNoName": "Download interrupted",
+      "text": "The connection with the dive computer was lost before the end."
     },
     "nothingChanged": "No dive was changed.",
     "check": "To check",
