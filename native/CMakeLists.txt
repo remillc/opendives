@@ -26,6 +26,7 @@ list(APPEND SOURCES
   "${ROOT}/core/libopendives/settings.cpp"
   "${ROOT}/core/libopendives/plan.cpp"
   "${ROOT}/core/libopendives/filter.cpp"
+  "${ROOT}/core/libopendives/account.cpp"
   "${ROOT}/plugins/opendives-core/android/src/main/cpp/opendives_jni.cpp")
 
 file(WRITE "${CMAKE_BINARY_DIR}/gen/build-defs.h" "#define SUBSURFACE_SOURCE \"\"\n")

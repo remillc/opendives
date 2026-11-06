@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Reply of https://divelogs.de/xml_available_dives.php, written from the
+     format described in Subsurface's parseDiveLogsDeDiveList()
+     (desktop-widgets/subsurfacewebservices.cpp); not a captured reply. The
+     date without divelogsId is skipped, as Subsurface skips it. -->
+<DiveDateReader version="1.0">
+  <Login>succeeded</Login>
+  <DiveDates>
+    <date divelogsId="481516" lastModified="2024-05-02 18:22:10">01.05.2024 09:12</date>
+    <date divelogsId="2342" lastModified="2024-05-02 18:22:10">01.05.2024 14:40</date>
+    <date lastModified="2024-05-03 08:00:00">02.05.2024 10:05</date>
+    <date divelogsId="108" lastModified="2025-08-14 07:51:33">13.08.2025 16:30</date>
+  </DiveDates>
+</DiveDateReader>

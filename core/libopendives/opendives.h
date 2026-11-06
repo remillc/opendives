@@ -130,6 +130,74 @@ int cloud_sign_out(bool delete_copy, std::string &error);
 int cloud_delete_account(const std::string &password, const std::string &keep_dives_in, std::string &json,
 			 std::string &error);
 
+// --- New account and divelogs.de (account.cpp; spec, section 4, "First launch")
+//
+// Subsurface's checks of cloud credentials (core/cloudstorage.cpp,
+// isValidEmail and isValidPassword).
+bool cloud_valid_email(const std::string &email);
+bool cloud_valid_password(const std::string &password);
+
+// Creating an account WRITES to the Subsurface cloud: both functions are
+// under the cloud write lock (WRITE_LOCKED for any email but the test
+// account's, unless writes are enabled), and check the credentials first
+// (INVALID_CREDENTIALS, INVALID_PIN); no request is sent then. Port of
+// CloudStorageAuthenticate::backend(): POST "email password" to
+// cloud_base_url + "/storage" (an unknown email creates the account and the
+// server mails a PIN; a known one checks the password), or "email password
+// pin" to "/verify". The email is sent in lower case, as Subsurface-mobile
+// does. Writes {"status":"verified"|"need_pin"|"incorrect", "http":…,
+// "reply":<server reply>}, read as uploadFinished() reads it ("[VERIFIED]"
+// or "[OK]": verified; "[VERIFY]" or "Invalid PIN": need_pin; anything else:
+// incorrect). NETWORK when no reply came. Nothing is kept: the app
+// configures the account (cloud_configure) once it is verified.
+int cloud_create_account(const std::string &email, const std::string &password, std::string &json,
+			 std::string &error);
+int cloud_verify_pin(const std::string &email, const std::string &password, const std::string &pin,
+		     std::string &json, std::string &error);
+
+// First logbook of the account set by cloud_configure(), whose log branch
+// does not exist on the server yet (a new account). WRITES to the cloud: under
+// the write lock. Refused when the server cannot be reached (NETWORK), when the
+// branch exists (LOG_EXISTS) or when this device already has a copy of the
+// account's log (LOCAL_COPY_EXISTS). With `import_path` (a file the core reads,
+// e.g. the .dld downloaded from divelogs.de), the file is read first
+// (IMPORT_FAILED: nothing written). Then, as Subsurface does for a new
+// account (git-access.cpp, create_and_push_remote), the log is created with
+// an empty commit pushed to the server; the imported dives are added as
+// Subsurface-mobile imports a file (add_imported_dives, merge_all_trips),
+// saved and synced. Writes the object of cloud_list_dives plus
+// "imported":<dives read from the file>.
+int cloud_create_log(const std::string &import_path, std::string &json, std::string &error);
+
+// Read-only: reads the file `path` (as cloud_create_log will) into a
+// separate log and writes {"dives":n}; IMPORT_FAILED if it cannot be read.
+// The "read the dives" step of the import, before anything is written.
+int import_count(const std::string &path, std::string &json, std::string &error);
+
+// divelogs.de, as Subsurface's desktop "Download from divelogs.de": the form
+// body of the requests (user, pass and, for the archive, the dive ids), and
+// the reading of the list of dives (parseDiveLogsDeDiveList): `ids` comma-
+// separated, or `error` LOGIN_FAILED or INVALID_RESPONSE (with `details`).
+struct divelogs_list {
+	std::string error, details, ids;
+	int count = 0;
+};
+std::string divelogs_request_body(const std::string &user, const std::string &password, const std::string &ids);
+divelogs_list divelogs_parse_list(const std::string &xml);
+
+// Checks the divelogs.de credentials with the first request of the download
+// (the list of dives), before anything else: writes {"dives":n}. Same errors
+// as divelogs_download, LOGIN_FAILED when divelogs.de refuses them.
+int divelogs_check(const std::string &user, const std::string &password, std::string &json, std::string &error);
+
+// Downloads the divelogs.de logbook of `user` into `out_path` (a .dld zip
+// archive the core reads). The credentials are only sent to divelogs.de, over
+// HTTPS, never kept or logged. Writes {"dives":n, "bytes":…}; with no dive,
+// {"dives":0} and no file. Errors: INVALID_CREDENTIALS, NETWORK,
+// LOGIN_FAILED, INVALID_RESPONSE, INVALID_ARCHIVE, WRITE_FAILED.
+int divelogs_download(const std::string &user, const std::string &password, const std::string &out_path,
+		      std::string &json, std::string &error);
+
 // Read-only, network only: asks the server for the head of the log branch of
 // the account set by cloud_configure(). Writes {"exists":…, "head":…}.
 // The one façade function that may run on another thread than the core's,

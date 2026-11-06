@@ -714,6 +714,84 @@ int cloud_probe(std::string &json, std::string &error)
 	return 0;
 }
 
+int cloud_create_log(const std::string &import_path, std::string &json, std::string &error)
+{
+	const std::string url = configured_url;
+	if (url.empty() || prefs.cloud_storage_email.empty()) {
+		error = "NO_ACCOUNT";
+		return -1;
+	}
+	if (!internal::cloud_writes_allowed_for(prefs.cloud_storage_email)) {
+		error = "WRITE_LOCKED";
+		return -1;
+	}
+	struct git_info info;
+	if (!is_git_repository(url.c_str(), &info)) {
+		error = "Invalid dive log address";
+		return -1;
+	}
+	std::error_code ec;
+	if (std::filesystem::exists(info.localdir, ec)) {
+		error = "LOCAL_COPY_EXISTS";
+		return -1;
+	}
+	// Never create the branch unless the server says, now, that it is missing.
+	bool exists = false;
+	std::string head, probe_error;
+	if (cloud_branch_status(url, exists, head, probe_error)) {
+		error = "NETWORK: " + probe_error;
+		return -1;
+	}
+	if (exists) {
+		error = "LOG_EXISTS";
+		return -1;
+	}
+	// The file is read before anything is written.
+	struct divelog imported;
+	if (!import_path.empty() && parse_file(import_path.c_str(), &imported)) {
+		error = "IMPORT_FAILED";
+		return -1;
+	}
+	const size_t count = imported.dives.size();
+
+	// No local cache: the core clones, finds no branch and creates it with an
+	// empty commit pushed to the server (create_and_push_remote).
+	bool was_local_only = git_local_only;
+	git_local_only = false;
+	int ret = load(url, error);
+	git_local_only = was_local_only;
+	if (ret) {
+		loaded_cloud_url.clear();
+		error = "CREATE_FAILED: " + error;
+		return -1;
+	}
+	loaded_cloud_url = url;
+	apply_log_prefs();
+	divelog.process_loaded_dives();
+	bool synced = git_remote_sync_successful;
+	if (count > 0) {
+		// As QMLManager::importCacheRepo(): add the dives read, then save and sync.
+		divelog.add_imported_dives(imported, import_flags::merge_all_trips);
+		divelog.process_loaded_dives();
+		if (save_as(url, error)) {
+			error = "SAVE_FAILED: " + error;
+			return -1;
+		}
+		std::string status;
+		if (sync(status, error)) {
+			// Saved on this device: the next sync sends it.
+			synced = false;
+			error.clear();
+		} else {
+			synced = status.find("\"stopped\"") == std::string::npos && status.find("\"offline\"") == std::string::npos;
+		}
+	}
+	json = cloud_json(loaded_git_commit, synced, std::string(), true);
+	json.pop_back();
+	json += ",\"imported\":" + std::to_string(count) + '}';
+	return 0;
+}
+
 // A single attempt: a wrong password must not be retried.
 static int probe_credentials(git_credential **out, const char *, const char *, unsigned int, void *payload)
 {

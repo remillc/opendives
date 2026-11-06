@@ -434,16 +434,21 @@ int read_format_version()
 	return version;
 }
 
+bool account_writes_allowed(const std::string &email)
+{
+	if (cloud_writes_enabled)
+		return true;
+	std::string a = email, b = cloud_test_email;
+	std::transform(a.begin(), a.end(), a.begin(), [](unsigned char c) { return std::tolower(c); });
+	std::transform(b.begin(), b.end(), b.begin(), [](unsigned char c) { return std::tolower(c); });
+	return !b.empty() && a == b;
+}
+
 bool writes_allowed()
 {
 	if (!internal::current_log_is_cloud())
 		return true; // a local log cannot affect the cloud (plan, section 4)
-	if (cloud_writes_enabled)
-		return true;
-	std::string a = prefs.cloud_storage_email, b = cloud_test_email;
-	std::transform(a.begin(), a.end(), a.begin(), [](unsigned char c) { return std::tolower(c); });
-	std::transform(b.begin(), b.end(), b.begin(), [](unsigned char c) { return std::tolower(c); });
-	return !b.empty() && a == b;
+	return account_writes_allowed(prefs.cloud_storage_email);
 }
 
 bool is_git_log(const std::string &log)
@@ -597,6 +602,11 @@ std::string sync_json(const std::string &status, bool reloaded)
 // ---------------------------------------------------------------------------
 
 namespace internal {
+
+bool cloud_writes_allowed_for(const std::string &email)
+{
+	return account_writes_allowed(email);
+}
 
 int pending_for(const std::string &log)
 {

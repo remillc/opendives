@@ -18,6 +18,10 @@ const std::string &current_log();
 // True when the log in memory is the cloud log of the configured account.
 bool current_log_is_cloud();
 
+// Cloud write lock for the account `email` (edit.cpp), whatever log is in
+// memory: true when it is the test account or writes are enabled.
+bool cloud_writes_allowed_for(const std::string &email);
+
 // Called by load() after every successful load (edit.cpp): the dives are new
 // objects, so the undo stack is cleared; the format version is read again.
 void on_log_loaded();
