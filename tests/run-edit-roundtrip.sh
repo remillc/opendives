@@ -25,7 +25,7 @@
 
 ED=$1; RT=$2; W=$3; shift 3
 FIELDS="notes suit rating visibility wavesize current surge chill buddies diveguide tags"
-pass=0; fail=0; skip=0
+
 tree() { git -C "$1" rev-parse 'main^{tree}'; }
 tip() { git -C "$1" rev-parse main; }
 count() { git -C "$1" rev-list --count main; }
@@ -39,7 +39,9 @@ echo "not a dive log" > "$U0/README"
 git -C "$U0" add README
 git -C "$U0" -c user.name=test -c user.email=test@example.invalid commit -q -m "unrelated"
 
-for s in "$@"; do
+# One sample; prints its PASS, FAIL or SKIP line. The samples run in parallel.
+run_one() {
+  s=$1
   n=$(basename "$s"); d="$W/$n"; rm -rf "$d"; mkdir -p "$d"
   why=""
   newrepo "$d/A"; newrepo "$d/B"; newrepo "$d/B2"
@@ -52,10 +54,10 @@ for s in "$@"; do
   [ -z "$why" ] && { "$ED" baseline "$d/B[main]" "$d/B2[main]" >"$d/baseline2.out" 2>>"$d/log-baseline" || why="baseline 2"; }
   [ -z "$why" ] && [ "$(tree "$d/B")" != "$(tree "$d/B2")" ] && why="baseline not stable: $(echo $(git -C "$d/B2" diff --name-only "$(tree "$d/B")" 'main^{tree}'))"
   if [ "$why" = "no dive" ]; then
-    skip=$((skip+1)); printf 'SKIP %-42s no dive to edit\n' "$n"; continue
+    printf 'SKIP %-42s no dive to edit\n' "$n"; return
   fi
   if [ -n "$why" ]; then
-    fail=$((fail+1)); printf 'FAIL %-42s %s\n' "$n" "$why"; continue
+    printf 'FAIL %-42s %s\n' "$n" "$why"; return
   fi
   T0=$(tree "$d/B"); C0=$(count "$d/B")
 
@@ -118,12 +120,20 @@ for s in "$@"; do
   fi
 
   if [ "$why" = "no dive" ]; then
-    skip=$((skip+1)); printf 'SKIP %-42s no dive to edit\n' "$n"
+    printf 'SKIP %-42s no dive to edit\n' "$n"
   elif [ -z "$why" ]; then
-    pass=$((pass+1)); printf 'PASS %-42s %s dives\n' "$n" "$(value dives "$d/edit-notes.out")"
+    printf 'PASS %-42s %s dives\n' "$n" "$(value dives "$d/edit-notes.out")"
   else
-    fail=$((fail+1)); printf 'FAIL %-42s %s\n' "$n" "$why"
+    printf 'FAIL %-42s %s\n' "$n" "$why"
   fi
-done
+}
+
+# One sample per processor (JOBS to change it). Keep the work directory on a
+# Linux file system (under WSL, not /mnt/...): git is much slower there.
+export ED RT W FIELDS U0
+export -f run_one tree tip count newrepo value
+printf '%s\0' "$@" | xargs -0 -P "${JOBS:-$(nproc)}" -I{} bash -c 'run_one "$1"' _ {} > "$W/results"
+sort -k2 "$W/results"
+pass=$(grep -c '^PASS' "$W/results"); fail=$(grep -c '^FAIL' "$W/results"); skip=$(grep -c '^SKIP' "$W/results")
 echo "passed: $pass  failed: $fail  skipped: $skip"
-[ $fail = 0 ]
+[ "$fail" = 0 ]
