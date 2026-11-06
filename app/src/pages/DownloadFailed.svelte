@@ -3,8 +3,10 @@
   // Download failed (docs/mockups/android-etat-echec.dc.html,
   // ios-etat-echec.dc.html; spec, section 6, "Error"): what happened, what did
   // not change, what to check as a numbered list, then Retry. Never the raw
-  // text of a core error. Shown by the download from the dive computer, which
-  // is not built yet (Bluetooth): ?computer=<model name>&reason=notFound.
+  // text of a core error. Opened by the download (pages/Download.svelte), in
+  // its place: ?computer=<model name>&reason=notFound (the connection could
+  // not be opened) or lost (it was, then the download failed). Retry starts
+  // the same attempt again, "Choose another dive computer" opens the list.
   import { Page, Navbar, Link, theme } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
   import { t } from '../lib/i18n.js';
@@ -12,8 +14,13 @@
   /** @type {{ f7route: { query: { computer?: string, reason?: string } }, f7router: any }} */
   let { f7route, f7router } = $props();
   const computer = f7route.query?.computer ?? '';
-  const reason = 'notFound';
+  const reason = f7route.query?.reason === 'lost' ? 'lost' : 'notFound';
   const checks = ['on', 'near', 'otherApp'];
+
+  /** The download screen again, in this one's place: the same attempt (retry) or the list. @param {boolean} retry */
+  function again(retry) {
+    f7router.navigate('/download/', { reloadCurrent: true, props: { retry } });
+  }
 </script>
 
 <Page class="od-download-failed">
@@ -40,8 +47,8 @@
 
   {#snippet fixedContent()}
     <div class="actions">
-      <a href="/settings/" class="od-text-button">{t('downloadFailed.otherComputer')}</a>
-      <button type="button" class="retry" onclick={() => f7router.back()}>{t('downloadFailed.retry')}</button>
+      <button type="button" class="od-text-button" onclick={() => again(false)}>{t('downloadFailed.otherComputer')}</button>
+      <button type="button" class="retry" onclick={() => again(true)}>{t('downloadFailed.retry')}</button>
     </div>
   {/snippet}
 </Page>

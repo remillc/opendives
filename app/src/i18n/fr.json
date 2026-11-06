@@ -1293,6 +1293,63 @@
       "text": "La reprise d'un carnet divelogs.de viendra dans une prochaine version. Vos identifiants divelogs.de ne seront jamais enregistrés."
     }
   },
+  "download": {
+    "title": "Téléchargement",
+    "cancel": "Annuler",
+    "close": "Fermer",
+    "intro": "Allumez l'ordinateur de plongée, mettez-le en mode transfert Bluetooth et gardez-le près du téléphone.",
+    "pairingNote": "La première fois, le téléphone peut demander le code affiché par l'ordinateur.",
+    "remembered": "Ordinateurs mémorisés",
+    "nearby": "À proximité",
+    "seen": "Visible",
+    "searching": "Recherche des ordinateurs de plongée…",
+    "noneFound": "Aucun ordinateur de plongée trouvé.",
+    "searchAgain": "Rechercher à nouveau",
+    "vendorBluetooth": "{vendor}, Bluetooth",
+    "unknownModel": "Modèle à choisir",
+    "chooseVendor": "Marque de l'ordinateur",
+    "chooseProduct": "Modèle {vendor}",
+    "forceAll": "Tout retélécharger",
+    "forceAllText": "À utiliser seulement si des plongées manquent dans le carnet.",
+    "computer": "Ordinateur de plongée",
+    "connecting": "Connexion…",
+    "connected": "Connecté",
+    "reading": "Lecture des nouvelles plongées",
+    "readingAll": "Lecture de toutes les plongées",
+    "percent": "{n} %",
+    "progressLabel": "Progression du téléchargement",
+    "keepNear": "Gardez l'écran allumé et le téléphone près de l'ordinateur.",
+    "notAgain": "Les plongées déjà dans le carnet ne sont pas retéléchargées.",
+    "received": "Reçues jusqu'ici",
+    "newDive": "Nouvelle plongée",
+    "done": {
+      "one": "{n} plongée téléchargée",
+      "other": "{n} plongées téléchargées"
+    },
+    "noneNew": "Aucune nouvelle plongée sur {computer}.",
+    "cancelled": "Téléchargement annulé. Aucune plongée n'a été ajoutée.",
+    "cannotAdd": "Les plongées n'ont pas pu être ajoutées au carnet. Aucune plongée n'a été modifiée.",
+    "none": {
+      "title": "Pas de Bluetooth",
+      "text": "Cet appareil n'a pas de Bluetooth. Le téléchargement depuis l'ordinateur de plongée n'est pas possible ici."
+    },
+    "permission": {
+      "title": "Autoriser le Bluetooth",
+      "text": "Pour trouver l'ordinateur de plongée et s'y connecter, Android demande l'autorisation « Appareils à proximité » (la localisation avant Android 12). OpenDives ne s'en sert pour rien d'autre.",
+      "button": "Autoriser"
+    },
+    "denied": {
+      "title": "Autorisation refusée",
+      "text": "Sans l'autorisation Bluetooth, OpenDives ne peut pas trouver l'ordinateur de plongée. Vous pouvez la donner dans les réglages d'Android, rubrique Autorisations.",
+      "button": "Ouvrir les réglages",
+      "again": "Demander à nouveau"
+    },
+    "off": {
+      "title": "Bluetooth désactivé",
+      "text": "Activez le Bluetooth pour trouver l'ordinateur de plongée.",
+      "button": "Activer le Bluetooth"
+    }
+  },
   "downloadFailed": {
     "title": "Téléchargement",
     "close": "Fermer",
@@ -1300,6 +1357,11 @@
       "title": "{computer} introuvable",
       "titleNoName": "Ordinateur de plongée introuvable",
       "text": "Le téléphone n'a pas trouvé l'ordinateur."
+    },
+    "lost": {
+      "title": "Téléchargement interrompu avec {computer}",
+      "titleNoName": "Téléchargement interrompu",
+      "text": "La connexion avec l'ordinateur a été perdue avant la fin."
     },
     "nothingChanged": "Aucune plongée n'a été modifiée.",
     "check": "À vérifier",

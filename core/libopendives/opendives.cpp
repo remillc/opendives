@@ -2,6 +2,7 @@
 #include "opendives.h"
 #include "internal.h"
 
+#include "core/device.h"
 #include "core/dive.h"
 #include "core/divecomputer.h"
 #include "core/divelog.h"
@@ -78,6 +79,10 @@ static int load(const std::string &path, std::string &error)
 	loaded_git_commit.clear();
 	current_log_path.clear();
 	divelog.clear();
+	// The dive computers' fingerprints are global in the core, not in
+	// divelog: those of the log read before must not be saved into this one.
+	// The loader fills the table again from the log.
+	fingerprints.clear();
 	int ret = parse_file(path.c_str(), &divelog);
 	if (ret) {
 		error = "Cannot read " + path + " (" + std::to_string(ret) + ")";
@@ -185,6 +190,13 @@ static std::vector<int> profile_summary(const struct dive &d, size_t points = 40
 		out.push_back(samples.back().depth.mm);
 	}
 	return out;
+}
+
+std::string internal::profile_json(const struct dive &d)
+{
+	std::string json;
+	append_json_array(json, profile_summary(d));
+	return json;
 }
 
 static std::string site_name(const struct dive &d)
@@ -607,6 +619,7 @@ int cloud_sign_out(bool delete_copy, std::string &error)
 	}
 	// Close the log and forget the account.
 	divelog.clear();
+	fingerprints.clear();
 	loaded_git_commit.clear();
 	current_log_path.clear();
 	loaded_cloud_url.clear();

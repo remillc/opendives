@@ -40,6 +40,7 @@
   import AddUnavailable from './pages/AddUnavailable.svelte';
   import DownloadFailed from './pages/DownloadFailed.svelte';
   import NavRail from './components/NavRail.svelte';
+  import Download from './pages/Download.svelte';
   import NavMenu from './components/NavMenu.svelte';
   import Welcome from './components/Welcome.svelte';
   import { layout, ios, listWidth, splitBreakpoint } from './lib/layout.svelte.js';
@@ -70,6 +71,7 @@
       { path: '/filter/', component: Filter },
       { path: '/filter/:key/', component: FilterCriterion },
       { path: '/add/:what/', component: AddUnavailable },
+      { path: '/download/', component: Download },
       { path: '/download/failed/', component: DownloadFailed },
       { path: '/settings/', component: Settings },
       { path: '/settings/cylinders/', component: CylinderTypes },

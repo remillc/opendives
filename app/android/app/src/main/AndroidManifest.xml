@@ -42,4 +42,14 @@
          taps it (Capacitor's WebChromeClient requests it at that moment). -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <!-- Download from the dive computer (Bluetooth Low Energy and Classic),
+         asked when the diver opens the download. Android 12 and later:
+         "Nearby devices", the scan never used for location. Before: the
+         legacy permissions, and the location above, which the scan needs. -->
+    <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" android:usesPermissionFlags="neverForLocation" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <uses-feature android:name="android.hardware.bluetooth_le" android:required="false" />
+    <uses-feature android:name="android.hardware.bluetooth" android:required="false" />
 </manifest>

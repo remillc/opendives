@@ -471,6 +471,54 @@ int stats(const std::string &criteria_json, std::string &json, std::string &erro
 // identifier) and "location" is added. Gas keys are "o2/he" in per mille.
 int stats_values(const std::string &field, std::string &json, std::string &error);
 
+// --- Download from a dive computer (download.cpp; spec, "Download") ---------
+//
+// Over Bluetooth only, as Subsurface-mobile on Android: Bluetooth Low Energy
+// and Bluetooth Classic (RFCOMM). The platform provides the transport
+// (core/compat/bt_transport.h, set with opendives_compat::set_bt_transport);
+// Subsurface's own Bluetooth code, ported in core/compat/bluetooth_compat.cpp,
+// drives it through libdivecomputer's custom I/O.
+
+// The dive computer a Bluetooth device name stands for, as Subsurface's
+// btdiscovery.cpp (getDeviceType) tells: {"vendor", "product"} (a model of
+// libdivecomputer's list), or null when the name is not a known dive
+// computer. Reentrant: may run on any thread.
+std::string dc_from_bluetooth_name(const std::string &name);
+
+// The models that download over Bluetooth, for a device whose name says
+// nothing: [{"vendor", "products":[{"name", "ble", "classic"}]}] sorted as
+// Subsurface's vendor and product lists. Reentrant.
+std::string dc_bluetooth_models();
+
+// Progress of a download, called on the download's thread with a JSON
+// object: {"state":"connecting"|"connected", "fraction" (0 to 1, -1 when
+// unknown), "dives" (dives received), "newDives":[{"date", "maxDepthMm",
+// "durationSeconds", "profile"}] (received since the last call)}.
+using download_progress = void (*)(const std::string &json, void *userdata);
+
+// Downloads the new dives of a dive computer and adds them to the log as one
+// undoable step, saved and synced like an edit: Subsurface-mobile's
+// DownloadThread::run() then DiveImportedModel::recordDives(). Blocks until
+// the end. `request_json`: {"vendor", "product" (a model of
+// dc_bluetooth_models), "address" ("LE:" + MAC for Bluetooth Low Energy,
+// the MAC alone to try Classic first when the model has both, as
+// Subsurface), "name" (the device's Bluetooth name), "forceDownload" (all
+// dives, not only the new ones; default false), "logFile" (path of
+// libdivecomputer's log, optional)}. The computer is remembered (Settings,
+// dive computers) as Subsurface does after each attempt. Writes
+// {"downloaded":n, "vendor", "product" (as the computer told), "serial",
+// "firmware", "list":{…} (the dive list step, as import_dives; absent when
+// n is 0), "undo", "diveComputerList" (get_prefs')}. Errors: NO_LOG,
+// FORMAT_NEWER, BAD_REQUEST, UNKNOWN_COMPUTER, NO_TRANSPORT, CANCELLED,
+// NOT_FOUND (the connection could not be opened), FAILED (it was, then the
+// download failed), each followed by ": " and Subsurface's message.
+int download_dives(const std::string &request_json, download_progress progress, void *userdata, std::string &json,
+		   std::string &error);
+
+// Asks the download running on another thread to stop (Subsurface's
+// import_thread_cancelled); the platform also ends the transport's waits.
+void download_cancel();
+
 // Undo stack of the session; cleared by every load. The result is the dive
 // changed, as get_dive() gives it.
 int undo(std::string &result_json, std::string &error);

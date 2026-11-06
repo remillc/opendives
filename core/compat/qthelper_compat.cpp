@@ -221,16 +221,7 @@ enum mediatype_t get_metadata(const char *, struct metadata *data)
 	return MEDIATYPE_UNKNOWN;
 }
 
-// --- bluetoothaddress.cpp: transports are handled by the app layer -------
-bool isBluetoothLowEnergyAddress(const QString &address)
-{
-	return address.startsWith("LE:");
-}
-
-bool isBluetoothClassicAddress(const QString &address)
-{
-	return !address.startsWith("LE:") && address.contains(":");
-}
+// --- bluetoothaddress.cpp: ported in bluetooth_compat.cpp ----------------
 
 // --- import-suunto-json.cpp (Qt JSON): not part of the POC ---------------
 int suunto_json_import(const std::string &, const std::string &, struct divelog *)
