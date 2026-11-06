@@ -19,6 +19,10 @@
   import DivesWithoutSite from './pages/DivesWithoutSite.svelte';
   import SitesCleanup from './pages/SitesCleanup.svelte';
   import SitesUnplaced from './pages/SitesUnplaced.svelte';
+  import Statistics from './pages/Statistics.svelte';
+  import StatisticsYear from './pages/StatisticsYear.svelte';
+  import StatisticsResult from './pages/StatisticsResult.svelte';
+  import StatisticNew from './pages/StatisticNew.svelte';
   import Icon from './components/Icon.svelte';
   import AdaptiveLabel from './components/AdaptiveLabel.svelte';
   import NavMenu from './components/NavMenu.svelte';
@@ -60,11 +64,11 @@
       { path: '/site/new/', component: SiteEdit },
       { path: '/site/:uuid/', component: SiteSheet },
       { path: '/site/:uuid/edit/', component: SiteEdit },
-      {
-        path: '/statistics/',
-        component: Placeholder,
-        options: { props: { title: t('tabs.statistics'), text: t('placeholders.statisticsText') } },
-      },
+      { path: '/statistics/', component: Statistics },
+      { path: '/statistics/year/:year/', component: StatisticsYear },
+      { path: '/statistics/result/', component: StatisticsResult },
+      // Android: a full-screen dialog; iPhone: a sheet (the popup pushes the view back).
+      { path: '/statistics/new/', popup: { component: StatisticNew } },
       {
         path: '/tools/',
         component: Placeholder,

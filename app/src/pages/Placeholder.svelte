@@ -1,6 +1,6 @@
 <script>
   // @ts-check
-  // Sections not built yet: Sites, Statistics, Tools.
+  // Screens not built yet: Tools, the planner.
   import { Page, Navbar, Block } from 'framework7-svelte';
   import MenuButton from '../components/MenuButton.svelte';
 
