@@ -399,8 +399,15 @@ int filter_dives(const std::string &fulltext, const std::string &fulltext_mode, 
 // duration, fake_dc()), added by AddDive (autogroup, new number). Fields:
 // "date" ("YYYY-MM-DDTHH:MM", local time), "durationSeconds", "maxDepthMm",
 // "site" (uuid, 0 for none), "notes", "suit", "buddies", "guides", "tags"
-// (lists), "rating", "visibility" (0 to 5), "waterTempMk", "airTempMk".
+// (lists), "rating", "visibility" (0 to 5), "waterTempMk", "airTempMk", and
+// for the first cylinder "cylinderType" (a name of the cylinder types table,
+// which gives its size and working pressure), "startMbar", "endMbar",
+// "o2Permille", "hePermille".
 int create_dive(const std::string &fields_json, std::string &result_json, std::string &error);
+
+// Deletes a dive (DeleteDive, commands/command_divelist.cpp): its trip goes
+// too if it was the last one; undo puts both back.
+int delete_dive(int id, std::string &result_json, std::string &error);
 
 // Imports a file (.ssrf, .xml and the other formats the core reads) into the
 // log: parse_file(), then ImportDives with merge_all_trips, as
@@ -425,10 +432,12 @@ int filter_preset_delete(int index, std::string &json, std::string &error); // R
 // times, UTC), "items":[{"path", "diveId", "number", "date", "lines":[{"key",
 // "device", "cloud"}]}]}.
 int sync_conflicts(std::string &json, std::string &error);
-// Keeps one side ("device" or "cloud") for every conflicting file, in a new
-// commit on the merge, then reads the log again (no network); the app syncs
-// it like an edit. Cloud writes as save_local(): the test account only.
-int resolve_conflicts(const std::string &keep, std::string &error);
+// Keeps, for each conflicting file, the side chosen by the diver:
+// `choices_json` is {"<path>":"device"|"cloud", …}, every conflicting path
+// included. One new commit on the merge, then the log is read again (no
+// network); the app syncs it like an edit. Cloud writes as save_local(): the
+// test account only.
+int resolve_conflicts(const std::string &choices_json, std::string &error);
 
 // Undo stack of the session; cleared by every load. The result is the dive
 // changed, as get_dive() gives it.
@@ -453,12 +462,16 @@ int save_local(std::string &error);
 // the same check; for tests.
 int save_as(const std::string &destination, std::string &error);
 
-// Local save if needed, then for a cloud log the reload with sync of
-// Subsurface-mobile (fetch, merge, push), then the log's settings. Writes
-// {"status":…, "pending":n, "reloaded":true|false} with status "local" (log
-// without account), "up_to_date", "pushed", "pulled", "merged", "offline"
-// (saved locally, server unreachable) or "stopped" (sync failed; the local
-// commits wait). After a reload the dives are new: list them again with
+// Local save if needed, then for a cloud log (or a git log with a remote of
+// its own) Subsurface's exchange with the server (fetch, then fast-forward,
+// merge or push). When only this device's commits were sent, the log in
+// memory is kept, and so is the undo history (as desktop Subsurface after a
+// cloud save); when the cloud brought changes, the merged log is read again
+// with its settings (as Subsurface-mobile). Writes {"status":…, "pending":n,
+// "reloaded":true|false} with status "local" (log without account),
+// "up_to_date", "pushed", "pulled", "merged", "offline" (saved locally,
+// server unreachable) or "stopped" (sync failed; the local commits wait).
+// After a reload the dives are new: list them again with
 // list_loaded_dives(); the undo stack is cleared.
 int sync(std::string &status_json, std::string &error);
 

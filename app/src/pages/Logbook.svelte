@@ -17,6 +17,7 @@
   import { filter, loadOptions, applyFilter, isEmpty } from '../lib/filter.svelte.js';
   import { formatDateTime } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
+  import { offerUndo } from '../lib/undo.js';
 
   /** @typedef {import('opendives-core').Dive} Dive */
   /**
@@ -241,26 +242,7 @@
     importing = true;
     try {
       const n = await importFile(file);
-      f7.toast
-        .create({
-          text: t('logbook.imported', { n }),
-          closeButton: true,
-          closeButtonText: t('edit.undo'),
-          closeTimeout: 5000,
-          position: 'bottom',
-          on: {
-            closeButtonClick: async () => {
-              try {
-                await undoLastChange();
-                toast(t('edit.undone'));
-              } catch (e) {
-                console.error('Undo', e);
-                toast(t('edit.undoFailed'));
-              }
-            },
-          },
-        })
-        .open();
+      offerUndo(t('logbook.imported', { n }));
     } catch (e) {
       const code = String(/** @type {any} */ (e)?.message ?? '');
       console.error('Import a file', code);

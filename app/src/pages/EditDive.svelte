@@ -14,6 +14,7 @@
   import StarsInput from '../components/StarsInput.svelte';
   import { logbook, saveDiveChanges, undoLastChange } from '../lib/logbook.svelte.js';
   import { settings } from '../lib/settings.svelte.js';
+  import { offerUndo } from '../lib/undo.js';
   import {
     formatDateTime,
     formatDepth,
@@ -142,26 +143,7 @@
       await saveDiveChanges(dive.id, changes);
       f7router.back();
       // Undo, offered for a few seconds (Android snackbar).
-      f7.toast
-        .create({
-          text: t('edit.saved'),
-          closeButton: true,
-          closeButtonText: t('edit.undo'),
-          closeTimeout: 5000,
-          position: 'bottom',
-          on: {
-            closeButtonClick: async () => {
-              try {
-                await undoLastChange();
-                toast(t('edit.undone'));
-              } catch (e) {
-                console.error('Undo', e);
-                toast(t('edit.undoFailed'));
-              }
-            },
-          },
-        })
-        .open();
+      offerUndo(t('edit.saved'));
     } catch (e) {
       const code = String(/** @type {any} */ (e)?.message ?? '');
       console.error('Save dive', code);

@@ -29,10 +29,11 @@ internal object NativeCore {
     external fun siteQuery(kind: String, uuid: Long, lat: Int, lon: Int, a: Int, b: Int, text: String): String
     external fun filterQuery(kind: String, fulltext: String, mode: String, rules: Array<String>): String
     external fun createDive(fields: String): String
+    external fun deleteDive(id: Int): String
     external fun importDives(file: String, source: String): String
     external fun filterPresets(action: String, name: String, fulltext: String, mode: String, rules: Array<String>, index: Int): String
     external fun syncConflicts(): String
-    external fun resolveConflicts(keep: String)
+    external fun resolveConflicts(choices: String)
     external fun siteAction(action: String, uuid: Long, other: Long, uuids: LongArray?, field: String, value: String, lat: Int, lon: Int): String
     external fun setRegionsFile(path: String)
     external fun toolQuery(kind: String, o2: Int, he: Int, po2: Int, depth: Int): String

@@ -430,14 +430,16 @@ import { registerPlugin } from '@capacitor/core';
  *   dives matching every rule and the fulltext query (number[]).
  * @property {(options: {fields: Record<string, string|number|string[]>}) => Promise<EditResult>} createDive
  *   Logs a dive by hand, one undoable step (create_dive in opendives.h).
+ * @property {(options: {id: number}) => Promise<EditResult>} deleteDive
+ *   Deletes a dive, one undoable step (delete_dive).
  * @property {(options: {name: string, data: string}) => Promise<EditResult>} importDives
  *   Imports a file (base64 contents, original name), one undoable step (import_dives).
  * @property {(options: {action: 'list'} | {action: 'save', name: string, fulltext?: string, mode?: string, rules: FilterRule[]} | {action: 'delete', index: number}) => Promise<any>} filterPresets
  *   Filter presets: the list ({presetList}), or an undoable save or delete (EditResult).
  * @property {() => Promise<SyncConflicts>} syncConflicts
  *   Read-only: the conflicts left by the last automatic merge.
- * @property {(options: {keep: 'device'|'cloud'}) => Promise<void>} resolveConflicts
- *   Keeps one side of every conflict, then reads the log again (no network).
+ * @property {(options: {choices: Record<string, 'device'|'cloud'>}) => Promise<void>} resolveConflicts
+ *   Keeps the chosen side of each conflicting file (by path), then reads the log again (no network).
  * @property {(options: {action: 'create'|'edit'|'geocode'|'merge'|'delete'|'deleteSite', uuid?: number, other?: number, uuids?: number[], field?: string, value?: string, lat?: number, lon?: number}) => Promise<EditResult>} siteAction
  *   One undoable site change, as Subsurface's site commands.
  * @property {(options: {tripId: number}) => Promise<TripDetail>} getTrip
@@ -525,6 +527,9 @@ export const OpenDivesCore = {
   },
   async createDive(options) {
     return JSON.parse((await native.createDive(options)).json);
+  },
+  async deleteDive(options) {
+    return JSON.parse((await native.deleteDive(options)).json);
   },
   async importDives(options) {
     return JSON.parse((await native.importDives(options)).json);

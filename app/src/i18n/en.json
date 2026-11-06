@@ -215,7 +215,13 @@
       "one": "{n} photo",
       "other": "{n} photos"
     },
-    "photoNote": "On another device: only their reference is synced"
+    "photoNote": "On another device: only their reference is synced",
+    "delete": "Delete the dive",
+    "deleteTitle": "Delete the dive",
+    "deleteText": "The dive is removed from the logbook, on this device and in the cloud. You can undo it for a few seconds.",
+    "deleteAction": "Delete",
+    "deleted": "Dive deleted",
+    "deleteFailed": "The dive could not be deleted. No dive was changed."
   },
   "profile": {
     "hint": "Touch the profile to read time and depth.",
@@ -1331,16 +1337,19 @@
       "other": "dive record"
     },
     "textNoDate": "A dive was changed here and in the cloud (from another device): {field}. The two versions do not combine. Nothing is lost until you choose.",
-    "more": {
-      "one": "One other dive is in the same case.",
-      "other": "{n} other dives are in the same case."
-    },
     "deviceWhen": "Changed on {when}",
     "cloudWhen": "Sent from another device on {when}",
     "thisDevice": "This phone:",
     "theCloud": "Cloud:",
     "empty": "(empty)",
-    "failed": "The choice could not be saved. Nothing changed."
+    "failed": "The choice could not be saved. Nothing changed.",
+    "textMany": {
+      "one": "{n} dive was changed here and in the cloud (from another device), and the two versions do not combine. Nothing is lost until you choose.",
+      "other": "{n} dives were changed here and in the cloud (from another device), and the two versions do not combine. Nothing is lost until you choose."
+    },
+    "diveTitle": "No. {number}, {date}",
+    "unknownDive": "Dive without a date",
+    "forAll": "Apply this choice to all the dives"
   },
   "confirmCode": {
     "heading": "Confirm your address",
@@ -1389,9 +1398,6 @@
     "title": "Log a dive",
     "cancel": "Cancel",
     "save": "Save",
-    "dateTime": "Date and time",
-    "dateHint": "For example 2026-11-06 09:30",
-    "dateInvalid": "Date not recognised, for example 2026-11-06 09:30",
     "duration": "Duration (min)",
     "depth": "Maximum depth ({unit})",
     "required": "Value required",
@@ -1406,6 +1412,24 @@
     "rating": "Rating",
     "notes": "Notes",
     "saved": "Dive added",
-    "failed": "The dive could not be added. No dive was changed."
+    "failed": "The dive could not be added. No dive was changed.",
+    "date": "Date",
+    "time": "Time",
+    "day": "Day",
+    "month": "Month",
+    "year": "Year",
+    "hour": "Hour",
+    "minute": "Minute",
+    "water": "Water temperature ({unit})",
+    "invalid": "Value not recognised",
+    "cylinder": "Cylinder",
+    "cylinderType": "Cylinder type",
+    "defaultCylinder": "Default cylinder",
+    "startPressure": "Start pressure ({unit})",
+    "endPressure": "End pressure ({unit})",
+    "o2": "Oxygen (%)",
+    "he": "Helium (%)",
+    "gasHint": "Empty: air.",
+    "gasInvalid": "Mix not valid: oxygen from 5 to 100 %, helium up to 95 %, 100 % at most in all."
   }
 }

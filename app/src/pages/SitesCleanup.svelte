@@ -10,6 +10,7 @@
   import { dismissPair, pairKey, possibleDuplicates, siteChange } from '../lib/sites.svelte.js';
   import { t } from '../lib/i18n.js';
   import { confirmAction } from '../lib/dialogs.js';
+  import { offerUndo } from '../lib/undo.js';
 
   /** @type {{a: import('opendives-core').SiteSummary, b: import('opendives-core').SiteSummary, distanceM: number}[]} */
   let pairs = $state([]);
@@ -56,7 +57,7 @@
       onConfirm: async () => {
         try {
           await siteChange({ action: 'merge', uuid: keep.uuid, other: other.uuid });
-          offerUndo();
+          offerSiteUndo();
         } catch (e) {
           console.error('Merge sites', e);
           f7.toast.create({ text: t('edit.failed'), closeTimeout: 3000 }).open();
@@ -76,7 +77,7 @@
         try {
           await siteChange({ action: 'delete', uuids: selection });
           selected = {};
-          offerUndo();
+          offerSiteUndo();
         } catch (e) {
           console.error('Delete sites', e);
           f7.toast.create({ text: t('edit.failed'), closeTimeout: 3000 }).open();
@@ -85,17 +86,8 @@
     });
   }
 
-  async function offerUndo() {
-    const { undoLastChange } = await import('../lib/logbook.svelte.js');
-    f7.toast
-      .create({
-        text: t('sites.done'),
-        closeButton: true,
-        closeButtonText: t('edit.undo'),
-        closeTimeout: 5000,
-        on: { closeButtonClick: () => undoLastChange() },
-      })
-      .open();
+  function offerSiteUndo() {
+    offerUndo(t('sites.done'));
   }
 
   function selectAll() {

@@ -139,6 +139,18 @@ export async function refreshAfterChange(undoText) {
 }
 
 /**
+ * Deletes a dive (one undoable step), saved and synced like an edit.
+ * @param {number} id
+ */
+export async function deleteDive(id) {
+  const result = await OpenDivesCore.deleteDive({ id });
+  logbook.undoText = result.undo;
+  logbook.dives = await OpenDivesCore.listLoadedDives();
+  logbook.sitesVersion++;
+  await persistChanges();
+}
+
+/**
  * Logs a dive by hand (one undoable step), saved and synced like an edit.
  * @param {Record<string, string|number|string[]>} fields
  * @returns {Promise<number>} the new dive's identifier
@@ -189,14 +201,14 @@ async function readConflicts() {
 }
 
 /**
- * The diver's choice for a sync conflict: one side kept for every
- * conflicting dive, in a new commit, then synced like an edit.
- * @param {'device'|'cloud'} keep
+ * The diver's choices for a sync conflict, dive by dive (by file path of the
+ * git log): one new commit, then synced like an edit.
+ * @param {Record<string, 'device'|'cloud'>} choices
  */
-export async function resolveConflict(keep) {
-  await OpenDivesCore.resolveConflicts({ keep });
+export async function resolveConflict(choices) {
+  await OpenDivesCore.resolveConflicts({ choices });
   logbook.conflict = null;
-  logbook.undoText = '';
+  undoCleared();
   logbook.dives = await OpenDivesCore.listLoadedDives();
   await persistChanges();
 }
@@ -230,15 +242,22 @@ async function persistChanges() {
   if (logbook.email && logbook.autoSync) syncTimer = setTimeout(syncEdits, SYNC_DELAY_MS);
 }
 
+/** The core's undo history was emptied (a load): no "Undo" may be offered any more. */
+function undoCleared() {
+  logbook.undoText = '';
+  if (typeof window !== 'undefined') window.dispatchEvent(new Event('od-undo-cleared'));
+}
+
 /** Sends the saved edits (automatic synchronisation). */
 async function syncEdits() {
   logbook.sync = 'syncing';
   try {
     const status = await OpenDivesCore.syncChanges();
     if (status.reloaded) {
-      // The merged log was read again: its dives are new objects.
+      // The cloud brought changes: the merged log was read again, its dives
+      // are new objects and the undo history is gone (lib/undo.js).
       logbook.dives = await OpenDivesCore.listLoadedDives();
-      logbook.undoText = '';
+      undoCleared();
     }
     logbook.sync = status.status === 'offline' || status.status === 'stopped' ? 'offline' : 'cloud';
     if (logbook.sync === 'cloud') markSynced();
@@ -548,6 +567,7 @@ async function loadCloud(force) {
  *   with automatic synchronisation off ("Sync now")
  */
 export async function loadLogbook({ force = false } = {}) {
+  undoCleared();
   logbook.loading = true;
   logbook.error = null;
   try {

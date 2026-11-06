@@ -12,6 +12,7 @@
 //                                                       edit, then save into an unrelated repo
 //        edit-roundtrip divelist <repo[branch]> <file>  log a dive by hand, import <file>; each undone
 //        edit-roundtrip presets  <repo[branch]> -       filter presets created, edited, deleted, undone
+//        edit-roundtrip syncundo <git://…[branch]> -    edit, save, sync, undo, save, sync
 //        edit-roundtrip conflict <repo[branch]> device|cloud
 //                                                       a sync conflict on the notes, resolved
 // field: notes, suit, rating, visibility, buddies, diveguide, tags
@@ -400,7 +401,9 @@ int main(int argc, char **argv)
 			return true;
 		};
 		std::string fields = "{\"date\":\"2001-02-03T10:20\",\"durationSeconds\":2700,\"maxDepthMm\":18300,"
-				     "\"buddies\":[\"OpenDives test\"],\"rating\":3,\"notes\":\"logged by hand\"}";
+				     "\"buddies\":[\"OpenDives test\"],\"rating\":3,\"notes\":\"logged by hand\","
+				     "\"waterTempMk\":291150,\"cylinderType\":\"AL80\",\"startMbar\":200000,"
+				     "\"endMbar\":60000,\"o2Permille\":320,\"hePermille\":0}";
 		if (create_dive(fields, json, error)) {
 			printf("error=create: %s\n", error.c_str());
 			return 1;
@@ -411,11 +414,24 @@ int main(int argc, char **argv)
 				added = dv.get();
 		if (divelog.dives.size() != dives0 + 1 || !added || added->duration.seconds != 2700 ||
 		    added->maxdepth.mm != 18300 || added->dcs[0].samples.empty() || added->buddy != "OpenDives test" ||
-		    undo_text() != "add dive") {
+		    added->watertemp.mkelvin != 291150 || added->cylinders.empty() ||
+		    added->cylinders[0].type.description != "AL80" || added->cylinders[0].type.size.mliter <= 0 ||
+		    added->cylinders[0].start.mbar != 200000 || added->cylinders[0].end.mbar != 60000 ||
+		    added->cylinders[0].gasmix.o2.permille != 320 || undo_text() != "add dive") {
 			printf("error=create: unexpected dive\n");
 			return 1;
 		}
 		if (!undo_and_save("create"))
+			return 1;
+		// Delete the first dive (and its trip if it was the last one), then undo.
+		dive *first = first_dive();
+		size_t trips0 = divelog.trips.size();
+		if (delete_dive(first->id, json, error) || divelog.dives.size() != dives0 - 1 ||
+		    undo_text().rfind("delete 1 dive(s) [", 0) != 0) {
+			printf("error=delete: %s\n", error.c_str());
+			return 1;
+		}
+		if (!undo_and_save("delete") || divelog.trips.size() != trips0)
 			return 1;
 		if (import_dives(arg, "import-test", json, error)) {
 			if (error == "NO_NEW_DIVES") {
@@ -491,6 +507,33 @@ int main(int argc, char **argv)
 		return 0;
 	}
 
+	if (mode == "syncundo") {
+		// `repo` is a log with a remote ("git://…[main]"): edit, save, sync
+		// (the commit is only pushed: the log is not read again), then undo,
+		// save, sync. The undo history must survive the sync; the script then
+		// checks that the remote's tree is the original one.
+		std::string json, error, result, status;
+		dive *dv = first_dive();
+		std::string request, expected;
+		make_change(*dv, "notes", request, expected);
+		if (edit_dive(dv->id, request, result, error) || save_local(error) || sync(status, error)) {
+			printf("error=edit and sync: %s\n", error.c_str());
+			return 1;
+		}
+		printf("sync=%s\n", status.c_str());
+		if (status.find("\"reloaded\":false") == std::string::npos || status.find("pushed") == std::string::npos ||
+		    !can_undo()) {
+			printf("error=the sync read the log again or lost the undo history\n");
+			return 1;
+		}
+		if (undo(result, error) || save_local(error) || sync(status, error)) {
+			printf("error=undo after the sync: %s\n", error.c_str());
+			return 1;
+		}
+		printf("sync=%s\n", status.c_str());
+		return status.find("pushed") != std::string::npos ? 0 : 1;
+	}
+
 	if (mode == "conflict") {
 		// A dive whose notes changed on this device and in the "cloud" (another
 		// branch from the same commit), merged as Subsurface's sync does
@@ -561,7 +604,9 @@ int main(int argc, char **argv)
 			return 1;
 		}
 		printf("conflict=%s\n", json.c_str());
-		if (resolve_conflicts(arg, error)) {
+		size_t p0 = json.find("\"path\":\"") + 8;
+		std::string path_in_log = json.substr(p0, json.find('"', p0) - p0);
+		if (resolve_conflicts("{\"" + path_in_log + "\":\"" + arg + "\"}", error)) {
 			printf("error=resolve: %s\n", error.c_str());
 			return 1;
 		}

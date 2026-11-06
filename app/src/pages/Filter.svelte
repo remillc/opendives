@@ -17,6 +17,7 @@
   import TextField from '../components/TextField.svelte';
   import { logbook, undoLastChange } from '../lib/logbook.svelte.js';
   import { confirmAction } from '../lib/dialogs.js';
+  import { offerUndo } from '../lib/undo.js';
   import {
     filter,
     groups,
@@ -119,25 +120,7 @@
 
   /** @param {string} text */
   function undoToast(text) {
-    f7.toast
-      .create({
-        text,
-        closeButton: true,
-        closeButtonText: t('edit.undo'),
-        closeTimeout: 5000,
-        position: 'bottom',
-        on: {
-          closeButtonClick: async () => {
-            try {
-              await undoLastChange();
-              await loadPresets();
-            } catch (e) {
-              console.error('Undo', e);
-            }
-          },
-        },
-      })
-      .open();
+    offerUndo(text, () => loadPresets());
   }
 
   async function confirmSave() {

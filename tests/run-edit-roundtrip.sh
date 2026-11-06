@@ -24,7 +24,9 @@
 #      by default TestDiveDivelogsDE.xml next to the first sample), each
 #      undone; filter presets created, edited, deleted, undone: the tree is
 #      the original one again. A sync conflict on the notes, after a merge
-#      made as Subsurface's, resolved keeping each side in turn.
+#      made as Subsurface's, resolved keeping each side in turn. On
+#      SampleDivesV2: an edit synced to a remote (git daemon) then undone
+#      and synced: the undo history survives the sync.
 #
 # usage: run-edit-roundtrip.sh <edit-roundtrip> <roundtrip> <workdir> <sample>...
 
@@ -136,6 +138,18 @@ run_one() {
     fi
   fi
 
+  if [ -z "$why" ] && [ "$n" = SampleDivesV2.ssrf ]; then
+    # Undo after a sync: the log has a remote (a bare copy of B served by
+    # git daemon); edit, save, sync, undo, save, sync: the remote's tree is
+    # the original one, and the sync never read the log again.
+    rm -rf "$d/remote.git" "$d/home"; git clone -q --bare "$d/B" "$d/remote.git"; mkdir -p "$d/home"
+    E="$d/syncundo"
+    HOME="$d/home" "$ED" syncundo "git://127.0.0.1:$PORT/$n/remote.git[main]" - >"$E.out" 2>"$E.err" ||
+      why="syncundo: $(value error "$E.out")"
+    [ -z "$why" ] && [ "$(git -C "$d/remote.git" rev-parse 'main^{tree}')" != "$T0" ] && why="syncundo: remote tree differs"
+    [ -z "$why" ] && [ "$(git -C "$d/remote.git" rev-list --count main)" != $((C0+2)) ] && why="syncundo: $(($(git -C "$d/remote.git" rev-list --count main)-C0)) commits pushed"
+  fi
+
   for k in device cloud; do
     [ -n "$why" ] && break
     # A sync conflict on the notes of the first dive, resolved by keeping one side.
@@ -163,7 +177,13 @@ run_one() {
 
 # One sample per processor (JOBS to change it). Keep the work directory on a
 # Linux file system (under WSL, not /mnt/...): git is much slower there.
-export ED RT W FIELDS U0 IMPORT
+# A git daemon serves the work directory, for the undo-after-sync check.
+PORT=${PORT:-19418}
+git daemon --export-all --enable=receive-pack --base-path="$W" --listen=127.0.0.1 --port=$PORT --reuseaddr \
+  --pid-file="$W/daemon.pid" --detach "$W"
+trap 'kill $(cat "$W/daemon.pid") 2>/dev/null' EXIT
+
+export ED RT W FIELDS U0 IMPORT PORT
 export -f run_one tree tip count newrepo value
 printf '%s\0' "$@" | xargs -0 -P "${JOBS:-$(nproc)}" -I{} bash -c 'run_one "$1"' _ {} > "$W/results"
 sort -k2 "$W/results"
