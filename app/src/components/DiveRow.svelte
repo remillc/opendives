@@ -8,10 +8,16 @@
 
   /**
    * `inTrip`: the row belongs to an expanded trip and is shifted to the right.
-   * `highlight`: the latest dive, shown as a block (dark in the "black blocks" theme).
-   * @type {{ dive: import('opendives-core').Dive, prefs: import('opendives-core').Prefs, inTrip?: boolean, highlight?: boolean }}
+   * `index` and `top`: position in the logbook's virtual list.
+   * @type {{
+   *   dive: import('opendives-core').Dive,
+   *   prefs: import('opendives-core').Prefs,
+   *   inTrip?: boolean,
+   *   index?: number,
+   *   top?: number,
+   * }}
    */
-  let { dive, prefs, inTrip = false, highlight = false } = $props();
+  let { dive, prefs, inTrip = false, index = undefined, top = undefined } = $props();
 
   // Name read by TalkBack and VoiceOver: site, date, then the values.
   // A zero depth means "unknown" in the core: it is not read.
@@ -25,7 +31,7 @@
   );
 </script>
 
-<li class:in-trip={inTrip} class:od-block={highlight}>
+<li class:in-trip={inTrip} data-virtual-list-index={index} style:top={top === undefined ? undefined : `${top}px`}>
   <a href="/dive/{dive.id}/" class="item-link item-content dive-row" aria-label={label}>
     <div class="item-media">
       <ProfileThumbnail profile={dive.profile} maxDepthMm={dive.maxDepthMm} {prefs} />

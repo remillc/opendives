@@ -50,11 +50,22 @@ int set_ca_file(const std::string &path);
 // Read-only: checks that the log branch exists on the server, then loads
 // the log through the core (clone, or update of the local cache under
 // $HOME/.subsurface). Writes an object into `json`:
-//   {"server":…, "head":…, "synced":true|false, "offlineReason":…, "dives":[…]}
+//   {"server":…, "head":…, "synced":true|false, "offlineReason":…,
+//    "unchanged":true|false, "dives":[…]}
+// When the server's head is the commit already loaded from this log (by an
+// earlier call or by cloud_list_cached_dives), nothing is loaded again:
+// "unchanged" is true and "dives" is absent; the loaded log and its dive
+// identifiers stay valid. Like Subsurface's remote_repo_uptodate().
 // Server unreachable: reads the local copy without syncing (synced=false,
 // offlineReason set), or fails if there is none.
 // Refuses to load if the branch is missing: the core would create it by pushing.
 int cloud_list_dives(const std::string &email, const std::string &password, std::string &json, std::string &error);
+
+// Read-only, no network: loads the local cache of the cloud log, as left by
+// the last sync, so that the logbook can be shown at once. Same object as
+// cloud_list_dives, with "synced":false and "head" the commit read.
+// Returns 1, with `json` empty, when there is no local cache yet.
+int cloud_list_cached_dives(const std::string &email, const std::string &password, std::string &json, std::string &error);
 
 // Read-only: asks the server for its list of branches, with libgit2's normal
 // TLS validation, and tells whether the log branch exists.

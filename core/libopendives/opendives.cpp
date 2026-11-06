@@ -62,8 +62,13 @@ static std::string repo_path(const std::string &repo)
 	return repo.substr(0, repo.find('['));
 }
 
+// Address of the cloud log currently in `divelog`; empty for any other log.
+static std::string loaded_cloud_url;
+
 static int load(const std::string &path, std::string &error)
 {
+	// Set by the core's git loader; cleared here for files and failed loads.
+	loaded_git_commit.clear();
 	divelog.clear();
 	int ret = parse_file(path.c_str(), &divelog);
 	if (ret) {
@@ -404,6 +409,7 @@ int get_prefs(std::string &json)
 
 int list_dives(const std::string &log, std::string &json, std::string &error)
 {
+	loaded_cloud_url.clear();
 	if (load(log, error))
 		return -1;
 	apply_log_prefs();
@@ -416,6 +422,61 @@ int set_ca_file(const std::string &path)
 {
 	opendives_https_set_ca_file(path);
 	return git_libgit2_opts(GIT_OPT_SET_SSL_CERT_LOCATIONS, path.c_str(), nullptr) < 0 ? -1 : 0;
+}
+
+static std::string cloud_host()
+{
+	size_t host_start = prefs.cloud_base_url.find("://");
+	host_start = host_start == std::string::npos ? 0 : host_start + 3;
+	std::string host = prefs.cloud_base_url.substr(host_start);
+	if (!host.empty() && host.back() == '/')
+		host.pop_back();
+	return host;
+}
+
+// The object returned by the cloud functions; `dives` false for "unchanged".
+static std::string cloud_json(const std::string &head, bool synced, const std::string &offline_reason, bool dives)
+{
+	std::string json = "{\"server\":";
+	append_json_string(json, cloud_host());
+	json += ",\"head\":";
+	append_json_string(json, head);
+	json += ",\"synced\":";
+	json += synced ? "true" : "false";
+	json += ",\"offlineReason\":";
+	append_json_string(json, offline_reason);
+	json += ",\"unchanged\":";
+	json += dives ? "false" : "true";
+	if (dives)
+		json += ",\"dives\":" + dives_json();
+	json += '}';
+	return json;
+}
+
+int cloud_list_cached_dives(const std::string &email, const std::string &password, std::string &json, std::string &error)
+{
+	std::string url;
+	json.clear();
+	if (cloud_configure(email, password, url)) {
+		error = "Incomplete cloud credentials";
+		return -1;
+	}
+	struct git_info info;
+	if (!is_git_repository(url.c_str(), &info) || !log_exists(info.localdir))
+		return 1;
+	bool was_local_only = git_local_only;
+	git_local_only = true;
+	int ret = load(url, error);
+	git_local_only = was_local_only;
+	if (ret) {
+		loaded_cloud_url.clear();
+		return -1;
+	}
+	loaded_cloud_url = url;
+	apply_log_prefs();
+	divelog.process_loaded_dives();
+	json = cloud_json(loaded_git_commit, false, std::string(), true);
+	return 0;
 }
 
 int cloud_list_dives(const std::string &email, const std::string &password, std::string &json, std::string &error)
@@ -441,31 +502,24 @@ int cloud_list_dives(const std::string &email, const std::string &password, std:
 		// The core would create the branch by pushing an empty commit: stop here.
 		error = "No dive log on the server for this account";
 		return -1;
+	} else if (loaded_cloud_url == url && !loaded_git_commit.empty() && loaded_git_commit == head) {
+		// What is loaded is the server's head: nothing to fetch or read again.
+		json = cloud_json(head, true, std::string(), false);
+		return 0;
 	}
 	bool was_local_only = git_local_only;
 	if (offline)
 		git_local_only = true;
 	int ret = load(url, error);
 	git_local_only = was_local_only;
-	if (ret)
+	if (ret) {
+		loaded_cloud_url.clear();
 		return -1;
+	}
+	loaded_cloud_url = url;
 	apply_log_prefs();
 	divelog.process_loaded_dives();
-
-	size_t host_start = prefs.cloud_base_url.find("://");
-	host_start = host_start == std::string::npos ? 0 : host_start + 3;
-	std::string host = prefs.cloud_base_url.substr(host_start);
-	if (!host.empty() && host.back() == '/')
-		host.pop_back();
-	json = "{\"server\":";
-	append_json_string(json, host);
-	json += ",\"head\":";
-	append_json_string(json, head);
-	json += ",\"synced\":";
-	json += !offline && git_remote_sync_successful ? "true" : "false";
-	json += ",\"offlineReason\":";
-	append_json_string(json, offline ? probe_error : std::string());
-	json += ",\"dives\":" + dives_json() + "}";
+	json = cloud_json(head, !offline && git_remote_sync_successful, offline ? probe_error : std::string(), true);
 	return 0;
 }
 

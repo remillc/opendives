@@ -66,6 +66,18 @@ Java_org_opendives_core_NativeCore_cloudListDives(JNIEnv *env, jobject, jstring 
 	return env->NewStringUTF(json.c_str());
 }
 
+// Empty string: no local cache yet.
+JNIEXPORT jstring JNICALL
+Java_org_opendives_core_NativeCore_cloudListCachedDives(JNIEnv *env, jobject, jstring email, jstring password)
+{
+	std::string json, error;
+	if (opendives::cloud_list_cached_dives(to_string(env, email), to_string(env, password), json, error) < 0) {
+		throw_core_error(env, error);
+		return nullptr;
+	}
+	return env->NewStringUTF(json.c_str());
+}
+
 JNIEXPORT jstring JNICALL
 Java_org_opendives_core_NativeCore_getDive(JNIEnv *env, jobject, jint id)
 {

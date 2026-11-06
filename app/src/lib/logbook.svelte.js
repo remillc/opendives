@@ -7,10 +7,11 @@ import { defaultPrefs } from './format.js';
 /** @typedef {import('opendives-core').Prefs} Prefs */
 
 /**
+ * - syncing: the device's copy is shown, the sync with the cloud is running;
  * - cloud: read and synced with the Subsurface cloud;
  * - offline: the device's copy, the server did not answer;
  * - local: logbook on this device only (no account).
- * @typedef {'cloud'|'offline'|'local'} SyncState
+ * @typedef {'syncing'|'cloud'|'offline'|'local'} SyncState
  */
 
 export const logbook = $state({
@@ -25,15 +26,48 @@ export const logbook = $state({
   error: null,
 });
 
+/**
+ * Cloud log: the device's copy first, shown at once without network, then
+ * the sync. When the server has nothing new, the copy shown stays as is.
+ * @returns {Promise<boolean>} false when no cloud account is configured
+ */
+async function loadCloud() {
+  let shown = false;
+  try {
+    const cached = await OpenDivesCore.listCloudDives({ cached: true });
+    if (!cached.available) return false;
+    if (cached.dives) {
+      logbook.dives = cached.dives;
+      logbook.prefs = await OpenDivesCore.getPrefs();
+      logbook.sync = 'syncing';
+      logbook.loading = false;
+      shown = true;
+    }
+  } catch (e) {
+    // An unreadable copy is not fatal: the sync below reads the log again.
+    console.error('Reading the device copy of the cloud log', e);
+  }
+  try {
+    const fresh = await OpenDivesCore.listCloudDives();
+    if (fresh.dives) {
+      logbook.dives = fresh.dives;
+      logbook.prefs = await OpenDivesCore.getPrefs();
+    }
+    logbook.sync = fresh.synced ? 'cloud' : 'offline';
+  } catch (e) {
+    if (!shown) throw e;
+    // The copy shown stays usable: the logbook is only out of date.
+    console.error('Syncing with the cloud', e);
+    logbook.sync = 'offline';
+  }
+  return true;
+}
+
 export async function loadLogbook() {
   logbook.loading = true;
   logbook.error = null;
   try {
-    const cloud = await OpenDivesCore.listCloudDives();
-    if (cloud.available && cloud.dives) {
-      logbook.dives = cloud.dives;
-      logbook.sync = cloud.synced ? 'cloud' : 'offline';
-    } else {
+    if (!(await loadCloud())) {
       let local = await OpenDivesCore.listDives();
       if (!local.exists) {
         await OpenDivesCore.importSample();
@@ -41,8 +75,8 @@ export async function loadLogbook() {
       }
       logbook.dives = local.dives;
       logbook.sync = 'local';
+      logbook.prefs = await OpenDivesCore.getPrefs();
     }
-    logbook.prefs = await OpenDivesCore.getPrefs();
   } catch (e) {
     // Never the raw core text on screen (spec, section 6): it goes to the log.
     console.error('Loading the logbook', e);

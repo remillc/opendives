@@ -44,6 +44,8 @@
     --od-tint: var(--od-surface-2);
     --od-on-tint: var(--od-text);
     --od-thumbnail-background: var(--od-surface);
+    /* Android side menu (MD3 surface-container-low); iOS uses --od-surface. */
+    --od-drawer: #F0F0EE;
   }
 
   /* Dark mode: system surfaces from Framework7, bright water with an outlined line. */
@@ -66,6 +68,7 @@
     --od-on-tint: var(--f7-md-on-surface);
     --od-oxygen: #7FD283;
     --od-thumbnail-background: var(--f7-md-surface-variant);
+    --od-drawer: var(--f7-md-surface-1);
   }
 }
 
@@ -134,6 +137,15 @@ html.ios {
     color: var(--od-on-block);
   }
 
+  /* Scrim under the side menu. */
+  .md {
+    --f7-panel-backdrop-bg-color: rgb(0 0 0 / 0.32);
+  }
+
+  .ios {
+    --f7-panel-backdrop-bg-color: rgb(0 0 0 / 0.25);
+  }
+
   /* Bottom bar labels: 12 px minimum (spec, section 3); the WebView scales them with the system text size. */
   .toolbar {
     --f7-tabbar-label-font-size: 12px;
@@ -150,6 +162,14 @@ html.ios {
   .md .od-fab-add {
     --f7-fab-bg-color: var(--f7-md-secondary-container);
     --f7-fab-text-color: var(--f7-md-on-secondary-container);
+    --f7-fab-label-bg-color: var(--od-surface);
+    --f7-fab-label-text-color: var(--od-text);
+    --f7-fab-label-padding: 8px 14px;
+
+    /* The label is part of the choice: a tap on it counts. */
+    .fab-label {
+      pointer-events: auto;
+    }
   }
 
   /*

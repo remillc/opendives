@@ -15,4 +15,5 @@ internal object NativeCore {
     external fun getPrefs(): String
     external fun setCaFile(path: String)
     external fun cloudListDives(email: String, password: String): String
+    external fun cloudListCachedDives(email: String, password: String): String
 }

@@ -5,12 +5,19 @@
   import Icon from './Icon.svelte';
   import { t } from '../lib/i18n.js';
 
-  /** @type {{ sync: import('../lib/logbook.svelte.js').SyncState }} */
-  let { sync } = $props();
+  /**
+   * @type {{
+   *   sync: import('../lib/logbook.svelte.js').SyncState,
+   *   live?: boolean,
+   * }}
+   * `live`: announced when it changes; false for the copy in the side menu.
+   */
+  let { sync, live = true } = $props();
 
   // No change is possible yet: nothing is waiting to be sent.
-  /** @type {Record<string, {icon: 'check'|'offline'|'device', text: string, pending: boolean}>} */
+  /** @type {Record<string, {icon: 'check'|'offline'|'device'|'sync', text: string, pending: boolean}>} */
   const states = {
+    syncing: { icon: 'sync', text: t('sync.syncing'), pending: false },
     cloud: { icon: 'check', text: t('sync.cloud'), pending: false },
     offline: { icon: 'offline', text: t('sync.offline'), pending: true },
     local: { icon: 'device', text: t('sync.local'), pending: false },
@@ -18,7 +25,7 @@
   const state = $derived(states[sync]);
 </script>
 
-<div class="sync-status" class:pending={state.pending} role="status">
+<div class="sync-status" class:pending={state.pending} role={live ? 'status' : undefined}>
   <Icon name={state.icon} size={18} />
   <span>{state.text}</span>
 </div>

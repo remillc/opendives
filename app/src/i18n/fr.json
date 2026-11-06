@@ -30,9 +30,18 @@
     "retry": "Réessayer",
     "emptyTitle": "Aucune plongée pour l'instant",
     "emptyText": "Ajoutez vos plongées depuis votre ordinateur de plongée, un fichier, ou à la main.",
-    "noResults": "Aucune plongée ne correspond à « {query} »."
+    "noResults": "Aucune plongée ne correspond à « {query} ».",
+    "count": {
+      "one": "{n} plongée",
+      "other": "{n} plongées"
+    },
+    "countFiltered": {
+      "one": "{n} plongée sur {total}",
+      "other": "{n} plongées sur {total}"
+    }
   },
   "sync": {
+    "syncing": "Synchronisation avec le cloud Subsurface…",
     "cloud": "Synchronisé avec le cloud Subsurface",
     "offline": "Hors ligne : aucune modification en attente",
     "local": "Carnet enregistré sur cet appareil seulement"
@@ -147,5 +156,10 @@
     "oxygen": "Oxygène",
     "nitrox": "Nitrox {o2}",
     "trimix": "Trimix {o2}/{he}"
+  },
+  "menu": {
+    "open": "Menu",
+    "title": "OpenDives",
+    "sections": "Sections"
   }
 }

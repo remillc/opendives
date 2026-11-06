@@ -7,7 +7,7 @@
 
   /**
    * @type {{
-   *   name: 'logbook'|'sites'|'statistics'|'tools'|'plus'|'check'|'offline'|'device'|'expand'|'settings'|'edit'|'more'|'moreCircle'|'plan',
+   *   name: 'logbook'|'sites'|'statistics'|'tools'|'plus'|'check'|'offline'|'device'|'expand'|'settings'|'edit'|'more'|'moreCircle'|'plan'|'menu'|'sync'|'close'|'download'|'file',
    *   size?: number,
    *   weight?: number,
    * }}
@@ -21,6 +21,11 @@
     statistics: 'M4 20h16M6.5 20v-6M11 20V8M15.5 20v-9M20 20V4',
     tools: 'M14.5 6.5a4 4 0 0 0 5 5L12 19a2.1 2.1 0 0 1-3-3l7.5-7.5a4 4 0 0 0-5-5l2.5 2.5-1 2-2 1z',
     plus: 'M12 5v14M5 12h14',
+    menu: 'M4 7h16M4 12h16M4 17h16',
+    close: 'M6 6l12 12M18 6L6 18',
+    download: 'M12 4v11M7.5 10.5L12 15l4.5-4.5M5 19.5h14',
+    file: 'M7 3h7l5 5v13H7zM14 3v5h5',
+    sync: 'M19.5 12a7.5 7.5 0 0 1-13.4 4.6M4.5 12a7.5 7.5 0 0 1 13.4-4.6M18.5 3.5v4h-4M5.5 20.5v-4h4',
     check: 'M5 12.5l4.5 4.5L19 7.5',
     offline: 'M7 18h10a4 4 0 0 0 .6-8A6 6 0 0 0 6.5 9 4.5 4.5 0 0 0 7 18zM4 4l16 16',
     device: 'M8 3h8a1.5 1.5 0 0 1 1.5 1.5v15A1.5 1.5 0 0 1 16 21H8a1.5 1.5 0 0 1-1.5-1.5v-15A1.5 1.5 0 0 1 8 3zM11 18h2',

@@ -7,7 +7,17 @@ import { f7 } from 'framework7-svelte';
 
 export function enableBackButton() {
   CapacitorApp.addListener('backButton', () => {
-    // 1. An open sheet or dialog closes.
+    // 1. The side menu closes.
+    if (document.querySelector('.panel.panel-in')) {
+      f7.panel.close();
+      return;
+    }
+    // 2. The choices of the "+" button close.
+    if (document.querySelector('.fab-opened')) {
+      f7.fab.close();
+      return;
+    }
+    // 3. An open sheet or dialog closes.
     const modal = document.querySelector('.modal-in');
     if (modal) {
       if (modal.classList.contains('actions-modal')) f7.actions.close();
@@ -17,24 +27,24 @@ export function enableBackButton() {
       else if (modal.classList.contains('popover')) f7.popover.close();
       return;
     }
-    // 2. An active search closes.
+    // 4. An active search closes.
     const search = document.querySelector('.searchbar-enabled');
     if (search) {
       f7.searchbar.disable(/** @type {HTMLElement} */ (search));
       return;
     }
-    // 3. Back to the previous screen of the section.
+    // 5. Back to the previous screen of the section.
     const view = f7.views.current;
     if (view && view.router.history.length > 1) {
       view.router.back();
       return;
     }
-    // 4. From another section, back to the Logbook.
+    // 6. From another section, back to the Logbook.
     if (view && view.el?.id !== 'view-logbook') {
       f7.tab.show('#view-logbook');
       return;
     }
-    // 5. From the Logbook: the app goes to the background, as on Android.
+    // 7. From the Logbook: the app goes to the background, as on Android.
     CapacitorApp.minimizeApp();
   });
 }

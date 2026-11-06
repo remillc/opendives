@@ -3,7 +3,6 @@ package org.opendives.core
 
 import android.util.Base64
 import android.util.Log
-import com.getcapacitor.JSArray
 import com.getcapacitor.JSObject
 import com.getcapacitor.Plugin
 import com.getcapacitor.PluginCall
@@ -48,12 +47,18 @@ class OpenDivesCorePlugin : Plugin() {
         call.resolve(JSObject().put("count", count))
     }
 
+    /**
+     * The JSON made by the core is passed on as a string and parsed once, in
+     * JavaScript: parsing it into JSObject here, then serialising it again
+     * for the bridge, took a large part of the loading time.
+     */
     @PluginMethod
     fun listDives(call: PluginCall) = onCoreThread(call) {
+        val start = System.currentTimeMillis()
         val exists = NativeCore.logExists(repo)
-        val dives = if (exists) JSArray(NativeCore.listDives(repo)) else JSArray()
-        Log.i(TAG, "listDives: exists=$exists, ${dives.length()} dives read from $repo")
-        call.resolve(JSObject().put("exists", exists).put("dives", dives))
+        val json = if (exists) NativeCore.listDives(repo) else "[]"
+        Log.i(TAG, "listDives: exists=$exists, ${json.length} chars from $repo, ${System.currentTimeMillis() - start} ms")
+        call.resolve(JSObject().put("exists", exists).put("json", json))
     }
 
     /** Detail of one dive of the loaded log; `id` comes from listDives or listCloudDives. */
@@ -78,6 +83,8 @@ class OpenDivesCorePlugin : Plugin() {
      * Read-only access to the Subsurface cloud. TEMPORARY, for development:
      * the credentials are read from files/cloud-dev.env, copied with adb
      * (see app/README.md). They are neither in the APK nor logged.
+     * `cached: true` reads the device's copy only, without network; `json`
+     * is then empty when there is no copy yet.
      */
     @PluginMethod
     fun listCloudDives(call: PluginCall) = onCoreThread(call) {
@@ -86,16 +93,15 @@ class OpenDivesCorePlugin : Plugin() {
             call.resolve(JSObject().put("available", false))
             return@onCoreThread
         }
+        val cached = call.getBoolean("cached", false) == true
         val start = System.currentTimeMillis()
-        val result = JSObject(NativeCore.cloudListDives(credentials.first, credentials.second))
-        val dives = result.getJSONArray("dives")
-        Log.i(
-            TAG,
-            "listCloudDives: ${dives.length()} dives, server ${result.getString("server")}, " +
-                "synced=${result.getBoolean("synced")}, ${System.currentTimeMillis() - start} ms",
-        )
-        result.put("available", true)
-        call.resolve(result)
+        val json = if (cached) {
+            NativeCore.cloudListCachedDives(credentials.first, credentials.second)
+        } else {
+            NativeCore.cloudListDives(credentials.first, credentials.second)
+        }
+        Log.i(TAG, "listCloudDives(cached=$cached): ${json.length} chars, ${System.currentTimeMillis() - start} ms")
+        call.resolve(JSObject().put("available", true).put("json", json))
     }
 
     private fun readDevCredentials(): Pair<String, String>? {

@@ -15,9 +15,12 @@
    *   prefs: import('opendives-core').Prefs,
    *   expanded: boolean,
    *   ontoggle: () => void,
+   *   index?: number,
+   *   top?: number,
    * }}
+   * `index` and `top`: position in the logbook's virtual list.
    */
-  let { dives, location, prefs, expanded, ontoggle } = $props();
+  let { dives, location, prefs, expanded, ontoggle, index = undefined, top = undefined } = $props();
 
   // Dives arrive from the most recent to the oldest.
   const start = $derived(dives[dives.length - 1].date);
@@ -50,7 +53,7 @@
   }
 </script>
 
-<li class="trip-row">
+<li class="trip-row" data-virtual-list-index={index} style:top={top === undefined ? undefined : `${top}px`}>
   <div
     class="item-link item-content no-chevron"
     role="button"

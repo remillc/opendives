@@ -30,9 +30,18 @@
     "retry": "Try again",
     "emptyTitle": "No dives yet",
     "emptyText": "Add your dives from your dive computer, from a file, or manually.",
-    "noResults": "No dive matches “{query}”."
+    "noResults": "No dive matches “{query}”.",
+    "count": {
+      "one": "{n} dive",
+      "other": "{n} dives"
+    },
+    "countFiltered": {
+      "one": "{n} dive of {total}",
+      "other": "{n} dives of {total}"
+    }
   },
   "sync": {
+    "syncing": "Syncing with the Subsurface cloud…",
     "cloud": "Synced with Subsurface cloud",
     "offline": "Offline: no changes waiting",
     "local": "Logbook stored on this device only"
@@ -147,5 +156,10 @@
     "oxygen": "Oxygen",
     "nitrox": "Nitrox {o2}",
     "trimix": "Trimix {o2}/{he}"
+  },
+  "menu": {
+    "open": "Menu",
+    "title": "OpenDives",
+    "sections": "Sections"
   }
 }

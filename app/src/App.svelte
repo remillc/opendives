@@ -1,7 +1,8 @@
 <script>
   // @ts-check
-  // Main navigation (spec, section 3): bottom navigation bar with four
-  // sections; the Logbook opens the dive detail full screen.
+  // Main navigation (spec, section 3). Phone layout: a top bar on each screen
+  // and a side menu with the four sections and Settings. Tablet layout: the
+  // bottom bar stands in until the iPad sidebar and the Android rail exist.
   import { onMount } from 'svelte';
   import { App, Views, View, Toolbar, Link } from 'framework7-svelte';
   import Logbook from './pages/Logbook.svelte';
@@ -10,6 +11,9 @@
   import Settings from './pages/Settings.svelte';
   import Icon from './components/Icon.svelte';
   import AdaptiveLabel from './components/AdaptiveLabel.svelte';
+  import NavMenu from './components/NavMenu.svelte';
+  import { layout } from './lib/layout.svelte.js';
+  import { trackSection } from './lib/navigation.svelte.js';
   import { loadLogbook } from './lib/logbook.svelte.js';
   import { enableBackButton } from './lib/back-button.js';
   import { enableAccessibility } from './lib/accessibility.js';
@@ -58,12 +62,15 @@
   onMount(() => {
     enableBackButton();
     enableAccessibility();
+    trackSection();
     loadLogbook();
   });
 </script>
 
 <App {...f7params}>
+  {#if layout.phone}<NavMenu />{/if}
   <Views tabs class="safe-areas">
+    {#if !layout.phone}
     <Toolbar tabbar icons bottom>
       <Link tabLink="#view-logbook" tabLinkActive text={t('tabs.logbook')}><i class="icon"><Icon name="logbook" /></i></Link>
       <Link tabLink="#view-sites" text={t('tabs.sites')}><i class="icon"><Icon name="sites" /></i></Link>
@@ -73,6 +80,7 @@
       </Link>
       <Link tabLink="#view-tools" text={t('tabs.tools')}><i class="icon"><Icon name="tools" /></i></Link>
     </Toolbar>
+    {/if}
     <View id="view-logbook" main tab tabActive url="/" />
     <View id="view-sites" tab url="/sites/" />
     <View id="view-statistics" tab url="/statistics/" />

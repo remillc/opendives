@@ -97,10 +97,13 @@ import { registerPlugin } from '@capacitor/core';
  * configured; the other fields are then absent.
  * @typedef {Object} CloudDives
  * @property {boolean} available
+ * @property {boolean} [cached] false when a cached read found no copy on the device
  * @property {string} [server] e.g. ssrf-cloud-eu.subsurface-divelog.org
- * @property {string} [head] commit of the branch on the server
- * @property {boolean} [synced] false: local copy, the server did not answer
+ * @property {string} [head] commit read: the server's, or the device copy's for a cached read
+ * @property {boolean} [synced] false: device copy only (cached read, or the server did not answer)
  * @property {string} [offlineReason] reason, when the server did not answer
+ * @property {boolean} [unchanged] the server's head is the log already loaded: `dives` is absent
+ *   and the dives already listed (and their identifiers) stay valid
  * @property {Dive[]} [dives]
  */
 
@@ -110,13 +113,35 @@ import { registerPlugin } from '@capacitor/core';
  *   Saves the sample log as a local git repository.
  * @property {() => Promise<{exists: boolean, dives: Dive[]}>} listDives
  *   Reads the local git repository again. `exists` is false until a repository has been created.
- * @property {() => Promise<CloudDives>} listCloudDives
+ * @property {(options?: {cached?: boolean}) => Promise<CloudDives>} listCloudDives
  *   Read-only access to the Subsurface cloud log (development credentials).
+ *   `cached`: the device's copy only, without network, to show the log at once.
  * @property {(options: {id: number}) => Promise<DiveDetail>} getDive
  *   Detail of one dive of the last loaded log.
  * @property {() => Promise<Prefs>} getPrefs
  *   Units of the last loaded log.
  */
 
-/** @type {OpenDivesCorePlugin} */
-export const OpenDivesCore = registerPlugin('OpenDivesCore');
+/** @type {any} */
+const native = registerPlugin('OpenDivesCore');
+
+/**
+ * The native side passes the lists as JSON text (`json`), parsed here once:
+ * much faster than converting them into bridge objects.
+ * @type {OpenDivesCorePlugin}
+ */
+export const OpenDivesCore = {
+  importSample: () => native.importSample(),
+  async listDives() {
+    const { exists, json } = await native.listDives();
+    return { exists, dives: JSON.parse(json) };
+  },
+  async listCloudDives(options = {}) {
+    const { available, json } = await native.listCloudDives(options);
+    if (!available) return { available: false };
+    if (!json) return { available: true, cached: false };
+    return { available: true, ...JSON.parse(json) };
+  },
+  getDive: (options) => native.getDive(options),
+  getPrefs: () => native.getPrefs(),
+};

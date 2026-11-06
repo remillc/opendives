@@ -235,6 +235,22 @@ The detail follows the "Détail complet" mock-ups (`detail3`). Checked on the Pi
 - **Pitfall:** Framework7 styles the global classes `.card` (margins, shadow) and `.panel` (hidden side panel); the block therefore uses the class `group`.
 - **Data shown as stored:** the cylinder description ("Steel") is diver data and is not translated.
 
+## Navigation and logbook loading (6 November 2026)
+
+Checked on the Pixel with the cloud log (1,353 dives).
+
+- **Navigation (phone layout, below 768 px):** the bottom bar is replaced by a ☰ button on the left of each section's top bar and a 300 px side menu (Framework7 panel, `swipeOnlyClose`: a swipe to the left closes it, the screen edge never opens it). Active section with `aria-current="page"`; while open, the screens behind are `inert` and the focus goes to the active section, then back to ☰ on close. The Settings gear is gone from the Logbook. The system back closes the menu first. Wider screens keep the bottom bar until the iPad sidebar and the Android rail exist. Only Android was seen.
+- **"+" on Android:** a floating button whose three labelled choices open above it over a scrim; it closes on the scrim, the system back or a choice. The choices have no action yet. iOS and the empty logbook keep the action sheet.
+- **Logbook:** the latest dive no longer has its own background (a leftover of the "black blocks" theme). A line under the search gives the number of dives, and "n of total" while searching.
+- **Virtual list:** Framework7's VirtualList with `renderExternal`; about 20 rows are in the document instead of 1,353. Rows have different heights (text size, site names on two lines): each rendered row is measured and its height kept by row key, so that expanding a trip does not make the list jump.
+- **Loading time:** cold start to the full list went from about 8.2 s to about 0.5 s.
+  - `cloud_list_cached_dives()` reads the device's copy of the cloud log without network (430 ms for 1,353 dives); the list is shown with "Syncing with the Subsurface cloud…".
+  - `cloud_list_dives()` then probes the server: when its head is the commit already loaded (`loaded_git_commit`), nothing is fetched or read again (1.5 s, network only), as Subsurface's `remote_repo_uptodate()` does. Otherwise the log is reloaded and the list replaced.
+  - The plugin passes the core's JSON as a string, parsed once in JavaScript, instead of parsing it into `JSObject` and serialising it again.
+- **Skeleton:** greyed bars (Framework7 `skeleton-block`, wave effect) laid out like a real row and one line of text high, so that nothing moves when the dives arrive; count and sync lines included. Framework7's skeleton font did not apply in the WebView, hence the bars.
+- **Known limit:** if the server has new commits, the list is replaced after the sync and dive identifiers change; a detail opened from the old list in the meantime cannot be read again.
+- **Tests:** round trip 97 passed, 1 known failure.
+
 ## Reproduce
 
 The commands are in [AGENTS.md](../AGENTS.md#commands).
