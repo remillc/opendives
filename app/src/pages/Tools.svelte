@@ -14,6 +14,7 @@
   import { OpenDivesCore } from 'opendives-core';
   import MenuButton from '../components/MenuButton.svelte';
   import Icon from '../components/Icon.svelte';
+  import TextField from '../components/TextField.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
   import { depthUnit, formatGas, formatNumber } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
@@ -112,21 +113,12 @@
 
   <h2 class="section">{t('tools.gasCalculator')}</h2>
 
-  <!-- TODO(merge): switch these fields to the shared components/TextField.svelte.
-       Until then, plain markup following "Text fields" (spec, section 1): MD3
-       filled field, label inside the field when empty, small above the value
-       on focus or once filled, no placeholder, helper text under the field. -->
-  <div class="field" class:filled-value={o2 !== ''} class:invalid={gasInvalid}>
-    <label class="flabel" for="od-o2">{t('tools.oxygen')}</label>
-    <input id="od-o2" type="text" inputmode="numeric" bind:value={o2} aria-invalid={gasInvalid} />
-    <span class="unit">{t('units.percent')}</span>
-  </div>
-  <div class="field" class:filled-value={he !== ''} class:invalid={gasInvalid}>
-    <label class="flabel" for="od-he">{t('tools.helium')}</label>
-    <input id="od-he" type="text" inputmode="numeric" bind:value={he} aria-invalid={gasInvalid} aria-describedby="od-gas-help" />
-    <span class="unit">{t('units.percent')}</span>
-  </div>
-  {#if gasInvalid}<p class="helper invalid" id="od-gas-help">{t('tools.gasInvalid')}</p>{/if}
+  <TextField label={t('tools.oxygen')} bind:value={o2} inputmode="numeric" invalid={gasInvalid}>
+    {#snippet trailing()}<span class="unit">{t('units.percent')}</span>{/snippet}
+  </TextField>
+  <TextField label={t('tools.helium')} bind:value={he} inputmode="numeric" invalid={gasInvalid} supporting={gasInvalid ? t('tools.gasInvalid') : ''}>
+    {#snippet trailing()}<span class="unit">{t('units.percent')}</span>{/snippet}
+  </TextField>
 
   <div class="field filled-value dropdown">
     <label class="flabel" for="od-cylinder-type">{t('tools.cylinderType')}</label>
@@ -154,14 +146,15 @@
     </div>
   </div>
 
-  <div class="field" class:filled-value={depth !== ''} class:invalid={depthInvalid}>
-    <label class="flabel" for="od-planned-depth">{t('tools.plannedDepth')}</label>
-    <input id="od-planned-depth" type="text" inputmode="decimal" bind:value={depth} aria-invalid={depthInvalid} aria-describedby="od-depth-help" />
-    <span class="unit">{depthUnit(logbook.prefs)}</span>
-  </div>
-  <p class="helper" class:invalid={depthInvalid} id="od-depth-help">
-    {depthInvalid ? t('tools.depthInvalid') : t('tools.plannedDepthHelp', { depth: `${defaultDepth} ${depthUnit(logbook.prefs)}` })}
-  </p>
+  <TextField
+    label={t('tools.plannedDepth')}
+    bind:value={depth}
+    inputmode="decimal"
+    invalid={depthInvalid}
+    supporting={depthInvalid ? t('tools.depthInvalid') : t('tools.plannedDepthHelp', { depth: `${defaultDepth} ${depthUnit(logbook.prefs)}` })}
+  >
+    {#snippet trailing()}<span class="unit">{depthUnit(logbook.prefs)}</span>{/snippet}
+  </TextField>
 
   <div class="results" aria-live="polite">
     <div class="result">
@@ -247,11 +240,6 @@
         border-bottom: 2px solid var(--od-action);
       }
 
-      &.invalid {
-        border-bottom-color: var(--od-alarm);
-      }
-
-      input,
       select {
         flex: 1;
         min-width: 0;
@@ -304,31 +292,18 @@
         color: var(--od-text);
       }
 
-      .invalid & {
-        color: var(--od-alarm);
-      }
     }
 
+    /* MD3 suffix: on the value's line, shown with the value. */
     .unit {
-      flex: none;
-      padding-top: 18px;
+      display: block;
+      padding: 24px 8px 0 0;
       font-size: 16px;
+      line-height: 24px;
       color: var(--od-text-2);
 
-      .field:not(.filled-value):not(:focus-within) & {
+      :global(.field:not(.floated)) & {
         visibility: hidden;
-      }
-    }
-
-    .helper {
-      margin: 4px 16px 0;
-      padding-left: 16px;
-      font-size: 12px;
-      line-height: 16px;
-      color: var(--od-text-2);
-
-      &.invalid {
-        color: var(--od-alarm);
       }
     }
 
