@@ -53,8 +53,7 @@
     }
   }
 
-  function syncNow(/** @type {MouseEvent} */ e) {
-    e.preventDefault();
+  function syncNow() {
     if (!logbook.loading) loadLogbook();
   }
 
@@ -114,10 +113,8 @@
             </div>
           </div>
         </li>
-        <li>
-          <a href="#sync" class="item-link item-content external no-chevron sync-now" role="button" onclick={syncNow}>
-            <div class="item-inner"><div class="item-title">{t('account.syncNow')}</div></div>
-          </a>
+        <li class="sync-now">
+          <button type="button" disabled={logbook.loading} onclick={syncNow}>{t('account.syncNow')}</button>
         </li>
       </ul>
     </div>
@@ -241,8 +238,43 @@
       white-space: normal;
     }
 
-    .sync-now .item-title {
-      font-weight: 600;
+    /*
+     * "Sync now": a real button centred in its row. Android: MD3 tonal button
+     * (40 dp, 24 dp side padding, fully rounded); iOS: 44 pt bordered button
+     * with 12 pt corners.
+     */
+    .sync-now {
+      padding: 12px 16px 14px;
+      display: flex;
+      justify-content: center;
+
+      /* Framework7 stretches buttons in a list: this one keeps its own width. */
+      button {
+        width: auto;
+        text-align: center;
+        height: 40px;
+        padding: 0 24px;
+        border: none;
+        border-radius: 20px;
+        background: var(--od-tint);
+        color: var(--od-on-tint);
+        font: inherit;
+        font-size: 14px;
+        font-weight: 600;
+        letter-spacing: 0.1px;
+        cursor: pointer;
+
+        &:disabled {
+          opacity: 0.5;
+        }
+
+        :global(.ios) & {
+          height: 44px;
+          border-radius: 12px;
+          font-size: 17px;
+          letter-spacing: 0;
+        }
+      }
     }
 
     .danger {

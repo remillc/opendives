@@ -45,6 +45,8 @@ Done in Add a top margin above the dive detail header
 
 In `DiveDetail.svelte`, add a 16 px top margin between the top bar and the header line (number and date), on iOS and Android, as in the refreshed `docs/mockups/detail3-*.dc.html`.
 
-## [ ] 2026-11-06-05 "Sync now" as a centred button
+## [x] 2026-11-06-05 "Sync now" as a centred button
+
+Done in Make "Sync now" a centred button on the Account screen
 
 On the Account screen, "Sync now" is a real button, centred in its row: tonal button on Android (40 dp high, 24 dp side padding, fully rounded, `--od-tint` background), and on iOS a 44 pt bordered button with 12 pt corners. See `docs/mockups/compte-*-connecte.dc.html`.
