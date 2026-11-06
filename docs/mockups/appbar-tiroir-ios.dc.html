@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Barre du haut, menu latéral, iPhone</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:#1F2124}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #F4F4F2; font-family: -apple-system, 'SF Pro Text', system-ui, sans-serif; color: #1F2124; position: relative; overflow: hidden">
+  <div style="padding: 50px 8px 0 8px; height: 44px; display: flex; justify-content: space-between; align-items: center">
+    <span style="display: flex"><button aria-label="Menu" aria-haspopup="menu" style="width: 44px; height: 44px; border: none; background: none; padding: 0; display: flex; align-items: center; justify-content: center"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style="flex: none; fill: none; stroke: #1F2124; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round"><path d="M4 7h16 M4 12h16 M4 17h16"></path></svg></button></span>
+    <span style="display: flex; align-items: center">
+      <button aria-label="Rechercher" style="width: 44px; height: 44px; border: none; background: none; padding: 0; display: flex; align-items: center; justify-content: center"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style="flex: none; fill: none; stroke: #1F2124; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round"><circle cx="10.5" cy="10.5" r="6.5"></circle><path d="M15.5 15.5L20 20"></path></svg></button>
+      <button aria-label="Ajouter : télécharger, importer ou noter une plongée" style="width: 44px; height: 44px; border: none; background: none; padding: 0; display: flex; align-items: center; justify-content: center"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style="flex: none; fill: none; stroke: #1F2124; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round"><path d="M12 5v14 M5 12h14"></path></svg></button>
+    </span>
+  </div>
+  <div style="padding: 2px 20px 0 20px; display: flex; flex-direction: column; gap: 2px"><h1 style="margin: 0; font-size: 34px; line-height: 41px; font-weight: 800; letter-spacing: -0.5px">Carnet</h1><p style="margin: 0; font-size: 15px; line-height: 21px; color: #4A4D52; font-variant-numeric: tabular-nums">9 plongées, la plus profonde à 101,5 m</p></div>
+
+  <a href="detail3-ios.dc.html" style="margin: 12px 16px 0 16px; display: block; border-radius: 18px; overflow: hidden; background: #FFFFFF; color: #1F2124; text-decoration: none">
+    <div style="padding: 12px 14px 0 14px"><span style="padding: 4px 10px; border-radius: 12px; background: #1F2124; color: #FFFFFF; font-size: 13px; font-weight: 700">Dernière plongée</span></div>
+    <svg width="358" height="130" viewBox="0 0 358 130" preserveAspectRatio="none" role="img" aria-label="Profil, 27,6 m au plus profond" style="display: block; margin-top: 10px">
+      <defs><linearGradient id="mono-3-h" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color: #FBE3B2"></stop><stop offset="1" style="stop-color: {{hb}}"></stop></linearGradient></defs>
+      <path d="{{ha}}" style="fill: url(#mono-3-h); stroke: none"></path>
+      <path d="{{hl}}" style="fill: none; stroke: #1F2124; stroke-width: 2; vector-effect: non-scaling-stroke"></path>
+    </svg>
+    <div style="padding: 10px 14px 14px 14px; display: flex; justify-content: space-between; align-items: baseline; gap: 12px">
+      <span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 20px; font-weight: 700">Site à préciser</span><span style="font-size: 14px; color: #4A4D52">7 févr. 2026, 09:09, recycleur</span></span>
+      <span style="font-size: 26px; font-weight: 800; font-variant-numeric: tabular-nums">27,6 m</span>
+    </div>
+  </a>
+
+  <div style="margin: 12px 16px 0 16px; padding: 12px 14px; border-radius: 14px; background: #E8E8E5; display: flex; flex-direction: column; gap: 8px">
+    <span style="font-size: 15px; font-weight: 600">Encore 1 plongée avant la 10e</span>
+    <span role="progressbar" aria-valuemin="0" aria-valuemax="10" aria-valuenow="9" aria-label="9 plongées sur 10" style="height: 8px; border-radius: 4px; background: #DADAD6; display: block; overflow: hidden"><span style="display: block; width: 90%; height: 8px; background: #1F2124"></span></span>
+  </div>
+
+  <div style="margin: 14px 16px 0 16px; display: flex; flex-direction: column">
+    <sc-for list="{{rows}}" as="d" hint-placeholder-count="3">
+      <a href="detail3-ios.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 60px; border-bottom: 0.5px solid #DADAD6; color: #1F2124; text-decoration: none">
+        <svg width="56" height="36" viewBox="0 0 56 36" preserveAspectRatio="none" role="img" aria-label="{{d.alt}}" style="flex: none; border-radius: 6px; background: #E8E8E5">
+          <defs><linearGradient id="{{d.gid}}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color: #FBE3B2"></stop><stop offset="1" style="stop-color: {{d.bottom}}"></stop></linearGradient></defs>
+          <path d="{{d.area}}" style="fill: url(#{{d.gid}}); stroke: none"></path>
+          <path d="{{d.line}}" style="fill: none; stroke: #1F2124; stroke-width: 1.25; vector-effect: non-scaling-stroke"></path>
+        </svg>
+        <span style="flex: 1; display: flex; flex-direction: column; gap: 1px"><span style="font-size: 17px; font-weight: 600">{{d.site}}</span><span style="font-size: 13px; color: #4A4D52">{{d.date}}</span></span>
+        <span style="font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums">{{d.max}}</span>
+      </a>
+    </sc-for>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+function hx(h) { return [parseInt(h.substr(1,2),16), parseInt(h.substr(3,2),16), parseInt(h.substr(5,2),16)]; }
+function mix(f) {
+  var a = hx('#FBE3B2'), b = hx('#B4530F');
+  f = Math.max(0, Math.min(1, f));
+  return 'rgb(' + a.map(function (v, i) { return Math.round(v + (b[i] - v) * f); }).join(',') + ')';
+}
+function prof(pts, W, H, top) {
+  top = top || 0;
+  var t1 = pts[pts.length - 1][0], maxD = 0;
+  pts.forEach(function (p) { if (p[1] > maxD) maxD = p[1]; });
+  var line = 'M' + pts.map(function (p) { return (p[0] / t1 * W).toFixed(1) + ' ' + (top + p[1] / maxD * (H - top - 2)).toFixed(1); }).join(' L');
+  return { line: line, area: line + ' L' + W + ' 0 L0 0 Z', bottom: mix(maxD / 60) };
+}
+var P = { d9: [[10,0.0],[110,7.3],[210,14.4],[310,20.9],[410,25.0],[510,25.9],[610,25.3],[710,25.3],[810,24.8],[910,27.1],[1010,26.2],[1110,25.3],[1210,26.2],[1310,27.5],[1410,26.8],[1510,22.1],[1610,16.7],[1710,16.3],[1810,16.4],[1910,15.2],[2010,14.8],[2110,16.5],[2210,15.3],[2310,15.5],[2410,15.1],[2510,15.9],[2610,15.6],[2710,16.1],[2810,13.7],[2910,13.1],[3010,8.9],[3110,6.3],[3210,6.2],[3310,5.2],[3390,0.0]], d8: [[10,3.4],[210,23.7],[410,51.2],[610,75.7],[810,96.6],[1010,92.7],[1210,68.7],[1410,51.6],[1610,34.1],[1810,28.9],[2010,25.2],[2210,21.4],[2410,18.1],[2610,15.9],[2810,12.4],[3010,14.0],[3210,9.8],[3410,9.1],[3610,9.5],[3810,6.5],[4010,7.0],[4210,7.1],[4410,7.9],[4610,6.6],[4810,6.3],[5010,8.5],[5210,7.9],[5410,7.7],[5610,6.5],[5810,5.8],[6010,4.7],[6160,0.0]], d7: [[0,0.0],[170,24.0],[390,46.4],[610,57.3],[830,59.6],[1050,55.5],[1160,52.9],[1380,32.4],[1553,20.7],[1632,20.6],[1676,21.1],[1750,22.4],[1970,20.7],[2190,22.3],[2410,24.0],[2630,22.6],[2850,18.2],[3070,16.5],[3290,16.5],[3510,14.3],[3730,16.2],[3950,13.3],[4170,10.0],[4390,10.9],[4610,10.5],[4830,9.9],[5050,7.5],[5270,6.1],[5490,7.6],[5710,6.3],[5930,4.5],[6150,5.0],[6240,0.0]], d6: [[0,2.7],[220,8.4],[440,14.1],[660,22.0],[880,22.4],[1100,31.9],[1320,66.3],[1540,78.0],[1760,75.8],[1980,61.2],[2200,45.2],[2420,30.4],[2640,23.4],[2860,21.5],[3080,20.2],[3300,16.1],[3520,12.6],[3740,9.3],[3960,8.7],[4180,7.0],[4400,5.7],[4620,6.0],[4840,4.4],[5060,3.6],[5280,4.0],[5500,4.5],[5720,4.1],[5940,0.0]] };
+
+class Component extends DCLogic {
+  renderVals() {
+    var h = prof(P.d9, 358, 130, 6);
+    var rows = [['d8', 'Site à préciser', '27 sept. 2025', '101,5 m'], ['d7', 'Northern Arch', '24 avr. 2022', '60,2 m'], ['d6', 'Hälvälä, Finlande', '23 mai 2015', '79,6 m']].map(function (r) {
+      var q = prof(P[r[0]], 56, 36);
+      return { site: r[1], date: r[2], max: r[3], line: q.line, area: q.area, bottom: q.bottom, gid: 'mono-3-' + r[0], alt: 'Profil, ' + r[3] + ' au plus profond' };
+    });
+    return { hl: h.line, ha: h.area, hb: h.bottom, rows: rows };
+  }
+}
+</script>
+</body>
+</html>

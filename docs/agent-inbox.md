@@ -1,0 +1,32 @@
+# Agent inbox
+
+Tasks for the coding agent, written from the design sessions with Christian on claude.ai. They are shown to the agent automatically by the hooks in `.claude/settings.json`, which run `tools/agent-inbox.mjs`.
+
+**Rules**
+
+- Do the open tasks in order. Each task names its references: `docs/ui-specification.md` wins over the mock-ups; the mock-ups in `docs/mockups/` are the source of the canvas boards (readable HTML, not meant to be opened standalone).
+- When a task is done, change its heading from `[ ]` to `[x]` in the same commit as its work, and add one line under it: `Done in <commit subject>`.
+- A task marked **Wait** must not be started until Christian says so in the chat.
+- Never delete or rewrite a task; if a task is unclear or contradicts the specification, stop and ask Christian.
+- Only the design side (claude.ai) adds tasks. The agent does not add tasks here.
+
+## [ ] 2026-11-06-00 Register the inbox hooks
+
+Create `.claude/settings.json` (committed) with two command hooks that run `tools/agent-inbox.mjs`: `SessionStart` with the argument `start`, and `UserPromptSubmit` with the argument `prompt`. The command is `node "$CLAUDE_PROJECT_DIR/tools/agent-inbox.mjs" start` (or `prompt`), timeout 10 seconds. Add `.claude/inbox-seen.json` and `.claude/settings.local.json` to `.gitignore`. Then check, in a new session, that the open tasks of this file appear by themselves; if the VS Code extension does not show the hook's output, say so to Christian.
+
+## [ ] 2026-11-06-01 Account entry in the side menu
+
+Add an "Account" entry to `NavMenu.svelte`, after the separator and before Settings, with a person icon (see `docs/mockups/appbar-tiroir-ios-ouvert.dc.html` and `appbar-tiroir-android-ouvert.dc.html`). It opens the Account screen (next task). Texts through `fr.json` ("Compte") and `en.json` ("Account").
+
+## [ ] 2026-11-06-02 Account screen
+
+Build the Account screen from `docs/mockups/compte-*.dc.html` (iOS and Android, signed in and without an account) and `docs/ui-specification.md`, section 3 (Sections row).
+
+- **Signed in:** card with the account email and "Subsurface account verified"; Synchronisation group: "Sync automatically" switch with its explanation, last synchronisation time, number of dives in the cloud, "Sync now"; Subsurface account group: "Change password" (a link is sent by email); Leave group: "Sign out" and "Delete account" (alarm colour), each with its consequence under the label; at the bottom, a caption "Connected through the Europe server (ssrf-cloud-eu)." with the host actually in use. The server is not a setting: the core picks the first one that answers.
+- **Without an account:** card "No account" with the number of dives on this device; one sentence on what an account brings; two choices with their consequences: "Create an account" and "Sign in to an existing account".
+- **For now, do not wire** "Change password", "Sign out", "Delete account", "Create an account" and "Sign in": show them, and on tap show "Not available yet". Their behaviour in Subsurface must be checked first (design side), and will come as separate tasks.
+- Remove the account rows from Settings if they duplicate this screen.
+
+## [ ] 2026-11-06-03 Editing and cloud sync, after test 1
+
+**Wait.** Test 1 of `docs/editing-and-sync-plan.md` is reported done (commit "Add dive editing, local save and sync to the façade, with test 1"). Do not start test 2 or anything that writes to a cloud account until Christian has read the report and says to go on.

@@ -117,3 +117,7 @@ Gradle does not rebuild the native code: rerun `native/build-android.sh` when th
 - Code files taken from or derived from Subsurface: `SPDX-License-Identifier: GPL-2.0` header. OpenDives is GPLv2 because it reuses Subsurface's core.
 - Never commit Subsurface cloud credentials or a personal dive log.
 - Existing French comments and documentation are translated to English when the file is next touched.
+
+## Agent inbox
+
+Decisions and tasks from the design sessions on claude.ai arrive in `docs/agent-inbox.md`. Do its open tasks in order, following its rules, and mark each one done in the same commit as its work. A task marked **Wait** waits for Christian's go-ahead in the chat. The mock-ups the tasks refer to are copied in `docs/mockups/`.
