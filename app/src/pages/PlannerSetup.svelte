@@ -14,7 +14,8 @@
   import { formatNumber, depthUnit } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
 
-  const prefs = $derived(logbook.prefs);
+  // The units when the screen opens; the fields are built for them.
+  const prefs = logbook.prefs;
   const feet = prefs.length === 'ft';
   const psi = prefs.pressure === 'psi';
   const cuft = prefs.volume === 'cuft';
