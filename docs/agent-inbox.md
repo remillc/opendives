@@ -33,6 +33,8 @@ Build the Account screen from `docs/mockups/compte-*.dc.html` (iOS and Android, 
 - **For now, do not wire** "Change password", "Sign out", "Delete account", "Create an account" and "Sign in": show them, and on tap show "Not available yet". Their behaviour in Subsurface must be checked first (design side), and will come as separate tasks.
 - Remove the account rows from Settings if they duplicate this screen.
 
-## [ ] 2026-11-06-03 Editing and cloud sync, after test 1
+## [x] 2026-11-06-03 Editing and cloud sync, after test 1
+
+Done in Add tests 2 and 3 of the editing plan, keep the sync flag (Christian said to go on, on the development account)
 
 **Wait.** Test 1 of `docs/editing-and-sync-plan.md` is reported done (commit "Add dive editing, local save and sync to the façade, with test 1"). Do not start test 2 or anything that writes to a cloud account until Christian has read the report and says to go on.

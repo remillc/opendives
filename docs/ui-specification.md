@@ -82,7 +82,7 @@ Width decides the layout, not the type of device: below 768 px wide, phone layou
 |  | Phone | Tablet |
 | --- | --- | --- |
 | Main navigation | Top bar with a ☰ button on the left that opens a side menu (iOS and Android, decided on 6 November 2026); no bar at the bottom | iOS: 220 px sidebar; Android: 96 px navigation rail with the "+" button at the top |
-| Sections | Logbook, Sites, Statistics, Tools, then Settings after a separator, in the side menu; the synchronisation state at the bottom of the menu | The same, plus Settings at the bottom of the bar |
+| Sections | Logbook, Sites, Statistics, Tools, then Account and Settings after a separator, in the side menu; the synchronisation state at the bottom of the menu. Account is a section (☰ in its top bar): the cloud account, its synchronisation and the server in use, or, without an account, the choices to create one or sign in | The same, plus Account and Settings at the bottom of the bar |
 | Logbook | List, then full-screen detail | List (340 px) and detail side by side |
 | Sites | Map, list in a bottom sheet | List on the left, map on the right |
 | Tools | List of tools, then full-screen planner | Parameters on the left, computed plan on the right |
