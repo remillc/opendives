@@ -251,3 +251,7 @@ After "Continuer" on step 2, show the import progress screen, then the Logbook, 
 Done in Check divelogs.de credentials before the import, add Précédent and import from a file
 
 On step 2, "Continuer" with divelogs.de checks the credentials before the import starts. If divelogs.de refuses them, stay on step 2 with the error under the password field. The import failure screen now only covers failures during the import, with "Réessayer". Step 2 also gets a "Précédent" button back to step 1 (the account already exists: do not create a second one). On the confirmation code screen, "Renvoyer le code" is a button with a refresh icon right under the field (outlined on Android, tinted grey on iOS). See `docs/ui-specification.md` (section 4, "Sign in and new account"). Mock-ups: `android-compte-import`, `ios-compte-import`, `compte-import-identifiants-android`, `compte-import-identifiants-ios`, `compte-import-echec-android`, `compte-import-echec-ios`, `compte-code-android`, `compte-code-erreur-android`, `compte-code-ios`, `compte-code-erreur-ios`.
+
+## [ ] 2026-11-06-34 New account step 2: empty logbook first
+
+On "Reprendre votre carnet ?", the choices are now in this order: "Commencer avec un carnet vide", "Depuis divelogs.de", "Depuis un fichier". Mock-ups: `android-compte-import`, `ios-compte-import`, `compte-import-identifiants-android`, `compte-import-identifiants-ios`.
