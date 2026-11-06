@@ -9,6 +9,7 @@ English copies of OpenDives' design documents (5 November 2026). The French orig
 | [Proposed architecture](architecture.md) | Layers, native plugin, synchronisation, coexistence with Subsurface-mobile | [online](https://claude.ai/artifact/Q3xMEsTfLkAqTnwT4m33Z9) |
 | [UI foundations](ui-foundations.md) | Principles, iOS and MD3, navigation, filters and statistics, visual identity | [online](https://claude.ai/artifact/8goh1sZMXM9npSVThnA61r) |
 | [UI specification](ui-specification.md) | Colours, text, layout, components, screens and core data: the reference for the code | [online](https://claude.ai/artifact/TJU7voFbP6zeNaSUci5p7i) |
+| [Editing and cloud sync plan](editing-and-sync-plan.md) | First write path: facade API, write lock, tests on a test account | — |
 | Key screen mock-ups | iPhone, Android, iOS and Android tablets | [online](https://claude.ai/artifact/Jpuj8pGER3xz8n383JvYep) |
 | [Proof of concept](../poc/README.md) | Subsurface core without Qt, Git round trip | — |
 
