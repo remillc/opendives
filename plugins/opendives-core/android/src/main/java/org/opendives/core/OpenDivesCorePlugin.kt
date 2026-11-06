@@ -391,6 +391,17 @@ class OpenDivesCorePlugin : Plugin() {
         call.resolve(JSObject().put("json", NativeCore.createDive(fields.toString())))
     }
 
+    /** Deletes a dive (delete_dive): one undoable step. */
+    @PluginMethod
+    fun deleteDive(call: PluginCall) = onCoreThread(call) {
+        val id = call.getInt("id")
+        if (id == null) {
+            call.reject("Missing id", "BAD_ARGUMENT")
+            return@onCoreThread
+        }
+        call.resolve(JSObject().put("json", NativeCore.deleteDive(id)))
+    }
+
     /**
      * Imports a file chosen in the WebView (import_dives): its bytes arrive in
      * base64, are written to a temporary file with the original name (the core
@@ -434,10 +445,15 @@ class OpenDivesCorePlugin : Plugin() {
         call.resolve(JSObject().put("json", NativeCore.syncConflicts()))
     }
 
-    /** Keeps one side of a sync conflict ("device" or "cloud"), then reads the log again. */
+    /** Keeps the chosen side of each conflicting file ({path: "device"|"cloud"}), then reads the log again. */
     @PluginMethod
     fun resolveConflicts(call: PluginCall) = onCoreThread(call) {
-        NativeCore.resolveConflicts(call.getString("keep").orEmpty())
+        val choices = call.getObject("choices")
+        if (choices == null) {
+            call.reject("Missing choices", "BAD_ARGUMENT")
+            return@onCoreThread
+        }
+        NativeCore.resolveConflicts(choices.toString())
         call.resolve()
     }
 

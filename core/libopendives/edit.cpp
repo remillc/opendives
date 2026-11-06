@@ -1773,6 +1773,9 @@ int save_as(const std::string &destination, std::string &error)
 	return save_to(destination, error);
 }
 
+static int sync_and_reload_if_needed(const std::string &log, const std::string &local_before, bool server_in_local,
+			      bool local_in_server, std::string &status_json, std::string &error);
+
 int sync(std::string &status_json, std::string &error)
 {
 	const std::string log = internal::current_log();
@@ -1783,6 +1786,14 @@ int sync(std::string &status_json, std::string &error)
 	if (!internal::current_log_is_cloud()) {
 		if (save_local(error))
 			return -1;
+		// A git log with a remote of its own (not the Subsurface cloud, e.g.
+		// "git://host/repo[branch]", which the tests use): the same exchange.
+		struct git_info info;
+		if (git_info_of(log, info) && info.transport != RT_LOCAL) {
+			Heads before = read_heads(log);
+			return sync_and_reload_if_needed(log, before.local, before.local != before.remote, before.local == before.remote, status_json,
+							 error);
+		}
 		status_json = sync_json("local", false);
 		return 0;
 	}
@@ -1816,22 +1827,57 @@ int sync(std::string &status_json, std::string &error)
 	bool server_in_local = includes(log, before.local, server_head);
 	bool local_in_server = includes(log, server_head, before.local) || before.local == before.remote;
 
-	// saveChangesCloud(): reload with git_local_only off, which fetches,
-	// merges and pushes (sync_with_remote), then reads the merged log.
+	return sync_and_reload_if_needed(log, before.local, server_in_local, local_in_server, status_json, error);
+}
+
+// The exchange with the server without reading the log: Subsurface's
+// open_git_repository() with git_local_only off (get_remote_repo(), then
+// sync_with_remote(): fetch, then fast-forward, merge or push, as on
+// desktop after a save). When the local branch did not move (only this
+// device's commits were sent), the log in memory is still the saved one: it
+// is kept, and so is the undo history, as desktop Subsurface keeps it after
+// a cloud save. When the cloud brought changes, the merged log is read again,
+// as Subsurface-mobile does (saveChangesCloud()), and the undo history goes.
+static int sync_and_reload_if_needed(const std::string &log, const std::string &local_before, bool server_in_local,
+			      bool local_in_server, std::string &status_json, std::string &error)
+{
+	{
+		struct git_info info;
+		if (!is_git_repository(log.c_str(), &info)) {
+			error = "NOT_GIT";
+			return -1;
+		}
+		git_remote_sync_successful = false;
+		bool was_local_only = git_local_only;
+		git_local_only = false;
+		bool opened = open_git_repository(&info);
+		git_local_only = was_local_only;
+		if (!opened) {
+			error = "STOPPED: cannot open the local copy";
+			return -1;
+		}
+	}
+	bool synced = git_remote_sync_successful;
+	Heads after = read_heads(log);
+	if (after.local == local_before) {
+		status_json = sync_json(!synced ? "stopped" : server_in_local ? "pushed" : "up_to_date", false);
+		return 0;
+	}
 	bool was_local_only = git_local_only;
-	git_local_only = false;
+	git_local_only = true;
 	int ret = internal::load(log, error);
 	git_local_only = was_local_only;
+	git_remote_sync_successful = synced;
 	if (ret) {
 		error = "STOPPED: " + error;
 		return -1;
 	}
 	apply_log_prefs();
 	divelog.process_loaded_dives();
-	if (!git_remote_sync_successful)
+	if (!synced)
 		status_json = sync_json("stopped", true);
 	else
-		status_json = sync_json(server_in_local ? "pushed" : local_in_server ? "pulled" : "merged", true);
+		status_json = sync_json(local_in_server ? "pulled" : "merged", true);
 	return 0;
 }
 
@@ -2098,12 +2144,22 @@ int sync_conflicts(std::string &json, std::string &error)
 	return 0;
 }
 
-int resolve_conflicts(const std::string &keep, std::string &error)
+int resolve_conflicts(const std::string &choices_json, std::string &error)
 {
 	const std::string log = internal::current_log();
-	if (keep != "device" && keep != "cloud") {
-		error = "BAD_REQUEST: keep";
+	// One choice per conflicting file: {"<path>":"device"|"cloud", …}.
+	std::vector<std::pair<std::string, JsonValue>> fields;
+	if (!JsonReader(choices_json).object(fields)) {
+		error = "BAD_REQUEST: choices";
 		return -1;
+	}
+	std::map<std::string, bool> keep_device;
+	for (const auto &[path, value]: fields) {
+		if (value.kind != JsonValue::STRING || (value.text != "device" && value.text != "cloud")) {
+			error = "BAD_REQUEST: choice for " + path;
+			return -1;
+		}
+		keep_device[path] = value.text == "device";
 	}
 	if (!is_git_log(log)) {
 		error = log.empty() ? "NO_LOG" : "NOT_GIT";
@@ -2127,23 +2183,31 @@ int resolve_conflicts(const std::string &keep, std::string &error)
 		error = "NOTHING_TO_DO";
 		return -1;
 	}
+	for (const ConflictFile &f: mc.files) {
+		if (!keep_device.count(f.path)) {
+			git_repository_free(repo);
+			error = "BAD_REQUEST: no choice for " + f.path;
+			return -1;
+		}
+	}
 	// The head's tree, with each conflicting file as the chosen side has it.
-	git_commit *head = nullptr, *side = nullptr;
-	git_tree *head_tree = nullptr, *side_tree = nullptr, *new_tree = nullptr;
+	git_commit *head = nullptr, *dev = nullptr, *cld = nullptr;
+	git_tree *head_tree = nullptr, *dev_tree = nullptr, *cld_tree = nullptr, *new_tree = nullptr;
 	git_index *index = nullptr;
 	git_signature *author = nullptr;
 	git_reference *ref = nullptr;
 	git_oid tree_oid, commit_oid;
 	std::string message = "Changes made: \n\n";
 	int ret = -1;
-	const git_oid *side_id = keep == "device" ? &mc.device : &mc.cloud;
 	if (git_commit_lookup(&head, repo, &mc.head) || git_commit_tree(&head_tree, head) ||
-	    git_commit_lookup(&side, repo, side_id) || git_commit_tree(&side_tree, side) ||
+	    git_commit_lookup(&dev, repo, &mc.device) || git_commit_tree(&dev_tree, dev) ||
+	    git_commit_lookup(&cld, repo, &mc.cloud) || git_commit_tree(&cld_tree, cld) ||
 	    git_index_new(&index) || git_index_read_tree(index, head_tree))
 		goto done;
 	for (const ConflictFile &f: mc.files) {
+		bool device = keep_device[f.path];
 		git_tree_entry *entry = nullptr;
-		if (git_tree_entry_bypath(&entry, side_tree, f.path.c_str()))
+		if (git_tree_entry_bypath(&entry, device ? dev_tree : cld_tree, f.path.c_str()))
 			goto done;
 		git_index_entry ie = {};
 		ie.mode = git_tree_entry_filemode(entry);
@@ -2158,7 +2222,7 @@ int resolve_conflicts(const std::string &keep, std::string &error)
 		for (auto &dp: divelog.dives)
 			if (when && dp->when == when)
 				d = dp.get();
-		message += std::string(keep == "device" ? "Keep this device's version" : "Take the cloud's version") + " [" +
+		message += std::string(device ? "Keep this device's version" : "Take the cloud's version") + " [" +
 			   (d ? dive_number_or_date(*d) : f.path) + "]\n";
 	}
 	message += "\nCreated by " + subsurface_user_agent() + "\n";
@@ -2185,9 +2249,11 @@ done:
 	git_signature_free(author);
 	git_index_free(index);
 	git_tree_free(new_tree);
-	git_tree_free(side_tree);
+	git_tree_free(dev_tree);
+	git_tree_free(cld_tree);
 	git_tree_free(head_tree);
-	git_commit_free(side);
+	git_commit_free(dev);
+	git_commit_free(cld);
 	git_commit_free(head);
 	git_repository_free(repo);
 	if (ret)
@@ -2256,6 +2322,8 @@ int create_dive(const std::string &fields_json, std::string &result_json, std::s
 	std::unique_ptr<dive> d = divelog.dives.default_dive();
 	dive_site *site = nullptr;
 	bool profile_changed = false;
+	std::string cylinder_type;
+	int start_mbar = -1, end_mbar = -1, o2 = -1, he = -1;
 	for (const auto &[key, value]: fields) {
 		bool number = value.kind == JsonValue::NUMBER, text = value.kind == JsonValue::STRING,
 		     list = value.kind == JsonValue::LIST;
@@ -2317,10 +2385,57 @@ int create_dive(const std::string &fields_json, std::string &result_json, std::s
 			(key == "rating" ? d->rating : d->visibility) = static_cast<int>(value.number);
 		} else if ((key == "waterTempMk" || key == "airTempMk") && number && value.number >= 0) {
 			(key == "waterTempMk" ? d->watertemp : d->airtemp).mkelvin = static_cast<uint32_t>(value.number);
+		} else if (key == "cylinderType" && text) {
+			cylinder_type = trim(value.text);
+		} else if ((key == "startMbar" || key == "endMbar") && number && value.number >= 0 && value.number <= 500000) {
+			(key == "startMbar" ? start_mbar : end_mbar) = static_cast<int>(value.number);
+		} else if ((key == "o2Permille" || key == "hePermille") && number && value.number >= 0 && value.number <= 1000) {
+			(key == "o2Permille" ? o2 : he) = static_cast<int>(value.number);
 		} else {
 			error = "BAD_REQUEST: field " + key;
 			return -1;
 		}
+	}
+	// commitChanges(): the first cylinder's pressures (the end never above
+	// the start), gas mix (only a valid one) and type, whose size and working
+	// pressure come from the cylinder types table.
+	if (start_mbar >= 0 || end_mbar >= 0) {
+		cylinder_t *cyl = d->get_or_create_cylinder(0);
+		if (start_mbar >= 0)
+			cyl->start.mbar = start_mbar;
+		if (end_mbar >= 0)
+			cyl->end.mbar = end_mbar;
+		if (cyl->end.mbar > cyl->start.mbar)
+			cyl->end.mbar = cyl->start.mbar;
+	}
+	if (o2 >= 0 || he >= 0) {
+		int o2v = o2 >= 0 ? o2 : 0, hev = he >= 0 ? he : 0;
+		if (o2v + hev > 1000) {
+			error = "BAD_REQUEST: gas mix";
+			return -1;
+		}
+		cylinder_t *cyl = d->get_or_create_cylinder(0);
+		cyl->gasmix.o2.permille = o2v;
+		cyl->gasmix.he.permille = hev;
+	}
+	if (!cylinder_type.empty()) {
+		int size = 0, wp = 0;
+		for (const tank_info &ti: tank_info_table) {
+			if (ti.name == cylinder_type) {
+				if (ti.ml > 0) {
+					size = ti.ml;
+					wp = ti.bar * 1000;
+				} else {
+					size = (int)(cuft_to_l(ti.cuft) * 1000 / bar_to_atm(psi_to_bar(ti.psi)));
+					wp = psi_to_mbar(ti.psi);
+				}
+				break;
+			}
+		}
+		cylinder_t *cyl = d->get_or_create_cylinder(0);
+		cyl->type.description = cylinder_type;
+		cyl->type.size.mliter = size;
+		cyl->type.workingpressure.mbar = wp;
 	}
 	if (profile_changed) {
 		d->dcs[0].samples.clear();
@@ -2354,6 +2469,27 @@ int create_dive(const std::string &fields_json, std::string &result_json, std::s
 	size_t idx = divelog.dives.get_insertion_index(d.get());
 	d->number = divelog.dives.get_dive_nr_at_idx(static_cast<int>(idx));
 	step.list.dives.push_back({ std::move(d), trip, site });
+	apply_dive_list(step);
+	result_json = dive_list_json(step);
+	push_step(std::move(step));
+	return 0;
+}
+
+int delete_dive(int id, std::string &result_json, std::string &error)
+{
+	if (check_writable_log(error))
+		return -1;
+	dive *d = divelog.dives.get_by_uniq_id(id);
+	if (!d) {
+		error = "NOT_FOUND";
+		return -1;
+	}
+	// DeleteDive::DeleteDive() and redoit(): the dive leaves the log, with its
+	// trip if it was the last one.
+	Step step;
+	step.kind = Step::DIVE_LIST;
+	step.list.remove_dives = { d };
+	step.text = "delete 1 dive(s) [" + list_of_dives(step.list.remove_dives) + "]";
 	apply_dive_list(step);
 	result_json = dive_list_json(step);
 	push_step(std::move(step));

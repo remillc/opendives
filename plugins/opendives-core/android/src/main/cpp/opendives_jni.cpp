@@ -253,6 +253,18 @@ Java_org_opendives_core_NativeCore_createDive(JNIEnv *env, jobject, jstring fiel
 	return edit_result(env, json);
 }
 
+// Deletes a dive: one undoable step (delete_dive).
+JNIEXPORT jstring JNICALL
+Java_org_opendives_core_NativeCore_deleteDive(JNIEnv *env, jobject, jint id)
+{
+	std::string json, error;
+	if (opendives::delete_dive(id, json, error)) {
+		throw_core_error(env, error);
+		return nullptr;
+	}
+	return edit_result(env, json);
+}
+
 // Imports a file into the log: one undoable step (import_dives).
 JNIEXPORT jstring JNICALL
 Java_org_opendives_core_NativeCore_importDives(JNIEnv *env, jobject, jstring file, jstring source)
@@ -314,10 +326,10 @@ Java_org_opendives_core_NativeCore_syncConflicts(JNIEnv *env, jobject)
 }
 
 JNIEXPORT void JNICALL
-Java_org_opendives_core_NativeCore_resolveConflicts(JNIEnv *env, jobject, jstring keep)
+Java_org_opendives_core_NativeCore_resolveConflicts(JNIEnv *env, jobject, jstring choices)
 {
 	std::string error;
-	if (opendives::resolve_conflicts(to_string(env, keep), error))
+	if (opendives::resolve_conflicts(to_string(env, choices), error))
 		throw_core_error(env, error);
 }
 
