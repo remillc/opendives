@@ -283,6 +283,20 @@ import { registerPlugin } from '@capacitor/core';
  */
 
 /**
+ * A filter preset of the log (Subsurface's filter_presets). `index` is its
+ * place in the list, valid until the next change.
+ * @typedef {{index: number, name: string, filter: {fulltext: string, mode: string, rules: FilterRule[]}}} FilterPreset
+ */
+
+/**
+ * A sync conflict after an automatic merge (sync_conflicts): for each file,
+ * the lines both sides changed differently.
+ * @typedef {{conflict: false} | {conflict: true, deviceTime: string, cloudTime: string,
+ *   items: {path: string, diveId: number, number: number, date: string,
+ *   lines: {key: string, device: string, cloud: string}[]}[]}} SyncConflicts
+ */
+
+/**
  * Values present in the loaded log for each filter criterion (filter_options).
  * @typedef {{modes: string[], years: [number, number], suits: string[], computers: string[],
  *   cylinderTypes: string[], tags: string[], people: string[], sites: string[], countries: string[],
@@ -343,6 +357,9 @@ import { registerPlugin } from '@capacitor/core';
  * @property {SiteDetail} [site] the site after a site step
  * @property {TripDetail} [trip] the trip after a trip step
  * @property {{types: CylinderType[], library: string[]}} [cylinderTypes] after a cylinder type rename
+ * @property {{listChange: true, dives: number, id: number}} [list] after a dive was added or
+ *   imported, or such a step undone: the dives in the log, the first dive added (0 if none)
+ * @property {{presetList: FilterPreset[]}} [presets] after a filter preset step
  * @property {string} undo text of the step that Undo would revert ("Edit notes [#12]"); empty when none
  * @property {string} redo text of the step that Redo would apply; empty when none
  */
@@ -386,6 +403,16 @@ import { registerPlugin } from '@capacitor/core';
  * @property {(options: {kind: 'options'} | {kind: 'dives', fulltext?: string, mode?: string, rules: FilterRule[]}) => Promise<any>} filterQuery
  *   Read-only free filter (opendives.h): FilterOptions, or the identifiers of the
  *   dives matching every rule and the fulltext query (number[]).
+ * @property {(options: {fields: Record<string, string|number|string[]>}) => Promise<EditResult>} createDive
+ *   Logs a dive by hand, one undoable step (create_dive in opendives.h).
+ * @property {(options: {name: string, data: string}) => Promise<EditResult>} importDives
+ *   Imports a file (base64 contents, original name), one undoable step (import_dives).
+ * @property {(options: {action: 'list'} | {action: 'save', name: string, fulltext?: string, mode?: string, rules: FilterRule[]} | {action: 'delete', index: number}) => Promise<any>} filterPresets
+ *   Filter presets: the list ({presetList}), or an undoable save or delete (EditResult).
+ * @property {() => Promise<SyncConflicts>} syncConflicts
+ *   Read-only: the conflicts left by the last automatic merge.
+ * @property {(options: {keep: 'device'|'cloud'}) => Promise<void>} resolveConflicts
+ *   Keeps one side of every conflict, then reads the log again (no network).
  * @property {(options: {action: 'create'|'edit'|'geocode'|'merge'|'delete'|'deleteSite', uuid?: number, other?: number, uuids?: number[], field?: string, value?: string, lat?: number, lon?: number}) => Promise<EditResult>} siteAction
  *   One undoable site change, as Subsurface's site commands.
  * @property {(options: {tripId: number}) => Promise<TripDetail>} getTrip
@@ -459,6 +486,19 @@ export const OpenDivesCore = {
   async filterQuery(options) {
     return JSON.parse((await native.filterQuery(options)).json);
   },
+  async createDive(options) {
+    return JSON.parse((await native.createDive(options)).json);
+  },
+  async importDives(options) {
+    return JSON.parse((await native.importDives(options)).json);
+  },
+  async filterPresets(options) {
+    return JSON.parse((await native.filterPresets(options)).json);
+  },
+  async syncConflicts() {
+    return JSON.parse((await native.syncConflicts()).json);
+  },
+  resolveConflicts: (options) => native.resolveConflicts(options),
   async siteAction(options) {
     return JSON.parse((await native.siteAction(options)).json);
   },

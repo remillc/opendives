@@ -3,8 +3,8 @@
 // "Filter criteria"). The criteria are turned into Subsurface's own filter
 // constraints and matched by the core (filterQuery, read-only); only the
 // identifiers of the matching dives come back. The same filter applies to the
-// Logbook, the Statistics and the map. It lasts for the session: saving a
-// filter is not built yet.
+// Logbook, the Statistics and the map. A filter can be saved in the logbook as
+// one of Subsurface's filter presets, and a saved filter applied again.
 import { OpenDivesCore } from 'opendives-core';
 import { t } from './i18n.js';
 import { formatNumber } from './format.js';
@@ -28,7 +28,15 @@ import { formatNumber } from './format.js';
  *   waterTemp: Range, airTemp: Range, cylinderSize: Range, o2: Range, he: Range,
  *   rating: number, visibility: number, current: number, wavesize: number, surge: number, chill: number,
  *   notes: string, fulltext: string,
+ *   preset: SavedFilter|null,
  * }} Criteria
+ * `preset`: a saved filter applied as the core keeps it (its rules are added
+ * to the other criteria).
+ */
+
+/**
+ * A filter saved in the logbook (Subsurface's filter presets).
+ * @typedef {{ name: string, fulltext: string, mode: string, rules: FilterRule[] }} SavedFilter
  */
 
 /** @returns {Criteria} */
@@ -43,6 +51,7 @@ export function emptyCriteria() {
     waterTemp: range(), airTemp: range(), cylinderSize: range(), o2: range(), he: range(),
     rating: 0, visibility: 0, current: 0, wavesize: 0, surge: 0, chill: 0,
     notes: '', fulltext: '',
+    preset: null,
   };
 }
 
@@ -63,6 +72,8 @@ export const filter = $state({
   options: /** @type {FilterOptions|null} */ (null),
   /** The core refused the filter or could not be asked. */
   failed: false,
+  /** Filters saved in the logbook, as the core lists them. */
+  presets: /** @type {import('opendives-core').FilterPreset[]} */ ([]),
 });
 
 /**
@@ -282,7 +293,18 @@ export function rulesFor(c, prefs) {
     rules.push({ type: 'day_of_week', data: String(bits) });
   }
   if (c.planned.length === 1) rules.push({ type: c.planned[0], data: '' });
+  if (c.preset) rules.push(...c.preset.rules);
   return rules;
+}
+
+/**
+ * Fulltext query and mode of a set of criteria: the diver's search, else the
+ * saved filter's.
+ * @param {Criteria} c
+ */
+function fulltextOf(c) {
+  if (c.fulltext.trim() || !c.preset) return { fulltext: c.fulltext.trim(), mode: 'starts_with' };
+  return { fulltext: c.preset.fulltext, mode: c.preset.mode };
 }
 
 /** @param {Criteria} c */
@@ -297,12 +319,7 @@ export function isEmpty(c) {
  */
 async function match(c, prefs) {
   /** @type {number[]} */
-  const ids = await OpenDivesCore.filterQuery({
-    kind: 'dives',
-    fulltext: c.fulltext.trim(),
-    mode: 'starts_with',
-    rules: rulesFor(c, prefs),
-  });
+  const ids = await OpenDivesCore.filterQuery({ kind: 'dives', ...fulltextOf(c), rules: rulesFor(c, prefs) });
   return new Set(ids);
 }
 
@@ -314,6 +331,51 @@ export async function loadOptions() {
     console.error('Reading the filter criteria', e);
     filter.options = null;
   }
+}
+
+/** Reads the filters saved in the logbook. */
+export async function loadPresets() {
+  try {
+    filter.presets = (await OpenDivesCore.filterPresets({ action: 'list' })).presetList;
+  } catch (e) {
+    console.error('Reading the saved filters', e);
+    filter.presets = [];
+  }
+}
+
+/**
+ * Saves criteria in the logbook under a name (replacing a saved filter of the
+ * same name): one undoable step. Errors keep the core's code: NOT_IN_PRESET
+ * when the filter uses a criterion the logbook cannot keep.
+ * @param {string} name
+ * @param {Criteria} c
+ * @param {Prefs} prefs
+ * @returns {Promise<string>} the text of the step, for Undo
+ */
+export async function savePreset(name, c, prefs) {
+  const result = await OpenDivesCore.filterPresets({ action: 'save', name, ...fulltextOf(c), rules: rulesFor(c, prefs) });
+  filter.presets = result.presets.presetList;
+  return result.undo;
+}
+
+/**
+ * Deletes a saved filter: one undoable step.
+ * @param {number} index
+ * @returns {Promise<string>} the text of the step, for Undo
+ */
+export async function deletePreset(index) {
+  const result = await OpenDivesCore.filterPresets({ action: 'delete', index });
+  filter.presets = result.presets.presetList;
+  return result.undo;
+}
+
+/**
+ * The criteria of a saved filter: its rules, kept as the core keeps them.
+ * @param {import('opendives-core').FilterPreset} p
+ * @returns {Criteria}
+ */
+export function presetCriteria(p) {
+  return { ...emptyCriteria(), preset: { name: p.name, fulltext: p.filter.fulltext, mode: p.filter.mode, rules: p.filter.rules } };
 }
 
 /** Opening the Filter screen: the draft starts from the applied filter. */
@@ -451,6 +513,7 @@ export function valueText(key, c, prefs, tripName = (id) => id) {
 export function activeKeys(c) {
   /** @type {(keyof Criteria)[]} */
   const keys = [];
+  if (c.preset) keys.push('preset');
   if (c.mode !== 'all') keys.push('mode');
   for (const g of groups) for (const k of g.keys) if (isSet(k.key, c)) keys.push(k.key);
   return keys;

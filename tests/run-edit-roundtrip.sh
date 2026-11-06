@@ -20,10 +20,16 @@
 #      the original one again.
 #   5. On a copy of B: edit, then save into an unrelated repository: refused
 #      with SAVE_REPLACEMENT, and that repository is unchanged.
+#   6. On copies of B: a dive logged by hand and a file imported ($IMPORT,
+#      by default TestDiveDivelogsDE.xml next to the first sample), each
+#      undone; filter presets created, edited, deleted, undone: the tree is
+#      the original one again. A sync conflict on the notes, after a merge
+#      made as Subsurface's, resolved keeping each side in turn.
 #
 # usage: run-edit-roundtrip.sh <edit-roundtrip> <roundtrip> <workdir> <sample>...
 
 ED=$1; RT=$2; W=$3; shift 3
+IMPORT=${IMPORT:-$(cd "$(dirname "$1")" && pwd)/TestDiveDivelogsDE.xml}
 FIELDS="notes suit rating visibility wavesize current surge chill buddies diveguide tags"
 
 tree() { git -C "$1" rev-parse 'main^{tree}'; }
@@ -111,6 +117,33 @@ run_one() {
   fi
 
   if [ -z "$why" ]; then
+    # A dive logged by hand, then a file imported, each undone: the tree is
+    # the original one again.
+    E="$d/divelist"; rm -rf "$E"; cp -r "$d/B" "$E"
+    "$ED" divelist "$E[main]" "$IMPORT" >"$E.out" 2>"$E.err"; rc=$?
+    if [ $rc != 0 ]; then why="divelist: $(value error "$E.out")"
+    elif [ "$(tree "$E")" != "$T0" ]; then why="divelist: tree differs after undo: $(echo $(git -C "$E" diff --name-only "$T0" 'main^{tree}'))"
+    fi
+  fi
+
+  if [ -z "$why" ]; then
+    # Filter presets created, edited, deleted, each undone, and read back
+    # from git: the tree is the original one again.
+    E="$d/presets"; rm -rf "$E"; cp -r "$d/B" "$E"
+    "$ED" presets "$E[main]" - >"$E.out" 2>"$E.err"; rc=$?
+    if [ $rc != 0 ]; then why="presets: $(value error "$E.out")"
+    elif [ "$(tree "$E")" != "$T0" ]; then why="presets: tree differs: $(echo $(git -C "$E" diff --name-only "$T0" 'main^{tree}'))"
+    fi
+  fi
+
+  for k in device cloud; do
+    [ -n "$why" ] && break
+    # A sync conflict on the notes of the first dive, resolved by keeping one side.
+    E="$d/conflict-$k"; rm -rf "$E"; cp -r "$d/B" "$E"
+    "$ED" conflict "$E[main]" $k >"$E.out" 2>"$E.err" || why="conflict $k: $(value error "$E.out")"
+  done
+
+  if [ -z "$why" ]; then
     # Save into an unrelated repository: refused, nothing written.
     E="$d/refuse"; rm -rf "$E" "$d/unrelated"; cp -r "$d/B" "$E"; cp -r "$U0" "$d/unrelated"
     H0=$(tip "$d/unrelated")
@@ -130,7 +163,7 @@ run_one() {
 
 # One sample per processor (JOBS to change it). Keep the work directory on a
 # Linux file system (under WSL, not /mnt/...): git is much slower there.
-export ED RT W FIELDS U0
+export ED RT W FIELDS U0 IMPORT
 export -f run_one tree tip count newrepo value
 printf '%s\0' "$@" | xargs -0 -P "${JOBS:-$(nproc)}" -I{} bash -c 'run_one "$1"' _ {} > "$W/results"
 sort -k2 "$W/results"

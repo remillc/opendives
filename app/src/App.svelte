@@ -32,6 +32,7 @@
   import Planner from './pages/Planner.svelte';
   import PlannerSetup from './pages/PlannerSetup.svelte';
   import Filter from './pages/Filter.svelte';
+  import NewDive from './pages/NewDive.svelte';
   import FilterCriterion from './pages/FilterCriterion.svelte';
   import AddUnavailable from './pages/AddUnavailable.svelte';
   import DownloadFailed from './pages/DownloadFailed.svelte';
@@ -61,6 +62,7 @@
     dialog: { buttonOk: t('dialog.ok'), buttonCancel: t('dialog.cancel') },
     routes: [
       { path: '/', component: Logbook },
+      { path: '/dive/new/', component: NewDive },
       { path: '/dive/:id/', component: DiveDetail },
       { path: '/filter/', component: Filter },
       { path: '/filter/:key/', component: FilterCriterion },

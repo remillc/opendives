@@ -7,11 +7,16 @@
   // the N dives", whose count follows the criteria. Each criterion opens its
   // own screen. A criterion that applies to no dive of the logbook is not
   // shown. Never offered: weight, weight type, start and end pressures, water
-  // density, nitrogen percentage.
+  // density, nitrogen percentage. The filters saved in the logbook come first;
+  // "Save this filter" keeps the criteria under a name (Subsurface's filter
+  // presets, one undoable step each).
   import { onMount } from 'svelte';
-  import { Page, Navbar, Link, List, ListItem, Searchbar, theme } from 'framework7-svelte';
+  import { Page, Navbar, Link, List, ListItem, Searchbar, f7, theme } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
-  import { logbook } from '../lib/logbook.svelte.js';
+  import Md3Dialog from '../components/Md3Dialog.svelte';
+  import TextField from '../components/TextField.svelte';
+  import { logbook, undoLastChange } from '../lib/logbook.svelte.js';
+  import { confirmAction } from '../lib/dialogs.js';
   import {
     filter,
     groups,
@@ -22,6 +27,11 @@
     emptyCriteria,
     valueText,
     isSet,
+    isEmpty,
+    loadPresets,
+    savePreset,
+    deletePreset,
+    presetCriteria,
   } from '../lib/filter.svelte.js';
   import { t } from '../lib/i18n.js';
   import { formatLongDate } from '../lib/format.js';
@@ -35,6 +45,7 @@
 
   onMount(() => {
     startDraft();
+    loadPresets();
   });
 
   // The count follows every change of the draft.
@@ -54,10 +65,8 @@
     return names;
   });
 
-  /** Rebreather modes in the logbook: only then is the dive mode a choice. */
-  const showMode = $derived(
-    !filter.options || filter.options.modes.some((m) => m === 'CCR' || m === 'PSCR'),
-  );
+  /** The dive mode is a choice only when the logbook has more than one mode. */
+  const showMode = $derived(!!filter.options && filter.options.modes.length > 1);
 
   /** @param {string} key */
   const label = (key) => t(`filter.criteria.${key}`);
@@ -97,6 +106,78 @@
     f7router.back();
   }
 
+  // "Save this filter": a name, then one undoable step.
+  let naming = $state(false);
+  let presetName = $state('');
+  let saveError = $state('');
+
+  function startSaving() {
+    presetName = filter.draft.preset?.name ?? '';
+    saveError = '';
+    naming = true;
+  }
+
+  /** @param {string} text */
+  function undoToast(text) {
+    f7.toast
+      .create({
+        text,
+        closeButton: true,
+        closeButtonText: t('edit.undo'),
+        closeTimeout: 5000,
+        position: 'bottom',
+        on: {
+          closeButtonClick: async () => {
+            try {
+              await undoLastChange();
+              await loadPresets();
+            } catch (e) {
+              console.error('Undo', e);
+            }
+          },
+        },
+      })
+      .open();
+  }
+
+  async function confirmSave() {
+    const name = presetName.trim();
+    if (!name) {
+      saveError = t('filter.nameRequired');
+      return;
+    }
+    try {
+      await savePreset(name, filter.draft, logbook.prefs);
+      naming = false;
+      undoToast(t('filter.saved', { name }));
+    } catch (e) {
+      const code = String(/** @type {any} */ (e)?.message ?? '');
+      console.error('Save a filter', code);
+      saveError = code.startsWith('NOT_IN_PRESET')
+        ? t('filter.notInPreset')
+        : code.startsWith('WRITE_LOCKED')
+          ? t('edit.writeLocked')
+          : t('filter.saveFailed');
+    }
+  }
+
+  /** @param {import('opendives-core').FilterPreset} p */
+  function removePreset(p) {
+    confirmAction({
+      title: t('filter.deleteTitle', { name: p.name }),
+      text: t('filter.deleteText'),
+      action: t('filter.delete'),
+      onConfirm: async () => {
+        try {
+          await deletePreset(p.index);
+          undoToast(t('filter.deleted', { name: p.name }));
+        } catch (e) {
+          console.error('Delete a filter', e);
+        }
+      },
+    });
+  }
+
   const showText = $derived(
     filter.draftCount === null ? t('filter.show') : t('filter.showCount', { n: filter.draftCount }),
   );
@@ -124,6 +205,25 @@
     onSearchbarSearch={(/** @type {any} */ _sb, /** @type {string} */ q) => (search = q)}
     onSearchbarClear={() => (search = '')}
   />
+
+  {#if filter.presets.length && !search.trim()}
+    <h2 class="group-title">{t('filter.savedFilters')}</h2>
+    <List inset={theme.ios} strong={theme.ios} dividers={theme.ios} class="criteria">
+      {#each filter.presets as p (p.name)}
+        <li class:set={filter.draft.preset?.name === p.name}>
+          <div class="item-content preset-row">
+            <button type="button" class="preset" aria-pressed={filter.draft.preset?.name === p.name} onclick={() => (filter.draft = presetCriteria(p))}>
+              <span class="preset-name">{p.name}</span>
+              {#if filter.draft.preset?.name === p.name}<Icon name="check" size={20} weight={2} />{/if}
+            </button>
+            <button type="button" class="od-icon-button" aria-label={t('filter.deleteNamed', { name: p.name })} onclick={() => removePreset(p)}>
+              <Icon name="close" size={20} />
+            </button>
+          </div>
+        </li>
+      {/each}
+    </List>
+  {/if}
 
   {#if showMode && !search.trim()}
     <h2 class="group-title" id="od-filter-mode">{t('filter.mode')}</h2>
@@ -198,14 +298,27 @@
   {#snippet fixedContent()}
     <div class="bottom">
       <button type="button" class="show" onclick={show} disabled={filter.draftCount === 0}>{showText}</button>
+      <button type="button" class="od-text-button save" onclick={startSaving} disabled={isEmpty(filter.draft)}>{t('filter.save')}</button>
     </div>
   {/snippet}
 </Page>
 
+{#if naming}
+  <Md3Dialog title={t('filter.saveTitle')} text={t('filter.saveText')} oncancel={() => (naming = false)}>
+    <div class="name-field">
+      <TextField label={t('filter.name')} bind:value={presetName} invalid={!!saveError} supporting={saveError} />
+    </div>
+    {#snippet actions()}
+      <button type="button" onclick={() => (naming = false)}>{t('dialog.cancel')}</button>
+      <button type="button" onclick={confirmSave}>{t('filter.saveConfirm')}</button>
+    {/snippet}
+  </Md3Dialog>
+{/if}
+
 <style>
   @layer od.components {
     :global(.od-filter .page-content) {
-      padding-bottom: 112px;
+      padding-bottom: 160px;
     }
 
     .group-title {
@@ -355,6 +468,43 @@
 
     .open .expand {
       transform: rotate(180deg);
+    }
+
+    .preset-row {
+      padding-inline-end: 4px;
+      gap: 4px;
+    }
+
+    .preset {
+      flex: 1;
+      min-height: 48px;
+      border: none;
+      background: none;
+      color: var(--od-text);
+      font: inherit;
+      font-size: 16px;
+      text-align: start;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+
+      :global(.ios) & {
+        font-size: 17px;
+      }
+    }
+
+    .preset-name {
+      flex: 1;
+    }
+
+    .save {
+      display: flex;
+      margin: 4px auto 0;
+    }
+
+    .name-field {
+      --od-field-margin: 24px;
     }
 
     .bottom {
