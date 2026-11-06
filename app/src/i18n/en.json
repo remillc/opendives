@@ -231,7 +231,7 @@
     "percent": "%",
     "kilograms": "kg",
     "pounds": "lb",
-    "hoursMinutes": "{h} h {mm} min"
+    "hoursMinutes": "{h} h {mm}"
   },
   "settings": {
     "title": "Settings",
@@ -775,13 +775,10 @@
     "title": "Statistics",
     "freeFilter": "Free filter",
     "filterShort": "Filter",
-    "notAvailable": "Not available yet",
     "figureDives": "Dives",
     "figureTime": "Under water",
     "figureDeepest": "Deepest",
-    "pendingValue": "Waiting for the core’s calculation",
-    "pending": "Computed by the Subsurface core: coming",
-    "pendingNote": "The totals will be computed by the Subsurface core. The per-dive charts already show the logbook.",
+    "pendingValue": "Not available",
     "charts": "Charts",
     "chartDepth": "Maximum depth",
     "chartDepthLabel": {
@@ -798,8 +795,6 @@
       "one": "Duration of {n} dive",
       "other": "Duration of {n} dives"
     },
-    "perDiveFrom": "Per dive, {from} to {to}",
-    "perDiveIn": "Per dive, in {year}",
     "perDiveRange": "Per dive, {min} to {max}",
     "mine": "My statistics",
     "mineEmpty": "Save a question you come back to, such as the dives with one suit or one tag.",
@@ -875,8 +870,6 @@
     "criterion": "Criterion",
     "criteriaHint": "Also: tag, buddy, guide, site, trip, mode, gas, cylinder, dive computer, year, rating…",
     "values": "Values in your logbook",
-    "countsPending": "The number of dives of each value will come from the Subsurface core.",
-    "valuesPending": "The values of this criterion will come from the Subsurface core: coming.",
     "noValues": "No value in your logbook.",
     "addCriterion": "Add a criterion",
     "addCriterionEllipsis": "Add a criterion…",

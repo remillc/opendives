@@ -38,12 +38,24 @@
     if (!nameTyped) name = proposed;
   });
 
+  // The whole logbook, as the values and their numbers of dives (the free
+  // filter applies once the statistic is shown in the section).
   $effect(() => {
-    computeStatistics($state.snapshot(chosen)).then((r) => (result = r));
+    computeStatistics($state.snapshot(chosen), { ignoreFilter: true }).then((r) => (result = r));
   });
 
-  /** Number of dives of each value of each criterion, from the core (pending until then). */
-  const counts = /** @type {Record<string, Record<string, number>>|null} */ (null);
+  /** Values of each field found in the logbook, with their number of dives (the core's stats_values). */
+  let valuesByField = $state(/** @type {Record<string, {key: string, label: string, dives: number}[]>} */ ({}));
+  $effect(() => {
+    void logbook.dives;
+    for (const c of criteria) {
+      const field = c.field;
+      if (valuesByField[field]) continue;
+      criterionValues(field, logbook.dives)
+        .then((values) => (valuesByField[field] = values))
+        .catch((e) => console.error('Statistic values', e));
+    }
+  });
 
   /** @param {number} index @param {string} field */
   function setField(index, field) {
@@ -111,7 +123,7 @@
       </Navbar>
 
       {#each criteria as c, index (index)}
-        {@const values = criterionValues(c.field, logbook.dives)}
+        {@const values = valuesByField[c.field]}
         {#if theme.ios}
           <div class="block-title">{t('stats.criterion')}</div>
           <div class="list list-strong inset list-dividers">
@@ -159,14 +171,13 @@
             <ul>
               {#each values as v (v.key)}
                 {@const on = c.values.includes(v.key)}
-                {@const count = counts?.[c.field]?.[v.key]}
                 <li>
                   {#if theme.ios}
                     <!-- iOS: a check mark at the end of the selected rows (HIG). -->
                     <button type="button" class="item-content check-row" role="checkbox" aria-checked={on} onclick={() => toggle(index, v.key, !on)}>
                       <div class="item-inner">
                         <div class="item-title">{v.label}</div>
-                        {#if count !== undefined}<div class="item-after od-value">{t('trip.dives', { n: count })}</div>{/if}
+                        <div class="item-after od-value">{t('trip.dives', { n: v.dives })}</div>
                         <span class="check" class:on><Icon name="check" size={20} weight={2.6} /></span>
                       </div>
                     </button>
@@ -176,7 +187,7 @@
                       <i class="icon icon-checkbox"></i>
                       <div class="item-inner">
                         <div class="item-title">{v.label}</div>
-                        {#if count !== undefined}<div class="item-after od-value">{t('trip.dives', { n: count })}</div>{/if}
+                        <div class="item-after od-value">{t('trip.dives', { n: v.dives })}</div>
                       </div>
                     </label>
                   {/if}
@@ -184,11 +195,8 @@
               {/each}
             </ul>
           </div>
-          {#if !counts}<p class="note">{t('stats.countsPending')}</p>{/if}
         {:else if values}
           <p class="note">{t('stats.noValues')}</p>
-        {:else}
-          <p class="note">{t('stats.valuesPending')}</p>
         {/if}
       {/each}
 

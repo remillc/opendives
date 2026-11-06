@@ -12,6 +12,7 @@
   import BarChart from '../components/BarChart.svelte';
   import StatsDetails from '../components/StatsDetails.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
+  import { filter } from '../lib/filter.svelte.js';
   import {
     chronological,
     computeStatistics,
@@ -39,6 +40,7 @@
 
   $effect(() => {
     void logbook.dives;
+    void filter.ids;
     computeStatistics($state.snapshot(criteria)).then((r) => (result = r));
   });
 
@@ -49,23 +51,12 @@
       t('stats.allDives'),
   );
 
-  /**
-   * The dives counted: from the core; for criteria on dates only, the dive
-   * list is enough to know them.
-   */
+  /** The dives counted by the core (invalid dives and the free filter left out), the oldest first. */
   const dives = $derived.by(() => {
-    if (result) {
-      const ids = new Set(result.diveIds);
-      return chronological(logbook.dives.filter((d) => ids.has(d.id)));
-    }
-    if (!criteria.every((c) => c.field === 'year' || c.field === 'month')) return null;
-    return chronological(
-      logbook.dives.filter((d) =>
-        criteria.every((c) => c.values.some((v) => d.date.startsWith(c.field === 'year' ? `${v}-` : v))),
-      ),
-    );
+    const ids = new Set(result?.diveIds ?? []);
+    return chronological(logbook.dives.filter((d) => ids.has(d.id)));
   });
-  const bars = $derived((dives ?? []).map((d) => ({ value: d.maxDepthMm, label: d.date.slice(0, 4) })));
+  const bars = $derived(dives.map((d) => ({ value: d.maxDepthMm, label: d.date.slice(0, 4) })));
 
   /** @param {number} index */
   function removeCriterion(index) {
@@ -97,20 +88,16 @@
       </span>
     {/each}
     <span class="count od-value" role="status">
-      {result ? t('stats.outOf', { n: result.total.dives, total: result.logDives }) : t('stats.pending')}
+      {result ? t('stats.outOf', { n: result.total.dives, total: result.logDives }) : ''}
     </span>
   </div>
 
   <KeyFigures figures={result?.total ?? null} prefs={logbook.prefs} />
 
   <div class="block-title">{t('stats.depthPerDive')}</div>
-  {#if dives}
-    <div class="chart-block">
-      <BarChart {bars} depth height={120} label={t('stats.chartDepthLabel', { n: dives.length })} />
-    </div>
-  {:else}
-    <p class="note">{t('stats.pending')}</p>
-  {/if}
+  <div class="chart-block">
+    <BarChart {bars} depth height={120} label={t('stats.chartDepthLabel', { n: dives.length })} />
+  </div>
 
   <StatsDetails
     figures={result?.total ?? null}
@@ -142,8 +129,6 @@
           {/each}
         </ul>
       </div>
-    {:else}
-      <p class="note">{t('stats.pending')}</p>
     {/if}
   {/if}
   <div class="end"></div>
@@ -226,12 +211,6 @@
       }
     }
 
-    .note {
-      margin: 8px 20px 0;
-      font-size: 13px;
-      line-height: 18px;
-      color: var(--od-text-2);
-    }
 
     /* MD3 text button (40 dp, 12 dp side padding); a plain text button on iOS. */
     .compare {

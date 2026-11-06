@@ -376,6 +376,10 @@ import { registerPlugin } from '@capacitor/core';
  * @property {(options: {kind: 'options'} | {kind: 'dives', fulltext?: string, mode?: string, rules: FilterRule[]}) => Promise<any>} filterQuery
  *   Read-only free filter (opendives.h): FilterOptions, or the identifiers of the
  *   dives matching every rule and the fulltext query (number[]).
+ * @property {(options: {kind: 'stats', criteria: Record<string, string[]>} | {kind: 'values', field: string}) => Promise<any>} statsQuery
+ *   Read-only statistics (opendives.h, stats and stats_values): the StatsResult of the
+ *   dives meeting the criteria ({field: [keys]}; any key of a field, every field), or the
+ *   values of one field in the log, [{key, dives, location?}]. Rejects with BAD_REQUEST.
  * @property {(options: {action: 'create'|'edit'|'geocode'|'merge'|'delete'|'deleteSite', uuid?: number, other?: number, uuids?: number[], field?: string, value?: string, lat?: number, lon?: number}) => Promise<EditResult>} siteAction
  *   One undoable site change, as Subsurface's site commands.
  * @property {(options: {tripId: number}) => Promise<TripDetail>} getTrip
@@ -449,6 +453,9 @@ export const OpenDivesCore = {
   },
   async filterQuery(options) {
     return JSON.parse((await native.filterQuery(options)).json);
+  },
+  async statsQuery(options) {
+    return JSON.parse((await native.statsQuery(options)).json);
   },
   async siteAction(options) {
     return JSON.parse((await native.siteAction(options)).json);

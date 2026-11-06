@@ -3,7 +3,7 @@
   // "In detail" block of a year or a filtered result: Subsurface's yearly
   // statistics (yearlystatisticsmodel.cpp), as the core computes them. The mean
   // duration is total / number of dives, as Subsurface shows it. A row without
-  // a value is not shown; while the core is pending, the pending text instead.
+  // a value is not shown; nothing while the core computes.
   import { formatDepth, formatHours, formatLongDuration, formatSac, formatTemperature, temperatureValue } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
 
@@ -41,8 +41,8 @@
   );
 </script>
 
-<div class="block-title">{t('stats.details')}</div>
-{#if figures}
+{#if shown.length}
+  <div class="block-title">{t('stats.details')}</div>
   <div class="list list-strong inset list-dividers">
     <ul>
       {#each shown as r (r.row)}
@@ -55,17 +55,4 @@
       {/each}
     </ul>
   </div>
-{:else}
-  <p class="note">{t('stats.pending')}</p>
 {/if}
-
-<style>
-  @layer od.components {
-    .note {
-      margin: 8px 20px 0;
-      font-size: 13px;
-      line-height: 18px;
-      color: var(--od-text-2);
-    }
-  }
-</style>
