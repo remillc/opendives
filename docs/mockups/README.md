@@ -1,6 +1,6 @@
 # Mock-ups (source)
 
-Copies of every board of the design canvas on claude.ai ([online](https://claude.ai/artifact/Jpuj8pGER3xz8n383JvYep), private), for the coding agent, refreshed on 6 November 2026. They are the HTML source of the boards: read them for structure, texts, sizes and colours. They need the canvas runtime to render, so they do not display correctly when opened alone. UI texts are in French, the reference language.
+Copies of every board of the design canvas on claude.ai ([online](https://claude.ai/artifact/Jpuj8pGER3xz8n383JvYep), private), for the coding agent, refreshed on 6 November 2026 (latest: account buttons, conditions, Sites, trip). They are the HTML source of the boards: read them for structure, texts, sizes and colours. They need the canvas runtime to render, so they do not display correctly when opened alone. UI texts are in French, the reference language.
 
 When a mock-up and `docs/ui-specification.md` disagree, the specification wins. Some older boards predate later decisions (for example, the bottom bar was replaced by the side menu on phones, and the full dive detail is `detail3-*`); follow the specification and the tasks in `docs/agent-inbox.md`.
 
@@ -62,3 +62,13 @@ When a mock-up and `docs/ui-specification.md` disagree, the specification wins. 
 | `compte-android-connecte.dc.html` | Compte, Android, connecté |
 | `compte-ios-sans-compte.dc.html` | Compte, iPhone, sans compte |
 | `compte-android-sans-compte.dc.html` | Compte, Android, sans compte |
+| `appbar-tiroir-android-ouvert-manuel.dc.html` | Barre du haut, menu latéral, Android, ouvert, synchronisation manuelle |
+| `compte-android-connecte-manuel.dc.html` | Compte, Android, synchronisation manuelle |
+| `compte-android-deconnexion.dc.html` | Compte, Android, confirmation de déconnexion |
+| `compte-android-suppression.dc.html` | Compte, Android, supprimer le compte |
+| `alarme-sombre-1.dc.html` | Couleurs alarme et en attente, sombre |
+| `voyage-android.dc.html` | Voyage, Android |
+| `sites-fiche-android.dc.html` | Sites, Android, fiche d'un site |
+| `sites-edition-android.dc.html` | Sites, Android, nouveau site |
+| `sites-sans-site-android.dc.html` | Sites, Android, plongées sans site |
+| `sites-nettoyer-android.dc.html` | Sites, Android, nettoyer les sites |
