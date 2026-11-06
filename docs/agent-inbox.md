@@ -181,7 +181,9 @@ Done in Compute the statistics with the core, two charts on the main screen
 
 The iPhone screens of the Statistics section are updated to match task 22: `docs/mockups/ios-stats-tableau.dc.html` (main screen), `ios-stats-annee.dc.html` (year), `ios-stats.dc.html` (filtered result, replaces the old "detail of a statistics row"), `ios-stats-nouvelle.dc.html` (new statistic, as a sheet with Annuler / Enregistrer). Same content and rules as on Android (`docs/ui-specification.md`, "Statistics"), with the iOS look: large title, inset grouped lists, chevrons in tertiary grey, actions as rows ("Nouvelle statistique…", "Ajouter un critère…"), a check mark for the selected values.
 
-## [ ] 2026-11-06-24 Tools: desaturation and gas calculator
+## [x] 2026-11-06-24 Tools: desaturation and gas calculator
+
+Done in Add the Tools section, gas calculator and Desaturation screen (the remaining desaturation time is not shown: no criterion in the core, Christian agreed)
 
 Follow "Tools" in `docs/ui-specification.md`, section 4. Build the Desaturation screen (`docs/mockups/outils-desaturation-android.dc.html`) with the core's tissue model (no new formula: if the core does not expose tissue loads after the last dives, stop and ask Christian), and add the cylinder type, EAD at the MOD and END at the MOD to the gas calculator (`android-outils.dc.html`), computed by the core's gas functions. The wait-before-flying rule is OpenDives' own: 12 h after one dive, 18 h after several dives in a day; show it as a recommendation, never as a guarantee.
 
