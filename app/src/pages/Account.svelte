@@ -7,7 +7,8 @@
   import { Page, Navbar, f7 } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
   import MenuButton from '../components/MenuButton.svelte';
-  import { logbook, setAutoSync, syncNow } from '../lib/logbook.svelte.js';
+  import { logbook, setAutoSync, signOut, syncNow } from '../lib/logbook.svelte.js';
+  import { showSection } from '../lib/navigation.svelte.js';
   import { formatDateTime, formatNumber, formatTimeOfDay } from '../lib/format.js';
   import { t, tIfExists } from '../lib/i18n.js';
 
@@ -32,6 +33,60 @@
     const region = code ? tIfExists(`account.regions.${code}`) : undefined;
     return region ? t('account.server', { region, host }) : t('account.serverHost', { host });
   });
+
+  /** @param {string} s */
+  const escape = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c] ?? c);
+
+  /**
+   * "Sign out" (spec, section 4): always confirmed. With changes not sent, the
+   * dialog says so and offers to sync first; deleting the device copy is only
+   * possible once everything is sent.
+   * @param {MouseEvent} e
+   */
+  function confirmSignOut(e) {
+    e.preventDefault();
+    const pending = logbook.pending;
+    const text = pending ? t('signOut.textPending', { n: pending }) : t('signOut.textNone');
+    const content = `
+      <p class="od-signout-text">${escape(text)}</p>
+      <label class="od-signout-copy${pending ? ' disabled' : ''}">
+        <span class="checkbox"><input type="checkbox"${pending ? ' disabled' : ''}><i class="icon-checkbox"></i></span>
+        <span>${escape(t('signOut.deleteCopy'))}${pending ? `<span class="od-signout-hint">${escape(t('signOut.deleteCopyHint'))}</span>` : ''}</span>
+      </label>`;
+    /** @param {any} dialog */
+    const deleteCopy = (dialog) => !pending && dialog.$el.find('input[type="checkbox"]')[0]?.checked === true;
+    const buttons = pending
+      ? [
+          { text: t('signOut.syncThenSignOut'), bold: true, onClick: () => syncThenSignOut() },
+          { text: t('signOut.signOutAnyway'), onClick: () => runSignOut(false) },
+          { text: t('signOut.cancel') },
+        ]
+      : [
+          { text: t('signOut.cancel') },
+          { text: t('signOut.confirm'), bold: true, onClick: (/** @type {any} */ dialog) => runSignOut(deleteCopy(dialog)) },
+        ];
+    f7.dialog.create({ title: t('signOut.title'), content, buttons, verticalButtons: pending > 0, cssClass: 'od-signout' }).open();
+  }
+
+  /** @param {boolean} deleteCopy */
+  async function runSignOut(deleteCopy) {
+    try {
+      await signOut({ deleteCopy });
+      showSection('logbook');
+    } catch (err) {
+      console.error('Signing out', err);
+      f7.toast.create({ text: t('signOut.failed'), closeTimeout: 3000, position: 'center' }).open();
+    }
+  }
+
+  async function syncThenSignOut() {
+    await syncNow();
+    if (logbook.pending > 0) {
+      f7.toast.create({ text: t('signOut.syncFailed'), closeTimeout: 3000, position: 'center' }).open();
+      return;
+    }
+    await runSignOut(false);
+  }
 
   /** Actions whose behaviour in Subsurface is still to be checked. */
   function notAvailable(/** @type {MouseEvent} */ e) {
@@ -125,7 +180,7 @@
     <div class="list list-strong inset list-dividers">
       <ul>
         <li>
-          <a href="#sign-out" class="item-link item-content external no-chevron" role="button" onclick={notAvailable}>
+          <a href="#sign-out" class="item-link item-content external no-chevron" role="button" onclick={confirmSignOut}>
             <div class="item-inner">
               <div class="item-title">
                 {t('account.signOut')}
@@ -233,6 +288,28 @@
 
     .pending {
       color: var(--od-pending);
+    }
+
+    /* Sign-out dialog (outside this page in the document): fully global selectors. */
+    :global(.od-signout .od-signout-text) {
+      margin: 0 0 12px;
+    }
+
+    :global(.od-signout .od-signout-copy) {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      text-align: start;
+    }
+
+    :global(.od-signout .od-signout-copy.disabled) {
+      opacity: 0.55;
+    }
+
+    :global(.od-signout .od-signout-hint) {
+      display: block;
+      font-size: 13px;
+      color: var(--od-text-2);
     }
 
     .danger {

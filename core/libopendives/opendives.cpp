@@ -22,6 +22,7 @@
 #include <chrono>
 #include <cstdio>
 #include <ctime>
+#include <filesystem>
 
 namespace opendives {
 
@@ -547,6 +548,38 @@ int cloud_configure(const std::string &email, const std::string &password, std::
 	if (!cloud_url)
 		return -1;
 	url = configured_url = *cloud_url;
+	return 0;
+}
+
+int cloud_sign_out(bool delete_copy, std::string &error)
+{
+	const std::string url = configured_url;
+	if (delete_copy && !url.empty()) {
+		struct git_info info;
+		if (is_git_repository(url.c_str(), &info) && log_exists(info.localdir)) {
+			// Never delete a copy that holds changes the server does not have.
+			if (internal::pending_for(url) > 0) {
+				error = "PENDING_CHANGES";
+				return -1;
+			}
+			std::error_code ec;
+			std::filesystem::remove_all(info.localdir, ec);
+			if (ec) {
+				error = "DELETE_FAILED: " + ec.message();
+				return -1;
+			}
+		}
+	}
+	// Close the log and forget the account.
+	divelog.clear();
+	loaded_git_commit.clear();
+	current_log_path.clear();
+	loaded_cloud_url.clear();
+	configured_url.clear();
+	internal::on_log_loaded();
+	prefs.cloud_storage_email.clear();
+	prefs.cloud_storage_email_encoded.clear();
+	prefs.cloud_storage_password.clear();
 	return 0;
 }
 

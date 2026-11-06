@@ -19,6 +19,11 @@ export function enableBackButton() {
     }
     // 3. An open sheet or dialog closes.
     const modal = document.querySelector('.modal-in');
+    // First launch waits for a choice: Back sends the app to the background.
+    if (modal?.classList.contains('od-welcome')) {
+      CapacitorApp.minimizeApp();
+      return;
+    }
     if (modal) {
       if (modal.classList.contains('actions-modal')) f7.actions.close();
       else if (modal.classList.contains('dialog')) f7.dialog.close();

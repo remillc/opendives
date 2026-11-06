@@ -18,6 +18,7 @@ internal object NativeCore {
     external fun cloudConfigure(email: String, password: String)
     external fun cloudListCachedDives(): String
     external fun pendingChanges(): String
+    external fun cloudSignOut(deleteCopy: Boolean)
 
     /** The one call allowed off the core thread, even during a load (see opendives.h). */
     external fun cloudProbe(): String

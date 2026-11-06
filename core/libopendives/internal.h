@@ -28,6 +28,10 @@ int dive_json(int id, std::string &json, std::string &error);
 // JSON array of the dives in memory, as list_dives() returns (opendives.cpp).
 std::string dives_json();
 
+// Local commits of the git log `log` not on its remote-tracking branch
+// (edit.cpp), whatever log is in memory.
+int pending_for(const std::string &log);
+
 } // namespace opendives::internal
 
 #endif

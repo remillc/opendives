@@ -13,9 +13,10 @@
   import Icon from './components/Icon.svelte';
   import AdaptiveLabel from './components/AdaptiveLabel.svelte';
   import NavMenu from './components/NavMenu.svelte';
+  import Welcome from './components/Welcome.svelte';
   import { layout } from './lib/layout.svelte.js';
   import { trackSection } from './lib/navigation.svelte.js';
-  import { loadLogbook } from './lib/logbook.svelte.js';
+  import { logbook, loadLogbook } from './lib/logbook.svelte.js';
   import { enableBackButton } from './lib/back-button.js';
   import { enableAccessibility } from './lib/accessibility.js';
   import { t } from './lib/i18n.js';
@@ -65,12 +66,14 @@
     enableBackButton();
     enableAccessibility();
     trackSection();
-    loadLogbook();
+    // After signing out, first launch is shown and nothing is loaded until a choice.
+    if (!logbook.welcome) loadLogbook();
   });
 </script>
 
 <App {...f7params}>
   {#if layout.phone}<NavMenu />{/if}
+  <Welcome />
   <Views tabs class="safe-areas">
     {#if !layout.phone}
     <Toolbar tabbar icons bottom>

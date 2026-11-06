@@ -36,7 +36,51 @@ export const logbook = $state({
   autoSync: readAutoSync(),
   /** Local changes of the cloud log not sent yet. */
   pending: 0,
+  /** First launch is shown (after signing out): nothing is loaded until a choice is made. */
+  welcome: readWelcome(),
 });
+
+function readWelcome() {
+  try {
+    return localStorage.getItem('od.welcome') === 'show';
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Signs out (spec, section 4, "Sign out"): the core closes the log and forgets
+ * the account, the credentials are forgotten, and first launch is shown. The
+ * device copy is kept, unless deleteCopy (refused while changes are not sent).
+ * @param {{ deleteCopy?: boolean }} [options]
+ */
+export async function signOut({ deleteCopy = false } = {}) {
+  await OpenDivesCore.signOut({ deleteCopy });
+  logbook.dives = [];
+  logbook.email = '';
+  logbook.server = '';
+  logbook.sync = 'local';
+  logbook.pending = 0;
+  logbook.lastSync = null;
+  logbook.welcome = true;
+  try {
+    localStorage.removeItem('od.lastSync');
+    localStorage.setItem('od.welcome', 'show');
+  } catch {
+    // Not fatal.
+  }
+}
+
+/** First launch, "Start without an account": the logbook of this device. */
+export function startWithoutAccount() {
+  logbook.welcome = false;
+  try {
+    localStorage.removeItem('od.welcome');
+  } catch {
+    // Not fatal.
+  }
+  return loadLogbook();
+}
 
 function readAutoSync() {
   try {

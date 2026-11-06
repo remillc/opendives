@@ -148,6 +148,20 @@ class OpenDivesCorePlugin : Plugin() {
         call.resolve(JSObject().put("json", NativeCore.pendingChanges()))
     }
 
+    /**
+     * Signs out: the core closes the log and forgets the account (and deletes
+     * the device copy when asked, never with changes not sent), then the
+     * stored credentials are forgotten. For now they are the development file;
+     * the Android keystore comes with the sign-in screen.
+     */
+    @PluginMethod
+    fun signOut(call: PluginCall) = onCoreThread(call) {
+        NativeCore.cloudSignOut(call.getBoolean("deleteCopy", false) == true)
+        File(context.filesDir, DEV_CREDENTIALS).delete()
+        Log.i(TAG, "signOut: credentials forgotten")
+        call.resolve()
+    }
+
     private fun readDevCredentials(): Pair<String, String>? {
         val file = File(context.filesDir, DEV_CREDENTIALS)
         if (!file.exists()) return null

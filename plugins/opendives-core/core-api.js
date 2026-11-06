@@ -125,6 +125,9 @@ import { registerPlugin } from '@capacitor/core';
  * @property {() => Promise<{id: string, summary: string, message: string}[]>} pendingChanges
  *   Local commits of the loaded cloud log not yet on the server, newest first;
  *   empty for a log without account.
+ * @property {(options?: {deleteCopy?: boolean}) => Promise<void>} signOut
+ *   Closes the cloud log and forgets the account and its credentials; the
+ *   device copy is kept unless deleteCopy (refused with changes not sent).
  * @property {(options: {id: number}) => Promise<DiveDetail>} getDive
  *   Detail of one dive of the last loaded log.
  * @property {() => Promise<Prefs>} getPrefs
@@ -160,6 +163,7 @@ export const OpenDivesCore = {
     const { json } = await native.pendingChanges();
     return JSON.parse(json);
   },
+  signOut: (options = {}) => native.signOut(options),
   getDive: (options) => native.getDive(options),
   getPrefs: () => native.getPrefs(),
 };

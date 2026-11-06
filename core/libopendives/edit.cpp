@@ -622,6 +622,11 @@ std::string sync_json(const std::string &status, bool reloaded)
 
 namespace internal {
 
+int pending_for(const std::string &log)
+{
+	return static_cast<int>(list_pending(log).size());
+}
+
 void on_log_loaded()
 {
 	steps.clear();

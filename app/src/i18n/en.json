@@ -182,7 +182,7 @@
     "changePasswordText": "A link is sent to your email",
     "leaveGroup": "Leave",
     "signOut": "Sign out",
-    "signOutText": "The logbook stays in the cloud; it is removed from this device until you sign in again",
+    "signOutText": "The logbook stays in the cloud. A copy stays on this device, not shown, and is used if you sign in again.",
     "delete": "Delete account",
     "deleteText": "Deletes the account and all its dives from the Subsurface cloud. Cannot be undone.",
     "server": "Connected through the {region} server ({host}).",
@@ -210,5 +210,31 @@
     "notAvailable": "Not available yet",
     "autoSyncOff": "Off: changes stay on this device, and those from other devices do not arrive, until you sync",
     "pending": "Changes not sent"
+  },
+  "welcome": {
+    "title": "OpenDives",
+    "intro": "Your dive logbook, on your phone and tablet. How do you want to start?",
+    "existing": "I already have a Subsurface account",
+    "existingText": "Your dives are backed up in the Subsurface cloud. A copy stays on this device: you can read it without a network, and it is updated when the network is back.",
+    "create": "Create a Subsurface account",
+    "createText": "Free. Your dives are backed up and shared between your phone, your tablet and your computer. You can bring your divelogs.de logbook into it.",
+    "noAccount": "Start without an account",
+    "noAccountText": "Your dives stay on this device only: no backup, and no sharing with your other devices. You can create an account later and send your logbook to it."
+  },
+  "signOut": {
+    "title": "Sign out?",
+    "textNone": "The logbook stays in the cloud. A copy stays on this device, not shown, and is used if you sign in again.",
+    "textPending": {
+      "one": "{n} change is not sent to the cloud yet. If you sign out anyway, it will be sent the next time you sign in to this account, from this device.",
+      "other": "{n} changes are not sent to the cloud yet. If you sign out anyway, they will be sent the next time you sign in to this account, from this device."
+    },
+    "deleteCopy": "Also delete the copy on this device",
+    "deleteCopyHint": "Possible once the changes are sent",
+    "confirm": "Sign out",
+    "syncThenSignOut": "Sync, then sign out",
+    "signOutAnyway": "Sign out anyway",
+    "cancel": "Cancel",
+    "syncFailed": "The changes could not be sent; you are still signed in.",
+    "failed": "Signing out did not complete; nothing was deleted."
   }
 }

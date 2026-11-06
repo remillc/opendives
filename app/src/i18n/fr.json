@@ -182,7 +182,7 @@
     "changePasswordText": "Un lien est envoyé à votre courriel",
     "leaveGroup": "Quitter",
     "signOut": "Se déconnecter",
-    "signOutText": "Le carnet reste dans le cloud ; il est retiré de cet appareil jusqu’à la prochaine connexion",
+    "signOutText": "Le carnet reste dans le cloud. Une copie reste sur cet appareil, non affichée, et sert si vous vous reconnectez.",
     "delete": "Supprimer le compte",
     "deleteText": "Supprime le compte et toutes ses plongées du cloud Subsurface. Irréversible.",
     "server": "Connecté via le serveur {region} ({host}).",
@@ -210,5 +210,31 @@
     "notAvailable": "Pas encore disponible",
     "autoSyncOff": "Désactivée : les modifications restent sur cet appareil, et celles des autres appareils n'arrivent pas, tant que vous ne synchronisez pas",
     "pending": "Modifications non envoyées"
+  },
+  "welcome": {
+    "title": "OpenDives",
+    "intro": "Votre carnet de plongée, sur le téléphone et la tablette. Comment voulez-vous commencer ?",
+    "existing": "J'ai déjà un compte Subsurface",
+    "existingText": "Vos plongées sont sauvegardées dans le cloud Subsurface. Une copie reste sur cet appareil : vous la consultez même sans réseau, et elle se met à jour quand le réseau revient.",
+    "create": "Créer un compte Subsurface",
+    "createText": "Gratuit. Vos plongées sont sauvegardées et partagées entre votre téléphone, votre tablette et votre ordinateur. Vous pourrez y reprendre votre carnet divelogs.de.",
+    "noAccount": "Commencer sans compte",
+    "noAccountText": "Vos plongées restent seulement sur cet appareil : pas de sauvegarde, et pas de partage avec vos autres appareils. Vous pourrez créer un compte plus tard et y envoyer votre carnet."
+  },
+  "signOut": {
+    "title": "Se déconnecter ?",
+    "textNone": "Le carnet reste dans le cloud. Une copie reste sur cet appareil, non affichée, et sert si vous vous reconnectez.",
+    "textPending": {
+      "one": "{n} modification n'est pas encore envoyée au cloud. Si vous vous déconnectez quand même, elle sera envoyée à votre prochaine connexion à ce compte, depuis cet appareil.",
+      "other": "{n} modifications ne sont pas encore envoyées au cloud. Si vous vous déconnectez quand même, elles seront envoyées à votre prochaine connexion à ce compte, depuis cet appareil."
+    },
+    "deleteCopy": "Effacer aussi la copie de cet appareil",
+    "deleteCopyHint": "Possible une fois les modifications envoyées",
+    "confirm": "Se déconnecter",
+    "syncThenSignOut": "Synchroniser puis se déconnecter",
+    "signOutAnyway": "Se déconnecter quand même",
+    "cancel": "Annuler",
+    "syncFailed": "Les modifications n'ont pas pu être envoyées ; vous restez connecté.",
+    "failed": "La déconnexion n'a pas abouti ; rien n'a été effacé."
   }
 }

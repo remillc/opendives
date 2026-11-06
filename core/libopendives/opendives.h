@@ -69,6 +69,13 @@ int cloud_list_dives(const std::string &email, const std::string &password, std:
 // Returns 1, with `json` empty, when there is no local cache yet.
 int cloud_list_cached_dives(std::string &json, std::string &error);
 
+// Signs out of the cloud account (spec, section 4, "Sign out"): closes the log
+// in memory and forgets the account. The local copy of the account's log is
+// kept, and reused if the diver signs in again, unless `delete_copy`: then it
+// is deleted, but never while it holds changes not sent (PENDING_CHANGES).
+// The app forgets the stored credentials itself.
+int cloud_sign_out(bool delete_copy, std::string &error);
+
 // Read-only, network only: asks the server for the head of the log branch of
 // the account set by cloud_configure(). Writes {"exists":…, "head":…}.
 // The one façade function that may run on another thread than the core's,

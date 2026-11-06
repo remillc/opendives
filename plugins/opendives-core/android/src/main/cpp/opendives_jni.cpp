@@ -86,6 +86,14 @@ Java_org_opendives_core_NativeCore_cloudListCachedDives(JNIEnv *env, jobject)
 	return env->NewStringUTF(json.c_str());
 }
 
+JNIEXPORT void JNICALL
+Java_org_opendives_core_NativeCore_cloudSignOut(JNIEnv *env, jobject, jboolean deleteCopy)
+{
+	std::string error;
+	if (opendives::cloud_sign_out(deleteCopy, error))
+		throw_core_error(env, error);
+}
+
 // Local commits of the cloud log not yet on the server, as a JSON array.
 JNIEXPORT jstring JNICALL
 Java_org_opendives_core_NativeCore_pendingChanges(JNIEnv *env, jobject)
