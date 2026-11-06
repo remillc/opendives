@@ -281,6 +281,17 @@ export function startWithoutAccount() {
   return loadLogbook();
 }
 
+/**
+ * Signed in, or a new account with its first logbook: first launch closes
+ * and the logbook of the account is loaded (its credentials are stored).
+ */
+export function accountReady() {
+  logbook.welcome = false;
+  writeWelcomeState('done');
+  logbook.lastSync = null;
+  return loadLogbook();
+}
+
 function readAutoSync() {
   try {
     return localStorage.getItem('od.autoSync') !== 'false';

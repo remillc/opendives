@@ -204,3 +204,38 @@ Every text field of the app now uses the MD3 filled variant (`docs/ui-specificat
 Done in Sites: new site FAB, smaller centre-on-me button
 
 The Sites screen gets back its FAB "+" (56 dp, aria-label "Nouveau site") at the bottom right over the list panel, opening the new site form. The "Centrer sur ma position" button becomes a small 40 dp button at the bottom right of the visible map. The panel keeps 88 dp of bottom padding. See `docs/ui-specification.md` (Sites) and `docs/mockups/android-sites.dc.html`.
+
+## [ ] 2026-11-06-29 Statistics: remove the maximum depth chart
+
+The Statistics screen keeps two ready-made charts: dives per year and dive durations. Remove the maximum depth chart from the main screen (Android and iOS). Maximum depth per dive stays on the year and filtered result screens. See `docs/ui-specification.md` (Statistics) and `docs/mockups/android-stats.dc.html`, `docs/mockups/ios-stats-tableau.dc.html`.
+
+## [x] 2026-11-06-30 Aligner Se connecter, Nouveau compte étape 1 et le code de confirmation sur les nouvelles maquettes
+
+Done in Build the sign-in, new account and import screens
+
+Align Sign in, New account step 1 and the confirmation code with the new mock-ups. The confirmation code is a new screen between step 1 and step 2 ("Reprendre votre carnet ?"), using `cloud_verify_pin`, with "Renvoyer le code". Show the states: request in progress (fields and button disabled, spinner, linear indicator on Android), wrong credentials, invalid email, wrong code. First launch and Account without an account now open these screens. See `docs/ui-specification.md` (section 4, "Sign in and new account").
+
+Mock-ups, Android then iPhone:
+- `docs/mockups/compte-connexion-android.dc.html`, `compte-connexion-encours-android.dc.html`, `compte-connexion-erreur-android.dc.html`
+- `docs/mockups/compte-creation-android.dc.html`
+- `docs/mockups/compte-code-android.dc.html`, `compte-code-erreur-android.dc.html`
+- `docs/mockups/compte-connexion-ios.dc.html`, `compte-connexion-encours-ios.dc.html`, `compte-connexion-erreur-ios.dc.html`
+- `docs/mockups/compte-creation-ios.dc.html`
+- `docs/mockups/compte-code-ios.dc.html`, `compte-code-erreur-ios.dc.html`
+- Links updated in `android-accueil`, `ios-accueil`, `compte-android-sans-compte`, `compte-ios-sans-compte`.
+
+## [x] 2026-11-06-31 New account step 2: "Continuer" button
+
+Done in Build the sign-in, new account and import screens
+
+On "Reprendre votre carnet ?", the main button at the bottom applies to the selected choice, so its label is now "Continuer" instead of "Télécharger mes plongées": divelogs.de starts the download, file opens the file picker, empty logbook opens the logbook. Mock-ups: `docs/mockups/android-compte-import.dc.html`, `docs/mockups/ios-compte-import.dc.html`.
+
+## [x] 2026-11-06-32 New account: import progress and failure
+
+Done in Build the sign-in, new account and import screens
+
+After "Continuer" on step 2, show the import progress screen, then the Logbook, or the failure screen. See `docs/ui-specification.md` (section 4, "Sign in and new account"). Mock-ups: `docs/mockups/compte-import-encours-android.dc.html`, `compte-import-echec-android.dc.html`, `compte-import-encours-ios.dc.html`, `compte-import-echec-ios.dc.html`.
+
+## [ ] 2026-11-06-33 New account: check divelogs.de credentials first, "Précédent", "Renvoyer le code" under the field
+
+On step 2, "Continuer" with divelogs.de checks the credentials before the import starts. If divelogs.de refuses them, stay on step 2 with the error under the password field. The import failure screen now only covers failures during the import, with "Réessayer". Step 2 also gets a "Précédent" button back to step 1 (the account already exists: do not create a second one). On the confirmation code screen, "Renvoyer le code" is a button with a refresh icon right under the field (outlined on Android, tinted grey on iOS). See `docs/ui-specification.md` (section 4, "Sign in and new account"). Mock-ups: `android-compte-import`, `ios-compte-import`, `compte-import-identifiants-android`, `compte-import-identifiants-ios`, `compte-import-echec-android`, `compte-import-echec-ios`, `compte-code-android`, `compte-code-erreur-android`, `compte-code-ios`, `compte-code-erreur-ios`.

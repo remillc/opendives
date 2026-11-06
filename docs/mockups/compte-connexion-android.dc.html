@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Se connecter, Android</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:#1F2124}a:hover{color:#1F2124}
+@keyframes odlin{0%{left:-40%}100%{left:100%}}
+@keyframes odspin{to{transform:rotate(360deg)}}
+input::placeholder{color:#8E8E93;-webkit-text-fill-color:#8E8E93}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #F4F4F2; font-family: Roboto, 'Google Sans', system-ui, sans-serif; color: #1F2124; position: relative; overflow: hidden">
+  <div style="padding: 40px 8px 0 4px; height: 104px; box-sizing: border-box; display: flex; align-items: center; gap: 4px">
+    <a href="compte-android-sans-compte.dc.html" aria-label="Fermer" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #1F2124; stroke-width: 2; stroke-linecap: round"><path d="M6 6l12 12 M18 6L6 18"></path></svg></a>
+    <span style="flex: 1; font-size: 22px; line-height: 28px">Se connecter</span>
+  </div>
+  <div style="padding: 8px 24px 0 24px; display: flex; flex-direction: column; gap: 8px">
+    <h1 style="margin: 0; font-size: 24px; line-height: 32px; font-weight: 400">Votre compte Subsurface</h1>
+    <p style="margin: 0; font-size: 14px; line-height: 20px; color: #4A4D52; letter-spacing: 0.25px">Le même compte que dans Subsurface sur l'ordinateur ou dans Subsurface-mobile. Vos plongées sont lues depuis le cloud, puis une copie reste sur cet appareil.</p>
+  </div>
+  <form onsubmit="return false" style="margin: 24px 16px 0 16px; display: flex; flex-direction: column; gap: 16px">
+      <div>
+        <label style="position: relative; display: flex; align-items: center; gap: 8px; height: 56px; background: #E8E8E5; border-bottom: 1px solid #75787C; border-radius: 4px 4px 0 0; padding: 0 16px; box-sizing: border-box">
+          <span style="position: absolute; left: 16px; top: 8px; font-size: 12px; line-height: 16px; color: #4A4D52">Adresse e-mail</span>
+          <input type="email" value="vous@exemple.com" autocomplete="email" aria-label="Adresse e-mail" style="flex: 1; min-width: 0; margin-top: 16px; border: none; background: transparent; font-family: inherit; font-size: 16px; line-height: 24px; color: #1F2124; padding: 0; outline: none">
+        </label>
+      </div>
+      <div>
+        <label style="position: relative; display: flex; align-items: center; gap: 8px; height: 56px; background: #E8E8E5; border-bottom: 2px solid #1F2124; border-radius: 4px 4px 0 0; padding: 0 16px; box-sizing: border-box">
+          <span style="position: absolute; left: 16px; top: 8px; font-size: 12px; line-height: 16px; color: #4A4D52">Mot de passe</span>
+          <input type="password" value="••••••••••" autocomplete="current-password" aria-label="Mot de passe" style="flex: 1; min-width: 0; margin-top: 16px; border: none; background: transparent; font-family: inherit; font-size: 16px; line-height: 24px; color: #1F2124; padding: 0; outline: none"><button aria-label="Afficher le mot de passe" style="flex: none; width: 48px; height: 48px; margin-right: -12px; border: none; background: none; padding: 0; display: flex; align-items: center; justify-content: center"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #4A4D52; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"></path><circle cx="12" cy="12" r="3"></circle></svg></button>
+        </label><span style="display: block; padding: 4px 16px 0 16px; font-size: 12px; line-height: 16px; letter-spacing: 0.4px; color: #4A4D52">Gardé seulement dans le stockage sécurisé de cet appareil</span>
+      </div>
+  </form>
+  <div style="position: absolute; left: 24px; right: 24px; bottom: 32px; display: flex; justify-content: space-between; align-items: center">
+    <span style="flex: 1"></span><a href="compte-connexion-encours-android.dc.html" style="height: 40px; padding: 0 24px; border-radius: 20px; background: #1F2124; color: #FFFFFF; text-decoration: none; font-size: 14px; font-weight: 500; letter-spacing: 0.1px; display: inline-flex; align-items: center">Se connecter</a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

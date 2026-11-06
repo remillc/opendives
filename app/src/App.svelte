@@ -15,6 +15,8 @@
   import SignIn from './pages/SignIn.svelte';
   import CreateAccount from './pages/CreateAccount.svelte';
   import BringLogbook from './pages/BringLogbook.svelte';
+  import ConfirmCode from './pages/ConfirmCode.svelte';
+  import ImportProgress from './pages/ImportProgress.svelte';
   import EditDive from './pages/EditDive.svelte';
   import Trip from './pages/Trip.svelte';
   import Sites from './pages/Sites.svelte';
@@ -75,11 +77,16 @@
       // Signing in and creating an account, from the Account screen without an account.
       { path: '/account/sign-in/', component: SignIn },
       { path: '/account/create/', component: CreateAccount },
+      { path: '/account/code/', component: ConfirmCode },
+      { path: '/account/import/', component: BringLogbook },
+      { path: '/account/importing/', component: ImportProgress },
       // First launch, in the view of its popup (components/Welcome.svelte).
       { path: '/welcome/', component: WelcomeStart },
-      { path: '/welcome/sign-in/', component: SignIn },
+      { path: '/welcome/sign-in/', component: SignIn, options: { props: { welcome: true } } },
       { path: '/welcome/create/', component: CreateAccount, options: { props: { welcome: true } } },
+      { path: '/welcome/code/', component: ConfirmCode, options: { props: { welcome: true } } },
       { path: '/welcome/import/', component: BringLogbook },
+      { path: '/welcome/importing/', component: ImportProgress },
       { path: '/dive/:id/edit/', component: EditDive },
       { path: '/trip/:id/', component: Trip },
       // The planner: /plan/new/ for a new dive, /plan/<dive id>/ from a logbook dive.

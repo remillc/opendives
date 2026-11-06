@@ -1,11 +1,15 @@
 <script>
   // @ts-check
+  import Icon from './Icon.svelte';
   // Text field (spec, section 4, "Text fields"): the MD3 filled variant.
   // Surface-container-highest background (--od-surface-2), 4 dp top corners,
   // a 1 dp bottom indicator, 2 dp in the primary colour on focus. The label is
   // inside the field: full size when the field is empty and not focused (no
   // placeholder), small above the value on focus or once there is a value.
   // Helper text under the field; an optional plain icon button at the end.
+  // In error (invalid): the label and a 2 dp indicator in --od-alarm, an error
+  // icon at the end instead of the button, the helper text in --od-alarm.
+  // Disabled: the whole field at 38 % (MD3).
   // Side margins: 16 dp on the page, 12 dp inside a white surface (set
   // --od-field-margin on the surface).
 
@@ -17,8 +21,9 @@
    *   supporting?: string,
    *   invalid?: boolean,
    *   inputmode?: 'text'|'decimal'|'numeric',
-   *   type?: 'text'|'password',
+   *   type?: 'text'|'password'|'email',
    *   autocomplete?: import('svelte/elements').FullAutoFill,
+   *   disabled?: boolean,
    *   onchange?: () => void,
    *   oninput?: (e: Event) => void,
    *   trailing?: import('svelte').Snippet,
@@ -33,6 +38,7 @@
     inputmode = 'text',
     type = 'text',
     autocomplete,
+    disabled = false,
     onchange,
     oninput,
     trailing,
@@ -45,7 +51,7 @@
   const floated = $derived(focused || !!value);
 </script>
 
-<div class="field" class:focused class:invalid class:floated class:multiline>
+<div class="field" class:focused class:invalid class:floated class:multiline class:disabled>
   <!-- A tap anywhere in the field focuses the input. -->
   <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
   <div class="box" onclick={() => input?.focus()}>
@@ -60,6 +66,7 @@
           {type}
           {inputmode}
           {autocomplete}
+          {disabled}
           bind:value
           {onchange}
           {oninput}
@@ -69,7 +76,11 @@
         />
       {/if}
     </div>
-    {#if trailing}<div class="trailing">{@render trailing()}</div>{/if}
+    {#if invalid && !multiline}
+      <div class="error-icon"><Icon name="error" /></div>
+    {:else if trailing}
+      <div class="trailing">{@render trailing()}</div>
+    {/if}
   </div>
   {#if supporting}<p class="supporting">{supporting}</p>{/if}
 </div>
@@ -180,6 +191,17 @@
       min-height: 72px;
       resize: none;
       field-sizing: content;
+    }
+
+    .disabled {
+      opacity: 0.38;
+      pointer-events: none;
+    }
+
+    .error-icon {
+      flex: none;
+      display: flex;
+      color: var(--od-alarm);
     }
 
     /* Plain icon button at the end (spec: no filled background). */

@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Se connecter, erreur, iPhone</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:#1F2124}a:hover{color:#1F2124}
+@keyframes odlin{0%{left:-40%}100%{left:100%}}
+@keyframes odspin{to{transform:rotate(360deg)}}
+input::placeholder{color:#8E8E93;-webkit-text-fill-color:#8E8E93}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #F4F4F2; font-family: -apple-system, 'SF Pro Text', system-ui, sans-serif; color: #000000; position: relative; overflow: hidden">
+  <div style="padding: 54px 8px 0 8px; height: 98px; box-sizing: border-box; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: center; background: #F9F9F7; border-bottom: 0.5px solid #DADAD6">
+    <a href="compte-ios-sans-compte.dc.html" style="font-size: 17px; text-decoration: none; color: #1F2124; min-height: 44px; display: flex; align-items: center; padding-left: 8px">Annuler</a>
+    <span style="text-align: center; font-size: 17px; font-weight: 600; white-space: nowrap">Se connecter</span>
+    <span style="justify-self: end; font-size: 15px; color: #3C3C43; padding-right: 8px"></span>
+  </div>
+  <div style="padding: 20px 32px 0 32px; display: flex; flex-direction: column; gap: 6px">
+    <h1 style="margin: 0; font-size: 28px; line-height: 34px; font-weight: 700">Votre compte Subsurface</h1>
+    <p style="margin: 0; font-size: 15px; line-height: 21px; color: #3C3C43">Le même compte que dans Subsurface sur l'ordinateur ou dans Subsurface-mobile. Vos plongées sont lues depuis le cloud, puis une copie reste sur cet appareil.</p>
+  </div>
+  <form onsubmit="return false">
+  <div style="margin: 20px 16px 0 16px">
+    <div style="background: #FFFFFF; border-radius: 10px; overflow: hidden">
+      <label style="min-height: 44px; padding: 0 16px; display: flex; align-items: center; gap: 12px"><span style="width: 112px; flex: none; font-size: 17px; color: #000000">E-mail</span><input type="email" value="vous@exemple.com" autocomplete="email" placeholder="" style="flex: 1; min-width: 0; height: 44px; border: none; background: transparent; padding: 0; font-family: inherit; font-size: 17px; color: #000000; -webkit-text-fill-color: #000000; outline: none"></label>
+      <label style="border-top: 0.5px solid #E8E8E5; min-height: 44px; padding: 0 16px; display: flex; align-items: center; gap: 12px"><span style="width: 112px; flex: none; font-size: 17px; color: #000000">Mot de passe</span><input type="password" value="••••••••••" autocomplete="current-password" aria-invalid="true" placeholder="" style="flex: 1; min-width: 0; height: 44px; border: none; background: transparent; padding: 0; font-family: inherit; font-size: 17px; color: #C62828; -webkit-text-fill-color: #C62828; outline: none"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" style="flex: none; fill: #C62828"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"></path></svg></label>
+    </div>
+    <p style="margin: 6px 16px 0 16px; font-size: 13px; line-height: 18px; color: #C62828">Adresse ou mot de passe incorrect</p>
+  </div>
+  </form>
+  <div style="position: absolute; left: 16px; right: 16px; bottom: 40px; display: flex; flex-direction: column; gap: 8px">
+    <a href="compte-connexion-encours-ios.dc.html" style="width: 100%; height: 52px; border-radius: 14px; background: #1F2124; color: #FFFFFF; text-decoration: none; font-size: 17px; font-weight: 600; display: flex; align-items: center; justify-content: center">Se connecter</a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

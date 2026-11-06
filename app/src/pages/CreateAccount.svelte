@@ -1,15 +1,17 @@
 <script>
   // @ts-check
-  // New Subsurface cloud account, step 1 of 2 on first launch (spec, section
-  // 4: cloud_create_account, then validation with a PIN sent by email). No
-  // mock-up for this step: built in the frame of step 2. The email and
-  // password are checked with Subsurface's own rules (core/cloudstorage.cpp,
-  // isValidEmail and isValidPassword). Creating the account is not built:
-  // the action says so, nothing is sent. On first launch the dialog offers a
-  // preview of step 2 (BringLogbook).
-  import TextField from '../components/TextField.svelte';
+  // New Subsurface cloud account, step 1 of 2 (docs/mockups/
+  // compte-creation-*.dc.html; spec, section 4, "Sign in and new account").
+  // The email and password are checked with Subsurface's own rules, then
+  // cloud_create_account: the server mails a code (next screen,
+  // ConfirmCode). An email that already has an account with this password
+  // signs in instead. Creating an account writes to the cloud: refused, for
+  // now, except on the test account (write lock).
+  import { OpenDivesCore } from 'opendives-core';
+  import AccountField from '../components/AccountField.svelte';
   import AccountStep from '../components/AccountStep.svelte';
   import { notAvailableYet } from '../lib/not-available.js';
+  import { errorCode, finishAccount, showFailure, validEmail, validPassword } from '../lib/account.js';
   import { t } from '../lib/i18n.js';
 
   /** @type {{ f7router: any, welcome?: boolean }} */
@@ -17,50 +19,71 @@
 
   let email = $state('');
   let password = $state('');
-  let checked = $state(false);
+  let busy = $state(false);
+  let emailError = $state('');
+  let passwordError = $state('');
 
-  // Ported from core/cloudstorage.cpp (isValidEmail, isValidPassword).
-  const EMAIL = /^[a-zA-Z0-9.+_-]+@[a-zA-Z0-9.+_-]+\.[a-zA-Z0-9+_-]{2,}$/;
-  const PASSWORD = /^[a-zA-Z0-9@.+_-]+$/;
-  const emailValid = $derived(email.length <= 254 && email.indexOf('@') <= 64 && EMAIL.test(email.trim()));
-  const passwordValid = $derived(PASSWORD.test(password));
-
-  function create() {
-    checked = true;
-    if (!emailValid || !passwordValid) return;
-    password = '';
-    checked = false;
-    notAvailableYet(
-      t('notAvailable.create'),
-      welcome ? { text: t('notAvailable.previewStep2'), onClick: () => f7router.navigate('/welcome/import/?preview=1') } : undefined,
-    );
+  async function create() {
+    emailError = validEmail(email.trim()) ? '' : t('createAccount.invalidEmail');
+    passwordError = validPassword(password) ? '' : t('createAccount.passwordText');
+    if (emailError || passwordError) return;
+    busy = true;
+    try {
+      const result = await OpenDivesCore.createAccount({ email: email.trim(), password });
+      if (result.status === 'need_pin') {
+        password = '';
+        f7router.navigate(`${welcome ? '/welcome' : '/account'}/code/`, { props: { email: result.email } });
+      } else if (result.status === 'verified') {
+        // The account exists with this password: sign in to it.
+        const signedIn = await OpenDivesCore.signIn({ email: email.trim(), password });
+        password = '';
+        if (signedIn.exists) finishAccount(f7router, welcome);
+        else f7router.navigate(`${welcome ? '/welcome' : '/account'}/import/`);
+      } else {
+        passwordError = t('signIn.incorrect');
+      }
+    } catch (e) {
+      const code = errorCode(e);
+      if (code === 'WRITE_LOCKED') notAvailableYet(t('notAvailable.createLocked'));
+      else if (code === 'INVALID_CREDENTIALS') passwordError = t('createAccount.passwordText');
+      else showFailure(code);
+    } finally {
+      busy = false;
+    }
   }
 </script>
 
 <AccountStep
   title={t('createAccount.title')}
-  step={welcome ? t('createAccount.step1') : ''}
+  step={t('createAccount.step1')}
   heading={t('createAccount.heading')}
   intro={t('createAccount.intro')}
   action={t('createAccount.submit')}
+  busyLabel={t('createAccount.busy')}
+  {busy}
   actionDisabled={!email.trim() || !password}
   onaction={create}
 >
   <div class="fields">
-    <TextField
+    <AccountField
       label={t('createAccount.email')}
-      bind:value={email}
+      rowLabel={t('accountStep.emailRow')}
+      type="email"
       autocomplete="email"
-      invalid={checked && !emailValid}
-      supporting={checked && !emailValid ? t('createAccount.invalidEmail') : ''}
+      bind:value={email}
+      error={emailError}
+      disabled={busy}
     />
-    <TextField
+    <AccountField
       label={t('createAccount.password')}
+      rowLabel={t('createAccount.password')}
       type="password"
       autocomplete="new-password"
       bind:value={password}
-      invalid={checked && !passwordValid}
       supporting={t('createAccount.passwordText')}
+      error={passwordError}
+      disabled={busy}
+      required
     />
   </div>
 </AccountStep>
@@ -68,7 +91,11 @@
 <style>
   @layer od.components {
     .fields {
-      margin: 8px 8px 0;
+      margin: 6px 0 0;
+
+      :global(.ios) & {
+        margin: 0;
+      }
     }
   }
 </style>
