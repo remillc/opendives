@@ -121,6 +121,8 @@ Six components do not exist in Framework7; each is a single Svelte component, sh
 
 **`<SyncStatus>`: the synchronisation state.** A row under the Logbook title, never a dialog: "Synced with the Subsurface cloud" (secondary text, check mark), "Offline: 2 changes will be sent when the network is back" or "Synchronisation stopped for one dive" (`--od-pending`, with an icon). It interrupts the diver only when a choice is needed (conflict, section 6).
 
+**Manual synchronisation (decided on 6 November 2026).** When "Sync automatically" is turned off in Account, the app behaves like Subsurface-mobile: changes are saved in the local copy, nothing is sent or fetched, and the full exchange (fetch, merge, send) only happens on "Sync now". The setting belongs to the device. In this mode, `<SyncStatus>` says so at all times, at the top of the Logbook and at the bottom of the side menu: "Manual sync: 3 changes not sent", in `--od-pending`; the side menu then offers the "Sync now" button; the Account screen adds a "Changes not sent" row, and the explanation under the switch becomes "Off: changes stay on this device, and those from other devices do not arrive, until you sync".
+
 An insufficient gas reserve in the planner is an ordinary list row whose value is in `--od-alarm`, with the gap spelled out ("18 bar short to surface two divers").
 
 ## 5. Screens and data requested from the core
