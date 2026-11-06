@@ -10,6 +10,7 @@
   import { Page, Navbar, Link, f7 } from 'framework7-svelte';
   import { OpenDivesCore } from 'opendives-core';
   import Icon from '../components/Icon.svelte';
+  import OutlinedField from '../components/OutlinedField.svelte';
   import StarsInput from '../components/StarsInput.svelte';
   import { logbook, saveDiveChanges, undoLastChange } from '../lib/logbook.svelte.js';
   import { settings } from '../lib/settings.svelte.js';
@@ -208,33 +209,12 @@
     </div>
 
     <div class="block-title">{t('edit.peopleGroup')}</div>
-    <div class="list list-strong inset list-dividers">
+    <div class="list list-strong inset">
       <ul>
-        <li class="item-content item-input">
-          <div class="item-inner">
-            <div class="item-title item-label">{t('edit.guides')}</div>
-            <div class="item-input-wrap"><input type="text" bind:value={guides} /></div>
-            <div class="item-footer">{t('edit.listHint')}</div>
-          </div>
-        </li>
-        <li class="item-content item-input">
-          <div class="item-inner">
-            <div class="item-title item-label">{t('edit.buddies')}</div>
-            <div class="item-input-wrap"><input type="text" bind:value={buddies} /></div>
-          </div>
-        </li>
-        <li class="item-content item-input">
-          <div class="item-inner">
-            <div class="item-title item-label">{t('edit.tags')}</div>
-            <div class="item-input-wrap"><input type="text" bind:value={tags} /></div>
-          </div>
-        </li>
-        <li class="item-content item-input">
-          <div class="item-inner">
-            <div class="item-title item-label">{t('edit.notes')}</div>
-            <div class="item-input-wrap"><textarea class="resizable" rows="4" bind:value={notes}></textarea></div>
-          </div>
-        </li>
+        <OutlinedField label={t('edit.guides')} bind:value={guides} supporting={t('edit.listHint')} />
+        <OutlinedField label={t('edit.buddies')} bind:value={buddies} />
+        <OutlinedField label={t('edit.tags')} bind:value={tags} />
+        <OutlinedField label={t('edit.notes')} bind:value={notes} multiline />
       </ul>
     </div>
 
@@ -276,12 +256,7 @@
           </button>
         </li>
         {#if equipmentOpen}
-          <li class="item-content item-input">
-            <div class="item-inner">
-              <div class="item-title item-label">{t('detail.suitRow')}</div>
-              <div class="item-input-wrap"><input type="text" bind:value={suit} /></div>
-            </div>
-          </li>
+          <OutlinedField label={t('detail.suitRow')} bind:value={suit} />
           {#each dive.cylinders.filter((c) => c.used) as cylinder, i (i)}
             <li class="item-content readonly">
               <div class="item-inner">

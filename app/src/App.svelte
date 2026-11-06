@@ -18,6 +18,7 @@
   import SiteEdit from './pages/SiteEdit.svelte';
   import DivesWithoutSite from './pages/DivesWithoutSite.svelte';
   import SitesCleanup from './pages/SitesCleanup.svelte';
+  import SitesUnplaced from './pages/SitesUnplaced.svelte';
   import Icon from './components/Icon.svelte';
   import AdaptiveLabel from './components/AdaptiveLabel.svelte';
   import NavMenu from './components/NavMenu.svelte';
@@ -55,6 +56,7 @@
       { path: '/sites/', component: Sites },
       { path: '/sites/without/', component: DivesWithoutSite },
       { path: '/sites/cleanup/', component: SitesCleanup },
+      { path: '/sites/unplaced/', component: SitesUnplaced },
       { path: '/site/new/', component: SiteEdit },
       { path: '/site/:uuid/', component: SiteSheet },
       { path: '/site/:uuid/edit/', component: SiteEdit },

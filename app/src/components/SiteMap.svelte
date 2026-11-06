@@ -100,6 +100,14 @@
     }
   });
 
+  /**
+   * Centres the map on a position ("centre on my position" of the Sites map).
+   * @param {{latUdeg: number, lonUdeg: number}} p
+   */
+  export function centreOn(p) {
+    map?.easeTo({ center: lngLat(p), zoom: Math.max(map.getZoom(), 11) }, { programmatic: true });
+  }
+
   /** Place names in the app's language, else in Latin script, else local. */
   function showLabelsInLanguage() {
     if (!map) return;

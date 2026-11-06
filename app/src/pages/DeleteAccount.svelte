@@ -6,6 +6,7 @@
   // request is never sent by automated tests.
   import { Page, Navbar, Link, f7 } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
+  import OutlinedField from '../components/OutlinedField.svelte';
   import { logbook, accountDeleted, syncNow } from '../lib/logbook.svelte.js';
   import { OpenDivesCore } from 'opendives-core';
   import { t } from '../lib/i18n.js';
@@ -89,15 +90,13 @@
 
   <div class="list list-strong inset">
     <ul>
-      <li class="item-content item-input">
-        <div class="item-inner">
-          <div class="item-title item-label">{t('deleteAccount.password')}</div>
-          <div class="item-input-wrap">
-            <input type="password" autocomplete="current-password" bind:value={password} />
-          </div>
-          <div class="item-footer">{t('deleteAccount.passwordText')}</div>
-        </div>
-      </li>
+      <OutlinedField
+        label={t('deleteAccount.password')}
+        type="password"
+        autocomplete="current-password"
+        bind:value={password}
+        supporting={t('deleteAccount.passwordText')}
+      />
     </ul>
   </div>
 
@@ -195,14 +194,17 @@
       flex-direction: column;
       gap: 8px;
 
+      /* MD3 buttons: 40 dp, fully rounded, 24 dp side padding, 14 sp medium. */
       button {
         width: 100%;
-        height: 48px;
+        height: 40px;
+        padding: 0 24px;
         border: none;
-        border-radius: 24px;
+        border-radius: 20px;
         font: inherit;
-        font-size: 15px;
-        font-weight: 600;
+        font-size: 14px;
+        font-weight: 500;
+        letter-spacing: 0.1px;
       }
 
       .danger {

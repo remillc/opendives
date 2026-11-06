@@ -49,9 +49,26 @@
       <SiteMap pin={{ latUdeg: site.latUdeg, lonUdeg: site.lonUdeg }} height="200px" />
       <div class="coords">
         <span class="od-value">{formatCoordinates(site.latUdeg, site.lonUdeg)}</span>
-        <a class="external open" href={mapsLink(site.latUdeg, site.lonUdeg, site.name)}>{t('sites.openInMaps')}</a>
+        <a class="external od-text-button open" href={mapsLink(site.latUdeg, site.lonUdeg, site.name)}>
+          {t('sites.openInMaps')}<Icon name="openInNew" size={18} /><span class="od-sr-only">, {t('sites.opensElsewhere')}</span>
+        </a>
       </div>
     {/if}
+
+    <div class="block-title">{t('sites.about')}</div>
+    <div class="list list-strong inset list-dividers">
+      <ul>
+        <li class="item-content"><div class="item-inner"><div class="item-title">{t('sites.description')}<div class="item-footer text">{site.description || t('sites.noDescription')}</div></div></div></li>
+        <li class="item-content"><div class="item-inner"><div class="item-title">{t('sites.notes')}<div class="item-footer text">{site.notes || t('sites.noNotes')}</div></div></div></li>
+        {#if place}
+          <li class="item-content">
+            <div class="item-inner">
+              <div class="item-title">{t('sites.regionCity')}<div class="item-footer text">{place}<br />{anyManual ? t('sites.corrected') : t('sites.foundAutomatically')}</div></div>
+            </div>
+          </li>
+        {/if}
+      </ul>
+    </div>
 
     {#if site.diveList.length}
       <div class="block-title">{t('sites.divesHere')}</div>
@@ -75,20 +92,6 @@
       </div>
     {/if}
 
-    <div class="block-title">{t('sites.about')}</div>
-    <div class="list list-strong inset list-dividers">
-      <ul>
-        <li class="item-content"><div class="item-inner"><div class="item-title">{t('sites.description')}<div class="item-footer text">{site.description || t('sites.noDescription')}</div></div></div></li>
-        <li class="item-content"><div class="item-inner"><div class="item-title">{t('sites.notes')}<div class="item-footer text">{site.notes || t('sites.noNotes')}</div></div></div></li>
-        {#if place}
-          <li class="item-content">
-            <div class="item-inner">
-              <div class="item-title">{t('sites.regionCity')}<div class="item-footer text">{place}<br />{anyManual ? t('sites.corrected') : t('sites.foundAutomatically')}</div></div>
-            </div>
-          </li>
-        {/if}
-      </ul>
-    </div>
   {/if}
 </Page>
 
@@ -119,9 +122,11 @@
       gap: 12px;
       font-size: 15px;
 
+      min-height: 48px;
+
+      /* The button's own padding aligns its label with the margin. */
       .open {
-        font-weight: 600;
-        color: var(--od-text);
+        margin-right: -12px;
       }
     }
 

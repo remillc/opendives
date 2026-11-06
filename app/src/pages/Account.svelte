@@ -289,6 +289,12 @@
       text-align: start;
     }
 
+    /* The check box keeps its 18 dp: never shrunk by the text beside it. */
+    :global(.od-signout .od-signout-copy .checkbox) {
+      flex: none;
+      margin-top: 2px;
+    }
+
     :global(.od-signout .od-signout-copy.disabled) {
       opacity: 0.55;
     }

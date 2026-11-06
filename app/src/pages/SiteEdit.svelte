@@ -170,11 +170,13 @@
       <Link back iconOnly><Icon name="close" /><span class="od-sr-only">{t('sites.close')}</span></Link>
     {/snippet}
     {#snippet right()}
-      <button type="button" class="od-filled-button save" disabled={saving} onclick={save}>{t('edit.save')}</button>
+      <Link onClick={save} class={saving ? 'disabled' : ''}>{t('edit.save')}</Link>
     {/snippet}
   </Navbar>
 
-  <OutlinedField label={t('sites.name')} bind:value={name} />
+  <div class="list name">
+    <ul><OutlinedField label={t('sites.name')} bind:value={name} /></ul>
+  </div>
 
   <div class="map-card" class:fullscreen use:lift={fullscreen}>
     <SiteMap pin={position} editable onmove={setPosition} height={fullscreen ? '100%' : '190px'} />
@@ -186,55 +188,55 @@
     {#if fullscreen && coordsText}<span class="coords od-value">{coordsText}</span>{/if}
   </div>
 
-  <OutlinedField
-    label={t('sites.coordinates')}
-    bind:value={coordsText}
-    onchange={typedCoordinates}
-    invalid={coordsError}
-    supporting={coordsError ? t('sites.coordinatesInvalid') : t('sites.coordinatesHint')}
-  >
-    {#snippet trailing()}
-      <button type="button" class="locate" onclick={useDevicePosition}>
-        <Icon name="locate" size={20} weight={2} />
-        <span class="od-sr-only">{t('sites.useDevicePosition')}</span>
-      </button>
-    {/snippet}
-  </OutlinedField>
+  <!-- Position: coordinates, then country and region found from them. -->
+  <div class="list list-strong inset surface">
+    <ul>
+      <OutlinedField
+        label={t('sites.coordinates')}
+        bind:value={coordsText}
+        onchange={typedCoordinates}
+        invalid={coordsError}
+        supporting={coordsError ? t('sites.coordinatesInvalid') : t('sites.coordinatesHint')}
+      >
+        {#snippet trailing()}
+          <button type="button" class="od-icon-button" onclick={useDevicePosition}>
+            <Icon name="locate" />
+            <span class="od-sr-only">{t('sites.useDevicePosition')}</span>
+          </button>
+        {/snippet}
+      </OutlinedField>
+      <OutlinedField label={t('sites.country')} bind:value={country} supporting={country && country === autoCountry ? t('sites.fromPosition') : ''} />
+      <OutlinedField label={t('sites.region')} bind:value={region} supporting={region && region === autoRegion ? t('sites.fromPosition') : ''} />
+      <li class="explain">{t('sites.placeExplain')}</li>
+    </ul>
+  </div>
 
-  <p class="hint"><Icon name="place" size={16} />{t('sites.placeHint')}</p>
-
-  <OutlinedField label={t('sites.country')} bind:value={country}>
-    {#snippet trailing()}
-      {#if country && country === autoCountry}<span class="auto">{t('sites.automatic')}</span>{/if}
-    {/snippet}
-  </OutlinedField>
-  <OutlinedField label={t('sites.region')} bind:value={region} supporting={t('sites.correctionHint')}>
-    {#snippet trailing()}
-      {#if region && region === autoRegion}<span class="auto">{t('sites.automatic')}</span>{/if}
-    {/snippet}
-  </OutlinedField>
-
-  <OutlinedField label={t('sites.description')} bind:value={description} placeholder={t('sites.descriptionPlaceholder')} multiline />
-  <OutlinedField label={t('sites.notes')} bind:value={notes} placeholder={t('sites.notesPlaceholder')} multiline />
+  <div class="list list-strong inset surface">
+    <ul>
+      <OutlinedField label={t('sites.description')} bind:value={description} multiline />
+      <OutlinedField label={t('sites.notes')} bind:value={notes} multiline />
+    </ul>
+  </div>
 
   {#if nearby}
-    <p class="nearby" role="status">
-      {t('sites.nearby')}
-      <a href="/site/{nearby.uuid}/" onclick={useNearby}>{nearby.name || t('sites.noName')}</a>. {t('sites.nearbyAdvice')}
-    </p>
+    <div class="nearby" role="note">
+      <span>{t('sites.nearbyShort', { site: nearby.name || t('sites.noName') })}</span>
+      <button type="button" class="od-text-button use" onclick={useNearby}>{t('sites.useNearby')}</button>
+    </div>
   {/if}
   <div class="end"></div>
 </Page>
 
 <style>
   @layer od.components {
-    .save {
-      margin-right: 8px;
+    .name {
+      margin-top: 8px;
+      margin-bottom: 0;
     }
 
     .map-card {
       position: relative;
-      margin: 18px 16px 0;
+      margin: 8px 16px 0;
       border-radius: 16px;
       overflow: hidden;
 
@@ -265,21 +267,33 @@
 
     .map-button {
       position: absolute;
-      right: 10px;
-      top: 10px;
-      width: 40px;
-      height: 40px;
+      right: 4px;
+      top: 4px;
+      width: 48px;
+      height: 48px;
       border: none;
-      border-radius: 20px;
-      background: var(--od-surface);
-      color: var(--od-text);
+      background: none;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 1px 3px rgb(0 0 0 / 0.2);
+      color: var(--od-text);
+
+      /* The visible disc, 40 dp, in a 48 dp target. */
+      &::before {
+        content: '';
+        position: absolute;
+        inset: 4px;
+        border-radius: 50%;
+        background: var(--od-surface);
+        box-shadow: 0 1px 3px rgb(0 0 0 / 0.2);
+      }
+
+      :global(.od-icon) {
+        position: relative;
+      }
 
       .fullscreen & {
-        top: calc(10px + env(safe-area-inset-top));
+        top: calc(4px + env(safe-area-inset-top));
       }
     }
 
@@ -295,45 +309,37 @@
       white-space: nowrap;
     }
 
-    .locate {
-      flex: none;
-      width: 40px;
-      height: 40px;
-      border: none;
-      border-radius: 20px;
-      background: var(--od-tint);
-      color: var(--od-on-tint);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    .surface {
+      margin-top: 18px;
+
+      /* Room above the first label, which sits on the outline. */
+      ul {
+        padding-top: 8px;
+        padding-bottom: 4px;
+      }
     }
 
-    .auto {
-      flex: none;
-      font-size: 12px;
-      color: var(--od-text-2);
-    }
-
-    .hint {
-      margin: 18px 20px 0;
+    .explain {
+      margin: 4px 16px 12px;
       font-size: 13px;
       line-height: 18px;
       color: var(--od-text-2);
-      display: flex;
-      gap: 8px;
-      align-items: center;
     }
 
     .nearby {
-      margin: 16px 20px 0;
-      font-size: 13px;
-      line-height: 18px;
-      color: var(--od-text-2);
+      margin: 18px 16px 0;
+      padding: 12px 16px 4px;
+      border-radius: 12px;
+      background: var(--od-surface-2);
+      font-size: 14px;
+      line-height: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
 
-      a {
-        color: var(--od-text);
-        font-weight: 600;
-      }
+    .use {
+      align-self: flex-end;
     }
 
     .end {

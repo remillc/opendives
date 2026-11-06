@@ -4,6 +4,7 @@
 import { OpenDivesCore } from 'opendives-core';
 import { logbook, refreshAfterChange } from './logbook.svelte.js';
 import { language } from './i18n.js';
+import { settings } from './settings.svelte.js';
 
 /**
  * One site change (create, edit, geocode, merge, delete), one undoable step.
@@ -87,32 +88,51 @@ export function dismissPair(a, b) {
 }
 
 /**
- * "35° 26,9′ S  174° 43,9′ E": degrees and decimal minutes, in the device's
- * number format.
+ * GPS coordinates in the format chosen in Settings (spec, settings table,
+ * "Coordonnées GPS"), formatted by OpenDives (the core knows only seconds and
+ * decimal):
+ *   decimal (default) "-35.4485, 174.7317": a point, as maps and GPS write it;
+ *   minutes           "35° 26,9′ S  174° 43,9′ E", in the device's number format;
+ *   seconds           "35° 26′ 54,6″ S  174° 43′ 54,1″ E".
  * @param {number} latUdeg
  * @param {number} lonUdeg
+ * @param {'decimal'|'minutes'|'seconds'} [format]
  */
-export function formatCoordinates(latUdeg, lonUdeg) {
-  const minutes = new Intl.NumberFormat(language, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+export function formatCoordinates(latUdeg, lonUdeg, format = /** @type {any} */ (settings).coordinatesFormat ?? 'decimal') {
+  if (format === 'decimal') return `${(latUdeg / 1e6).toFixed(4)}, ${(lonUdeg / 1e6).toFixed(4)}`;
+  const tenth = new Intl.NumberFormat(language, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
   /** @param {number} udeg @param {string} pos @param {string} neg */
   const part = (udeg, pos, neg) => {
-    const abs = Math.abs(udeg) / 1e6;
-    const deg = Math.floor(abs);
-    const min = (abs - deg) * 60;
-    return `${deg}° ${minutes.format(min)}′ ${udeg < 0 ? neg : pos}`;
+    const hemisphere = udeg < 0 ? neg : pos;
+    // Rounded first, so that 59.96′ shows as the next degree, not as 60.0′.
+    if (format === 'seconds') {
+      const tenths = Math.round((Math.abs(udeg) / 1e6) * 36000);
+      const deg = Math.floor(tenths / 36000);
+      const min = Math.floor((tenths % 36000) / 600);
+      return `${deg}° ${min}′ ${tenth.format((tenths % 600) / 10)}″ ${hemisphere}`;
+    }
+    const tenths = Math.round((Math.abs(udeg) / 1e6) * 600);
+    return `${Math.floor(tenths / 600)}° ${tenth.format((tenths % 600) / 10)}′ ${hemisphere}`;
   };
   return `${part(latUdeg, 'N', 'S')}  ${part(lonUdeg, 'E', 'W')}`;
 }
 
 /**
- * Coordinates typed by the diver: decimal degrees ("-35.4485, 174.732") or
- * degrees and minutes ("35°26.9'S 174°43.9'E"). Null when not understood.
+ * Coordinates typed by the diver, in any of the three formats: decimal
+ * degrees ("-35.4485, 174.732", "-35.4485,174.732", or with decimal commas
+ * "-35,4485; 174,732"), degrees and minutes ("35°26.9'S 174°43.9'E") or
+ * degrees, minutes and seconds. Null when not understood.
  * @param {string} text
  * @returns {{latUdeg: number, lonUdeg: number}|null}
  */
 export function parseCoordinates(text) {
-  const t = text.trim().replace(/,(?=\d)/g, '.');
-  const decimal = t.match(/^(-?\d+(?:\.\d+)?)\s*[;,\s]\s*(-?\d+(?:\.\d+)?)$/);
+  const raw = text.trim();
+  // Decimal degrees with points: a comma, semicolon or space between them.
+  const points = raw.match(/^(-?\d+(?:\.\d+)?)\s*[;,\s]\s*(-?\d+(?:\.\d+)?)$/);
+  if (points) return check(Number(points[1]), Number(points[2]));
+  // From here a comma between digits is a decimal comma.
+  const t = raw.replace(/(\d),(?=\d)/g, '$1.');
+  const decimal = t.match(/^(-?\d+(?:\.\d+)?)\s*[;\s]\s*(-?\d+(?:\.\d+)?)$/);
   if (decimal) return check(Number(decimal[1]), Number(decimal[2]));
   const part = String.raw`(\d+(?:\.\d+)?)\s*°\s*(?:(\d+(?:\.\d+)?)\s*['′]\s*)?(?:(\d+(?:\.\d+)?)\s*["″]\s*)?([NSEWOnsewo])`;
   const dm = t.match(new RegExp(`^${part}[\\s,;]*${part}$`));

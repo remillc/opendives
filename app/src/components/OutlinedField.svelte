@@ -1,125 +1,85 @@
 <script>
   // @ts-check
-  // Material 3 outlined text field, as drawn in the Android mock-ups
-  // (sites-edition-android): the label sits on the outline, an optional
-  // element at the end (a button, or "automatic"), and a supporting text
-  // below, in the alarm colour when the value is invalid.
+  // Text field (spec, section 4, "Text fields"): a Framework7 MD outline input
+  // with a floating label, as in Framework7's kitchen sink. Empty and not
+  // focused, the label fills the field; focused or filled, it moves onto the
+  // outline. No placeholder. Helper text under the field; an optional plain
+  // icon button at the end. Use inside <div class="list"><ul>…</ul></div> (on
+  // the page) or a "list list-strong inset" (on a white surface): Framework7
+  // gives the label the background of its container.
+  //
+  // The state classes (with value, focused) are set here, as Svelte fills the
+  // fields without Framework7 knowing.
 
   /**
    * @type {{
    *   label: string,
    *   value: string,
-   *   placeholder?: string,
    *   multiline?: boolean,
    *   supporting?: string,
    *   invalid?: boolean,
    *   inputmode?: 'text'|'decimal'|'numeric',
+   *   type?: 'text'|'password',
+   *   autocomplete?: import('svelte/elements').FullAutoFill,
    *   onchange?: () => void,
    *   trailing?: import('svelte').Snippet,
    * }}
    */
-  let { label, value = $bindable(), placeholder = '', multiline = false, supporting = '', invalid = false, inputmode = 'text', onchange, trailing } = $props();
+  let { label, value = $bindable(), multiline = false, supporting = '', invalid = false, inputmode = 'text', type = 'text', autocomplete, onchange, trailing } = $props();
 
+  let focused = $state(false);
   const id = `od-field-${Math.random().toString(36).slice(2, 9)}`;
 </script>
 
-<div class="field" class:invalid>
-  <div class="box">
-    <label class="label" for={id}>{label}</label>
-    {#if multiline}
-      <textarea {id} rows="2" {placeholder} bind:value {onchange} aria-invalid={invalid}></textarea>
-    {:else}
-      <input {id} type="text" {inputmode} {placeholder} bind:value {onchange} aria-invalid={invalid} />
-    {/if}
-    {#if trailing}{@render trailing()}{/if}
+<li
+  class="item-content item-input item-input-outline"
+  class:item-input-with-value={!!value}
+  class:item-input-focused={focused}
+  class:item-input-invalid={invalid}
+  class:item-input-with-info={!!supporting}
+  class:with-trailing={!!trailing}
+>
+  <div class="item-inner">
+    <label class="item-title item-floating-label" for={id}>{label}</label>
+    <div class="item-input-wrap">
+      {#if multiline}
+        <textarea {id} class="resizable" bind:value {onchange} onfocus={() => (focused = true)} onblur={() => (focused = false)} aria-invalid={invalid}></textarea>
+      {:else}
+        <input {id} {type} {inputmode} {autocomplete} bind:value {onchange} onfocus={() => (focused = true)} onblur={() => (focused = false)} aria-invalid={invalid} />
+      {/if}
+      {#if trailing}<div class="trailing">{@render trailing()}</div>{/if}
+    </div>
+    {#if supporting}<div class="item-input-info">{supporting}</div>{/if}
   </div>
-  {#if supporting}<p class="supporting">{supporting}</p>{/if}
-</div>
+</li>
 
 <style>
   @layer od.components {
-    .field {
-      margin: 18px 16px 0;
+    /* Room for the trailing icon button, inside the outline. */
+    .with-trailing :is(input, textarea) {
+      padding-right: 44px;
     }
 
-    .box {
-      position: relative;
-      min-height: 56px;
-      padding: 0 12px 0 16px;
-      box-sizing: border-box;
-      border: 1px solid var(--od-text-2);
-      border-radius: 4px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-
-      &:focus-within {
-        border: 2px solid var(--od-text);
-        padding: 0 11px 0 15px;
-      }
-
-      .invalid & {
-        border-color: var(--od-alarm);
-      }
-    }
-
-    .label {
+    .trailing {
       position: absolute;
-      left: 12px;
-      top: -9px;
-      padding: 0 4px;
-      background: var(--od-background);
-      font-size: 12px;
-      line-height: 16px;
-      color: var(--od-text-2);
-
-      .box:focus-within & {
-        left: 11px;
-        top: -10px;
-        color: var(--od-text);
-      }
-
-      .invalid & {
-        color: var(--od-alarm);
-      }
-    }
-
-    input,
-    textarea {
-      flex: 1;
-      min-width: 0;
-      padding: 16px 0;
-      border: none;
-      outline: none;
-      background: none;
-      color: var(--od-text);
-      font: inherit;
-      font-size: 16px;
-      line-height: 24px;
-      font-variant-numeric: tabular-nums;
-
-      &::placeholder {
-        color: var(--od-text-2);
-        opacity: 0.8;
-      }
+      right: 0;
+      top: calc(var(--f7-input-height) / 2);
+      transform: translateY(-50%);
+      z-index: 2;
     }
 
     textarea {
-      resize: none;
-      field-sizing: content;
-      min-height: 24px;
+      min-height: 72px;
     }
 
-    .supporting {
-      margin: 4px 0 0;
-      padding-left: 16px;
-      font-size: 12px;
-      line-height: 16px;
-      color: var(--od-text-2);
+    /* The helper text sits under the outline (MD3), not inside it: the
+       outline stops above the room Framework7 keeps for it. */
+    li.item-input-with-info::after {
+      bottom: 26px;
+    }
 
-      .invalid & {
-        color: var(--od-alarm);
-      }
+    li.item-input-with-info .item-input-info {
+      margin-top: 2px;
     }
   }
 </style>

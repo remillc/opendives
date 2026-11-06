@@ -129,6 +129,15 @@ html.ios {
     font-variant-numeric: tabular-nums;
   }
 
+  /* MD3: check boxes (18 dp) and radio buttons (20 dp) keep their size in
+     any flex layout. */
+  .checkbox,
+  .radio,
+  .icon-checkbox,
+  .icon-radio {
+    flex: none;
+  }
+
   /* Title of an empty or error state. */
   .od-state-title {
     font-size: 22px;
@@ -272,6 +281,7 @@ html.ios {
     font-weight: 600;
     letter-spacing: 0.1px;
     text-align: center;
+    white-space: nowrap;
     cursor: pointer;
 
     &:disabled {
@@ -287,36 +297,51 @@ html.ios {
   }
 
   /*
-   * Filled button (the "Save" of an Android edit screen, MD3): ink on light,
-   * the main action of the screen. On iOS a bold text button, as the HIG.
+   * Text button (MD3): 40 dp high, fully rounded, 12 dp side padding, 14 sp
+   * medium label; "Utiliser ce site", "Ouvrir dans Cartes". A link that
+   * leaves the app ends with the "open in new" icon (18 dp, 8 dp gap).
    */
-  .od-filled-button {
+  .od-text-button {
     width: auto;
     height: 40px;
-    padding: 0 20px;
+    padding: 0 12px;
     border: none;
     border-radius: 20px;
-    background: var(--od-primary-action);
-    color: var(--od-on-primary-action);
+    background: none;
+    color: var(--od-text);
     font: inherit;
     font-size: 14px;
     font-weight: 500;
     letter-spacing: 0.1px;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
     cursor: pointer;
-
-    &:disabled {
-      opacity: 0.5;
-    }
 
     .ios & {
       height: 44px;
-      padding: 0 8px;
-      background: none;
-      color: var(--od-action);
       font-size: 17px;
-      font-weight: 600;
+      font-weight: 400;
       letter-spacing: 0;
+      color: var(--od-action);
     }
+  }
+
+  /* Plain icon button: a 24 dp icon in a 48 dp target, no background. */
+  .od-icon-button {
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: none;
+    color: var(--od-text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
   }
 
   /*
@@ -336,6 +361,7 @@ html.ios {
     font-weight: 600;
     letter-spacing: 0.1px;
     text-align: center;
+    white-space: nowrap;
     cursor: pointer;
 
     &.danger {
