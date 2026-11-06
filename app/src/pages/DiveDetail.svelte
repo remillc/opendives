@@ -627,6 +627,11 @@
       font-size: 16px;
       border-top: 1px solid var(--od-separator);
 
+      /* MD3: one-line list item, 56 dp. */
+      :global(.md) & {
+        min-height: 56px;
+      }
+
       &:first-child {
         border-top: none;
       }

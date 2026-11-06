@@ -951,8 +951,8 @@
     .row {
       box-sizing: border-box;
       width: 100%;
-      min-height: 48px;
-      padding: 6px 24px 6px 16px;
+      min-height: 56px;
+      padding: 8px 24px 8px 16px;
       display: flex;
       align-items: center;
       gap: 12px;
@@ -976,6 +976,16 @@
 
     div.row {
       cursor: default;
+    }
+
+    /* MD3: two-line item, 72 dp. */
+    :global(.md) .row:has(.supporting) {
+      min-height: 72px;
+    }
+
+    :global(.md) .supporting {
+      font-size: 14px;
+      line-height: 20px;
     }
 
     .texts {

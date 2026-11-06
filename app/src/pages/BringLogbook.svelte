@@ -166,6 +166,8 @@
       display: flex;
       gap: 16px;
       padding: 8px;
+      min-height: 48px;
+      box-sizing: border-box;
       align-items: flex-start;
       cursor: pointer;
 

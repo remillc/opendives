@@ -116,7 +116,7 @@
     .row {
       box-sizing: border-box;
       width: 100%;
-      min-height: 48px;
+      min-height: 56px;
       padding: 6px 24px 6px 16px;
       display: flex;
       align-items: center;

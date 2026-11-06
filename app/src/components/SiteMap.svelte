@@ -207,6 +207,14 @@
       background: var(--od-text);
       box-shadow: 0 1px 3px rgb(0 0 0 / 0.3);
       cursor: pointer;
+      position: relative;
+
+      /* 16 dp dot, 48 dp touch target. */
+      &::after {
+        content: '';
+        position: absolute;
+        inset: -16px;
+      }
     }
   }
 </style>

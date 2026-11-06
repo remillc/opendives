@@ -152,6 +152,56 @@ html.ios {
     flex: none;
   }
 
+  /*
+   * MD3 search bar: 56 dp, fully rounded, icon inside at 16 dp from the start,
+   * 16 dp side margins (inline in a page; in the subnavbar of the Logbook).
+   */
+  .md {
+    --f7-searchbar-height: 56px;
+    --f7-searchbar-input-height: 56px;
+    --f7-searchbar-inline-input-height: 56px;
+    --f7-searchbar-input-border-radius: 28px;
+    --f7-searchbar-inline-input-border-radius: 28px;
+    --f7-searchbar-inner-padding-left: 16px;
+    --f7-searchbar-inner-padding-right: 16px;
+
+    .searchbar {
+      --f7-searchbar-input-extra-padding-left: 40px;
+    }
+
+    .searchbar-icon,
+    .searchbar-disable-button {
+      width: 56px;
+      height: 56px;
+    }
+
+    .searchbar-disable-button {
+      margin-top: -28px;
+    }
+
+    .searchbar-inline {
+      margin: 8px 16px;
+      width: auto;
+    }
+  }
+
+  /*
+   * MD3 list items: 56 dp minimum (one line), 16 dp at the start, 24 dp at the
+   * end; items that are links keep Framework7's end padding (the chevron).
+   */
+  .md {
+    --f7-list-item-min-height: 56px;
+
+    /* Two-line rows of the logbook: 72 dp. */
+    .media-list .item-inner.od-row {
+      min-height: 72px;
+    }
+
+    .list:not(.media-list) :not(.item-link) > .item-content:not(.item-link) .item-inner {
+      padding-right: calc(24px + var(--f7-safe-area-right));
+    }
+  }
+
   /* Title of an empty or error state. */
   .od-state-title {
     font-size: 22px;
@@ -292,7 +342,7 @@ html.ios {
     color: var(--od-on-tint);
     font: inherit;
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 500;
     letter-spacing: 0.1px;
     text-align: center;
     white-space: nowrap;
@@ -372,7 +422,7 @@ html.ios {
     color: var(--od-text);
     font: inherit;
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 500;
     letter-spacing: 0.1px;
     text-align: center;
     white-space: nowrap;

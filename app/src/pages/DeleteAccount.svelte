@@ -133,6 +133,9 @@
 
     .keep {
       margin: 20px 16px 0;
+      min-height: 48px;
+      box-sizing: border-box;
+      padding: 4px 0;
       display: flex;
       gap: 16px;
       align-items: flex-start;

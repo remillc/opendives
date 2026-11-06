@@ -253,7 +253,7 @@
 
     /* "Enregistrer" in the top bar: a text button (spec, "Text fields"). */
     :global(.navbar .save) {
-      font-weight: 600;
+      font-weight: 500;
     }
 
     /*

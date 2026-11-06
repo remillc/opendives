@@ -460,7 +460,7 @@
 
     .preset {
       flex: 1;
-      min-height: 48px;
+      min-height: 56px;
       border: none;
       background: none;
       color: var(--od-text);

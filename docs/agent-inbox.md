@@ -157,7 +157,9 @@ Apply three updates of `docs/ui-specification.md`, section 4, everywhere they oc
 2. Choice dialogs as plain MD3 single-choice dialogs (no tinted or bold selected row): `docs/mockups/reglages-*-android.dc.html`.
 3. GPS coordinates: three formats, decimal by default, formatted by OpenDives itself (the core only knows seconds and decimal). Update the Settings row and the site screens.
 
-## [ ] 2026-11-06-21 Material 3 audit fixes (Android)
+## [x] 2026-11-06-21 Material 3 audit fixes (Android)
+
+Done in Apply the MD3 audit to every Android screen
 
 Christian asked for every Android screen to be MD3-compliant. Read "Android follows Material 3" in `docs/ui-specification.md`, section 4, then fix these points found in the audit of the mock-ups, in the app where the screens exist (and keep them in mind for screens still to build):
 1. Sites map (`android-sites.dc.html`): the ☰ button overlapped the search bar. The menu icon now sits inside the search bar at its start, the search icon at its end. The two links of the bottom sheet ("6 plongées sans site", "2 doublons possibles") become 56 dp list items with a trailing chevron.

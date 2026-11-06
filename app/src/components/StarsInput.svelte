@@ -42,6 +42,12 @@
       justify-content: center;
     }
 
+    /* Android: 48 dp touch targets (MD3). */
+    :global(.md) button {
+      width: 48px;
+      height: 48px;
+    }
+
     path {
       fill: none;
       stroke: var(--od-text);

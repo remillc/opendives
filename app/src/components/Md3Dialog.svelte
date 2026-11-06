@@ -87,7 +87,7 @@
       max-height: calc(100% - 96px);
       display: flex;
       flex-direction: column;
-      padding: 24px 0 14px;
+      padding: 24px 0 24px;
       border-radius: 28px;
       background: var(--od-dialog);
       color: var(--od-text);

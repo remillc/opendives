@@ -113,13 +113,22 @@
     .suggestion {
       align-self: flex-start;
       margin-top: 6px;
-      padding: 6px 12px;
+      position: relative;
+      min-height: 32px;
+      padding: 0 12px;
       border: 1px dashed var(--od-text-2);
-      border-radius: 16px;
+      /* MD3 suggestion chip: 32 dp, 8 dp corners, 48 dp touch target. */
+      border-radius: 8px;
       background: none;
       color: var(--od-text);
       font: inherit;
       font-size: 14px;
+
+      &::after {
+        content: '';
+        position: absolute;
+        inset: -8px 0;
+      }
     }
 
     .actions {
