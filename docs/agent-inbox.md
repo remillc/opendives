@@ -62,3 +62,7 @@ Set the dark values of `--od-alarm` to #FF8A80 and `--od-pending` to #F2B84B (`d
 ## [ ] 2026-11-06-08 Sign out
 
 Wire "Sign out" on the Account screen as in `docs/ui-specification.md`, section 4, "Sign out", and `docs/mockups/compte-android-deconnexion.dc.html`: confirmation dialog (MD3 on Android); with pending changes, "Sync, then sign out", "Sign out anyway", "Cancel"; "Also delete the copy on this device" checkbox, off by default, disabled while changes are pending. Signing out forgets the credentials (keychain), closes the logbook and shows first launch; keep the local copy unless the box is checked. Never delete a copy that has unsent commits. Also update the text under "Sign out" (see `compte-android-connecte.dc.html`).
+
+## [ ] 2026-11-06-09 Delete the account
+
+Build the delete-account screen from `docs/mockups/compte-android-suppression.dc.html` and `docs/ui-specification.md`, section 4, "Delete the account". Port the request from Subsurface (`core/cloudstorage.cpp`, `deleteAccount()`: POST "email password" as text/plain to `<cloud>/delete-account`) into the facade without Qt. Unlike Subsurface, read the reply and treat the account as deleted only when the server confirms; record the exact replies seen on the test account in the report. Sync unsent changes first; keep the dives in a no-cloud local logbook when the box is checked; require the password again. **Wait** before running it against any account other than `OPENDIVES_CLOUD_TEST_EMAIL`; never call the endpoint in automated tests.
