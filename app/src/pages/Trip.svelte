@@ -13,6 +13,7 @@
   import { logbook, tripChange, undoLastChange } from '../lib/logbook.svelte.js';
   import { formatDateRange, formatDateTime, formatDuration, formatLongDate } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
+  import { confirmAction } from '../lib/dialogs.js';
 
   /** @type {{ f7route: { params: { id: string } }, f7router: any }} */
   let { f7route, f7router } = $props();
@@ -196,7 +197,12 @@
   }
 
   function confirmUngroup() {
-    f7.dialog.confirm(t('tripScreen.ungroupText'), t('tripScreen.ungroupTitle'), () => change({ action: 'ungroup', tripId }));
+    confirmAction({
+      title: t('tripScreen.ungroupTitle'),
+      text: t('tripScreen.ungroupText'),
+      action: t('tripScreen.ungroupConfirm'),
+      onConfirm: () => change({ action: 'ungroup', tripId }),
+    });
   }
 </script>
 

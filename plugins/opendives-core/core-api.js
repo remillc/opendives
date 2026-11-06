@@ -124,8 +124,31 @@ import { registerPlugin } from '@capacitor/core';
  */
 
 /**
+ * @typedef {Object} SiteSummary
+ * @property {number} uuid
+ * @property {string} name
+ * @property {boolean} hasLocation
+ * @property {number} latUdeg micro-degrees
+ * @property {number} lonUdeg
+ * @property {string} country
+ * @property {number} dives number of dives at this site
+ * @property {string} lastDate local time of the latest dive; empty without dives
+ * @property {number} maxDepthMm deepest dive at this site
+ */
+
+/**
+ * A site; uuid is 0 when it no longer exists. Region and city say whether the
+ * diver corrected them (manual), in which case a lookup never replaces them.
+ * @typedef {SiteSummary & {description: string, notes: string,
+ *   countryTaxonomy: {value: string, manual: boolean}, region: {value: string, manual: boolean},
+ *   city: {value: string, manual: boolean},
+ *   diveList: {id: number, number: number, date: string, durationSeconds: number, maxDepthMm: number}[]}} SiteDetail
+ */
+
+/**
  * @typedef {Object} EditResult
  * @property {DiveDetail} [dive] the dive after a dive step
+ * @property {SiteDetail} [site] the site after a site step
  * @property {TripDetail} [trip] the trip after a trip step
  * @property {string} undo text of the step that Undo would revert ("Edit notes [#12]"); empty when none
  * @property {string} redo text of the step that Redo would apply; empty when none
@@ -158,6 +181,12 @@ import { registerPlugin } from '@capacitor/core';
  * @property {(options: {id: number, changes: Record<string, string|number|string[]>}) => Promise<EditResult>} editDive
  *   One undoable step; only the fields named change (edit_dive in opendives.h).
  * @property {(options?: {redo?: boolean}) => Promise<EditResult>} undo
+ * @property {(options: {kind: 'list'|'site'|'nearby'|'duplicates'|'without', uuid?: number, lat?: number, lon?: number, a?: number, b?: number}) => Promise<any>} siteQuery
+ *   Read-only site queries (opendives.h): list of SiteSummary, a SiteDetail, the site
+ *   within a metres of lat/lon (or null), possible duplicates (a: same name within a m,
+ *   b: other names within b m), dives without a site.
+ * @property {(options: {action: 'create'|'edit'|'geocode'|'merge'|'delete', uuid?: number, other?: number, uuids?: number[], field?: string, value?: string, lat?: number, lon?: number}) => Promise<EditResult>} siteAction
+ *   One undoable site change, as Subsurface's site commands.
  * @property {(options: {tripId: number}) => Promise<TripDetail>} getTrip
  * @property {(options: {action: 'location'|'notes'|'remove'|'split'|'merge'|'add'|'ungroup', tripId?: number, diveId?: number, otherId?: number, diveIds?: number[], value?: string}) => Promise<EditResult>} tripAction
  *   One undoable trip change, as Subsurface's trip commands.
@@ -209,6 +238,12 @@ export const OpenDivesCore = {
   },
   async editDive(options) {
     return JSON.parse((await native.editDive(options)).json);
+  },
+  async siteQuery(options) {
+    return JSON.parse((await native.siteQuery(options)).json);
+  },
+  async siteAction(options) {
+    return JSON.parse((await native.siteAction(options)).json);
   },
   async getTrip(options) {
     return JSON.parse((await native.getTrip(options)).json);

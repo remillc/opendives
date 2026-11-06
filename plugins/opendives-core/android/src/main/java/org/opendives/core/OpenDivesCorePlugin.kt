@@ -98,6 +98,8 @@ class OpenDivesCorePlugin : Plugin() {
         // Write lock (docs/editing-and-sync-plan.md, section 4): writing to the
         // cloud is allowed only for the test account named in files/cloud-test.env.
         NativeCore.setCloudTestEmail(readTestEmail())
+        // OpenDives' own GeoNames account (files/geonames.env), never Subsurface's.
+        NativeCore.setGeonamesUsername(readSetting(GEONAMES, "GEONAMES_USERNAME"))
         // The account email is shown on the Account screen; the password never leaves the plugin.
         call.resolve(JSObject().put("available", credentials != null).put("email", credentials?.first ?: ""))
     }
@@ -251,6 +253,49 @@ class OpenDivesCorePlugin : Plugin() {
         call.resolve()
     }
 
+    /**
+     * A site uuid (an unsigned 32-bit number). Capacitor's getLong returns null
+     * for a number small enough to be parsed as an Integer, so read any Number.
+     */
+    private fun PluginCall.uuid(name: String): Long = (data.opt(name) as? Number)?.toLong() ?: 0L
+
+    /** Read-only site queries (see opendives.h): list, site, nearby, duplicates, without. */
+    @PluginMethod
+    fun siteQuery(call: PluginCall) = onCoreThread(call) {
+        val json = NativeCore.siteQuery(
+            call.getString("kind").orEmpty(),
+            call.uuid("uuid"),
+            call.getInt("lat") ?: 0,
+            call.getInt("lon") ?: 0,
+            call.getInt("a") ?: 0,
+            call.getInt("b") ?: 0,
+        )
+        call.resolve(JSObject().put("json", json))
+    }
+
+    /** One undoable site change (see opendives.h): create, edit, geocode, merge, delete. */
+    @PluginMethod
+    fun siteAction(call: PluginCall) = onCoreThread(call) {
+        val uuids = call.getArray("uuids")?.toList<Any>()?.map { (it as Number).toLong() }?.toLongArray()
+        val json = NativeCore.siteAction(
+            call.getString("action").orEmpty(),
+            call.uuid("uuid"),
+            call.uuid("other"),
+            uuids,
+            call.getString("field").orEmpty(),
+            call.getString("value").orEmpty(),
+            call.getInt("lat") ?: 0,
+            call.getInt("lon") ?: 0,
+        )
+        call.resolve(JSObject().put("json", json))
+    }
+
+    private fun readSetting(fileName: String, key: String): String {
+        val file = File(context.filesDir, fileName)
+        if (!file.exists()) return ""
+        return file.readLines().map { it.trim() }.firstOrNull { it.startsWith("$key=") }?.substringAfter('=').orEmpty()
+    }
+
     private fun readTestEmail(): String {
         val file = File(context.filesDir, TEST_ACCOUNT)
         if (!file.exists()) return ""
@@ -306,5 +351,6 @@ class OpenDivesCorePlugin : Plugin() {
         const val SAMPLE_ASSET = "SampleDivesV2.ssrf"
         const val DEV_CREDENTIALS = "cloud-dev.env"
         const val TEST_ACCOUNT = "cloud-test.env"
+        const val GEONAMES = "geonames.env"
     }
 }

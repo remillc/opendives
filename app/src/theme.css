@@ -3,7 +3,8 @@
  *
  * Layers, from weakest to strongest:
  *   framework7     Framework7's CSS, imported here and not in main.js;
- *   od.tokens      OpenDives colors (--od-*), each declared once;
+ *   maplibre       MapLibre's CSS (the Sites maps);
+ *   od.tokens     OpenDives colors (--od-*), each declared once;
  *   od.base        rules shared by the screens;
  *   od.components  styles of the Svelte components (each in this layer).
  * A stronger layer wins whatever the specificity of the selectors.
@@ -11,9 +12,10 @@
  * Palette: neutral light UI, colour only in the data (the water column of the
  * profile goes from --od-water-top to --od-water-bottom with depth).
  */
-@layer framework7, od.tokens, od.base, od.components;
+@layer framework7, maplibre, od.tokens, od.base, od.components;
 
 @import 'framework7/css/bundle' layer(framework7);
+@import 'maplibre-gl/dist/maplibre-gl.css' layer(maplibre);
 
 @layer od.tokens {
   :root {

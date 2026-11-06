@@ -19,6 +19,7 @@
 #include "core/divelog.h"
 #include "core/tag.h"
 #include "core/trip.h"
+#include "core/divesite.h"
 
 #include <functional>
 
@@ -218,6 +219,79 @@ int main(int argc, char **argv)
 
 	if (int ret = open_log(repo))
 		return ret;
+
+	if (mode == "sites") {
+		// Each site change: applied, saved, undone, saved again; the script
+		// then checks that the tree is the original one.
+		std::vector<dive_site *> used;
+		for (auto &ds: divelog.sites)
+			if (!ds->dives.empty())
+				used.push_back(ds.get());
+		if (used.size() < 2) {
+			printf("error=fewer than two sites with dives\n");
+			return 2;
+		}
+		uint32_t a = used[0]->uuid, b = used[1]->uuid;
+		int dive_id = used[1]->dives[0]->id;
+		size_t sites0 = divelog.sites.size();
+		auto undo_and_save = [&](const char *name) {
+			std::string json, error;
+			printf("step=%s\n", undo_text().c_str());
+			if (save_local(error) || undo(json, error) || save_local(error)) {
+				printf("error=%s: save or undo: %s\n", name, error.c_str());
+				return false;
+			}
+			if (divelog.sites.size() != sites0) {
+				printf("error=%s: undo did not restore the sites\n", name);
+				return false;
+			}
+			return true;
+		};
+		std::string json, error;
+		struct Edit {
+			const char *field, *value;
+			int lat, lon;
+		};
+		for (Edit e: { Edit{ "name", "OpenDives site", 0, 0 }, Edit{ "location", "", 45500000, -73500000 },
+			       Edit{ "country", "Testland", 0, 0 }, Edit{ "notes", "site notes", 0, 0 } }) {
+			if (site_edit(a, e.field, e.value, e.lat, e.lon, json, error)) {
+				printf("error=edit %s: %s\n", e.field, error.c_str());
+				return 1;
+			}
+			if (!undo_and_save(e.field))
+				return 1;
+		}
+		if (edit_dive(dive_id, "{\"site\":" + std::to_string(a) + "}", json, error) || !undo_and_save("dive site")) {
+			printf("error=dive site: %s\n", error.c_str());
+			return 1;
+		}
+		if (sites_merge(a, b, json, error)) {
+			printf("error=merge: %s\n", error.c_str());
+			return 1;
+		}
+		if (divelog.sites.size() != sites0 - 1 || !undo_and_save("merge"))
+			return 1;
+		if (site_create("OpenDives new site", 45500000, -73500000, json, error)) {
+			printf("error=create: %s\n", error.c_str());
+			return 1;
+		}
+		uint32_t created = static_cast<uint32_t>(atol(json.c_str() + json.find("\"uuid\":") + 7));
+		if (divelog.sites.size() != sites0 + 1) {
+			printf("error=create: site count\n");
+			return 1;
+		}
+		if (sites_delete_unused({ created }, json, error) || divelog.sites.size() != sites0) {
+			printf("error=delete: %s\n", error.c_str());
+			return 1;
+		}
+		// Undo the delete then the creation: back to the original.
+		if (undo(json, error) || undo(json, error) || save_local(error) || divelog.sites.size() != sites0) {
+			printf("error=undo create and delete: %s\n", error.c_str());
+			return 1;
+		}
+		printf("step=create, delete\n");
+		return 0;
+	}
 
 	if (mode == "trips") {
 		// Each trip operation: applied and checked, saved, undone, saved again.

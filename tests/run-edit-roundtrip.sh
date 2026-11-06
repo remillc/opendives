@@ -99,6 +99,16 @@ for s in "$@"; do
   fi
 
   if [ -z "$why" ]; then
+    # Site changes (edit fields, a dive's site, merge, create and delete),
+    # each undone: the tree is the original one again.
+    E="$d/sites"; rm -rf "$E"; cp -r "$d/B" "$E"
+    "$ED" sites "$E[main]" - >"$E.out" 2>"$E.err"; rc=$?
+    if [ $rc = 1 ]; then why="sites: $(value error "$E.out")"
+    elif [ $rc = 0 ] && [ "$(tree "$E")" != "$T0" ]; then why="sites: tree differs after undo: $(echo $(git -C "$E" diff --name-only "$T0" 'main^{tree}'))"
+    elif [ $rc = 0 ]; then echo ok > "$d/sites.ok"; fi
+  fi
+
+  if [ -z "$why" ]; then
     # Save into an unrelated repository: refused, nothing written.
     E="$d/refuse"; rm -rf "$E" "$d/unrelated"; cp -r "$d/B" "$E"; cp -r "$U0" "$d/unrelated"
     H0=$(tip "$d/unrelated")

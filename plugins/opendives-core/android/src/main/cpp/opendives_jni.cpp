@@ -118,7 +118,8 @@ static jstring edit_result(JNIEnv *env, const std::string &dive_json)
 		return out;
 	};
 	// A trip step gives the trip ({"tripId":...}), a dive step the dive.
-	const char *key = dive_json.rfind("{\"tripId\"", 0) == 0 ? "trip" : "dive";
+	const char *key = dive_json.rfind("{\"tripId\"", 0) == 0 ? "trip"
+			: dive_json.rfind("{\"uuid\"", 0) == 0 ? "site" : "dive";
 	std::string json = std::string("{\"") + key + "\":" + dive_json + ",\"undo\":\"" + quoted(opendives::undo_text());
 	json += "\",\"redo\":\"" + quoted(opendives::redo_text()) + "\"}";
 	return env->NewStringUTF(json.c_str());
@@ -178,6 +179,71 @@ Java_org_opendives_core_NativeCore_tripAction(JNIEnv *env, jobject, jstring acti
 		return nullptr;
 	}
 	return edit_result(env, json);
+}
+
+// Read-only site queries: list, site, nearby, duplicates, without (dives without a site).
+JNIEXPORT jstring JNICALL
+Java_org_opendives_core_NativeCore_siteQuery(JNIEnv *env, jobject, jstring kindIn, jlong uuid, jint lat, jint lon,
+					     jint a, jint b)
+{
+	std::string kind = to_string(env, kindIn), json, error;
+	if (kind == "list")
+		opendives::sites_json(json);
+	else if (kind == "site")
+		opendives::site_json(static_cast<uint32_t>(uuid), json, error);
+	else if (kind == "nearby")
+		opendives::site_nearby(lat, lon, a, json);
+	else if (kind == "duplicates")
+		opendives::sites_duplicates(a, b, json);
+	else if (kind == "without")
+		opendives::dives_without_site(json);
+	else
+		json = "null";
+	return env->NewStringUTF(json.c_str());
+}
+
+// One undoable site change: create, edit, geocode, merge, delete.
+JNIEXPORT jstring JNICALL
+Java_org_opendives_core_NativeCore_siteAction(JNIEnv *env, jobject, jstring actionIn, jlong uuid, jlong other,
+					      jlongArray uuidsIn, jstring fieldIn, jstring valueIn, jint lat, jint lon)
+{
+	std::string action = to_string(env, actionIn), field = to_string(env, fieldIn), value = to_string(env, valueIn);
+	std::vector<uint32_t> uuids;
+	if (uuidsIn) {
+		jsize n = env->GetArrayLength(uuidsIn);
+		std::vector<jlong> raw(n);
+		if (n)
+			env->GetLongArrayRegion(uuidsIn, 0, n, raw.data());
+		for (jlong v: raw)
+			uuids.push_back(static_cast<uint32_t>(v));
+	}
+	std::string json, error;
+	int ret;
+	if (action == "create")
+		ret = opendives::site_create(value, lat, lon, json, error);
+	else if (action == "edit")
+		ret = opendives::site_edit(static_cast<uint32_t>(uuid), field, value, lat, lon, json, error);
+	else if (action == "geocode")
+		ret = opendives::site_geocode(static_cast<uint32_t>(uuid), value, json, error);
+	else if (action == "merge")
+		ret = opendives::sites_merge(static_cast<uint32_t>(uuid), static_cast<uint32_t>(other), json, error);
+	else if (action == "delete")
+		ret = opendives::sites_delete_unused(uuids, json, error);
+	else {
+		ret = -1;
+		error = "BAD_REQUEST: unknown action " + action;
+	}
+	if (ret) {
+		throw_core_error(env, error);
+		return nullptr;
+	}
+	return edit_result(env, json);
+}
+
+JNIEXPORT void JNICALL
+Java_org_opendives_core_NativeCore_setGeonamesUsername(JNIEnv *env, jobject, jstring username)
+{
+	opendives::set_geonames_username(to_string(env, username));
 }
 
 JNIEXPORT jstring JNICALL

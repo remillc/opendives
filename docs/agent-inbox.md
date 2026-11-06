@@ -99,7 +99,9 @@ Done in Add the trip screen and undoable trip changes
 
 Build the trip screen from `docs/mockups/voyage-android.dc.html` and section 4, "Trip". Automatic trips have no stable identifier: never store one.
 
-## [ ] 2026-11-06-14 Sites screens
+## [x] 2026-11-06-14 Sites screens
+
+Done in Add the Sites screens and undoable site changes
 
 Build the four Sites screens from `docs/mockups/sites-fiche-android.dc.html`, `sites-edition-android.dc.html`, `sites-sans-site-android.dc.html` and `sites-nettoyer-android.dc.html`, following section 4, "Sites", and add the duplicates row and links to `android-sites.dc.html`. Use the core functions named there; country and region lookup goes through GeoNames like Subsurface. Merging and deleting sites change the logbook: confirm before each, and test on the test account only.
 

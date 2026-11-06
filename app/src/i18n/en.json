@@ -392,6 +392,106 @@
     "noLooseDive": "Every dive is already in a trip",
     "edit": "Edit the trip",
     "done": "Trip changed",
-    "help": "Each dive's menu removes it from the trip or splits the trip there. The top menu merges this trip with another, adds dives or ungroups the trip."
+    "help": "Each dive's menu removes it from the trip or splits the trip there. The top menu merges this trip with another, adds dives or ungroups the trip.",
+    "ungroupConfirm": "Ungroup"
+  },
+  "sites": {
+    "title": "Sites",
+    "map": "Map of the sites",
+    "noName": "No name",
+    "newSite": "New site",
+    "editTitle": "Edit the site",
+    "edit": "Edit the site",
+    "siteCount": {
+      "one": "{n} site",
+      "other": "{n} sites"
+    },
+    "withoutLink": {
+      "one": "{n} dive without a site: assign it",
+      "other": "{n} dives without a site: assign them"
+    },
+    "duplicatesLink": {
+      "one": "{n} possible duplicate: clean up the sites",
+      "other": "{n} possible duplicates: clean up the sites"
+    },
+    "rowDives": {
+      "one": "{n} dive, on {date}",
+      "other": "{n} dives, the latest on {date}"
+    },
+    "rowNoGps": {
+      "one": "{n} dive, no GPS position",
+      "other": "{n} dives, no GPS position"
+    },
+    "openInMaps": "Open in Maps",
+    "divesHere": "Dives at this site",
+    "about": "About the site",
+    "description": "Description",
+    "notes": "Notes",
+    "noDescription": "No description",
+    "noNotes": "No notes",
+    "regionCity": "Region and city",
+    "foundAutomatically": "Found automatically from the position",
+    "corrected": "Corrected by hand",
+    "name": "Name",
+    "movePin": "Tap the map or drag the pin to correct it",
+    "nearby": "A site already exists within 100 m of this position:",
+    "useNearby": "Use this site",
+    "coordinates": "Coordinates",
+    "coordinatesHint": "Type them, for example -35.4485, 174.732 or 35°26.9'S 174°43.9'E, or use your position",
+    "coordinatesInvalid": "Coordinates not recognised. Example: -35.4485, 174.732",
+    "useDevicePosition": "Use my position",
+    "noDevicePosition": "The device's position is not available",
+    "geonamesHint": "Country and region filled in from the coordinates (GeoNames), at each change of position",
+    "country": "Country",
+    "region": "Region",
+    "automatic": "automatic",
+    "correctionHint": "You can correct them. A correction is never replaced. Offline, they are filled in when the network is back.",
+    "descriptionPlaceholder": "Access, depths, what you see there",
+    "notesPlaceholder": "Your personal notes about this site",
+    "withoutTitle": "Dives without a site",
+    "withoutIntro": {
+      "one": "{n} dive has no site. OpenDives suggests the site of the other dives of the same trip.",
+      "other": "{n} dives have no site. OpenDives suggests the site of the other dives of the same trip."
+    },
+    "suggestion": "Suggestion: {site}, same trip",
+    "chooseSite": "Choose a site",
+    "cleanupTitle": "Clean up the sites",
+    "cleanupIntro": "Imports sometimes create the same site several times. Merging keeps a single site, with all its dives. It can be undone.",
+    "sameNameAt": "Same name apart from case, {n} m apart",
+    "sameName": "Same name apart from case",
+    "samePlace": "Same position, different names",
+    "diveCount": {
+      "one": "{n} dive",
+      "other": "{n} dives"
+    },
+    "noCountry": "no country",
+    "withPosition": "with a position",
+    "withoutPosition": "no position",
+    "notDuplicates": "These are not duplicates",
+    "merge": "Merge",
+    "mergeTitle": "Merge the sites?",
+    "mergeText": "“{keep}” keeps all the dives of “{other}”, which goes away. It can be undone.",
+    "unusedTitle": "Sites without dives",
+    "unusedIntro": {
+      "one": "{n} site is not used by any dive. They often come from imports or deleted dives.",
+      "other": "{n} sites are not used by any dive. They often come from imports or deleted dives."
+    },
+    "selectAll": "Select all",
+    "noDive": "No dive",
+    "deleteSelection": "Delete the selection ({n})",
+    "deleteTitle": "Delete the sites?",
+    "deleteText": {
+      "one": "The selected site will be deleted. No dive is affected. It can be undone.",
+      "other": "The {n} selected sites will be deleted. No dive is affected. It can be undone."
+    },
+    "done": "Sites changed",
+    "delete": "Delete"
+  },
+  "dialog": {
+    "ok": "OK",
+    "cancel": "Cancel"
+  },
+  "common": {
+    "back": "Back"
   }
 }

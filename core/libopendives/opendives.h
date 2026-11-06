@@ -6,6 +6,7 @@
 #define OPENDIVES_H
 
 #include <string>
+#include <cstdint>
 #include <vector>
 
 namespace opendives {
@@ -134,6 +135,30 @@ int trip_split_at(int dive_id, std::string &json, std::string &error); // this d
 int trips_merge(int trip_id, int other_id, std::string &json, std::string &error);
 int trip_add_dives(int trip_id, const std::vector<int> &dive_ids, std::string &json, std::string &error);
 int trip_ungroup(int trip_id, std::string &json, std::string &error);
+
+// Dive sites (spec, section 4, "Sites"), by uuid; each change one undoable
+// step as Subsurface's site commands. Coordinates in micro-degrees.
+// site_json: summary + description, notes, countryTaxonomy/region/city
+// ({value, manual}) and diveList; {"uuid":0} when the site no longer exists.
+int sites_json(std::string &json);
+int site_json(uint32_t uuid, std::string &json, std::string &error);
+int site_nearby(int lat_udeg, int lon_udeg, int distance_m, std::string &json); // get_by_gps_proximity; "null" if none
+int site_create(const std::string &name, int lat_udeg, int lon_udeg, std::string &json, std::string &error);
+// field: name, description, notes, location (lat, lon; 0, 0 removes it),
+// country, region, city (corrected values, never replaced by a lookup).
+int site_edit(uint32_t uuid, const std::string &field, const std::string &value, int lat_udeg, int lon_udeg,
+	      std::string &json, std::string &error);
+// Country, region and city from GeoNames for the site's position (port of
+// reverseGeoLookup); keeps corrected values. Needs set_geonames_username().
+int site_geocode(uint32_t uuid, const std::string &lang, std::string &json, std::string &error);
+void set_geonames_username(const std::string &username);
+// Possible duplicates: same name ignoring case within same_name_m, or
+// different names within same_place_m: [{"a":…, "b":…, "distanceM":…}].
+int sites_duplicates(int same_name_m, int same_place_m, std::string &json);
+int sites_merge(uint32_t keep, uint32_t other, std::string &json, std::string &error); // MergeDiveSites
+int sites_delete_unused(const std::vector<uint32_t> &uuids, std::string &json, std::string &error);
+// Dives without a site: [{"id", "number", "date", "durationSeconds", "suggestedSite"}].
+int dives_without_site(std::string &json);
 
 // Undo stack of the session; cleared by every load. The result is the dive
 // changed, as get_dive() gives it.

@@ -24,6 +24,9 @@
 #include "core/pref.h"
 #include "core/tag.h"
 #include "core/trip.h"
+#include "core/taxonomy.h"
+#include "core/compat/platform_https.h"
+#include "core/qthelper.h"
 #include "core/version.h"
 #include "commands/command.h"
 
@@ -258,7 +261,7 @@ struct TripMove {
 };
 
 struct Step {
-	enum Kind { DIVE, TRIP_FIELD, MOVE } kind = DIVE;
+	enum Kind { DIVE, TRIP_FIELD, MOVE, SITE_FIELD, SITES } kind = DIVE;
 	// DIVE: the dive and the contents to swap in on the next undo or redo.
 	int dive_id = 0;
 	std::unique_ptr<dive> other;
@@ -269,6 +272,18 @@ struct Step {
 	// MOVE: as Subsurface's DivesToTrip (commands/command_divelist.h).
 	std::vector<TripMove> moves;
 	std::vector<std::unique_ptr<dive_trip>> trips_to_add;
+	// SITE_FIELD: a site, which field (0 name, 1 description, 2 notes,
+	// 3 location, 4 taxonomy) and the value to swap in.
+	dive_site *site = nullptr;
+	int site_field = 0;
+	location_t location {};
+	taxonomy_data taxonomy;
+	// SITES: as Subsurface's AddDiveSite, DeleteDiveSites and MergeDiveSites:
+	// sites to remove from the core, or removed ones (owned) to put back;
+	// for a merge, the site that receives their dives.
+	std::vector<dive_site *> sites_to_remove;
+	std::vector<std::unique_ptr<dive_site>> sites_to_add;
+	dive_site *merge_into = nullptr;
 	std::string text;
 };
 
@@ -382,6 +397,77 @@ dive_trip *trip_by_id(int id)
 		if (trip->id == id)
 			return trip.get();
 	return nullptr;
+}
+
+// Ports of addDiveSites() and removeDiveSites() (commands/command_divesite.cpp),
+// without signals. A removed site keeps its list of dives for the undo. The
+// dives' cache is invalidated so that their site is written again (Subsurface
+// does not do it here).
+std::vector<dive_site *> add_sites(std::vector<std::unique_ptr<dive_site>> &sites)
+{
+	std::vector<dive_site *> res;
+	for (std::unique_ptr<dive_site> &ds: sites) {
+		for (dive *d: ds->dives) {
+			d->dive_site = ds.get();
+			d->invalidate_cache();
+		}
+		res.push_back(divelog.sites.register_site(std::move(ds)).ptr);
+	}
+	sites.clear();
+	return res;
+}
+
+std::vector<std::unique_ptr<dive_site>> remove_sites(std::vector<dive_site *> &sites)
+{
+	std::vector<std::unique_ptr<dive_site>> res;
+	for (dive_site *ds: sites) {
+		for (dive *d: ds->dives) {
+			d->dive_site = nullptr;
+			d->invalidate_cache();
+		}
+		res.push_back(std::move(divelog.sites.pull(ds).ptr));
+	}
+	sites.clear();
+	return res;
+}
+
+// Redo and undo of a SITES step (AddDiveSite, DeleteDiveSites, MergeDiveSites).
+void apply_sites(Step &step)
+{
+	if (!step.sites_to_remove.empty()) {
+		step.sites_to_add = remove_sites(step.sites_to_remove);
+		if (step.merge_into) {
+			for (const std::unique_ptr<dive_site> &site: step.sites_to_add)
+				for (dive *d: site->dives) {
+					step.merge_into->add_dive(d);
+					d->invalidate_cache();
+				}
+		}
+	} else {
+		if (step.merge_into) {
+			for (const std::unique_ptr<dive_site> &site: step.sites_to_add)
+				for (dive *d: site->dives) {
+					unregister_dive_from_dive_site(d);
+					d->invalidate_cache();
+				}
+		}
+		step.sites_to_remove = add_sites(step.sites_to_add);
+	}
+}
+
+// Redo and undo of a SITE_FIELD step: the value is swapped.
+void apply_site_field(Step &step)
+{
+	dive_site *ds = step.site;
+	switch (step.site_field) {
+	case 0: std::swap(ds->name, step.value); break;
+	case 1: std::swap(ds->description, step.value); break;
+	case 2: std::swap(ds->notes, step.value); break;
+	case 3: std::swap(ds->location, step.location); break;
+	default: std::swap(ds->taxonomy, step.taxonomy); break;
+	}
+	for (dive *d: ds->dives)
+		d->invalidate_cache();
 }
 
 // "#12", or "@" and the date when the dive has no number. Subsurface's
@@ -768,6 +854,21 @@ int edit_dive(int id, const std::string &changes_json, std::string &result_json,
 				taglist_cleanup(copy->tags);
 				fields.push_back("tags");
 			}
+		} else if (key == "site") {
+			// EditDiveSite: the dive's site by uuid; 0: no site.
+			if (value.kind != JsonValue::NUMBER) {
+				error = "BAD_REQUEST: site must be a site uuid";
+				return -1;
+			}
+			dive_site *ds = value.number ? divelog.sites.get_by_uuid(static_cast<uint32_t>(value.number)) : nullptr;
+			if (value.number && !ds) {
+				error = "NOT_FOUND";
+				return -1;
+			}
+			if (copy->dive_site != ds) {
+				copy->dive_site = ds;
+				fields.push_back("dive site");
+			}
 		} else {
 			error = "BAD_REQUEST: unknown field " + key;
 			return -1;
@@ -1016,12 +1117,419 @@ int trip_add_dives(int trip_id, const std::vector<int> &dive_ids, std::string &j
 	return do_move(std::move(step), trip_id, json, error);
 }
 
+// ---------------------------------------------------------------------------
+// Dive sites (spec, section 4, "Sites"). Sites are identified by their uuid.
+
+static std::string geonames_username;
+
+void set_geonames_username(const std::string &username)
+{
+	geonames_username = username;
+}
+
+static std::string iso_time(timestamp_t when);
+
+static void append_site_summary(std::string &json, const dive_site &ds)
+{
+	json += "{\"uuid\":" + std::to_string(ds.uuid) + ",\"name\":";
+	append_json_string(json, ds.name);
+	json += ",\"hasLocation\":";
+	json += has_location(&ds.location) ? "true" : "false";
+	json += ",\"latUdeg\":" + std::to_string(ds.location.lat.udeg);
+	json += ",\"lonUdeg\":" + std::to_string(ds.location.lon.udeg);
+	json += ",\"country\":";
+	append_json_string(json, taxonomy_get_country(ds.taxonomy));
+	json += ",\"dives\":" + std::to_string(ds.dives.size());
+	// The latest dive and the deepest, for the list of sites.
+	timestamp_t last = 0;
+	int deepest = 0;
+	for (const dive *d: ds.dives) {
+		last = std::max(last, d->when);
+		deepest = std::max(deepest, d->maxdepth.mm);
+	}
+	json += ",\"lastDate\":";
+	append_json_string(json, last ? iso_time(last) : std::string());
+	json += ",\"maxDepthMm\":" + std::to_string(deepest) + '}';
+}
+
+int sites_json(std::string &json)
+{
+	json = "[";
+	bool first = true;
+	for (const auto &ds: divelog.sites) {
+		if (!first)
+			json += ',';
+		first = false;
+		append_site_summary(json, *ds);
+	}
+	json += ']';
+	return 0;
+}
+
+static const taxonomy *find_taxonomy(const taxonomy_data &t, taxonomy_category cat)
+{
+	for (const taxonomy &entry: t)
+		if (entry.category == cat)
+			return &entry;
+	return nullptr;
+}
+
+static void append_taxonomy_entry(std::string &json, const char *key, const taxonomy_data &t, taxonomy_category cat)
+{
+	const taxonomy *entry = find_taxonomy(t, cat);
+	json += std::string(",\"") + key + "\":{\"value\":";
+	append_json_string(json, entry ? entry->value : std::string());
+	json += ",\"manual\":";
+	json += entry && entry->origin == GEOMANUAL ? "true" : "false";
+	json += '}';
+}
+
+int site_json(uint32_t uuid, std::string &json, std::string &error)
+{
+	(void)error;
+	dive_site *ds = uuid ? divelog.sites.get_by_uuid(uuid) : nullptr;
+	if (!ds) {
+		json = "{\"uuid\":0}"; // the site no longer exists
+		return 0;
+	}
+	append_site_summary(json = std::string(), *ds);
+	json.pop_back(); // reopen the object
+	json += ",\"description\":";
+	append_json_string(json, ds->description);
+	json += ",\"notes\":";
+	append_json_string(json, ds->notes);
+	append_taxonomy_entry(json, "countryTaxonomy", ds->taxonomy, TC_COUNTRY);
+	append_taxonomy_entry(json, "region", ds->taxonomy, TC_ADMIN_L1);
+	append_taxonomy_entry(json, "city", ds->taxonomy, TC_LOCALNAME);
+	json += ",\"diveList\":[";
+	bool first = true;
+	for (const dive *d: ds->dives) {
+		if (!first)
+			json += ',';
+		first = false;
+		json += "{\"id\":" + std::to_string(d->id) + ",\"number\":" + std::to_string(d->number) + ",\"date\":";
+		append_json_string(json, iso_time(d->when));
+		json += ",\"durationSeconds\":" + std::to_string(d->duration.seconds) + ",\"maxDepthMm\":" +
+			std::to_string(d->maxdepth.mm) + '}';
+	}
+	json += "]}";
+	return 0;
+}
+
+int site_nearby(int lat_udeg, int lon_udeg, int distance_m, std::string &json)
+{
+	location_t loc;
+	loc.lat.udeg = lat_udeg;
+	loc.lon.udeg = lon_udeg;
+	dive_site *ds = divelog.sites.get_by_gps_proximity(loc, distance_m);
+	if (!ds) {
+		json = "null";
+		return 0;
+	}
+	json.clear();
+	append_site_summary(json, *ds);
+	return 0;
+}
+
+int site_create(const std::string &name, int lat_udeg, int lon_udeg, std::string &json, std::string &error)
+{
+	location_t loc;
+	loc.lat.udeg = lat_udeg;
+	loc.lon.udeg = lon_udeg;
+	Step step;
+	step.kind = Step::SITES;
+	step.text = "add dive site"; // AddDiveSite
+	step.sites_to_add.push_back(std::make_unique<dive_site>(name, loc));
+	apply_sites(step);
+	uint32_t uuid = step.sites_to_remove[0]->uuid;
+	push_step(std::move(step));
+	return site_json(uuid, json, error);
+}
+
+static int push_site_field(dive_site *ds, Step step, std::string &json, std::string &error)
+{
+	apply_site_field(step);
+	push_step(std::move(step));
+	return site_json(ds->uuid, json, error);
+}
+
+int site_edit(uint32_t uuid, const std::string &field, const std::string &value, int lat_udeg, int lon_udeg,
+	      std::string &json, std::string &error)
+{
+	dive_site *ds = divelog.sites.get_by_uuid(uuid);
+	if (!ds) {
+		error = "NOT_FOUND";
+		return -1;
+	}
+	Step step;
+	step.kind = Step::SITE_FIELD;
+	step.site = ds;
+	if (field == "name" || field == "description" || field == "notes") {
+		// EditDiveSiteName, EditDiveSiteDescription, EditDiveSiteNotes
+		const std::string &current = field == "name" ? ds->name : field == "description" ? ds->description : ds->notes;
+		if (current == value)
+			return site_json(uuid, json, error);
+		step.site_field = field == "name" ? 0 : field == "description" ? 1 : 2;
+		step.value = value;
+		step.text = "Edit dive site " + field;
+		return push_site_field(ds, std::move(step), json, error);
+	}
+	if (field == "location") {
+		// EditDiveSiteLocation; 0, 0 removes the position.
+		location_t loc;
+		loc.lat.udeg = lat_udeg;
+		loc.lon.udeg = lon_udeg;
+		bool ok = has_location(&loc), old_ok = has_location(&ds->location);
+		if (ok == old_ok && (!ok || loc == ds->location))
+			return site_json(uuid, json, error);
+		step.site_field = 3;
+		step.location = loc;
+		step.text = "Edit dive site location";
+		return push_site_field(ds, std::move(step), json, error);
+	}
+	if (field == "country" || field == "region" || field == "city") {
+		// A corrected value: origin GEOMANUAL, never replaced by a lookup.
+		taxonomy_data t = ds->taxonomy;
+		if (field == "country") {
+			if (taxonomy_get_country(t) == value)
+				return site_json(uuid, json, error);
+			taxonomy_set_country(t, value, GEOMANUAL); // EditDiveSiteCountry
+			step.text = "Edit dive site country";
+		} else {
+			taxonomy_category cat = field == "region" ? TC_ADMIN_L1 : TC_LOCALNAME;
+			if (taxonomy_get_value(t, cat) == value)
+				return site_json(uuid, json, error);
+			taxonomy_set_category(t, cat, value, GEOMANUAL); // EditDiveSiteTaxonomy
+			step.text = "Edit dive site taxonomy";
+		}
+		step.site_field = 4;
+		step.taxonomy = std::move(t);
+		return push_site_field(ds, std::move(step), json, error);
+	}
+	error = "BAD_REQUEST: unknown site field " + field;
+	return -1;
+}
+
+// The first string value of "key" in a JSON text, from `from` on; JSON escapes
+// of quotes and backslashes are undone, \uXXXX are kept as they are.
+static std::string json_value(const std::string &text, const std::string &key, size_t from = 0)
+{
+	std::string pattern = "\"" + key + "\":\"";
+	size_t start = text.find(pattern, from);
+	if (start == std::string::npos)
+		return std::string();
+	start += pattern.size();
+	std::string out;
+	for (size_t i = start; i < text.size() && text[i] != '"'; i++) {
+		if (text[i] == '\\' && i + 1 < text.size())
+			i++;
+		out += text[i];
+	}
+	return out;
+}
+
+// Port of reverseGeoLookup() (core/divesitehelpers.cpp, Qt): GeoNames' ocean,
+// then nearby place name, else nearby, with OpenDives' own GeoNames account.
+static int reverse_geo_lookup(location_t loc, const std::string &lang, taxonomy_data &taxonomy, std::string &error)
+{
+	if (geonames_username.empty()) {
+		error = "NO_GEONAMES_ACCOUNT";
+		return -1;
+	}
+	char coords[96];
+	snprintf(coords, sizeof(coords), "lat=%.6f&lng=%.6f", loc.lat.udeg / 1000000.0, loc.lon.udeg / 1000000.0);
+	std::string query = "?lang=" + lang + "&" + coords + "&radius=50&username=" + geonames_username;
+	const std::string base = "https://secure.geonames.org/";
+	int status = 0;
+	std::string body;
+	if (opendives_https_get(base + "oceanJSON" + query, subsurface_user_agent(), 5, status, body)) {
+		error = "OFFLINE";
+		return -1;
+	}
+	size_t ocean = body.find("\"ocean\"");
+	if (ocean != std::string::npos) {
+		std::string name = json_value(body, "name", ocean);
+		if (!name.empty())
+			taxonomy_set_category(taxonomy, TC_OCEAN, name, GEOCODED);
+	}
+	body.clear();
+	if (opendives_https_get(base + "findNearbyPlaceNameJSON" + query, subsurface_user_agent(), 5, status, body)) {
+		error = "OFFLINE";
+		return -1;
+	}
+	size_t list = body.find("\"geonames\":[{");
+	if (list == std::string::npos) {
+		body.clear();
+		if (opendives_https_get(base + "findNearbyJSON" + query, subsurface_user_agent(), 5, status, body)) {
+			error = "OFFLINE";
+			return -1;
+		}
+		list = body.find("\"geonames\":[{");
+	}
+	if (list == std::string::npos) {
+		error = "NO_RESULT";
+		return -1;
+	}
+	size_t end = body.find('}', list);
+	std::string first = body.substr(list, end == std::string::npos ? std::string::npos : end - list);
+	for (int idx = TC_COUNTRY; idx < TC_NR_CATEGORIES; idx++) {
+		std::string value = json_value(first, taxonomy_api_names[idx]);
+		if (!value.empty())
+			taxonomy_set_category(taxonomy, static_cast<taxonomy_category>(idx), value, GEOCODED);
+	}
+	std::string l3 = taxonomy_get_value(taxonomy, TC_ADMIN_L3);
+	std::string lt = taxonomy_get_value(taxonomy, TC_LOCALNAME);
+	if (!l3.empty() && !lt.empty())
+		taxonomy_set_category(taxonomy, TC_ADMIN_L3, lt, GEOCOPIED); // as Subsurface does
+	return 0;
+}
+
+int site_geocode(uint32_t uuid, const std::string &lang, std::string &json, std::string &error)
+{
+	dive_site *ds = divelog.sites.get_by_uuid(uuid);
+	if (!ds || !has_location(&ds->location)) {
+		error = "NOT_FOUND";
+		return -1;
+	}
+	taxonomy_data found;
+	if (reverse_geo_lookup(ds->location, lang, found, error))
+		return -1;
+	// A corrected value is never replaced (spec, section 4, "Sites").
+	taxonomy_data t = ds->taxonomy;
+	for (const taxonomy &entry: found) {
+		const taxonomy *old = find_taxonomy(t, entry.category);
+		if (!old || old->origin != GEOMANUAL)
+			taxonomy_set_category(t, entry.category, entry.value, entry.origin);
+	}
+	Step step;
+	step.kind = Step::SITE_FIELD;
+	step.site = ds;
+	step.site_field = 4;
+	step.taxonomy = std::move(t);
+	step.text = "Edit dive site taxonomy";
+	return push_site_field(ds, std::move(step), json, error);
+}
+
+static std::string lower(std::string s)
+{
+	std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c) { return std::tolower(c); });
+	return s;
+}
+
+int sites_duplicates(int same_name_m, int same_place_m, std::string &json)
+{
+	// Possible duplicates, as the spec defines them: same name ignoring case
+	// and close, or same position with different names.
+	json = "[";
+	bool first = true;
+	std::vector<dive_site *> all;
+	for (auto &ds: divelog.sites)
+		all.push_back(ds.get());
+	for (size_t i = 0; i < all.size(); i++) {
+		for (size_t j = i + 1; j < all.size(); j++) {
+			dive_site *a = all[i], *b = all[j];
+			bool located = has_location(&a->location) && has_location(&b->location);
+			unsigned int distance = located ? get_distance(a->location, b->location) : 0;
+			bool same_name = !a->name.empty() && lower(a->name) == lower(b->name) &&
+					 (!located || distance <= static_cast<unsigned int>(same_name_m));
+			bool same_place = located && a->name != b->name && distance <= static_cast<unsigned int>(same_place_m);
+			if (!same_name && !same_place)
+				continue;
+			if (!first)
+				json += ',';
+			first = false;
+			json += "{\"a\":";
+			append_site_summary(json, *a);
+			json += ",\"b\":";
+			append_site_summary(json, *b);
+			json += ",\"distanceM\":" + std::to_string(located ? static_cast<int>(distance) : -1) + '}';
+		}
+	}
+	json += ']';
+	return 0;
+}
+
+int sites_merge(uint32_t keep, uint32_t other, std::string &json, std::string &error)
+{
+	dive_site *ds = divelog.sites.get_by_uuid(keep), *gone = divelog.sites.get_by_uuid(other);
+	if (!ds || !gone || ds == gone) {
+		error = "NOT_FOUND";
+		return -1;
+	}
+	Step step;
+	step.kind = Step::SITES;
+	step.text = "merge dive sites"; // MergeDiveSites
+	step.merge_into = ds;
+	step.sites_to_remove.push_back(gone);
+	apply_sites(step);
+	push_step(std::move(step));
+	return site_json(keep, json, error);
+}
+
+int sites_delete_unused(const std::vector<uint32_t> &uuids, std::string &json, std::string &error)
+{
+	// PurgeUnusedDiveSites, limited to the selection: only sites without dives.
+	Step step;
+	step.kind = Step::SITES;
+	for (uint32_t uuid: uuids) {
+		dive_site *ds = divelog.sites.get_by_uuid(uuid);
+		if (ds && ds->dives.empty())
+			step.sites_to_remove.push_back(ds);
+	}
+	if (step.sites_to_remove.empty()) {
+		error = "NOTHING_TO_DO";
+		return -1;
+	}
+	step.text = "delete " + std::to_string(step.sites_to_remove.size()) + " dive site(s)"; // DeleteDiveSites
+	apply_sites(step);
+	push_step(std::move(step));
+	json = "{\"uuid\":0}";
+	return 0;
+}
+
+int dives_without_site(std::string &json)
+{
+	json = "[";
+	bool first = true;
+	for (const auto &d: divelog.dives) {
+		if (d->dive_site)
+			continue;
+		if (!first)
+			json += ',';
+		first = false;
+		json += "{\"id\":" + std::to_string(d->id) + ",\"number\":" + std::to_string(d->number) + ",\"date\":";
+		append_json_string(json, iso_time(d->when));
+		json += ",\"durationSeconds\":" + std::to_string(d->duration.seconds);
+		// Suggestion: the site of another dive of the same trip.
+		uint32_t suggestion = 0;
+		if (d->divetrip)
+			for (const dive *other: d->divetrip->dives)
+				if (other->dive_site) {
+					suggestion = other->dive_site->uuid;
+					break;
+				}
+		json += ",\"suggestedSite\":" + std::to_string(suggestion) + '}';
+	}
+	json += ']';
+	return 0;
+}
+
 static int swap_step(Step &step, std::string &result_json, std::string &error)
 {
 	if (step.kind == Step::TRIP_FIELD) {
 		std::string &field = step.notes ? step.trip->notes : step.trip->location;
 		std::swap(field, step.value);
 		return trip_json(step.trip->id, result_json, error);
+	}
+	if (step.kind == Step::SITE_FIELD) {
+		apply_site_field(step);
+		return site_json(step.site->uuid, result_json, error);
+	}
+	if (step.kind == Step::SITES) {
+		apply_sites(step);
+		uint32_t shown = step.merge_into ? step.merge_into->uuid
+			       : !step.sites_to_remove.empty() ? step.sites_to_remove[0]->uuid : 0;
+		return site_json(shown, result_json, error);
 	}
 	if (step.kind == Step::MOVE) {
 		move_dives_between_trips(step);

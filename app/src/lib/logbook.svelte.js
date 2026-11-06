@@ -44,6 +44,8 @@ export const logbook = $state({
   editedTrip: /** @type {import('opendives-core').TripDetail|null} */ (null),
   /** Text of the step that Undo would revert, e.g. "Edit notes [#12]". */
   undoText: '',
+  /** Increases at each site change, so that site screens read the sites again. */
+  sitesVersion: 0,
 });
 
 /**
@@ -79,6 +81,18 @@ export async function saveDiveChanges(id, changes) {
   return result;
 }
 
+/**
+ * After a change that may touch many dives (sites): the list is read again,
+ * then saved and synced like an edit.
+ * @param {string} undoText
+ */
+export async function refreshAfterChange(undoText) {
+  logbook.undoText = undoText;
+  logbook.dives = await OpenDivesCore.listLoadedDives();
+  logbook.sitesVersion++;
+  await persistChanges();
+}
+
 /** Undoes the last edit, saved and synced the same way. */
 export async function undoLastChange() {
   const result = await OpenDivesCore.undo();
@@ -86,6 +100,10 @@ export async function undoLastChange() {
   if (result.trip) {
     logbook.editedTrip = result.trip;
     logbook.dives = await OpenDivesCore.listLoadedDives();
+  }
+  if (result.site) {
+    logbook.dives = await OpenDivesCore.listLoadedDives();
+    logbook.sitesVersion++;
   }
   logbook.undoText = result.undo;
   await persistChanges();

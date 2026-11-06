@@ -13,6 +13,11 @@
   import DeleteAccount from './pages/DeleteAccount.svelte';
   import EditDive from './pages/EditDive.svelte';
   import Trip from './pages/Trip.svelte';
+  import Sites from './pages/Sites.svelte';
+  import SiteSheet from './pages/SiteSheet.svelte';
+  import SiteEdit from './pages/SiteEdit.svelte';
+  import DivesWithoutSite from './pages/DivesWithoutSite.svelte';
+  import SitesCleanup from './pages/SitesCleanup.svelte';
   import Icon from './components/Icon.svelte';
   import AdaptiveLabel from './components/AdaptiveLabel.svelte';
   import NavMenu from './components/NavMenu.svelte';
@@ -31,6 +36,8 @@
     // Framework7 derives its palette from --od-action (theme.css); the mapped
     // variables in theme.css then take precedence.
     colors: { primary: getComputedStyle(document.documentElement).getPropertyValue('--od-action').trim() },
+    // Framework7's own dialog buttons are in English.
+    dialog: { buttonOk: t('dialog.ok'), buttonCancel: t('dialog.cancel') },
     routes: [
       { path: '/', component: Logbook },
       { path: '/dive/:id/', component: DiveDetail },
@@ -45,11 +52,12 @@
         component: Placeholder,
         options: { props: { title: t('detail.plan'), text: t('placeholders.planText') } },
       },
-      {
-        path: '/sites/',
-        component: Placeholder,
-        options: { props: { title: t('tabs.sites'), text: t('placeholders.sitesText') } },
-      },
+      { path: '/sites/', component: Sites },
+      { path: '/sites/without/', component: DivesWithoutSite },
+      { path: '/sites/cleanup/', component: SitesCleanup },
+      { path: '/site/new/', component: SiteEdit },
+      { path: '/site/:uuid/', component: SiteSheet },
+      { path: '/site/:uuid/edit/', component: SiteEdit },
       {
         path: '/statistics/',
         component: Placeholder,
