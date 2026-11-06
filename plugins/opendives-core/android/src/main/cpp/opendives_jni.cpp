@@ -5,6 +5,7 @@
 #include <jni.h>
 #include <cstdlib>
 #include <string>
+#include <vector>
 
 static std::string to_string(JNIEnv *env, jstring s)
 {
@@ -202,6 +203,36 @@ Java_org_opendives_core_NativeCore_siteQuery(JNIEnv *env, jobject, jstring kindI
 		opendives::place_at(lat, lon, to_string(env, textIn), json);
 	else
 		json = "null";
+	return env->NewStringUTF(json.c_str());
+}
+
+// Read-only free filter: "options" (values present in the log) or "dives"
+// (identifiers of the matching dives). `rules` holds five strings per rule:
+// type, string mode, range mode, negate ("1" or "0"), data (opendives.h).
+JNIEXPORT jstring JNICALL
+Java_org_opendives_core_NativeCore_filterQuery(JNIEnv *env, jobject, jstring kindIn, jstring fulltextIn,
+					       jstring modeIn, jobjectArray rulesIn)
+{
+	std::string kind = to_string(env, kindIn), json, error;
+	if (kind == "options") {
+		opendives::filter_options(json);
+		return env->NewStringUTF(json.c_str());
+	}
+	std::vector<std::string> flat;
+	jsize n = rulesIn ? env->GetArrayLength(rulesIn) : 0;
+	for (jsize i = 0; i < n; i++) {
+		auto s = static_cast<jstring>(env->GetObjectArrayElement(rulesIn, i));
+		flat.push_back(s ? to_string(env, s) : std::string());
+		if (s)
+			env->DeleteLocalRef(s);
+	}
+	std::vector<opendives::filter_rule> rules;
+	for (size_t i = 0; i + 4 < flat.size(); i += 5)
+		rules.push_back({ flat[i], flat[i + 1], flat[i + 2], flat[i + 4], flat[i + 3] == "1" });
+	if (opendives::filter_dives(to_string(env, fulltextIn), to_string(env, modeIn), rules, json, error)) {
+		throw_core_error(env, error);
+		return nullptr;
+	}
 	return env->NewStringUTF(json.c_str());
 }
 

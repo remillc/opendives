@@ -169,6 +169,39 @@ int site_delete(uint32_t uuid, std::string &json, std::string &error);
 // Dives without a site: [{"id", "number", "date", "durationSeconds", "suggestedSite"}].
 int dives_without_site(std::string &json);
 
+// --- Free filter (filter.cpp), read-only -----------------------------------
+//
+// One constraint in the text form of Subsurface's filter presets (the
+// filter_constraint parser constructor): `type` a token of
+// core/filterconstraint.cpp ("suit", "depth", "dive_mode"…), the modes as
+// tokens or empty, `data` as filter_constraint_data_to_string() writes it
+// (core units: mm, seconds, mK, mL/min, mL, permille; strings separated by
+// commas; dive_mode and day_of_week as a bit field). Never accepted: weight,
+// weight_type, water_density, cylinder_n2 (spec). OpenDives additions, not in
+// Subsurface's filter: "od_country", "od_region" (the site's taxonomy) and
+// "od_trip" (trip identifiers of the load), with comma-separated values.
+// Text values may also be given one per line ('\n'): then each is kept
+// whole, commas included (the preset text form splits at every comma).
+struct filter_rule {
+	std::string type, string_mode, range_mode, data;
+	bool negate = false;
+};
+
+// Values present in the loaded log for each criterion, so that a criterion
+// that applies to no dive is not offered: {"modes":["OC","CCR"…],
+// "years":[min,max], "suits", "computers", "cylinderTypes", "tags", "people",
+// "sites", "countries", "regions" (sorted lists), and flags "helium",
+// "oxygen" (a gas other than air), "cylinderSize", "sac", "waterTemp",
+// "airTemp", "planned" (both planned and logged dives), "notes", "rating",
+// "visibility", "current", "wavesize", "surge", "chill"}.
+int filter_options(std::string &json);
+
+// Identifiers of the dives of the loaded log that match every rule and the
+// fulltext query (mode "starts_with" by default, "substring" or "exact"),
+// as a JSON array. BAD_REQUEST for a type or mode not accepted.
+int filter_dives(const std::string &fulltext, const std::string &fulltext_mode, const std::vector<filter_rule> &rules,
+		 std::string &json, std::string &error);
+
 // Undo stack of the session; cleared by every load. The result is the dive
 // changed, as get_dive() gives it.
 int undo(std::string &result_json, std::string &error);

@@ -137,6 +137,24 @@ import { registerPlugin } from '@capacitor/core';
  */
 
 /**
+ * One free-filter rule, in the text form of Subsurface's filter presets
+ * (opendives.h, filter_rule): type token ("suit", "depth", "dive_mode"…, or
+ * the OpenDives od_country, od_region, od_trip), modes as tokens or empty,
+ * data in core units.
+ * @typedef {{type: string, stringMode?: ''|'starts_with'|'substring'|'exact',
+ *   rangeMode?: ''|'equal'|'less'|'greater'|'range', negate?: boolean, data: string}} FilterRule
+ */
+
+/**
+ * Values present in the loaded log for each filter criterion (filter_options).
+ * @typedef {{modes: string[], years: [number, number], suits: string[], computers: string[],
+ *   cylinderTypes: string[], tags: string[], people: string[], sites: string[], countries: string[],
+ *   regions: string[], helium: boolean, oxygen: boolean, cylinderSize: boolean, sac: boolean,
+ *   waterTemp: boolean, airTemp: boolean, planned: boolean, notes: boolean, rating: boolean,
+ *   visibility: boolean, current: boolean, wavesize: boolean, surge: boolean, chill: boolean}} FilterOptions
+ */
+
+/**
  * A site; uuid is 0 when it no longer exists. Region and city say whether the
  * diver corrected them (manual), in which case a lookup never replaces them.
  * @typedef {SiteSummary & {description: string, notes: string,
@@ -186,6 +204,9 @@ import { registerPlugin } from '@capacitor/core';
  *   within a metres of lat/lon (or null), possible duplicates (a: same name within a m,
  *   b: other names within b m), dives without a site, and place: {country, region, city,
  *   offline} at lat/lon in the language text (Nominatim, else offline Natural Earth), or null.
+ * @property {(options: {kind: 'options'} | {kind: 'dives', fulltext?: string, mode?: string, rules: FilterRule[]}) => Promise<any>} filterQuery
+ *   Read-only free filter (opendives.h): FilterOptions, or the identifiers of the
+ *   dives matching every rule and the fulltext query (number[]).
  * @property {(options: {action: 'create'|'edit'|'geocode'|'merge'|'delete'|'deleteSite', uuid?: number, other?: number, uuids?: number[], field?: string, value?: string, lat?: number, lon?: number}) => Promise<EditResult>} siteAction
  *   One undoable site change, as Subsurface's site commands.
  * @property {(options: {tripId: number}) => Promise<TripDetail>} getTrip
@@ -242,6 +263,9 @@ export const OpenDivesCore = {
   },
   async siteQuery(options) {
     return JSON.parse((await native.siteQuery(options)).json);
+  },
+  async filterQuery(options) {
+    return JSON.parse((await native.filterQuery(options)).json);
   },
   async siteAction(options) {
     return JSON.parse((await native.siteAction(options)).json);
