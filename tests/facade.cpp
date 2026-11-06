@@ -1,12 +1,14 @@
 // SPDX-License-Identifier: GPL-2.0
 // Exercises the façade on the development machine, without a phone.
 // usage: facade import <file> <path[branch]>
+//        facade filter <log> <fulltext> [type:string_mode:range_mode:negate:data]...
 //        facade list <path[branch]>
 //        facade dive <log> <number>
 #include "core/libopendives/opendives.h"
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <vector>
 
 int main(int argc, char **argv)
 {
@@ -83,6 +85,34 @@ int main(int argc, char **argv)
 		check(opendives::cylinder_type_action("remove", "Test 7L", 0, 0, json, error), "remove");
 		return 0;
 	}
-	fprintf(stderr, "usage: %s import <file> <repo[branch]> | list <repo[branch]> | dive <log> <number> | settings <log>\n", argv[0]);
+	if (argc >= 4 && !strcmp(argv[1], "filter")) {
+		// filter <log> <fulltext> [type:string_mode:range_mode:negate:data]...
+		// Prints the filter options, then the identifiers of the matching dives.
+		if (opendives::list_dives(argv[2], json, error)) {
+			fprintf(stderr, "%s\n", error.c_str());
+			return 1;
+		}
+		std::vector<opendives::filter_rule> rules;
+		for (int i = 4; i < argc; i++) {
+			std::string s = argv[i], parts[5];
+			for (int k = 0; k < 4; k++) {
+				size_t colon = s.find(':');
+				parts[k] = s.substr(0, colon);
+				s = colon == std::string::npos ? std::string() : s.substr(colon + 1);
+			}
+			parts[4] = s;
+			rules.push_back({ parts[0], parts[1], parts[2], parts[4], parts[3] == "1" });
+		}
+		opendives::filter_options(json);
+		printf("%s\n", json.c_str());
+		if (opendives::filter_dives(argv[3], "", rules, json, error)) {
+			fprintf(stderr, "%s\n", error.c_str());
+			return 1;
+		}
+		printf("%s\n", json.c_str());
+		return 0;
+	}
+	fprintf(stderr, "usage: %s import <file> <repo[branch]> | list <repo[branch]> | dive <log> <number>"
+		" | settings <log> | filter <log> <fulltext> [type:string_mode:range_mode:negate:data]...\n", argv[0]);
 	return 2;
 }

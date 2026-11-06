@@ -27,6 +27,7 @@ internal object NativeCore {
     external fun undo(redo: Boolean): String
     external fun getTrip(id: Int): String
     external fun siteQuery(kind: String, uuid: Long, lat: Int, lon: Int, a: Int, b: Int, text: String): String
+    external fun filterQuery(kind: String, fulltext: String, mode: String, rules: Array<String>): String
     external fun siteAction(action: String, uuid: Long, other: Long, uuids: LongArray?, field: String, value: String, lat: Int, lon: Int): String
     external fun setRegionsFile(path: String)
     external fun toolQuery(kind: String, o2: Int, he: Int, po2: Int, depth: Int): String

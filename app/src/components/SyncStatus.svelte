@@ -12,7 +12,7 @@
    *   pending?: number,
    * }}
    * `live`: announced when it changes; false for the copy in the side menu.
-   * `pending`: changes not sent, for the manual synchronisation state.
+   * `pending`: changes not sent, for the manual and offline states.
    */
   let { sync, live = true, pending = 0 } = $props();
 
@@ -21,7 +21,11 @@
     manual: { icon: 'cloud', text: t('sync.manual', { n: pending }), pending: true },
     syncing: { icon: 'sync', text: t('sync.syncing'), pending: false },
     cloud: { icon: 'check', text: t('sync.cloud'), pending: false },
-    offline: { icon: 'offline', text: t('sync.offline'), pending: true },
+    offline: {
+      icon: 'offline',
+      text: pending ? t('sync.offlinePending', { n: pending }) : t('sync.offline'),
+      pending: true,
+    },
     local: { icon: 'device', text: t('sync.local'), pending: false },
   });
   const state = $derived(states[sync]);

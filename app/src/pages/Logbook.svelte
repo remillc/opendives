@@ -1,16 +1,20 @@
 <script>
   // @ts-check
   // Logbook screen (spec, sections 3 to 6, "Carnet"): list by trip, search,
-  // dive count, sync status, "+" button. A log can hold thousands of dives:
+  // free filter, dive count, sync status, "+" button, and the states: loading,
+  // error, empty logbook, offline with pending changes, sync conflict. A log can hold thousands of dives:
   // the list is virtual, only the rows near the screen are in the document.
-  import { onDestroy, tick } from 'svelte';
-  import { Page, Navbar, NavRight, Link, Subnavbar, Searchbar, List, Block, Button, f7, theme } from 'framework7-svelte';
+  import { onDestroy, tick, untrack } from 'svelte';
+  import { Page, Navbar, NavRight, Link, Subnavbar, Searchbar, List, ListItem, Block, Button, f7, theme } from 'framework7-svelte';
   import SyncStatus from '../components/SyncStatus.svelte';
   import DiveRow from '../components/DiveRow.svelte';
   import TripRow from '../components/TripRow.svelte';
   import Icon from '../components/Icon.svelte';
   import MenuButton from '../components/MenuButton.svelte';
+  import ActiveFilter from '../components/ActiveFilter.svelte';
+  import ConflictSheet from '../components/ConflictSheet.svelte';
   import { logbook, loadLogbook } from '../lib/logbook.svelte.js';
+  import { filter, loadOptions, applyFilter, isEmpty } from '../lib/filter.svelte.js';
   import { formatDateTime } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
 
@@ -26,11 +30,28 @@
    *   | { kind: 'trip', key: string, index: number, id: number, location: string, dives: Dive[] }} Row
    */
 
+  /** @type {{ f7router: any }} */
+  let { f7router } = $props();
+
   let query = $state('');
   /** Expanded trips, by trip identifier of the current load. */
   let expanded = $state(/** @type {Record<number, boolean>} */ ({}));
 
-  const sorted = $derived([...logbook.dives].sort((a, b) => b.date.localeCompare(a.date)));
+  const all = $derived([...logbook.dives].sort((a, b) => b.date.localeCompare(a.date)));
+  /** The dives that match the free filter (all of them without one). */
+  const sorted = $derived(filter.ids ? all.filter((d) => filter.ids?.has(d.id)) : all);
+  const filtered = $derived(!!filter.ids);
+
+  // Each load gives new dive identifiers and maybe new values: the criteria
+  // are read again and the filter applied again.
+  $effect(() => {
+    logbook.dives;
+    if (logbook.loading || logbook.error) return;
+    untrack(() => {
+      loadOptions();
+      if (!isEmpty(filter.applied)) applyFilter(filter.applied, logbook.prefs);
+    });
+  });
 
   /** Dives outside trips and trips, from the most recent to the oldest. */
   const entries = $derived.by(() => {
@@ -89,10 +110,10 @@
     return list;
   });
 
-  /** Number of dives shown: follows the search. */
+  /** Number of dives shown: follows the search (the filter row counts the filter). */
   const count = $derived(
     results
-      ? t('logbook.countFiltered', { n: results.length, total: sorted.length })
+      ? t('logbook.countFiltered', { n: results.length, total: all.length })
       : t('logbook.count', { n: sorted.length }),
   );
 
@@ -167,7 +188,8 @@
   });
 
   /**
-   * The three choices of the "+" button (spec, section 3). No action yet.
+   * The three choices of the "+" button (spec, section 3). None can be done
+   * by this version yet: each opens a screen that says so.
    * @type {{ key: string, icon: 'download'|'file'|'edit', text: string }[]}
    */
   const addChoices = [
@@ -176,12 +198,32 @@
     { key: 'manual', icon: 'edit', text: t('logbook.addManual') },
   ];
 
-  /** iOS "+" and the empty logbook: the choices in an action sheet. */
+  /**
+   * The empty logbook (spec, section 6, "Empty"): pair a dive computer,
+   * import a file, download from divelogs.de, log by hand.
+   * @type {{ key: string, icon: 'download'|'file'|'edit', text: string }[]}
+   */
+  const emptyChoices = [
+    { key: 'download', icon: 'download', text: t('logbook.emptyPair') },
+    { key: 'import', icon: 'file', text: t('logbook.addImport') },
+    { key: 'divelogs', icon: 'download', text: t('logbook.emptyDivelogs') },
+    { key: 'manual', icon: 'edit', text: t('logbook.addManual') },
+  ];
+
+  /** @param {string} key download, import, manual, divelogs */
+  function choose(key) {
+    f7router.navigate(`/add/${key}/`);
+  }
+
+  /** iOS "+": the choices in an action sheet. */
   function add() {
     f7.actions
       .create({
         buttons: [
-          [{ text: t('logbook.add'), label: true }, ...addChoices.map((c) => ({ text: c.text }))],
+          [
+            { text: t('logbook.add'), label: true },
+            ...addChoices.map((c) => ({ text: c.text, onClick: () => choose(c.key) })),
+          ],
           [{ text: t('logbook.cancel'), bold: true }],
         ],
       })
@@ -212,11 +254,16 @@
 <Page>
   <Navbar large title={t('logbook.title')}>
     {#snippet left()}<MenuButton />{/snippet}
-    {#if theme.ios}
-      <NavRight>
+    <NavRight>
+      {#if logbook.dives.length}
+        <Link iconOnly href="/filter/" class={filtered ? 'filter-on' : ''}>
+          <Icon name="filter" /><span class="od-sr-only">{t(filtered ? 'logbook.filterOn' : 'logbook.filter')}</span>
+        </Link>
+      {/if}
+      {#if theme.ios}
         <Link iconOnly onClick={add}><Icon name="plus" /><span class="od-sr-only">{t('logbook.add')}</span></Link>
-      </NavRight>
-    {/if}
+      {/if}
+    </NavRight>
     <Subnavbar inner={false}>
       <Searchbar
         customSearch
@@ -230,7 +277,12 @@
 
   <!-- While loading, the count and the status are not known yet: nothing is shown. -->
   {#if !logbook.loading && !logbook.error}
-    {#if sorted.length}<p class="count od-value" role="status">{count}</p>{/if}
+    {#if filtered}
+      <ActiveFilter prefs={logbook.prefs} dives={logbook.dives} shown={results ? results.length : sorted.length} />
+    {:else if sorted.length}
+      <p class="count od-value" role="status">{count}</p>
+    {/if}
+    {#if filter.failed}<p class="count failed" role="status">{t('logbook.filterFailed')}</p>{/if}
     <!--
       Only offline or in manual synchronisation, when the logbook may be out of
       date; the side menu shows every state.
@@ -282,13 +334,35 @@
       <Button fill class="od-primary-action" onClick={() => loadLogbook()}>{t('logbook.retry')}</Button>
     </Block>
   {:else if logbook.dives.length === 0}
-    <Block>
+    <!-- Empty logbook (docs/mockups/*-etat-vide): the choices of "+" directly. -->
+    {#if logbook.email}<p class="count">{t('logbook.emptyCloud')}</p>{/if}
+    <div class="empty">
       <h2 class="od-state-title">{t('logbook.emptyTitle')}</h2>
-      <p>{t('logbook.emptyText')}</p>
-      <Button tonal onClick={add}>{t('logbook.add')}</Button>
-    </Block>
+      <p class="empty-text">{t('logbook.emptyText')}</p>
+    </div>
+    {#if theme.ios}
+      <List inset strong dividers class="empty-choices">
+        {#each emptyChoices as c, i (c.key)}
+          <ListItem link="/add/{c.key}/" title={c.text} class={i === 0 ? 'first' : ''} noChevron>
+            {#snippet media()}<Icon name={c.icon} size={22} />{/snippet}
+          </ListItem>
+        {/each}
+      </List>
+    {:else}
+      <div class="empty-buttons">
+        <a href="/add/download/" class="filled">
+          <Icon name="download" size={18} weight={2} />{t('logbook.emptyPair')}
+        </a>
+        <a href="/add/import/" class="od-outlined-button">{t('logbook.addImport')}</a>
+        <a href="/add/divelogs/" class="od-outlined-button">{t('logbook.emptyDivelogs')}</a>
+        <a href="/add/manual/" class="od-text-button">{t('logbook.addManual')}</a>
+      </div>
+    {/if}
+    <p class="empty-note">{t('logbook.emptyNote')}</p>
   {:else if results && results.length === 0}
     <Block><p>{t('logbook.noResults', { query })}</p></Block>
+  {:else if filtered && sorted.length === 0}
+    <Block><p>{t('logbook.noFilterResults')}</p></Block>
   {/if}
 
   {#if !logbook.loading && !logbook.error && rows.length}
@@ -306,15 +380,25 @@
               top={visible.topPosition}
             />
           {:else}
-            <DiveRow dive={row.dive} prefs={logbook.prefs} inTrip={row.kind === 'inTrip'} index={row.index} top={visible.topPosition} />
+            <DiveRow
+              dive={row.dive}
+              prefs={logbook.prefs}
+              inTrip={row.kind === 'inTrip'}
+              index={row.index}
+              top={visible.topPosition}
+              pending={row.dive.number ? (logbook.pendingByDive[row.dive.number] ?? []) : []}
+            />
           {/if}
         {/each}
       </ul>
     </div>
   {/if}
 
+  <!-- Not reported by the core yet: logbook.conflict stays null (see the report). -->
+  <ConflictSheet conflict={logbook.conflict} oncompare={() => {}} onchoose={() => {}} />
+
   {#snippet fixedContent()}
-    {#if !theme.ios}
+    {#if !theme.ios && logbook.dives.length}
       <!--
         Written by hand: the Fab component of framework7-svelte 9 calls onclick
         twice and leaves the link without a name for screen readers.
@@ -345,6 +429,7 @@
               onclick={(e) => {
                 e.preventDefault();
                 f7.fab.close(fabEl);
+                choose(choice.key);
               }}
             >
               <span><Icon name={choice.icon} /></span>
@@ -364,6 +449,82 @@
       font-size: 15px;
       line-height: 21px;
       color: var(--od-text-2);
+    }
+
+    .failed {
+      color: var(--od-alarm);
+    }
+
+    /* The filter button says when a filter is applied: a tinted circle. */
+    :global(.navbar .filter-on) {
+      background: var(--od-tint);
+      border-radius: 50%;
+    }
+
+    .empty {
+      margin: 48px 24px 0;
+
+      :global(.ios) & {
+        margin-inline: 32px;
+      }
+    }
+
+    .empty-text {
+      margin: 0;
+      font-size: 16px;
+      line-height: 24px;
+      color: var(--od-text-2);
+
+      :global(.ios) & {
+        font-size: 17px;
+      }
+    }
+
+    .empty-buttons {
+      margin: 24px 24px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+
+      a {
+        display: inline-flex;
+        align-items: center;
+        box-sizing: border-box;
+        text-decoration: none;
+      }
+    }
+
+    /* MD3 filled button with a leading icon: 16 dp before it, 24 dp after the label. */
+    .filled {
+      height: 40px;
+      padding: 0 24px 0 16px;
+      gap: 8px;
+      border-radius: 20px;
+      background: var(--od-primary-action);
+      color: var(--od-on-primary-action);
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.1px;
+    }
+
+    :global(.empty-choices .first .item-title) {
+      font-weight: 600;
+    }
+
+    .empty-note {
+      margin: 16px 24px 0;
+      font-size: 12px;
+      line-height: 16px;
+      letter-spacing: 0.4px;
+      color: var(--od-text-2);
+
+      :global(.ios) & {
+        margin: 8px 32px 0;
+        font-size: 13px;
+        line-height: 18px;
+        letter-spacing: 0;
+      }
     }
 
     .skeleton-thumbnail {

@@ -338,6 +338,33 @@ class OpenDivesCorePlugin : Plugin() {
         call.resolve(JSObject().put("json", json))
     }
 
+    /**
+     * Read-only free filter (see opendives.h): kind "options", or "dives" with
+     * fulltext, mode and rules [{type, stringMode, rangeMode, negate, data}].
+     */
+    @PluginMethod
+    fun filterQuery(call: PluginCall) = onCoreThread(call) {
+        val rules = mutableListOf<String>()
+        val list = call.getArray("rules")
+        if (list != null) {
+            for (i in 0 until list.length()) {
+                val rule = list.getJSONObject(i)
+                rules.add(rule.optString("type"))
+                rules.add(rule.optString("stringMode"))
+                rules.add(rule.optString("rangeMode"))
+                rules.add(if (rule.optBoolean("negate")) "1" else "0")
+                rules.add(rule.optString("data"))
+            }
+        }
+        val json = NativeCore.filterQuery(
+            call.getString("kind").orEmpty(),
+            call.getString("fulltext").orEmpty(),
+            call.getString("mode").orEmpty(),
+            rules.toTypedArray(),
+        )
+        call.resolve(JSObject().put("json", json))
+    }
+
     /** One undoable site change (see opendives.h): create, edit, geocode, merge, delete. */
     @PluginMethod
     fun siteAction(call: PluginCall) = onCoreThread(call) {

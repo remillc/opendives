@@ -17,6 +17,14 @@ import { keepCylinderLibrary } from './settings.svelte.js';
  * @typedef {'syncing'|'cloud'|'offline'|'local'|'manual'} SyncState
  */
 
+/**
+ * A dive changed here and in the cloud that the core could not merge.
+ * `date`: local time of the dive; `field`: what changed on both sides
+ * (notes, suit…); `localWhen`, `cloudWhen`: where and when each version was
+ * made, as sentences.
+ * @typedef {{ date: string, field: string, localWhen: string, cloudWhen: string }} Conflict
+ */
+
 export const logbook = $state({
   /** @type {Dive[]} */
   dives: [],
@@ -37,6 +45,17 @@ export const logbook = $state({
   autoSync: readAutoSync(),
   /** Local changes of the cloud log not sent yet. */
   pending: 0,
+  /**
+   * Fields changed and not sent yet, by dive number (spec, section 4,
+   * <DiveRow>: "Notes edited, waiting to be sent"); read from the texts of
+   * the pending commits, which list the edits as Subsurface writes them.
+   */
+  pendingByDive: /** @type {Record<number, string[]>} */ ({}),
+  /**
+   * A sync the core could not merge (spec, section 6, "Conflict"); not
+   * reported by the core yet: always null for now.
+   */
+  conflict: /** @type {Conflict|null} */ (null),
   /** First launch is shown (first start, or after signing out): nothing is loaded until a choice is made. */
   welcome: readWelcome(),
   /** Last dive changed by an edit or an undo, for the detail screen. */
@@ -244,6 +263,7 @@ function forgetAccount(showWelcome) {
   logbook.server = '';
   logbook.sync = 'local';
   logbook.pending = 0;
+  logbook.pendingByDive = {};
   logbook.lastSync = null;
   logbook.welcome = showWelcome;
   try {
@@ -295,12 +315,43 @@ export function syncNow() {
   return loadLogbook({ force: true });
 }
 
+/**
+ * Edits of each dive in the messages of the pending commits. Subsurface's
+ * commit message lists the edit texts ("Edit notes [#12]", "(undo) Edit
+ * tags [#12]"); a dive without a number is shown by its date ("[@…]") and
+ * is not matched here.
+ * @param {{ message: string }[]} commits
+ */
+export function pendingFields(commits) {
+  /** @type {Record<number, string[]>} */
+  const byDive = {};
+  const edit = /Edit (notes|suit|rating|visibility|wavesize|current|surge|chill|buddies|dive guide|tags|dive site|dive) \[#(\d+)\]/g;
+  for (const c of commits) {
+    for (const m of c.message.matchAll(edit)) {
+      const n = Number(m[2]);
+      const field = m[1] === 'dive guide' ? 'diveguide' : m[1] === 'dive site' ? 'site' : m[1];
+      byDive[n] ??= [];
+      if (!byDive[n].includes(field)) byDive[n].push(field);
+    }
+  }
+  return byDive;
+}
+
 async function countPending() {
   try {
-    logbook.pending = (await OpenDivesCore.pendingChanges()).length;
+    const commits = await OpenDivesCore.pendingChanges();
+    logbook.pending = commits.length;
+    logbook.pendingByDive = pendingFields(commits);
   } catch (e) {
     console.error('Counting the changes not sent', e);
   }
+}
+
+// Offline: sending starts by itself when the network is back (spec, section 6).
+if (typeof window !== 'undefined') {
+  window.addEventListener('online', () => {
+    if (logbook.email && logbook.autoSync && logbook.sync === 'offline' && logbook.pending) syncEdits();
+  });
 }
 
 function readLastSync() {
@@ -437,6 +488,7 @@ export async function loadLogbook({ force = false } = {}) {
       logbook.dives = local.dives;
       logbook.sync = 'local';
       logbook.pending = 0;
+      logbook.pendingByDive = {};
       logbook.prefs = await OpenDivesCore.getPrefs();
     }
   } catch (e) {

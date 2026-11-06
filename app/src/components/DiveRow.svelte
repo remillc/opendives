@@ -15,9 +15,20 @@
    *   inTrip?: boolean,
    *   index?: number,
    *   top?: number,
+   *   pending?: string[],
    * }}
+   * `pending`: fields edited and not sent yet; the date gives way to them.
    */
-  let { dive, prefs, inTrip = false, index = undefined, top = undefined } = $props();
+  let { dive, prefs, inTrip = false, index = undefined, top = undefined, pending = [] } = $props();
+
+  // "Notes edited, waiting to be sent" (spec, section 4, <DiveRow>).
+  const pendingText = $derived(
+    pending.length === 0
+      ? ''
+      : pending.length === 1
+        ? t('dive.pending', { what: t(`dive.pendingFields.${pending[0]}`) })
+        : t('dive.pendingSeveral'),
+  );
 
   // Dive number as in the detail ("N° 1234"); 0 means not numbered.
   const number = $derived(dive.number ? t('detail.number', { number: String(dive.number) }) : '');
@@ -32,7 +43,7 @@
       duration: formatDuration(dive.durationSeconds),
     }),
   );
-  const label = $derived(number ? `${number}, ${details}` : details);
+  const label = $derived([number, details, pendingText].filter(Boolean).join(', '));
 </script>
 
 <li class:in-trip={inTrip} data-virtual-list-index={index} style:top={top === undefined ? undefined : `${top}px`}>
@@ -45,7 +56,11 @@
         <div class="item-title">
           {#if dive.site}{dive.site}{:else}<span class="not-set">{t('dive.siteNotSet')}</span>{/if}
         </div>
-        <div class="item-text">{#if number}{number}<span class="separator" aria-hidden="true">·</span>{/if}{formatDateTime(dive.date)}</div>
+        {#if pendingText}
+          <div class="item-text pending">{pendingText}</div>
+        {:else}
+          <div class="item-text">{#if number}{number}<span class="separator" aria-hidden="true">·</span>{/if}{formatDateTime(dive.date)}</div>
+        {/if}
       </div>
       <div class="values od-value">
         {#if dive.maxDepthMm}<strong>{formatDepth(dive.maxDepthMm, prefs)}</strong>{/if}
@@ -64,6 +79,10 @@
 
     .separator {
       margin: 0 0.4em;
+    }
+
+    .item-text.pending {
+      color: var(--od-pending);
     }
 
     .not-set {

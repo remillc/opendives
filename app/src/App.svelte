@@ -31,6 +31,10 @@
   import Desaturation from './pages/Desaturation.svelte';
   import Planner from './pages/Planner.svelte';
   import PlannerSetup from './pages/PlannerSetup.svelte';
+  import Filter from './pages/Filter.svelte';
+  import FilterCriterion from './pages/FilterCriterion.svelte';
+  import AddUnavailable from './pages/AddUnavailable.svelte';
+  import DownloadFailed from './pages/DownloadFailed.svelte';
   import Icon from './components/Icon.svelte';
   import AdaptiveLabel from './components/AdaptiveLabel.svelte';
   import NavMenu from './components/NavMenu.svelte';
@@ -58,6 +62,10 @@
     routes: [
       { path: '/', component: Logbook },
       { path: '/dive/:id/', component: DiveDetail },
+      { path: '/filter/', component: Filter },
+      { path: '/filter/:key/', component: FilterCriterion },
+      { path: '/add/:what/', component: AddUnavailable },
+      { path: '/download/failed/', component: DownloadFailed },
       { path: '/settings/', component: Settings },
       { path: '/settings/cylinders/', component: CylinderTypes },
       { path: '/settings/cylinders/new/', component: CylinderType },

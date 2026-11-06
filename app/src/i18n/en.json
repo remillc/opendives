@@ -23,12 +23,12 @@
     "loading": "Loading the logbook",
     "errorTitle": "The logbook could not be read",
     "errorNothingChanged": "No dive was changed.",
-    "errorCheck": "Please check:",
-    "errorInternet": "the device's Internet connection",
-    "errorStorage": "the free space on the device.",
+    "errorCheck": "To check",
+    "errorInternet": "The device's Internet connection.",
+    "errorStorage": "The free space on the device.",
     "retry": "Try again",
     "emptyTitle": "No dives yet",
-    "emptyText": "Add your dives from your dive computer, from a file, or manually.",
+    "emptyText": "Pair your dive computer to download your dives. You can also import an existing logbook or log a dive by hand.",
     "noResults": "No dive matches “{query}”.",
     "count": {
       "one": "{n} dive",
@@ -37,7 +37,15 @@
     "countFiltered": {
       "one": "{n} dive of {total}",
       "other": "{n} dives of {total}"
-    }
+    },
+    "filter": "Filter the dives",
+    "filterOn": "Filter the dives, a filter is applied",
+    "filterFailed": "The filter could not be applied. All dives are shown.",
+    "emptyCloud": "Connected to the Subsurface cloud, no dives",
+    "emptyPair": "Pair a dive computer",
+    "emptyDivelogs": "Download from divelogs.de",
+    "emptyNote": "Files from Subsurface (.ssrf, .xml), divelogs.de and other logbooks are imported here.",
+    "noFilterResults": "No dive matches the filter."
   },
   "sync": {
     "syncing": "Syncing with the Subsurface cloud…",
@@ -47,13 +55,34 @@
     "manual": {
       "one": "Manual sync: {n} change not sent",
       "other": "Manual sync: {n} changes not sent"
+    },
+    "offlinePending": {
+      "one": "Offline: {n} change will be sent when the network is back",
+      "other": "Offline: {n} changes will be sent when the network is back"
     }
   },
   "dive": {
     "siteNotSet": "Dive site not set",
     "screenReader": "{site}, {date}, max. depth {depth}, duration {duration}",
     "screenReaderNoDepth": "{site}, {date}, duration {duration}",
-    "thumbnail": "Profile, {depth} max. depth"
+    "thumbnail": "Profile, {depth} max. depth",
+    "pending": "{what}, waiting to be sent",
+    "pendingSeveral": "Edited, waiting to be sent",
+    "pendingFields": {
+      "notes": "Notes edited",
+      "suit": "Suit edited",
+      "rating": "Rating edited",
+      "visibility": "Visibility edited",
+      "wavesize": "Surface waves edited",
+      "current": "Current edited",
+      "surge": "Surge edited",
+      "chill": "Chill edited",
+      "buddies": "Buddies edited",
+      "diveguide": "Dive guide edited",
+      "tags": "Tags edited",
+      "site": "Site edited",
+      "dive": "Dive edited"
+    }
   },
   "trip": {
     "startingOn": "Trip starting {date}",
@@ -1066,5 +1095,186 @@
     "resetTitle": "Back to Subsurface's values?",
     "resetText": "Speeds, reserve, pO₂ and stops go back to Subsurface's defaults. The dive to plan does not change.",
     "resetAction": "Reset values"
+  },
+  "filter": {
+    "title": "Filter",
+    "cancel": "Cancel",
+    "clearAll": "Clear all",
+    "searchCriterion": "Search for a criterion",
+    "mode": "Dive mode",
+    "modes": {
+      "all": "All",
+      "oc": "Open circuit",
+      "rebreather": "Rebreather"
+    },
+    "groups": {
+      "gear": "Equipment",
+      "when": "When",
+      "where": "Where",
+      "people": "With whom",
+      "dive": "The dive",
+      "conditions": "Conditions",
+      "text": "Text"
+    },
+    "hints": {
+      "when": "Date or period, year, day of the week, time",
+      "where": "Site, country and region, trip",
+      "people": "Buddies, dive guide",
+      "dive": "Max depth, duration, SAC, rating, real or planned",
+      "conditions": "Water and air, visibility, current, waves, surge, chill",
+      "text": "Notes, search across the whole dive"
+    },
+    "otherCriteria": "Other criteria",
+    "setCount": {
+      "one": "{n} set",
+      "other": "{n} set"
+    },
+    "show": "Show the dives",
+    "showCount": {
+      "one": "Show {n} dive",
+      "other": "Show the {n} dives"
+    },
+    "criteria": {
+      "suits": "Suit",
+      "computers": "Dive computer",
+      "cylinderTypes": "Cylinder type",
+      "cylinderSize": "Cylinder size",
+      "o2": "Gas, oxygen",
+      "he": "Gas, helium",
+      "tags": "Other equipment (tags)",
+      "date": "Date or period",
+      "year": "Year",
+      "weekdays": "Day of the week",
+      "timeOfDay": "Start time",
+      "sites": "Site",
+      "countries": "Country",
+      "regions": "Region",
+      "trips": "Trip",
+      "people": "Buddies and guides",
+      "depth": "Max depth",
+      "duration": "Duration",
+      "sac": "Air consumption (SAC)",
+      "rating": "Rating",
+      "planned": "Real or planned",
+      "waterTemp": "Water temperature",
+      "airTemp": "Air temperature",
+      "visibility": "Visibility",
+      "current": "Current",
+      "wavesize": "Surface waves",
+      "surge": "Surge",
+      "chill": "Chill",
+      "notes": "Notes",
+      "fulltext": "Search across the whole dive"
+    },
+    "any": "All",
+    "several": {
+      "one": "{first} and {n} more",
+      "other": "{first} and {n} more"
+    },
+    "rangeBoth": "{min} to {max} {unit}",
+    "rangeBothNoUnit": "{min} to {max}",
+    "rangeMin": "{min} {unit} or more",
+    "rangeMinNoUnit": "{min} or more",
+    "rangeMax": "{max} {unit} or less",
+    "rangeMaxNoUnit": "{max} or less",
+    "starsAtLeast": "{n} of 5 or more",
+    "quoted": "“{text}”",
+    "weekdays": {
+      "0": "Sunday",
+      "1": "Monday",
+      "2": "Tuesday",
+      "3": "Wednesday",
+      "4": "Thursday",
+      "5": "Friday",
+      "6": "Saturday"
+    },
+    "plannedValues": {
+      "logged": "Real dive",
+      "planned": "Planned dive"
+    },
+    "from": "From",
+    "to": "To",
+    "fromUnit": "From ({unit})",
+    "toUnit": "To ({unit})",
+    "dateHint": "For example 2025-06-30",
+    "timeHint": "For example 9:30",
+    "invalid": "Value not recognised",
+    "rangeHint": "Leave a field empty to set no limit.",
+    "cylinderSizeHint": "Water capacity of the cylinder, in litres. Leave a field empty to set no limit.",
+    "atLeast": "At least",
+    "starsHint": "Tap the chosen star again to remove the criterion.",
+    "fulltextHint": "Dives with a word that starts with this text, anywhere in the dive.",
+    "notesHint": "Dives whose notes contain this text.",
+    "listHint": "A dive matches if it has one of the chosen values.",
+    "noValues": "No dive of the logbook has a value for this criterion.",
+    "chip": "{name}: {value}",
+    "activeLabel": "Filter applied",
+    "removeCriterion": "Remove the criterion {name}",
+    "matching": {
+      "one": "{n} dive of {total}",
+      "other": "{n} dives of {total}"
+    },
+    "clear": "Remove the filter"
+  },
+  "addUnavailable": {
+    "heading": "Not available yet",
+    "nothingChanged": "No dive was changed.",
+    "meanwhileCloud": "Meanwhile, dives added with Subsurface on a computer or with Subsurface-mobile arrive here at the next synchronisation.",
+    "download": {
+      "title": "Download",
+      "text": "Downloading from the dive computer over Bluetooth will come in a later version."
+    },
+    "import": {
+      "title": "Import a file",
+      "text": "Importing a file (.ssrf, .xml, divelogs.de) will come in a later version."
+    },
+    "manual": {
+      "title": "Log a dive",
+      "text": "Logging a dive by hand will come in a later version."
+    },
+    "divelogs": {
+      "title": "divelogs.de",
+      "text": "Bringing a divelogs.de logbook will come in a later version. Your divelogs.de credentials will never be stored."
+    }
+  },
+  "downloadFailed": {
+    "title": "Download",
+    "close": "Close",
+    "notFound": {
+      "title": "{computer} not found",
+      "titleNoName": "Dive computer not found",
+      "text": "The phone did not find the dive computer."
+    },
+    "nothingChanged": "No dive was changed.",
+    "check": "To check",
+    "checks": {
+      "on": "The dive computer is on and in Bluetooth transfer mode.",
+      "near": "It is less than a metre from the phone.",
+      "otherApp": "No other app (Subsurface-mobile, for example) is connected to the dive computer."
+    },
+    "otherComputer": "Choose another dive computer",
+    "retry": "Retry"
+  },
+  "conflict": {
+    "title": "Dive changed in two places",
+    "text": "{field} of the dive of {date} changed here and in the cloud (from another device), and the two versions do not combine. Nothing is lost until you choose.",
+    "choiceLabel": "Version to keep",
+    "device": "Keep this phone's version",
+    "cloud": "Take the cloud version",
+    "compare": "Compare",
+    "compareLong": "Compare the two versions",
+    "continue": "Continue",
+    "continueLong": "Continue the synchronisation",
+    "fields": {
+      "notes": "The notes",
+      "suit": "The suit",
+      "rating": "The rating",
+      "visibility": "The visibility",
+      "buddies": "The buddies",
+      "diveguide": "The dive guide",
+      "tags": "The tags",
+      "site": "The site",
+      "dive": "The dive"
+    }
   }
 }
