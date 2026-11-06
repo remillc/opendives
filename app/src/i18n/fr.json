@@ -8,7 +8,6 @@
   },
   "placeholders": {
     "sitesText": "La carte et la liste des sites viendront ici.",
-    "statisticsText": "Les statistiques du carnet viendront ici.",
     "toolsText": "Le calculateur de gaz et le planificateur viendront ici.",
     "editText": "La modification d'une plongée viendra ici.",
     "planText": "Le planificateur, prérempli avec cette plongée, viendra ici."
@@ -202,7 +201,8 @@
     "psi": "psi",
     "percent": "%",
     "kilograms": "kg",
-    "pounds": "lb"
+    "pounds": "lb",
+    "hoursMinutes": "{h} h {mm}"
   },
   "settings": {
     "title": "Réglages",
@@ -496,5 +496,121 @@
   },
   "common": {
     "back": "Retour"
+  },
+  "stats": {
+    "title": "Statistiques",
+    "freeFilter": "Filtre libre",
+    "filterShort": "Filtre",
+    "notAvailable": "Pas encore disponible",
+    "figureDives": "Plongées",
+    "figureTime": "Sous l’eau",
+    "figureDeepest": "La plus profonde",
+    "pendingValue": "En attente du calcul par le cœur",
+    "pending": "Calcul par le cœur de Subsurface : à venir",
+    "pendingNote": "Les totaux seront calculés par le cœur de Subsurface ; les graphiques par plongée montrent déjà le carnet.",
+    "charts": "Graphiques",
+    "chartDepth": "Profondeur maximale",
+    "chartDepthLabel": {
+      "one": "Profondeur maximale de {n} plongée",
+      "other": "Profondeur maximale de {n} plongées"
+    },
+    "chartYears": "Plongées par année",
+    "chartYearsText": {
+      "one": "{dives} sur {n} année",
+      "other": "{dives} sur {n} années"
+    },
+    "chartDurations": "Durée des plongées",
+    "chartDurationsLabel": {
+      "one": "Durée de {n} plongée",
+      "other": "Durée de {n} plongées"
+    },
+    "perDiveFrom": "Par plongée, de {from} à {to}",
+    "perDiveIn": "Par plongée, en {year}",
+    "perDiveRange": "Par plongée, de {min} à {max}",
+    "mine": "Mes statistiques",
+    "mineEmpty": "Enregistrez une question qui revient, par exemple les plongées avec une combinaison ou une étiquette.",
+    "new": "Nouvelle statistique",
+    "newEllipsis": "Nouvelle statistique…",
+    "byYear": "Par année",
+    "byMode": "Par mode",
+    "bySuit": "Par combinaison",
+    "byBuddy": "Par compagnon",
+    "byMonth": "Par mois",
+    "byTrip": "Par voyage",
+    "notSet": "Non renseigné",
+    "notSetFor": {
+      "suit": "Non renseignée",
+      "site": "Sans site",
+      "trip": "Hors voyage"
+    },
+    "emptyTitle": "Pas encore de statistiques",
+    "emptyText": "Les statistiques apparaissent avec les premières plongées du carnet.",
+    "depthPerDive": "Profondeur maximale par plongée",
+    "chartYearLabel": {
+      "one": "Profondeur maximale de la plongée de {year} : {max}",
+      "other": "Profondeur maximale des {n} plongées de {year}, de {min} à {max}"
+    },
+    "tripLine": "{dives} · {place}",
+    "placeToSpecify": "lieu à préciser",
+    "rowSummary": "{dives} · {time} · max {depth}",
+    "rowSummaryNoDepth": "{dives} · {time}",
+    "details": "En détail",
+    "detail": {
+      "total": "Durée totale",
+      "mean": "Durée moyenne",
+      "shortest": "Plus courte",
+      "longest": "Plus longue",
+      "meanDepth": "Profondeur moyenne",
+      "maxDepth": "Profondeur maximale",
+      "meanMaxDepth": "Moyenne des maximales",
+      "sac": "SAC moyen",
+      "waterMean": "Eau, moyenne",
+      "waterRange": "Eau"
+    },
+    "tempRange": "{min} à {max}",
+    "allDives": "Toutes les plongées",
+    "outOf": {
+      "one": "{n} plongée sur {total}",
+      "other": "{n} plongées sur {total}"
+    },
+    "removeCriterion": "Retirer le critère",
+    "compareBySuit": "Comparer par combinaison",
+    "criterionValue": "{criterion} : {value}",
+    "criteria": {
+      "suit": "Combinaison",
+      "tag": "Étiquette",
+      "buddy": "Compagnon",
+      "guide": "Guide",
+      "site": "Site",
+      "trip": "Voyage",
+      "mode": "Mode",
+      "gas": "Gaz",
+      "cylinder": "Bouteille",
+      "computer": "Ordinateur",
+      "year": "Année",
+      "rating": "Note",
+      "month": "Mois"
+    },
+    "stars": {
+      "one": "{n} étoile",
+      "other": "{n} étoiles"
+    },
+    "newTitle": "Nouvelle statistique",
+    "newTitleShort": "Statistique",
+    "close": "Fermer",
+    "criterion": "Critère",
+    "criteriaHint": "Aussi : étiquette, compagnon, guide, site, voyage, mode, gaz, bouteille, ordinateur, année, note…",
+    "values": "Valeurs dans votre carnet",
+    "countsPending": "Le nombre de plongées de chaque valeur viendra du cœur de Subsurface.",
+    "valuesPending": "Les valeurs de ce critère viendront du cœur de Subsurface : à venir.",
+    "noValues": "Aucune valeur dans votre carnet.",
+    "addCriterion": "Ajouter un critère",
+    "addCriterionEllipsis": "Ajouter un critère…",
+    "result": "Résultat",
+    "name": "Nom",
+    "nameHint": "Facultatif, proposé d’après les critères.",
+    "nameHintShort": "Facultatif. Proposé d’après les critères",
+    "rulesValues": "Les valeurs sont celles qui existent dans votre carnet.",
+    "rules": "Plusieurs valeurs cochées comptent les plongées qui ont l’une ou l’autre. Plusieurs critères comptent les plongées qui les remplissent tous."
   }
 }

@@ -64,6 +64,20 @@ export function formatDuration(seconds) {
   return `${formatNumber(Math.round(seconds / 60), 0)}${NBSP}${t('units.minutes')}`;
 }
 
+/** Time under water in hours and minutes, for totals: "11 h 26", "0 h 56". @param {number} seconds */
+export function formatHours(seconds) {
+  const minutes = Math.round(seconds / 60);
+  return t('units.hoursMinutes', {
+    h: formatNumber(Math.floor(minutes / 60), 0),
+    mm: String(minutes % 60).padStart(2, '0'),
+  });
+}
+
+/** One duration of a statistic: "59 min" under an hour, else "1 h 06". @param {number} seconds */
+export function formatLongDuration(seconds) {
+  return seconds < 3570 ? formatDuration(seconds) : formatHours(seconds);
+}
+
 /** Time in the profile: min:s. @param {number} seconds */
 export function formatMinSec(seconds) {
   const s = Math.max(0, Math.round(seconds));
@@ -78,10 +92,17 @@ export function formatMinSec(seconds) {
  */
 export function formatTemperature(mk, prefs) {
   if (!mk) return null;
+  return `${temperatureValue(mk, prefs)}${NBSP}${t(prefs.temperature === 'F' ? 'units.fahrenheit' : 'units.celsius')}`;
+}
+
+/**
+ * Temperature without its unit, for a range ("4,0 à 26,0 °C").
+ * @param {number} mk
+ * @param {Prefs} prefs
+ */
+export function temperatureValue(mk, prefs) {
   const c = (mk - 273150) / 1000;
-  return prefs.temperature === 'F'
-    ? `${formatNumber(c * 9 / 5 + 32, 1)}${NBSP}${t('units.fahrenheit')}`
-    : `${formatNumber(c, 1)}${NBSP}${t('units.celsius')}`;
+  return formatNumber(prefs.temperature === 'F' ? c * 9 / 5 + 32 : c, 1);
 }
 
 /**

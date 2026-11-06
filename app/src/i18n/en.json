@@ -8,7 +8,6 @@
   },
   "placeholders": {
     "sitesText": "The map and the list of dive sites will appear here.",
-    "statisticsText": "The logbook statistics will appear here.",
     "toolsText": "The gas calculator and the dive planner will appear here.",
     "editText": "Editing a dive will appear here.",
     "planText": "The planner, prefilled with this dive, will appear here."
@@ -202,7 +201,8 @@
     "psi": "psi",
     "percent": "%",
     "kilograms": "kg",
-    "pounds": "lb"
+    "pounds": "lb",
+    "hoursMinutes": "{h} h {mm} min"
   },
   "settings": {
     "title": "Settings",
@@ -496,5 +496,121 @@
   },
   "common": {
     "back": "Back"
+  },
+  "stats": {
+    "title": "Statistics",
+    "freeFilter": "Free filter",
+    "filterShort": "Filter",
+    "notAvailable": "Not available yet",
+    "figureDives": "Dives",
+    "figureTime": "Under water",
+    "figureDeepest": "Deepest",
+    "pendingValue": "Waiting for the core’s calculation",
+    "pending": "Computed by the Subsurface core: coming",
+    "pendingNote": "The totals will be computed by the Subsurface core; the per-dive charts already show the logbook.",
+    "charts": "Charts",
+    "chartDepth": "Maximum depth",
+    "chartDepthLabel": {
+      "one": "Maximum depth of {n} dive",
+      "other": "Maximum depth of {n} dives"
+    },
+    "chartYears": "Dives per year",
+    "chartYearsText": {
+      "one": "{dives} over {n} year",
+      "other": "{dives} over {n} years"
+    },
+    "chartDurations": "Dive durations",
+    "chartDurationsLabel": {
+      "one": "Duration of {n} dive",
+      "other": "Duration of {n} dives"
+    },
+    "perDiveFrom": "Per dive, {from} to {to}",
+    "perDiveIn": "Per dive, in {year}",
+    "perDiveRange": "Per dive, {min} to {max}",
+    "mine": "My statistics",
+    "mineEmpty": "Save a question you come back to, such as the dives with one suit or one tag.",
+    "new": "New statistic",
+    "newEllipsis": "New statistic…",
+    "byYear": "By year",
+    "byMode": "By mode",
+    "bySuit": "By suit",
+    "byBuddy": "By buddy",
+    "byMonth": "By month",
+    "byTrip": "By trip",
+    "notSet": "Not set",
+    "notSetFor": {
+      "suit": "No suit",
+      "site": "No site",
+      "trip": "No trip"
+    },
+    "emptyTitle": "No statistics yet",
+    "emptyText": "Statistics appear with the first dives of the logbook.",
+    "depthPerDive": "Maximum depth per dive",
+    "chartYearLabel": {
+      "one": "Maximum depth of the dive of {year}: {max}",
+      "other": "Maximum depth of the {n} dives of {year}, {min} to {max}"
+    },
+    "tripLine": "{dives} · {place}",
+    "placeToSpecify": "place to be specified",
+    "rowSummary": "{dives} · {time} · max {depth}",
+    "rowSummaryNoDepth": "{dives} · {time}",
+    "details": "In detail",
+    "detail": {
+      "total": "Total time",
+      "mean": "Mean duration",
+      "shortest": "Shortest",
+      "longest": "Longest",
+      "meanDepth": "Mean depth",
+      "maxDepth": "Maximum depth",
+      "meanMaxDepth": "Mean of maximum depths",
+      "sac": "Mean SAC",
+      "waterMean": "Water, mean",
+      "waterRange": "Water"
+    },
+    "tempRange": "{min} to {max}",
+    "allDives": "All dives",
+    "outOf": {
+      "one": "{n} dive out of {total}",
+      "other": "{n} dives out of {total}"
+    },
+    "removeCriterion": "Remove the criterion",
+    "compareBySuit": "Compare by suit",
+    "criterionValue": "{criterion}: {value}",
+    "criteria": {
+      "suit": "Suit",
+      "tag": "Tag",
+      "buddy": "Buddy",
+      "guide": "Dive guide",
+      "site": "Site",
+      "trip": "Trip",
+      "mode": "Mode",
+      "gas": "Gas",
+      "cylinder": "Cylinder",
+      "computer": "Dive computer",
+      "year": "Year",
+      "rating": "Rating",
+      "month": "Month"
+    },
+    "stars": {
+      "one": "{n} star",
+      "other": "{n} stars"
+    },
+    "newTitle": "New statistic",
+    "newTitleShort": "Statistic",
+    "close": "Close",
+    "criterion": "Criterion",
+    "criteriaHint": "Also: tag, buddy, guide, site, trip, mode, gas, cylinder, dive computer, year, rating…",
+    "values": "Values in your logbook",
+    "countsPending": "The number of dives of each value will come from the Subsurface core.",
+    "valuesPending": "The values of this criterion will come from the Subsurface core: coming.",
+    "noValues": "No value in your logbook.",
+    "addCriterion": "Add a criterion",
+    "addCriterionEllipsis": "Add a criterion…",
+    "result": "Result",
+    "name": "Name",
+    "nameHint": "Optional, proposed from the criteria.",
+    "nameHintShort": "Optional. Proposed from the criteria",
+    "rulesValues": "The values are those found in your logbook.",
+    "rules": "Several checked values count the dives that have any of them. Several criteria count the dives that meet all of them."
   }
 }
