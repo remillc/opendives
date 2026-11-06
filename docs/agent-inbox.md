@@ -170,3 +170,7 @@ The iPhone screens of the Statistics section are updated to match task 22: `docs
 ## [ ] 2026-11-06-24 Tools: desaturation and gas calculator
 
 Follow "Tools" in `docs/ui-specification.md`, section 4. Build the Desaturation screen (`docs/mockups/outils-desaturation-android.dc.html`) with the core's tissue model (no new formula: if the core does not expose tissue loads after the last dives, stop and ask Christian), and add the cylinder type, EAD at the MOD and END at the MOD to the gas calculator (`android-outils.dc.html`), computed by the core's gas functions. The wait-before-flying rule is OpenDives' own: 12 h after one dive, 18 h after several dives in a day; show it as a recommendation, never as a guarantee.
+
+## [ ] 2026-11-06-25 Settings: Décompression group
+
+Add the "Décompression" group to Settings, after "Profil de plongée" (`docs/mockups/android-reglages.dc.html`, rows in the settings table of `docs/ui-specification.md`): model, gradient factors, VPM-B conservatism, oxygen narcotic, best-mix END. They are shared by the profile's calculated ceiling, the planner, the desaturation tool and the gas calculator: read them from the same preferences everywhere, and remove any copy of them from the planner's own settings. One model setting drives both `display_deco_mode` and `planner_deco_mode`.
