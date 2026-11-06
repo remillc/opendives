@@ -265,6 +265,16 @@ int loaded_format_version = 0; // "version" line of 00-Subsurface; 0 if unknown
 std::string cloud_test_email;
 bool cloud_writes_enabled = false;
 
+// is_git_repository() resets git_remote_sync_successful (it expects a new
+// remote): the façade's own lookups after a sync must keep the flag.
+bool git_info_of(const std::string &log, struct git_info &info)
+{
+	bool kept = git_remote_sync_successful;
+	bool found = is_git_repository(log.c_str(), &info);
+	git_remote_sync_successful = kept;
+	return found;
+}
+
 const std::string &step_text(long i)
 {
 	static const std::string none;
@@ -412,7 +422,7 @@ int read_format_version()
 	if (log.empty() || loaded_git_commit.empty())
 		return 0;
 	struct git_info info;
-	if (!is_git_repository(log.c_str(), &info))
+	if (!git_info_of(log, info))
 		return 0;
 	git_repository *repo = nullptr;
 	if (git_repository_open(&repo, info.localdir.c_str()))
@@ -463,14 +473,14 @@ bool writes_allowed()
 bool is_git_log(const std::string &log)
 {
 	struct git_info info;
-	return !log.empty() && is_git_repository(log.c_str(), &info);
+	return !log.empty() && git_info_of(log, info);
 }
 
 // Port of cloudDestinationIsSafe(): only "normal" may be saved.
 int check_destination(const std::string &log, std::string &error)
 {
 	struct git_info info;
-	if (!is_git_repository(log.c_str(), &info)) {
+	if (!git_info_of(log, info)) {
 		error = "NOT_GIT";
 		return -1;
 	}
@@ -520,7 +530,7 @@ std::string ref_target(git_repository *repo, const std::string &name)
 int open_log_repo(const std::string &log, git_repository **repo, std::string &branch)
 {
 	struct git_info info;
-	if (!is_git_repository(log.c_str(), &info))
+	if (!git_info_of(log, info))
 		return -1;
 	branch = info.branch;
 	return git_repository_open(repo, info.localdir.c_str());

@@ -50,6 +50,22 @@ tests/run-edit-roundtrip.sh build/poc/edit-roundtrip build/poc/roundtrip ~/ert  
 
 The work directory must be on a Linux file system (not `/mnt/*`), as for the cloud test.
 
+## Local log and cloud writes (6 November 2026)
+
+- **Test 2, log without account:** `edit-roundtrip local <dive-file> <new-folder>` creates the log as the app does (`import_file`), edits the notes of the first dive, saves and reopens it: passed. As noted for the skeleton, `HEAD` stays on an unborn `master` while the data is on `main` (Subsurface's `git_create_local_repo`).
+- **Test 3, cloud writes:** `tests/run-cloud-write-test.sh` with `build/poc/cloud-write` (`tests/cloud_write.cpp`), on the development account only: the tool and the script refuse any account other than `OPENDIVES_CLOUD_TEST_EMAIL` (file outside the repository). Each clone is a separate `$HOME`; the offline scenario runs the process without network (`unshare -rn`). Passed:
+  - lock: with another test address set, `save_local` and `sync` return `WRITE_LOCKED` and the server head does not move;
+  - one edit then sync: one commit on the server, seen by a fresh clone;
+  - two clones at the same head edit two dives: the second sync makes an "Automatic merge" commit, both changes are on the server;
+  - two clones edit the notes of the same dive: the second sync also merges without error, and **the server keeps the notes of the first one pushed**: the second edit is lost without any warning. Nothing else changes;
+  - offline: the edit is saved locally (status "offline", 1 commit pending), then pushed when the network is back;
+  - the notes of the dives used are put back at the end.
+- **Fixed on the way:** Subsurface's `is_git_repository()` resets `git_remote_sync_successful`; the façade's own lookups after a load now keep it (`cloud_list_dives()` had reported `synced: false` after a real sync).
+
+```sh
+tests/run-cloud-write-test.sh build/poc/cloud-write ~/.opendives/cloud-dev.env ~/.opendives/cloud-test.env ~/cwt
+```
+
 ## Reproduce
 
 Linux or WSL is required. The required packages are listed at the top of `poc/build.sh`.

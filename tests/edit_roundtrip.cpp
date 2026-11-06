@@ -3,7 +3,8 @@
 // façade, on a git log. Driven by tests/run-edit-roundtrip.sh, which compares
 // the git trees.
 //
-// usage: edit-roundtrip baseline <repo[branch]> <new-repo[branch]>
+// usage: edit-roundtrip local    <dive-file> <new-folder>  test 2: create a log, edit, save, reopen
+//        edit-roundtrip baseline <repo[branch]> <new-repo[branch]>
 //                                                       load as the app does, save into a new repo
 //        edit-roundtrip edit   <repo[branch]> <field>   edit the first dive, save, reload, check
 //        edit-roundtrip undo   <repo[branch]> <field>   edit, save, undo, save
@@ -157,6 +158,35 @@ int main(int argc, char **argv)
 	}
 	std::string mode = argv[1], repo = argv[2], arg = argv[3];
 	init();
+
+	if (mode == "local") {
+		// Test 2: a log without account. `repo` is a dive file, `arg` a
+		// folder that does not exist yet: create the log there as the app
+		// does (import_file), edit, save, reopen.
+		std::string log = arg + "[main]", error, json, result;
+		int count = import_file(repo, log, error);
+		printf("created=%d\n", count);
+		if (count <= 0 || open_log(log))
+			return 1;
+		dive *d = first_dive();
+		timestamp_t when = d->when;
+		std::string request, expected;
+		make_change(*d, "notes", request, expected);
+		if (edit_dive(d->id, request, result, error) || save_local(error)) {
+			printf("error=%s\n", error.c_str());
+			return 1;
+		}
+		printf("text=%s\n", undo_text().c_str());
+		if (open_log(log))
+			return 1;
+		d = first_dive();
+		if (d->when != when || d->notes != expected) {
+			printf("error=notes not saved\n");
+			return 1;
+		}
+		return 0;
+	}
+
 	if (int ret = open_log(repo))
 		return ret;
 
