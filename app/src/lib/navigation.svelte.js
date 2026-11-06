@@ -15,6 +15,10 @@ export const navigation = $state({
   /** @type {Section} */
   section: 'logbook',
   menuOpen: false,
+  /** Counts the presses of the rail's "+" button; the Logbook offers its choices on each. */
+  addRequests: 0,
+  /** Identifier of the dive shown beside the list (tablet), or null. */
+  dive: /** @type {string|null} */ (null),
 });
 
 /** Element that opened the menu; it gets the focus back on close. */
@@ -24,6 +28,18 @@ let opener = null;
 /** @param {Section} section */
 export function showSection(section) {
   f7.tab.show(`#view-${section}`);
+}
+
+/** Settings open over the current section, from the side menu or the tablet navigation. */
+export function openSettings() {
+  const router = f7.views.current?.router;
+  if (router && router.currentRoute?.path !== '/settings/') router.navigate('/settings/');
+}
+
+/** The "+" button of the Android rail: shows the Logbook, which offers the choices. */
+export function requestAdd() {
+  showSection('logbook');
+  navigation.addRequests += 1;
 }
 
 /** Follows the visible tab, whatever showed it (menu, Back key, tablet bar). */

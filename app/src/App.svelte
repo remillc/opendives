@@ -2,9 +2,10 @@
   // @ts-check
   // Main navigation (spec, section 3). Phone layout: a top bar on each screen
   // and a side menu with the four sections and Settings. Tablet layout: the
-  // bottom bar stands in until the iPad sidebar and the Android rail exist.
+  // iPad sidebar or the Android rail and, in the Logbook, the list and the
+  // dive side by side from `splitBreakpoint` (Framework7's master-detail).
   import { onMount } from 'svelte';
-  import { App, Views, View, Toolbar, Link } from 'framework7-svelte';
+  import { App, Views, View } from 'framework7-svelte';
   import Logbook from './pages/Logbook.svelte';
   import DiveDetail from './pages/DiveDetail.svelte';
   import Placeholder from './pages/Placeholder.svelte';
@@ -38,11 +39,10 @@
   import FilterCriterion from './pages/FilterCriterion.svelte';
   import AddUnavailable from './pages/AddUnavailable.svelte';
   import DownloadFailed from './pages/DownloadFailed.svelte';
-  import Icon from './components/Icon.svelte';
-  import AdaptiveLabel from './components/AdaptiveLabel.svelte';
+  import NavRail from './components/NavRail.svelte';
   import NavMenu from './components/NavMenu.svelte';
   import Welcome from './components/Welcome.svelte';
-  import { layout } from './lib/layout.svelte.js';
+  import { layout, ios, listWidth, splitBreakpoint } from './lib/layout.svelte.js';
   import { trackSection } from './lib/navigation.svelte.js';
   import { startApp } from './lib/logbook.svelte.js';
   import { enableBackButton } from './lib/back-button.js';
@@ -54,7 +54,7 @@
 
   const f7params = {
     name: 'OpenDives',
-    theme: 'auto',
+    theme: ios ? 'ios' : 'md',
     // Settings, Display, Theme: the device's, or light or dark.
     darkMode: settings.theme === 'system' ? 'auto' : settings.theme === 'dark',
     // Framework7 derives its palette from --od-action (theme.css); the mapped
@@ -63,9 +63,10 @@
     // Framework7's own dialog buttons are in English.
     dialog: { buttonOk: t('dialog.ok'), buttonCancel: t('dialog.cancel') },
     routes: [
-      { path: '/', component: Logbook },
+      // The Logbook is the master of a master-detail pair on a wide enough tablet:
+      // a dive then opens beside the list, and full screen otherwise.
+      { path: '/', component: Logbook, master: true, detailRoutes: [{ path: '/dive/:id/', component: DiveDetail }] },
       { path: '/dive/new/', component: NewDive },
-      { path: '/dive/:id/', component: DiveDetail },
       { path: '/filter/', component: Filter },
       { path: '/filter/:key/', component: FilterCriterion },
       { path: '/add/:what/', component: AddUnavailable },
@@ -123,24 +124,54 @@
 </script>
 
 <App {...f7params}>
-  {#if layout.phone}<NavMenu />{/if}
+  {#if layout.phone}<NavMenu />{:else}<NavRail />{/if}
   <Welcome />
-  <Views tabs class="safe-areas">
-    {#if !layout.phone}
-    <Toolbar tabbar icons bottom>
-      <Link tabLink="#view-logbook" tabLinkActive text={t('tabs.logbook')}><i class="icon"><Icon name="logbook" /></i></Link>
-      <Link tabLink="#view-sites" text={t('tabs.sites')}><i class="icon"><Icon name="sites" /></i></Link>
-      <Link tabLink="#view-statistics">
-        <i class="icon"><Icon name="statistics" /></i>
-        <AdaptiveLabel full={t('tabs.statistics')} short={t('tabs.statisticsShort')} />
-      </Link>
-      <Link tabLink="#view-tools" text={t('tabs.tools')}><i class="icon"><Icon name="tools" /></i></Link>
-    </Toolbar>
-    {/if}
-    <View id="view-logbook" main tab tabActive url="/" />
+  <Views tabs class="safe-areas {layout.phone ? '' : 'od-tablet'}" style="--f7-page-master-width: {listWidth}px; --od-no-dive: '{t('tablet.noDive')}'">
+    <View id="view-logbook" main tab tabActive url="/" masterDetailBreakpoint={splitBreakpoint} />
     <View id="view-sites" tab url="/sites/" />
     <View id="view-statistics" tab url="/statistics/" />
     <View id="view-tools" tab url="/tools/" />
     <View id="view-account" tab url="/account/" />
   </Views>
 </App>
+
+<style>
+  @layer od.components {
+    /* Tablet: the views leave room for the sidebar or the rail (NavRail.svelte). */
+    :global(.views.od-tablet) {
+      margin-left: var(--od-nav-width);
+      width: calc(100% - var(--od-nav-width));
+    }
+
+    /* Logbook, list and dive side by side (Framework7 master-detail). */
+    :global(.view-master-detail .page-master-detail) {
+      background: var(--od-surface);
+    }
+
+    /* Beside the list, the dive has no Back button: the list stays on screen. */
+    :global(.view-master-detail .page-master-detail .navbar .left .back) {
+      display: none;
+    }
+
+    /* No ☰ button on a tablet and no Back button beside the list: no empty button bubble (iOS). */
+    :global(.views.od-tablet .navbar .left:not(:has(a, button))),
+    :global(.view-master-detail .page-master-detail .navbar .left) {
+      display: none;
+    }
+
+    /* Nothing chosen yet. */
+    :global(.view-master-detail:not(:has(.page-master-detail))::after) {
+      content: var(--od-no-dive);
+      position: absolute;
+      inset: 0 0 0 var(--f7-page-master-width);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: var(--od-surface);
+      color: var(--od-text-2);
+      font-size: 16px;
+      text-align: center;
+    }
+  }
+</style>
