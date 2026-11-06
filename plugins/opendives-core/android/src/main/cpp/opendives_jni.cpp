@@ -326,6 +326,25 @@ Java_org_opendives_core_NativeCore_deleteDive(JNIEnv *env, jobject, jint id)
 	return edit_result(env, json);
 }
 
+// Renumbers dives (all of them if ids is empty): one undoable step (renumber_dives).
+JNIEXPORT jstring JNICALL
+Java_org_opendives_core_NativeCore_renumberDives(JNIEnv *env, jobject, jintArray diveIds, jint start)
+{
+	std::vector<int> ids;
+	if (diveIds) {
+		jsize n = env->GetArrayLength(diveIds);
+		ids.resize(n);
+		if (n)
+			env->GetIntArrayRegion(diveIds, 0, n, ids.data());
+	}
+	std::string json, error;
+	if (opendives::renumber_dives(ids, start, json, error)) {
+		throw_core_error(env, error);
+		return nullptr;
+	}
+	return edit_result(env, json);
+}
+
 // Imports a file into the log: one undoable step (import_dives).
 JNIEXPORT jstring JNICALL
 Java_org_opendives_core_NativeCore_importDives(JNIEnv *env, jobject, jstring file, jstring source)

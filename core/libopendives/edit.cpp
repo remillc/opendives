@@ -116,7 +116,7 @@ struct DiveListChange {
 };
 
 struct Step {
-	enum Kind { DIVE, TRIP_FIELD, MOVE, SITE_FIELD, SITES, CYLINDER_TYPE, DIVE_LIST, FILTER_PRESET } kind = DIVE;
+	enum Kind { DIVE, TRIP_FIELD, MOVE, SITE_FIELD, SITES, CYLINDER_TYPE, DIVE_LIST, FILTER_PRESET, RENUMBER } kind = DIVE;
 	// DIVE_LIST: as Subsurface's AddDive and ImportDives: what the next undo
 	// or redo puts in and takes out; for an import, the dive computers and
 	// filter presets it brings, and whether they are in the log now.
@@ -125,6 +125,9 @@ struct Step {
 	std::vector<std::pair<std::string, FilterData>> presets_to_add;
 	std::vector<int> presets_to_remove;
 	bool list_applied = false;
+	// RENUMBER: as Subsurface's RenumberDives, each dive with the number to
+	// swap in; after each undo or redo it holds the previous numbers.
+	std::vector<std::pair<dive *, int>> renumbered;
 	// FILTER_PRESET: as CreateFilterPreset, RemoveFilterPreset and
 	// EditFilterPreset (commands/command_filter.cpp).
 	enum PresetOp { CREATE, REMOVE, EDIT } preset_op = CREATE;
@@ -1667,6 +1670,16 @@ static std::string dive_list_json(const Step &step)
 
 static int swap_step(Step &step, std::string &result_json, std::string &error)
 {
+	if (step.kind == Step::RENUMBER) {
+		// renumberDives(): the old numbers are kept in the array, so doing it
+		// twice is a no-op.
+		for (auto &[d, number]: step.renumbered) {
+			std::swap(d->number, number);
+			d->invalidate_cache();
+		}
+		result_json = "{\"listChange\":true,\"dives\":" + std::to_string(divelog.dives.size()) + ",\"id\":0}";
+		return 0;
+	}
 	if (step.kind == Step::DIVE_LIST) {
 		apply_dive_list(step);
 		result_json = dive_list_json(step);
@@ -2502,6 +2515,45 @@ int delete_dive(int id, std::string &result_json, std::string &error)
 	step.text = "delete 1 dive(s) [" + list_of_dives(step.list.remove_dives) + "]";
 	apply_dive_list(step);
 	result_json = dive_list_json(step);
+	push_step(std::move(step));
+	return 0;
+}
+
+int renumber_dives(const std::vector<int> &ids, int start, std::string &result_json, std::string &error)
+{
+	if (check_writable_log(error))
+		return -1;
+	if (start < 0) {
+		error = "BAD_REQUEST: start";
+		return -1;
+	}
+	std::set<int> wanted(ids.begin(), ids.end());
+	for (int id: ids) {
+		if (!divelog.dives.get_by_uniq_id(id)) {
+			error = "NOT_FOUND";
+			return -1;
+		}
+	}
+	// RenumberDialog::buttonClicked() (desktop-widgets/simplewidgets.cpp): the
+	// dives in date order (the order of the table), from the starting number.
+	Step step;
+	step.kind = Step::RENUMBER;
+	int number = start;
+	for (auto &d: divelog.dives) {
+		if (wanted.empty() || wanted.count(d->id))
+			step.renumbered.push_back({ d.get(), number++ });
+	}
+	if (step.renumbered.empty()) {
+		error = "NOTHING_TO_DO";
+		return -1;
+	}
+	std::vector<dive *> list;
+	for (auto &item: step.renumbered)
+		list.push_back(item.first);
+	// RenumberDives::RenumberDives(): "renumber %n dive(s) [list]".
+	step.text = "renumber " + std::to_string(list.size()) + " dive(s) [" + list_of_dives(list) + "]";
+	std::string unused;
+	swap_step(step, result_json, unused);
 	push_step(std::move(step));
 	return 0;
 }

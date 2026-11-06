@@ -15,7 +15,8 @@
   import StarsInput from '../components/StarsInput.svelte';
   import WheelDialog from '../components/WheelDialog.svelte';
   import ChoiceDialog from '../components/ChoiceDialog.svelte';
-  import { logbook, addDive } from '../lib/logbook.svelte.js';
+  import { logbook, addDive, renumberDives, renumberPlanFrom } from '../lib/logbook.svelte.js';
+  import { confirmAction } from '../lib/dialogs.js';
   import { parseNumber } from '../lib/filter.svelte.js';
   import { depthUnit, formatCylinderSize, formatLongDate, locale } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
@@ -122,6 +123,21 @@
     return chosen && !first.includes(chosen) ? [chosen, ...first.slice(0, 5)] : first;
   });
 
+  /** @param {{ ids: number[], start: number }} plan @param {() => void} back */
+  function renumberAfterAdd(plan, back) {
+    return async () => {
+      try {
+        await renumberDives(plan.ids, plan.start);
+        // The dive page shows the number it had: open it again.
+        f7router.navigate(`/dive/${plan.ids[0]}/`, { reloadCurrent: true });
+        offerUndo(t('renumber.done'), back);
+      } catch (e) {
+        console.error('Renumber', e);
+        f7.toast.create({ text: t('renumber.failed'), closeTimeout: 4000 }).open();
+      }
+    };
+  }
+
   async function save() {
     tried = true;
     if (saving || !durationOk || !depthOk || !waterOk || !startOk || !endOk || !gasOk) return;
@@ -151,7 +167,20 @@
       if (notes.trim()) fields.notes = notes;
       const id = await addDive(fields);
       f7router.navigate(id ? `/dive/${id}/` : '/', { reloadCurrent: true });
-      offerUndo(t('newDive.saved'), () => f7router.navigate('/', { reloadCurrent: true }));
+      const back = () => f7router.navigate('/', { reloadCurrent: true });
+      // A dive logged between others has no number (0): offer to renumber the
+      // logbook from its date onward, as Subsurface's Renumber does.
+      const plan = id && logbook.dives.find((d) => d.id === id)?.number === 0 ? renumberPlanFrom(id) : null;
+      if (plan)
+        confirmAction({
+          title: t('newDive.renumberTitle'),
+          text: t('newDive.renumberText', { count: plan.ids.length - 1, start: plan.start }),
+          action: t('renumber.action'),
+          cancel: t('newDive.renumberLater'),
+          onConfirm: renumberAfterAdd(plan, back),
+          onCancel: () => offerUndo(t('newDive.saved'), back),
+        });
+      else offerUndo(t('newDive.saved'), back);
     } catch (e) {
       const code = String(/** @type {any} */ (e)?.message ?? '');
       console.error('Log a dive', code);

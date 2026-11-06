@@ -779,6 +779,17 @@
     },
     "deleteSiteTextUnused": "No dive uses it. It can be undone."
   },
+  "renumber": {
+    "label": "Renumber dives",
+    "text": "Consecutive numbers in date order",
+    "title": "Renumber all dives?",
+    "dialogText": "All {count} dives get consecutive numbers in date order, from the number below. The numbers they have now are replaced, in the logbook and in Subsurface. You can undo it right after.",
+    "start": "First number",
+    "invalid": "Enter a whole number, 1 or more",
+    "action": "Renumber",
+    "done": "Dives renumbered",
+    "failed": "The dives could not be renumbered. No dive was changed."
+  },
   "dialog": {
     "ok": "OK",
     "cancel": "Cancel"
@@ -1404,6 +1415,9 @@
     "buddies": "Buddies",
     "rating": "Rating",
     "notes": "Notes",
+    "renumberTitle": "Renumber the logbook?",
+    "renumberText": "This dive was added between others and has no number. Renumbering gives it and the {count} dives after it consecutive numbers, starting at {start}. Earlier dives keep their numbers. You can undo it right after.",
+    "renumberLater": "Not now",
     "saved": "Dive added",
     "failed": "The dive could not be added. No dive was changed.",
     "date": "Date",

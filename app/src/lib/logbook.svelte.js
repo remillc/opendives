@@ -151,6 +151,33 @@ export async function deleteDive(id) {
 }
 
 /**
+ * Renumbers dives in date order from `start` (one undoable step), saved and
+ * synced like an edit. No ids: all the dives, as Subsurface's Renumber dialog.
+ * @param {number[]} ids
+ * @param {number} start
+ */
+export async function renumberDives(ids, start) {
+  const result = await OpenDivesCore.renumberDives({ ids, start });
+  logbook.undoText = result.undo;
+  logbook.dives = await OpenDivesCore.listLoadedDives();
+  await persistChanges();
+}
+
+/**
+ * The dives that a new dive logged in the middle of the logbook pushes down:
+ * that dive and every later one, and the number the first one should take
+ * (the previous dive's number plus one, 1 for the first dive of the log).
+ * @param {number} id the new dive
+ * @returns {{ ids: number[], start: number }|null} null if the dive is not in the logbook
+ */
+export function renumberPlanFrom(id) {
+  const sorted = [...logbook.dives].sort((a, b) => a.date.localeCompare(b.date) || a.id - b.id);
+  const i = sorted.findIndex((d) => d.id === id);
+  if (i < 0) return null;
+  return { ids: sorted.slice(i).map((d) => d.id), start: (sorted[i - 1]?.number ?? 0) + 1 };
+}
+
+/**
  * Logs a dive by hand (one undoable step), saved and synced like an edit.
  * @param {Record<string, string|number|string[]>} fields
  * @returns {Promise<number>} the new dive's identifier

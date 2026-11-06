@@ -13,6 +13,7 @@
   import { OpenDivesCore } from 'opendives-core';
   import ChoiceDialog from '../components/ChoiceDialog.svelte';
   import WheelDialog from '../components/WheelDialog.svelte';
+  import RenumberDialog from '../components/RenumberDialog.svelte';
   import { t, deviceLanguage } from '../lib/i18n.js';
   import { logbook, setAutogroup } from '../lib/logbook.svelte.js';
   import {
@@ -35,7 +36,7 @@
    *       options: () => Option[] | Promise<Option[]>, set: (v: string) => unknown, dimmed?: boolean }
    *   | { kind: 'number', id: string, label: string, text?: string, value: string, title?: string, dialogText?: string,
    *       wheels: () => {label: string, values: string[], index: number, defaultIndex: number}[], set: (indexes: number[]) => unknown, dimmed?: boolean }
-   *   | { kind: 'link', id: string, label: string, text?: string, href?: string, disabled?: boolean }
+   *   | { kind: 'link', id: string, label: string, text?: string, href?: string, action?: () => void, disabled?: boolean }
    *   | { kind: 'info', id: string, label: string, value: string }} Row
    */
 
@@ -52,6 +53,7 @@
   const defaults = $derived(/** @type {CorePrefValues} */ (logbook.prefs.defaults ?? p));
 
   let search = $state('');
+  let renumbering = $state(false);
   const UNIT_SYSTEMS = /** @type {const} */ (['metric', 'imperial', 'personalize']);
 
   /** @type {{ kind: 'choice', row: Extract<Row, {kind: 'choice'}>, options: Option[] } | { kind: 'number', row: Extract<Row, {kind: 'number'}> } | null} */
@@ -308,6 +310,7 @@
             }
           },
         },
+        { kind: 'link', id: 'renumber', label: t('renumber.label'), text: t('renumber.text'), action: () => (renumbering = true) },
         { kind: 'switch', id: 'displayInvalidDives', label: t('settings.invalidDives.label'), text: t('settings.invalidDives.text'), checked: p.displayInvalidDives, set: async (v) => {
           await setCore({ displayInvalidDives: v });
           // The core's list leaves invalid dives out unless this is on.
@@ -608,6 +611,8 @@
       }
     } else if (row.kind === 'number') {
       dialog = { kind: 'number', row };
+    } else if (row.kind === 'link' && row.action && !row.disabled) {
+      row.action();
     } else if (row.kind === 'link' && row.href && !row.disabled) {
       f7.views.current.router.navigate(row.href);
     }
@@ -859,6 +864,10 @@
   {#if nothingShown}<p class="note empty">{t('settings.noResult', { text: search.trim() })}</p>{/if}
   <div class="bottom"></div>
 </Page>
+
+{#if renumbering}
+  <RenumberDialog oncancel={() => (renumbering = false)} ondone={() => (renumbering = false)} />
+{/if}
 
 {#if dialog?.kind === 'choice'}
   {@const row = dialog.row}

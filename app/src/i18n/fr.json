@@ -779,6 +779,17 @@
     },
     "deleteSiteTextUnused": "Aucune plongée ne l’utilise. C’est annulable."
   },
+  "renumber": {
+    "label": "Renuméroter les plongées",
+    "text": "Numéros consécutifs, dans l'ordre des dates",
+    "title": "Renuméroter toutes les plongées ?",
+    "dialogText": "Les {count} plongées reçoivent des numéros consécutifs, dans l'ordre des dates, à partir du numéro ci-dessous. Leurs numéros actuels sont remplacés, dans le carnet et dans Subsurface. Vous pourrez annuler juste après.",
+    "start": "Premier numéro",
+    "invalid": "Entrez un nombre entier, 1 ou plus",
+    "action": "Renuméroter",
+    "done": "Plongées renumérotées",
+    "failed": "Les plongées n'ont pas pu être renumérotées. Aucune plongée n'a été modifiée."
+  },
   "dialog": {
     "ok": "OK",
     "cancel": "Annuler"
@@ -1404,6 +1415,9 @@
     "buddies": "Compagnons",
     "rating": "Note globale",
     "notes": "Notes",
+    "renumberTitle": "Renuméroter le carnet ?",
+    "renumberText": "Cette plongée a été ajoutée entre d'autres et n'a pas de numéro. En renumérotant, elle et les {count} plongées qui la suivent reçoivent des numéros consécutifs, à partir de {start}. Les plongées plus anciennes gardent leur numéro. Vous pourrez annuler juste après.",
+    "renumberLater": "Pas maintenant",
     "saved": "Plongée ajoutée",
     "failed": "La plongée n'a pas pu être ajoutée. Aucune plongée n'a été modifiée.",
     "date": "Date",

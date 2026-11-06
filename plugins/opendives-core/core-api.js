@@ -432,6 +432,8 @@ import { registerPlugin } from '@capacitor/core';
  *   Logs a dive by hand, one undoable step (create_dive in opendives.h).
  * @property {(options: {id: number}) => Promise<EditResult>} deleteDive
  *   Deletes a dive, one undoable step (delete_dive).
+ * @property {(options: {ids: number[], start: number}) => Promise<EditResult>} renumberDives
+ *   Renumbers the dives (all if ids is empty) in date order from start, one undoable step (renumber_dives).
  * @property {(options: {name: string, data: string}) => Promise<EditResult>} importDives
  *   Imports a file (base64 contents, original name), one undoable step (import_dives).
  * @property {(options: {action: 'list'} | {action: 'save', name: string, fulltext?: string, mode?: string, rules: FilterRule[]} | {action: 'delete', index: number}) => Promise<any>} filterPresets
@@ -534,6 +536,9 @@ export const OpenDivesCore = {
   },
   async deleteDive(options) {
     return JSON.parse((await native.deleteDive(options)).json);
+  },
+  async renumberDives(options) {
+    return JSON.parse((await native.renumberDives(options)).json);
   },
   async importDives(options) {
     return JSON.parse((await native.importDives(options)).json);
