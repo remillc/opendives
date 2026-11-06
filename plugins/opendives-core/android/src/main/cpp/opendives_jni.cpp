@@ -243,6 +243,29 @@ Java_org_opendives_core_NativeCore_siteAction(JNIEnv *env, jobject, jstring acti
 	return edit_result(env, json);
 }
 
+// Read-only tools (tools.cpp): gas (calculator: o2, he in per mille, pO2 in
+// mbar, planned depth in mm), cylinders (cylinder types), desaturation (tissues
+// now, after the logbook dives).
+JNIEXPORT jstring JNICALL
+Java_org_opendives_core_NativeCore_toolQuery(JNIEnv *env, jobject, jstring kindIn, jint o2, jint he, jint po2,
+					     jint depth)
+{
+	std::string kind = to_string(env, kindIn), json, error;
+	if (kind == "gas") {
+		if (opendives::gas_calculator(o2, he, po2, depth, json, error)) {
+			throw_core_error(env, error);
+			return nullptr;
+		}
+	} else if (kind == "cylinders") {
+		opendives::cylinder_types(json);
+	} else if (kind == "desaturation") {
+		opendives::desaturation(0, json);
+	} else {
+		json = "null";
+	}
+	return env->NewStringUTF(json.c_str());
+}
+
 JNIEXPORT void JNICALL
 Java_org_opendives_core_NativeCore_setRegionsFile(JNIEnv *env, jobject, jstring path)
 {
