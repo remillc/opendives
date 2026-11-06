@@ -322,8 +322,9 @@
 
 <style>
   @layer od.components {
+    /* 16 px under the top bar, as in the detail3 mock-ups. */
     .head {
-      padding: 0 20px;
+      padding: 16px 20px 0;
     }
 
     .day {
