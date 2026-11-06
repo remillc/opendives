@@ -123,6 +123,9 @@
     }
 
     .actions :global(button) {
+      /* Framework7 stretches buttons: text buttons keep their own width. */
+      width: auto;
+      flex: none;
       height: 40px;
       padding: 0 12px;
       border: none;
