@@ -45,7 +45,16 @@
     "emptyPair": "Pair a dive computer",
     "emptyDivelogs": "Download from divelogs.de",
     "emptyNote": "Files from Subsurface (.ssrf, .xml), divelogs.de and other logbooks are imported here.",
-    "noFilterResults": "No dive matches the filter."
+    "noFilterResults": "No dive matches the filter.",
+    "imported": {
+      "one": "{n} dive imported",
+      "other": "{n} dives imported"
+    },
+    "importTitle": "Import a file",
+    "importNothingNew": "Every dive of this file is already in the logbook. No dive was changed.",
+    "importNoDives": "This file holds no dive. No dive was changed.",
+    "importFailed": "This file could not be read. Files from Subsurface (.ssrf, .xml), divelogs.de and other logbooks are accepted. No dive was changed.",
+    "importing": "Importing the file"
   },
   "sync": {
     "syncing": "Syncing with the Subsurface cloud…",
@@ -1214,7 +1223,23 @@
       "one": "{n} dive of {total}",
       "other": "{n} dives of {total}"
     },
-    "clear": "Remove the filter"
+    "clear": "Remove the filter",
+    "savedFilter": "Saved filter",
+    "savedFilters": "Saved filters",
+    "save": "Save this filter",
+    "saveTitle": "Save this filter",
+    "saveText": "The filter is saved in the logbook, as in Subsurface.",
+    "name": "Filter name",
+    "saveConfirm": "Save",
+    "nameRequired": "Name required",
+    "saved": "Filter “{name}” saved",
+    "notInPreset": "Country, region, trip and values holding a comma cannot be saved in a Subsurface filter.",
+    "saveFailed": "The filter could not be saved.",
+    "deleteTitle": "Delete the filter “{name}”",
+    "deleteText": "The dives do not change.",
+    "delete": "Delete",
+    "deleted": "Filter “{name}” deleted",
+    "deleteNamed": "Delete the filter {name}"
   },
   "addUnavailable": {
     "heading": "Not available yet",
@@ -1223,18 +1248,6 @@
     "download": {
       "title": "Download",
       "text": "Downloading from the dive computer over Bluetooth will come in a later version."
-    },
-    "import": {
-      "title": "Import a file",
-      "text": "Importing a file (.ssrf, .xml, divelogs.de) will come in a later version."
-    },
-    "manual": {
-      "title": "Log a dive",
-      "text": "Logging a dive by hand will come in a later version."
-    },
-    "divelogs": {
-      "title": "divelogs.de",
-      "text": "Bringing a divelogs.de logbook will come in a later version. Your divelogs.de credentials will never be stored."
     }
   },
   "downloadFailed": {
@@ -1257,7 +1270,7 @@
   },
   "conflict": {
     "title": "Dive changed in two places",
-    "text": "{field} of the dive of {date} changed here and in the cloud (from another device), and the two versions do not combine. Nothing is lost until you choose.",
+    "text": "The dive of {date} was changed here and in the cloud (from another device): {field}. The two versions do not combine. Nothing is lost until you choose.",
     "choiceLabel": "Version to keep",
     "device": "Keep this phone's version",
     "cloud": "Take the cloud version",
@@ -1266,15 +1279,56 @@
     "continue": "Continue",
     "continueLong": "Continue the synchronisation",
     "fields": {
-      "notes": "The notes",
-      "suit": "The suit",
-      "rating": "The rating",
-      "visibility": "The visibility",
-      "buddies": "The buddies",
-      "diveguide": "The dive guide",
-      "tags": "The tags",
-      "site": "The site",
-      "dive": "The dive"
-    }
+      "notes": "notes",
+      "suit": "suit",
+      "rating": "rating",
+      "visibility": "visibility",
+      "buddy": "buddies",
+      "divemaster": "dive guide",
+      "tags": "tags",
+      "divesiteid": "site",
+      "current": "current",
+      "wavesize": "surface waves",
+      "surge": "surge",
+      "chill": "chill",
+      "airtemp": "air temperature",
+      "watertemp": "water temperature",
+      "duration": "duration",
+      "other": "dive record"
+    },
+    "textNoDate": "A dive was changed here and in the cloud (from another device): {field}. The two versions do not combine. Nothing is lost until you choose.",
+    "more": {
+      "one": "One other dive is in the same case.",
+      "other": "{n} other dives are in the same case."
+    },
+    "deviceWhen": "Changed on {when}",
+    "cloudWhen": "Sent from another device on {when}",
+    "thisDevice": "This phone:",
+    "theCloud": "Cloud:",
+    "empty": "(empty)",
+    "failed": "The choice could not be saved. Nothing changed."
+  },
+  "newDive": {
+    "title": "Log a dive",
+    "cancel": "Cancel",
+    "save": "Save",
+    "dateTime": "Date and time",
+    "dateHint": "For example 2026-11-06 09:30",
+    "dateInvalid": "Date not recognised, for example 2026-11-06 09:30",
+    "duration": "Duration (min)",
+    "depth": "Maximum depth ({unit})",
+    "required": "Value required",
+    "profileHint": "A simple profile is drawn from the depth and the duration, as in Subsurface-mobile.",
+    "site": "Site",
+    "searchSite": "Search for a site",
+    "noSite": "Site to be specified",
+    "lastDive": "Last dive on {date}",
+    "newSiteNote": "A new site is created in Sites, then chosen by editing the dive.",
+    "more": "Buddies, rating and notes",
+    "buddies": "Buddies",
+    "rating": "Rating",
+    "notes": "Notes",
+    "saved": "Dive added",
+    "failed": "The dive could not be added. No dive was changed."
   }
 }

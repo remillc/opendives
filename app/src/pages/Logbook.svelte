@@ -13,7 +13,7 @@
   import MenuButton from '../components/MenuButton.svelte';
   import ActiveFilter from '../components/ActiveFilter.svelte';
   import ConflictSheet from '../components/ConflictSheet.svelte';
-  import { logbook, loadLogbook } from '../lib/logbook.svelte.js';
+  import { logbook, loadLogbook, importFile, undoLastChange, resolveConflict } from '../lib/logbook.svelte.js';
   import { filter, loadOptions, applyFilter, isEmpty } from '../lib/filter.svelte.js';
   import { formatDateTime } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
@@ -210,9 +210,71 @@
     { key: 'manual', icon: 'edit', text: t('logbook.addManual') },
   ];
 
+  /** Where each choice leads; download from the dive computer is not built yet. */
+  const routes = /** @type {Record<string, string>} */ ({
+    download: '/add/download/',
+    manual: '/dive/new/',
+    divelogs: '/welcome/import/',
+  });
+
   /** @param {string} key download, import, manual, divelogs */
   function choose(key) {
-    f7router.navigate(`/add/${key}/`);
+    if (key === 'import') fileInput?.click();
+    else f7router.navigate(routes[key]);
+  }
+
+  // Import a file: the WebView's own file picker, no native code; the core
+  // reads the file and merges it into the logbook as one undoable step.
+  /** @type {HTMLInputElement|undefined} */
+  let fileInput = $state();
+  let importing = $state(false);
+
+  /** @param {string} text */
+  function toast(text) {
+    f7.toast.create({ text, closeTimeout: 4000, position: 'bottom' }).open();
+  }
+
+  async function fileChosen() {
+    const file = fileInput?.files?.[0];
+    if (!file || !fileInput) return;
+    fileInput.value = '';
+    importing = true;
+    try {
+      const n = await importFile(file);
+      f7.toast
+        .create({
+          text: t('logbook.imported', { n }),
+          closeButton: true,
+          closeButtonText: t('edit.undo'),
+          closeTimeout: 5000,
+          position: 'bottom',
+          on: {
+            closeButtonClick: async () => {
+              try {
+                await undoLastChange();
+                toast(t('edit.undone'));
+              } catch (e) {
+                console.error('Undo', e);
+                toast(t('edit.undoFailed'));
+              }
+            },
+          },
+        })
+        .open();
+    } catch (e) {
+      const code = String(/** @type {any} */ (e)?.message ?? '');
+      console.error('Import a file', code);
+      const key = code.startsWith('NO_NEW_DIVES')
+        ? 'logbook.importNothingNew'
+        : code.startsWith('NO_DIVES')
+          ? 'logbook.importNoDives'
+          : code.startsWith('WRITE_LOCKED')
+            ? 'edit.writeLocked'
+            : 'logbook.importFailed';
+      f7.dialog.create({ title: t('logbook.importTitle'), text: t(key), buttons: [{ text: t('dialog.ok') }] }).open();
+    } finally {
+      importing = false;
+    }
   }
 
   /** iOS "+": the choices in an action sheet. */
@@ -343,7 +405,7 @@
     {#if theme.ios}
       <List inset strong dividers class="empty-choices">
         {#each emptyChoices as c, i (c.key)}
-          <ListItem link="/add/{c.key}/" title={c.text} class={i === 0 ? 'first' : ''} noChevron>
+          <ListItem link="#" title={c.text} class={i === 0 ? 'first' : ''} noChevron onClick={() => choose(c.key)}>
             {#snippet media()}<Icon name={c.icon} size={22} />{/snippet}
           </ListItem>
         {/each}
@@ -353,9 +415,9 @@
         <a href="/add/download/" class="filled">
           <Icon name="download" size={18} weight={2} />{t('logbook.emptyPair')}
         </a>
-        <a href="/add/import/" class="od-outlined-button">{t('logbook.addImport')}</a>
-        <a href="/add/divelogs/" class="od-outlined-button">{t('logbook.emptyDivelogs')}</a>
-        <a href="/add/manual/" class="od-text-button">{t('logbook.addManual')}</a>
+        <button type="button" class="od-outlined-button" onclick={() => choose('import')}>{t('logbook.addImport')}</button>
+        <a href="/welcome/import/" class="od-outlined-button">{t('logbook.emptyDivelogs')}</a>
+        <a href="/dive/new/" class="od-text-button">{t('logbook.addManual')}</a>
       </div>
     {/if}
     <p class="empty-note">{t('logbook.emptyNote')}</p>
@@ -395,7 +457,11 @@
   {/if}
 
   <!-- Not reported by the core yet: logbook.conflict stays null (see the report). -->
-  <ConflictSheet conflict={logbook.conflict} oncompare={() => {}} onchoose={() => {}} />
+  <ConflictSheet conflict={logbook.conflict} onchoose={resolveConflict} />
+
+  <!-- The file picker of "Import a file" (hidden; any file: the core tells what it can read). -->
+  <input type="file" class="od-sr-only" tabindex="-1" aria-hidden="true" bind:this={fileInput} onchange={fileChosen} />
+  {#if importing}<p class="od-sr-only" role="status">{t('logbook.importing')}</p>{/if}
 
   {#snippet fixedContent()}
     {#if !theme.ios && logbook.dives.length}
