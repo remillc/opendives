@@ -11,7 +11,7 @@
   import { logbook } from '../lib/logbook.svelte.js';
   import { planner, setting, setSetting, resetSettings } from '../lib/planner.svelte.js';
   import { confirmAction } from '../lib/dialogs.js';
-  import { formatNumber, depthUnit } from '../lib/format.js';
+  import { locale, depthUnit } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
 
   // The units when the screen opens; the fields are built for them.
@@ -36,7 +36,12 @@
 
   /** @param {number} value @param {number} decimals */
   function show(value, decimals = 0) {
-    return formatNumber(value, decimals).replace(/\s/g, '');
+    // No thousands separator: "2,901" would read back as 2.901.
+    return new Intl.NumberFormat(locale, {
+      useGrouping: false,
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals,
+    }).format(value);
   }
 
   /**

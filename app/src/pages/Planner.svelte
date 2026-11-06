@@ -389,6 +389,7 @@
     }
 
     .source {
+      width: auto;
       margin: 0 16px;
       min-height: 72px;
       padding: 8px 16px;
