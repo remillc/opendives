@@ -136,7 +136,7 @@
     "conditions": "Conditions",
     "conditionNames": {
       "visibility": "Visibility",
-      "wavesize": "Wave size",
+      "wavesize": "Surface waves",
       "current": "Current",
       "surge": "Surge",
       "chill": "Chill"
@@ -206,9 +206,236 @@
   },
   "settings": {
     "title": "Settings",
-    "comingSoon": "Settings will appear here.",
-    "extraConditions": "Wave size, surge and chill",
-    "extraConditionsText": "Adds these three conditions when editing a dive. Off by default, as in Subsurface"
+    "search": "Search settings",
+    "noResult": "No setting matches “{text}”",
+    "system": "System",
+    "error": "The setting could not be saved",
+    "defaults": "Default values",
+    "defaultValue": "Default {value}",
+    "groups": {
+      "language": "Language and formats",
+      "units": "Units",
+      "logbook": "Logbook",
+      "equipment": "Equipment",
+      "profile": "Dive profile",
+      "deco": "Decompression",
+      "partialPressures": "Partial pressures",
+      "rebreather": "Rebreather",
+      "computers": "Dive computers",
+      "display": "Display",
+      "maps": "Offline maps",
+      "advanced": "Advanced"
+    },
+    "language": {
+      "label": "App language",
+      "systemText": "{language}, as the device"
+    },
+    "dateFormat": {
+      "label": "Date format"
+    },
+    "timeFormat": {
+      "label": "Time format",
+      "h24": "24-hour",
+      "h12": "12-hour",
+      "text": "{name}, {example}"
+    },
+    "unitSystem": {
+      "label": "Unit system",
+      "metric": "Metric",
+      "imperial": "Imperial",
+      "personalize": "Personalised",
+      "note": "Metric and Imperial set every unit at once. Changing one unit switches to Personalised."
+    },
+    "depth": "Depth",
+    "meters": "Metres",
+    "feet": "Feet",
+    "pressure": "Pressure",
+    "volume": "Volume",
+    "liters": "Litres",
+    "cubicFeet": "Cubic feet",
+    "temperature": "Temperature",
+    "weight": "Weight",
+    "verticalSpeed": {
+      "label": "Ascent and descent speeds",
+      "perMinute": "Per minute",
+      "perSecond": "Per second",
+      "perMinuteValue": "per minute",
+      "perSecondValue": "per second"
+    },
+    "duration": {
+      "label": "Duration",
+      "mixed": "Automatic",
+      "mixedText": "In minutes under an hour, otherwise in hours and minutes",
+      "hours": "Hours and minutes",
+      "hoursText": "Always in hours and minutes",
+      "minutes": "Minutes",
+      "minutesText": "Always in minutes"
+    },
+    "coordinates": {
+      "label": "GPS coordinates",
+      "decimal": "Decimal",
+      "minutes": "Degrees, minutes",
+      "seconds": "Degrees, minutes, seconds"
+    },
+    "autogroup": {
+      "label": "Group dives into trips",
+      "text": "Saved in the logbook, shared with your other devices"
+    },
+    "invalidDives": {
+      "label": "Show invalid dives",
+      "text": "For example pool dives marked invalid"
+    },
+    "extraConditions": {
+      "label": "Surface waves, surge and chill",
+      "text": "Adds these three conditions when editing a dive"
+    },
+    "salinity": {
+      "label": "Edit water salinity",
+      "text": "Otherwise the water type comes from the dive computer"
+    },
+    "defaultCylinder": {
+      "label": "Default cylinder",
+      "text": "Added to dives logged by hand",
+      "none": "None"
+    },
+    "unusedTanks": {
+      "label": "Show unused cylinders",
+      "text": "And include them in export, copy and merge"
+    },
+    "standardSizes": {
+      "label": "Offer standard sizes",
+      "text": "When choosing the type of a cylinder"
+    },
+    "cylinderTypes": {
+      "label": "Cylinder types",
+      "text": "Add, rename, remove"
+    },
+    "averageDepth": "Mean depth",
+    "depthGrid": {
+      "label": "Depth grid",
+      "text": "Or by multiples of 3: 3, 6, 15",
+      "textThree": "Or by 1, 2, 5 or 10",
+      "standard": "1, 2, 5, 10",
+      "three": "3, 6, 15",
+      "standardText": "Lines at 1, 2, 5 or 10",
+      "threeText": "Lines at multiples of 3"
+    },
+    "dcCeiling": "Ceiling from the dive computer",
+    "redCeiling": "Ceiling in red",
+    "calcCeiling": {
+      "label": "Calculated ceiling",
+      "text": "With the decompression model below"
+    },
+    "tankbar": {
+      "label": "Tank bar",
+      "text": "Under the profile, shows which cylinder is in use at each moment"
+    },
+    "deco": {
+      "warning": "These settings change the stops and limits the app calculates. Badly chosen values expose you to decompression sickness. Only change them if you know what you are doing.",
+      "model": "Model",
+      "orVpmb": "Or VPM-B",
+      "orBuehlmann": "Or Bühlmann ZH-L16",
+      "buehlmann": "Bühlmann ZH-L16",
+      "vpmb": "VPM-B",
+      "gf": "Gradient factors",
+      "gfText": "GF low / GF high, from 10 to 150 %",
+      "gfDialog": "In percent. Used by the Bühlmann model.",
+      "gfLow": "GF low",
+      "gfHigh": "GF high",
+      "vpmbConservatism": "VPM-B conservatism",
+      "vpmbText": "Only used with VPM-B",
+      "vpmbDialog": "From 0 to +4. The higher the value, the longer the stops.",
+      "o2narcotic": "Narcotic oxygen",
+      "o2narcoticText": "Counted in the equivalent narcotic depth (END)",
+      "bestMixEnd": "Best mix maximum END",
+      "bestMixEndDialog": "Largest equivalent narcotic depth allowed when choosing the best mix.",
+      "note": "Used by the calculated ceiling of the profile, the planner, desaturation and the gas calculator."
+    },
+    "pp": {
+      "po2": "pO₂ thresholds",
+      "po2Text": "Minimum and maximum",
+      "po2Dialog": "In bar. The pO₂ graph of the profile is coloured outside these limits.",
+      "minimum": "Minimum",
+      "maximum": "Maximum",
+      "pn2": "pN₂ threshold",
+      "phe": "pHe threshold",
+      "thresholdDialog": "In bar. The profile graph is coloured above this threshold.",
+      "mod": "pO₂ for the maximum operating depth (MOD)",
+      "modDialog": "In bar. Used to calculate the maximum operating depth of a gas."
+    },
+    "rebreather": {
+      "setpoint": "Default setpoint (CCR)",
+      "setpointText": "Used by the planner",
+      "setpointDialog": "In bar.",
+      "sensors": "Show O₂ sensors",
+      "setpoints": "Show setpoints",
+      "ocDiluent": "Open-circuit gas as diluent",
+      "o2consumption": "Metabolic O₂ consumption (pSCR)",
+      "o2consumptionDialog": "In litres per minute.",
+      "dilution": "Dilution ratio (pSCR)",
+      "dilutionDialog": "One part dumped for N parts breathed (1:N).",
+      "ocPo2": "Equivalent open-circuit pO₂ (pSCR)"
+    },
+    "computers": {
+      "remembered": "Remembered",
+      "none": "No remembered dive computer",
+      "more": "More options for {name}",
+      "rename": "Rename",
+      "forgetOne": "Forget this computer",
+      "forgetOneTitle": "Forget {name}?",
+      "forgetOneText": "It will no longer be offered for download. Dives already downloaded do not change.",
+      "showAll": "Show all Bluetooth devices",
+      "showAllText": "Even those not recognised as dive computers",
+      "forgetAll": "Forget remembered dive computers",
+      "forgetAllTitle": "Forget remembered dive computers?",
+      "forgetAllText": "They will no longer be offered for download. Dives already downloaded do not change.",
+      "forget": "Forget"
+    },
+    "display": {
+      "theme": "Theme",
+      "themeText": "Light or dark, as the device",
+      "light": "Light",
+      "dark": "Dark",
+      "textSize": "Text size",
+      "textSizeValue": "As the device"
+    },
+    "maps": {
+      "regions": "Downloaded regions",
+      "none": "None"
+    },
+    "advanced": {
+      "resetText": "Goes back to the default values for every setting of this device",
+      "reset": "Reset all settings",
+      "resetTitle": "Reset all settings?",
+      "resetConfirm": "Every setting of this device goes back to Subsurface’s default value. Dives do not change.",
+      "resetAction": "Reset",
+      "note": "Planning parameters (rates, reserve, SAC, ppO₂, deco) and trip grouping are not changed."
+    },
+    "cylinders": {
+      "title": "Cylinder types",
+      "intro": "Offered when choosing the type of a cylinder. Renaming a type also renames the cylinders of that type in the logbook. Changing its size or removing it does not change existing dives.",
+      "yours": "Your types",
+      "standard": "Standard",
+      "standardNote": "Tap a type to open its sheet (name, volume, working pressure). A standard type can be changed like the others.",
+      "hidden": "Standard sizes are hidden: the “Offer standard sizes” setting is off.",
+      "add": "Add a type",
+      "newTitle": "New type",
+      "editTitle": "Cylinder type",
+      "name": "Name",
+      "volume": "Volume ({unit})",
+      "pressure": "Working pressure ({unit})",
+      "pressureHelp": "Optional for a volume in litres",
+      "delete": "Remove this type",
+      "deleteTitle": "Remove {name}?",
+      "deleteText": "The type is no longer offered. Existing dives do not change.",
+      "deleteAction": "Remove",
+      "fromLogbook": "This type comes from the dives of the logbook. It stays offered while a dive uses it.",
+      "nameInUse": "This name is already a type",
+      "nameMissing": "Enter a name",
+      "volumeInvalid": "Enter a volume greater than 0",
+      "pressureInvalid": "Enter a valid pressure",
+      "renamed": "Type renamed"
+    }
   },
   "gas": {
     "air": "Air",

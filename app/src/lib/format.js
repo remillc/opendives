@@ -4,8 +4,9 @@
 // display time, never in the data.
 
 import { t } from './i18n.js';
+import { settings } from './settings.svelte.js';
 
-/** @typedef {import('opendives-core').Prefs} Prefs */
+/** Units only: the full preferences (logbook.prefs) can be passed. @typedef {import('opendives-core').Units} Prefs */
 
 /** Device language; formats follow it (decimal comma in French). */
 export const locale = typeof navigator !== 'undefined' ? navigator.language : 'fr';
@@ -59,9 +60,18 @@ export function formatDepth(mm, prefs) {
   return `${depthValue(mm, prefs)}${NBSP}${depthUnit(prefs)}`;
 }
 
-/** Dive duration: whole minutes. @param {number} seconds */
-export function formatDuration(seconds) {
-  return `${formatNumber(Math.round(seconds / 60), 0)}${NBSP}${t('units.minutes')}`;
+/**
+ * Dive duration in whole minutes, as the Duration setting says (the core's
+ * units.duration_units): automatic, "45 min" under an hour and "1:12" from an
+ * hour, always hours and minutes ("0:45"), or always minutes ("72 min").
+ * @param {number} seconds
+ * @param {'mixed'|'minutes'|'hours'} [mode]
+ */
+export function formatDuration(seconds, mode = settings.duration) {
+  const minutes = Math.round(seconds / 60);
+  if (mode === 'hours' || (mode === 'mixed' && minutes >= 60))
+    return `${Math.floor(minutes / 60)}:${String(minutes % 60).padStart(2, '0')}`;
+  return `${formatNumber(minutes, 0)}${NBSP}${t('units.minutes')}`;
 }
 
 /** Time under water in hours and minutes, for totals: "11 h 26", "0 h 56". @param {number} seconds */
@@ -153,6 +163,7 @@ export function formatPercent(permille) {
 // shown in UTC so that it is never shifted.
 const dateTimeFormat = new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeStyle: 'short', timeZone: 'UTC' });
 const longDateFormat = new Intl.DateTimeFormat(locale, { dateStyle: 'long', timeZone: 'UTC' });
+const dateOnlyFormat = new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeZone: 'UTC' });
 const fullFormat = new Intl.DateTimeFormat(locale, { dateStyle: 'full', timeStyle: 'short', timeZone: 'UTC' });
 
 /** @param {string} iso */
@@ -160,9 +171,52 @@ function toDate(iso) {
   return new Date(`${iso}Z`);
 }
 
-/** Short date and time, for a list row. @param {string} iso */
+/** @type {Map<string, Intl.DateTimeFormat>} */
+const chosenFormats = new Map();
+
+/** @param {string} key @param {Intl.DateTimeFormatOptions} options */
+function chosenFormat(key, options) {
+  let f = chosenFormats.get(key);
+  if (!f) {
+    f = new Intl.DateTimeFormat(locale, { ...options, timeZone: 'UTC' });
+    chosenFormats.set(key, f);
+  }
+  return f;
+}
+
+/**
+ * A date in one of the formats of the "Date format" setting: the device's
+ * short format, 2026-11-06, 6 nov. 2026, 06/11/2026 or 11/06/2026.
+ * @param {Date} date read in UTC (see toDate)
+ * @param {'system'|'iso'|'medium'|'dmy'|'mdy'} choice
+ */
+export function formatDateChoice(date, choice) {
+  const y = String(date.getUTCFullYear());
+  const m = String(date.getUTCMonth() + 1).padStart(2, '0');
+  const d = String(date.getUTCDate()).padStart(2, '0');
+  if (choice === 'iso') return `${y}-${m}-${d}`;
+  if (choice === 'dmy') return `${d}/${m}/${y}`;
+  if (choice === 'mdy') return `${m}/${d}/${y}`;
+  if (choice === 'medium') return chosenFormat('medium', { day: 'numeric', month: 'short', year: 'numeric' }).format(date);
+  return chosenFormat('short', { dateStyle: 'short' }).format(date);
+}
+
+/**
+ * A time of day as the "Time format" setting says: the device's, 24-hour or 12-hour.
+ * @param {Date} date read in UTC
+ * @param {'system'|'24'|'12'} choice
+ */
+export function formatTimeChoice(date, choice) {
+  if (choice === 'system') return timeFormat.format(date);
+  return chosenFormat(`time${choice}`, { hour: 'numeric', minute: '2-digit', hour12: choice === '12' }).format(date);
+}
+
+/** Short date and time, for a list row, in the formats chosen in Settings. @param {string} iso */
 export function formatDateTime(iso) {
-  return dateTimeFormat.format(toDate(iso));
+  if (settings.dateFormat === 'system' && settings.timeFormat === 'system') return dateTimeFormat.format(toDate(iso));
+  const date = toDate(iso);
+  const day = settings.dateFormat === 'system' ? dateOnlyFormat.format(date) : formatDateChoice(date, settings.dateFormat);
+  return `${day} ${formatTimeChoice(date, settings.timeFormat)}`;
 }
 
 /** Long date without the time: "2 février 2013", "1er juillet 2016". @param {string} iso */
@@ -199,7 +253,7 @@ export function formatDiveDay(iso) {
  * @param {number} [afterSeconds]
  */
 export function formatTimeOfDay(iso, afterSeconds = 0) {
-  return timeFormat.format(new Date(toDate(iso).getTime() + afterSeconds * 1000));
+  return formatTimeChoice(new Date(toDate(iso).getTime() + afterSeconds * 1000), settings.timeFormat);
 }
 
 /**

@@ -62,7 +62,7 @@ int main(int argc, char **argv)
 	check("best He at 50 m", number(json, "bestHe"), 340);
 	check("bad gas refused", opendives::gas_calculator(800, 300, 1400, 30000, json, error), -1);
 
-	opendives::cylinder_types(json);
+	opendives::gas_cylinder_types(json);
 	check_true("cylinder types listed", json.find("\"name\":\"AL80\"") != std::string::npos);
 
 	// Desaturation with nothing loaded: tissues at rest, (1.013 - 0.0627) * 0.781

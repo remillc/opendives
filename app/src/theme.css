@@ -48,6 +48,9 @@
     --od-thumbnail-background: var(--od-surface);
     /* Android side menu (MD3 surface-container-low); iOS uses --od-surface. */
     --od-drawer: #F0F0EE;
+    /* Dialogs (MD3 surface-container-high) and the scrim under them. */
+    --od-dialog: #F0F0EE;
+    --od-scrim: rgb(0 0 0 / 0.32);
   }
 
   /* Dark mode: system surfaces from Framework7, bright water with an outlined line. */
@@ -74,6 +77,7 @@
     --od-oxygen: #7FD283;
     --od-thumbnail-background: var(--f7-md-surface-variant);
     --od-drawer: var(--f7-md-surface-1);
+    --od-dialog: var(--f7-md-surface-3);
   }
 }
 

@@ -89,13 +89,64 @@ import { registerPlugin } from '@capacitor/core';
  */
 
 /**
- * Units of the log, one per quantity.
- * @typedef {Object} Prefs
+ * Units, one per quantity (Subsurface's preferences; the log's when it has a
+ * "units" line).
+ * @typedef {Object} Units
  * @property {'m'|'ft'} length
  * @property {'C'|'F'} temperature
  * @property {'bar'|'psi'} pressure
  * @property {'l'|'cuft'} volume
  * @property {'kg'|'lbs'} weight
+ */
+
+/**
+ * The core's preferences shown in Settings (core/pref.h), in integer units;
+ * the keys accepted by setPrefs.
+ * @typedef {Units & {
+ *   unitSystem: 'metric'|'imperial'|'personalize',
+ *   verticalSpeed: 'min'|'s',
+ *   duration: 'mixed'|'minutes'|'hours',
+ *   dateFormat: string, dateFormatOverride: boolean,
+ *   timeFormat: string, timeFormatOverride: boolean,
+ *   displayInvalidDives: boolean, extraEnvironmental: boolean, salinityEdit: boolean,
+ *   defaultCylinder: string, includeUnusedTanks: boolean, displayDefaultTankInfos: boolean,
+ *   showAverageDepth: boolean, threeMGrid: boolean, dcCeiling: boolean, redCeiling: boolean,
+ *   calcCeiling: boolean, tankbar: boolean,
+ *   decoModel: 'buehlmann'|'vpmb', gfLow: number, gfHigh: number, vpmbConservatism: number,
+ *   o2narcotic: boolean, bestMixEndMm: number,
+ *   po2MinMbar: number, po2MaxMbar: number, pn2Mbar: number, pheMbar: number, modPo2Mbar: number,
+ *   setpointMbar: number, showCcrSensors: boolean, showCcrSetpoint: boolean,
+ *   allowOcGasAsDiluent: boolean, showScrOcPo2: boolean,
+ *   o2ConsumptionMlMin: number, pscrRatio: number,
+ * }} CorePrefValues
+ */
+
+/**
+ * @typedef {CorePrefValues & {
+ *   autogroup?: boolean,
+ *   diveComputers?: {slot: number, vendor: string, product: string, device: string, name: string}[],
+ *   planner?: {bottomPo2Mbar: number, decoPo2Mbar: number, bottomSacMlMin: number, decoSacMlMin: number},
+ *   defaults?: CorePrefValues,
+ * }} Prefs
+ * `autogroup` is the log's; `diveComputers` the remembered ones; `defaults`
+ * Subsurface's default of each value.
+ */
+
+/**
+ * @typedef {Object} CylinderType
+ * @property {string} name
+ * @property {number} ml
+ * @property {number} mbar working pressure; 0 when unknown
+ * @property {boolean} standard in the core's default list
+ * @property {boolean} library in the device's library (can be removed)
+ */
+
+/**
+ * @typedef {Object} CylinderTypes
+ * @property {CylinderType[]} types the runtime table, sorted by name
+ * @property {string[]} library the device's library, to keep as is and set again at start
+ * @property {string} undo
+ * @property {string} redo
  */
 
 /**
@@ -162,7 +213,7 @@ import { registerPlugin } from '@capacitor/core';
  */
 
 /**
- * @typedef {Object} CylinderTypes
+ * @typedef {Object} GasCylinderTypes
  * @property {string} default the default cylinder preference; empty when none
  * @property {{name: string, ml: number, workingPressureMbar: number}[]} types
  */
@@ -187,6 +238,7 @@ import { registerPlugin } from '@capacitor/core';
  * @property {DiveDetail} [dive] the dive after a dive step
  * @property {SiteDetail} [site] the site after a site step
  * @property {TripDetail} [trip] the trip after a trip step
+ * @property {{types: CylinderType[], library: string[]}} [cylinderTypes] after a cylinder type rename
  * @property {string} undo text of the step that Undo would revert ("Edit notes [#12]"); empty when none
  * @property {string} redo text of the step that Redo would apply; empty when none
  */
@@ -225,13 +277,14 @@ import { registerPlugin } from '@capacitor/core';
  *   offline} at lat/lon in the language text (Nominatim, else offline Natural Earth), or null.
  * @property {(options: {kind: 'gas'|'cylinders'|'desaturation', o2?: number, he?: number, po2?: number, depth?: number}) => Promise<any>} toolQuery
  *   Read-only tools (opendives.h): gas, a GasResult (o2, he per mille, po2 in mbar,
- *   planned depth in mm; rejects with BAD_REQUEST); cylinders, the CylinderTypes;
+ *   planned depth in mm; rejects with BAD_REQUEST); cylinders, the GasCylinderTypes;
  *   desaturation, the Desaturation now.
  * @property {(options: {action: 'create'|'edit'|'geocode'|'merge'|'delete'|'deleteSite', uuid?: number, other?: number, uuids?: number[], field?: string, value?: string, lat?: number, lon?: number}) => Promise<EditResult>} siteAction
  *   One undoable site change, as Subsurface's site commands.
  * @property {(options: {tripId: number}) => Promise<TripDetail>} getTrip
- * @property {(options: {action: 'location'|'notes'|'remove'|'split'|'merge'|'add'|'ungroup', tripId?: number, diveId?: number, otherId?: number, diveIds?: number[], value?: string}) => Promise<EditResult>} tripAction
- *   One undoable trip change, as Subsurface's trip commands.
+ * @property {(options: {action: 'location'|'notes'|'remove'|'split'|'merge'|'add'|'ungroup'|'autogroup', tripId?: number, diveId?: number, otherId?: number, diveIds?: number[], value?: string}) => Promise<EditResult>} tripAction
+ *   One undoable trip change, as Subsurface's trip commands; "autogroup" (value "on" or
+ *   "off") sets the log's trip grouping, as Subsurface's View > Autogroup.
  * @property {() => Promise<Dive[]>} listLoadedDives
  *   The dives of the log in memory, without loading anything.
  * @property {() => Promise<void>} saveLocal
@@ -241,7 +294,12 @@ import { registerPlugin } from '@capacitor/core';
  * @property {(options: {id: number}) => Promise<DiveDetail>} getDive
  *   Detail of one dive of the last loaded log.
  * @property {() => Promise<Prefs>} getPrefs
- *   Units of the last loaded log.
+ *   The core's preferences: units (the loaded log's when it has them), the Settings values.
+ * @property {(options: {changes: Partial<CorePrefValues> & {forgetDiveComputer?: number}}) => Promise<void>} setPrefs
+ *   Sets core preferences (set_prefs in opendives.h); a device setting, kept by the app.
+ * @property {(options: {action: 'list'|'library'|'add'|'size'|'remove'|'rename', name?: string, value?: string, ml?: number, mbar?: number}) => Promise<CylinderTypes>} cylinderTypes
+ *   Cylinder types of Settings; "rename" (to value) changes the log as one undoable step,
+ *   "library" sets the device's library (value: JSON {"library": [...]}).
  */
 
 /** @type {any} */
@@ -307,5 +365,12 @@ export const OpenDivesCore = {
     return JSON.parse((await native.syncChanges()).json);
   },
   getDive: (options) => native.getDive(options),
-  getPrefs: () => native.getPrefs(),
+  async getPrefs() {
+    return JSON.parse((await native.getPrefs()).json);
+  },
+  setPrefs: (options) => native.setPrefs(options),
+  async cylinderTypes(options) {
+    const result = JSON.parse((await native.cylinderTypes(options)).json);
+    return { ...result.cylinderTypes, undo: result.undo, redo: result.redo };
+  },
 };

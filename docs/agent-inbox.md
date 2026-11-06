@@ -124,15 +124,21 @@ Rules for this task:
 - Anything that writes to a cloud account runs on `OPENDIVES_CLOUD_TEST_EMAIL` only.
 - Report, at the end, which screens are built, which are partial and why.
 
-## [ ] 2026-11-06-16 Settings modelled on Subsurface
+## [x] 2026-11-06-16 Settings modelled on Subsurface
+
+Done in Rebuild Settings modelled on Subsurface
 
 Rebuild Settings from `docs/mockups/android-reglages.dc.html` and `docs/ui-specification.md`, section 4, "Settings, modelled on Subsurface" (it supersedes the settings part of task 12 and the old settings boards). Read and write each value through the core's preferences (`core/pref.h`), with Subsurface's defaults; keep them per device, except trip grouping, which is the logbook's `autogroup`. Do not move planner settings here: they belong to the planner screen. Rename the conditions to Subsurface's French labels ("Vagues de surface", "Flux-reflux", "Froid") in `fr.json`. Do this task before task 15.
 
-## [ ] 2026-11-06-17 Settings: behaviour of every row
+## [x] 2026-11-06-17 Settings: behaviour of every row
+
+Done in Rebuild Settings modelled on Subsurface
 
 Part of task 16. Wire every Settings row as in `docs/ui-specification.md`, section 4, "Settings: what each row does": the four row kinds (switch, single-choice dialog, number dialog, chevron), the two action buttons with their confirmation dialogs, the ⋮ menu of a remembered dive computer, and the cylinder types sub-screen. Mock-ups: `docs/mockups/android-reglages.dc.html`, `reglages-choix-android.dc.html`, `reglages-nombre-android.dc.html`, `reglages-menu-android.dc.html`, `reglages-bouteilles-android.dc.html`. Check each preference name in `core/pref.h` before using it; if one in the table does not exist or behaves differently, stop and ask Christian. The offline maps sub-screen is not designed yet: leave the row disabled.
 
-## [ ] 2026-11-06-18 Settings: dialogs and layout, updated
+## [x] 2026-11-06-18 Settings: dialogs and layout, updated
+
+Done in Rebuild Settings modelled on Subsurface
 
 Follow the updated paragraph "Settings: what each row does" in `docs/ui-specification.md`, section 4 (it replaces the earlier version used by task 17): chevrons on value rows, date choices shown as dates with the device's format first, wheel pickers instead of number fields, the speeds / duration / coordinates dialogs, the split Units group, and the layout rules. Mock-ups: `docs/mockups/android-reglages.dc.html` and `docs/mockups/reglages-*-android.dc.html`.
 
@@ -173,7 +179,9 @@ The iPhone screens of the Statistics section are updated to match task 22: `docs
 
 Follow "Tools" in `docs/ui-specification.md`, section 4. Build the Desaturation screen (`docs/mockups/outils-desaturation-android.dc.html`) with the core's tissue model (no new formula: if the core does not expose tissue loads after the last dives, stop and ask Christian), and add the cylinder type, EAD at the MOD and END at the MOD to the gas calculator (`android-outils.dc.html`), computed by the core's gas functions. The wait-before-flying rule is OpenDives' own: 12 h after one dive, 18 h after several dives in a day; show it as a recommendation, never as a guarantee.
 
-## [ ] 2026-11-06-25 Settings: Décompression group
+## [x] 2026-11-06-25 Settings: Décompression group
+
+Done in Rebuild Settings modelled on Subsurface
 
 Add the "Décompression" group to Settings, after "Profil de plongée" (`docs/mockups/android-reglages.dc.html`, rows in the settings table of `docs/ui-specification.md`): model, gradient factors, VPM-B conservatism, oxygen narcotic, best-mix END. They are shared by the profile's calculated ceiling, the planner, the desaturation tool and the gas calculator: read them from the same preferences everywhere, and remove any copy of them from the planner's own settings. One model setting drives both `display_deco_mode` and `planner_deco_mode`.
 

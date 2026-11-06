@@ -24,9 +24,48 @@ bool log_exists(const std::string &repo);
 // Identifiers are only valid until the next load.
 int get_dive(int id, std::string &json, std::string &error);
 
-// Units of the log, one per quantity: {"length":"m"|"ft", "temperature":"C"|"F",
-// "pressure":"bar"|"psi", "volume":"l"|"cuft", "weight":"kg"|"lbs"}.
+// --- Settings (settings.cpp; spec, section 4, "Settings, modelled on Subsurface")
+//
+// The core's preferences (core/pref.h) shown in Settings, in integer units:
+// {"length":"m"|"ft", "temperature":"C"|"F", "pressure":"bar"|"psi",
+//  "volume":"l"|"cuft", "weight":"kg"|"lbs", "unitSystem", "verticalSpeed",
+//  "duration", the other keys accepted by set_prefs, "autogroup" (the log's),
+//  "diveComputers":[{"slot", "vendor", "product", "device", "name"}],
+//  "planner":{planner-only values}, "defaults":{Subsurface's default of each
+//  key accepted by set_prefs}}.
 int get_prefs(std::string &json);
+
+// Sets preferences from a flat object whose keys are those of get_prefs
+// (strings, integers, booleans); unknown keys are BAD_REQUEST and nothing
+// changes. Changing one unit sets the unit system to "personalize", as in
+// Subsurface; "unitSystem" "metric" or "imperial" sets the five units.
+// "decoModel" sets display_deco_mode and planner_deco_mode together.
+// "forgetDiveComputer": slot 1 to 4, or 0 for all of them (Subsurface-mobile's
+// "Forget remembered dive computers"). These are settings of the device: the
+// app keeps them and sets them again at each start. The units, the tank bar,
+// the dive computer's ceiling and the rebreather displays are also written in
+// the log by save-git, and the log's values are applied after each load
+// (apply_log_prefs), as Subsurface-mobile does.
+int set_prefs(const std::string &changes_json, std::string &error);
+
+// Cylinder types (Settings, "Types de bouteilles"), as Subsurface's "Manage
+// cylinder types" (qt-models/tankinfomodel.cpp): the runtime table (the
+// device's library, if "displayDefaultTankInfos", plus the types the log
+// uses), each {"name", "ml", "mbar", "standard" (in the core's default list),
+// "library" (in the device's library: can be removed)}, and the device's
+// library itself as it is stored, one string per type, "name\tml\tbar\tcuft\tpsi":
+// {"types":[…], "library":[…]}.
+int cylinder_types(std::string &json);
+// The device's library, {"library":[…]} as cylinder_types() writes it, set
+// again at start (Subsurface keeps it in its settings); rebuilds the table.
+int set_cylinder_library(const std::string &library_json, std::string &error);
+// action: "add" (a new type `name` of `ml` and `mbar`; NAME_IN_USE), "size"
+// (`ml` and `mbar` of the type `name`, in the table and, if it is there, in the
+// library), "remove" (from the library and the table, and as the default
+// cylinder; only a library type). Writes cylinder_types(). Renaming changes
+// the log: see cylinder_type_rename().
+int cylinder_type_action(const std::string &action, const std::string &name, int ml, int mbar, std::string &json,
+			 std::string &error);
 
 // After a load: copies the settings read from the log (units, etc.) into the
 // preferences, like Subsurface-mobile (QMLManager::consumeFinishedLoad).
@@ -135,6 +174,19 @@ int trip_split_at(int dive_id, std::string &json, std::string &error); // this d
 int trips_merge(int trip_id, int other_id, std::string &json, std::string &error);
 int trip_add_dives(int trip_id, const std::vector<int> &dive_ids, std::string &json, std::string &error);
 int trip_ungroup(int trip_id, std::string &json, std::string &error);
+// "Group dives into trips" (the log's autogroup), as Subsurface desktop's
+// View > Autogroup: sets the flag, then one undoable step, AutogroupDives when
+// on, RemoveAutogenTrips when off (no step when no dive moves; the flag itself
+// is not undone, as in Subsurface). Writes the trip of the first dive moved,
+// {"tripId":0} when none.
+int trips_autogroup(bool on, std::string &json, std::string &error);
+
+// Renames a cylinder type, as Subsurface's RenameCylinderType: the cylinders
+// of that type in the log, the runtime table and the device's library; one
+// undoable step. NAME_IN_USE when the new name is already a type. Writes
+// cylinder_types().
+int cylinder_type_rename(const std::string &old_name, const std::string &new_name, std::string &json,
+			 std::string &error);
 
 // Dive sites (spec, section 4, "Sites"), by uuid; each change one undoable
 // step as Subsurface's site commands. Coordinates in micro-degrees.
@@ -181,9 +233,9 @@ int dives_without_site(std::string &json);
 int gas_calculator(int o2_permille, int he_permille, int po2_mbar, int planned_depth_mm, std::string &json,
 		   std::string &error);
 
-// Cylinder types offered in Subsurface's lists (formatFullCylinderList):
+// Gas calculator: cylinder types offered in Subsurface's lists (formatFullCylinderList):
 // {"default": prefs.default_cylinder, "types": [{"name", "ml", "workingPressureMbar"}]}.
-int cylinder_types(std::string &json);
+int gas_cylinder_types(std::string &json);
 
 // Tissues at `now` (local wall-clock seconds, as the core's dive times; 0 for
 // the current time), loaded by the core's init_decompression() with the

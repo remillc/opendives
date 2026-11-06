@@ -11,14 +11,28 @@ import en from '../i18n/en.json';
 const catalogs = { fr, en };
 const FALLBACK = 'en';
 
-/** Interface language: the first device language that has a translation. */
-export const language = (() => {
+/** Device language that has a translation, or English. */
+export const deviceLanguage = (() => {
   const preferred = typeof navigator !== 'undefined' ? navigator.languages ?? [navigator.language] : [];
   for (const tag of preferred) {
     const code = tag.toLowerCase().split('-')[0];
     if (code in catalogs) return code;
   }
   return FALLBACK;
+})();
+
+/**
+ * Interface language: the one chosen in Settings ("App language", kept by
+ * settings.svelte.js), else the device's. Changing it restarts the app.
+ */
+export const language = (() => {
+  try {
+    const chosen = JSON.parse(localStorage.getItem('od.appSettings') ?? '{}').language;
+    if (chosen in catalogs) return chosen;
+  } catch {
+    // The device's language.
+  }
+  return deviceLanguage;
 })();
 
 /** Number format: the device's ("1 353" in French). */

@@ -131,7 +131,7 @@ int gas_calculator(int o2_permille, int he_permille, int po2_mbar, int planned_d
 	return 0;
 }
 
-int cylinder_types(std::string &json)
+int gas_cylinder_types(std::string &json)
 {
 	// Port of formatFullCylinderList() (core/string-format.cpp): the cylinder
 	// types used in the log, then the known types, sorted, without duplicates.

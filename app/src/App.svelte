@@ -39,11 +39,15 @@
   import { enableBackButton } from './lib/back-button.js';
   import { enableAccessibility } from './lib/accessibility.js';
   import { t } from './lib/i18n.js';
+  import { settings, applyDeviceSettings } from './lib/settings.svelte.js';
+  import CylinderTypes from './pages/CylinderTypes.svelte';
+  import CylinderType from './pages/CylinderType.svelte';
 
   const f7params = {
     name: 'OpenDives',
     theme: 'auto',
-    darkMode: 'auto',
+    // Settings, Display, Theme: the device's, or light or dark.
+    darkMode: settings.theme === 'system' ? 'auto' : settings.theme === 'dark',
     // Framework7 derives its palette from --od-action (theme.css); the mapped
     // variables in theme.css then take precedence.
     colors: { primary: getComputedStyle(document.documentElement).getPropertyValue('--od-action').trim() },
@@ -53,6 +57,9 @@
       { path: '/', component: Logbook },
       { path: '/dive/:id/', component: DiveDetail },
       { path: '/settings/', component: Settings },
+      { path: '/settings/cylinders/', component: CylinderTypes },
+      { path: '/settings/cylinders/new/', component: CylinderType },
+      { path: '/settings/cylinders/type/', component: CylinderType },
       { path: '/account/', component: Account },
       { path: '/account/delete/', component: DeleteAccount },
       // Signing in and creating an account, from the Account screen without an account.
@@ -92,9 +99,10 @@
     enableBackButton();
     enableAccessibility();
     trackSection();
-    // On the first start and after signing out, first launch is shown and
-    // nothing is loaded until a choice.
-    startApp();
+    // The settings of this device go into the core before anything is read.
+    // Then, on the first start and after signing out, first launch is shown
+    // and nothing is loaded until a choice.
+    applyDeviceSettings().then(() => startApp());
   });
 </script>
 

@@ -48,7 +48,7 @@
   $effect(() => {
     if (logbook.loading) return;
     OpenDivesCore.toolQuery({ kind: 'cylinders' })
-      .then((/** @type {import('opendives-core').CylinderTypes} */ list) => {
+      .then((/** @type {import('opendives-core').GasCylinderTypes} */ list) => {
         cylinders = list.types.map((c) => c.name);
         if (!cylinder || !cylinders.includes(cylinder)) {
           cylinder = cylinders.includes(list.default) ? list.default : cylinders.includes('AL80') ? 'AL80' : (cylinders[0] ?? '');
