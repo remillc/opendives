@@ -91,31 +91,35 @@ export const settings = $state({
 
 /**
  * At start, before the logbook is loaded: the device's values go back into
- * the core, and its cylinder types library.
+ * the core, and its cylinder types library. The calls are sent at once, not
+ * one after the other: the core runs them in the order they were sent, and
+ * each wait would cost a turn of the busy start-up. The returned promise
+ * settles when all are done.
+ * @returns {Promise<void>}
  */
-export async function applyDeviceSettings() {
-  try {
-    if (Object.keys(storedCore).length) await OpenDivesCore.setPrefs({ changes: storedCore });
-  } catch (e) {
-    // A value refused by this core (an older version kept something else): the others are kept.
-    console.error('Restoring the settings of this device', e);
+export function applyDeviceSettings() {
+  /** @type {Promise<unknown>[]} */
+  const calls = [];
+  /**
+   * @param {string} failure
+   * @param {() => Promise<unknown>} call
+   */
+  const send = (failure, call) => calls.push(call().catch((/** @type {unknown} */ e) => console.error(failure, e)));
+  // A value refused by this core (an older version kept something else): the others are kept.
+  if (Object.keys(storedCore).length) {
+    send('Restoring the settings of this device', () => OpenDivesCore.setPrefs({ changes: storedCore }));
   }
   const computers = readJson(COMPUTERS_KEY);
   if (Array.isArray(computers)) {
-    try {
-      await OpenDivesCore.setPrefs({ changes: { diveComputerList: computers } });
-    } catch (e) {
-      console.error('Restoring the dive computers of this device', e);
-    }
+    send('Restoring the dive computers of this device', () => OpenDivesCore.setPrefs({ changes: { diveComputerList: computers } }));
   }
   const library = readJson(LIBRARY_KEY);
   if (Array.isArray(library)) {
-    try {
-      await OpenDivesCore.cylinderTypes({ action: 'library', value: JSON.stringify({ library }) });
-    } catch (e) {
-      console.error('Restoring the cylinder types of this device', e);
-    }
+    send('Restoring the cylinder types of this device', () =>
+      OpenDivesCore.cylinderTypes({ action: 'library', value: JSON.stringify({ library }) }),
+    );
   }
+  return Promise.all(calls).then(() => {});
 }
 
 /**

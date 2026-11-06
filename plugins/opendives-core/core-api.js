@@ -517,6 +517,8 @@ import { registerPlugin } from '@capacitor/core';
  *   The system dialog that turns Bluetooth on.
  * @property {() => Promise<void>} openAppSettings
  *   The app's page of the system settings (a permission refused for good).
+ * @property {() => Promise<void>} contentShown
+ *   The first screen is drawn: the launch screen (splash) can go (Android; no effect elsewhere).
  * @property {(options?: {durationMs?: number}) => Promise<void>} startBluetoothScan
  *   Looks for devices (default 60 s): "bluetoothDevice" events, then "bluetoothScanStopped".
  *   Rejects with NO_BLUETOOTH, BLUETOOTH_OFF, PERMISSION.
@@ -657,6 +659,7 @@ export const OpenDivesCore = {
   requestBluetoothPermission: () => native.requestBluetoothPermission(),
   enableBluetooth: () => native.enableBluetooth(),
   openAppSettings: () => native.openAppSettings(),
+  contentShown: () => native.contentShown(),
   startBluetoothScan: (options = {}) => native.startBluetoothScan(options),
   stopBluetoothScan: () => native.stopBluetoothScan(),
   async bluetoothModels() {

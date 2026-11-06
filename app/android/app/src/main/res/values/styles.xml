@@ -13,6 +13,8 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:background">@null</item>
+        <!-- Between the splash screen and the first paint of the WebView: the app's own background, no white flash. -->
+        <item name="android:windowBackground">@color/splash_background</item>
         <!-- Light backgrounds: dark status bar icons (values-night/styles.xml for dark mode). -->
         <item name="android:windowLightStatusBar">true</item>
     </style>

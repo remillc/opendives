@@ -254,6 +254,26 @@ Checked on the Pixel with the cloud log (1,353 dives).
 - **Known limit:** if the server has new commits, the list is replaced after the sync and dive identifiers change; a detail opened from the old list in the meantime cannot be read again.
 - **Tests:** round trip 97 passed, 1 known failure.
 
+## Start-up time (6 November 2026)
+
+Measured on the emulator (1,353 dives), cold starts after `am force-stop`; times in ms from the process start, medians of 9 to 10 runs. The WebView logs `[perf] name ms` marks (`src/lib/perf.js`, tag Capacitor/Console, ms since the navigation started) and the plugin logs `perf:` lines (tag OpenDives).
+
+| | before | after |
+| --- | --- | --- |
+| Launch screen replaced by the WebView | 720 (then a white WebView until 1,175) | held until the first content is painted: about 1,450 |
+| First content on screen | 1,175 (loading bars) | about 1,450 (the top of the list, 16 rows, real data from the last load) |
+| Real list painted | 1,787 | about 1,800 |
+| Probe of the cloud done | 2,650 | about 1,850 |
+
+The emulator is shared and its speed drifted between sessions (the WebView navigation started at 555 ms before, 700 ms after): measured from the navigation start, the real list is painted at 1,230 before and 1,160 after, the first content at 620 (bars) before and 750 (rows) after.
+
+- **Snapshot** (`lib/snapshot.js`): after each load the first 16 entries (dives and collapsed trips, 12 KB) are kept in `localStorage`; at the next start they are drawn at once, as the same `DiveRow` and `TripRow`, not tappable (their dive identifiers belong to the previous load), then replaced by the virtual list. Forgotten when signing out or deleting the account.
+- **Calls at once** (`boot()` in `lib/logbook.svelte.js`): settings, account, device copy and probe are sent from `main.js`, before the screens are built, in the order the core runs them; the first load takes their answers. Before, each step waited for a turn of the busy main thread.
+- **Plugin:** the certificates and regions work no longer holds the core thread (it took 450 to 600 ms, of which reading Android's store is the main part): the file of the last start is used at once and checked again 20 s later. Calls that reach the network wait for it; the ones that start the logbook do not.
+- **Bundle:** MapLibre (800 KB) is loaded when a map is first shown; the main script went from 2.3 to 1.3 MB.
+- **Launch screen:** kept until the WebView paints its first content (4 s at most), WebView background in the app's colour.
+- **Left as is:** the core reads the 1,353 dives in 380 to 500 ms; the cloud probe (1 to 2.6 s, network).
+
 ## Reproduce
 
 The commands are in [AGENTS.md](../AGENTS.md#commands).

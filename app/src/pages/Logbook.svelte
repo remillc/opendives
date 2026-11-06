@@ -19,6 +19,8 @@
   import { navigation } from '../lib/navigation.svelte.js';
   import { formatDateTime } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
+  import { mark } from '../lib/perf.js';
+  import { buildSnapshot, saveSnapshot } from '../lib/snapshot.js';
   import { offerUndo } from '../lib/undo.js';
   import { Capacitor } from '@capacitor/core';
 
@@ -48,6 +50,16 @@
   /** The dives that match the free filter (all of them without one). */
   const sorted = $derived(filter.ids ? all.filter((d) => filter.ids?.has(d.id)) : all);
   const filtered = $derived(!!filter.ids);
+
+  // The top of the list is kept for the next start (lib/snapshot.js), once the
+  // dives are loaded and the screen is at rest.
+  $effect(() => {
+    if (logbook.loading || logbook.error) return;
+    const list = all;
+    const prefs = logbook.prefs;
+    const timer = setTimeout(() => saveSnapshot(list.length ? buildSnapshot(list, $state.snapshot(prefs)) : null), 1500);
+    return () => clearTimeout(timer);
+  });
 
   // Each load gives new dive identifiers and maybe new values: the criteria
   // are read again and the filter applied again.
@@ -132,6 +144,7 @@
   let listEl = $state();
   /** @type {any} */
   let vl = null;
+  let rowsMarked = false;
   let visible = $state({ items: /** @type {Row[]} */ ([]), topPosition: 0 });
   /** @type {Map<string, number>} */
   const measured = new Map();
@@ -178,6 +191,11 @@
         height: rowHeight,
         renderExternal: (/** @type {any} */ _vl, /** @type {{items: Row[], topPosition: number}} */ data) => {
           visible = { items: data.items, topPosition: data.topPosition };
+          if (data.items.length && !rowsMarked) {
+            rowsMarked = true;
+            mark('rowsRender');
+            requestAnimationFrame(() => requestAnimationFrame(() => mark('rowsPainted')));
+          }
           measure();
         },
       });
@@ -317,8 +335,8 @@
   <Navbar large title={t('logbook.title')}>
     {#snippet left()}<MenuButton />{/snippet}
     <NavRight>
-      {#if logbook.dives.length}
-        <Link iconOnly href="/filter/" class={filtered ? 'filter-on' : ''}>
+      {#if logbook.dives.length || logbook.preview}
+        <Link iconOnly href="/filter/" class="{filtered ? 'filter-on' : ''} {logbook.dives.length ? '' : 'disabled'}">
           <Icon name="filter" /><span class="od-sr-only">{t(filtered ? 'logbook.filterOn' : 'logbook.filter')}</span>
         </Link>
       {/if}
@@ -352,7 +370,29 @@
     {#if logbook.sync === 'offline' || logbook.sync === 'manual'}<SyncStatus sync={logbook.sync} pending={logbook.pending} />{/if}
   {/if}
 
-  {#if logbook.loading}
+  {#if logbook.loading && logbook.preview}
+    <!--
+      Start: the top of the list as it was at the last load, drawn while the
+      core reads the log. Rows cannot be tapped (their identifiers are of
+      the previous load); the real list replaces them.
+    -->
+    <div class="preview" aria-busy="true" aria-label={t('logbook.loading')} role="status">
+      <div aria-hidden="true">
+        <p class="count od-value">{t('logbook.count', { n: logbook.preview.total })}</p>
+        <div class="list media-list chevron-center dividers">
+          <ul>
+            {#each logbook.preview.entries as entry, i (i)}
+              {#if entry.type === 'trip'}
+                <TripRow dives={entry.dives} location={entry.location} prefs={logbook.preview.prefs} expanded={false} ontoggle={() => {}} />
+              {:else}
+                <DiveRow dive={entry.dive} prefs={logbook.preview.prefs} />
+              {/if}
+            {/each}
+          </ul>
+        </div>
+      </div>
+    </div>
+  {:else if logbook.loading}
     <!--
       Loading (spec, section 6): greyed bars in the place and the layout of the
       real rows, with no spinner in the middle; screen readers hear "Loading
@@ -519,6 +559,12 @@
 
     .failed {
       color: var(--od-alarm);
+    }
+
+    /* The snapshot of the start: a picture of the list, nothing to tap yet. */
+    .preview {
+      pointer-events: none;
+      user-select: none;
     }
 
     /* The filter button says when a filter is applied: a tinted circle. */
