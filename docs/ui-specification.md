@@ -188,6 +188,7 @@ Layout: titles sit on the page background, 18 px bold; each group is a white sur
 | Plafond donné par l'ordinateur | switch | on | `dcceiling` |
 | Plafond en rouge | switch | off | `redceiling` |
 | Plafond calculé | switch | off; uses the model of the Décompression group | `calcceiling` |
+| Décompression · warning | note | under the group title, always shown: an outlined note in `--od-alarm` with a warning icon: "Ces réglages changent les paliers et les limites calculés par l’app. Des valeurs mal choisies exposent à un accident de décompression. Ne les modifiez que si vous savez ce que vous faites." | none |
 | Décompression · Modèle | choice | Bühlmann ZH-L16, VPM-B | `display_deco_mode` and `planner_deco_mode` set together |
 | Décompression · Facteurs de gradient | number (two wheels) | GF low 10–150 % (30), GF high 40–150 % (75) | `gflow`, `gfhigh` |
 | Décompression · Conservatisme VPM-B | number (wheel) | 0–4 (+3), shown dimmed with Bühlmann | `vpmb_conservatism` |
