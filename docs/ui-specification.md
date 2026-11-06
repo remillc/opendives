@@ -81,8 +81,8 @@ Width decides the layout, not the type of device: below 768 px wide, phone layou
 
 |  | Phone | Tablet |
 | --- | --- | --- |
-| Main navigation | Top bar and side menu: a ☰ button on the left of the top bar of each section opens a 300 px menu over a dark scrim, with the "OpenDives" header, the four sections, a separator, Settings, and the sync status at the bottom; the active section is highlighted (`--od-tint`, `aria-current="page"`). It closes on a tap on the scrim, a swipe to the left and the system back. Android: MD3 modal navigation drawer; iOS: panel drawn for OpenDives, which keeps the VoiceOver focus inside while open, gives it back to ☰ on close, and never opens from the edge swipe (that stays the back gesture). Pushed screens keep their Back button | iOS: 220 px sidebar; Android: 96 px navigation rail with the Add button at the top |
-| Sections | Logbook, Sites, Statistics, Tools; Settings in the side menu | The same, plus Settings at the bottom of the bar |
+| Main navigation | Top bar with a ☰ button on the left that opens a side menu (iOS and Android, decided on 6 November 2026); no bar at the bottom | iOS: 220 px sidebar; Android: 96 px navigation rail with the "+" button at the top |
+| Sections | Logbook, Sites, Statistics, Tools, then Settings after a separator, in the side menu; the synchronisation state at the bottom of the menu | The same, plus Settings at the bottom of the bar |
 | Logbook | List, then full-screen detail | List (340 px) and detail side by side |
 | Sites | Map, list in a bottom sheet | List on the left, map on the right |
 | Tools | List of tools, then full-screen planner | Parameters on the left, computed plan on the right |
@@ -91,13 +91,13 @@ Width decides the layout, not the type of device: below 768 px wide, phone layou
 
 **Touch targets:** at least 44 × 44 pt on iOS, 48 × 48 dp on Android; 56 px for list rows used on the boat (site choice, buddies).
 
-**Labels of the tablet sidebar (iOS) and navigation rail (Android):** at least 12 px, more than Apple's 10 pt, and they follow the system text size. When they no longer fit, the icon stays alone with its name read by VoiceOver or TalkBack, and a long press shows it large (Large Content Viewer on iOS).
+**Side menu (decided on 6 November 2026, replacing the bottom bar):** the ☰ button only appears on the four sections (Logbook, Sites, Statistics, Tools); a screen opened from a section (detail, planner, editing) has a Back button instead. The menu is 300 px wide and opens over a dark scrim; it closes by tapping the scrim, swiping it to the left or with the system back. Rows of 56 px on Android, 48 px on iOS, labels that follow the system text size; the active section is highlighted in `--od-tint` and announced as the current page. On Android, it is Material 3's modal navigation drawer. On iOS, Apple recommends the tab bar and has no native side menu: OpenDives draws it, and must take care of its accessibility (VoiceOver inside the menu, focus returned to the ☰ button on closing, the edge back gesture must not open it).
 
 **Spacing:** that of Framework7 lists and blocks; 16 px side margins on phones, 24 to 32 px in tablet panes. No cards with shadows: native full-width lists, or iOS grouped lists.
 
 **Back:** the native gesture (swipe from the edge on iOS, system back on Android) works everywhere; a sheet also closes by dragging it down.
 
-**Add (decided on 5 November 2026):** the Logbook no longer has a permanent Download button, which was of little use. Instead, a "+" button (top right of the navigation bar on iOS, opening an action sheet; on Android a floating action button in `secondary-container` whose three labelled choices open above it over a scrim, closing on the scrim, the system back or a choice; at the top of the rail on tablets) opens three choices: download from the dive computer, import a file, log a dive by hand. The empty logbook offers the same choices directly.
+**Add (decided on 5 November 2026):** the Logbook no longer has a permanent Download button, which was of little use. Instead, a "+" button (navigation bar on iOS, floating action button in `secondary-container` on Android, at the top of the rail on tablets) opens three choices: download from the dive computer, import a file, log a dive by hand. The empty logbook offers the same choices directly.
 
 ## 4. Components specific to OpenDives
 
