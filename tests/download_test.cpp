@@ -47,6 +47,8 @@ static std::atomic<bool> cancel_flag { false };
 // A GATT server and an RFCOMM peer played from a script.
 struct FakeTransport : BtTransport {
 	bool connect_ok = true;
+	bool rfcomm_ok = true;
+	int rfcomm_attempts = 0;
 	std::vector<BleService> services;
 	std::vector<std::string> log; // "descriptor <char> <hex>", "write <char> <hex> <mode>", "read <char>"
 	std::deque<std::pair<std::string, Bytes>> incoming;
@@ -113,7 +115,11 @@ struct FakeTransport : BtTransport {
 		}
 	}
 	void ble_close() override { closed = true; }
-	bool rfcomm_connect(const std::string &, int) override { return connect_ok; }
+	bool rfcomm_connect(const std::string &, int) override
+	{
+		rfcomm_attempts++;
+		return rfcomm_ok;
+	}
 	int rfcomm_read(unsigned char *data, size_t size, int) override
 	{
 		if (*cancelled)
@@ -428,6 +434,70 @@ static void test_download_failures()
 	check("diveComputerList set back", again == prefs);
 }
 
+// BLE first, then Bluetooth Classic when the BLE link fails and the device is
+// also paired as Classic (the Perdix has both).
+static void test_fallback()
+{
+	std::string json, error;
+	const std::string perdix = "{\"vendor\":\"Shearwater\",\"product\":\"Perdix\",\"address\":\"LE:00:13:43:0D:72:1C\","
+				   "\"name\":\"Perdix 1ABC\"";
+
+	// BLE cannot connect, Classic can: the download goes on over Classic.
+	FakeTransport t = shearwater_like();
+	t.connect_ok = false;
+	set_bt_transport(&t);
+	events.clear();
+	int rc = opendives::download_dives(perdix + ",\"classicAddress\":\"00:13:43:0D:72:1C\"}", on_progress, nullptr, json,
+					   error);
+	check("BLE fails, Classic paired: retried over Classic", t.rfcomm_attempts == 1);
+	check("progress said retrying", events.find("\"state\":\"retrying\"") != std::string::npos);
+	// The fake Classic peer never answers: the protocol fails, connected.
+	check("over Classic the computer was reached (FAILED, not NOT_FOUND)", rc == -1 && error.rfind("FAILED", 0) == 0, error);
+	std::string prefs;
+	opendives::get_prefs(prefs);
+	check("the Classic address is remembered", prefs.find("\"device\":\"00:13:43:0D:72:1C\"") != std::string::npos);
+
+	// BLE cannot connect, Classic cannot either: NOT_FOUND after both.
+	t = shearwater_like();
+	t.connect_ok = false;
+	t.rfcomm_ok = false;
+	set_bt_transport(&t);
+	rc = opendives::download_dives(perdix + ",\"classicAddress\":\"00:13:43:0D:72:1C\"}", on_progress, nullptr, json, error);
+	check("both fail: NOT_FOUND", rc == -1 && error.rfind("NOT_FOUND", 0) == 0 && t.rfcomm_attempts == 1, error);
+
+	// BLE fails, no Classic pairing: no second attempt.
+	t = shearwater_like();
+	t.connect_ok = false;
+	set_bt_transport(&t);
+	rc = opendives::download_dives(perdix + "}", on_progress, nullptr, json, error);
+	check("BLE fails, not paired as Classic: NOT_FOUND, no Classic attempt",
+	      rc == -1 && error.rfind("NOT_FOUND", 0) == 0 && t.rfcomm_attempts == 0, error);
+
+	// A model without Classic (Petrel 3): no second attempt either.
+	t = shearwater_like();
+	t.connect_ok = false;
+	set_bt_transport(&t);
+	rc = opendives::download_dives("{\"vendor\":\"Shearwater\",\"product\":\"Petrel 3\",\"address\":\"LE:00:13:43:0D:72:1C\","
+				       "\"classicAddress\":\"00:13:43:0D:72:1C\"}",
+				       on_progress, nullptr, json, error);
+	check("model without Classic: no Classic attempt", t.rfcomm_attempts == 0, error);
+
+	// Cancelled by the diver: never retried.
+	static std::atomic<bool> stop { false };
+	t = shearwater_like();
+	t.cancelled = &stop;
+	set_bt_transport(&t);
+	std::thread canceller([] {
+		std::this_thread::sleep_for(std::chrono::milliseconds(300));
+		opendives::download_cancel();
+		stop = true;
+	});
+	rc = opendives::download_dives(perdix + ",\"classicAddress\":\"00:13:43:0D:72:1C\"}", on_progress, nullptr, json, error);
+	canceller.join();
+	check("cancelled: no Classic attempt", rc == -1 && error == "CANCELLED" && t.rfcomm_attempts == 0, error);
+	set_bt_transport(nullptr);
+}
+
 // The downloaded dives as one undoable step, with the fingerprint (download.cpp,
 // edit.cpp import_downloaded).
 static void test_import_step(const char *file)
@@ -468,6 +538,73 @@ static void test_import_step(const char *file)
 	opendives::undo(json, error);
 }
 
+// A download cut after some dives (a stream lost, or cancelled): the dives
+// received are offered, as Subsurface-mobile does (download_partial).
+static void test_partial(const char *file)
+{
+	std::string json, error;
+	opendives::download_partial("count", json, error);
+	check("no dives kept aside after failures without dives", json == "{\"dives\":0}", json);
+
+	for (const char *choice: { "keep", "discard" }) {
+		struct divelog log;
+		if (parse_file(file, &log) || log.dives.empty()) {
+			check("read the dives received", false, file);
+			return;
+		}
+		size_t received = log.dives.size();
+		// The state do_libdivecomputer_import() leaves: the fingerprint of the
+		// newest dive received is in the core's table.
+		fingerprint_table before;
+		for (const fingerprint_record &fp: fingerprints) {
+			fingerprint_record r;
+			r.model = fp.model;
+			r.serial = fp.serial;
+			r.fsize = fp.fsize;
+			r.fdeviceid = fp.fdeviceid;
+			r.fdiveid = fp.fdiveid;
+			r.raw_data = std::make_unique<unsigned char[]>(fp.fsize);
+			memcpy(r.raw_data.get(), fp.raw_data.get(), fp.fsize);
+			before.push_back(std::move(r));
+		}
+		size_t fp_before = fingerprints.size();
+		unsigned char raw[4] = { 9, 8, 7, 6 };
+		create_fingerprint_node(fingerprints, 0x4321, 7, raw, sizeof(raw), 1, 2);
+		std::string undo_before = opendives::undo_text();
+		opendives::internal::DownloadedComputer computer { "LE:C8:5C:A2:11:22:33", "Shearwater", "Petrel 3", 42, 99 };
+		int rc = opendives::internal::finish_download(log, computer, "FAILED: Dive data import error", before, json, error);
+		check("cut download: FAILED", rc == -1 && error.rfind("FAILED", 0) == 0, error);
+		check("cut download: nothing added, fingerprint table as before",
+		      opendives::undo_text() == undo_before && fingerprints.size() == fp_before);
+		opendives::download_partial("count", json, error);
+		check("cut download: the dives received are offered", json == "{\"dives\":" + std::to_string(received) + "}", json);
+		if (std::string(choice) == "discard") {
+			opendives::download_partial("discard", json, error);
+			opendives::download_partial("count", json, error);
+			check("dropped: none offered any more", json == "{\"dives\":0}", json);
+			rc = opendives::download_partial("keep", json, error);
+			check("dropped: nothing to keep", rc == -1 && error == "NO_PARTIAL", error);
+			check("dropped: fingerprint table unchanged", fingerprints.size() == fp_before);
+			continue;
+		}
+		rc = opendives::download_partial("keep", json, error);
+		check("kept: one step", rc == 0 && json.find("\"downloaded\":" + std::to_string(received)) != std::string::npos &&
+					       json.find("\"listChange\":true") != std::string::npos,
+		      rc ? error : json);
+		check("kept: step text", opendives::undo_text().find("from LE:C8:5C:A2:11:22:33") != std::string::npos,
+		      opendives::undo_text());
+		check("kept: the fingerprint of the newest dive received", fingerprints.size() == fp_before + 1 &&
+								     fingerprints.back().model == 0x4321);
+		opendives::undo(json, error);
+		check("kept, undone: fingerprint table as before", fingerprints.size() == fp_before);
+		opendives::redo(json, error);
+		check("kept, redone: the fingerprint again", fingerprints.size() == fp_before + 1);
+		opendives::undo(json, error);
+		opendives::download_partial("count", json, error);
+		check("kept: none offered any more", json == "{\"dives\":0}", json);
+	}
+}
+
 int main(int argc, char **argv)
 {
 	if (argc < 3) {
@@ -488,7 +625,9 @@ int main(int argc, char **argv)
 		return 2;
 	}
 	test_download_failures();
+	test_fallback();
 	test_import_step(argv[2]);
+	test_partial(argv[2]);
 	printf("%s\n", failed ? "FAILED" : "all passed");
 	return failed ? 1 : 0;
 }

@@ -669,6 +669,7 @@ int pending_for(const std::string &log)
 
 void on_log_loaded()
 {
+	download_forget_partial();
 	steps.clear();
 	applied = 0;
 	clean_index = 0;

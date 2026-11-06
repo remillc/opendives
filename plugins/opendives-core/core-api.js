@@ -392,7 +392,7 @@ import { registerPlugin } from '@capacitor/core';
  */
 
 /**
- * @typedef {{state: 'connecting'|'connected', fraction: number, dives: number, newDives: ReceivedDive[]}} DownloadProgress
+ * @typedef {{state: 'connecting'|'connected'|'retrying', fraction: number, dives: number, newDives: ReceivedDive[]}} DownloadProgress
  */
 
 /**
@@ -523,12 +523,17 @@ import { registerPlugin } from '@capacitor/core';
  * @property {() => Promise<void>} stopBluetoothScan
  * @property {() => Promise<BluetoothVendor[]>} bluetoothModels
  *   The models that download over Bluetooth, for a device whose name says nothing.
- * @property {(options: {vendor: string, product: string, address: string, name: string, forceDownload?: boolean}) => Promise<DownloadResult>} downloadDives
+ * @property {(options: {vendor: string, product: string, address: string, name: string, classicAddress?: string, forceDownload?: boolean}) => Promise<DownloadResult>} downloadDives
  *   Downloads the new dives and adds them as one undoable step (download_dives in
  *   opendives.h); "downloadProgress" events meanwhile. `address`: "LE:" + MAC for
  *   Bluetooth Low Energy, the MAC for Classic. Rejects with the core's code first in
  *   the message: NOT_FOUND, FAILED, CANCELLED, UNKNOWN_COMPUTER, WRITE_LOCKED…, or
  *   NO_BLUETOOTH, BLUETOOTH_OFF, PERMISSION.
+ *   `classicAddress`: the MAC of the same device paired as Bluetooth Classic, tried once when the
+ *   BLE link fails (progress state "retrying").
+ * @property {(options: {action: 'count'|'keep'|'discard'}) => Promise<any>} downloadPartial
+ *   The dives received before a download failed or was cancelled: count ({dives}), keep (one
+ *   undoable step, a DownloadResult) or discard. Rejects with NO_PARTIAL.
  * @property {() => Promise<void>} cancelDownload
  * @property {(event: 'bluetoothDevice'|'bluetoothScanStopped'|'downloadProgress', listener: (data: any) => void) => Promise<{remove: () => Promise<void>}>} addListener
  *   bluetoothDevice gives a BluetoothDevice, downloadProgress a DownloadProgress.
@@ -659,6 +664,9 @@ export const OpenDivesCore = {
   },
   async downloadDives(options) {
     return JSON.parse((await native.downloadDives(options)).json);
+  },
+  async downloadPartial(options) {
+    return JSON.parse((await native.downloadPartial(options)).json);
   },
   cancelDownload: () => native.cancelDownload(),
   addListener(event, listener) {

@@ -24,7 +24,7 @@
   import { settings } from '../lib/settings.svelte.js';
   import { offerUndo } from '../lib/undo.js';
   import { errorCode } from '../lib/account.js';
-  import { addressFor, lastAttempt, macOf } from '../lib/download.js';
+  import { addressFor, keepReceived, lastAttempt, macOf } from '../lib/download.js';
   import { formatDateTime, formatDepth, formatDuration } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
 
@@ -55,6 +55,8 @@
   /** The download running. @type {Computer|null} */
   let computer = $state(null);
   let connected = $state(false);
+  /** Bluetooth Low Energy failed: the second attempt, over Classic. */
+  let retrying = $state(false);
   let fraction = $state(0);
   /** @type {ReceivedDive[]} */
   let received = $state([]);
@@ -149,15 +151,30 @@
   function pick(d) {
     if (d.computer) {
       const { vendor, product } = d.computer;
-      download({ vendor, product, name: d.name, address: addressFor(d, transportsOf(vendor, product)) });
+      download(withClassic({ vendor, product, name: d.name, address: addressFor(d, transportsOf(vendor, product)) }));
     } else {
       choosing = { step: 'vendor', device: d, vendor: '' };
     }
   }
 
+  /**
+   * Over Bluetooth Low Energy, a device also paired as Bluetooth Classic is
+   * tried once over Classic when the BLE link fails (Christian's choice):
+   * its MAC goes with the request when the model has Classic.
+   * @param {Computer} c
+   * @returns {Computer}
+   */
+  function withClassic(c) {
+    const d = found[macOf(c.address)];
+    const classic = c.address.startsWith('LE:') && d?.classic && transportsOf(c.vendor, c.product)?.classic;
+    return classic ? { ...c, classicAddress: d.mac } : c;
+  }
+
   /** @param {Computer} c */
   async function download(c) {
+    c = withClassic(c);
     computer = c;
+    retrying = false;
     lastAttempt.computer = c;
     lastAttempt.forceDownload = forceDownload;
     connected = false;
@@ -178,17 +195,31 @@
       const code = errorCode(e);
       console.error('Download', code, /** @type {any} */ (e)?.message);
       await afterDownload(null);
-      if (leaving) return;
+      // The dives received before the failure, offered as Subsurface-mobile does.
+      let kept = 0;
+      if (code === 'CANCELLED' || code === 'NOT_FOUND' || code === 'FAILED') {
+        try {
+          kept = (await OpenDivesCore.downloadPartial({ action: 'count' })).dives;
+        } catch (err) {
+          console.error('Dives received', err);
+        }
+      }
+      if (leaving) {
+        if (kept) OpenDivesCore.downloadPartial({ action: 'discard' }).catch(() => {});
+        return;
+      }
       if (code === 'CANCELLED') {
         leaving = true;
         f7router.back();
-        toast(t('download.cancelled'));
+        if (kept) offerPartial(kept);
+        else toast(t('download.cancelled'));
       } else if (code === 'NOT_FOUND' || code === 'FAILED') {
         leaving = true;
         const reason = code === 'NOT_FOUND' ? 'notFound' : 'lost';
-        f7router.navigate(`/download/failed/?computer=${encodeURIComponent(c.product)}&reason=${reason}`, {
-          reloadCurrent: true,
-        });
+        f7router.navigate(
+          `/download/failed/?computer=${encodeURIComponent(c.product)}&reason=${reason}&received=${kept}`,
+          { reloadCurrent: true },
+        );
       } else if (code === 'BLUETOOTH_OFF' || code === 'PERMISSION') {
         check();
       } else {
@@ -198,6 +229,26 @@
         scan();
       }
     }
+  }
+
+  /** Cancelled after some dives arrived: keep them or not (MD3 dialog). @param {number} n */
+  function offerPartial(n) {
+    f7.dialog
+      .create({
+        title: t('download.cancelledTitle'),
+        text: t('download.cancelledKeep', { n }),
+        buttons: [
+          {
+            text: t('download.dropReceived'),
+            onClick: () => {
+              OpenDivesCore.downloadPartial({ action: 'discard' }).catch(() => {});
+              toast(t('download.cancelled'));
+            },
+          },
+          { text: t('download.keepReceived', { n }), onClick: () => keepReceived() },
+        ],
+      })
+      .open();
   }
 
   /** @param {string} text */
@@ -224,6 +275,13 @@
         scanning = false;
       }),
       await OpenDivesCore.addListener('downloadProgress', (/** @type {import('opendives-core').DownloadProgress} */ p) => {
+        if (p.state === 'retrying') {
+          // BLE failed: the dives of the first attempt are read again over Classic.
+          retrying = true;
+          received = [];
+          fraction = 0;
+          return;
+        }
         connected = p.state === 'connected';
         if (p.fraction > 0) fraction = Math.min(1, p.fraction);
         if (p.newDives.length) received = [...p.newDives.slice().reverse(), ...received];
@@ -361,6 +419,7 @@
         <span class="trailing">{t('download.connecting')}</span>
       {/if}
     </div>
+    {#if retrying}<p class="retrying" role="status">{t('download.retryingClassic')}</p>{/if}
 
     <div class="progress">
       <div class="progress-head">
@@ -566,6 +625,13 @@
         border-radius: 10px;
         background: var(--od-surface);
       }
+    }
+
+    .retrying {
+      margin: 8px 16px 0;
+      font-size: 14px;
+      line-height: 20px;
+      color: var(--od-text-2);
     }
 
     .empty {

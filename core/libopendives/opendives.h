@@ -502,7 +502,11 @@ using download_progress = void (*)(const std::string &json, void *userdata);
 // the end. `request_json`: {"vendor", "product" (a model of
 // dc_bluetooth_models), "address" ("LE:" + MAC for Bluetooth Low Energy,
 // the MAC alone to try Classic first when the model has both, as
-// Subsurface), "name" (the device's Bluetooth name), "forceDownload" (all
+// Subsurface), "classicAddress" (optional, the MAC of the same device paired
+// as Bluetooth Classic: when the BLE link fails, not the computer's protocol
+// nor a cancellation, the download is tried once more over Classic, with a
+// "retrying" progress state; an OpenDives addition), "name" (the device's
+// Bluetooth name), "forceDownload" (all
 // dives, not only the new ones; default false), "logFile" (path of
 // libdivecomputer's log, optional)}. The computer is remembered (Settings,
 // dive computers) as Subsurface does after each attempt. Writes
@@ -514,6 +518,15 @@ using download_progress = void (*)(const std::string &json, void *userdata);
 // download failed), each followed by ": " and Subsurface's message.
 int download_dives(const std::string &request_json, download_progress progress, void *userdata, std::string &json,
 		   std::string &error);
+
+// The dives received before a download failed or was cancelled (FAILED,
+// NOT_FOUND, CANCELLED), as Subsurface-mobile offers them. `action`:
+// "count" writes {"dives":n}; "keep" adds them as one undoable step, as a
+// full download (with the fingerprint of the newest dive received, taken
+// away by undo) and writes download_dives()'s object; "discard" drops them.
+// Dropped too by the next download and by every load. NO_PARTIAL when there
+// are none to keep.
+int download_partial(const std::string &action, std::string &json, std::string &error);
 
 // Asks the download running on another thread to stop (Subsurface's
 // import_thread_cancelled); the platform also ends the transport's waits.

@@ -506,10 +506,12 @@ int download_dives(const std::string &request_json, download_progress progress_c
 		error = "BAD_REQUEST: invalid JSON";
 		return -1;
 	}
-	std::string vendor, product, address, btname, log_file;
+	std::string vendor, product, address, btname, log_file, classic_address;
 	bool force = false;
 	for (const auto &[key, v]: fields) {
-		if (key == "vendor")
+		if (key == "classicAddress")
+			classic_address = v.text;
+		else if (key == "vendor")
 			vendor = v.text;
 		else if (key == "product")
 			product = v.text;
@@ -537,18 +539,6 @@ int download_dives(const std::string &request_json, download_progress progress_c
 		return -1;
 	}
 
-	// DCDeviceData::DCDeviceData(), with BT_SUPPORT and SUBSURFACE_MOBILE.
-	device_data_t data;
-	struct divelog log;
-	data.log = nullptr;
-	data.diveid = 0;
-	data.bluetooth_mode = true;
-	data.force_download = force;
-	data.libdc_dump = false;
-	data.libdc_log = !log_file.empty();
-	data.sync_time = false;
-	data.vendor = vendor;
-	data.product = product;
 	// DCDeviceData::setDevName(): a string of the form "devicename
 	// (deviceaddress)" or "deviceaddress (devicename)" may have found its way
 	// into the preferences; fetch the address from it.
@@ -562,24 +552,25 @@ int download_dives(const std::string &request_json, download_progress progress_c
 			address = back.find(':') != std::string::npos ? back : front;
 		}
 	}
-	data.devname = address;
 
 	// DownloadThread::run()
-	data.descriptor = lookup_descriptor(vendor, product);
-	data.log = &log;
-	data.btname = btname;
-	if (!data.descriptor) {
+	dc_descriptor_t *descriptor = lookup_descriptor(vendor, product);
+	if (!descriptor) {
 		report_info("No download possible when DC type is unknown");
 		error = "UNKNOWN_COMPUTER: " + vendor + " " + product;
 		return -1;
 	}
 	// get the list of transports that this device supports and filter depending on Bluetooth option
-	unsigned int transports = dc_descriptor_get_transports(data.descriptor);
+	unsigned int transports = dc_descriptor_get_transports(descriptor);
 	transports &= (DC_TRANSPORT_BLE | DC_TRANSPORT_BLUETOOTH);
-	opendives_compat::bt_log("Starting download from %s%s%s (%s %s at %s)", transports & DC_TRANSPORT_BLUETOOTH ? "BT" : "",
-				 transports == (DC_TRANSPORT_BLE | DC_TRANSPORT_BLUETOOTH) ? ", " : "",
-				 transports & DC_TRANSPORT_BLE ? "BLE" : "", vendor.c_str(), product.c_str(), address.c_str());
-	opendives_compat::bt_log("downloading %s dives", data.force_download ? "all" : "only new");
+
+	// OpenDives: a device found over Bluetooth Low Energy and also paired as
+	// Bluetooth Classic ("classicAddress") is tried over BLE first; when the
+	// BLE link itself fails (not the dive computer's protocol, not a
+	// cancellation), once more over Classic, without the diver doing anything.
+	std::vector<std::string> addresses { address };
+	if (!classic_address.empty() && address.rfind("LE:", 0) == 0 && (transports & DC_TRANSPORT_BLUETOOTH))
+		addresses.push_back(classic_address);
 
 	std::string saved_logfile = logfile_name;
 	if (!log_file.empty())
@@ -587,63 +578,165 @@ int download_dives(const std::string &request_json, download_progress progress_c
 	int saved_verbose = verbose;
 	verbose = std::max(verbose, 1);
 	fingerprint_table fingerprints_before = copy_fingerprints(fingerprints);
-	progress = Progress();
-	progress.callback = progress_cb;
-	progress.userdata = userdata;
-	progress.data = &data;
-	progress.state = "connecting";
-	progress_bar_fraction = 0.0;
-	opendives_compat::bt_io_hook = on_io;
-	opendives_compat::bt_state_hook = on_state;
-	progress_callback = on_dev_info;
 
-	import_thread_cancelled = false;
-	std::string errorText = do_libdivecomputer_import(&data);
-	bool cancelled = import_thread_cancelled;
-	import_thread_cancelled = false;
+	std::unique_ptr<device_data_t> data;
+	std::unique_ptr<struct divelog> log;
+	std::string errorText;
+	bool cancelled = false, connected = false;
+	for (size_t attempt = 0; attempt < addresses.size(); attempt++) {
+		if (attempt) {
+			// The first attempt changed nothing that the second needs: its
+			// dives and its fingerprint are dropped, the second reads them again.
+			fingerprints = copy_fingerprints(fingerprints_before);
+			opendives_compat::bt_log("Bluetooth Low Energy failed at the transport level: retrying over Bluetooth Classic at %s",
+						 addresses[attempt].c_str());
+			progress.state = "retrying";
+			send_progress(true);
+		}
+		// DCDeviceData::DCDeviceData(), with BT_SUPPORT and SUBSURFACE_MOBILE.
+		data = std::make_unique<device_data_t>();
+		log = std::make_unique<struct divelog>();
+		data->diveid = 0;
+		data->bluetooth_mode = true;
+		data->force_download = force;
+		data->libdc_dump = false;
+		data->libdc_log = !log_file.empty();
+		data->sync_time = false;
+		data->vendor = vendor;
+		data->product = product;
+		data->devname = addresses[attempt];
+		data->descriptor = descriptor;
+		data->log = log.get();
+		data->btname = btname;
+		opendives_compat::bt_log("Starting download from %s%s%s (%s %s at %s), attempt %d of %d",
+					 transports & DC_TRANSPORT_BLUETOOTH ? "BT" : "",
+					 transports == (DC_TRANSPORT_BLE | DC_TRANSPORT_BLUETOOTH) ? ", " : "",
+					 transports & DC_TRANSPORT_BLE ? "BLE" : "", vendor.c_str(), product.c_str(),
+					 addresses[attempt].c_str(), static_cast<int>(attempt + 1), static_cast<int>(addresses.size()));
+		opendives_compat::bt_log("downloading %s dives", data->force_download ? "all" : "only new");
 
-	send_progress(true);
-	opendives_compat::bt_io_hook = nullptr;
-	opendives_compat::bt_state_hook = nullptr;
-	progress_callback = nullptr;
-	bool connected = progress.connected;
+		progress = Progress();
+		progress.callback = progress_cb;
+		progress.userdata = userdata;
+		progress.data = data.get();
+		progress.state = "connecting";
+		progress_bar_fraction = 0.0;
+		opendives_compat::bt_io_hook = on_io;
+		opendives_compat::bt_state_hook = on_state;
+		opendives_compat::bt_transport_error = false;
+		progress_callback = on_dev_info;
+
+		import_thread_cancelled = false;
+		errorText = do_libdivecomputer_import(data.get());
+		cancelled = import_thread_cancelled;
+		import_thread_cancelled = false;
+
+		send_progress(true);
+		opendives_compat::bt_io_hook = nullptr;
+		opendives_compat::bt_state_hook = nullptr;
+		progress_callback = nullptr;
+		connected = progress.connected;
+		bool transport_failed = opendives_compat::bt_transport_error;
+
+		if (!errorText.empty()) {
+			std::string message = format_string_std(errorText.c_str(), data->devname.c_str(), data->vendor.c_str(),
+								data->product.c_str());
+			opendives_compat::bt_log("Finishing download thread: %s (attempt %d%s)", message.c_str(),
+						 static_cast<int>(attempt + 1), transport_failed ? ", transport failure" : "");
+			errorText = message;
+		} else {
+			opendives_compat::bt_log("Finishing download thread: %d dives downloaded", static_cast<int>(log->dives.size()));
+		}
+		if (errorText.empty() || cancelled || !transport_failed)
+			break;
+	}
 	progress = Progress();
 	verbose = saved_verbose;
 	logfile_name = saved_logfile;
 
-	std::string message;
-	if (!errorText.empty()) {
-		message = format_string_std(errorText.c_str(), data.devname.c_str(), data.vendor.c_str(), data.product.c_str());
-		opendives_compat::bt_log("Finishing download thread: %s", message.c_str());
-	} else {
-		opendives_compat::bt_log("Finishing download thread: %d dives downloaded", static_cast<int>(log.dives.size()));
-	}
-	prefs.dive_computer.vendor = data.vendor;
-	prefs.dive_computer.product = data.product;
-	prefs.dive_computer.device = data.devname;
+	prefs.dive_computer.vendor = data->vendor;
+	prefs.dive_computer.product = data->product;
+	prefs.dive_computer.device = data->devname;
 	prefs.dive_computer.device_name = btname;
 	updateRememberedDCs();
 
-	auto restore_fingerprints = [&] { std::swap(fingerprints, fingerprints_before); };
-	if (cancelled) {
-		restore_fingerprints();
-		error = "CANCELLED";
-		return -1;
-	}
-	if (!errorText.empty()) {
-		// Nothing is added: the dives read before the failure are dropped
-		// (Subsurface-mobile offers them), and so is the new fingerprint.
-		restore_fingerprints();
-		error = std::string(connected ? "FAILED: " : "NOT_FOUND: ") + message;
+	std::string failure = cancelled ? "CANCELLED"
+			    : errorText.empty() ? std::string()
+			    : std::string(connected ? "FAILED: " : "NOT_FOUND: ") + errorText;
+	internal::DownloadedComputer computer { data->devname, data->vendor, data->product, data->devinfo.serial,
+						data->devinfo.firmware };
+	return internal::finish_download(*log, computer, failure, fingerprints_before, json, error);
+}
+
+namespace {
+
+// The dives received before a failure or a cancellation, kept until the
+// diver keeps or drops them (download_partial), as Subsurface-mobile offers
+// them: with the core's fingerprint table as the download left it (the
+// fingerprint of the newest dive received).
+struct Partial {
+	bool present = false;
+	struct divelog log;
+	fingerprint_table fingerprints;
+	internal::DownloadedComputer computer;
+};
+Partial partial;
+
+std::string result_json(size_t n, const std::string &list_json, const internal::DownloadedComputer &c)
+{
+	std::string json = "{\"downloaded\":" + std::to_string(n) + ",\"vendor\":";
+	append_json_string(json, c.vendor);
+	json += ",\"product\":";
+	append_json_string(json, c.product);
+	json += ",\"serial\":" + std::to_string(c.serial);
+	json += ",\"firmware\":" + std::to_string(c.firmware);
+	if (!list_json.empty())
+		json += ",\"list\":" + list_json;
+	json += ",\"undo\":";
+	append_json_string(json, undo_text());
+	std::string prefs_json;
+	get_prefs(prefs_json);
+	size_t at = prefs_json.find("\"diveComputerList\":");
+	size_t end = at == std::string::npos ? at : prefs_json.find(']', at);
+	if (end != std::string::npos)
+		json += ',' + prefs_json.substr(at, end - at + 1);
+	json += '}';
+	return json;
+}
+
+} // namespace
+
+void internal::download_forget_partial()
+{
+	partial = Partial();
+}
+
+int internal::finish_download(struct divelog &log, const DownloadedComputer &computer, const std::string &failure,
+			      fingerprint_table &fingerprints_before, std::string &json, std::string &error)
+{
+	download_forget_partial();
+	if (!failure.empty()) {
+		// Nothing is added yet. The dives received are kept aside with the
+		// new fingerprint; the core's table goes back to its state before.
+		if (!log.dives.empty()) {
+			partial.present = true;
+			partial.log = std::move(log);
+			partial.fingerprints = std::move(fingerprints);
+			partial.computer = computer;
+			opendives_compat::bt_log("%d dives received before the failure, kept aside",
+						 static_cast<int>(partial.log.dives.size()));
+		}
+		fingerprints = std::move(fingerprints_before);
+		error = failure;
 		return -1;
 	}
 
 	size_t n = log.dives.size();
-	std::string list_json, prefs_json;
+	std::string list_json;
 	if (n) {
 		std::string import_error;
-		if (internal::import_downloaded(log, data.devname, fingerprints_before, list_json, import_error)) {
-			restore_fingerprints();
+		if (import_downloaded(log, computer.devname, fingerprints_before, list_json, import_error)) {
+			fingerprints = std::move(fingerprints_before);
 			if (import_error != "NO_NEW_DIVES") {
 				error = import_error;
 				return -1;
@@ -651,24 +744,49 @@ int download_dives(const std::string &request_json, download_progress progress_c
 			n = 0;
 		}
 	} else {
-		restore_fingerprints();
+		fingerprints = std::move(fingerprints_before);
 	}
-	json = "{\"downloaded\":" + std::to_string(n) + ",\"vendor\":";
-	append_json_string(json, data.vendor);
-	json += ",\"product\":";
-	append_json_string(json, data.product);
-	json += ",\"serial\":" + std::to_string(data.devinfo.serial);
-	json += ",\"firmware\":" + std::to_string(data.devinfo.firmware);
-	if (!list_json.empty())
-		json += ",\"list\":" + list_json;
-	json += ",\"undo\":";
-	append_json_string(json, undo_text());
-	get_prefs(prefs_json);
-	size_t at = prefs_json.find("\"diveComputerList\":");
-	size_t end = at == std::string::npos ? at : prefs_json.find(']', at);
-	if (end != std::string::npos)
-		json += ',' + prefs_json.substr(at, end - at + 1);
-	json += '}';
+	json = result_json(n, list_json, computer);
+	return 0;
+}
+
+int download_partial(const std::string &action, std::string &json, std::string &error)
+{
+	if (action == "count") {
+		json = "{\"dives\":" + std::to_string(partial.present ? partial.log.dives.size() : 0) + '}';
+		return 0;
+	}
+	if (action == "discard") {
+		internal::download_forget_partial();
+		json = "{\"dives\":0}";
+		return 0;
+	}
+	if (action != "keep") {
+		error = "BAD_REQUEST: " + action;
+		return -1;
+	}
+	if (!partial.present) {
+		error = "NO_PARTIAL";
+		return -1;
+	}
+	// As a full download: one undoable step, which also brings the
+	// fingerprint of the newest dive kept, and takes it away on undo.
+	fingerprint_table before = std::move(fingerprints);
+	fingerprints = std::move(partial.fingerprints);
+	internal::DownloadedComputer computer = partial.computer;
+	size_t n = partial.log.dives.size();
+	std::string list_json;
+	int rc = internal::import_downloaded(partial.log, computer.devname, before, list_json, error);
+	if (rc) {
+		fingerprints = std::move(before);
+		internal::download_forget_partial();
+		if (error != "NO_NEW_DIVES")
+			return -1;
+		n = 0;
+		error.clear();
+	}
+	internal::download_forget_partial();
+	json = result_json(n, list_json, computer);
 	return 0;
 }
 

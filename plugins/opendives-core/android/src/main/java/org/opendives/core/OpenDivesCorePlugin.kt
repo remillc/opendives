@@ -868,6 +868,7 @@ class OpenDivesCorePlugin : Plugin() {
         val t = transport ?: BluetoothTransport(context, adapter) { mac -> scan?.device(mac) }.also { transport = it }
         t.reset()
         val request = JSObject()
+            .put("classicAddress", call.getString("classicAddress").orEmpty())
             .put("vendor", call.getString("vendor").orEmpty())
             .put("product", call.getString("product").orEmpty())
             .put("address", call.getString("address").orEmpty())
@@ -893,6 +894,19 @@ class OpenDivesCorePlugin : Plugin() {
                 keepScreenOn(false)
             }
         }
+    }
+
+    /**
+     * The dives received before a download failed or was cancelled
+     * (download_partial): action "count" ({dives}), "keep" (one undoable
+     * step, the object of downloadDives) or "discard".
+     */
+    @PluginMethod
+    fun downloadPartial(call: PluginCall) = onCoreThread(call) {
+        val action = call.getString("action").orEmpty()
+        val json = NativeCore.downloadPartial(action)
+        Log.i(TAG, "downloadPartial($action): $json")
+        call.resolve(JSObject().put("json", json))
     }
 
     /** Stops the running download (off the core thread, which is busy with it). */

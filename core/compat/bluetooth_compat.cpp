@@ -49,6 +49,7 @@ BtTransport *bt_transport()
 	return current_transport;
 }
 
+bool bt_transport_error = false;
 void (*bt_io_hook)() = nullptr;
 void (*bt_state_hook)(const char *state) = nullptr;
 void (*bt_log_hook)(const std::string &line) = nullptr;
@@ -451,6 +452,7 @@ bool BLEObject::wait_for_packet(int ms)
 			// OpenDives: Qt has no such answer; the wait would run to its
 			// end. Stop at once instead.
 			disconnected = true;
+			bt_transport_error = true;
 			bt_log("%s device disconnected (%s)", current_time().c_str(), transport.last_error().c_str());
 		} else if (r > 0) {
 			characteristcStateChanged(c, value);
@@ -518,6 +520,7 @@ dc_status_t BLEObject::write(const void *data, size_t size, size_t *actual)
 		// operation at a time, so the platform waits until it is sent.
 		if (!transport.ble_write(preferredService()->uuid, c.uuid, bytes, with_response, BLE_TIMEOUT)) {
 			bt_log("%s write failed: %s", current_time().c_str(), transport.last_error().c_str());
+			bt_transport_error = true;
 			return DC_STATUS_IO;
 		}
 		characteristicWritten(c.uuid, bytes);
@@ -538,8 +541,10 @@ dc_status_t BLEObject::poll(int timeout)
 			bt_log("%s packet WAIT", current_time().c_str());
 
 		wait_for_packet(timeout);
-		if (receivedPackets.empty())
+		if (receivedPackets.empty()) {
+			bt_transport_error = true; // no answer, or disconnected
 			return disconnected ? DC_STATUS_IO : DC_STATUS_TIMEOUT;
+		}
 	}
 
 	return DC_STATUS_SUCCESS;
@@ -792,6 +797,7 @@ dc_status_t BLEObject::enable_notifications(const BleCharacteristic &c)
 	if (!enabled) {
 		bt_log("Bluetooth: Failed to enable notifications for characteristic %s", c.uuid.c_str());
 		report_error("Bluetooth: Failed to enable notifications.");
+		bt_transport_error = true;
 		return DC_STATUS_TIMEOUT;
 	}
 	return DC_STATUS_SUCCESS;
@@ -848,6 +854,7 @@ static dc_status_t qt_ble_open(void **io, dc_context_t *, const char *devaddr, d
 	if (!transport->ble_connect(devaddr, random, BLE_TIMEOUT)) {
 		bt_log("failed to connect to the controller %s with error %s", devaddr, transport->last_error().c_str());
 		report_error("Failed to connect to %s: '%s'", devaddr, transport->last_error().c_str());
+		bt_transport_error = true;
 		transport->ble_close();
 		return DC_STATUS_IO;
 	}
