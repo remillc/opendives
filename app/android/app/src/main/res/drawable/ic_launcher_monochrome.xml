@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Themed icon layer of the "Hublot" logo (docs/brand): ring, waterline and bubbles in one colour. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Waterline: the top edge of the water, clipped to the porthole (circle r 28). -->
+    <group>
+        <clip-path android:pathData="M26,54a28,28 0,1 0,56 0a28,28 0,1 0,-56 0Z" />
+        <path
+            android:pathData="M20,50 Q32,44 44,50 T68,50 T92,50"
+            android:strokeColor="#FF000000"
+            android:strokeWidth="4" />
+    </group>
+    <path
+        android:pathData="M24,54a30,30 0,1 0,60 0a30,30 0,1 0,-60 0Z"
+        android:strokeColor="#FF000000"
+        android:strokeWidth="6" />
+    <path android:fillColor="#FF000000" android:pathData="M59.4,40a2.6,2.6 0,1 0,5.2 0a2.6,2.6 0,1 0,-5.2 0Z" />
+    <path android:fillColor="#FF000000" android:pathData="M55.2,33a1.8,1.8 0,1 0,3.6 0a1.8,1.8 0,1 0,-3.6 0Z" />
+</vector>
