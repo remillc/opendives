@@ -135,3 +135,7 @@ Part of task 16. Wire every Settings row as in `docs/ui-specification.md`, secti
 ## [ ] 2026-11-06-18 Settings: dialogs and layout, updated
 
 Follow the updated paragraph "Settings: what each row does" in `docs/ui-specification.md`, section 4 (it replaces the earlier version used by task 17): chevrons on value rows, date choices shown as dates with the device's format first, wheel pickers instead of number fields, the speeds / duration / coordinates dialogs, the split Units group, and the layout rules. Mock-ups: `docs/mockups/android-reglages.dc.html` and `docs/mockups/reglages-*-android.dc.html`.
+
+## [ ] 2026-11-06-19 App icon: Hublot
+
+Replace the app icon with the "Hublot" logo (`docs/ui-specification.md`, "Logo"). Android: an adaptive icon built from `docs/brand/opendives-icon-light-fullbleed.svg` (background #F4F4F2, the rest as foreground, as a vector drawable), plus a monochrome layer (ring, waterline and bubbles in one colour) for themed icons; check it in the round and squircle masks. iOS: a 1024 × 1024 icon from the same drawing, light and dark variants. Also the splash screen and the web favicon. Do not change the drawing; if something does not convert well, stop and ask Christian.

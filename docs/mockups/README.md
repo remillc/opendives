@@ -79,3 +79,4 @@ When a mock-up and `docs/ui-specification.md` disagree, the specification wins. 
 | `reglages-vitesse-android.dc.html` | Réglages, vitesses · Android |
 | `reglages-duree-android.dc.html` | Réglages, durée · Android |
 | `reglages-coordonnees-android.dc.html` | Réglages, coordonnées GPS · Android |
+| `logo-hublot.dc.html` | Logo · Hublot (retenu) |

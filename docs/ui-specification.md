@@ -38,6 +38,8 @@ The theme chosen on 5 November 2026 is **black and white, colour reserved for da
 
 **Contrast:** all text at least 4.5:1 on its background, 3:1 for text of 24 px and more and for chart lines. A colour never carries information alone: the alarm and pending states always have text that says what the problem is.
 
+**Logo (decided on 6 November 2026): "Hublot".** A porthole or mask seen from the front, half under water: a thick ink ring, a wavy waterline, the water below in the water gradient (#FBE3B2 to #B4530F in light mode, #E5B961 to #EF7625 in dark mode), and two small bubbles above the line. Light version on #F4F4F2 with an ink ring; dark version on #121314 with a light ring. It is the only place where the water colour appears outside data. Sources in `docs/brand/` (108 × 108 adaptive-icon grid, the mark inside the 66 px safe zone): `opendives-icon-*-fullbleed.svg` for the Android adaptive icon, `*-round.svg` and `*-squircle.svg` as previews of the two masks. Board: `docs/mockups/logo-hublot.dc.html`. Wordmark: "Open" bold and "Dives" regular, system font.
+
 ## 2. Text, numbers and units
 
 Fonts are the system ones: SF Pro on iOS, Roboto on Android. Sizes follow each platform's scale and respect the text size chosen in the phone's settings.
