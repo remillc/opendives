@@ -81,6 +81,70 @@ int cloud_probe(std::string &json, std::string &error);
 // Clones nothing, writes nothing, pushes nothing.
 int cloud_branch_status(const std::string &url, bool &exists, std::string &head, std::string &error);
 
+// --- Editing and saving (edit.cpp; docs/editing-and-sync-plan.md) ---------
+//
+// Errors are returned as -1 with `error` set to a code, optionally followed
+// by ": " and details: NO_LOG, NOT_GIT, NOT_FOUND, BAD_REQUEST, FORMAT_NEWER,
+// NOTHING_TO_UNDO, NOTHING_TO_REDO, WRITE_LOCKED, SAVE_REPLACEMENT,
+// SAVE_ERROR, STOPPED.
+
+// Applies a set of field changes to one dive of the log in memory as a single
+// undoable step. `changes_json` is an object with any of: "notes", "suit"
+// (strings), "rating", "visibility" (0 to 5), "buddies", "diveguide", "tags"
+// (lists of strings). Only those fields change; everything else in the dive
+// is kept as loaded. Like Subsurface, lists keep their order: removed entries
+// go, new ones are added at the end. Writes the updated dive, as get_dive()
+// does. Nothing changes and no step is added when the values are the same.
+// FORMAT_NEWER when the log was written by a newer format than this core's.
+int edit_dive(int id, const std::string &changes_json, std::string &result_json, std::string &error);
+
+// Undo stack of the session; cleared by every load. The result is the dive
+// changed, as get_dive() gives it.
+int undo(std::string &result_json, std::string &error);
+int redo(std::string &result_json, std::string &error);
+bool can_undo();
+bool can_redo();
+std::string undo_text(); // e.g. "Edit notes [#12]"; empty when nothing to undo
+std::string redo_text();
+
+// True when the log in memory differs from the last local save.
+bool has_unsaved_changes();
+
+// Saves the log in memory to its local git repository, without network.
+// Refused unless Subsurface's classify_git_save() says "normal"
+// (SAVE_REPLACEMENT, SAVE_ERROR), and for a cloud log unless writes are
+// allowed (WRITE_LOCKED). The commit message lists the changes since the
+// last save, as Subsurface writes them.
+int save_local(std::string &error);
+
+// Saves the log in memory to another git repository ("path[branch]"), with
+// the same check; for tests.
+int save_as(const std::string &destination, std::string &error);
+
+// Local save if needed, then for a cloud log the reload with sync of
+// Subsurface-mobile (fetch, merge, push), then the log's settings. Writes
+// {"status":…, "pending":n, "reloaded":true|false} with status "local" (log
+// without account), "up_to_date", "pushed", "pulled", "merged", "offline"
+// (saved locally, server unreachable) or "stopped" (sync failed; the local
+// commits wait). After a reload the dives are new: list them again with
+// list_loaded_dives(); the undo stack is cleared.
+int sync(std::string &status_json, std::string &error);
+
+// Local commits of the cloud log not yet on the server, newest first:
+// [{"id":…, "summary":…, "message":…}]. Empty for a log without account.
+int pending_changes(std::string &json);
+
+// The dives of the log in memory, as list_dives() returns them, without
+// loading anything.
+int list_loaded_dives(std::string &json);
+
+// Cloud write lock (plan, section 4). Writing to a cloud log is refused
+// unless the account email equals `email` (the test account), or writes
+// were enabled with the developer setting. Logs without account are not
+// affected.
+void set_cloud_test_email(const std::string &email);
+void set_cloud_writes_enabled(bool enabled);
+
 } // namespace opendives
 
 #endif

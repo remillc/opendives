@@ -36,6 +36,20 @@ These two differences were found by reading Subsurface's code. They were not com
 
 **Only failure:** `TestDiveSeabearNewFormat.xml`. This file contains pairs of dives with the same number and the same start time. On every save, their order is reversed, so the git tree changes. No data is lost. This edge case comes from Subsurface's sorting; it should be watched, but it blocks nothing.
 
+## Edit round trip (6 November 2026)
+
+Test 1 of `docs/editing-and-sync-plan.md`, without network: `tests/run-edit-roundtrip.sh` with `build/poc/edit-roundtrip` (`tests/edit_roundtrip.cpp`), through the façade's `edit_dive`, `undo`, `save_local` and `save_as` (`core/libopendives/edit.cpp`).
+
+- **Baseline:** each sample is imported, then loaded as the app loads a log (`list_dives`, hence `process_loaded_dives()`) and saved into a fresh repository. Subsurface desktop and mobile also call `process_loaded_dives()` after a load: with automatic grouping on, the first save writes the automatic trips as real trips (`00-Trip` files, dives moved into the trip folders). The baseline is taken after that, and must be stable on a second save.
+- **Checks, for notes, suit, rating, visibility, buddies, dive guide and tags:** the first dive is edited, saved and reloaded with the new value; exactly one file changed, that dive's `Dive` (or `Dive-<number>`) file; one commit, whose message is "Changes made:" and the command text ("Edit notes [#2]"). Then edit, save, undo, save: the tree is the original one, and the message is "(undo) Edit notes [#2]". Finally, saving into an unrelated repository is refused with `SAVE_REPLACEMENT` and writes nothing.
+- **Result:** 95 passed, 2 skipped (`Dive_2013-02-02-1614.xml` and `test24.xml` have no dive), 1 failure: `TestDiveSeabearNewFormat.xml`, the same pairs of identical dives whose order Subsurface reverses on every save (see above).
+
+```sh
+tests/run-edit-roundtrip.sh build/poc/edit-roundtrip build/poc/roundtrip ~/ert   third_party/subsurface/dives/*.xml third_party/subsurface/dives/*.ssrf
+```
+
+The work directory must be on a Linux file system (not `/mnt/*`), as for the cloud test.
+
 ## Reproduce
 
 Linux or WSL is required. The required packages are listed at the top of `poc/build.sh`.

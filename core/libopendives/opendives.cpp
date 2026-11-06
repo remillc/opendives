@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 #include "opendives.h"
+#include "internal.h"
 
 #include "core/dive.h"
 #include "core/divelog.h"
@@ -66,16 +67,23 @@ static std::string repo_path(const std::string &repo)
 // Address of the cloud log currently in `divelog`; empty for any other log.
 static std::string loaded_cloud_url;
 
+// Address of the log in memory; see internal::current_log().
+static std::string current_log_path;
+
 static int load(const std::string &path, std::string &error)
 {
 	// Set by the core's git loader; cleared here for files and failed loads.
 	loaded_git_commit.clear();
+	current_log_path.clear();
 	divelog.clear();
 	int ret = parse_file(path.c_str(), &divelog);
 	if (ret) {
 		error = "Cannot read " + path + " (" + std::to_string(ret) + ")";
+		internal::on_log_loaded();
 		return -1;
 	}
+	current_log_path = path;
+	internal::on_log_loaded();
 	return 0;
 }
 
@@ -627,5 +635,34 @@ int cloud_branch_status(const std::string &url, bool &exists, std::string &head,
 	git_remote_free(remote);
 	return ret ? -1 : 0;
 }
+
+namespace internal {
+
+int load(const std::string &path, std::string &error)
+{
+	return opendives::load(path, error);
+}
+
+const std::string &current_log()
+{
+	return current_log_path;
+}
+
+bool current_log_is_cloud()
+{
+	return !current_log_path.empty() && current_log_path == loaded_cloud_url;
+}
+
+int dive_json(int id, std::string &json, std::string &error)
+{
+	return get_dive(id, json, error);
+}
+
+std::string dives_json()
+{
+	return opendives::dives_json();
+}
+
+} // namespace internal
 
 } // namespace opendives

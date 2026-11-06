@@ -42,15 +42,18 @@ FLAGS="-std=c++20 -O1 -w
   echo "$COMPAT/qthelper_compat.cpp"; echo "$COMPAT/notifier_compat.cpp"
   echo "$COMPAT/cloud_compat.cpp"; echo "$COMPAT/https_openssl.cpp"
   echo "$ROOT/tests/roundtrip.cpp"; echo "$ROOT/tests/facade.cpp"; echo "$ROOT/tests/cloud.cpp"
-  echo "$ROOT/core/libopendives/opendives.cpp"; } > "$B/sources.txt"
+  echo "$ROOT/tests/edit_roundtrip.cpp"
+  echo "$ROOT/core/libopendives/opendives.cpp"; echo "$ROOT/core/libopendives/edit.cpp"; } > "$B/sources.txt"
 
 export FLAGS B
 xargs -P"$JOBS" -I{} bash -c 'o="$B/obj/$(basename {} .cpp).o"; [ "$o" -nt {} ] || g++ $FLAGS -c {} -o "$o"' < "$B/sources.txt"
 
 # 4. Link.
-OBJS=$(ls "$B"/obj/*.o | grep -Ev '/(roundtrip|facade|cloud|opendives)\.o$')
+OBJS=$(ls "$B"/obj/*.o | grep -Ev '/(roundtrip|facade|cloud|edit_roundtrip|opendives|edit)\.o$')
+FACADE="$B/obj/opendives.o $B/obj/edit.o"
 LIBS="$B/libdc/lib/libdivecomputer.a $(pkg-config --libs libgit2 libxml-2.0 libxslt libzip sqlite3) -lssl -lcrypto -lz -lm"
-g++ $OBJS "$B/obj/opendives.o" "$B/obj/roundtrip.o" -o "$B/roundtrip" $LIBS
-g++ $OBJS "$B/obj/opendives.o" "$B/obj/facade.o" -o "$B/facade" $LIBS
-g++ $OBJS "$B/obj/opendives.o" "$B/obj/cloud.o" -o "$B/cloud" $LIBS
-echo "built $B/roundtrip $B/facade $B/cloud"
+g++ $OBJS $FACADE "$B/obj/roundtrip.o" -o "$B/roundtrip" $LIBS
+g++ $OBJS $FACADE "$B/obj/facade.o" -o "$B/facade" $LIBS
+g++ $OBJS $FACADE "$B/obj/cloud.o" -o "$B/cloud" $LIBS
+g++ $OBJS $FACADE "$B/obj/edit_roundtrip.o" -o "$B/edit-roundtrip" $LIBS
+echo "built $B/roundtrip $B/facade $B/cloud $B/edit-roundtrip"

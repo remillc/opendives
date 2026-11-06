@@ -20,6 +20,7 @@
 #include "core/units.h"
 #include "core/file.h"
 #include "commands/command.h"
+#include "commands/command.h"
 
 #include <libxslt/xsltutils.h>
 #include <libxslt/transform.h>
@@ -238,10 +239,14 @@ int suunto_json_import(const std::string &, const std::string &, struct divelog 
 }
 
 // --- commands/command.cpp: undo stack lives in the app layer -------------
+namespace opendives_compat {
+std::string (*changes_made_hook)() = nullptr;
+}
+
 namespace Command {
 std::string changesMade()
 {
-	return std::string();
+	return opendives_compat::changes_made_hook ? opendives_compat::changes_made_hook() : std::string();
 }
 }
 
