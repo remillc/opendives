@@ -146,3 +146,15 @@ Apply three updates of `docs/ui-specification.md`, section 4, everywhere they oc
 1. "Text fields": Framework7 MD outline inputs with floating labels (label inside the empty field, moving onto the outline on focus or when filled, no placeholder), plain trailing icon buttons, a text "Enregistrer" button in the top bar of full-screen forms. Check every form already built (Account, delete account, dive editing, sites) and the new site screen `docs/mockups/sites-edition-android.dc.html`, which also gained a "site already within 100 m" note with a "Utiliser ce site" button.
 2. Choice dialogs as plain MD3 single-choice dialogs (no tinted or bold selected row): `docs/mockups/reglages-*-android.dc.html`.
 3. GPS coordinates: three formats, decimal by default, formatted by OpenDives itself (the core only knows seconds and decimal). Update the Settings row and the site screens.
+
+## [ ] 2026-11-06-21 Material 3 audit fixes (Android)
+
+Christian asked for every Android screen to be MD3-compliant. Read "Android follows Material 3" in `docs/ui-specification.md`, section 4, then fix these points found in the audit of the mock-ups, in the app where the screens exist (and keep them in mind for screens still to build):
+1. Sites map (`android-sites.dc.html`): the ☰ button overlapped the search bar. The menu icon now sits inside the search bar at its start, the search icon at its end. The two links of the bottom sheet ("6 plongées sans site", "2 doublons possibles") become 56 dp list items with a trailing chevron.
+2. Dive editing (`android-edition.dc.html`) and every full-screen form: "Enregistrer" is a text button at the right of the top bar, not a filled pill.
+3. Sign-out dialog (`compte-android-deconnexion.dc.html`): the "Also delete the copy" checkbox must render as an 18 dp box (it was squashed into a thin bar). Check that no radio button or checkbox can be shrunk by a flex layout (`flex: none`).
+4. Delete account (`compte-android-suppression.dc.html`): buttons 40 dp high, fully rounded (they were 48 dp).
+5. Take over a logbook (`android-compte-import.dc.html`): all radio buttons 20 dp (two were shrunk).
+6. Clean up sites (`sites-nettoyer-android.dc.html`): button labels on one line ("Pas des doublons").
+7. Site sheet (`sites-fiche-android.dc.html`): "Ouvrir dans Cartes" as an MD3 text button with the "open in new" icon (task 20 and the spec).
+Then go through every Android screen already built with the reference values of the spec, fix what does not match, and list what you changed in your report.
