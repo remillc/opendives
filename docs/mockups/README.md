@@ -86,3 +86,4 @@ When a mock-up and `docs/ui-specification.md` disagree, the specification wins. 
 | `ios-stats-annee.dc.html` | Statistiques, une année · iPhone |
 | `ios-stats-nouvelle.dc.html` | Nouvelle statistique · iPhone |
 | `outils-desaturation-android.dc.html` | Désaturation · Android |
+| `sites-modifier-android.dc.html` | Modifier le site · Android |
