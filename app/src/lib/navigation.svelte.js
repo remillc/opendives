@@ -2,10 +2,14 @@
 // Main sections and the side menu of the phone layout (spec, section 3).
 import { f7 } from 'framework7-svelte';
 
-/** @typedef {'logbook'|'sites'|'statistics'|'tools'} Section */
+/** @typedef {'logbook'|'sites'|'statistics'|'tools'|'account'} Section */
 
+/** The four main sections, in the order of the menu. */
 /** @type {Section[]} */
 export const sections = ['logbook', 'sites', 'statistics', 'tools'];
+
+/** Every section shown by the menu: the main ones, then Account after the separator. */
+const allSections = [...sections, 'account'];
 
 export const navigation = $state({
   /** @type {Section} */
@@ -26,7 +30,7 @@ export function showSection(section) {
 export function trackSection() {
   f7.on('tabShow', (/** @type {HTMLElement} */ el) => {
     const section = /** @type {Section} */ (el.id?.replace('view-', ''));
-    if (sections.includes(section)) navigation.section = section;
+    if (allSections.includes(section)) navigation.section = section;
   });
 }
 

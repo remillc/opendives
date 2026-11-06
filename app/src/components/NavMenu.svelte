@@ -85,6 +85,15 @@
       </a>
     {/each}
     <div class="separator" role="separator"></div>
+    <a
+      href="#account"
+      class="item"
+      aria-current={navigation.section === 'account' ? 'page' : undefined}
+      onclick={(e) => choose(e, () => showSection('account'))}
+    >
+      <Icon name="account" />
+      <span>{t('account.title')}</span>
+    </a>
     <a href="#settings" class="item" onclick={(e) => choose(e, openSettings)}>
       <Icon name="settings" />
       <span>{t('settings.title')}</span>

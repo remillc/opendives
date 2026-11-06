@@ -14,11 +14,15 @@ Tasks for the coding agent, written from the design sessions with Christian on c
 
 Create `.claude/settings.json` (committed) with two command hooks that run `tools/agent-inbox.mjs`: `SessionStart` with the argument `start`, and `UserPromptSubmit` with the argument `prompt`. The command is `node "$CLAUDE_PROJECT_DIR/tools/agent-inbox.mjs" start` (or `prompt`), timeout 10 seconds. Add `.claude/inbox-seen.json` and `.claude/settings.local.json` to `.gitignore`. Then check, in a new session, that the open tasks of this file appear by themselves; if the VS Code extension does not show the hook's output, say so to Christian.
 
-## [ ] 2026-11-06-01 Account entry in the side menu
+## [x] 2026-11-06-01 Account entry in the side menu
+
+Done in Add the Account screen and its entry in the side menu
 
 Add an "Account" entry to `NavMenu.svelte`, after the separator and before Settings, with a person icon (see `docs/mockups/appbar-tiroir-ios-ouvert.dc.html` and `appbar-tiroir-android-ouvert.dc.html`). It opens the Account screen (next task). Texts through `fr.json` ("Compte") and `en.json` ("Account").
 
-## [ ] 2026-11-06-02 Account screen
+## [x] 2026-11-06-02 Account screen
+
+Done in Add the Account screen and its entry in the side menu
 
 Build the Account screen from `docs/mockups/compte-*.dc.html` (iOS and Android, signed in and without an account) and `docs/ui-specification.md`, section 3 (Sections row).
 

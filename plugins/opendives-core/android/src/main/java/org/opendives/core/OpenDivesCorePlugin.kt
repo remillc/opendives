@@ -95,7 +95,8 @@ class OpenDivesCorePlugin : Plugin() {
     fun configureCloud(call: PluginCall) = onCoreThread(call) {
         val credentials = readDevCredentials()
         if (credentials != null) NativeCore.cloudConfigure(credentials.first, credentials.second)
-        call.resolve(JSObject().put("available", credentials != null))
+        // The account email is shown on the Account screen; the password never leaves the plugin.
+        call.resolve(JSObject().put("available", credentials != null).put("email", credentials?.first ?: ""))
     }
 
     @PluginMethod

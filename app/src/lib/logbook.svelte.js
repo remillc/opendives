@@ -24,7 +24,33 @@ export const logbook = $state({
   loading: true,
   /** @type {string|null} */
   error: null,
+  /** Cloud account email; empty without an account. */
+  email: '',
+  /** Cloud server host in use, e.g. ssrf-cloud-eu.subsurface-divelog.org. */
+  server: '',
+  /** Local time of the last successful sync (ISO, no time zone), or null. */
+  lastSync: /** @type {string|null} */ (readLastSync()),
 });
+
+function readLastSync() {
+  try {
+    return localStorage.getItem('od.lastSync');
+  } catch {
+    return null;
+  }
+}
+
+/** Notes a successful sync, kept across launches. */
+function markSynced() {
+  const now = new Date();
+  const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 19);
+  logbook.lastSync = local;
+  try {
+    localStorage.setItem('od.lastSync', local);
+  } catch {
+    // Not fatal: only the Account screen shows it.
+  }
+}
 
 /**
  * Cloud log: the device's copy is read (no network) while the server is asked
@@ -34,7 +60,13 @@ export const logbook = $state({
  * @returns {Promise<boolean>} false when no cloud account is configured
  */
 async function loadCloud() {
-  if (!(await OpenDivesCore.configureCloud()).available) return false;
+  const account = await OpenDivesCore.configureCloud();
+  if (!account.available) {
+    logbook.email = '';
+    logbook.server = '';
+    return false;
+  }
+  logbook.email = account.email;
   const probe = OpenDivesCore.probeCloud().then(
     (head) => ({ ok: true, ...head }),
     (/** @type {unknown} */ error) => ({ ok: false, exists: false, head: '', error }),
@@ -44,6 +76,7 @@ async function loadCloud() {
   let shownHead = null;
   try {
     const cached = await OpenDivesCore.listCloudDives({ cached: true });
+    if (cached.server) logbook.server = cached.server;
     if (cached.dives) {
       logbook.dives = cached.dives;
       logbook.prefs = await OpenDivesCore.getPrefs();
@@ -60,6 +93,7 @@ async function loadCloud() {
   if (shownHead !== null) {
     if (server.ok && server.exists && server.head === shownHead) {
       logbook.sync = 'cloud';
+      markSynced();
       return true;
     }
     if (!server.ok) {
@@ -75,7 +109,9 @@ async function loadCloud() {
       logbook.dives = fresh.dives;
       logbook.prefs = await OpenDivesCore.getPrefs();
     }
+    if (fresh.server) logbook.server = fresh.server;
     logbook.sync = fresh.synced ? 'cloud' : 'offline';
+    if (fresh.synced) markSynced();
   } catch (e) {
     if (shownHead === null) throw e;
     // The copy shown stays usable: the logbook is only out of date.

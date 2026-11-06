@@ -161,5 +161,48 @@
     "open": "Menu",
     "title": "OpenDives",
     "sections": "Sections"
+  },
+  "account": {
+    "title": "Account",
+    "verified": "Subsurface account verified",
+    "syncGroup": "Synchronisation",
+    "autoSync": "Sync automatically",
+    "autoSyncText": "When the app opens, when you come back to it and a few seconds after a change",
+    "lastSync": "Last synchronisation",
+    "lastSyncNever": "Never",
+    "todayAt": "today, {time}",
+    "cloudDives": "Dives in the cloud",
+    "syncNow": "Sync now",
+    "subsurfaceGroup": "Subsurface account",
+    "changePassword": "Change password",
+    "changePasswordText": "A link is sent to your email",
+    "leaveGroup": "Leave",
+    "signOut": "Sign out",
+    "signOutText": "The logbook stays in the cloud; it is removed from this device until you sign in again",
+    "delete": "Delete account",
+    "deleteText": "Deletes the account and all its dives from the Subsurface cloud. Cannot be undone.",
+    "server": "Connected through the {region} server ({host}).",
+    "serverHost": "Connected through the {host} server.",
+    "regions": {
+      "eu": "Europe",
+      "us": "United States"
+    },
+    "noAccount": "No account",
+    "deviceDives": {
+      "one": "{n} dive, on this device only, not backed up",
+      "other": "{n} dives, on this device only, not backed up"
+    },
+    "pitch": "A Subsurface account backs up your logbook and shares it between your devices, and with Subsurface on a computer. It is free.",
+    "create": "Create an account",
+    "createText": {
+      "one": "Your dive is sent to it; a confirmation code arrives by email",
+      "other": "Your {n} dives are sent to it; a confirmation code arrives by email"
+    },
+    "signIn": "Sign in to an existing account",
+    "signInText": {
+      "one": "Your dive is added to the account's dives, without overwriting anything",
+      "other": "Your {n} dives are added to the account's dives, without overwriting anything"
+    },
+    "notAvailable": "Not available yet"
   }
 }

@@ -113,9 +113,9 @@ import { registerPlugin } from '@capacitor/core';
  *   Saves the sample log as a local git repository.
  * @property {() => Promise<{exists: boolean, dives: Dive[]}>} listDives
  *   Reads the local git repository again. `exists` is false until a repository has been created.
- * @property {() => Promise<{available: boolean}>} configureCloud
+ * @property {() => Promise<{available: boolean, email: string}>} configureCloud
  *   Sets the cloud account (development credentials), without network.
- *   `available` is false when none is configured.
+ *   `available` is false when none is configured; `email` is the account's.
  * @property {() => Promise<{exists: boolean, head: string}>} probeCloud
  *   Head of the log branch on the server, network only; may run during a load.
  * @property {(options?: {cached?: boolean}) => Promise<CloudDives>} listCloudDives

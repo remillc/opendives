@@ -9,6 +9,7 @@
   import DiveDetail from './pages/DiveDetail.svelte';
   import Placeholder from './pages/Placeholder.svelte';
   import Settings from './pages/Settings.svelte';
+  import Account from './pages/Account.svelte';
   import Icon from './components/Icon.svelte';
   import AdaptiveLabel from './components/AdaptiveLabel.svelte';
   import NavMenu from './components/NavMenu.svelte';
@@ -30,6 +31,7 @@
       { path: '/', component: Logbook },
       { path: '/dive/:id/', component: DiveDetail },
       { path: '/settings/', component: Settings },
+      { path: '/account/', component: Account },
       // Not built yet: editing a dive, and the planner prefilled from a dive.
       {
         path: '/dive/:id/edit/',
@@ -85,5 +87,6 @@
     <View id="view-sites" tab url="/sites/" />
     <View id="view-statistics" tab url="/statistics/" />
     <View id="view-tools" tab url="/tools/" />
+    <View id="view-account" tab url="/account/" />
   </Views>
 </App>

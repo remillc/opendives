@@ -161,5 +161,48 @@
     "open": "Menu",
     "title": "OpenDives",
     "sections": "Sections"
+  },
+  "account": {
+    "title": "Compte",
+    "verified": "Compte Subsurface vérifié",
+    "syncGroup": "Synchronisation",
+    "autoSync": "Synchroniser automatiquement",
+    "autoSyncText": "À l'ouverture, au retour dans l'app et quelques secondes après une modification",
+    "lastSync": "Dernière synchronisation",
+    "lastSyncNever": "Jamais",
+    "todayAt": "aujourd’hui, {time}",
+    "cloudDives": "Plongées dans le cloud",
+    "syncNow": "Synchroniser maintenant",
+    "subsurfaceGroup": "Compte Subsurface",
+    "changePassword": "Changer le mot de passe",
+    "changePasswordText": "Un lien est envoyé à votre courriel",
+    "leaveGroup": "Quitter",
+    "signOut": "Se déconnecter",
+    "signOutText": "Le carnet reste dans le cloud ; il est retiré de cet appareil jusqu’à la prochaine connexion",
+    "delete": "Supprimer le compte",
+    "deleteText": "Supprime le compte et toutes ses plongées du cloud Subsurface. Irréversible.",
+    "server": "Connecté via le serveur {region} ({host}).",
+    "serverHost": "Connecté via le serveur {host}.",
+    "regions": {
+      "eu": "Europe",
+      "us": "États-Unis"
+    },
+    "noAccount": "Sans compte",
+    "deviceDives": {
+      "one": "{n} plongée, seulement sur cet appareil, sans sauvegarde",
+      "other": "{n} plongées, seulement sur cet appareil, sans sauvegarde"
+    },
+    "pitch": "Un compte Subsurface sauvegarde votre carnet et le partage entre vos appareils, et avec Subsurface sur ordinateur. Il est gratuit.",
+    "create": "Créer un compte",
+    "createText": {
+      "one": "Votre plongée y est envoyée ; un code de confirmation arrive par courriel",
+      "other": "Vos {n} plongées y sont envoyées ; un code de confirmation arrive par courriel"
+    },
+    "signIn": "Se connecter à un compte existant",
+    "signInText": {
+      "one": "Votre plongée est ajoutée à celles du compte, sans rien écraser",
+      "other": "Vos {n} plongées sont ajoutées à celles du compte, sans rien écraser"
+    },
+    "notAvailable": "Pas encore disponible"
   }
 }
