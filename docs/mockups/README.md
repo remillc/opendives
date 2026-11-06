@@ -9,8 +9,8 @@ When a mock-up and `docs/ui-specification.md` disagree, the specification wins. 
 | `Main.dc.html` | iPhone, Carnet |
 | `ios-telechargement.dc.html` | iPhone, Téléchargement en cours |
 | `ios-saisie.dc.html` | iPhone, Saisie rapide sur le bateau |
-| `ios-stats-tableau.dc.html` | iPhone, Statistiques précompilées (retenu) |
-| `ios-stats.dc.html` | iPhone, Détail d'une ligne de statistiques |
+| `ios-stats-tableau.dc.html` | Statistiques · iPhone |
+| `ios-stats.dc.html` | Statistiques, résultat filtré · iPhone |
 | `ios-filtre.dc.html` | iPhone, Filtre libre |
 | `ios-accueil.dc.html` | iPhone, Premier lancement |
 | `ios-sites.dc.html` | iPhone, Sites (carte hors ligne) |
@@ -83,3 +83,5 @@ When a mock-up and `docs/ui-specification.md` disagree, the specification wins. 
 | `stats-annee-android.dc.html` | Statistiques, une année · Android |
 | `stats-filtre-android.dc.html` | Statistiques, résultat filtré · Android |
 | `stats-nouvelle-android.dc.html` | Nouvelle statistique · Android |
+| `ios-stats-annee.dc.html` | Statistiques, une année · iPhone |
+| `ios-stats-nouvelle.dc.html` | Nouvelle statistique · iPhone |

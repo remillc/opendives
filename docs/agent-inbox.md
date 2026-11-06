@@ -162,3 +162,7 @@ Then go through every Android screen already built with the reference values of 
 ## [ ] 2026-11-06-22 Statistics section
 
 Build the Statistics section from `docs/ui-specification.md`, section 4, "Statistics", and the mock-ups `docs/mockups/android-stats.dc.html`, `stats-annee-android.dc.html`, `stats-filtre-android.dc.html`, `stats-nouvelle-android.dc.html` (MD3). This supersedes the older statistics boards (`ios-stats*`, `android-stats` before today, tablets): remove the totals by dive computer, add the three ready-made charts, *My statistics* with "New statistic", *By year* and the year screen. No chart builder. Compute every figure with the core (`stats`, yearly statistics); if the core does not expose something the screens need, stop and ask Christian before adding it to the facade.
+
+## [ ] 2026-11-06-23 Statistics section on iPhone
+
+The iPhone screens of the Statistics section are updated to match task 22: `docs/mockups/ios-stats-tableau.dc.html` (main screen), `ios-stats-annee.dc.html` (year), `ios-stats.dc.html` (filtered result, replaces the old "detail of a statistics row"), `ios-stats-nouvelle.dc.html` (new statistic, as a sheet with Annuler / Enregistrer). Same content and rules as on Android (`docs/ui-specification.md`, "Statistics"), with the iOS look: large title, inset grouped lists, chevrons in tertiary grey, actions as rows ("Nouvelle statistique…", "Ajouter un critère…"), a check mark for the selected values.
