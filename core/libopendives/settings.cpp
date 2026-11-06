@@ -72,6 +72,40 @@ static const BoolPref bool_prefs[] = {
 	{ "showScrOcPo2", &preferences::show_scr_ocpo2 },
 	{ "dateFormatOverride", &preferences::date_format_override },
 	{ "timeFormatOverride", &preferences::time_format_override },
+	// The planner's own switches (Subsurface-mobile's "Dive planner setup").
+	{ "lastStop6m", &preferences::last_stop },
+	{ "safetyStop", &preferences::safetystop },
+	{ "switchAtRequiredStop", &preferences::switch_at_req_stop },
+	{ "o2Breaks", &preferences::doo2breaks },
+};
+
+// The planner's own numbers, by key: one int of `preferences`, its range in
+// the key's unit, and the factor from the stored unit to the key's (rates are
+// stored in mm/s and passed in mm/min; set as the planner's per-minute fields
+// do it: value / 60).
+struct IntPref {
+	const char *key;
+	int preferences::*field;
+	long min, max;
+	int per_minute; // 60 for the rates, 1 otherwise
+};
+
+// Ranges of Subsurface's planner fields (desktop-widgets/diveplanner.ui,
+// mobile-widgets/qml/DivePlannerSetup.qml).
+static const IntPref int_prefs[] = {
+	{ "bottomPo2Mbar", &preferences::bottompo2, 160, 2000, 1 },
+	{ "decoPo2Mbar", &preferences::decopo2, 160, 2000, 1 },
+	{ "bottomSacMlMin", &preferences::bottomsac, 1000, 99000, 1 },
+	{ "decoSacMlMin", &preferences::decosac, 1000, 99000, 1 },
+	{ "descentMmMin", &preferences::descrate, 1000, 99000, 60 },
+	{ "ascent75MmMin", &preferences::ascrate75, 1000, 99000, 60 },
+	{ "ascent50MmMin", &preferences::ascrate50, 1000, 99000, 60 },
+	{ "ascentStopsMmMin", &preferences::ascratestops, 1000, 99000, 60 },
+	{ "ascentLast6mMmMin", &preferences::ascratelast6m, 1000, 99000, 60 },
+	{ "minSwitchSeconds", &preferences::min_switch_duration, 0, 9 * 60, 1 },
+	{ "problemSolvingMinutes", &preferences::problemsolvingtime, 0, 99, 1 },
+	{ "sacFactor", &preferences::sacfactor, 100, 900, 1 },
+	{ "reserveMbar", &preferences::reserve_gas, 0, 400000, 1 },
 };
 
 // Partial pressures, stored by the core as bar (double), passed as mbar.
@@ -138,6 +172,8 @@ static void append_values(std::string &json, const preferences &p)
 	json += ",\"setpointMbar\":" + std::to_string(p.defaultsetpoint);
 	json += ",\"o2ConsumptionMlMin\":" + std::to_string(p.o2consumption);
 	json += ",\"pscrRatio\":" + std::to_string(p.pscr_ratio);
+	for (const IntPref &i: int_prefs)
+		json += std::string(",\"") + i.key + "\":" + std::to_string(static_cast<long>(p.*i.field) * i.per_minute);
 }
 
 static dive_computer_prefs_t *dive_computer_slot(preferences &p, int slot)
@@ -234,6 +270,14 @@ static int apply_change(preferences &p, const std::string &key, const JsonValue 
 			if (v.kind != JsonValue::NUMBER)
 				return -1;
 			p.*b.field = v.number != 0;
+			return 0;
+		}
+	}
+	for (const IntPref &i: int_prefs) {
+		if (key == i.key) {
+			if (!in_range(v, i.min, i.max))
+				return -1;
+			p.*i.field = static_cast<int>(v.number / i.per_minute);
 			return 0;
 		}
 	}
@@ -425,6 +469,13 @@ int cylinder_types(std::string &json)
 	}
 	json += "]}";
 	return 0;
+}
+
+void reset_cylinder_library()
+{
+	// "Reset all settings": the device's library back to Subsurface's list.
+	set_tank_info_baseline(default_tank_info_table());
+	reset_tank_info_table(tank_info_table);
 }
 
 int set_cylinder_library(const std::string &library_json, std::string &error)

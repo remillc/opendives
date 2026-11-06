@@ -9,11 +9,13 @@
 // not have are added: the site's country and region (from its taxonomy) and
 // the trip.
 #include "opendives.h"
+#include "internal.h"
 
 #include "core/dive.h"
 #include "core/divecomputer.h"
 #include "core/divelog.h"
 #include "core/divesite.h"
+#include "core/divefilter.h"
 #include "core/filterconstraint.h"
 #include "core/fulltext.h"
 #include "core/gas.h"
@@ -262,11 +264,15 @@ int filter_options(std::string &json)
 	return 0;
 }
 
-int filter_dives(const std::string &fulltext, const std::string &fulltext_mode, const std::vector<filter_rule> &rules,
-		 std::string &json, std::string &error)
+namespace {
+
+// Subsurface's constraints and the OpenDives criteria of a filter. Fulltext
+// mode tokens: "starts_with" (or "startswith", as filter presets write it),
+// "substring", "exact".
+int parse_rules(const std::string &fulltext_mode, const std::vector<filter_rule> &rules,
+		std::vector<filter_constraint> &constraints, std::vector<ExtraRule> &extras, StringFilterMode &mode,
+		std::string &error)
 {
-	std::vector<filter_constraint> constraints;
-	std::vector<ExtraRule> extras;
 	for (const filter_rule &r: rules) {
 		if (r.type == "od_country" || r.type == "od_region" || r.type == "od_trip") {
 			ExtraRule::Kind kind = r.type == "od_country" ? ExtraRule::COUNTRY
@@ -313,14 +319,108 @@ int filter_dives(const std::string &fulltext, const std::string &fulltext_mode, 
 			start = nl + 1;
 		}
 	}
-	if (!fulltext_mode.empty() && !known(fulltext_mode, { "starts_with", "substring", "exact" })) {
+	if (!fulltext_mode.empty() && !known(fulltext_mode, { "starts_with", "startswith", "substring", "exact" })) {
 		error = "BAD_REQUEST: fulltext mode " + fulltext_mode;
 		return -1;
 	}
-	// FilterData's default is "starts with"; tokens as in filterpreset.cpp.
-	StringFilterMode mode = fulltext_mode == "substring" ? StringFilterMode::SUBSTRING
-				: fulltext_mode == "exact"   ? StringFilterMode::EXACT
-							     : StringFilterMode::STARTSWITH;
+	// FilterData's default is "starts with".
+	mode = fulltext_mode == "substring" ? StringFilterMode::SUBSTRING
+	       : fulltext_mode == "exact"   ? StringFilterMode::EXACT
+					    : StringFilterMode::STARTSWITH;
+	return 0;
+}
+
+} // namespace
+
+namespace internal {
+
+int filter_data_from_rules(const std::string &fulltext, const std::string &fulltext_mode,
+			   const std::vector<filter_rule> &rules, FilterData &out, std::string &error)
+{
+	std::vector<filter_constraint> constraints;
+	std::vector<ExtraRule> extras;
+	StringFilterMode mode;
+	if (parse_rules(fulltext_mode, rules, constraints, extras, mode, error))
+		return -1;
+	if (!extras.empty()) {
+		error = "NOT_IN_PRESET: country, region and trip are not Subsurface criteria";
+		return -1;
+	}
+	// The log keeps a text list joined by commas (filter_constraint_data_to_string):
+	// a value with a comma would come back as several values.
+	for (const filter_constraint &c: constraints) {
+		if (!filter_constraint_is_string(c.type))
+			continue;
+		for (const QString &v: *c.data.string_list) {
+			if (v.contains(',')) {
+				error = "NOT_IN_PRESET: a value holds a comma";
+				return -1;
+			}
+		}
+	}
+	out = FilterData();
+	out.fullText = QString::fromStdString(trimmed(fulltext));
+	out.fulltextStringMode = mode;
+	out.constraints = std::move(constraints);
+	return 0;
+}
+
+bool filter_data_equal(const FilterData &a, const FilterData &b)
+{
+	// FilterData::operator== (desktop core/divefilter.cpp, not compiled here).
+	return a.fullText.originalQuery == b.fullText.originalQuery && a.fulltextStringMode == b.fulltextStringMode &&
+	       a.constraints == b.constraints;
+}
+
+void append_filter_data(std::string &json, const FilterData &data)
+{
+	json += "{\"fulltext\":";
+	append_json_string(json, data.fullText.originalQuery.toStdString());
+	json += ",\"mode\":\"";
+	json += data.fulltextStringMode == StringFilterMode::SUBSTRING ? "substring"
+		: data.fulltextStringMode == StringFilterMode::EXACT    ? "exact"
+									: "starts_with";
+	json += "\",\"rules\":[";
+	bool first = true;
+	for (const filter_constraint &c: data.constraints) {
+		if (!first)
+			json += ',';
+		first = false;
+		json += "{\"type\":\"";
+		json += filter_constraint_type_to_string(c.type);
+		json += "\",\"stringMode\":\"";
+		if (filter_constraint_has_string_mode(c.type))
+			json += filter_constraint_string_mode_to_string(c.string_mode);
+		json += "\",\"rangeMode\":\"";
+		if (filter_constraint_has_range_mode(c.type))
+			json += filter_constraint_range_mode_to_string(c.range_mode);
+		json += "\",\"negate\":";
+		json += c.negate ? "true" : "false";
+		json += ",\"data\":";
+		std::string data;
+		if (filter_constraint_is_string(c.type)) {
+			// One value per line, as filter_dives() takes them.
+			for (const QString &v: *c.data.string_list)
+				data += v.toStdString() + "\n";
+		} else {
+			data = filter_constraint_data_to_string(c);
+		}
+		append_json_string(json, data);
+		json += '}';
+	}
+	json += "]}";
+}
+
+} // namespace internal
+
+int filter_dives(const std::string &fulltext, const std::string &fulltext_mode, const std::vector<filter_rule> &rules,
+		 std::string &json, std::string &error)
+{
+	std::vector<filter_constraint> constraints;
+	std::vector<ExtraRule> extras;
+	StringFilterMode mode;
+	if (parse_rules(fulltext_mode, rules, constraints, extras, mode, error))
+		return -1;
 	FullTextQuery query;
 	query = QString::fromStdString(fulltext);
 	bool do_fulltext = query.doit();

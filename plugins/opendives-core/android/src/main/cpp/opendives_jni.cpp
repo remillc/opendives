@@ -182,7 +182,9 @@ static jstring edit_result(JNIEnv *env, const std::string &dive_json)
 	// A trip step gives the trip ({"tripId":...}), a dive step the dive.
 	const char *key = dive_json.rfind("{\"tripId\"", 0) == 0 ? "trip"
 			: dive_json.rfind("{\"uuid\"", 0) == 0 ? "site"
-			: dive_json.rfind("{\"types\"", 0) == 0 ? "cylinderTypes" : "dive";
+			: dive_json.rfind("{\"types\"", 0) == 0 ? "cylinderTypes"
+			: dive_json.rfind("{\"listChange\"", 0) == 0 ? "list"
+			: dive_json.rfind("{\"presetList\"", 0) == 0 ? "presets" : "dive";
 	std::string json = std::string("{\"") + key + "\":" + dive_json + ",\"undo\":\"" + quoted(opendives::undo_text());
 	json += "\",\"redo\":\"" + quoted(opendives::redo_text()) + "\"}";
 	return env->NewStringUTF(json.c_str());
@@ -298,6 +300,86 @@ Java_org_opendives_core_NativeCore_filterQuery(JNIEnv *env, jobject, jstring kin
 		return nullptr;
 	}
 	return env->NewStringUTF(json.c_str());
+}
+
+// Logs a dive by hand: one undoable step (create_dive).
+JNIEXPORT jstring JNICALL
+Java_org_opendives_core_NativeCore_createDive(JNIEnv *env, jobject, jstring fields)
+{
+	std::string json, error;
+	if (opendives::create_dive(to_string(env, fields), json, error)) {
+		throw_core_error(env, error);
+		return nullptr;
+	}
+	return edit_result(env, json);
+}
+
+// Imports a file into the log: one undoable step (import_dives).
+JNIEXPORT jstring JNICALL
+Java_org_opendives_core_NativeCore_importDives(JNIEnv *env, jobject, jstring file, jstring source)
+{
+	std::string json, error;
+	if (opendives::import_dives(to_string(env, file), to_string(env, source), json, error)) {
+		throw_core_error(env, error);
+		return nullptr;
+	}
+	return edit_result(env, json);
+}
+
+// Filter presets: action "list" (read-only), "save" (rules: five strings per
+// rule, as filterQuery) or "delete" (index); save and delete are undoable steps.
+JNIEXPORT jstring JNICALL
+Java_org_opendives_core_NativeCore_filterPresets(JNIEnv *env, jobject, jstring actionIn, jstring name,
+						 jstring fulltext, jstring mode, jobjectArray rulesIn, jint index)
+{
+	std::string action = to_string(env, actionIn), json, error;
+	if (action == "list") {
+		opendives::filter_presets_json(json);
+		return env->NewStringUTF(json.c_str());
+	}
+	int ret;
+	if (action == "delete") {
+		ret = opendives::filter_preset_delete(index, json, error);
+	} else {
+		std::vector<std::string> flat;
+		jsize n = rulesIn ? env->GetArrayLength(rulesIn) : 0;
+		for (jsize i = 0; i < n; i++) {
+			auto s = static_cast<jstring>(env->GetObjectArrayElement(rulesIn, i));
+			flat.push_back(s ? to_string(env, s) : std::string());
+			if (s)
+				env->DeleteLocalRef(s);
+		}
+		std::vector<opendives::filter_rule> rules;
+		for (size_t i = 0; i + 4 < flat.size(); i += 5)
+			rules.push_back({ flat[i], flat[i + 1], flat[i + 2], flat[i + 4], flat[i + 3] == "1" });
+		ret = opendives::filter_preset_save(to_string(env, name), to_string(env, fulltext), to_string(env, mode), rules,
+						    json, error);
+	}
+	if (ret) {
+		throw_core_error(env, error);
+		return nullptr;
+	}
+	return edit_result(env, json);
+}
+
+// Sync conflict: the read (sync_conflicts), or the choice of a side (resolve_conflicts).
+JNIEXPORT jstring JNICALL
+Java_org_opendives_core_NativeCore_syncConflicts(JNIEnv *env, jobject)
+{
+	std::string json, error;
+	if (opendives::sync_conflicts(json, error)) {
+		throw_core_error(env, error);
+		return nullptr;
+	}
+	return env->NewStringUTF(json.c_str());
+}
+
+JNIEXPORT void JNICALL
+Java_org_opendives_core_NativeCore_resolveConflicts(JNIEnv *env, jobject, jstring keep)
+{
+	std::string error;
+	if (opendives::resolve_conflicts(to_string(env, keep), error))
+		throw_core_error(env, error);
 }
 
 // One undoable site change: create, edit, geocode, merge, delete.
@@ -475,6 +557,10 @@ Java_org_opendives_core_NativeCore_cylinderTypes(JNIEnv *env, jobject, jstring a
 		ret = opendives::cylinder_types(json);
 	else if (action == "library")
 		ret = opendives::set_cylinder_library(value, error) ? -1 : opendives::cylinder_types(json);
+	else if (action == "standard") {
+		opendives::reset_cylinder_library();
+		ret = opendives::cylinder_types(json);
+	}
 	else if (action == "rename")
 		ret = opendives::cylinder_type_rename(name, value, json, error);
 	else

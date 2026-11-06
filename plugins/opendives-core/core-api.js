@@ -118,7 +118,13 @@ import { registerPlugin } from '@capacitor/core';
  *   setpointMbar: number, showCcrSensors: boolean, showCcrSetpoint: boolean,
  *   allowOcGasAsDiluent: boolean, showScrOcPo2: boolean,
  *   o2ConsumptionMlMin: number, pscrRatio: number,
+ *   bottomPo2Mbar: number, decoPo2Mbar: number, bottomSacMlMin: number, decoSacMlMin: number,
+ *   descentMmMin: number, ascent75MmMin: number, ascent50MmMin: number, ascentStopsMmMin: number,
+ *   ascentLast6mMmMin: number, lastStop6m: boolean, safetyStop: boolean, switchAtRequiredStop: boolean,
+ *   minSwitchSeconds: number, o2Breaks: boolean, reserveMbar: number, problemSolvingMinutes: number,
+ *   sacFactor: number,
  * }} CorePrefValues
+ * The planner's own values (rates in mm per minute, sacFactor x100) are set from the planner screen.
  */
 
 /**
@@ -147,6 +153,9 @@ import { registerPlugin } from '@capacitor/core';
  * @property {string[]} library the device's library, to keep as is and set again at start
  * @property {string} undo
  * @property {string} redo
+ */
+
+/**
  * Planner settings (plan_dive in opendives.h). The deco model, gradient
  * factors and VPM-B conservatism are the shared preferences (Settings); the
  * others are the planner's own, rates in mm per minute.
@@ -180,6 +189,7 @@ import { registerPlugin } from '@capacitor/core';
  * @property {number} hePermille
  * @property {number} sizeMl
  * @property {number} startMbar
+ * @property {number} [switchDepthMm] deco gases: 0 or absent for the MOD at the ppO2 for deco
  */
 
 /**
@@ -273,6 +283,20 @@ import { registerPlugin } from '@capacitor/core';
  */
 
 /**
+ * A filter preset of the log (Subsurface's filter_presets). `index` is its
+ * place in the list, valid until the next change.
+ * @typedef {{index: number, name: string, filter: {fulltext: string, mode: string, rules: FilterRule[]}}} FilterPreset
+ */
+
+/**
+ * A sync conflict after an automatic merge (sync_conflicts): for each file,
+ * the lines both sides changed differently.
+ * @typedef {{conflict: false} | {conflict: true, deviceTime: string, cloudTime: string,
+ *   items: {path: string, diveId: number, number: number, date: string,
+ *   lines: {key: string, device: string, cloud: string}[]}[]}} SyncConflicts
+ */
+
+/**
  * Values present in the loaded log for each filter criterion (filter_options).
  * @typedef {{modes: string[], years: [number, number], suits: string[], computers: string[],
  *   cylinderTypes: string[], tags: string[], people: string[], sites: string[], countries: string[],
@@ -333,6 +357,9 @@ import { registerPlugin } from '@capacitor/core';
  * @property {SiteDetail} [site] the site after a site step
  * @property {TripDetail} [trip] the trip after a trip step
  * @property {{types: CylinderType[], library: string[]}} [cylinderTypes] after a cylinder type rename
+ * @property {{listChange: true, dives: number, id: number}} [list] after a dive was added or
+ *   imported, or such a step undone: the dives in the log, the first dive added (0 if none)
+ * @property {{presetList: FilterPreset[]}} [presets] after a filter preset step
  * @property {string} undo text of the step that Undo would revert ("Edit notes [#12]"); empty when none
  * @property {string} redo text of the step that Redo would apply; empty when none
  */
@@ -399,6 +426,16 @@ import { registerPlugin } from '@capacitor/core';
  * @property {(options: {kind: 'options'} | {kind: 'dives', fulltext?: string, mode?: string, rules: FilterRule[]}) => Promise<any>} filterQuery
  *   Read-only free filter (opendives.h): FilterOptions, or the identifiers of the
  *   dives matching every rule and the fulltext query (number[]).
+ * @property {(options: {fields: Record<string, string|number|string[]>}) => Promise<EditResult>} createDive
+ *   Logs a dive by hand, one undoable step (create_dive in opendives.h).
+ * @property {(options: {name: string, data: string}) => Promise<EditResult>} importDives
+ *   Imports a file (base64 contents, original name), one undoable step (import_dives).
+ * @property {(options: {action: 'list'} | {action: 'save', name: string, fulltext?: string, mode?: string, rules: FilterRule[]} | {action: 'delete', index: number}) => Promise<any>} filterPresets
+ *   Filter presets: the list ({presetList}), or an undoable save or delete (EditResult).
+ * @property {() => Promise<SyncConflicts>} syncConflicts
+ *   Read-only: the conflicts left by the last automatic merge.
+ * @property {(options: {keep: 'device'|'cloud'}) => Promise<void>} resolveConflicts
+ *   Keeps one side of every conflict, then reads the log again (no network).
  * @property {(options: {action: 'create'|'edit'|'geocode'|'merge'|'delete'|'deleteSite', uuid?: number, other?: number, uuids?: number[], field?: string, value?: string, lat?: number, lon?: number}) => Promise<EditResult>} siteAction
  *   One undoable site change, as Subsurface's site commands.
  * @property {(options: {tripId: number}) => Promise<TripDetail>} getTrip
@@ -417,10 +454,9 @@ import { registerPlugin } from '@capacitor/core';
  *   The core's preferences: units (the loaded log's when it has them), the Settings values.
  * @property {(options: {changes: Partial<CorePrefValues> & {forgetDiveComputer?: number}}) => Promise<void>} setPrefs
  *   Sets core preferences (set_prefs in opendives.h); a device setting, kept by the app.
- * @property {(options: {action: 'list'|'library'|'add'|'size'|'remove'|'rename', name?: string, value?: string, ml?: number, mbar?: number}) => Promise<CylinderTypes>} cylinderTypes
+ * @property {(options: {action: 'list'|'library'|'standard'|'add'|'size'|'remove'|'rename', name?: string, value?: string, ml?: number, mbar?: number}) => Promise<CylinderTypes>} cylinderTypes
  *   Cylinder types of Settings; "rename" (to value) changes the log as one undoable step,
  *   "library" sets the device's library (value: JSON {"library": [...]}).
- *   Units of the last loaded log.
  * @property {() => Promise<PlannerSetup>} plannerSetup
  *   The planner's settings as the core's preferences hold them.
  * @property {(request: PlanRequest) => Promise<PlanResult>} planDive
@@ -484,6 +520,19 @@ export const OpenDivesCore = {
   async filterQuery(options) {
     return JSON.parse((await native.filterQuery(options)).json);
   },
+  async createDive(options) {
+    return JSON.parse((await native.createDive(options)).json);
+  },
+  async importDives(options) {
+    return JSON.parse((await native.importDives(options)).json);
+  },
+  async filterPresets(options) {
+    return JSON.parse((await native.filterPresets(options)).json);
+  },
+  async syncConflicts() {
+    return JSON.parse((await native.syncConflicts()).json);
+  },
+  resolveConflicts: (options) => native.resolveConflicts(options),
   async siteAction(options) {
     return JSON.parse((await native.siteAction(options)).json);
   },

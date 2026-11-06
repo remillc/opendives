@@ -18,11 +18,9 @@ import { keepCylinderLibrary } from './settings.svelte.js';
  */
 
 /**
- * A dive changed here and in the cloud that the core could not merge.
- * `date`: local time of the dive; `field`: what changed on both sides
- * (notes, suit…); `localWhen`, `cloudWhen`: where and when each version was
- * made, as sentences.
- * @typedef {{ date: string, field: string, localWhen: string, cloudWhen: string }} Conflict
+ * Dives changed here and in the cloud on the same line, which Subsurface's
+ * automatic merge could not combine (OpenDivesCore.syncConflicts).
+ * @typedef {Extract<import('opendives-core').SyncConflicts, {conflict: true}>} Conflict
  */
 
 export const logbook = $state({
@@ -52,8 +50,8 @@ export const logbook = $state({
    */
   pendingByDive: /** @type {Record<number, string[]>} */ ({}),
   /**
-   * A sync the core could not merge (spec, section 6, "Conflict"); not
-   * reported by the core yet: always null for now.
+   * A sync conflict to settle (spec, section 6, "Conflict"): read after each
+   * sync of the cloud log, cleared once the diver chose a version.
    */
   conflict: /** @type {Conflict|null} */ (null),
   /** First launch is shown (first start, or after signing out): nothing is loaded until a choice is made. */
@@ -140,10 +138,77 @@ export async function refreshAfterChange(undoText) {
   await persistChanges();
 }
 
+/**
+ * Logs a dive by hand (one undoable step), saved and synced like an edit.
+ * @param {Record<string, string|number|string[]>} fields
+ * @returns {Promise<number>} the new dive's identifier
+ */
+export async function addDive(fields) {
+  const result = await OpenDivesCore.createDive({ fields });
+  logbook.undoText = result.undo;
+  logbook.dives = await OpenDivesCore.listLoadedDives();
+  await persistChanges();
+  return result.list?.id ?? 0;
+}
+
+/**
+ * Imports a file chosen by the diver (one undoable step), saved and synced
+ * like an edit. Errors keep the core's code (IMPORT_FAILED, NO_DIVES,
+ * NO_NEW_DIVES) for the message.
+ * @param {File} file
+ * @returns {Promise<number>} the number of dives added to the logbook
+ */
+export async function importFile(file) {
+  const before = logbook.dives.length;
+  const data = await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result).replace(/^data:[^,]*,/, ''));
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
+  });
+  const result = await OpenDivesCore.importDives({ name: file.name, data });
+  logbook.undoText = result.undo;
+  logbook.dives = await OpenDivesCore.listLoadedDives();
+  logbook.sitesVersion++;
+  await persistChanges();
+  return Math.max(0, logbook.dives.length - before);
+}
+
+/**
+ * After each sync of the cloud log: the conflicts Subsurface's merge left,
+ * if any (read only).
+ */
+async function readConflicts() {
+  if (!logbook.email) return;
+  try {
+    const found = await OpenDivesCore.syncConflicts();
+    logbook.conflict = found.conflict ? found : null;
+  } catch (e) {
+    console.error('Reading the sync conflicts', e);
+  }
+}
+
+/**
+ * The diver's choice for a sync conflict: one side kept for every
+ * conflicting dive, in a new commit, then synced like an edit.
+ * @param {'device'|'cloud'} keep
+ */
+export async function resolveConflict(keep) {
+  await OpenDivesCore.resolveConflicts({ keep });
+  logbook.conflict = null;
+  logbook.undoText = '';
+  logbook.dives = await OpenDivesCore.listLoadedDives();
+  await persistChanges();
+}
+
 /** Undoes the last edit, saved and synced the same way. */
 export async function undoLastChange() {
   const result = await OpenDivesCore.undo();
   if (result.dive) logbook.edited = { id: result.dive.id, dive: result.dive };
+  if (result.list) {
+    logbook.dives = await OpenDivesCore.listLoadedDives();
+    logbook.sitesVersion++;
+  }
   if (result.trip) {
     logbook.editedTrip = result.trip;
     logbook.dives = await OpenDivesCore.listLoadedDives();
@@ -177,6 +242,7 @@ async function syncEdits() {
     }
     logbook.sync = status.status === 'offline' || status.status === 'stopped' ? 'offline' : 'cloud';
     if (logbook.sync === 'cloud') markSynced();
+    if (status.status === 'merged') await readConflicts();
   } catch (e) {
     console.error('Syncing the edits', e);
     logbook.sync = 'offline';
@@ -490,6 +556,7 @@ export async function loadLogbook({ force = false } = {}) {
       // "Sync now" too (spec, section 4).
       if (!logbook.autoSync) logbook.sync = 'manual';
       await countPending();
+      await readConflicts();
     } else {
       let local = await OpenDivesCore.listDives();
       if (!local.exists) {

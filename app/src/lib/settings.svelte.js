@@ -124,6 +124,21 @@ export async function setCorePrefs(changes) {
   return prefs;
 }
 
+/**
+ * Sets core preferences back to Subsurface's defaults and forgets them as
+ * this device's values (the planner's "Back to Subsurface's values").
+ * @param {(keyof CorePrefValues)[]} keys
+ */
+export async function resetCorePrefs(keys) {
+  const { defaults } = await OpenDivesCore.getPrefs();
+  if (!defaults) return;
+  /** @type {Partial<CorePrefValues>} */
+  const changes = Object.fromEntries(keys.map((key) => [key, defaults[key]]));
+  await OpenDivesCore.setPrefs({ changes });
+  for (const key of keys) delete storedCore[key];
+  writeJson(CORE_KEY, storedCore);
+}
+
 /** Forgets one remembered dive computer (slot 1 to 4), or all of them (0). @param {number} slot */
 export async function forgetDiveComputers(slot) {
   await OpenDivesCore.setPrefs({ changes: { forgetDiveComputer: slot } });
@@ -162,6 +177,9 @@ export async function resetAllSettings(defaults) {
   await OpenDivesCore.setPrefs({ changes: defaults });
   for (const key of Object.keys(storedCore)) delete storedCore[/** @type {keyof CorePrefValues} */ (key)];
   writeJson(CORE_KEY, null);
+  // The cylinder types too: back to Subsurface's standard list (Christian's choice).
+  await OpenDivesCore.cylinderTypes({ action: 'standard' });
+  writeJson(LIBRARY_KEY, null);
   try {
     localStorage.removeItem('od.extraConditions');
   } catch {

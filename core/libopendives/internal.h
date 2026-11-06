@@ -3,7 +3,12 @@
 #ifndef OPENDIVES_INTERNAL_H
 #define OPENDIVES_INTERNAL_H
 
+#include "opendives.h"
+
 #include <string>
+#include <vector>
+
+struct FilterData;
 
 namespace opendives::internal {
 
@@ -39,6 +44,17 @@ int pending_for(const std::string &log);
 // True when `name` is a cylinder type of the runtime table or of the device's
 // library (settings.cpp; TankInfoModel's tank_type_name_in_use()).
 bool cylinder_type_name_in_use(const std::string &name);
+
+// Free filter (filter.cpp). A filter as Subsurface's FilterData, for a filter
+// preset: refuses the OpenDives criteria (country, region, trip) and text
+// values holding a comma, which the log could not keep (NOT_IN_PRESET).
+int filter_data_from_rules(const std::string &fulltext, const std::string &fulltext_mode,
+			   const std::vector<filter_rule> &rules, FilterData &out, std::string &error);
+// FilterData::operator== of desktop core/divefilter.cpp, not compiled here.
+bool filter_data_equal(const FilterData &a, const FilterData &b);
+// {"fulltext", "mode", "rules":[{type, stringMode, rangeMode, negate, data}]},
+// text values one per line, as filter_dives() takes them.
+void append_filter_data(std::string &json, const FilterData &data);
 
 } // namespace opendives::internal
 

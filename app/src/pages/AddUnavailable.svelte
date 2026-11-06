@@ -1,9 +1,8 @@
 <script>
   // @ts-check
   // A choice of the "+" button that this version cannot do yet: downloading
-  // from the dive computer (Bluetooth), importing a file (file picker), logging
-  // a dive by hand (creating a dive in the core), taking a divelogs.de logbook.
-  // Says so plainly, what does not change, and what works meanwhile.
+  // from the dive computer (Bluetooth, no plugin chosen yet). Says so plainly,
+  // what does not change, and what works meanwhile.
   import { Page, Navbar, Block, theme } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
@@ -11,9 +10,9 @@
 
   /** @type {{ f7route: { params: { what: string } } }} */
   let { f7route } = $props();
-  const what = ['download', 'import', 'manual', 'divelogs'].includes(f7route.params.what) ? f7route.params.what : 'download';
-  /** @type {Record<string, 'download'|'file'|'edit'>} */
-  const icons = { download: 'download', import: 'file', manual: 'edit', divelogs: 'download' };
+  const what = ['download'].includes(f7route.params.what) ? f7route.params.what : 'download';
+  /** @type {Record<string, 'download'>} */
+  const icons = { download: 'download' };
 </script>
 
 <Page>
@@ -23,7 +22,7 @@
     <h1 class="od-state-title">{t('addUnavailable.heading')}</h1>
     <p>{t(`addUnavailable.${what}.text`)}</p>
     <p>{t('addUnavailable.nothingChanged')}</p>
-    {#if logbook.email && what !== 'divelogs'}<p>{t('addUnavailable.meanwhileCloud')}</p>{/if}
+    {#if logbook.email}<p>{t('addUnavailable.meanwhileCloud')}</p>{/if}
   </Block>
 </Page>
 

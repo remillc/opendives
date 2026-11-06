@@ -562,6 +562,82 @@ class OpenDivesCorePlugin : Plugin() {
         call.resolve(JSObject().put("json", json))
     }
 
+    /** The five strings per rule that the native side takes (see filterQuery). */
+    private fun PluginCall.flatRules(): Array<String> {
+        val rules = mutableListOf<String>()
+        val list = getArray("rules") ?: return rules.toTypedArray()
+        for (i in 0 until list.length()) {
+            val rule = list.getJSONObject(i)
+            rules.add(rule.optString("type"))
+            rules.add(rule.optString("stringMode"))
+            rules.add(rule.optString("rangeMode"))
+            rules.add(if (rule.optBoolean("negate")) "1" else "0")
+            rules.add(rule.optString("data"))
+        }
+        return rules.toTypedArray()
+    }
+
+    /** Logs a dive by hand (create_dive): one undoable step. */
+    @PluginMethod
+    fun createDive(call: PluginCall) = onCoreThread(call) {
+        val fields = call.getObject("fields")
+        if (fields == null) {
+            call.reject("Missing fields", "BAD_ARGUMENT")
+            return@onCoreThread
+        }
+        call.resolve(JSObject().put("json", NativeCore.createDive(fields.toString())))
+    }
+
+    /**
+     * Imports a file chosen in the WebView (import_dives): its bytes arrive in
+     * base64, are written to a temporary file with the original name (the core
+     * reads the format from it), imported, then the copy is deleted.
+     */
+    @PluginMethod
+    fun importDives(call: PluginCall) = onCoreThread(call) {
+        val name = File(call.getString("name").orEmpty()).name.ifEmpty { "import.xml" }
+        val data = call.getString("data")
+        if (data == null) {
+            call.reject("Missing data", "BAD_ARGUMENT")
+            return@onCoreThread
+        }
+        val dir = File(context.cacheDir, "import").apply { mkdirs() }
+        val file = File(dir, name)
+        try {
+            file.writeBytes(Base64.decode(data, Base64.DEFAULT))
+            call.resolve(JSObject().put("json", NativeCore.importDives(file.absolutePath, name)))
+        } finally {
+            file.delete()
+        }
+    }
+
+    /** Filter presets of the log: list, save (undoable), delete (undoable). */
+    @PluginMethod
+    fun filterPresets(call: PluginCall) = onCoreThread(call) {
+        val json = NativeCore.filterPresets(
+            call.getString("action").orEmpty(),
+            call.getString("name").orEmpty(),
+            call.getString("fulltext").orEmpty(),
+            call.getString("mode").orEmpty(),
+            call.flatRules(),
+            call.getInt("index") ?: -1,
+        )
+        call.resolve(JSObject().put("json", json))
+    }
+
+    /** Sync conflict after an automatic merge (read-only). */
+    @PluginMethod
+    fun syncConflicts(call: PluginCall) = onCoreThread(call) {
+        call.resolve(JSObject().put("json", NativeCore.syncConflicts()))
+    }
+
+    /** Keeps one side of a sync conflict ("device" or "cloud"), then reads the log again. */
+    @PluginMethod
+    fun resolveConflicts(call: PluginCall) = onCoreThread(call) {
+        NativeCore.resolveConflicts(call.getString("keep").orEmpty())
+        call.resolve()
+    }
+
     /** One undoable site change (see opendives.h): create, edit, geocode, merge, delete. */
     @PluginMethod
     fun siteAction(call: PluginCall) = onCoreThread(call) {

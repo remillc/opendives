@@ -45,7 +45,16 @@
     "emptyPair": "Associer un ordinateur de plongée",
     "emptyDivelogs": "Télécharger depuis divelogs.de",
     "emptyNote": "Les fichiers de Subsurface (.ssrf, .xml), de divelogs.de et d'autres carnets s'importent ici.",
-    "noFilterResults": "Aucune plongée ne correspond au filtre."
+    "noFilterResults": "Aucune plongée ne correspond au filtre.",
+    "imported": {
+      "one": "{n} plongée importée",
+      "other": "{n} plongées importées"
+    },
+    "importTitle": "Importer un fichier",
+    "importNothingNew": "Toutes les plongées de ce fichier sont déjà dans le carnet. Aucune plongée n'a été modifiée.",
+    "importNoDives": "Ce fichier ne contient aucune plongée. Aucune plongée n'a été modifiée.",
+    "importFailed": "Ce fichier n'a pas pu être lu. Les fichiers de Subsurface (.ssrf, .xml), de divelogs.de et d'autres carnets sont acceptés. Aucune plongée n'a été modifiée.",
+    "importing": "Import du fichier en cours"
   },
   "sync": {
     "syncing": "Synchronisation avec le cloud Subsurface…",
@@ -1100,7 +1109,15 @@
     "reset": "Revenir aux valeurs de Subsurface",
     "resetTitle": "Revenir aux valeurs de Subsurface ?",
     "resetText": "Les vitesses, la réserve, les pO₂ et les paliers reprennent les valeurs par défaut de Subsurface. La plongée à planifier ne change pas.",
-    "resetAction": "Revenir aux valeurs"
+    "resetAction": "Revenir aux valeurs",
+    "decoGases": "Gaz de décompression",
+    "decoGasAt": "{gas} à {depth}",
+    "decoGasesNone": "Aucun",
+    "groupDecoGases": "Gaz de décompression",
+    "addDecoGas": "Ajouter un gaz de décompression",
+    "removeDecoGas": "Retirer",
+    "switchDepth": "Profondeur de changement",
+    "switchDepthAuto": "Vide : la MOD à la pO₂ de décompression, comme dans Subsurface"
   },
   "filter": {
     "title": "Filtrer",
@@ -1220,7 +1237,23 @@
       "one": "{n} plongée sur {total}",
       "other": "{n} plongées sur {total}"
     },
-    "clear": "Retirer le filtre"
+    "clear": "Retirer le filtre",
+    "savedFilter": "Filtre enregistré",
+    "savedFilters": "Filtres enregistrés",
+    "save": "Enregistrer ce filtre",
+    "saveTitle": "Enregistrer ce filtre",
+    "saveText": "Le filtre est enregistré dans le carnet, comme dans Subsurface.",
+    "name": "Nom du filtre",
+    "saveConfirm": "Enregistrer",
+    "nameRequired": "Nom requis",
+    "saved": "Filtre « {name} » enregistré",
+    "notInPreset": "Le pays, la région, le voyage et les valeurs contenant une virgule ne peuvent pas être enregistrés dans un filtre de Subsurface.",
+    "saveFailed": "Le filtre n'a pas pu être enregistré.",
+    "deleteTitle": "Supprimer le filtre « {name} »",
+    "deleteText": "Les plongées ne changent pas.",
+    "delete": "Supprimer",
+    "deleted": "Filtre « {name} » supprimé",
+    "deleteNamed": "Supprimer le filtre {name}"
   },
   "addUnavailable": {
     "heading": "Pas encore disponible",
@@ -1263,7 +1296,7 @@
   },
   "conflict": {
     "title": "Plongée modifiée à deux endroits",
-    "text": "{field} de la plongée du {date} ont changé ici et dans le cloud (depuis un autre appareil), et les deux versions ne se combinent pas. Rien n'est perdu tant que vous n'avez pas choisi.",
+    "text": "La plongée du {date} a été modifiée ici et dans le cloud (depuis un autre appareil) : {field}. Les deux versions ne se combinent pas. Rien n'est perdu tant que vous n'avez pas choisi.",
     "choiceLabel": "Version à garder",
     "device": "Garder la version de ce téléphone",
     "cloud": "Prendre la version du cloud",
@@ -1272,16 +1305,38 @@
     "continue": "Continuer",
     "continueLong": "Continuer la synchronisation",
     "fields": {
-      "notes": "Les notes",
-      "suit": "La combinaison",
-      "rating": "La note",
-      "visibility": "La visibilité",
+      "notes": "notes",
+      "suit": "combinaison",
+      "rating": "note globale",
+      "visibility": "visibilité",
       "buddies": "Les compagnons",
       "diveguide": "Le guide",
-      "tags": "Les étiquettes",
+      "tags": "étiquettes",
       "site": "Le site",
-      "dive": "La fiche"
-    }
+      "dive": "La fiche",
+      "buddy": "compagnons",
+      "divemaster": "guide de palanquée",
+      "divesiteid": "site",
+      "current": "courant",
+      "wavesize": "vagues de surface",
+      "surge": "flux-reflux",
+      "chill": "froid",
+      "airtemp": "température de l'air",
+      "watertemp": "température de l'eau",
+      "duration": "durée",
+      "other": "fiche de la plongée"
+    },
+    "textNoDate": "Une plongée a été modifiée ici et dans le cloud (depuis un autre appareil) : {field}. Les deux versions ne se combinent pas. Rien n'est perdu tant que vous n'avez pas choisi.",
+    "more": {
+      "one": "Une autre plongée est dans le même cas.",
+      "other": "{n} autres plongées sont dans le même cas."
+    },
+    "deviceWhen": "Modifiée le {when}",
+    "cloudWhen": "Envoyée depuis un autre appareil le {when}",
+    "thisDevice": "Ce téléphone :",
+    "theCloud": "Cloud :",
+    "empty": "(vide)",
+    "failed": "Le choix n'a pas pu être enregistré. Rien n'a changé."
   },
   "confirmCode": {
     "heading": "Confirmer votre adresse",
@@ -1326,5 +1381,28 @@
     "editCredentials": "Modifier les identifiants",
     "empty": "Carnet vide",
     "emptyLong": "Commencer avec un carnet vide"
+  },
+  "newDive": {
+    "title": "Noter une plongée",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "dateTime": "Date et heure",
+    "dateHint": "Par exemple 2026-11-06 09:30",
+    "dateInvalid": "Date non reconnue, par exemple 2026-11-06 09:30",
+    "duration": "Durée (min)",
+    "depth": "Profondeur maximale ({unit})",
+    "required": "Valeur requise",
+    "profileHint": "Un profil simple est tracé à partir de la profondeur et de la durée, comme dans Subsurface-mobile.",
+    "site": "Site",
+    "searchSite": "Chercher un site",
+    "noSite": "Site à préciser",
+    "lastDive": "Dernière plongée le {date}",
+    "newSiteNote": "Un nouveau site se crée dans Sites, puis se choisit en modifiant la plongée.",
+    "more": "Compagnons, note et notes",
+    "buddies": "Compagnons",
+    "rating": "Note globale",
+    "notes": "Notes",
+    "saved": "Plongée ajoutée",
+    "failed": "La plongée n'a pas pu être ajoutée. Aucune plongée n'a été modifiée."
   }
 }

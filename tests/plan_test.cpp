@@ -139,6 +139,25 @@ int main()
 	      "mock-up: stops at 6 and 3 m");
 	check(num(mock, "cns") == 16 && num(mock, "otu") == 44, "mock-up: CNS 16 %, 44 OTU");
 
+	// A deco gas with its switch depth chosen (EAN50 at 9 m instead of its MOD,
+	// 21 m at ppO2 1.6): the switch happens at 9 m.
+	std::string deco = run("{\"depthMm\":40000,\"bottomTimeSeconds\":1500,\"when\":1000000000,"
+			       "\"cylinders\":[{\"o2Permille\":210,\"hePermille\":0,\"sizeMl\":24000,\"startMbar\":200000},"
+			       "{\"o2Permille\":500,\"hePermille\":0,\"sizeMl\":7000,\"startMbar\":200000,\"switchDepthMm\":9000}]}");
+	std::string mod = run("{\"depthMm\":40000,\"bottomTimeSeconds\":1500,\"when\":1000000000,"
+			      "\"cylinders\":[{\"o2Permille\":210,\"hePermille\":0,\"sizeMl\":24000,\"startMbar\":200000},"
+			      "{\"o2Permille\":500,\"hePermille\":0,\"sizeMl\":7000,\"startMbar\":200000}]}");
+	check(num(mod, "switchDepthMm", item(mod, "cylinders", 1)) == 21000, "deco gas: EAN50 switch at its MOD, 21 m");
+	check(num(deco, "switchDepthMm", item(deco, "cylinders", 1)) == 9000, "deco gas: chosen switch depth kept");
+	bool at9 = false;
+	for (int i = 0; item(deco, "stops", i) != std::string::npos && item(deco, "stops", i) < deco.find("\"cylinders\""); i++) {
+		size_t at = item(deco, "stops", i);
+		if (deco.compare(deco.find("\"gasChange\":", at) + 12, 4, "true") == 0)
+			at9 |= num(deco, "depthMm", at) == 9000 && num(deco, "cylinder", at) == 1;
+	}
+	check(at9, "deco gas: switch to EAN50 on the 9 m stop");
+	check(num(deco, "gasUsedMl", item(deco, "cylinders", 1)) > 0, "deco gas: its gas use");
+
 	std::string bad, error;
 	check(opendives::plan_dive("{\"depthMm\":0}", bad, error) == -1 && error.rfind("BAD_REQUEST", 0) == 0, "bad request refused");
 

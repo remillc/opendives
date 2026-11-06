@@ -59,6 +59,8 @@ int cylinder_types(std::string &json);
 // The device's library, {"library":[…]} as cylinder_types() writes it, set
 // again at start (Subsurface keeps it in its settings); rebuilds the table.
 int set_cylinder_library(const std::string &library_json, std::string &error);
+// The library back to Subsurface's standard list (Reset all settings).
+void reset_cylinder_library();
 // action: "add" (a new type `name` of `ml` and `mbar`; NAME_IN_USE), "size"
 // (`ml` and `mbar` of the type `name`, in the table and, if it is there, in the
 // library), "remove" (from the library and the table, and as the default
@@ -333,8 +335,9 @@ int planner_setup(std::string &json);
 
 // Runs Subsurface's planner on a square profile. `request`: {"depthMm",
 // "bottomTimeSeconds" (descent included), "cylinders":[{"o2Permille",
-// "hePermille", "sizeMl", "startMbar"}] (the first is the bottom gas, the
-// others are switched to at their depth for the ppO2 for deco), optional
+// "hePermille", "sizeMl", "startMbar", optional "switchDepthMm"}] (the first
+// is the bottom gas, the others are switched to at their switch depth, by
+// default the MOD at the ppO2 for deco rounded to 3 m / 10 ft), optional
 // "surfacePressureMbar" (1013), "salinity" (10300, sea water), "when" (local
 // timestamp; default an hour from now, or after the latest dive), and any
 // planner-only setting of planner_setup(), for this plan only}.
@@ -384,6 +387,48 @@ int filter_options(std::string &json);
 // as a JSON array. BAD_REQUEST for a type or mode not accepted.
 int filter_dives(const std::string &fulltext, const std::string &fulltext_mode, const std::vector<filter_rule> &rules,
 		 std::string &json, std::string &error);
+
+// --- Adding and importing dives, filter presets (edit.cpp) ------------------
+// Each is one undoable step, saved and synced like an edit. A dive list step
+// gives {"listChange":true, "dives":<dives in the log>, "id":<first dive
+// added, 0 if none>}, also on its undo and redo.
+
+// Logs a dive by hand (spec, section 3, "Add"): Subsurface-mobile's
+// QMLManager::addDive() (the core's default dive) with the values of the form
+// as its commitChanges() sets them (a simple profile from the depth and the
+// duration, fake_dc()), added by AddDive (autogroup, new number). Fields:
+// "date" ("YYYY-MM-DDTHH:MM", local time), "durationSeconds", "maxDepthMm",
+// "site" (uuid, 0 for none), "notes", "suit", "buddies", "guides", "tags"
+// (lists), "rating", "visibility" (0 to 5), "waterTempMk", "airTempMk".
+int create_dive(const std::string &fields_json, std::string &result_json, std::string &error);
+
+// Imports a file (.ssrf, .xml and the other formats the core reads) into the
+// log: parse_file(), then ImportDives with merge_all_trips, as
+// QMLManager::importDivesFromFile() does; `source` names the file in the
+// command text. IMPORT_FAILED, NO_DIVES, NO_NEW_DIVES (all already there).
+int import_dives(const std::string &file, const std::string &source, std::string &result_json, std::string &error);
+
+// Filter presets of the log (Subsurface's filter_presets):
+// {"presetList":[{"index", "name", "filter":{"fulltext", "mode", "rules"}}]}.
+int filter_presets_json(std::string &json);
+// CreateFilterPreset, or EditFilterPreset when the name exists; rules as
+// filter_dives() takes them. NOT_IN_PRESET for country, region, trip, or a
+// text value with a comma (the log could not keep them).
+int filter_preset_save(const std::string &name, const std::string &fulltext, const std::string &fulltext_mode,
+		       const std::vector<filter_rule> &rules, std::string &json, std::string &error);
+int filter_preset_delete(int index, std::string &json, std::string &error); // RemoveFilterPreset
+
+// --- Sync conflict (edit.cpp; spec, section 6, an OpenDives addition) ------
+// After Subsurface's automatic merge (union of the lines of each file), the
+// dives whose same line both sides changed differently. Read-only:
+// {"conflict":false} or {"conflict":true, "deviceTime", "cloudTime" (commit
+// times, UTC), "items":[{"path", "diveId", "number", "date", "lines":[{"key",
+// "device", "cloud"}]}]}.
+int sync_conflicts(std::string &json, std::string &error);
+// Keeps one side ("device" or "cloud") for every conflicting file, in a new
+// commit on the merge, then reads the log again (no network); the app syncs
+// it like an edit. Cloud writes as save_local(): the test account only.
+int resolve_conflicts(const std::string &keep, std::string &error);
 
 // Undo stack of the session; cleared by every load. The result is the dive
 // changed, as get_dive() gives it.
