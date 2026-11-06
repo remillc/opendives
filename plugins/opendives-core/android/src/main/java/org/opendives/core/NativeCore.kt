@@ -13,6 +13,8 @@ internal object NativeCore {
     external fun listDives(repo: String): String
     external fun getDive(id: Int): String
     external fun getPrefs(): String
+    external fun setPrefs(changes: String)
+    external fun cylinderTypes(action: String, name: String, value: String, ml: Int, mbar: Int): String
     external fun setCaFile(path: String)
     external fun cloudListDives(email: String, password: String): String
     external fun cloudConfigure(email: String, password: String)

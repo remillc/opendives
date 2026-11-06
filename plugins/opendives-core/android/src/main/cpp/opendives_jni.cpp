@@ -119,7 +119,8 @@ static jstring edit_result(JNIEnv *env, const std::string &dive_json)
 	};
 	// A trip step gives the trip ({"tripId":...}), a dive step the dive.
 	const char *key = dive_json.rfind("{\"tripId\"", 0) == 0 ? "trip"
-			: dive_json.rfind("{\"uuid\"", 0) == 0 ? "site" : "dive";
+			: dive_json.rfind("{\"uuid\"", 0) == 0 ? "site"
+			: dive_json.rfind("{\"types\"", 0) == 0 ? "cylinderTypes" : "dive";
 	std::string json = std::string("{\"") + key + "\":" + dive_json + ",\"undo\":\"" + quoted(opendives::undo_text());
 	json += "\",\"redo\":\"" + quoted(opendives::redo_text()) + "\"}";
 	return env->NewStringUTF(json.c_str());
@@ -170,6 +171,8 @@ Java_org_opendives_core_NativeCore_tripAction(JNIEnv *env, jobject, jstring acti
 		ret = opendives::trip_add_dives(tripId, ids, json, error);
 	else if (action == "ungroup")
 		ret = opendives::trip_ungroup(tripId, json, error);
+	else if (action == "autogroup")
+		ret = opendives::trips_autogroup(value == "on", json, error);
 	else {
 		ret = -1;
 		error = "BAD_REQUEST: unknown action " + action;
@@ -330,6 +333,40 @@ Java_org_opendives_core_NativeCore_getPrefs(JNIEnv *env, jobject)
 	std::string json;
 	opendives::get_prefs(json);
 	return env->NewStringUTF(json.c_str());
+}
+
+// Settings: sets core preferences from a flat JSON object (settings.cpp).
+JNIEXPORT void JNICALL
+Java_org_opendives_core_NativeCore_setPrefs(JNIEnv *env, jobject, jstring changes)
+{
+	std::string error;
+	if (opendives::set_prefs(to_string(env, changes), error))
+		throw_core_error(env, error);
+}
+
+// Cylinder types: list, library (set the device's library from `value`), add,
+// size, remove, rename (to `value`, one undoable step). Each returns
+// {"cylinderTypes":…, "undo":…, "redo":…}.
+JNIEXPORT jstring JNICALL
+Java_org_opendives_core_NativeCore_cylinderTypes(JNIEnv *env, jobject, jstring actionIn, jstring nameIn,
+						 jstring valueIn, jint ml, jint mbar)
+{
+	std::string action = to_string(env, actionIn), name = to_string(env, nameIn), value = to_string(env, valueIn);
+	std::string json, error;
+	int ret;
+	if (action == "list")
+		ret = opendives::cylinder_types(json);
+	else if (action == "library")
+		ret = opendives::set_cylinder_library(value, error) ? -1 : opendives::cylinder_types(json);
+	else if (action == "rename")
+		ret = opendives::cylinder_type_rename(name, value, json, error);
+	else
+		ret = opendives::cylinder_type_action(action, name, ml, mbar, json, error);
+	if (ret) {
+		throw_core_error(env, error);
+		return nullptr;
+	}
+	return edit_result(env, json);
 }
 
 JNIEXPORT jstring JNICALL

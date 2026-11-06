@@ -32,6 +32,10 @@ std::string dives_json();
 // (edit.cpp), whatever log is in memory.
 int pending_for(const std::string &log);
 
+// True when `name` is a cylinder type of the runtime table or of the device's
+// library (settings.cpp; TankInfoModel's tank_type_name_in_use()).
+bool cylinder_type_name_in_use(const std::string &name);
+
 } // namespace opendives::internal
 
 #endif

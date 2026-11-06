@@ -86,10 +86,35 @@ class OpenDivesCorePlugin : Plugin() {
         call.resolve(JSObject(NativeCore.getDive(id)))
     }
 
-    /** Units of the loaded log, one per quantity. */
+    /** The core's preferences shown in Settings (see get_prefs in opendives.h). */
     @PluginMethod
     fun getPrefs(call: PluginCall) = onCoreThread(call) {
-        call.resolve(JSObject(NativeCore.getPrefs()))
+        call.resolve(JSObject().put("json", NativeCore.getPrefs()))
+    }
+
+    /** Sets core preferences; `changes` is the flat JSON object of set_prefs(). */
+    @PluginMethod
+    fun setPrefs(call: PluginCall) = onCoreThread(call) {
+        val changes = call.getObject("changes")
+        if (changes == null) {
+            call.reject("Missing changes", "BAD_ARGUMENT")
+            return@onCoreThread
+        }
+        NativeCore.setPrefs(changes.toString())
+        call.resolve()
+    }
+
+    /** Cylinder types of Settings: list, library, add, size, remove, rename (see opendives.h). */
+    @PluginMethod
+    fun cylinderTypes(call: PluginCall) = onCoreThread(call) {
+        val json = NativeCore.cylinderTypes(
+            call.getString("action").orEmpty(),
+            call.getString("name").orEmpty(),
+            call.getString("value").orEmpty(),
+            call.getInt("ml") ?: 0,
+            call.getInt("mbar") ?: 0,
+        )
+        call.resolve(JSObject().put("json", json))
     }
 
 

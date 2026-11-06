@@ -211,6 +211,9 @@ static std::string dives_json()
 	std::string json = "[";
 	bool first = true;
 	for (const auto &d: divelog.dives) {
+		// Invalid dives are hidden unless "Show invalid dives" (DiveFilter::showDive).
+		if (d->invalid && !prefs.display_invalid_dives)
+			continue;
 		if (!first)
 			json += ',';
 		first = false;
@@ -445,35 +448,6 @@ int get_dive(int id, std::string &json, std::string &error)
 		json += "null";
 	json += ",\"ppo2Mbar\":";
 	append_json_array(json, ppo2);
-	json += "}}";
-	return 0;
-}
-
-int get_prefs(std::string &json)
-{
-	const struct units &u = prefs.units;
-	json = "{\"length\":";
-	json += u.length == units::FEET ? "\"ft\"" : "\"m\"";
-	json += ",\"temperature\":";
-	json += u.temperature == units::FAHRENHEIT ? "\"F\"" : "\"C\"";
-	json += ",\"pressure\":";
-	json += u.pressure == units::PSI ? "\"psi\"" : "\"bar\"";
-	json += ",\"volume\":";
-	json += u.volume == units::CUFT ? "\"cuft\"" : "\"l\"";
-	json += ",\"weight\":";
-	json += u.weight == units::LBS ? "\"lbs\"" : "\"kg\"";
-	// Planner defaults, read only (Subsurface's preferences).
-	json += ",\"planner\":{\"model\":";
-	json += prefs.planner_deco_mode == VPMB ? "\"vpmb\"" : prefs.planner_deco_mode == RECREATIONAL ? "\"recreational\"" : "\"buehlmann\"";
-	json += ",\"gfLow\":" + std::to_string(prefs.gflow);
-	json += ",\"gfHigh\":" + std::to_string(prefs.gfhigh);
-	json += ",\"vpmbConservatism\":" + std::to_string(prefs.vpmb_conservatism);
-	json += ",\"bottomPo2Mbar\":" + std::to_string(prefs.bottompo2);
-	json += ",\"decoPo2Mbar\":" + std::to_string(prefs.decopo2);
-	json += ",\"bottomSacMlMin\":" + std::to_string(prefs.bottomsac);
-	json += ",\"decoSacMlMin\":" + std::to_string(prefs.decosac);
-	json += ",\"defaultCylinder\":";
-	append_json_string(json, prefs.default_cylinder);
 	json += "}}";
 	return 0;
 }

@@ -114,7 +114,7 @@ The screenshots come from the Subsurface sample log, never from a personal log.
 - **Façade:**
   - `list_dives` gives, for each dive, an identifier, a thumbnail of about 40 points (time and depth) and the trip.
   - `get_dive` returns the facts, the cylinders and gases, the gas changes, the buddies, the suit, the tags, the notes and the dive computer. The profile is computed by the core (`create_plot_info_new`), with the cylinder breathed, the ppO2 and the ceiling if there is one.
-  - `get_prefs` gives the log's units, one per quantity.
+  - `get_prefs` gives the units (the log's, when it has a "units" line) and every core preference shown in Settings, with Subsurface's defaults; `set_prefs` changes them (settings.cpp). The app keeps the values changed on the device (`localStorage`, `lib/settings.svelte.js`) and sets them again in the core at each start, before the logbook is read. Trip grouping is the log's `autogroup` (`trips_autogroup`, an undoable step); cylinder types follow Subsurface's cylinder-type manager (`cylinder_types`, `cylinder_type_action`, `cylinder_type_rename`), the device's library kept by the app.
 - **Theme:**
   - The `--od-*` color tokens are declared, in light and dark.
   - `colors.primary` is `#1E4D3A`, with cream backgrounds in light mode.

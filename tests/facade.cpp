@@ -55,6 +55,34 @@ int main(int argc, char **argv)
 		printf("%s\n", json.c_str());
 		return 0;
 	}
-	fprintf(stderr, "usage: %s import <file> <repo[branch]> | list <repo[branch]> | dive <log> <number>\n", argv[0]);
+	if (argc == 3 && !strcmp(argv[1], "settings")) {
+		// settings <log>: the Settings functions on a log in memory, nothing saved.
+		if (opendives::list_dives(argv[2], json, error)) {
+			fprintf(stderr, "%s\n", error.c_str());
+			return 1;
+		}
+		auto check = [&](int ret, const char *what) {
+			printf("%s: %s\n", what, ret ? error.c_str() : json.c_str());
+			error.clear();
+		};
+		opendives::get_prefs(json);
+		check(0, "prefs");
+		check(opendives::set_prefs("{\"length\":\"ft\",\"gfLow\":40,\"decoModel\":\"vpmb\",\"po2MaxMbar\":1400,"
+					   "\"tankbar\":true,\"forgetDiveComputer\":0}", error), "set");
+		opendives::get_prefs(json);
+		check(0, "after set");
+		check(opendives::set_prefs("{\"gfLow\":5}", error), "out of range");
+		check(opendives::set_prefs("{\"unknown\":1}", error), "unknown key");
+		check(opendives::trips_autogroup(false, json, error), "autogroup off");
+		check(opendives::undo(json, error), "undo");
+		check(opendives::trips_autogroup(true, json, error), "autogroup on");
+		check(opendives::cylinder_type_action("add", "Test 7L", 7000, 300000, json, error), "add type");
+		check(opendives::cylinder_type_action("add", "Test 7L", 7000, 300000, json, error), "add again");
+		check(opendives::cylinder_type_rename("Test 7L", "Test 8L", json, error), "rename");
+		check(opendives::undo(json, error), "undo rename");
+		check(opendives::cylinder_type_action("remove", "Test 7L", 0, 0, json, error), "remove");
+		return 0;
+	}
+	fprintf(stderr, "usage: %s import <file> <repo[branch]> | list <repo[branch]> | dive <log> <number> | settings <log>\n", argv[0]);
 	return 2;
 }

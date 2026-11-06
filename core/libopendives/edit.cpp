@@ -14,10 +14,12 @@
 //    git_local_only) and saveChangesCloud() (then reload with sync).
 #include "opendives.h"
 #include "internal.h"
+#include "json.h"
 
 #include "core/dive.h"
 #include "core/divelog.h"
 #include "core/divesite.h"
+#include "core/equipment.h"
 #include "core/file.h"
 #include "core/fulltext.h"
 #include "core/git-access.h"
@@ -44,191 +46,10 @@
 
 namespace opendives {
 
-// ---------------------------------------------------------------------------
-// Minimal JSON reader for edit_dive(): one flat object whose values are
-// strings, integers or arrays of strings.
+using internal::JsonReader;
+using internal::JsonValue;
 
 namespace {
-
-struct JsonValue {
-	enum Kind { STRING, NUMBER, LIST } kind = STRING;
-	std::string text;
-	long number = 0;
-	std::vector<std::string> list;
-};
-
-class JsonReader {
-public:
-	explicit JsonReader(const std::string &s) : s(s) {}
-
-	bool object(std::vector<std::pair<std::string, JsonValue>> &out)
-	{
-		space();
-		if (!eat('{'))
-			return false;
-		space();
-		if (eat('}'))
-			return end();
-		for (;;) {
-			std::string key;
-			JsonValue value;
-			space();
-			if (!string(key))
-				return false;
-			space();
-			if (!eat(':'))
-				return false;
-			space();
-			if (!val(value))
-				return false;
-			out.emplace_back(std::move(key), std::move(value));
-			space();
-			if (eat(','))
-				continue;
-			if (eat('}'))
-				return end();
-			return false;
-		}
-	}
-
-private:
-	const std::string &s;
-	size_t i = 0;
-
-	void space()
-	{
-		while (i < s.size() && isspace(static_cast<unsigned char>(s[i])))
-			i++;
-	}
-	bool eat(char c)
-	{
-		if (i < s.size() && s[i] == c) {
-			i++;
-			return true;
-		}
-		return false;
-	}
-	bool end()
-	{
-		space();
-		return i == s.size();
-	}
-	static void utf8(std::string &out, unsigned cp)
-	{
-		if (cp < 0x80) {
-			out += static_cast<char>(cp);
-		} else if (cp < 0x800) {
-			out += static_cast<char>(0xC0 | (cp >> 6));
-			out += static_cast<char>(0x80 | (cp & 0x3F));
-		} else if (cp < 0x10000) {
-			out += static_cast<char>(0xE0 | (cp >> 12));
-			out += static_cast<char>(0x80 | ((cp >> 6) & 0x3F));
-			out += static_cast<char>(0x80 | (cp & 0x3F));
-		} else {
-			out += static_cast<char>(0xF0 | (cp >> 18));
-			out += static_cast<char>(0x80 | ((cp >> 12) & 0x3F));
-			out += static_cast<char>(0x80 | ((cp >> 6) & 0x3F));
-			out += static_cast<char>(0x80 | (cp & 0x3F));
-		}
-	}
-	bool hex4(unsigned &cp)
-	{
-		if (i + 4 > s.size())
-			return false;
-		cp = 0;
-		for (int k = 0; k < 4; k++) {
-			char c = s[i++];
-			cp <<= 4;
-			if (c >= '0' && c <= '9')
-				cp |= c - '0';
-			else if (c >= 'a' && c <= 'f')
-				cp |= c - 'a' + 10;
-			else if (c >= 'A' && c <= 'F')
-				cp |= c - 'A' + 10;
-			else
-				return false;
-		}
-		return true;
-	}
-	bool string(std::string &out)
-	{
-		if (!eat('"'))
-			return false;
-		while (i < s.size()) {
-			char c = s[i++];
-			if (c == '"')
-				return true;
-			if (c != '\\') {
-				out += c;
-				continue;
-			}
-			if (i >= s.size())
-				return false;
-			char e = s[i++];
-			switch (e) {
-			case '"': out += '"'; break;
-			case '\\': out += '\\'; break;
-			case '/': out += '/'; break;
-			case 'b': out += '\b'; break;
-			case 'f': out += '\f'; break;
-			case 'n': out += '\n'; break;
-			case 'r': out += '\r'; break;
-			case 't': out += '\t'; break;
-			case 'u': {
-				unsigned cp;
-				if (!hex4(cp))
-					return false;
-				if (cp >= 0xD800 && cp < 0xDC00 && i + 6 <= s.size() && s[i] == '\\' && s[i + 1] == 'u') {
-					i += 2;
-					unsigned low;
-					if (!hex4(low) || low < 0xDC00 || low > 0xDFFF)
-						return false;
-					cp = 0x10000 + ((cp - 0xD800) << 10) + (low - 0xDC00);
-				}
-				utf8(out, cp);
-				break;
-			}
-			default:
-				return false;
-			}
-		}
-		return false;
-	}
-	bool val(JsonValue &v)
-	{
-		if (i < s.size() && s[i] == '"') {
-			v.kind = JsonValue::STRING;
-			return string(v.text);
-		}
-		if (eat('[')) {
-			v.kind = JsonValue::LIST;
-			space();
-			if (eat(']'))
-				return true;
-			for (;;) {
-				std::string item;
-				space();
-				if (!string(item))
-					return false;
-				v.list.push_back(std::move(item));
-				space();
-				if (eat(','))
-					continue;
-				return eat(']');
-			}
-		}
-		size_t start = i;
-		if (i < s.size() && s[i] == '-')
-			i++;
-		while (i < s.size() && isdigit(static_cast<unsigned char>(s[i])))
-			i++;
-		if (i == start || (i == start + 1 && s[start] == '-'))
-			return false;
-		v.kind = JsonValue::NUMBER;
-		v.number = strtol(s.substr(start, i - start).c_str(), nullptr, 10);
-		return true;
-	}
-};
 
 void append_json_string(std::string &out, const std::string &s)
 {
@@ -265,7 +86,7 @@ struct TripMove {
 };
 
 struct Step {
-	enum Kind { DIVE, TRIP_FIELD, MOVE, SITE_FIELD, SITES } kind = DIVE;
+	enum Kind { DIVE, TRIP_FIELD, MOVE, SITE_FIELD, SITES, CYLINDER_TYPE } kind = DIVE;
 	// DIVE: the dive and the contents to swap in on the next undo or redo.
 	int dive_id = 0;
 	std::unique_ptr<dive> other;
@@ -288,6 +109,11 @@ struct Step {
 	std::vector<dive_site *> sites_to_remove;
 	std::vector<std::unique_ptr<dive_site>> sites_to_add;
 	dive_site *merge_into = nullptr;
+	// CYLINDER_TYPE: as Subsurface's RenameCylinderType, the cylinders of that
+	// type in the log; after each undo or redo, `value` holds the name to put
+	// back and `type_name` the name in use.
+	std::vector<std::pair<dive *, int>> cylinders;
+	std::string type_name;
 	std::string text;
 };
 
@@ -784,6 +610,8 @@ void on_log_loaded()
 	clean_index = 0;
 	next_to_write = 0;
 	loaded_format_version = read_format_version();
+	// The cylinder types of the new log (as clear_dive_file_data() before a load).
+	reset_tank_info_table(tank_info_table);
 }
 
 } // namespace internal
@@ -1119,6 +947,85 @@ int trip_add_dives(int trip_id, const std::vector<int> &dive_ids, std::string &j
 	for (dive *d: dives)
 		step.moves.push_back({ d, trip });
 	return do_move(std::move(step), trip_id, json, error);
+}
+
+// MainWindow::on_actionAutoGroup_triggered(): the flag, then AutogroupDives or
+// RemoveAutogenTrips (commands/command_divelist.cpp).
+int trips_autogroup(bool on, std::string &json, std::string &error)
+{
+	divelog.autogroup = on;
+	Step step;
+	step.kind = Step::MOVE;
+	if (on) {
+		step.text = "autogroup dives";
+		for (auto &entry: get_dives_to_autogroup(divelog.dives)) {
+			if (entry.created_trip)
+				step.trips_to_add.push_back(std::move(entry.created_trip));
+			for (auto it = divelog.dives.begin() + entry.from; it != divelog.dives.begin() + entry.to; ++it)
+				step.moves.push_back({ it->get(), entry.trip });
+		}
+	} else {
+		step.text = "remove autogenerated trips";
+		for (auto &d: divelog.dives)
+			if (d->divetrip && d->divetrip->autogen)
+				step.moves.push_back({ d.get(), nullptr });
+	}
+	if (step.moves.empty()) // TripBase::workToBeDone()
+		return trip_json(0, json, error);
+	move_dives_between_trips(step);
+	dive *first = step.moves[0].d;
+	int show = first->divetrip ? first->divetrip->id : 0;
+	push_step(std::move(step));
+	return trip_json(show, json, error);
+}
+
+// RenameCylinderType::redo() and undo(): from step.type_name to step.value,
+// then the two names are swapped for the next undo or redo.
+static void apply_cylinder_type(Step &step)
+{
+	const std::string &from = step.type_name, &to = step.value;
+	for (auto &[d, idx]: step.cylinders) {
+		d->cylinders[idx].type.description = to;
+		d->invalidate_cache(); // so that save-git writes this dive again
+	}
+	if (tank_info *info = get_tank_info(tank_info_table, from))
+		info->name = to;
+	if (tank_info *info = get_tank_info(get_tank_info_baseline(), from))
+		info->name = to;
+	std::swap(step.type_name, step.value);
+}
+
+int cylinder_type_rename(const std::string &old_name, const std::string &new_name_in, std::string &json,
+			 std::string &error)
+{
+	// TankInfoModel::setData(): trimmed, not empty, not the same, not in use.
+	std::string new_name = trim(new_name_in);
+	if (new_name.empty() || new_name == old_name)
+		return cylinder_types(json);
+	if (internal::cylinder_type_name_in_use(new_name)) {
+		error = "NAME_IN_USE";
+		return -1;
+	}
+	Step step;
+	step.kind = Step::CYLINDER_TYPE;
+	step.cylinders = find_cylinders_with_type_description(old_name);
+	// RenameCylinderType::workToBeDone()
+	if (step.cylinders.empty() && !get_tank_info(tank_info_table, old_name) &&
+	    !get_tank_info(get_tank_info_baseline(), old_name)) {
+		error = "NOT_FOUND";
+		return -1;
+	}
+	std::vector<dive *> affected;
+	for (auto &[d, idx]: step.cylinders)
+		if (std::find(affected.begin(), affected.end(), d) == affected.end())
+			affected.push_back(d);
+	step.text = affected.size() <= 1 ? "Rename cylinder type"
+					 : "Rename cylinder type (" + std::to_string(affected.size()) + " dive(s))";
+	step.type_name = old_name;
+	step.value = new_name;
+	apply_cylinder_type(step);
+	push_step(std::move(step));
+	return cylinder_types(json);
 }
 
 // ---------------------------------------------------------------------------
@@ -1576,6 +1483,10 @@ static int swap_step(Step &step, std::string &result_json, std::string &error)
 		uint32_t shown = step.merge_into ? step.merge_into->uuid
 			       : !step.sites_to_remove.empty() ? step.sites_to_remove[0]->uuid : 0;
 		return site_json(shown, result_json, error);
+	}
+	if (step.kind == Step::CYLINDER_TYPE) {
+		apply_cylinder_type(step);
+		return cylinder_types(result_json);
 	}
 	if (step.kind == Step::MOVE) {
 		move_dives_between_trips(step);
