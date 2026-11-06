@@ -26,12 +26,14 @@
    *   onaction?: () => void,
    *   secondary?: { label: string, onclick: () => void, disabled?: boolean },
    *   secondaryEnd?: boolean,
+   *   previous?: boolean,
    *   closable?: boolean,
    *   children: import('svelte').Snippet,
    * }}
    * No action: no main button. secondaryEnd: the text button sits next to
    * the main button (Android) instead of at the left. closable false: no
-   * close button (an import that runs).
+   * close button (an import that runs). previous: the text button is
+   * "Précédent" (iOS: a tonal button beside the main one).
    */
   let {
     title,
@@ -45,6 +47,7 @@
     onaction = () => {},
     secondary,
     secondaryEnd = false,
+    previous = false,
     closable = true,
     children,
   } = $props();
@@ -91,7 +94,7 @@
 
     {@render children()}
 
-    <div class="actions" class:end={secondaryEnd}>
+    <div class="actions" class:end={secondaryEnd} class:previous>
       {#if secondary}
         <button
           type="button"
@@ -238,6 +241,27 @@
         /* iOS: the main button first, the text button under it. */
         &.end .secondary {
           order: 1;
+        }
+
+        /* iOS: "Précédent", a tonal button beside the main one. */
+        &.previous {
+          flex-direction: row;
+          gap: 12px;
+
+          .secondary {
+            flex: none;
+            width: 128px;
+            height: 52px;
+            border-radius: 14px;
+            background: var(--od-tint);
+            color: var(--od-on-tint);
+            font-weight: 600;
+          }
+
+          .filled {
+            flex: 1;
+            width: auto;
+          }
         }
       }
     }

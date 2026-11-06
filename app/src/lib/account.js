@@ -7,6 +7,13 @@ import { accountReady } from './logbook.svelte.js';
 import { t } from './i18n.js';
 
 /**
+ * The account being created: its email once the code is confirmed. Step 1
+ * then only shows it ("Précédent" from step 2 never creates a second
+ * account).
+ */
+export const accountFlow = { confirmedEmail: '' };
+
+/**
  * The error code of a rejected plugin call: its own code, or the core's code
  * at the start of the message ("NETWORK: …").
  * @param {unknown} e
@@ -51,6 +58,7 @@ export function showFailure(code) {
  * @param {boolean} welcome
  */
 export function finishAccount(router, welcome) {
+  accountFlow.confirmedEmail = '';
   if (!welcome) {
     const first = router.history[0];
     if (first && router.history.length > 1) router.back(first, { force: true });

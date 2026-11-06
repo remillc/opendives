@@ -991,7 +991,8 @@
     "passwordText": "Unaccented letters, digits and @ . + _ - only",
     "invalidEmail": "This email address is not valid",
     "submit": "Create the account",
-    "busy": "Creating…"
+    "busy": "Creating…",
+    "confirmedText": "Your account is created and its address is confirmed."
   },
   "bringLogbook": {
     "heading": "Bring your logbook?",
@@ -1006,7 +1007,10 @@
     "fileText": "Subsurface logbook (.ssrf, .xml), divelogs.de export (.dld) or from another program",
     "empty": "Start with an empty logbook",
     "creating": "Creating the logbook…",
-    "continue": "Continue"
+    "continue": "Continue",
+    "previous": "Previous",
+    "checking": "Checking…",
+    "refused": "divelogs.de refused this user name or this password"
   },
   "notAvailable": {
     "title": "Not available yet",
@@ -1353,7 +1357,7 @@
     "title": "Importing your logbook",
     "text": "Keep OpenDives open until the end. Nothing is sent to your account before the last step.",
     "failedTitle": "The import did not go through",
-    "failedText": "Your account is created. Nothing was imported.",
+    "failedText": "Your account is created. Nothing was saved in it.",
     "stepsLabel": "Import steps",
     "steps": {
       "download": "Download from divelogs.de",
@@ -1372,15 +1376,14 @@
     "waiting": "Waiting",
     "notStarted": "Not started",
     "cancel": "Cancel the import",
-    "loginFailed": "divelogs.de refused the user name or the password.",
-    "offline": "No connection. Try again when you are online",
+    "offline": "Connection lost. Try again when you are online.",
     "downloadFailed": "The reply of divelogs.de could not be read.",
     "readFailed": "The logbook received could not be read.",
     "saveFailed": "Saving in your account did not go through.",
     "retry": "Try again",
-    "editCredentials": "Change the credentials",
     "empty": "Empty logbook",
-    "emptyLong": "Start with an empty logbook"
+    "emptyLong": "Start with an empty logbook",
+    "fileFailed": "This file could not be read."
   },
   "newDive": {
     "title": "Log a dive",

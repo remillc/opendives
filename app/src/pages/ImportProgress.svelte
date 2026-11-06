@@ -1,13 +1,15 @@
 <script>
   // @ts-check
-  // New account: the divelogs.de import in progress, then the logbook, or the
-  // failure (docs/mockups/compte-import-encours-*.dc.html,
+  // New account: the import in progress, then the logbook, or the failure
+  // (docs/mockups/compte-import-encours-*.dc.html,
   // compte-import-echec-*.dc.html; spec, section 4, "Sign in and new
-  // account"). Three steps: download (divelogs_download), read the dives
+  // account"). divelogs.de: download (divelogs_download), read the dives
   // (import_count, read-only) and save in the account (cloud_create_log, the
-  // only step that writes to it). "Annuler l'import" stops before the last
-  // step and nothing is sent. The divelogs.de credentials live only in this
-  // screen, for "Réessayer", and are never stored.
+  // only step that writes to it). A picked file: the same without the
+  // download. "Annuler l'import" stops before the last step and nothing is
+  // sent. The credentials were checked on step 2: the failure only covers
+  // the import itself, with "Réessayer"; they live only in this screen, for
+  // that, and are never stored.
   // The core reports no progress inside a step: the running step shows a
   // spinner, without the "128 sur 214" bar of the mock-up.
   import { onDestroy } from 'svelte';
@@ -18,25 +20,31 @@
   import { errorCode, finishAccount, showFailure } from '../lib/account.js';
   import { t } from '../lib/i18n.js';
 
-  /** @type {{ f7router: any, f7route: any, user?: string, password?: string }} */
-  let { f7router, f7route, user = '', password = '' } = $props();
+  /**
+   * @type {{ f7router: any, f7route: any, source?: 'divelogs'|'file', user?: string, password?: string, path?: string }}
+   */
+  let { f7router, f7route, source = 'divelogs', user = '', password = '', path: picked = '' } = $props();
   const welcome = $derived(String(f7route.path ?? '').startsWith('/welcome/'));
   const ios = f7.theme === 'ios';
 
+  /** @typedef {'download'|'read'|'save'} StepKey */
   /** @typedef {'waiting'|'running'|'done'|'failed'|'notStarted'} StepState */
-  /** @type {{ key: 'download'|'read'|'save', state: StepState, text: string }[]} */
+  /** @type {{ key: StepKey, state: StepState, text: string }[]} */
   let steps = $state([]);
   /** @type {'running'|'failed'} */
   let phase = $state('running');
-  let failure = $state('');
   let cancelled = false;
   let saving = $state(false);
   let busy = $state(false);
-  let path = '';
-  // Kept for "Réessayer" only (the values handed over when the screen
-  // opened); forgotten with the screen.
+  // The values handed over when the screen opened: the credentials are kept
+  // for "Réessayer" only and forgotten with the screen; a picked file stays
+  // in the app's cache until the screen closes.
   // svelte-ignore state_referenced_locally
   let credentials = { user, password };
+  // svelte-ignore state_referenced_locally
+  const fromFile = source === 'file';
+  // svelte-ignore state_referenced_locally
+  let path = picked;
 
   onDestroy(() => {
     // Left with Back: stops like "Annuler l'import" (not once saving began).
@@ -50,40 +58,41 @@
     path = '';
   }
 
-  /** @param {'download'|'read'|'save'} key @param {StepState} state @param {string} [text] */
+  /** @param {StepKey} key @param {StepState} state @param {string} [text] */
   function set(key, state, text = '') {
     steps = steps.map((s) => (s.key === key ? { key, state, text } : s));
   }
 
-  /** @param {string} code @param {'download'|'read'|'save'} step */
+  /** @param {string} code @param {StepKey} step */
   function message(code, step) {
-    if (code === 'NETWORK') return t('importProgress.offline');
-    if (code === 'LOGIN_FAILED') return t('importProgress.loginFailed');
+    if (code === 'NETWORK' || code === 'NETWORK_LOST') return t('importProgress.offline');
     if (code === 'WRITE_LOCKED') return t('notAvailable.createLocked');
     if (step === 'download') return t('importProgress.downloadFailed');
-    if (step === 'read') return t('importProgress.readFailed');
+    if (step === 'read') return fromFile ? t('importProgress.fileFailed') : t('importProgress.readFailed');
     return t('importProgress.saveFailed');
   }
 
   async function run() {
     phase = 'running';
-    failure = '';
     cancelled = false;
-    steps = [
+    /** @type {{ key: StepKey, state: StepState, text: string }[]} */
+    const all = [
       { key: 'download', state: 'running', text: '' },
-      { key: 'read', state: 'waiting', text: t('importProgress.waiting') },
+      { key: 'read', state: fromFile ? 'running' : 'waiting', text: fromFile ? '' : t('importProgress.waiting') },
       { key: 'save', state: 'waiting', text: t('importProgress.waiting') },
     ];
-    /** @type {'download'|'read'|'save'} */
-    let current = 'download';
+    steps = fromFile ? all.slice(1) : all;
+    /** @type {StepKey} */
+    let current = fromFile ? 'read' : 'download';
     try {
-      const downloaded = await OpenDivesCore.divelogsDownload(credentials);
-      path = downloaded.path;
-      if (cancelled) return stop();
-      set('download', 'done', t('importProgress.received', { n: downloaded.dives }));
-
-      current = 'read';
-      set('read', 'running');
+      if (!fromFile) {
+        const downloaded = await OpenDivesCore.divelogsDownload(credentials);
+        path = downloaded.path;
+        if (cancelled) return stop();
+        set('download', 'done', t('importProgress.received', { n: downloaded.dives }));
+        current = 'read';
+        set('read', 'running');
+      }
       const read = path ? await OpenDivesCore.importCount({ path }) : { dives: 0 };
       if (cancelled) return stop();
       set('read', 'done', t('importProgress.read', { n: read.dives }));
@@ -96,13 +105,13 @@
         : await OpenDivesCore.createLog({ source: 'empty' });
       path = '';
       set('save', 'done');
-      console.info('First logbook created from divelogs.de, dives imported:', result.imported);
+      console.info('First logbook created, dives imported:', result.imported);
       credentials = { user: '', password: '' };
       finishAccount(f7router, welcome);
     } catch (e) {
       const code = errorCode(e);
-      discard();
-      failure = code === 'NETWORK' ? 'network' : 'other';
+      // A downloaded file is fetched again by "Réessayer"; a picked one is kept.
+      if (!fromFile) discard();
       const order = ['download', 'read', 'save'];
       steps = steps.map((s) =>
         s.key === current
@@ -143,9 +152,9 @@
   step={t('createAccount.step2')}
   heading={phase === 'failed' ? t('importProgress.failedTitle') : t('importProgress.title')}
   intro={phase === 'failed' ? t('importProgress.failedText') : t('importProgress.text')}
-  action={phase === 'failed' ? (failure === 'network' ? t('importProgress.retry') : t('importProgress.editCredentials')) : ''}
+  action={phase === 'failed' ? t('importProgress.retry') : ''}
   {busy}
-  onaction={() => (failure === 'network' ? run() : f7router.back())}
+  onaction={run}
   secondary={phase === 'failed'
     ? { label: ios ? t('importProgress.emptyLong') : t('importProgress.empty'), onclick: emptyLogbook, disabled: busy }
     : {

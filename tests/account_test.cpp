@@ -118,6 +118,10 @@ int main(int argc, char **argv)
 	      opendives::divelogs_download("", "", "/nonexistent/x.dld", json, error) == -1 &&
 		      error == "INVALID_CREDENTIALS");
 
+	error.clear();
+	check("divelogs check without credentials: refused",
+	      opendives::divelogs_check("", "", json, error) == -1 && error == "INVALID_CREDENTIALS");
+
 	// The "read the dives" step of the import.
 	error.clear();
 	check("import_count, missing file: refused",

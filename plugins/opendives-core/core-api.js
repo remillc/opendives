@@ -404,6 +404,8 @@ import { registerPlugin } from '@capacitor/core';
  *   NETWORK, INVALID_RESPONSE, INVALID_ARCHIVE.
  * @property {(options: {user: string, password: string}) => Promise<{dives: number}>} divelogsCheck
  *   Checks the divelogs.de credentials before the import (LOGIN_FAILED, NETWORK…).
+ * @property {(options: {name: string, data: string}) => Promise<{path: string}>} stageImport
+ *   A picked file (base64 data) written to the app's cache for the import steps.
  * @property {(options: {path: string}) => Promise<{dives: number}>} importCount
  *   Import step 2, read-only: the dives of the downloaded file (IMPORT_FAILED).
  * @property {(options: {path: string}) => Promise<void>} discardImport
@@ -498,6 +500,7 @@ export const OpenDivesCore = {
   resendCode: () => native.resendCode(),
   verifyPin: (options) => native.verifyPin(options),
   divelogsCheck: (options) => native.divelogsCheck(options),
+  stageImport: (options) => native.stageImport(options),
   divelogsDownload: (options) => native.divelogsDownload(options),
   importCount: (options) => native.importCount(options),
   discardImport: (options) => native.discardImport(options),

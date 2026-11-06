@@ -379,6 +379,24 @@ class OpenDivesCorePlugin : Plugin() {
         call.resolve(JSObject(NativeCore.divelogsCheck(call.getString("user").orEmpty(), call.getString("password").orEmpty())))
     }
 
+    /**
+     * Step 2's "Depuis un fichier": the file picked in the web layer
+     * (`name`, base64 `data`) is written to the app's cache for the import
+     * steps (importCount, createLog); {path}.
+     */
+    @PluginMethod
+    fun stageImport(call: PluginCall) = onCoreThread(call) {
+        val name = File(call.getString("name").orEmpty()).name.replace(Regex("[^A-Za-z0-9._-]"), "_").ifEmpty { "import.xml" }
+        val data = call.getString("data")
+        if (data == null) {
+            call.reject("BAD_REQUEST", "BAD_REQUEST")
+            return@onCoreThread
+        }
+        val file = File(context.cacheDir, "$IMPORT_PREFIX${System.currentTimeMillis()}-$name")
+        file.writeBytes(Base64.decode(data, Base64.DEFAULT))
+        call.resolve(JSObject().put("path", file.absolutePath))
+    }
+
     /** Import, step 2: reads the downloaded file (read-only), {dives}. */
     @PluginMethod
     fun importCount(call: PluginCall) = onCoreThread(call) {

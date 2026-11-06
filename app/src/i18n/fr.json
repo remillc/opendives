@@ -991,7 +991,8 @@
     "passwordText": "Lettres sans accent, chiffres et @ . + _ - seulement",
     "invalidEmail": "Cette adresse e-mail n'est pas valide",
     "submit": "Créer le compte",
-    "busy": "Création…"
+    "busy": "Création…",
+    "confirmedText": "Votre compte est créé et son adresse est confirmée."
   },
   "bringLogbook": {
     "heading": "Reprendre votre carnet ?",
@@ -1006,7 +1007,10 @@
     "fileText": "Carnet Subsurface (.ssrf, .xml), export divelogs.de (.dld) ou d'un autre logiciel",
     "empty": "Commencer avec un carnet vide",
     "creating": "Création du carnet…",
-    "continue": "Continuer"
+    "continue": "Continuer",
+    "previous": "Précédent",
+    "checking": "Vérification…",
+    "refused": "divelogs.de a refusé ce nom d'utilisateur ou ce mot de passe"
   },
   "notAvailable": {
     "title": "Pas encore disponible",
@@ -1353,7 +1357,7 @@
     "title": "Import de votre carnet",
     "text": "Gardez OpenDives ouverte jusqu'à la fin. Rien n'est envoyé à votre compte avant la dernière étape.",
     "failedTitle": "L'import n'a pas abouti",
-    "failedText": "Votre compte est créé. Rien n'a été importé.",
+    "failedText": "Votre compte est créé. Rien n'a été enregistré dedans.",
     "stepsLabel": "Étapes de l'import",
     "steps": {
       "download": "Télécharger depuis divelogs.de",
@@ -1372,15 +1376,14 @@
     "waiting": "En attente",
     "notStarted": "Pas commencé",
     "cancel": "Annuler l'import",
-    "loginFailed": "divelogs.de a refusé le nom d'utilisateur ou le mot de passe.",
-    "offline": "Pas de connexion. Réessayez quand vous êtes en ligne",
+    "offline": "Connexion perdue. Réessayez quand vous êtes en ligne.",
     "downloadFailed": "La réponse de divelogs.de n'a pas pu être lue.",
     "readFailed": "Le carnet reçu n'a pas pu être lu.",
     "saveFailed": "L'enregistrement dans votre compte n'a pas abouti.",
     "retry": "Réessayer",
-    "editCredentials": "Modifier les identifiants",
     "empty": "Carnet vide",
-    "emptyLong": "Commencer avec un carnet vide"
+    "emptyLong": "Commencer avec un carnet vide",
+    "fileFailed": "Ce fichier n'a pas pu être lu."
   },
   "newDive": {
     "title": "Noter une plongée",
