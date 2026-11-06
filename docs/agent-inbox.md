@@ -54,3 +54,7 @@ On the Account screen, "Sync now" is a real button, centred in its row: tonal bu
 ## [ ] 2026-11-06-06 Manual synchronisation mode
 
 When "Sync automatically" is off (Account screen), follow `docs/ui-specification.md`, section 4, "Manual synchronisation": save locally only, no fetch or send until "Sync now"; the setting is per device. Show "Manual sync: N changes not sent" in `--od-pending` in `<SyncStatus>` (top of the Logbook and bottom of the side menu), add the "Sync now" button at the bottom of the side menu in this mode, add the "Changes not sent" row and the "Off: ..." explanation on the Account screen. Mock-ups: `docs/mockups/compte-android-connecte-manuel.dc.html`, `appbar-tiroir-android-ouvert-manuel.dc.html`.
+
+## [ ] 2026-11-06-07 Dark-mode alarm and pending colours
+
+Set the dark values of `--od-alarm` to #FF8A80 and `--od-pending` to #F2B84B (`docs/ui-specification.md`, section 1). Light values are unchanged. Reference: `docs/mockups/alarme-sombre-1.dc.html`.

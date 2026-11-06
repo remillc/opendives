@@ -24,9 +24,9 @@ The theme chosen on 5 November 2026 is **black and white, colour reserved for da
 | `--od-water-top` | #FBE3B2 | #E5B961 | Top of the water column |
 | `--od-water-bottom` | #B4530F | #EF7625 (tempered amber) | Water column at 60 m and deeper; in between, the colour is mixed according to the maximum depth |
 | `--od-trace` | #1F2124 (3.2:1 on the bottom of the water) | #F4F4F2, 2 px, over a 4.5 px #121314 outline | Profile line |
-| `--od-alarm` | #C62828 (5.1:1) | To decide | Ceiling violated, fast ascent, insufficient gas reserve, errors; never anywhere else |
+| `--od-alarm` | #C62828 (5.1:1) | #FF8A80 (8.1:1) | Ceiling violated, fast ascent, insufficient gas reserve, errors; never anywhere else |
 | `--od-oxygen` | #2E7D32 (4.7:1) | #7FD283 | ppO2 curve, nitrox and oxygen mixes |
-| `--od-pending` | #8A4B00 (6.2:1) | To decide | "Offline, waiting to be sent" state; text only, always with an icon |
+| `--od-pending` | #8A4B00 (6.2:1) | #F2B84B (10.4:1) | "Offline, waiting to be sent" state; text only, always with an icon |
 
 **One colour for data.** The rust of the water never appears on a button, a link or a state. To check on screen: the pending colour (#8A4B00) is from the same family; it stays readable because it is always text with an icon, never a surface.
 
@@ -205,4 +205,4 @@ Each screen has five states to build, besides the normal one: loading, empty, er
 - [ ] The five states of section 6
 - [ ] A real logbook read from the cloud (Christian's), and the Subsurface sample logbook
 
-**Open points to decide:** alarm and pending colours in dark mode; telling the pending colour apart from the rust of the water, to check on screen; version choice in case of conflict.
+**Open points to decide:** telling the pending colour apart from the colour of the water, to check on screen (in dark mode, the amber of the pending state is close to the honey of the water; chosen knowingly on 6 November 2026); version choice in case of conflict.
