@@ -19,9 +19,12 @@ export function enableBackButton() {
     }
     // 3. An open sheet or dialog closes.
     const modal = document.querySelector('.modal-in');
-    // First launch waits for a choice: Back sends the app to the background.
+    // First launch waits for a choice: Back returns to the three choices,
+    // then sends the app to the background.
     if (modal?.classList.contains('od-welcome')) {
-      CapacitorApp.minimizeApp();
+      const welcome = /** @type {any} */ (f7.views).welcome;
+      if (welcome && welcome.router.history.length > 1) welcome.router.back();
+      else CapacitorApp.minimizeApp();
       return;
     }
     if (modal) {

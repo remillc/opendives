@@ -2,8 +2,8 @@
   // @ts-check
   // Account screen (docs/mockups/compte-*.dc.html; docs/agent-inbox.md, task
   // 2026-11-06-02): the Subsurface cloud account, or the choices to get one.
-  // Change password, sign out, delete, create and sign in are shown but not
-  // wired yet: their behaviour in Subsurface is still to be checked.
+  // Change password is shown but not wired yet. Create and sign in open the
+  // screens of first launch, whose actions are not built yet.
   import { Page, Navbar, f7 } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
   import MenuButton from '../components/MenuButton.svelte';
@@ -200,11 +200,11 @@
     </div>
     <p class="pitch">{t('account.pitch')}</p>
     <div class="choices">
-      <a href="#create" class="choice primary external" role="button" onclick={notAvailable}>
+      <a href="/account/create/" class="choice primary">
         <span class="label">{t('account.create')}</span>
         <span class="consequence">{t('account.createText', { n: count })}</span>
       </a>
-      <a href="#sign-in" class="choice external" role="button" onclick={notAvailable}>
+      <a href="/account/sign-in/" class="choice">
         <span class="label">{t('account.signIn')}</span>
         <span class="consequence">{t('account.signInText', { n: count })}</span>
       </a>

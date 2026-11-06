@@ -280,7 +280,8 @@
     "create": "Créer un compte Subsurface",
     "createText": "Gratuit. Vos plongées sont sauvegardées et partagées entre votre téléphone, votre tablette et votre ordinateur. Vous pourrez y reprendre votre carnet divelogs.de.",
     "noAccount": "Commencer sans compte",
-    "noAccountText": "Vos plongées restent seulement sur cet appareil : pas de sauvegarde, et pas de partage avec vos autres appareils. Vous pourrez créer un compte plus tard et y envoyer votre carnet."
+    "noAccountText": "Vos plongées restent seulement sur cet appareil : pas de sauvegarde, et pas de partage avec vos autres appareils. Vous pourrez créer un compte plus tard et y envoyer votre carnet.",
+    "choicesLabel": "Façons de commencer"
   },
   "signOut": {
     "title": "Se déconnecter ?",
@@ -513,5 +514,55 @@
   },
   "common": {
     "back": "Retour"
+  },
+  "accountStep": {
+    "back": "Retour"
+  },
+  "signIn": {
+    "title": "Se connecter",
+    "heading": "Votre compte Subsurface",
+    "intro": "Le même compte que dans Subsurface sur l'ordinateur ou dans Subsurface-mobile. Vos plongées sont lues depuis le cloud, puis une copie reste sur cet appareil.",
+    "email": "Adresse e-mail",
+    "password": "Mot de passe",
+    "passwordText": "Gardé seulement dans le stockage sécurisé de cet appareil",
+    "submit": "Se connecter"
+  },
+  "createAccount": {
+    "title": "Nouveau compte",
+    "step1": "Étape 1 sur 2",
+    "step2": "Étape 2 sur 2",
+    "heading": "Créer votre compte Subsurface",
+    "intro": "Gratuit. Un code vous est envoyé par e-mail pour confirmer l'adresse.",
+    "email": "Adresse e-mail",
+    "password": "Mot de passe",
+    "passwordText": "Lettres sans accent, chiffres et @ . + _ - seulement",
+    "invalidEmail": "Cette adresse e-mail n'est pas valide",
+    "submit": "Créer le compte"
+  },
+  "bringLogbook": {
+    "heading": "Reprendre votre carnet ?",
+    "intro": "Votre compte Subsurface est prêt. Vous pouvez le remplir tout de suite avec les plongées que vous avez déjà.",
+    "previewIntro": "Aperçu de cette étape. Aucun compte n'a été créé.",
+    "sourceLabel": "Source du carnet",
+    "divelogs": "Depuis divelogs.de",
+    "divelogsText": "Les plongées sont téléchargées une seule fois, puis enregistrées dans votre compte Subsurface. Ensuite, divelogs.de et OpenDives ne se synchronisent pas : vous pourrez y renvoyer des plongées quand vous voulez.",
+    "user": "Nom d'utilisateur divelogs.de",
+    "password": "Mot de passe divelogs.de",
+    "credentialsNote": "Ces identifiants servent seulement à ce téléchargement. OpenDives ne les garde pas.",
+    "file": "Depuis un fichier",
+    "fileText": "Carnet Subsurface (.ssrf, .xml), export divelogs.de (.dld) ou d'un autre logiciel",
+    "empty": "Commencer avec un carnet vide",
+    "download": "Télécharger mes plongées",
+    "chooseFile": "Choisir un fichier",
+    "start": "Commencer"
+  },
+  "notAvailable": {
+    "title": "Pas encore disponible",
+    "signIn": "La connexion avec un compte saisi ici n'est pas encore construite. Rien n'a été envoyé ni gardé.",
+    "create": "La création d'un compte n'est pas encore construite. Aucun compte n'a été créé et rien n'a été envoyé.",
+    "previewStep2": "Voir l'étape 2",
+    "divelogs": "Le téléchargement depuis divelogs.de n'est pas encore construit. Vos identifiants n'ont été ni envoyés ni gardés.",
+    "file": "L'import d'un fichier n'est pas encore construit.",
+    "empty": "L'ouverture du carnet vide d'un nouveau compte n'est pas encore construite."
   }
 }

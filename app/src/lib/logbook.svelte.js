@@ -36,7 +36,7 @@ export const logbook = $state({
   autoSync: readAutoSync(),
   /** Local changes of the cloud log not sent yet. */
   pending: 0,
-  /** First launch is shown (after signing out): nothing is loaded until a choice is made. */
+  /** First launch is shown (first start, or after signing out): nothing is loaded until a choice is made. */
   welcome: readWelcome(),
   /** Last dive changed by an edit or an undo, for the detail screen. */
   edited: /** @type {{ id: number, dive: import('opendives-core').DiveDetail }|null} */ (null),
@@ -136,12 +136,54 @@ async function syncEdits() {
   await countPending();
 }
 
-function readWelcome() {
+/**
+ * "od.welcome": "show" after signing out, "done" once a way to start was
+ * chosen, absent before the first start.
+ * @returns {string|null}
+ */
+function readWelcomeState() {
   try {
-    return localStorage.getItem('od.welcome') === 'show';
+    return localStorage.getItem('od.welcome');
   } catch {
-    return false;
+    return 'done';
   }
+}
+
+function readWelcome() {
+  return readWelcomeState() === 'show';
+}
+
+/** @param {'show'|'done'} value */
+function writeWelcomeState(value) {
+  try {
+    localStorage.setItem('od.welcome', value);
+  } catch {
+    // Not fatal: first launch may be shown again at the next start.
+  }
+}
+
+/**
+ * At start: first launch is shown on the very first start, unless a cloud
+ * account is already configured on this device (development credentials);
+ * otherwise the logbook is loaded.
+ */
+export async function startApp() {
+  if (logbook.welcome) return;
+  if (readWelcomeState() === null) {
+    let configured = false;
+    try {
+      configured = (await OpenDivesCore.configureCloud()).available;
+    } catch (e) {
+      console.error('Reading the cloud account', e);
+    }
+    if (!configured) {
+      logbook.welcome = true;
+      logbook.loading = false;
+      return;
+    }
+    writeWelcomeState('done');
+  }
+  await loadLogbook();
 }
 
 /**
@@ -177,20 +219,16 @@ function forgetAccount(showWelcome) {
   logbook.welcome = showWelcome;
   try {
     localStorage.removeItem('od.lastSync');
-    if (showWelcome) localStorage.setItem('od.welcome', 'show');
   } catch {
     // Not fatal.
   }
+  if (showWelcome) writeWelcomeState('show');
 }
 
 /** First launch, "Start without an account": the logbook of this device. */
 export function startWithoutAccount() {
   logbook.welcome = false;
-  try {
-    localStorage.removeItem('od.welcome');
-  } catch {
-    // Not fatal.
-  }
+  writeWelcomeState('done');
   return loadLogbook();
 }
 

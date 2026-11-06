@@ -11,6 +11,10 @@
   import Settings from './pages/Settings.svelte';
   import Account from './pages/Account.svelte';
   import DeleteAccount from './pages/DeleteAccount.svelte';
+  import WelcomeStart from './pages/WelcomeStart.svelte';
+  import SignIn from './pages/SignIn.svelte';
+  import CreateAccount from './pages/CreateAccount.svelte';
+  import BringLogbook from './pages/BringLogbook.svelte';
   import EditDive from './pages/EditDive.svelte';
   import Trip from './pages/Trip.svelte';
   import Sites from './pages/Sites.svelte';
@@ -25,7 +29,7 @@
   import Welcome from './components/Welcome.svelte';
   import { layout } from './lib/layout.svelte.js';
   import { trackSection } from './lib/navigation.svelte.js';
-  import { logbook, loadLogbook } from './lib/logbook.svelte.js';
+  import { startApp } from './lib/logbook.svelte.js';
   import { enableBackButton } from './lib/back-button.js';
   import { enableAccessibility } from './lib/accessibility.js';
   import { t } from './lib/i18n.js';
@@ -45,6 +49,14 @@
       { path: '/settings/', component: Settings },
       { path: '/account/', component: Account },
       { path: '/account/delete/', component: DeleteAccount },
+      // Signing in and creating an account, from the Account screen without an account.
+      { path: '/account/sign-in/', component: SignIn },
+      { path: '/account/create/', component: CreateAccount },
+      // First launch, in the view of its popup (components/Welcome.svelte).
+      { path: '/welcome/', component: WelcomeStart },
+      { path: '/welcome/sign-in/', component: SignIn },
+      { path: '/welcome/create/', component: CreateAccount, options: { props: { welcome: true } } },
+      { path: '/welcome/import/', component: BringLogbook },
       // Not built yet: the planner prefilled from a dive.
       { path: '/dive/:id/edit/', component: EditDive },
       { path: '/trip/:id/', component: Trip },
@@ -77,8 +89,9 @@
     enableBackButton();
     enableAccessibility();
     trackSection();
-    // After signing out, first launch is shown and nothing is loaded until a choice.
-    if (!logbook.welcome) loadLogbook();
+    // On the first start and after signing out, first launch is shown and
+    // nothing is loaded until a choice.
+    startApp();
   });
 </script>
 
