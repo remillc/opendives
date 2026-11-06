@@ -9,7 +9,7 @@
   import { Panel, f7 } from 'framework7-svelte';
   import Icon from './Icon.svelte';
   import SyncStatus from './SyncStatus.svelte';
-  import { logbook } from '../lib/logbook.svelte.js';
+  import { logbook, syncNow } from '../lib/logbook.svelte.js';
   import { navigation, sections, showSection, closeMenu, restoreFocus } from '../lib/navigation.svelte.js';
   import { t } from '../lib/i18n.js';
 
@@ -100,7 +100,15 @@
     </a>
     <div class="spacer"></div>
     {#if !logbook.loading && !logbook.error}
-      <div class="status"><SyncStatus sync={logbook.sync} live={false} /></div>
+      <div class="status">
+        <SyncStatus sync={logbook.sync} pending={logbook.pending} live={false} />
+        {#if logbook.sync === 'manual'}
+          <!-- Manual synchronisation: the exchange happens only from here or Account. -->
+          <button type="button" class="od-tonal-button" disabled={logbook.loading} onclick={() => syncNow()}>
+            {t('account.syncNow')}
+          </button>
+        {/if}
+      </div>
     {/if}
   </nav>
 </Panel>
@@ -171,6 +179,15 @@
 
     .status {
       padding: 0 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 6px;
+
+      /* Lined up with the status text. */
+      .od-tonal-button {
+        margin-left: 16px;
+      }
     }
 
     /* iOS: large bold title, 48 pt rows with a rounded highlight. */

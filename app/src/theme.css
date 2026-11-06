@@ -249,6 +249,38 @@ html.ios {
     }
   }
 
+  /*
+   * Tonal button ("Sync now"): Android, MD3 tonal button (40 dp, 24 dp side
+   * padding, fully rounded); iOS, 44 pt bordered button with 12 pt corners.
+   * Framework7 stretches buttons in lists: this one keeps its own width.
+   */
+  .od-tonal-button {
+    width: auto;
+    height: 40px;
+    padding: 0 24px;
+    border: none;
+    border-radius: 20px;
+    background: var(--od-tint);
+    color: var(--od-on-tint);
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.1px;
+    text-align: center;
+    cursor: pointer;
+
+    &:disabled {
+      opacity: 0.5;
+    }
+
+    .ios & {
+      height: 44px;
+      border-radius: 12px;
+      font-size: 17px;
+      letter-spacing: 0;
+    }
+  }
+
   /* Text for screen readers only. */
   .od-sr-only {
     position: absolute;

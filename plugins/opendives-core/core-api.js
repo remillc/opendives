@@ -122,6 +122,9 @@ import { registerPlugin } from '@capacitor/core';
  *   Read-only access to the Subsurface cloud log (development credentials).
  *   `cached`: the device's copy only, without network, to show the log at once
  *   (after configureCloud).
+ * @property {() => Promise<{id: string, summary: string, message: string}[]>} pendingChanges
+ *   Local commits of the loaded cloud log not yet on the server, newest first;
+ *   empty for a log without account.
  * @property {(options: {id: number}) => Promise<DiveDetail>} getDive
  *   Detail of one dive of the last loaded log.
  * @property {() => Promise<Prefs>} getPrefs
@@ -152,6 +155,10 @@ export const OpenDivesCore = {
     if (!available) return { available: false };
     if (!json) return { available: true, cached: false };
     return { available: true, ...JSON.parse(json) };
+  },
+  async pendingChanges() {
+    const { json } = await native.pendingChanges();
+    return JSON.parse(json);
   },
   getDive: (options) => native.getDive(options),
   getPrefs: () => native.getPrefs(),

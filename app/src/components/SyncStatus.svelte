@@ -9,19 +9,21 @@
    * @type {{
    *   sync: import('../lib/logbook.svelte.js').SyncState,
    *   live?: boolean,
+   *   pending?: number,
    * }}
    * `live`: announced when it changes; false for the copy in the side menu.
+   * `pending`: changes not sent, for the manual synchronisation state.
    */
-  let { sync, live = true } = $props();
+  let { sync, live = true, pending = 0 } = $props();
 
-  // No change is possible yet: nothing is waiting to be sent.
-  /** @type {Record<string, {icon: 'check'|'offline'|'device'|'sync', text: string, pending: boolean}>} */
-  const states = {
+  /** @type {Record<string, {icon: 'check'|'offline'|'device'|'sync'|'cloud', text: string, pending: boolean}>} */
+  const states = $derived({
+    manual: { icon: 'cloud', text: t('sync.manual', { n: pending }), pending: true },
     syncing: { icon: 'sync', text: t('sync.syncing'), pending: false },
     cloud: { icon: 'check', text: t('sync.cloud'), pending: false },
     offline: { icon: 'offline', text: t('sync.offline'), pending: true },
     local: { icon: 'device', text: t('sync.local'), pending: false },
-  };
+  });
   const state = $derived(states[sync]);
 </script>
 

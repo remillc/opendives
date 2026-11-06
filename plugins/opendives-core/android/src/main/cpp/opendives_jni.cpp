@@ -86,6 +86,15 @@ Java_org_opendives_core_NativeCore_cloudListCachedDives(JNIEnv *env, jobject)
 	return env->NewStringUTF(json.c_str());
 }
 
+// Local commits of the cloud log not yet on the server, as a JSON array.
+JNIEXPORT jstring JNICALL
+Java_org_opendives_core_NativeCore_pendingChanges(JNIEnv *env, jobject)
+{
+	std::string json;
+	opendives::pending_changes(json);
+	return env->NewStringUTF(json.c_str());
+}
+
 JNIEXPORT jstring JNICALL
 Java_org_opendives_core_NativeCore_cloudProbe(JNIEnv *env, jobject)
 {

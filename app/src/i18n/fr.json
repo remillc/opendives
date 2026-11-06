@@ -44,7 +44,11 @@
     "syncing": "Synchronisation avec le cloud Subsurface…",
     "cloud": "Synchronisé avec le cloud Subsurface",
     "offline": "Hors ligne : aucune modification en attente",
-    "local": "Carnet enregistré sur cet appareil seulement"
+    "local": "Carnet enregistré sur cet appareil seulement",
+    "manual": {
+      "one": "Synchronisation manuelle : {n} modification non envoyée",
+      "other": "Synchronisation manuelle : {n} modifications non envoyées"
+    }
   },
   "dive": {
     "siteNotSet": "Site à préciser",
@@ -203,6 +207,8 @@
       "one": "Votre plongée est ajoutée à celles du compte, sans rien écraser",
       "other": "Vos {n} plongées sont ajoutées à celles du compte, sans rien écraser"
     },
-    "notAvailable": "Pas encore disponible"
+    "notAvailable": "Pas encore disponible",
+    "autoSyncOff": "Désactivée : les modifications restent sur cet appareil, et celles des autres appareils n'arrivent pas, tant que vous ne synchronisez pas",
+    "pending": "Modifications non envoyées"
   }
 }

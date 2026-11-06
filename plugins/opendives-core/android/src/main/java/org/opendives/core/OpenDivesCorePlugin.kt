@@ -142,6 +142,12 @@ class OpenDivesCorePlugin : Plugin() {
         call.resolve(JSObject().put("available", true).put("json", json))
     }
 
+    /** Local commits of the loaded cloud log not yet on the server (manual synchronisation). */
+    @PluginMethod
+    fun pendingChanges(call: PluginCall) = onCoreThread(call) {
+        call.resolve(JSObject().put("json", NativeCore.pendingChanges()))
+    }
+
     private fun readDevCredentials(): Pair<String, String>? {
         val file = File(context.filesDir, DEV_CREDENTIALS)
         if (!file.exists()) return null

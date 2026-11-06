@@ -231,8 +231,11 @@
   <!-- While loading, the count and the status are not known yet: nothing is shown. -->
   {#if !logbook.loading && !logbook.error}
     {#if sorted.length}<p class="count od-value" role="status">{count}</p>{/if}
-    <!-- Only offline, when the logbook may be out of date; the side menu shows every state. -->
-    {#if logbook.sync === 'offline'}<SyncStatus sync={logbook.sync} />{/if}
+    <!--
+      Only offline or in manual synchronisation, when the logbook may be out of
+      date; the side menu shows every state.
+    -->
+    {#if logbook.sync === 'offline' || logbook.sync === 'manual'}<SyncStatus sync={logbook.sync} pending={logbook.pending} />{/if}
   {/if}
 
   {#if logbook.loading}
@@ -276,7 +279,7 @@
         <li>{t('logbook.errorInternet')}</li>
         <li>{t('logbook.errorStorage')}</li>
       </ol>
-      <Button fill class="od-primary-action" onClick={loadLogbook}>{t('logbook.retry')}</Button>
+      <Button fill class="od-primary-action" onClick={() => loadLogbook()}>{t('logbook.retry')}</Button>
     </Block>
   {:else if logbook.dives.length === 0}
     <Block>

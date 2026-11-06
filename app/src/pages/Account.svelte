@@ -7,7 +7,7 @@
   import { Page, Navbar, f7 } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
   import MenuButton from '../components/MenuButton.svelte';
-  import { logbook, loadLogbook } from '../lib/logbook.svelte.js';
+  import { logbook, setAutoSync, syncNow } from '../lib/logbook.svelte.js';
   import { formatDateTime, formatNumber, formatTimeOfDay } from '../lib/format.js';
   import { t, tIfExists } from '../lib/i18n.js';
 
@@ -32,30 +32,6 @@
     const region = code ? tIfExists(`account.regions.${code}`) : undefined;
     return region ? t('account.server', { region, host }) : t('account.serverHost', { host });
   });
-
-  // Not stored by the core yet: the app syncs at every launch for now.
-  let autoSync = $state(readAutoSync());
-
-  function readAutoSync() {
-    try {
-      return localStorage.getItem('od.autoSync') !== 'false';
-    } catch {
-      return true;
-    }
-  }
-
-  function setAutoSync(/** @type {boolean} */ value) {
-    autoSync = value;
-    try {
-      localStorage.setItem('od.autoSync', String(value));
-    } catch {
-      // Not fatal.
-    }
-  }
-
-  function syncNow() {
-    if (!logbook.loading) loadLogbook();
-  }
 
   /** Actions whose behaviour in Subsurface is still to be checked. */
   function notAvailable(/** @type {MouseEvent} */ e) {
@@ -86,17 +62,27 @@
             <div class="item-inner">
               <div class="item-title">
                 {t('account.autoSync')}
-                <div class="item-footer">{t('account.autoSyncText')}</div>
+                <div class="item-footer">{t(logbook.autoSync ? 'account.autoSyncText' : 'account.autoSyncOff')}</div>
               </div>
               <div class="item-after">
                 <span class="toggle">
-                  <input type="checkbox" checked={autoSync} onchange={(e) => setAutoSync(e.currentTarget.checked)} />
+                  <input type="checkbox" checked={logbook.autoSync} onchange={(e) => setAutoSync(e.currentTarget.checked)} />
                   <span class="toggle-icon"></span>
                 </span>
               </div>
             </div>
           </label>
         </li>
+        {#if !logbook.autoSync}
+          <li>
+            <div class="item-content">
+              <div class="item-inner">
+                <div class="item-title">{t('account.pending')}</div>
+                <div class="item-after od-value" class:pending={logbook.pending > 0}>{formatNumber(logbook.pending)}</div>
+              </div>
+            </div>
+          </li>
+        {/if}
         <li>
           <div class="item-content">
             <div class="item-inner">
@@ -114,7 +100,7 @@
           </div>
         </li>
         <li class="sync-now">
-          <button type="button" disabled={logbook.loading} onclick={syncNow}>{t('account.syncNow')}</button>
+          <button type="button" class="od-tonal-button" disabled={logbook.loading} onclick={() => syncNow()}>{t('account.syncNow')}</button>
         </li>
       </ul>
     </div>
@@ -238,43 +224,15 @@
       white-space: normal;
     }
 
-    /*
-     * "Sync now": a real button centred in its row. Android: MD3 tonal button
-     * (40 dp, 24 dp side padding, fully rounded); iOS: 44 pt bordered button
-     * with 12 pt corners.
-     */
+    /* "Sync now": a real button centred in its row (style: .od-tonal-button). */
     .sync-now {
       padding: 12px 16px 14px;
       display: flex;
       justify-content: center;
+    }
 
-      /* Framework7 stretches buttons in a list: this one keeps its own width. */
-      button {
-        width: auto;
-        text-align: center;
-        height: 40px;
-        padding: 0 24px;
-        border: none;
-        border-radius: 20px;
-        background: var(--od-tint);
-        color: var(--od-on-tint);
-        font: inherit;
-        font-size: 14px;
-        font-weight: 600;
-        letter-spacing: 0.1px;
-        cursor: pointer;
-
-        &:disabled {
-          opacity: 0.5;
-        }
-
-        :global(.ios) & {
-          height: 44px;
-          border-radius: 12px;
-          font-size: 17px;
-          letter-spacing: 0;
-        }
-      }
+    .pending {
+      color: var(--od-pending);
     }
 
     .danger {

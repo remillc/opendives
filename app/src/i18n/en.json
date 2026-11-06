@@ -44,7 +44,11 @@
     "syncing": "Syncing with the Subsurface cloud…",
     "cloud": "Synced with Subsurface cloud",
     "offline": "Offline: no changes waiting",
-    "local": "Logbook stored on this device only"
+    "local": "Logbook stored on this device only",
+    "manual": {
+      "one": "Manual sync: {n} change not sent",
+      "other": "Manual sync: {n} changes not sent"
+    }
   },
   "dive": {
     "siteNotSet": "Dive site not set",
@@ -203,6 +207,8 @@
       "one": "Your dive is added to the account's dives, without overwriting anything",
       "other": "Your {n} dives are added to the account's dives, without overwriting anything"
     },
-    "notAvailable": "Not available yet"
+    "notAvailable": "Not available yet",
+    "autoSyncOff": "Off: changes stay on this device, and those from other devices do not arrive, until you sync",
+    "pending": "Changes not sent"
   }
 }
