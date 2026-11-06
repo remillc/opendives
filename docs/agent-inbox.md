@@ -229,3 +229,7 @@ On "Reprendre votre carnet ?", the main button at the bottom applies to the sele
 ## [ ] 2026-11-06-32 New account: import progress and failure
 
 After "Continuer" on step 2, show the import progress screen, then the Logbook, or the failure screen. See `docs/ui-specification.md` (section 4, "Sign in and new account"). Mock-ups: `docs/mockups/compte-import-encours-android.dc.html`, `compte-import-echec-android.dc.html`, `compte-import-encours-ios.dc.html`, `compte-import-echec-ios.dc.html`.
+
+## [ ] 2026-11-06-33 New account: check divelogs.de credentials first, "Précédent", "Renvoyer le code" under the field
+
+On step 2, "Continuer" with divelogs.de checks the credentials before the import starts. If divelogs.de refuses them, stay on step 2 with the error under the password field. The import failure screen now only covers failures during the import, with "Réessayer". Step 2 also gets a "Précédent" button back to step 1 (the account already exists: do not create a second one). On the confirmation code screen, "Renvoyer le code" sits right under the field. See `docs/ui-specification.md` (section 4, "Sign in and new account"). Mock-ups: `android-compte-import`, `ios-compte-import`, `compte-import-identifiants-android`, `compte-import-identifiants-ios`, `compte-import-echec-android`, `compte-import-echec-ios`, `compte-code-android`, `compte-code-erreur-android`, `compte-code-ios`, `compte-code-erreur-ios`.

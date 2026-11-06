@@ -78,6 +78,8 @@ When a mock-up and `docs/ui-specification.md` disagree, the specification wins. 
 | `compte-creation-ios.dc.html` | Nouveau compte, étape 1 sur 2 · iPhone |
 | `compte-code-ios.dc.html` | Nouveau compte, code de confirmation · iPhone |
 | `compte-code-erreur-ios.dc.html` | Nouveau compte, code incorrect · iPhone |
+| `compte-import-identifiants-android.dc.html` | Nouveau compte, étape 2, identifiants refusés · Android |
+| `compte-import-identifiants-ios.dc.html` | Nouveau compte, étape 2, identifiants refusés · iPhone |
 | `compte-import-encours-android.dc.html` | Nouveau compte, import en cours · Android |
 | `compte-import-echec-android.dc.html` | Nouveau compte, import échoué · Android |
 | `compte-import-encours-ios.dc.html` | Nouveau compte, import en cours · iPhone |
