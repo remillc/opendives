@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Launch screen before Android 12: the "Hublot" logo centred on its background.
+     The mark is drawn at the size of the Android 12 splash icon (240 dp). -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@color/splash_background" />
+    <item
+        android:width="240dp"
+        android:height="240dp"
+        android:gravity="center"
+        android:drawable="@drawable/ic_splash_mark" />
+</layer-list>

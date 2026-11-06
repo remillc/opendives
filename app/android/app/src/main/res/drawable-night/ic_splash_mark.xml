@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Splash screen mark in dark mode: the dark "Hublot" logo (docs/brand/opendives-icon-dark-fullbleed.svg) without its background. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Water, clipped to the porthole (circle r 28). -->
+    <group>
+        <clip-path android:pathData="M26,54a28,28 0,1 0,56 0a28,28 0,1 0,-56 0Z" />
+        <path android:pathData="M20,50 Q32,44 44,50 T68,50 T92,50 V100 H20 Z">
+            <aapt:attr name="android:fillColor">
+                <gradient
+                    android:type="linear"
+                    android:startX="54"
+                    android:startY="47"
+                    android:endX="54"
+                    android:endY="100">
+                    <item android:offset="0" android:color="#FFE5B961" />
+                    <item android:offset="1" android:color="#FFEF7625" />
+                </gradient>
+            </aapt:attr>
+        </path>
+    </group>
+    <!-- Ring: circle r 30, stroke 6. -->
+    <path
+        android:pathData="M24,54a30,30 0,1 0,60 0a30,30 0,1 0,-60 0Z"
+        android:strokeColor="#FFF4F4F2"
+        android:strokeWidth="6" />
+    <!-- Bubbles. -->
+    <path android:fillColor="#FFF4F4F2" android:pathData="M59.4,40a2.6,2.6 0,1 0,5.2 0a2.6,2.6 0,1 0,-5.2 0Z" />
+    <path android:fillColor="#FFF4F4F2" android:pathData="M55.2,33a1.8,1.8 0,1 0,3.6 0a1.8,1.8 0,1 0,-3.6 0Z" />
+</vector>
