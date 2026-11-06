@@ -85,7 +85,7 @@ export function formatHours(seconds) {
 
 /** One duration of a statistic: "59 min" under an hour, else "1 h 06". @param {number} seconds */
 export function formatLongDuration(seconds) {
-  return seconds < 3570 ? formatDuration(seconds) : formatHours(seconds);
+  return seconds < 3570 ? formatDuration(seconds, 'minutes') : formatHours(seconds);
 }
 
 /** Time in the profile: min:s. @param {number} seconds */

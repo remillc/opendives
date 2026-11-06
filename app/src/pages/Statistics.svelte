@@ -2,28 +2,30 @@
   // @ts-check
   // Statistics section (spec, section 1, "Statistics"; Android
   // docs/mockups/android-stats.dc.html, iPhone ios-stats-tableau.dc.html):
-  // "Free filter" in the top bar; the three key figures; three ready-made
-  // charts on cards scrolled sideways (no chart builder); My statistics with
+  // "Free filter" in the top bar (the same filter as the Logbook: the figures
+  // follow it); the three key figures; two ready-made charts on cards scrolled
+  // sideways, dives per year and dive durations (no chart builder; the maximum
+  // depth chart is only on the year and filtered screens); My statistics with
   // "New statistic"; By year (opening the year), By mode, By suit, By buddy.
   // No totals by dive computer. Every figure comes from the core
-  // (lib/statistics.svelte.js); the per-dive charts use each dive's own values.
-  import { Page, Navbar, NavRight, Link, f7, theme } from 'framework7-svelte';
+  // (lib/statistics.svelte.js).
+  import { Page, Navbar, NavRight, Link, theme } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
   import MenuButton from '../components/MenuButton.svelte';
   import KeyFigures from '../components/KeyFigures.svelte';
   import BarChart from '../components/BarChart.svelte';
+  import ActiveFilter from '../components/ActiveFilter.svelte';
+  import { filter } from '../lib/filter.svelte.js';
   import { logbook } from '../lib/logbook.svelte.js';
   import {
-    FIGURES_PENDING,
     chronological,
     computeStatistics,
     encodeCriteria,
     myStatistics,
     notSetLabel,
     summaryLine,
-    yearsOf,
   } from '../lib/statistics.svelte.js';
-  import { formatDuration, formatHours, formatNumber } from '../lib/format.js';
+  import { formatHours, formatLongDuration } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
 
   let result = $state(/** @type {import('../lib/statistics.svelte.js').StatsResult|null} */ (null));
@@ -33,40 +35,34 @@
   $effect(() => {
     const dives = logbook.dives;
     const list = myStatistics.list;
+    const ids = filter.ids;
     if (logbook.loading) return;
     void dives;
+    void ids;
     computeStatistics([]).then((r) => (result = r));
     for (const s of list) computeStatistics(s.criteria).then((r) => (saved[s.id] = r?.total ?? null));
   });
 
-  const dives = $derived(chronological(logbook.dives));
-  const years = $derived(yearsOf(logbook.dives));
-  const yearly = $derived(new Map((result?.yearly ?? []).map((y) => [y.year, y])));
+  /** The dives counted by the core (invalid dives and the free filter left out), the oldest first. */
+  const dives = $derived.by(() => {
+    const ids = new Set(result?.diveIds ?? []);
+    return chronological(logbook.dives.filter((d) => ids.has(d.id)));
+  });
+  const yearly = $derived([...(result?.yearly ?? [])].sort((a, b) => b.year - a.year));
 
-  const depthBars = $derived(dives.map((d) => ({ value: d.maxDepthMm })));
   const durationBars = $derived(dives.map((d) => ({ value: d.durationSeconds })));
   const durations = $derived(dives.map((d) => d.durationSeconds).filter((s) => s > 0));
-  const firstYear = $derived(years.length ? years[years.length - 1] : 0);
-  const lastYear = $derived(years.length ? years[0] : 0);
-  const perDive = $derived(
-    firstYear === lastYear ? t('stats.perDiveIn', { year: String(firstYear) }) : t('stats.perDiveFrom', { from: String(firstYear), to: String(lastYear) }),
-  );
   const durationRange = $derived(
     durations.length
       ? t('stats.perDiveRange', {
-          min: formatNumber(Math.round(Math.min(...durations) / 60)),
-          max: formatDuration(Math.max(...durations)),
+          min: formatLongDuration(Math.min(...durations)),
+          max: formatLongDuration(Math.max(...durations)),
         })
       : '',
   );
   const yearBars = $derived(
     [...(result?.yearly ?? [])].sort((a, b) => a.year - b.year).map((y) => ({ value: y.dives, label: String(y.year) })),
   );
-
-  function freeFilter() {
-    // The free filter (ios-filtre) is built with the Logbook additions (task 15).
-    f7.toast.create({ text: t('stats.notAvailable'), closeTimeout: 2500, position: 'center' }).open();
-  }
 
   /** @param {string} field @param {string} value */
   const resultHref = (field, value) => `/statistics/result/?c=${encodeCriteria([{ field, values: [value] }])}`;
@@ -77,9 +73,9 @@
     {#snippet left()}<MenuButton />{/snippet}
     <NavRight>
       {#if theme.ios}
-        <Link onClick={freeFilter}>{t('stats.filterShort')}</Link>
+        <Link href="/filter/">{t('stats.filterShort')}</Link>
       {:else}
-        <Link class="filter-button" onClick={freeFilter}><Icon name="filter" size={18} weight={2} />{t('stats.freeFilter')}</Link>
+        <Link class="filter-button" href="/filter/"><Icon name="filter" size={18} weight={2} />{t('stats.freeFilter')}</Link>
       {/if}
     </NavRight>
   </Navbar>
@@ -90,25 +86,17 @@
       <p>{t('stats.emptyText')}</p>
     </div>
   {:else if !logbook.loading}
+    {#if filter.ids}
+      <ActiveFilter prefs={logbook.prefs} dives={logbook.dives} shown={result?.total.dives ?? filter.ids.size} />
+    {/if}
     <KeyFigures figures={result?.total ?? null} prefs={logbook.prefs} />
-    {#if FIGURES_PENDING}<p class="note">{t('stats.pendingNote')}</p>{/if}
 
     <div class="block-title">{t('stats.charts')}</div>
     <div class="charts">
       <section class="chart-card">
-        <h3>{t('stats.chartDepth')}</h3>
-        <p>{perDive}</p>
-        <BarChart bars={depthBars} depth label={t('stats.chartDepthLabel', { n: dives.length })} />
-      </section>
-      <section class="chart-card">
         <h3>{t('stats.chartYears')}</h3>
-        {#if result}
-          <p>{t('stats.chartYearsText', { dives: t('trip.dives', { n: result.total.dives }), n: yearBars.length })}</p>
-          <BarChart bars={yearBars} label={t('stats.chartYears')} />
-        {:else}
-          <p>{t('stats.pending')}</p>
-          <div class="chart-pending" aria-hidden="true"></div>
-        {/if}
+        <p>{result ? t('stats.chartYearsText', { dives: t('trip.dives', { n: result.total.dives }), n: yearBars.length }) : ''}</p>
+        <BarChart bars={yearBars} label={t('stats.chartYears')} />
       </section>
       <section class="chart-card">
         <h3>{t('stats.chartDurations')}</h3>
@@ -148,12 +136,12 @@
     <div class="block-title">{t('stats.byYear')}</div>
     <div class="list list-strong inset list-dividers media-list chevron-center">
       <ul>
-        {#each years as year (year)}
+        {#each yearly as y (y.year)}
           <li>
-            <a href="/statistics/year/{year}/" class="item-link item-content">
+            <a href="/statistics/year/{y.year}/" class="item-link item-content">
               <div class="item-inner">
-                <div class="item-title-row"><div class="item-title od-value">{year}</div></div>
-                <div class="item-text od-value">{summaryLine(yearly.get(year), logbook.prefs)}</div>
+                <div class="item-title-row"><div class="item-title od-value">{y.year}</div></div>
+                <div class="item-text od-value">{summaryLine(y, logbook.prefs)}</div>
               </div>
             </a>
           </li>
@@ -162,8 +150,8 @@
     </div>
 
     {#snippet group(/** @type {string} */ title, /** @type {{key: string, label: string, figures: import('../lib/statistics.svelte.js').StatsFigures}[]|null} */ rows, /** @type {string} */ field)}
-      <div class="block-title">{title}</div>
-      {#if rows}
+      {#if rows?.length}
+        <div class="block-title">{title}</div>
         <div class="list list-strong inset list-dividers media-list chevron-center">
           <ul>
             {#each rows as row (row.key)}
@@ -181,8 +169,6 @@
             {/each}
           </ul>
         </div>
-      {:else}
-        <p class="note">{t('stats.pending')}</p>
       {/if}
     {/snippet}
 
@@ -284,12 +270,6 @@
           line-height: 18px;
         }
       }
-    }
-
-    .chart-pending {
-      height: 110px;
-      border-radius: 4px;
-      background: var(--od-tint);
     }
 
     /* Android: "New statistic" is a tonal button under the list (MD3). */

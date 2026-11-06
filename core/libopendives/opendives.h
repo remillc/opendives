@@ -438,6 +438,32 @@ int sync_conflicts(std::string &json, std::string &error);
 // network); the app syncs it like an edit. Cloud writes as save_local(): the
 // test account only.
 int resolve_conflicts(const std::string &choices_json, std::string &error);
+// --- Statistics (stats.cpp), read-only --------------------------------------
+//
+// Figures of a set of dives, Subsurface's stats_t (core/statistics.h):
+// S = {"dives", "totalSeconds", "shortestSeconds", "longestSeconds",
+// "maxDepthMm", "minDepthMm", "meanDepthMm", "meanMaxDepthMm", "meanSacMlMin",
+// "minTempMk", "maxTempMk", "meanTempMk"}; 0 when unknown. Invalid dives are
+// left out, as Subsurface does.
+//
+// `criteria_json`: {"<field>":["value", …], …}, fields suit, tag, buddy,
+// guide, site, trip, mode, gas, cylinder, computer, year, month, rating, with
+// the keys stats_values() gives ("" for "not set"), and "id" (dive identifiers
+// of the load, for the free filter's result). Several values of a field:
+// any of them; several fields: all of them. "{}": every dive. The dives are
+// marked through their `selected` flag, in memory only and put back, and
+// counted by calculate_stats_summary() and calculate_stats_selected().
+// Writes {"logDives":n, "total":S, "yearly":[S+"year"], "monthly":[S+"year",
+// "month"], "byTrip":[S+"start","location"], "byMode":[S+"mode"],
+// "bySuit":[S+"value"], "byBuddy":[S+"value"], "diveIds":[…]}.
+// BAD_REQUEST for an unknown field.
+int stats(const std::string &criteria_json, std::string &json, std::string &error);
+
+// The values of one field in the loaded log, with their number of dives:
+// [{"key", "dives"}] sorted by key, "" for dives without one; for "trip",
+// the key is the date of the trip's first dive (trips have no stable
+// identifier) and "location" is added. Gas keys are "o2/he" in per mille.
+int stats_values(const std::string &field, std::string &json, std::string &error);
 
 // Undo stack of the session; cleared by every load. The result is the dive
 // changed, as get_dive() gives it.

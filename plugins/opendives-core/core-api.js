@@ -440,6 +440,10 @@ import { registerPlugin } from '@capacitor/core';
  *   Read-only: the conflicts left by the last automatic merge.
  * @property {(options: {choices: Record<string, 'device'|'cloud'>}) => Promise<void>} resolveConflicts
  *   Keeps the chosen side of each conflicting file (by path), then reads the log again (no network).
+ * @property {(options: {kind: 'stats', criteria: Record<string, string[]>} | {kind: 'values', field: string}) => Promise<any>} statsQuery
+ *   Read-only statistics (opendives.h, stats and stats_values): the StatsResult of the
+ *   dives meeting the criteria ({field: [keys]}; any key of a field, every field), or the
+ *   values of one field in the log, [{key, dives, location?}]. Rejects with BAD_REQUEST.
  * @property {(options: {action: 'create'|'edit'|'geocode'|'merge'|'delete'|'deleteSite', uuid?: number, other?: number, uuids?: number[], field?: string, value?: string, lat?: number, lon?: number}) => Promise<EditResult>} siteAction
  *   One undoable site change, as Subsurface's site commands.
  * @property {(options: {tripId: number}) => Promise<TripDetail>} getTrip
@@ -541,6 +545,9 @@ export const OpenDivesCore = {
     return JSON.parse((await native.syncConflicts()).json);
   },
   resolveConflicts: (options) => native.resolveConflicts(options),
+  async statsQuery(options) {
+    return JSON.parse((await native.statsQuery(options)).json);
+  },
   async siteAction(options) {
     return JSON.parse((await native.siteAction(options)).json);
   },

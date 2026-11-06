@@ -672,6 +672,18 @@ class OpenDivesCorePlugin : Plugin() {
         call.resolve()
     }
 
+    /**
+     * Read-only statistics (see opendives.h): kind "stats" with `criteria`
+     * ({field: [values]}), or "values" with `field`.
+     */
+    @PluginMethod
+    fun statsQuery(call: PluginCall) = onCoreThread(call) {
+        val kind = call.getString("kind").orEmpty()
+        val text = if (kind == "values") call.getString("field").orEmpty()
+                   else (call.getObject("criteria") ?: JSObject()).toString()
+        call.resolve(JSObject().put("json", NativeCore.statsQuery(kind, text)))
+    }
+
     /** One undoable site change (see opendives.h): create, edit, geocode, merge, delete. */
     @PluginMethod
     fun siteAction(call: PluginCall) = onCoreThread(call) {

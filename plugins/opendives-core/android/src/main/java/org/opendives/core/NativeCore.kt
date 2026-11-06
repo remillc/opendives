@@ -34,6 +34,7 @@ internal object NativeCore {
     external fun filterPresets(action: String, name: String, fulltext: String, mode: String, rules: Array<String>, index: Int): String
     external fun syncConflicts(): String
     external fun resolveConflicts(choices: String)
+    external fun statsQuery(kind: String, text: String): String
     external fun siteAction(action: String, uuid: Long, other: Long, uuids: LongArray?, field: String, value: String, lat: Int, lon: Int): String
     external fun setRegionsFile(path: String)
     external fun toolQuery(kind: String, o2: Int, he: Int, po2: Int, depth: Int): String

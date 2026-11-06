@@ -169,11 +169,15 @@ Christian asked for every Android screen to be MD3-compliant. Read "Android foll
 7. Site sheet (`sites-fiche-android.dc.html`): "Ouvrir dans Cartes" as an MD3 text button with the "open in new" icon (task 20 and the spec).
 Then go through every Android screen already built with the reference values of the spec, fix what does not match, and list what you changed in your report.
 
-## [ ] 2026-11-06-22 Statistics section
+## [x] 2026-11-06-22 Statistics section
+
+Done in Compute the statistics with the core, two charts on the main screen
 
 Build the Statistics section from `docs/ui-specification.md`, section 4, "Statistics", and the mock-ups `docs/mockups/android-stats.dc.html`, `stats-annee-android.dc.html`, `stats-filtre-android.dc.html`, `stats-nouvelle-android.dc.html` (MD3). This supersedes the older statistics boards (`ios-stats*`, `android-stats` before today, tablets): remove the totals by dive computer, add the three ready-made charts, *My statistics* with "New statistic", *By year* and the year screen. No chart builder. Compute every figure with the core (`stats`, yearly statistics); if the core does not expose something the screens need, stop and ask Christian before adding it to the facade.
 
-## [ ] 2026-11-06-23 Statistics section on iPhone
+## [x] 2026-11-06-23 Statistics section on iPhone
+
+Done in Compute the statistics with the core, two charts on the main screen
 
 The iPhone screens of the Statistics section are updated to match task 22: `docs/mockups/ios-stats-tableau.dc.html` (main screen), `ios-stats-annee.dc.html` (year), `ios-stats.dc.html` (filtered result, replaces the old "detail of a statistics row"), `ios-stats-nouvelle.dc.html` (new statistic, as a sheet with Annuler / Enregistrer). Same content and rules as on Android (`docs/ui-specification.md`, "Statistics"), with the iOS look: large title, inset grouped lists, chevrons in tertiary grey, actions as rows ("Nouvelle statistique…", "Ajouter un critère…"), a check mark for the selected values.
 
@@ -205,7 +209,9 @@ Done in Sites: new site FAB, smaller centre-on-me button
 
 The Sites screen gets back its FAB "+" (56 dp, aria-label "Nouveau site") at the bottom right over the list panel, opening the new site form. The "Centrer sur ma position" button becomes a small 40 dp button at the bottom right of the visible map. The panel keeps 88 dp of bottom padding. See `docs/ui-specification.md` (Sites) and `docs/mockups/android-sites.dc.html`.
 
-## [ ] 2026-11-06-29 Statistics: remove the maximum depth chart
+## [x] 2026-11-06-29 Statistics: remove the maximum depth chart
+
+Done in Compute the statistics with the core, two charts on the main screen
 
 The Statistics screen keeps two ready-made charts: dives per year and dive durations. Remove the maximum depth chart from the main screen (Android and iOS). Maximum depth per dive stays on the year and filtered result screens. See `docs/ui-specification.md` (Statistics) and `docs/mockups/android-stats.dc.html`, `docs/mockups/ios-stats-tableau.dc.html`.
 

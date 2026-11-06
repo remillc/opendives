@@ -48,14 +48,15 @@ FLAGS="-std=c++20 -O1 -w
   echo "$ROOT/core/libopendives/opendives.cpp"; echo "$ROOT/core/libopendives/edit.cpp"
   echo "$ROOT/core/libopendives/regions.cpp"; echo "$ROOT/core/libopendives/tools.cpp"
   echo "$ROOT/core/libopendives/settings.cpp"; echo "$ROOT/core/libopendives/plan.cpp"
-  echo "$ROOT/core/libopendives/filter.cpp"; echo "$ROOT/core/libopendives/account.cpp"; } > "$B/sources.txt"
+  echo "$ROOT/core/libopendives/filter.cpp"; echo "$ROOT/core/libopendives/account.cpp"
+  echo "$ROOT/core/libopendives/stats.cpp"; echo "$ROOT/tests/stats_test.cpp"; } > "$B/sources.txt"
 
 export FLAGS B
 xargs -P"$JOBS" -I{} bash -c 'o="$B/obj/$(basename {} .cpp).o"; [ "$o" -nt {} ] || g++ $FLAGS -c {} -o "$o"' < "$B/sources.txt"
 
 # 4. Link.
-OBJS=$(ls "$B"/obj/*.o | grep -Ev '/(roundtrip|facade|cloud|edit_roundtrip|cloud_write|regions_test|tools_test|plan_test|account_test|opendives|edit|regions|tools|settings|plan|filter|account)[.]o$')
-FACADE="$B/obj/opendives.o $B/obj/edit.o $B/obj/regions.o $B/obj/tools.o $B/obj/settings.o $B/obj/plan.o $B/obj/filter.o $B/obj/account.o"
+OBJS=$(ls "$B"/obj/*.o | grep -Ev '/(roundtrip|facade|cloud|edit_roundtrip|cloud_write|regions_test|tools_test|plan_test|account_test|stats_test|opendives|edit|regions|tools|settings|plan|filter|account|stats)[.]o$')
+FACADE="$B/obj/opendives.o $B/obj/edit.o $B/obj/regions.o $B/obj/tools.o $B/obj/settings.o $B/obj/plan.o $B/obj/filter.o $B/obj/account.o $B/obj/stats.o"
 LIBS="$B/libdc/lib/libdivecomputer.a $(pkg-config --libs libgit2 libxml-2.0 libxslt libzip sqlite3) -lssl -lcrypto -lz -lm"
 g++ $OBJS $FACADE "$B/obj/roundtrip.o" -o "$B/roundtrip" $LIBS
 g++ $OBJS $FACADE "$B/obj/facade.o" -o "$B/facade" $LIBS
@@ -66,4 +67,5 @@ g++ "$B/obj/regions.o" "$B/obj/regions_test.o" -o "$B/regions"
 g++ $OBJS $FACADE "$B/obj/tools_test.o" -o "$B/tools" $LIBS
 g++ $OBJS $FACADE "$B/obj/plan_test.o" -o "$B/plan" $LIBS
 g++ $OBJS $FACADE "$B/obj/account_test.o" -o "$B/account" $LIBS
-echo "built $B/account $B/plan $B/regions $B/tools $B/roundtrip $B/facade $B/cloud $B/edit-roundtrip $B/cloud-write"
+g++ $OBJS $FACADE "$B/obj/stats_test.o" -o "$B/stats" $LIBS
+echo "built $B/account $B/stats $B/plan $B/regions $B/tools $B/roundtrip $B/facade $B/cloud $B/edit-roundtrip $B/cloud-write"

@@ -1,18 +1,16 @@
 // @ts-check
 // Statistics section (docs/ui-specification.md, section 1 and 5, "Statistics").
 //
-// Every figure comes from the Subsurface core (statistics.cpp,
-// calculate_stats_summary), never from a sum made here. The facade does not
-// expose it yet: `computeStatistics` is the single place where it will be
-// called, and returns null until then, so the screens show the figures as
-// pending. The proposed facade function and its result are described by the
-// typedefs below (question for Christian, task 2026-11-06-22).
-//
-// What is already available is used as is: the list of dives (dates, trips,
-// sites) to build the rows by year, month and trip, and each dive's own
-// maximum depth and duration, as computed by the core, for the per-dive charts.
+// Every figure comes from the Subsurface core: the facade's `stats`
+// (core/libopendives/stats.cpp) runs calculate_stats_summary() and
+// calculate_stats_selected() on the dives that meet the criteria, invalid
+// dives left out as Subsurface does. Nothing is summed here. The free filter
+// applies too (spec: "Statistics apply to the filtered results"): its dives
+// are passed as an "id" criterion.
+import { OpenDivesCore } from 'opendives-core';
 import { t, tIfExists } from './i18n.js';
-import { formatDepth, formatHours, formatLongDate, locale } from './format.js';
+import { formatDepth, formatGasLong, formatHours, formatLongDate, locale } from './format.js';
+import { filter } from './filter.svelte.js';
 
 /** @typedef {import('opendives-core').Dive} Dive */
 
@@ -34,7 +32,7 @@ import { formatDepth, formatHours, formatLongDate, locale } from './format.js';
  */
 
 /**
- * Proposed result of the facade's `stats` on the dives that meet `criteria`.
+ * Result of the facade's `stats` on the dives that meet the criteria.
  * @typedef {Object} StatsResult
  * @property {number} logDives number of dives counted in the whole logbook
  * @property {StatsFigures} total
@@ -56,34 +54,40 @@ import { formatDepth, formatHours, formatLongDate, locale } from './format.js';
 /** @typedef {{id: string, name: string, criteria: Criterion[]}} SavedStatistic */
 
 /**
- * Criteria of "New statistic", in the order of the spec. "weight" is in the
- * spec's list but contradicts "never offered: weight" (question for Christian):
- * left out until answered. "month" is only used by the year screen's rows.
+ * Criteria of "New statistic", in the order of the spec. Weight is never
+ * offered (decided on 6 November 2026). "month" is only used by the year
+ * screen's rows.
  */
 export const CRITERIA = ['suit', 'tag', 'buddy', 'guide', 'site', 'trip', 'mode', 'gas', 'cylinder', 'computer', 'year', 'rating'];
 
-/** True while the facade does not compute the statistics (see the top of this file). */
-export const FIGURES_PENDING = true;
-
 /**
- * Figures of the dives meeting `criteria` (all dives when empty), computed by
- * the core. Pending: returns null until the facade exposes `stats`.
+ * Figures of the dives meeting `criteria` and the free filter (all dives when
+ * both are empty), computed by the core. Null when the core fails.
  * @param {Criterion[]} criteria
+ * @param {{ignoreFilter?: boolean}} [options]
  * @returns {Promise<StatsResult|null>}
  */
-export async function computeStatistics(criteria) {
-  void criteria;
-  return null;
+export async function computeStatistics(criteria, options = {}) {
+  /** @type {Record<string, string[]>} */
+  const object = {};
+  for (const c of criteria) if (c.values.length) object[c.field] = [...c.values];
+  if (filter.ids && !options.ignoreFilter) object.id = [...filter.ids].map(String);
+  try {
+    return await OpenDivesCore.statsQuery({ kind: 'stats', criteria: object });
+  } catch (e) {
+    console.error('Statistics', e);
+    return null;
+  }
 }
 
 /**
- * Supporting line of a row: "4 plongées · 4 h 07 · max 28,7 m"; the pending
- * text while the core does not give the figures.
+ * Supporting line of a row: "4 plongées · 4 h 07 · max 28,7 m"; empty while
+ * the core computes.
  * @param {StatsFigures|null|undefined} figures
  * @param {import('opendives-core').Prefs} prefs
  */
 export function summaryLine(figures, prefs) {
-  if (!figures) return t('stats.pending');
+  if (!figures) return '';
   const dives = t('trip.dives', { n: figures.dives });
   return figures.maxDepthMm
     ? t('stats.rowSummary', { dives, time: formatHours(figures.totalSeconds), depth: formatDepth(figures.maxDepthMm, prefs) })
@@ -91,30 +95,27 @@ export function summaryLine(figures, prefs) {
 }
 
 /**
- * The values of a criterion found in the logbook, for "New statistic". Only
- * year, month, site and trip can be read from the dive list; the others need
- * the core (pending: null). Their number of dives is a figure of the core too.
+ * The values of a criterion found in the logbook, with their number of dives
+ * (the core's stats_values, the whole logbook). "Not set" last; years and
+ * ratings from the highest, the others alphabetically.
  * @param {string} field
  * @param {Dive[]} dives
- * @returns {{key: string, label: string}[]|null}
+ * @returns {Promise<{key: string, label: string, dives: number}[]>}
  */
-export function criterionValues(field, dives) {
-  /** @type {Map<string, string>} */
-  const values = new Map();
-  if (field === 'year') {
-    for (const d of dives) values.set(d.date.slice(0, 4), d.date.slice(0, 4));
-    return [...values].sort((a, b) => b[0].localeCompare(a[0])).map(([key, label]) => ({ key, label }));
-  }
-  if (field === 'site') {
-    for (const d of dives) values.set(d.site, d.site || notSetLabel('site'));
-    return [...values]
-      .sort((a, b) => (a[0] === '' ? 1 : b[0] === '' ? -1 : a[1].localeCompare(b[1], locale)))
-      .map(([key, label]) => ({ key, label }));
-  }
-  if (field === 'trip') {
-    return tripsOf(dives).map((trip) => ({ key: trip.start, label: tripName(trip) }));
-  }
-  return null;
+export async function criterionValues(field, dives) {
+  /** @type {{key: string, dives: number, location?: string}[]} */
+  const values = await OpenDivesCore.statsQuery({ kind: 'values', field });
+  const descending = field === 'year' || field === 'month' || field === 'rating' || field === 'trip';
+  return values
+    .map((v) => ({
+      key: v.key,
+      label: field === 'trip' && v.key ? tripName({ start: v.key, location: v.location ?? '' }) : valueLabel(field, v.key, dives),
+      dives: v.dives,
+    }))
+    .sort((a, b) => {
+      if (!a.key || !b.key) return a.key ? -1 : b.key ? 1 : 0;
+      return descending ? b.key.localeCompare(a.key) : a.label.localeCompare(b.label, locale);
+    });
 }
 
 /**
@@ -139,23 +140,6 @@ export function tripsOf(dives) {
 /** @param {{start: string, location: string}} trip */
 export function tripName(trip) {
   return trip.location || t('trip.startingOn', { date: formatLongDate(trip.start) });
-}
-
-/** Years of the logbook, the latest first. @param {Dive[]} dives */
-export function yearsOf(dives) {
-  return [...new Set(dives.map((d) => Number(d.date.slice(0, 4))))].sort((a, b) => b - a);
-}
-
-/** Months of one year that have dives, in order. @param {Dive[]} dives @param {number} year */
-export function monthsOf(dives, year) {
-  const prefix = `${year}-`;
-  return [...new Set(dives.filter((d) => d.date.startsWith(prefix)).map((d) => Number(d.date.slice(5, 7))))].sort((a, b) => a - b);
-}
-
-/** Dives of one year, the oldest first. @param {Dive[]} dives @param {number} year */
-export function divesOfYear(dives, year) {
-  const prefix = `${year}-`;
-  return chronological(dives.filter((d) => d.date.startsWith(prefix)));
 }
 
 /** @param {Dive[]} dives */
@@ -193,7 +177,11 @@ export function valueLabel(field, value, dives) {
     return trip ? tripName(trip) : t('trip.startingOn', { date: formatLongDate(value) });
   }
   if (field === 'mode') return t(`detail.modes.${value}`);
-  if (field === 'rating') return t('stats.stars', { n: Number(value) });
+  if (field === 'rating' && value) return t('stats.stars', { n: Number(value) });
+  if (field === 'gas' && value) {
+    const [o2, he] = value.split('/').map(Number);
+    return formatGasLong(o2, he);
+  }
   return value || notSetLabel(field);
 }
 

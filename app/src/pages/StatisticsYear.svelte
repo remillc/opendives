@@ -9,12 +9,12 @@
   import BarChart from '../components/BarChart.svelte';
   import StatsDetails from '../components/StatsDetails.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
+  import { filter } from '../lib/filter.svelte.js';
   import {
+    chronological,
     computeStatistics,
-    divesOfYear,
     encodeCriteria,
     monthName,
-    monthsOf,
     summaryLine,
     tripName,
     tripsOf,
@@ -30,12 +30,21 @@
 
   $effect(() => {
     void logbook.dives;
+    void filter.ids;
     computeStatistics([{ field: 'year', values: [String(year)] }]).then((r) => (result = r));
   });
 
-  const dives = $derived(divesOfYear(logbook.dives, year));
-  const months = $derived(monthsOf(logbook.dives, year));
-  const trips = $derived(tripsOf(dives));
+  /** The dives counted by the core (invalid dives and the free filter left out), the oldest first. */
+  const dives = $derived.by(() => {
+    const ids = new Set(result?.diveIds ?? []);
+    return chronological(logbook.dives.filter((d) => ids.has(d.id)));
+  });
+  const months = $derived((result?.monthly ?? []).filter((m) => m.year === year));
+  /** Trips of the year, with the identifier of the load to open them (never stored). */
+  const trips = $derived.by(() => {
+    const ids = new Map(tripsOf(logbook.dives).map((tr) => [tr.start, tr.id]));
+    return (result?.byTrip ?? []).map((tr) => ({ ...tr, id: ids.get(tr.start) ?? 0 }));
+  });
 
   // Labels under the bars: the time when all the dives are on one day, else the day.
   const dayFormat = new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short', timeZone: 'UTC' });
@@ -58,10 +67,6 @@
       : t('stats.chartDepth'),
   );
 
-  /** @param {number} month */
-  const monthFigures = (month) => result?.monthly.find((m) => m.year === year && m.month === month) ?? null;
-  /** @param {string} start */
-  const tripFigures = (start) => result?.byTrip.find((tr) => tr.start === start) ?? null;
   /** @param {number} month */
   const monthHref = (month) =>
     `/statistics/result/?c=${encodeCriteria([{ field: 'month', values: [`${year}-${String(month).padStart(2, '0')}`] }])}`;
@@ -87,12 +92,12 @@
   <div class="block-title">{t('stats.byMonth')}</div>
   <div class="list list-strong inset list-dividers media-list chevron-center">
     <ul>
-      {#each months as month (month)}
+      {#each months as m (m.month)}
         <li>
-          <a href={monthHref(month)} class="item-link item-content">
+          <a href={monthHref(m.month)} class="item-link item-content">
             <div class="item-inner">
-              <div class="item-title-row"><div class="item-title">{monthName(month)}</div></div>
-              <div class="item-text od-value">{summaryLine(monthFigures(month), logbook.prefs)}</div>
+              <div class="item-title-row"><div class="item-title">{monthName(m.month)}</div></div>
+              <div class="item-text od-value">{summaryLine(m, logbook.prefs)}</div>
             </div>
           </a>
         </li>
@@ -104,21 +109,16 @@
     <div class="block-title">{t('stats.byTrip')}</div>
     <div class="list list-strong inset list-dividers media-list chevron-center">
       <ul>
-        {#each trips as trip (trip.id)}
-          {@const figures = tripFigures(trip.start)}
+        {#each trips as trip (trip.start)}
           <li>
             <a href="/trip/{trip.id}/" class="item-link item-content">
               <div class="item-inner">
                 <div class="item-title-row"><div class="item-title">{tripName(trip)}</div></div>
                 <div class="item-text od-value">
-                  {#if figures}
-                    {t('stats.tripLine', {
-                      dives: t('trip.dives', { n: figures.dives }),
-                      place: trip.location ? formatLongDate(trip.start) : t('stats.placeToSpecify'),
-                    })}
-                  {:else}
-                    {t('stats.pending')}
-                  {/if}
+                  {t('stats.tripLine', {
+                    dives: t('trip.dives', { n: trip.dives }),
+                    place: trip.location ? formatLongDate(trip.start) : t('stats.placeToSpecify'),
+                  })}
                 </div>
               </div>
             </a>

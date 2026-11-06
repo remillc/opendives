@@ -615,4 +615,18 @@ Java_org_opendives_core_NativeCore_listDives(JNIEnv *env, jobject, jstring repo)
 	return env->NewStringUTF(json.c_str());
 }
 
+// Read-only statistics: "stats" with the criteria as JSON in `text`, or
+// "values" with a field name in `text` (opendives.h).
+JNIEXPORT jstring JNICALL
+Java_org_opendives_core_NativeCore_statsQuery(JNIEnv *env, jobject, jstring kindIn, jstring textIn)
+{
+	std::string kind = to_string(env, kindIn), text = to_string(env, textIn), json, error;
+	int rc = kind == "values" ? opendives::stats_values(text, json, error) : opendives::stats(text, json, error);
+	if (rc) {
+		throw_core_error(env, error);
+		return nullptr;
+	}
+	return env->NewStringUTF(json.c_str());
+}
+
 } // extern "C"
