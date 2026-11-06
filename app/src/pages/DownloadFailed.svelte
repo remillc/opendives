@@ -5,7 +5,7 @@
   // not change, what to check as a numbered list, then Retry. Never the raw
   // text of a core error. Shown by the download from the dive computer, which
   // is not built yet (Bluetooth): ?computer=<model name>&reason=notFound.
-  import { Page, Navbar, NavLeft, Link, theme } from 'framework7-svelte';
+  import { Page, Navbar, Link, theme } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
   import { t } from '../lib/i18n.js';
 
@@ -18,13 +18,13 @@
 
 <Page class="od-download-failed">
   <Navbar title={t('downloadFailed.title')}>
-    <NavLeft>
+    {#snippet left()}
       {#if theme.ios}
         <Link back>{t('downloadFailed.close')}</Link>
       {:else}
         <Link back iconOnly><Icon name="close" /><span class="od-sr-only">{t('downloadFailed.close')}</span></Link>
       {/if}
-    </NavLeft>
+    {/snippet}
   </Navbar>
 
   <div class="content">

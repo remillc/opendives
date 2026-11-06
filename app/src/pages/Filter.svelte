@@ -9,7 +9,7 @@
   // shown. Never offered: weight, weight type, start and end pressures, water
   // density, nitrogen percentage.
   import { onMount } from 'svelte';
-  import { Page, Navbar, NavLeft, NavRight, Link, List, ListItem, Searchbar, theme } from 'framework7-svelte';
+  import { Page, Navbar, Link, List, ListItem, Searchbar, theme } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
   import {
@@ -104,16 +104,16 @@
 
 <Page class="od-filter">
   <Navbar title={t('filter.title')}>
-    <NavLeft>
+    {#snippet left()}
       {#if theme.ios}
         <Link back>{t('filter.cancel')}</Link>
       {:else}
         <Link back iconOnly><Icon name="close" /><span class="od-sr-only">{t('filter.cancel')}</span></Link>
       {/if}
-    </NavLeft>
-    <NavRight>
+    {/snippet}
+    {#snippet right()}
       <Link onClick={clearAll}>{t('filter.clearAll')}</Link>
-    </NavRight>
+    {/snippet}
   </Navbar>
 
   <Searchbar
