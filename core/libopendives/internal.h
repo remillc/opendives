@@ -5,6 +5,7 @@
 
 #include "opendives.h"
 
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -26,6 +27,21 @@ int check_writable(std::string &error);
 // `fingerprints_before` is left as it was.
 int import_downloaded(struct divelog &log, const std::string &source, fingerprint_table &fingerprints_before,
 		      std::string &result_json, std::string &error);
+
+// The end of a download (download.cpp), apart for the tests: the computer as
+// it identified itself; `failure` empty, CANCELLED, or "FAILED: …" or
+// "NOT_FOUND: …". Success: the dives of `log` are added as one undoable step.
+// Failure: the dives received, if any, are kept aside with the core's
+// fingerprint table as the download left it (download_partial), and the
+// table goes back to `fingerprints_before`.
+struct DownloadedComputer {
+	std::string devname, vendor, product;
+	uint32_t serial = 0, firmware = 0;
+};
+int finish_download(struct divelog &log, const DownloadedComputer &computer, const std::string &failure,
+		    fingerprint_table &fingerprints_before, std::string &json, std::string &error);
+// Drops the dives kept aside after a failure (a new load, a new download).
+void download_forget_partial();
 
 // The thumbnail of list_dives() ("profile"), as a JSON array (opendives.cpp).
 std::string profile_json(const struct dive &d);

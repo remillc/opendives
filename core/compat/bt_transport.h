@@ -93,6 +93,12 @@ public:
 void set_bt_transport(BtTransport *transport);
 BtTransport *bt_transport();
 
+// Set when the Bluetooth Low Energy link failed (no connection, a
+// disconnection, no answer within the timeout, a write refused), as opposed
+// to errors of the dive computer's protocol; cleared by the download before
+// each attempt. The download then tries Bluetooth Classic (download.cpp).
+extern bool bt_transport_error;
+
 // Called after every read of the Bluetooth stream, on the download's thread,
 // so that the download can report its progress (download.cpp).
 extern void (*bt_io_hook)();

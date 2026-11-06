@@ -7,15 +7,38 @@
   // its place: ?computer=<model name>&reason=notFound (the connection could
   // not be opened) or lost (it was, then the download failed). Retry starts
   // the same attempt again, "Choose another dive computer" opens the list.
+  // &received=N: dives arrived before the failure. As Subsurface-mobile, they
+  // can be kept (one undoable step, as a full download); otherwise they are
+  // dropped when this screen closes.
+  import { onDestroy } from 'svelte';
   import { Page, Navbar, Link, theme } from 'framework7-svelte';
+  import { OpenDivesCore } from 'opendives-core';
   import Icon from '../components/Icon.svelte';
+  import { keepReceived } from '../lib/download.js';
   import { t } from '../lib/i18n.js';
 
-  /** @type {{ f7route: { query: { computer?: string, reason?: string } }, f7router: any }} */
+  /** @type {{ f7route: { query: { computer?: string, reason?: string, received?: string } }, f7router: any }} */
   let { f7route, f7router } = $props();
   const computer = f7route.query?.computer ?? '';
   const reason = f7route.query?.reason === 'lost' ? 'lost' : 'notFound';
   const checks = ['on', 'near', 'otherApp'];
+  // svelte-ignore state_referenced_locally
+  let received = $state(Number(f7route.query?.received ?? 0) || 0);
+  let keeping = $state(false);
+
+  async function keep() {
+    keeping = true;
+    const kept = await keepReceived();
+    keeping = false;
+    if (kept) {
+      received = 0;
+      f7router.back();
+    }
+  }
+
+  onDestroy(() => {
+    if (received) OpenDivesCore.downloadPartial({ action: 'discard' }).catch(() => {});
+  });
 
   /** The download screen again, in this one's place: the same attempt (retry) or the list. @param {boolean} retry */
   function again(retry) {
@@ -37,6 +60,14 @@
   <div class="content">
     <h1>{computer ? t(`downloadFailed.${reason}.title`, { computer }) : t(`downloadFailed.${reason}.titleNoName`)}</h1>
     <p class="text">{t(`downloadFailed.${reason}.text`)} {t('downloadFailed.nothingChanged')}</p>
+    {#if received}
+      <div class="received">
+        <p class="text">{t('downloadFailed.received', { n: received })}</p>
+        <button type="button" class="od-outlined-button" disabled={keeping} onclick={keep}>
+          {t('download.keepReceived', { n: received })}
+        </button>
+      </div>
+    {/if}
     <h2>{t('downloadFailed.check')}</h2>
     <ol>
       {#each checks as c, i (c)}
@@ -129,6 +160,14 @@
       display: flex;
       align-items: center;
       justify-content: center;
+    }
+
+    .received {
+      margin-top: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
     }
 
     .actions {

@@ -64,6 +64,9 @@ internal object NativeCore {
     /** Blocks for the whole download (download_dives in opendives.h); on the core thread. */
     external fun downloadDives(request: String, transport: BluetoothTransport, listener: DownloadListener): String
 
+    /** Dives received before a failure: "count", "keep" (one undoable step) or "discard"; on the core thread. */
+    external fun downloadPartial(action: String): String
+
     /** Asks the running download to stop; from any thread. */
     external fun downloadCancel()
 }

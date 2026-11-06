@@ -917,6 +917,18 @@ Java_org_opendives_core_NativeCore_downloadDives(JNIEnv *env, jobject, jstring r
 	return env->NewStringUTF(json.c_str());
 }
 
+// The dives received before a failed or cancelled download: count, keep, discard.
+JNIEXPORT jstring JNICALL
+Java_org_opendives_core_NativeCore_downloadPartial(JNIEnv *env, jobject, jstring action)
+{
+	std::string json, error;
+	if (opendives::download_partial(to_string(env, action), json, error)) {
+		throw_core_error(env, error);
+		return nullptr;
+	}
+	return env->NewStringUTF(json.c_str());
+}
+
 // Off the core's thread, while downloadDives() runs.
 JNIEXPORT void JNICALL
 Java_org_opendives_core_NativeCore_downloadCancel(JNIEnv *, jobject)

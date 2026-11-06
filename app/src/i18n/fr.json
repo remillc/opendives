@@ -1347,7 +1347,18 @@
       "title": "Bluetooth désactivé",
       "text": "Activez le Bluetooth pour trouver l'ordinateur de plongée.",
       "button": "Activer le Bluetooth"
-    }
+    },
+    "keepReceived": {
+      "one": "Garder la plongée reçue",
+      "other": "Garder les {n} plongées reçues"
+    },
+    "dropReceived": "Ne pas garder",
+    "cancelledTitle": "Téléchargement annulé",
+    "cancelledKeep": {
+      "one": "Une plongée est arrivée avant l'annulation. Elle n'est pas encore dans le carnet.",
+      "other": "{n} plongées sont arrivées avant l'annulation. Elles ne sont pas encore dans le carnet."
+    },
+    "retryingClassic": "Le Bluetooth basse consommation ne répond pas. Nouvel essai en Bluetooth classique…"
   },
   "downloadFailed": {
     "title": "Téléchargement",
@@ -1370,7 +1381,11 @@
       "otherApp": "Aucune autre app (par exemple Subsurface-mobile) n'est connectée à l'ordinateur."
     },
     "otherComputer": "Choisir un autre ordinateur",
-    "retry": "Réessayer"
+    "retry": "Réessayer",
+    "received": {
+      "one": "Une plongée est arrivée avant la coupure. Vous pouvez la garder, les autres seront lues au prochain téléchargement.",
+      "other": "{n} plongées sont arrivées avant la coupure. Vous pouvez les garder, les autres seront lues au prochain téléchargement."
+    }
   },
   "conflict": {
     "title": "Plongée modifiée à deux endroits",

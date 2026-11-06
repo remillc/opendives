@@ -1347,7 +1347,18 @@
       "title": "Bluetooth is off",
       "text": "Turn Bluetooth on to find the dive computer.",
       "button": "Turn Bluetooth on"
-    }
+    },
+    "keepReceived": {
+      "one": "Keep the dive received",
+      "other": "Keep the {n} dives received"
+    },
+    "dropReceived": "Don't keep",
+    "cancelledTitle": "Download cancelled",
+    "cancelledKeep": {
+      "one": "One dive arrived before the download was cancelled. It is not in the logbook yet.",
+      "other": "{n} dives arrived before the download was cancelled. They are not in the logbook yet."
+    },
+    "retryingClassic": "Bluetooth Low Energy does not answer. Trying again over Bluetooth Classic…"
   },
   "downloadFailed": {
     "title": "Download",
@@ -1370,7 +1381,11 @@
       "otherApp": "No other app (Subsurface-mobile, for example) is connected to the dive computer."
     },
     "otherComputer": "Choose another dive computer",
-    "retry": "Retry"
+    "retry": "Retry",
+    "received": {
+      "one": "One dive arrived before the connection was lost. You can keep it, the others will be read at the next download.",
+      "other": "{n} dives arrived before the connection was lost. You can keep them, the others will be read at the next download."
+    }
   },
   "conflict": {
     "title": "Dive changed in two places",
