@@ -644,7 +644,7 @@
     "cylinderType": "Cylinder type",
     "maxPo2": "Maximum pO₂",
     "plannedDepth": "Planned depth",
-    "plannedDepthHelp": "For the best mix; {depth} when empty",
+    "plannedDepthHelp": "For the best mix, {depth} when empty",
     "depthInvalid": "Enter a depth",
     "mod": "Maximum operating depth (MOD)",
     "modSub": "{gas} at {po2} bar",

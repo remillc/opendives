@@ -644,7 +644,7 @@
     "cylinderType": "Type de bouteille",
     "maxPo2": "ppO2 maximale",
     "plannedDepth": "Profondeur prévue",
-    "plannedDepthHelp": "Pour le meilleur mélange ; {depth} si vide",
+    "plannedDepthHelp": "Pour le meilleur mélange, {depth} si vide",
     "depthInvalid": "Indiquez une profondeur",
     "mod": "Profondeur maximale (MOD)",
     "modSub": "{gas} à {po2} bar",
