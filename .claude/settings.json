@@ -7,6 +7,24 @@
             "type": "command",
             "command": "node \"$CLAUDE_PROJECT_DIR/tools/agent-inbox.mjs\" start",
             "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/tools/agent-inbox.mjs\" watch",
+            "asyncRewake": true,
+            "timeout": 86400
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/tools/agent-inbox.mjs\" watch",
+            "asyncRewake": true,
+            "timeout": 86400
           }
         ]
       }
