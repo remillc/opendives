@@ -1,24 +1,25 @@
 <script>
   // @ts-check
-  // Dive detail screen, after the "Détail complet" mock-ups: number and date,
-  // site and its location, three key figures, profile, secondary facts in a
-  // three-column grid, a "Gas and equipment" block (cylinders, SAC, suit,
-  // weights), rebreather gases as pills, buddies, tags and notes. Edit and an
-  // overflow menu ("Plan from this dive") in the navbar. A row without a value
-  // is never shown.
+  // Dive detail screen, after the detail3 mock-ups (spec, section 4, "Full dive
+  // detail" and "Conditions"): number and date, site, location, trip and
+  // rating; key figures; profile; facts in a three-column grid; a collapsed
+  // Conditions block; people and tags; "Gas and equipment" (one entry per
+  // cylinder, SAC, suit, weights per location); dive computers; photos; notes
+  // in full. Edit and an overflow menu in the navbar. A row without a value is
+  // never shown.
   import { onMount } from 'svelte';
   import { Page, Navbar, Link, List, ListItem, Block, Popover, theme } from 'framework7-svelte';
   import { OpenDivesCore } from 'opendives-core';
   import DiveProfile from '../components/DiveProfile.svelte';
   import Icon from '../components/Icon.svelte';
+  import Stars from '../components/Stars.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
   import {
     formatCylinderSize,
     formatDepth,
     formatDiveDay,
     formatDuration,
-    formatGas,
-    formatGasLong,
+        formatGasLong,
     formatGasVolume,
     formatNumber,
     formatPressure,
@@ -57,26 +58,26 @@
     return [
       dive.maxDepthMm ? { value: formatDepth(dive.maxDepthMm, prefs), label: t('detail.figureMaxDepth') } : null,
       { value: formatDuration(dive.durationSeconds), label: t('detail.figureDuration') },
-      water ? { value: water, label: t('detail.figureWater') } : null,
+      // Subsurface keeps the lowest water temperature of the dive.
+      water ? { value: water, label: t('detail.figureWaterMin') } : null,
     ].filter((f) => f !== null);
   });
 
-  /** Secondary facts in a three-column grid; a fact without a value is hidden. */
+  /** Secondary facts in a three-column grid (detail3 mock-ups); a fact without a value is hidden. */
   const facts = $derived.by(() => {
     if (!dive) return [];
     /** @type {[string, string|null|undefined|false][]} */
-    // Order chosen by the project owner: times and mean depth first, then mode,
-    // computer and oxygen exposure.
     const list = [
       [t('detail.entry'), formatTimeOfDay(dive.date)],
       [t('detail.exit'), dive.durationSeconds > 0 && formatTimeOfDay(dive.date, dive.durationSeconds)],
       [t('detail.meanDepth'), dive.meanDepthMm > 0 && formatDepth(dive.meanDepthMm, prefs)],
-      [t('detail.mode'), tIfExists(`detail.modes.${dive.divemode}`) ?? dive.divemode],
-      [t('detail.computer'), dive.computer],
-      [t('detail.cns'), dive.cns > 0 && `${formatNumber(dive.cns, 0)} %`],
-      [t('detail.otu'), dive.otu > 0 && formatNumber(dive.otu, 0)],
       [t('detail.airTemperature'), formatTemperature(dive.airTempMk, prefs)],
-      [t('detail.trip'), dive.trip?.location],
+      [t('detail.water'), dive.waterType && tIfExists(`detail.waterTypes.${dive.waterType}`)],
+      // Always in mbar, as Subsurface shows it.
+      [t('detail.surfacePressure'), dive.surfacePressureMbar > 0 && `${formatNumber(dive.surfacePressureMbar, 0)} mbar`],
+      [t('detail.mode'), tIfExists(`detail.modes.${dive.divemode}`) ?? dive.divemode],
+      [t('detail.cns'), dive.cns > 0 && `${formatNumber(dive.cns, 0)} %`],
+      [t('detail.otu'), dive.otu > 0 && formatNumber(dive.otu, 0)],
     ];
     return list.filter(([, value]) => value).map(([label, value]) => ({ label, value: String(value) }));
   });
@@ -91,26 +92,71 @@
   );
 
   /**
-   * Open-circuit cylinders of the "Gas and equipment" block. Gas used comes
-   * from the core (gas compressibility included), never computed here.
+   * Conditions, in Subsurface's order; each 1 to 5 stars, a condition at 0
+   * (not filled in) is left out (spec, section 4, "Conditions").
+   */
+  const conditions = $derived.by(() => {
+    if (!dive) return [];
+    const values = { visibility: dive.visibility, ...(dive.conditions ?? {}) };
+    return ['visibility', 'wavesize', 'current', 'surge', 'chill']
+      .map((key) => ({ key, name: t(`detail.conditionNames.${key}`), value: values[key] ?? 0 }))
+      .filter((c) => c.value > 0);
+  });
+
+  let conditionsOpen = $state(false);
+
+  /** Collapsed summary: "Visibility 4 of 5, chill 3 of 5, and 2 more". */
+  const conditionsSummary = $derived.by(() => {
+    const shown = conditions.slice(0, 2).map((c, i) => {
+      const name = i === 0 ? c.name : c.name.toLocaleLowerCase();
+      return t('detail.summaryItem', { name, n: c.value });
+    });
+    const list = shown.join(', ');
+    const more = conditions.length - shown.length;
+    return more > 0 ? t('detail.summaryMore', { list, n: more }) : list;
+  });
+
+  /**
+   * Cylinders of the "Gas and equipment" block, one entry each: name, size and
+   * use, start and end pressures, a bar of the pressure left, then working
+   * pressure, switch depth and gas used. Gas used and switch depth come from
+   * the core, never computed here.
    */
   const cylinders = $derived.by(() => {
-    if (!dive || rebreather) return [];
+    if (!dive) return [];
     return dive.cylinders
       .filter((c) => c.used)
       .map((c) => {
+        const gas = formatGasLong(c.o2Permille, c.hePermille);
+        const gasLower = gas.toLocaleLowerCase();
+        const use =
+          c.use === 'diluent'
+            ? t('detail.cylinderUses.diluent', { gas: gasLower })
+            : c.use === 'oxygen'
+              ? t('detail.cylinderUses.oxygen')
+              : rebreather
+                ? t('detail.cylinderUses.bailout', { gas: gasLower })
+                : gasLower;
         const left = c.startMbar > 0 && c.endMbar > 0 ? Math.round((c.endMbar / c.startMbar) * 100) : null;
+        const pressureValue = (/** @type {number} */ mbar) =>
+          formatNumber(mbar / (prefs.pressure === 'psi' ? 68.947572932 : 1000), 0);
         return {
-          gas: formatGasLong(c.o2Permille, c.hePermille),
-          type: [c.description, formatCylinderSize(c.sizeMl, c.workingPressureMbar, prefs)].filter(Boolean).join(' '),
+          name: c.description || gas,
+          subtitle: [formatCylinderSize(c.sizeMl, c.workingPressureMbar, prefs), use].filter(Boolean).join(' · '),
           pressures:
             c.startMbar > 0 && c.endMbar > 0
-              ? t('detail.pressureRange', { start: formatNumber(c.startMbar / (prefs.pressure === 'psi' ? 68.947572932 : 1000), 0), end: formatPressure(c.endMbar, prefs) })
+              ? t('detail.pressureRange', { start: pressureValue(c.startMbar), end: formatPressure(c.endMbar, prefs) })
               : c.startMbar > 0
                 ? formatPressure(c.startMbar, prefs)
                 : '',
           left,
-          used: c.gasUsedMl > 0 ? t('detail.gasUsed', { volume: formatGasVolume(c.gasUsedMl, prefs) }) : '',
+          details: [
+            c.workingPressureMbar > 0 && t('detail.service', { pressure: formatPressure(c.workingPressureMbar, prefs) }),
+            c.switchDepthMm > 0 && t('detail.switchAt', { depth: formatDepth(c.switchDepthMm, prefs) }),
+            c.gasUsedMl > 0 && t('detail.gasUsed', { volume: formatGasVolume(c.gasUsedMl, prefs) }),
+          ]
+            .filter(Boolean)
+            .join(' · '),
         };
       });
   });
@@ -118,44 +164,30 @@
   /** SAC: only when the core computes one, never on a rebreather dive. */
   const sac = $derived(dive && !rebreather && dive.sacMlMin > 0 ? formatSac(dive.sacMlMin, prefs) : '');
 
-  /** Weights: the total, and one line per entry when there are several. */
-  const weights = $derived.by(() => {
-    if (!dive) return null;
-    const entries = (dive.weights ?? []).filter((w) => w.grams > 0);
-    if (!entries.length) return null;
-    const total = entries.reduce((sum, w) => sum + w.grams, 0);
-    return {
-      total: formatWeight(total, prefs),
-      entries:
-        entries.length > 1
-          ? entries.map((w) => ({
-              // Locations as stored by Subsurface (integrated, belt...), translated when known.
-              place: tIfExists(`detail.weightPlaces.${w.description}`) ?? w.description,
-              weight: formatWeight(w.grams, prefs),
-            }))
-          : [],
-    };
-  });
+  /** Weights: one line per location, no total (spec, section 4, "Full dive detail"). */
+  const weights = $derived(
+    (dive?.weights ?? [])
+      .filter((w) => w.grams > 0)
+      .map((w) => ({
+        // Locations as stored by Subsurface (integrated, belt...), translated when known.
+        place: w.description ? (tIfExists(`detail.weightPlaces.${w.description}`) ?? w.description) : '',
+        weight: formatWeight(w.grams, prefs),
+      })),
+  );
 
-  const hasEquipment = $derived(cylinders.length > 0 || !!sac || !!dive?.suit || !!weights);
+  const hasEquipment = $derived(cylinders.length > 0 || !!sac || !!dive?.suit || weights.length > 0);
 
-  /**
-   * Rebreather gases as pills: the diluents and oxygen are the loop gases and
-   * the open-circuit cylinders are bailout (outlined).
-   */
-  const gasGroups = $derived.by(() => {
-    if (!dive || !rebreather) return [];
-    const used = dive.cylinders.filter((c) => c.used);
-    /** @param {import('opendives-core').Cylinder[]} list */
-    const names = (list) => [...new Set(list.map((c) => formatGas(c.o2Permille, c.hePermille)))];
-    return [
-      { label: t('detail.rebreatherGases'), names: names(used.filter((c) => c.use !== 'OC-gas')), bailout: false },
-      { label: t('detail.bailout'), names: names(used.filter((c) => c.use === 'OC-gas')), bailout: true },
-    ].filter((group) => group.names.length);
-  });
-
-  const people = $derived(
-    dive ? [...dive.buddies, ...dive.guides.map((name) => t('detail.guide', { name }))] : [],
+  /** Dive computers: the first is the main one; its mode follows. */
+  const computers = $derived(
+    (dive?.diveComputers ?? [])
+      .filter((dc) => dc.model)
+      .map((dc, i) => ({
+        model: dc.model,
+        role: [
+          i === 0 ? t('detail.mainComputer') : t('detail.otherComputer'),
+          tIfExists(`detail.computerModes.${dc.divemode}`) ?? dc.divemode,
+        ].join(' · '),
+      })),
   );
 </script>
 
@@ -214,6 +246,13 @@
       </p>
       <h1 class="site" class:not-set={!dive.site}>{dive.site || t('dive.siteNotSet')}</h1>
       {#if location}<p class="location">{location}</p>{/if}
+      {#if dive.trip?.location}<p class="location">{t('detail.tripLine', { name: dive.trip.location })}</p>{/if}
+      {#if dive.rating > 0}
+        <p class="rating">
+          <Stars value={dive.rating} size={18} label={t('detail.ratingLabel', { n: dive.rating })} />
+          <span aria-hidden="true">{t('detail.rating')}</span>
+        </p>
+      {/if}
     </header>
 
     <div class="figures od-value">
@@ -239,64 +278,40 @@
       </dl>
     {/if}
 
-    {#if hasEquipment}
+    {#if conditions.length}
+      <!-- Collapsed by default, with a summary of the filled-in conditions. -->
       <section class="section">
-        <h2 class="section-title">{t('detail.gasAndEquipment')}</h2>
         <div class="group">
-          {#each cylinders as cylinder, i (i)}
-            <div class="cylinder">
-              <div class="line">
-                <span class="name"><span class="gas">{cylinder.gas}</span>{#if cylinder.type}<span class="type">{cylinder.type}</span>{/if}</span>
-                {#if cylinder.pressures}<span class="value od-value">{cylinder.pressures}</span>{/if}
+          <button type="button" class="disclosure" aria-expanded={conditionsOpen} onclick={() => (conditionsOpen = !conditionsOpen)}>
+            <span class="text">
+              <span class="title">{t('detail.conditions')}</span>
+              {#if !conditionsOpen}<span class="summary">{conditionsSummary}</span>{/if}
+            </span>
+            <span class="arrow" class:open={conditionsOpen}><Icon name="expand" /></span>
+          </button>
+          {#if conditionsOpen}
+            {#each conditions as condition (condition.key)}
+              <div class="row">
+                <span>{condition.name}</span>
+                <Stars value={condition.value} label={t('detail.starsLabel', { name: condition.name, n: condition.value })} />
               </div>
-              {#if cylinder.left !== null}
-                <div class="bar" role="img" aria-label={t('detail.pressureLeft', { percent: cylinder.left })}>
-                  <div class="fill" style="width: {cylinder.left}%"></div>
-                </div>
-              {/if}
-              {#if cylinder.used || cylinder.left !== null}
-                <div class="secondary od-value">
-                  <span>{cylinder.used}</span>
-                  {#if cylinder.left !== null}<span>{t('detail.left', { percent: cylinder.left })}</span>{/if}
-                </div>
-              {/if}
-            </div>
-          {/each}
-          {#if sac}
-            <div class="row"><span>{t('detail.sacFull')}</span><span class="value od-value">{sac}</span></div>
-          {/if}
-          {#if dive.suit}
-            <div class="row"><span>{t('detail.suitRow')}</span><span class="value">{dive.suit}</span></div>
-          {/if}
-          {#if weights}
-            <div class="row weights">
-              <div class="line"><span>{t('detail.weights')}</span><span class="value od-value">{weights.total}</span></div>
-              {#if weights.entries.length}
-                <ul class="entries od-value">
-                  {#each weights.entries as entry, i (i)}<li><span>{entry.place}</span><span>{entry.weight}</span></li>{/each}
-                </ul>
-              {/if}
-            </div>
+            {/each}
           {/if}
         </div>
       </section>
     {/if}
 
-    {#each gasGroups as group (group.label)}
+    {#if dive.guides.length || dive.buddies.length}
       <section class="section">
-        <h2 class="section-title">{group.label}</h2>
-        <ul class="pills od-value">
-          {#each group.names as name (name)}<li class="pill" class:outlined={group.bailout}>{name}</li>{/each}
-        </ul>
-      </section>
-    {/each}
-
-    {#if people.length}
-      <section class="section">
-        <h2 class="section-title">{t('detail.buddies', { n: people.length })}</h2>
-        <ul class="pills">
-          {#each people as name (name)}<li class="pill large">{name}</li>{/each}
-        </ul>
+        <h2 class="section-title">{t('detail.people')}</h2>
+        <div class="group">
+          {#if dive.guides.length}
+            <div class="row"><span>{t('detail.guideRow', { n: dive.guides.length })}</span><span class="value">{dive.guides.join(', ')}</span></div>
+          {/if}
+          {#if dive.buddies.length}
+            <div class="row"><span>{t('detail.buddiesRow', { n: dive.buddies.length })}</span><span class="value">{dive.buddies.join(', ')}</span></div>
+          {/if}
+        </div>
       </section>
     {/if}
 
@@ -306,6 +321,62 @@
         <ul class="pills">
           {#each dive.tags as tag (tag)}<li class="pill large outlined">{tag}</li>{/each}
         </ul>
+      </section>
+    {/if}
+
+    {#if hasEquipment}
+      <section class="section">
+        <h2 class="section-title">{t('detail.gasAndEquipment')}</h2>
+        <div class="group">
+          {#each cylinders as cylinder, i (i)}
+            <div class="cylinder">
+              <div class="line">
+                <span class="name"><span class="gas">{cylinder.name}</span>{#if cylinder.subtitle}<span class="type">{cylinder.subtitle}</span>{/if}</span>
+                {#if cylinder.pressures}<span class="value od-value">{cylinder.pressures}</span>{/if}
+              </div>
+              {#if cylinder.left !== null}
+                <div class="bar" role="img" aria-label={t('detail.pressureLeft', { percent: cylinder.left })}>
+                  <div class="fill" style="width: {cylinder.left}%"></div>
+                </div>
+              {/if}
+              {#if cylinder.details}<div class="secondary od-value"><span>{cylinder.details}</span></div>{/if}
+            </div>
+          {/each}
+          {#if sac}
+            <div class="row"><span>{t('detail.sacFull')}</span><span class="value od-value">{sac}</span></div>
+          {/if}
+          {#if dive.suit}
+            <div class="row"><span>{t('detail.suitRow')}</span><span class="value">{dive.suit}</span></div>
+          {/if}
+          {#each weights as weight, i (i)}
+            <div class="row">
+              <span class="stacked"><span>{t('detail.weights')}</span>{#if weight.place}<span class="sub">{weight.place}</span>{/if}</span>
+              <span class="value od-value">{weight.weight}</span>
+            </div>
+          {/each}
+        </div>
+      </section>
+    {/if}
+
+    {#if computers.length}
+      <section class="section">
+        <h2 class="section-title">{t('detail.computers')}</h2>
+        <div class="group">
+          {#each computers as computer, i (i)}
+            <div class="row"><span class="stacked"><span>{computer.model}</span><span class="sub">{computer.role}</span></span></div>
+          {/each}
+        </div>
+      </section>
+    {/if}
+
+    {#if dive.pictures > 0}
+      <section class="section">
+        <h2 class="section-title">{t('detail.photos')}</h2>
+        <div class="group">
+          <div class="row">
+            <span class="stacked"><span>{t('detail.photoCount', { n: dive.pictures })}</span><span class="sub">{t('detail.photoNote')}</span></span>
+          </div>
+        </div>
       </section>
     {/if}
 
@@ -515,27 +586,76 @@
         font-weight: 600;
         text-align: right;
       }
+    }
 
-      &.weights {
-        display: block;
-        padding: 10px 16px 12px;
+    /* A label with a second line under it (weight location, computer role, photos). */
+    .stacked {
+      padding: 10px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+
+      .sub {
+        font-size: 13px;
+        line-height: 18px;
+        color: var(--od-text-2);
       }
     }
 
-    .entries {
+    /* Overall rating under the title. */
+    .rating {
       margin: 6px 0 0;
-      padding: 0;
-      list-style: none;
       display: flex;
-      flex-direction: column;
-      gap: 4px;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      color: var(--od-text-2);
+    }
 
-      li {
+    /* Header of the collapsible Conditions block. */
+    .disclosure {
+      width: 100%;
+      min-height: 56px;
+      padding: 10px 16px;
+      border: none;
+      background: none;
+      color: var(--od-text);
+      font: inherit;
+      text-align: start;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      .text {
+        flex: 1;
         display: flex;
-        justify-content: space-between;
-        font-size: 15px;
+        flex-direction: column;
+        gap: 2px;
+      }
+
+      .title {
+        font-size: 16px;
+        font-weight: 600;
+      }
+
+      .summary {
+        font-size: 13px;
+        line-height: 18px;
         color: var(--od-text-2);
       }
+
+      .arrow {
+        display: block;
+        color: var(--od-text-2);
+
+        &.open {
+          transform: rotate(180deg);
+        }
+      }
+    }
+
+    .disclosure + .row {
+      border-top: 1px solid var(--od-separator);
     }
 
     .pills {

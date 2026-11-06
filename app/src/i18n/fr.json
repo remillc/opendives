@@ -119,7 +119,64 @@
       "backplate": "Plaque dorsale",
       "clip-on": "Sur la bouteille",
       "unknown": "Non précisé"
-    }
+    },
+    "figureWaterMin": "eau, minimum",
+    "tripLine": "Voyage : {name}",
+    "rating": "note globale",
+    "ratingLabel": "Note globale : {n} sur 5",
+    "water": "Eau",
+    "waterTypes": {
+      "fresh": "douce",
+      "brackish": "saumâtre",
+      "en13319": "EN 13319",
+      "salt": "salée"
+    },
+    "surfacePressure": "Pression atm.",
+    "conditions": "Conditions",
+    "conditionNames": {
+      "visibility": "Visibilité",
+      "wavesize": "Houle",
+      "current": "Courant",
+      "surge": "Ressac",
+      "chill": "Froid"
+    },
+    "starsLabel": "{name} : {n} sur 5",
+    "summaryItem": "{name} {n} sur 5",
+    "summaryMore": {
+      "one": "{list} et {n} autre",
+      "other": "{list} et {n} autres"
+    },
+    "people": "Personnes",
+    "guideRow": {
+      "one": "Guide de palanquée",
+      "other": "Guides de palanquée"
+    },
+    "buddiesRow": {
+      "one": "Compagnon",
+      "other": "Compagnons"
+    },
+    "cylinderUses": {
+      "diluent": "diluant {gas}",
+      "oxygen": "oxygène",
+      "bailout": "secours, {gas}"
+    },
+    "service": "Service {pressure}",
+    "switchAt": "changement à {depth}",
+    "computers": "Ordinateurs de plongée",
+    "mainComputer": "Ordinateur principal",
+    "otherComputer": "Autre ordinateur",
+    "computerModes": {
+      "OC": "circuit ouvert",
+      "CCR": "recycleur",
+      "PSCR": "recycleur semi-fermé",
+      "Freedive": "apnée"
+    },
+    "photos": "Photos et vidéos",
+    "photoCount": {
+      "one": "{n} photo",
+      "other": "{n} photos"
+    },
+    "photoNote": "Sur un autre appareil : seule leur référence est synchronisée"
   },
   "profile": {
     "hint": "Posez le doigt sur le profil pour lire temps et profondeur.",

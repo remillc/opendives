@@ -3,6 +3,7 @@
 #include "internal.h"
 
 #include "core/dive.h"
+#include "core/divecomputer.h"
 #include "core/divelog.h"
 #include "core/divesite.h"
 #include "core/event.h"
@@ -293,6 +294,42 @@ int get_dive(int id, std::string &json, std::string &error)
 	json += ",\"otu\":" + std::to_string(d->otu);
 	json += ",\"rating\":" + std::to_string(d->rating);
 	json += ",\"visibility\":" + std::to_string(d->visibility);
+	// The other conditions, 0 to 5 stars as in Subsurface (0: not filled in).
+	json += ",\"conditions\":{\"wavesize\":" + std::to_string(d->wavesize);
+	json += ",\"current\":" + std::to_string(d->current);
+	json += ",\"surge\":" + std::to_string(d->surge);
+	json += ",\"chill\":" + std::to_string(d->chill) + '}';
+	// Water type from the salinity, with the thresholds of Subsurface's
+	// get_water_type_string() (core/string-format.cpp, Qt); empty when unknown.
+	{
+		int salinity = d->get_salinity();
+		const char *type = salinity <= 0 ? "" : salinity < 10050 ? "fresh" : salinity < 10190 ? "brackish"
+				 : salinity < 10210 ? "en13319" : "salt";
+		json += ",\"waterType\":\"";
+		json += type;
+		json += '"';
+	}
+	// Surface pressure as stored, as dive::get_surface_pressure() picks it,
+	// but 0 instead of its default of one atmosphere when nothing is stored.
+	{
+		int mbar = d->dcs.empty() || is_dc_manually_added_dive(&d->dcs[0]) ? d->surface_pressure.mbar
+									      : d->dcs[0].surface_pressure.mbar;
+		if (!mbar)
+			mbar = d->surface_pressure.mbar;
+		json += ",\"surfacePressureMbar\":" + std::to_string(mbar > 0 ? mbar : 0);
+	}
+	json += ",\"pictures\":" + std::to_string(d->pictures.size());
+	json += ",\"diveComputers\":[";
+	for (size_t i = 0; i < d->dcs.size(); i++) {
+		if (i)
+			json += ',';
+		json += "{\"model\":";
+		append_json_string(json, d->dcs[i].model);
+		json += ",\"divemode\":";
+		append_json_string(json, divemode_text[d->dcs[i].divemode]);
+		json += '}';
+	}
+	json += ']';
 	json += ",\"divemode\":";
 	append_json_string(json, dc ? divemode_text[dc->divemode] : "OC");
 	json += ",\"computer\":";
@@ -348,6 +385,18 @@ int get_dive(int id, std::string &json, std::string &error)
 		json += ",\"used\":";
 		json += d->is_cylinder_used(static_cast<int>(i)) ? "true" : "false";
 		json += ",\"gasUsedMl\":" + std::to_string(i < gas_used.size() ? gas_used[i].mliter : 0);
+		// Depth of the first switch to this cylinder during the dive, from the
+		// core's get_depth_at_time(); 0 when there is none after the start.
+		int switch_mm = 0;
+		if (dc) {
+			for (const auto &ev: dc->events) {
+				if (ev.is_gaschange() && ev.time.seconds > 0 && d->get_cylinder_index(ev, *dc) == static_cast<int>(i)) {
+					switch_mm = get_depth_at_time(dc, ev.time.seconds);
+					break;
+				}
+			}
+		}
+		json += ",\"switchDepthMm\":" + std::to_string(switch_mm);
 		json += '}';
 	}
 	json += ']';

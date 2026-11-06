@@ -38,6 +38,7 @@ import { registerPlugin } from '@capacitor/core';
  * @property {string} use OC-gas, diluent, oxygen, not used
  * @property {boolean} used the cylinder is breathed during the dive
  * @property {number} gasUsedMl gas used, computed by the core (compressibility included); 0 when unknown
+ * @property {number} switchDepthMm depth of the first switch to this cylinder after the start (core's get_depth_at_time); 0 when none
  */
 
 /**
@@ -65,8 +66,13 @@ import { registerPlugin } from '@capacitor/core';
  * @property {number} sacMlMin 0 when unknown
  * @property {number} cns
  * @property {number} otu
- * @property {number} rating
- * @property {number} visibility
+ * @property {number} rating 0 to 5 stars; 0: not filled in
+ * @property {number} visibility 0 to 5 stars; 0: not filled in
+ * @property {{wavesize: number, current: number, surge: number, chill: number}} conditions 0 to 5 stars each
+ * @property {''|'fresh'|'brackish'|'en13319'|'salt'} waterType from the salinity, Subsurface's thresholds; empty when unknown
+ * @property {number} surfacePressureMbar as stored; 0 when not stored
+ * @property {number} pictures number of pictures and videos referenced
+ * @property {{model: string, divemode: string}[]} diveComputers the first is the main one
  * @property {string} divemode OC, CCR, PSCR, Freedive
  * @property {string} computer model of the first dive computer
  * @property {number} computers number of dive computers

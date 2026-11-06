@@ -119,7 +119,64 @@
       "backplate": "Backplate",
       "clip-on": "Clip-on",
       "unknown": "Not specified"
-    }
+    },
+    "figureWaterMin": "water, minimum",
+    "tripLine": "Trip: {name}",
+    "rating": "overall rating",
+    "ratingLabel": "Overall rating: {n} of 5",
+    "water": "Water",
+    "waterTypes": {
+      "fresh": "fresh",
+      "brackish": "brackish",
+      "en13319": "EN 13319",
+      "salt": "salt"
+    },
+    "surfacePressure": "Atm. pressure",
+    "conditions": "Conditions",
+    "conditionNames": {
+      "visibility": "Visibility",
+      "wavesize": "Wave size",
+      "current": "Current",
+      "surge": "Surge",
+      "chill": "Chill"
+    },
+    "starsLabel": "{name}: {n} of 5",
+    "summaryItem": "{name} {n} of 5",
+    "summaryMore": {
+      "one": "{list}, and {n} more",
+      "other": "{list}, and {n} more"
+    },
+    "people": "People",
+    "guideRow": {
+      "one": "Dive guide",
+      "other": "Dive guides"
+    },
+    "buddiesRow": {
+      "one": "Buddy",
+      "other": "Buddies"
+    },
+    "cylinderUses": {
+      "diluent": "diluent {gas}",
+      "oxygen": "oxygen",
+      "bailout": "bailout, {gas}"
+    },
+    "service": "Working {pressure}",
+    "switchAt": "switch at {depth}",
+    "computers": "Dive computers",
+    "mainComputer": "Main computer",
+    "otherComputer": "Other computer",
+    "computerModes": {
+      "OC": "open circuit",
+      "CCR": "rebreather",
+      "PSCR": "semi-closed rebreather",
+      "Freedive": "freediving"
+    },
+    "photos": "Photos and videos",
+    "photoCount": {
+      "one": "{n} photo",
+      "other": "{n} photos"
+    },
+    "photoNote": "On another device: only their reference is synced"
   },
   "profile": {
     "hint": "Touch the profile to read time and depth.",
