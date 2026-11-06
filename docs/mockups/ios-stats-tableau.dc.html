@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Statistiques précompilées, iPhone</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:#1F2124}a:hover{color:#1F2124}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #F4F4F2; font-family: -apple-system, 'SF Pro Text', system-ui, sans-serif; color: #000000; display: flex; flex-direction: column; position: relative; overflow: hidden">
+  <button aria-label="Menu" aria-haspopup="menu" style="position: absolute; left: 6px; top: 50px; z-index: 3; width: 44px; height: 44px; border: none; background: transparent; border-radius: 22px; display: flex; align-items: center; justify-content: center; padding: 0"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #1F2124; stroke-width: 2.2; stroke-linecap: round"><path d="M4 7h16 M4 12h16 M4 17h16"></path></svg></button>
+  <div style="padding: 98px 16px 0 16px; display: flex; justify-content: space-between; align-items: flex-end">
+    <h1 style="margin: 0; font-size: 34px; line-height: 41px; font-weight: 700; letter-spacing: 0.4px">Statistiques</h1>
+    <a href="ios-filtre.dc.html" style="font-size: 17px; text-decoration: none; color: #1F2124; min-height: 44px; display: flex; align-items: center">Filtre libre</a>
+  </div>
+
+  <dl style="margin: 12px 16px 0 16px; background: #FFFFFF; border-radius: 10px; overflow: hidden; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; font-variant-numeric: tabular-nums">
+    <div style="padding: 12px 12px; display: flex; flex-direction: column; gap: 2px; border-right: 0.5px solid #E8E8E5">
+      <dt style="font-size: 13px; color: #3C3C43">Plongées</dt>
+      <dd style="margin: 0; font-size: 22px; font-weight: 700">9</dd>
+    </div>
+    <div style="padding: 12px 12px; display: flex; flex-direction: column; gap: 2px; border-right: 0.5px solid #E8E8E5">
+      <dt style="font-size: 13px; color: #3C3C43">Sous l’eau</dt>
+      <dd style="margin: 0; font-size: 22px; font-weight: 700">11 h 26</dd>
+    </div>
+    <div style="padding: 12px 12px; display: flex; flex-direction: column; gap: 2px">
+      <dt style="font-size: 13px; color: #3C3C43">La plus profonde</dt>
+      <dd style="margin: 0; font-size: 22px; font-weight: 700">101,5 m</dd>
+    </div>
+  </dl>
+
+  <sc-for list="{{sections}}" as="s" hint-placeholder-count="3">
+    <h2 style="margin: 18px 16px 6px 32px; font-size: 13px; font-weight: 400; color: #3C3C43">{{s.title}}</h2>
+    <div style="margin: 0 16px; background: #FFFFFF; border-radius: 10px; overflow: hidden">
+      <sc-if value="{{s.empty}}" hint-placeholder-val="{{ false }}">
+        <p style="margin: 0; padding: 12px 16px; font-size: 15px; line-height: 20px; color: #3C3C43">{{s.emptyText}}</p>
+      </sc-if>
+      <sc-for list="{{s.rows}}" as="r" hint-placeholder-count="2">
+        <a href="ios-stats.dc.html" style="min-height: 52px; padding: 6px 12px 6px 16px; border-bottom: 0.5px solid #E8E8E5; display: flex; align-items: center; gap: 10px; text-decoration: none; color: #000000; box-sizing: border-box; font-variant-numeric: tabular-nums">
+          <span style="flex: 1; min-width: 0; font-size: 17px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.label}}</span>
+          <span style="display: flex; flex-direction: column; align-items: flex-end; gap: 1px">
+            <span style="font-size: 17px; font-weight: 600">{{r.time}}</span>
+            <span style="font-size: 13px; color: #3C3C43">{{r.count}}</span>
+          </span>
+          <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #8E8E93; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round"><path d="M9 5l7 7-7 7"></path></svg>
+        </a>
+      </sc-for>
+      <sc-if value="{{s.more}}" hint-placeholder-val="{{ false }}">
+        <button style="width: 100%; min-height: 44px; border: none; background: transparent; font-family: inherit; font-size: 17px; color: #1F2124; text-align: left; padding: 0 16px">{{s.moreText}}</button>
+      </sc-if>
+    </div>
+  </sc-for>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    function row(label, time, n) { return { label: label, time: time, count: n + (n > 1 ? ' plongées' : ' plongée') }; }
+    return {
+      sections: [
+        { title: 'Par mode', empty: false, more: false, rows: [row('Circuit ouvert', '7 h 29', 6), row('Recycleur', '3 h 58', 3)] },
+        { title: 'Par combinaison', empty: true, emptyText: 'Aucune combinaison notée pour l’instant. Ajoutez-la à vos plongées pour voir le total par combinaison.', more: false, rows: [] },
+        { title: 'Par compagnon', empty: true, emptyText: 'Aucun compagnon noté pour l’instant. Ajoutez vos compagnons à vos plongées pour savoir combien de plongées vous avez faites ensemble.', more: false, rows: [] },
+        { title: 'Par ordinateur', empty: false, more: true, moreText: 'Voir les 6 ordinateurs', rows: [row('Suunto Vyper Air', '4 h 07', 4), row('AP DiveSight', '1 h 44', 1), row('Shearwater Perdix 2', '1 h 42', 1)] }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

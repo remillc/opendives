@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Carnet vide, Android</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:#1F2124}a:hover{color:#1F2124}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #F4F4F2; font-family: Roboto, 'Google Sans', system-ui, sans-serif; color: #1F2124; position: relative; overflow: hidden">
+  <button aria-label="Menu" aria-haspopup="menu" style="position: absolute; left: 4px; top: 48px; z-index: 3; width: 48px; height: 48px; border: none; background: transparent; border-radius: 24px; display: flex; align-items: center; justify-content: center; padding: 0"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #1F2124; stroke-width: 2.2; stroke-linecap: round"><path d="M4 7h16 M4 12h16 M4 17h16"></path></svg></button>
+  <div style="padding: 40px 4px 0 16px; display: flex; flex-direction: column">
+    <div style="height: 64px; display: flex; align-items: center; justify-content: flex-end">
+      
+    </div>
+    <h1 style="margin: 0; font-size: 28px; line-height: 36px; font-weight: 400">Carnet</h1>
+    <p style="margin: 4px 0 0 0; font-size: 14px; line-height: 20px; color: #4A4D52; letter-spacing: 0.25px; display: flex; gap: 6px; align-items: center">Connecté au cloud Subsurface, aucune plongée</p>
+  </div>
+  <div style="margin: 48px 24px 0 24px; display: flex; flex-direction: column; gap: 12px">
+    <h2 style="margin: 0; font-size: 22px; line-height: 28px; font-weight: 400">Aucune plongée pour l'instant</h2>
+    <p style="margin: 0; font-size: 16px; line-height: 24px; color: #4A4D52; letter-spacing: 0.5px">Associez votre ordinateur de plongée pour télécharger vos plongées. Vous pouvez aussi importer un carnet existant ou noter une plongée à la main.</p>
+  </div>
+  <div style="margin: 24px 24px 0 24px; display: flex; flex-direction: column; gap: 12px; align-items: flex-start">
+    <a href="#associer" style="height: 40px; padding: 0 24px 0 16px; border-radius: 20px; background: #1F2124; color: #FFFFFF; text-decoration: none; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 8px"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #FFFFFF; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M7 7l10 10-5 4V3l5 4L7 17"></path></svg>Associer un ordinateur de plongée</a>
+    <a href="#importer" style="height: 40px; padding: 0 24px; border-radius: 20px; border: 1px solid #75787C; color: #1F2124; text-decoration: none; font-size: 14px; font-weight: 500; display: flex; align-items: center">Importer un fichier</a>
+    <a href="android-compte-import.dc.html" style="height: 40px; padding: 0 24px; border-radius: 20px; border: 1px solid #75787C; color: #1F2124; text-decoration: none; font-size: 14px; font-weight: 500; display: flex; align-items: center">Télécharger depuis divelogs.de</a>
+    <a href="android-edition.dc.html" style="height: 40px; padding: 0 12px; border-radius: 20px; color: #1F2124; text-decoration: none; font-size: 14px; font-weight: 500; display: flex; align-items: center">Noter une plongée à la main</a>
+  </div>
+  <p style="margin: 16px 24px 0 24px; font-size: 12px; line-height: 16px; color: #4A4D52; letter-spacing: 0.4px">Les fichiers de Subsurface (.ssrf, .xml), de divelogs.de et d'autres carnets s'importent ici.</p>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

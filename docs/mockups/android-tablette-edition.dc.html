@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Modifier une plongée, tablette Android</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:#1F2124}a:hover{color:#1F2124}
+</style>
+</helmet>
+<div style="width: 1180px; height: 820px; box-sizing: border-box; background: #F4F4F2; font-family: Roboto, 'Google Sans', system-ui, sans-serif; color: #1F2124; position: relative; overflow: hidden; display: flex">
+  <nav aria-label="Sections" style="width: 96px; flex: none; padding: 24px 0 16px 0; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; gap: 12px">
+    <button aria-label="Ajouter : télécharger, importer ou noter une plongée" style="width: 56px; height: 56px; border: none; border-radius: 16px; background: #E8E8E5; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(0,0,0,0.3)"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #1F2124; stroke-width: 2; stroke-linecap: round"><path d="M12 5v14 M5 12h14"></path></svg></button>
+    <a href="android-tablette-carnet.dc.html" aria-current="page" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #1F2124; text-decoration: none; font-size: 12px; font-weight: 600; letter-spacing: 0.5px">
+      <span style="width: 56px; height: 32px; border-radius: 16px; background: #E8E8E5; display: flex; align-items: center; justify-content: center"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #1F2124; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z M5 17a3 3 0 0 1 3-3h11"></path></svg></span>
+      Carnet
+    </a>
+    <a href="android-tablette-sites.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #4A4D52; text-decoration: none; font-size: 12px; font-weight: 500; letter-spacing: 0.5px">
+      <span style="width: 56px; height: 32px; border-radius: 16px; display: flex; align-items: center; justify-content: center"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #4A4D52; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round"><path d="M12 21s-6-5.3-6-10a6 6 0 0 1 12 0c0 4.7-6 10-6 10z"></path><circle cx="12" cy="11" r="2"></circle></svg></span>
+      Sites
+    </a>
+    <a href="android-tablette-stats.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #4A4D52; text-decoration: none; font-size: 12px; font-weight: 500; letter-spacing: 0.5px">
+      <span style="width: 56px; height: 32px; border-radius: 16px; display: flex; align-items: center; justify-content: center"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #4A4D52; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round"><path d="M5 20V11 M12 20V5 M19 20v-7"></path></svg></span>
+      Statistiques
+    </a>
+    <a href="android-tablette-outils.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #4A4D52; text-decoration: none; font-size: 12px; font-weight: 500; letter-spacing: 0.5px">
+      <span style="width: 56px; height: 32px; border-radius: 16px; display: flex; align-items: center; justify-content: center"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #4A4D52; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round"><path d="M4 7h10 M18 7h2 M4 17h4 M12 17h8"></path><circle cx="16" cy="7" r="2"></circle><circle cx="10" cy="17" r="2"></circle></svg></span>
+      Outils
+    </a>
+    <span style="flex: 1"></span>
+    <a href="android-tablette-reglages.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #4A4D52; text-decoration: none; font-size: 12px; font-weight: 500; letter-spacing: 0.5px">
+      <span style="width: 56px; height: 32px; border-radius: 16px; display: flex; align-items: center; justify-content: center"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #4A4D52; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round"><circle cx="12" cy="12" r="3.5"></circle><path d="M12 3v2.5 M12 18.5V21 M3 12h2.5 M18.5 12H21 M5.6 5.6l1.8 1.8 M16.6 16.6l1.8 1.8 M5.6 18.4l1.8-1.8 M16.6 7.4l1.8-1.8"></path></svg></span>
+      Réglages
+    </a>
+  </nav>
+  <section role="dialog" aria-label="Modifier la plongée" style="flex: 1; margin: 16px 16px 16px 0; border-radius: 28px; background: #EEEEEC; box-sizing: border-box; overflow: hidden">
+    <div style="height: 64px; display: flex; align-items: center; gap: 8px; padding: 0 16px 0 8px">
+      <a href="android-tablette-carnet.dc.html" aria-label="Annuler" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #1F2124; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M6 6l12 12 M18 6L6 18"></path></svg></a>
+      <span style="flex: 1; font-size: 22px; line-height: 28px">Modifier la plongée</span>
+      <button style="height: 40px; padding: 0 24px; border: none; border-radius: 20px; background: #1F2124; color: #FFFFFF; font-family: inherit; font-size: 14px; font-weight: 500">Enregistrer</button>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; padding: 0 16px">
+      <div style="background: #F4F4F2; border-radius: 16px; padding-bottom: 8px">
+    <h2 style="margin: 4px 16px 0 16px; height: 44px; display: flex; align-items: center; font-size: 14px; font-weight: 500; letter-spacing: 0.1px; color: #1F2124">Plongée</h2>
+      <a href="#champ" style="display: flex; align-items: center; gap: 16px; min-height: 52px; padding: 6px 16px; box-sizing: border-box; color: #1F2124; text-decoration: none">
+        <span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><span style="font-size: 16px; line-height: 24px; letter-spacing: 0.15px">Date et heure</span></span><span style="font-size: 14px; color: #4A4D52; font-weight: 400; font-variant-numeric: tabular-nums; text-align: right">2 avr. 2014, 10:00</span>
+      </a>
+      <a href="#champ" style="display: flex; align-items: center; gap: 16px; min-height: 52px; padding: 6px 16px; box-sizing: border-box; color: #1F2124; text-decoration: none">
+        <span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><span style="font-size: 16px; line-height: 24px; letter-spacing: 0.15px">Site</span></span><span style="font-size: 14px; color: #4A4D52; font-weight: 400; font-variant-numeric: tabular-nums; text-align: right">Lake Coleridge</span>
+      </a>
+      <a href="#champ" style="display: flex; align-items: center; gap: 16px; min-height: 52px; padding: 6px 16px; box-sizing: border-box; color: #1F2124; text-decoration: none">
+        <span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><span style="font-size: 16px; line-height: 24px; letter-spacing: 0.15px">Eau</span></span><span style="font-size: 14px; color: #4A4D52; font-weight: 400; font-variant-numeric: tabular-nums; text-align: right">4,3 °C</span>
+      </a>
+      <a href="#champ" style="display: flex; align-items: center; gap: 16px; min-height: 52px; padding: 6px 16px; box-sizing: border-box; color: #1F2124; text-decoration: none">
+        <span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><span style="font-size: 16px; line-height: 24px; letter-spacing: 0.15px">Tags</span></span><span style="font-size: 14px; color: #4A4D52; font-weight: 400; font-variant-numeric: tabular-nums; text-align: right">ccr_dive</span>
+      </a>
+    <h2 style="margin: 4px 16px 0 16px; height: 44px; display: flex; align-items: center; font-size: 14px; font-weight: 500; letter-spacing: 0.1px; color: #1F2124">Compagnons</h2>
+        <div style="padding: 0 16px; display: flex; gap: 8px; flex-wrap: wrap">
+          <span style="height: 32px; padding: 0 4px 0 12px; border: 1px solid #75787C; border-radius: 8px; display: flex; align-items: center; gap: 4px; font-size: 14px; font-weight: 500">Michael<button aria-label="Retirer Michael" style="width: 28px; height: 28px; border: none; background: transparent; display: flex; align-items: center; justify-content: center; padding: 0"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #4A4D52; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round"><path d="M6 6l12 12 M18 6L6 18"></path></svg></button></span>
+          <button style="height: 32px; padding: 0 16px; border: 1px solid #75787C; border-radius: 8px; background: transparent; color: #1F2124; font-family: inherit; font-size: 14px; font-weight: 500">Ajouter</button>
+        </div>
+      </div>
+      <div style="background: #F4F4F2; border-radius: 16px; padding-bottom: 8px">
+    <h2 style="margin: 4px 16px 0 16px; height: 44px; display: flex; align-items: center; font-size: 14px; font-weight: 500; letter-spacing: 0.1px; color: #1F2124">Équipement</h2>
+        <div style="display: flex; align-items: center; gap: 16px; min-height: 56px; padding: 0 16px">
+          <span id="atm-l" style="flex: 1; font-size: 16px">Mode</span>
+          <div role="radiogroup" aria-labelledby="atm-l" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); width: 240px">
+            <button role="radio" aria-checked="false" style="height: 40px; border: 1px solid #75787C; border-radius: 20px 0 0 20px; background: transparent; color: #1F2124; font-family: inherit; font-size: 14px; font-weight: 500">Circuit ouvert</button>
+            <button role="radio" aria-checked="true" style="height: 40px; border: 1px solid #75787C; border-left: none; border-radius: 0 20px 20px 0; background: #E8E8E5; color: #1F2124; font-family: inherit; font-size: 14px; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 6px"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #1F2124; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round"><path d="M5 12.5l4.5 4.5L19 7"></path></svg>Recycleur</button>
+          </div>
+        </div>
+      <a href="#champ" style="display: flex; align-items: center; gap: 16px; min-height: 52px; padding: 6px 16px; box-sizing: border-box; color: #1F2124; text-decoration: none">
+        <span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><span style="font-size: 16px; line-height: 24px; letter-spacing: 0.15px">Combinaison</span></span><span style="font-size: 14px; color: #4A4D52; font-weight: 400; font-variant-numeric: tabular-nums; text-align: right">dry suit</span>
+      </a>
+      <a href="#champ" style="display: flex; align-items: center; gap: 16px; min-height: 52px; padding: 6px 16px; box-sizing: border-box; color: #1F2124; text-decoration: none">
+        <span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><span style="font-size: 16px; line-height: 24px; letter-spacing: 0.15px">Ordinateur</span></span><span style="font-size: 14px; color: #4A4D52; font-weight: 400; font-variant-numeric: tabular-nums; text-align: right">OSTC 3</span>
+      </a>
+    <h2 style="margin: 4px 16px 0 16px; height: 44px; display: flex; align-items: center; font-size: 14px; font-weight: 500; letter-spacing: 0.1px; color: #1F2124">Bouteilles</h2>
+      <a href="#bouteille" style="display: flex; align-items: center; gap: 16px; min-height: 64px; padding: 6px 16px; box-sizing: border-box; color: #1F2124; text-decoration: none">
+        <span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><span style="font-size: 16px; line-height: 24px; letter-spacing: 0.15px">Dil2, 2 L</span><span style="font-size: 14px; line-height: 20px; color: #4A4D52; letter-spacing: 0.25px">Diluant, trimix 16/45</span></span><span style="font-size: 14px; color: #4A4D52; font-weight: 400; font-variant-numeric: tabular-nums; text-align: right">185 à 130 bar</span>
+      </a>
+      <a href="#bouteille" style="display: flex; align-items: center; gap: 16px; min-height: 64px; padding: 6px 16px; box-sizing: border-box; color: #1F2124; text-decoration: none">
+        <span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><span style="font-size: 16px; line-height: 24px; letter-spacing: 0.15px">Oxy2, 2 L</span><span style="font-size: 14px; line-height: 20px; color: #4A4D52; letter-spacing: 0.25px">Oxygène</span></span><span style="font-size: 14px; color: #4A4D52; font-weight: 400; font-variant-numeric: tabular-nums; text-align: right">190 à 130 bar</span>
+      </a>
+      <a href="#bouteille" style="display: flex; align-items: center; gap: 16px; min-height: 64px; padding: 6px 16px; box-sizing: border-box; color: #1F2124; text-decoration: none">
+        <span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><span style="font-size: 16px; line-height: 24px; letter-spacing: 0.15px">AL80, 11,1 L</span><span style="font-size: 14px; line-height: 20px; color: #4A4D52; letter-spacing: 0.25px">Secours, air</span></span><span style="font-size: 14px; color: #4A4D52; font-weight: 400; font-variant-numeric: tabular-nums; text-align: right">207 à 200 bar</span>
+      </a>
+      </div>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1180,"height":820}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

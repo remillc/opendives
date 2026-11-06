@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Modifier une plongée, Android</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:#1F2124}a:hover{color:#1F2124}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #F4F4F2; font-family: Roboto, 'Google Sans', system-ui, sans-serif; color: #1F2124; position: relative; overflow: hidden">
+  <div style="padding: 40px 8px 0 4px; height: 104px; box-sizing: border-box; display: flex; align-items: center; gap: 4px">
+    <a href="detail3-android.dc.html" aria-label="Annuler" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #1F2124; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M6 6l12 12 M18 6L6 18"></path></svg></a>
+    <span style="flex: 1; font-size: 22px; line-height: 28px">Modifier la plongée</span>
+    <a href="#" style="height: 40px; padding: 0 12px; border-radius: 20px; display: flex; align-items: center; color: #1F2124; text-decoration: none; font-size: 14px; font-weight: 500; letter-spacing: 0.1px">Enregistrer</a>
+  </div>
+  <div style="height: 740px; overflow: hidden">
+    <a href="#champ" style="display: flex; align-items: center; gap: 16px; min-height: 48px; padding: 8px 24px 8px 16px; box-sizing: border-box; color: #1F2124; text-decoration: none">
+      <span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><span style="font-size: 16px; line-height: 24px; letter-spacing: 0.15px">Date et heure</span></span><span style="font-size: 14px; color: #4A4D52; font-weight: 400; font-variant-numeric: tabular-nums; text-align: right">2 avr. 2014, 10:00</span>
+    </a>
+    <a href="#champ" style="display: flex; align-items: center; gap: 16px; min-height: 48px; padding: 8px 24px 8px 16px; box-sizing: border-box; color: #1F2124; text-decoration: none">
+      <span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><span style="font-size: 16px; line-height: 24px; letter-spacing: 0.15px">Site</span></span><span style="font-size: 14px; color: #4A4D52; font-weight: 400; font-variant-numeric: tabular-nums; text-align: right">Lake Coleridge</span>
+    </a>
+    <a href="#champ" style="display: flex; align-items: center; gap: 16px; min-height: 48px; padding: 8px 24px 8px 16px; box-sizing: border-box; color: #1F2124; text-decoration: none">
+      <span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><span style="font-size: 16px; line-height: 24px; letter-spacing: 0.15px">Eau</span></span><span style="font-size: 14px; color: #4A4D52; font-weight: 400; font-variant-numeric: tabular-nums; text-align: right">4,3 °C</span>
+    </a>
+    <a href="#champ" style="display: flex; align-items: center; gap: 16px; min-height: 48px; padding: 8px 24px 8px 16px; box-sizing: border-box; color: #1F2124; text-decoration: none">
+      <span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><span style="font-size: 16px; line-height: 24px; letter-spacing: 0.15px">Tags</span></span><span style="font-size: 14px; color: #4A4D52; font-weight: 400; font-variant-numeric: tabular-nums; text-align: right">ccr_dive</span>
+    </a>
+  <h2 style="margin: 0px 16px 0 16px; height: 48px; display: flex; align-items: center; font-size: 14px; font-weight: 500; letter-spacing: 0.1px; color: #1F2124">Compagnons</h2>
+    <div style="padding: 0 16px; display: flex; gap: 8px; flex-wrap: wrap">
+      <span style="height: 32px; padding: 0 4px 0 12px; border: 1px solid #75787C; border-radius: 8px; display: flex; align-items: center; gap: 4px; font-size: 14px; font-weight: 500">Michael<button aria-label="Retirer Michael" style="width: 28px; height: 28px; border: none; background: transparent; display: flex; align-items: center; justify-content: center; padding: 0"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #4A4D52; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round"><path d="M6 6l12 12 M18 6L6 18"></path></svg></button></span>
+      <button style="height: 32px; padding: 0 16px; border: 1px solid #75787C; border-radius: 8px; background: transparent; color: #1F2124; font-family: inherit; font-size: 14px; font-weight: 500">Ajouter</button>
+    </div>
+  <h2 style="margin: 4px 16px 0 16px; height: 48px; display: flex; align-items: center; font-size: 14px; font-weight: 500; letter-spacing: 0.1px; color: #1F2124">Équipement</h2>
+    <div style="display: flex; align-items: center; gap: 16px; min-height: 56px; padding: 0 16px">
+      <span id="a-mode" style="flex: 1; font-size: 16px">Mode</span>
+      <div role="radiogroup" aria-labelledby="a-mode" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); width: 230px"><button role="radio" aria-checked="false" style="height: 40px; padding: 0 12px; border: 1px solid #75787C; border-radius: 20px 0 0 20px; background: transparent; color: #1F2124; font-family: inherit; font-size: 14px; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 6px; font-variant-numeric: tabular-nums">Circuit ouvert</button><button role="radio" aria-checked="true" style="height: 40px; padding: 0 12px; border: 1px solid #75787C; border-left: none; border-radius: 0 20px 20px 0; background: #E8E8E5; color: #1F2124; font-family: inherit; font-size: 14px; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 6px; font-variant-numeric: tabular-nums"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #1F2124; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round"><path d="M5 12.5l4.5 4.5L19 7"></path></svg>Recycleur</button></div>
+    </div>
+    <a href="#champ" style="display: flex; align-items: center; gap: 16px; min-height: 48px; padding: 8px 24px 8px 16px; box-sizing: border-box; color: #1F2124; text-decoration: none">
+      <span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><span style="font-size: 16px; line-height: 24px; letter-spacing: 0.15px">Combinaison</span></span><span style="font-size: 14px; color: #4A4D52; font-weight: 400; font-variant-numeric: tabular-nums; text-align: right">dry suit</span>
+    </a>
+    <a href="#champ" style="display: flex; align-items: center; gap: 16px; min-height: 48px; padding: 8px 24px 8px 16px; box-sizing: border-box; color: #1F2124; text-decoration: none">
+      <span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><span style="font-size: 16px; line-height: 24px; letter-spacing: 0.15px">Ordinateur</span></span><span style="font-size: 14px; color: #4A4D52; font-weight: 400; font-variant-numeric: tabular-nums; text-align: right">OSTC 3</span>
+    </a>
+  <h2 style="margin: 0px 16px 0 16px; height: 48px; display: flex; align-items: center; font-size: 14px; font-weight: 500; letter-spacing: 0.1px; color: #1F2124">Bouteilles</h2>
+    <a href="#bouteille" style="display: flex; align-items: center; gap: 16px; min-height: 60px; padding: 8px 24px 8px 16px; box-sizing: border-box; color: #1F2124; text-decoration: none">
+      <span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><span style="font-size: 16px; line-height: 24px; letter-spacing: 0.15px">Dil2, 2 L</span><span style="font-size: 14px; line-height: 20px; color: #4A4D52; letter-spacing: 0.25px">Diluant, trimix 16/45</span></span><span style="font-size: 14px; color: #4A4D52; font-weight: 400; font-variant-numeric: tabular-nums; text-align: right">185 à 130 bar</span>
+    </a>
+    <a href="#bouteille" style="display: flex; align-items: center; gap: 16px; min-height: 60px; padding: 8px 24px 8px 16px; box-sizing: border-box; color: #1F2124; text-decoration: none">
+      <span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><span style="font-size: 16px; line-height: 24px; letter-spacing: 0.15px">Oxy2, 2 L</span><span style="font-size: 14px; line-height: 20px; color: #4A4D52; letter-spacing: 0.25px">Oxygène</span></span><span style="font-size: 14px; color: #4A4D52; font-weight: 400; font-variant-numeric: tabular-nums; text-align: right">190 à 130 bar</span>
+    </a>
+    <a href="#bouteille" style="display: flex; align-items: center; gap: 16px; min-height: 60px; padding: 8px 24px 8px 16px; box-sizing: border-box; color: #1F2124; text-decoration: none">
+      <span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><span style="font-size: 16px; line-height: 24px; letter-spacing: 0.15px">AL80, 11,1 L</span><span style="font-size: 14px; line-height: 20px; color: #4A4D52; letter-spacing: 0.25px">Secours, air</span></span><span style="font-size: 14px; color: #4A4D52; font-weight: 400; font-variant-numeric: tabular-nums; text-align: right">207 à 200 bar</span>
+    </a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

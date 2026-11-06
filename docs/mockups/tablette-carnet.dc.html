@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Carnet, tablette</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:#1F2124}a:hover{color:#1F2124}
+</style>
+</helmet>
+<div style="width: 1180px; height: 820px; box-sizing: border-box; background: #FFFFFF; font-family: -apple-system, 'SF Pro Text', system-ui, sans-serif; color: #000000; display: flex; overflow: hidden">
+  <nav aria-label="Sections" style="width: 220px; flex: none; background: #F4F4F2; border-right: 0.5px solid #DADAD6; padding: 32px 12px 16px 12px; box-sizing: border-box; display: flex; flex-direction: column; gap: 2px">
+    <span style="font-size: 22px; font-weight: 700; padding: 0 10px 14px 10px">OpenDives</span>
+    <a href="tablette-carnet.dc.html" aria-current="page" style="height: 44px; border-radius: 10px; background: #E8E8E5; color: #1F2124; font-size: 17px; font-weight: 600; text-decoration: none; display: flex; align-items: center; gap: 10px; padding: 0 10px">
+      <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #1F2124; stroke-width: 1.8; stroke-linejoin: round"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z M5 17a3 3 0 0 1 3-3h11"></path></svg>
+      Carnet
+    </a>
+    <a href="tablette-sites.dc.html" style="height: 44px; border-radius: 10px; color: #000000; font-size: 17px; text-decoration: none; display: flex; align-items: center; gap: 10px; padding: 0 10px">
+      <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #1F2124; stroke-width: 1.8; stroke-linejoin: round"><path d="M12 21s-6-5.3-6-10a6 6 0 0 1 12 0c0 4.7-6 10-6 10z"></path><circle cx="12" cy="11" r="2"></circle></svg>
+      Sites
+    </a>
+    <a href="tablette-stats.dc.html" style="height: 44px; border-radius: 10px; color: #000000; font-size: 17px; text-decoration: none; display: flex; align-items: center; gap: 10px; padding: 0 10px">
+      <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #1F2124; stroke-width: 1.8; stroke-linecap: round"><path d="M5 20V11 M12 20V5 M19 20v-7"></path></svg>
+      Statistiques
+    </a>
+    <a href="tablette-outils.dc.html" style="height: 44px; border-radius: 10px; color: #000000; font-size: 17px; text-decoration: none; display: flex; align-items: center; gap: 10px; padding: 0 10px">
+      <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #1F2124; stroke-width: 1.8; stroke-linecap: round"><path d="M4 7h10 M18 7h2 M4 17h4 M12 17h8"></path><circle cx="16" cy="7" r="2"></circle><circle cx="10" cy="17" r="2"></circle></svg>
+      Outils
+    </a>
+    <span style="flex: 1"></span>
+    <a href="tablette-reglages.dc.html" style="height: 44px; border-radius: 10px; color: #000000; font-size: 17px; text-decoration: none; display: flex; align-items: center; gap: 10px; padding: 0 10px">
+      <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #1F2124; stroke-width: 1.8; stroke-linecap: round"><circle cx="12" cy="12" r="3.5"></circle><path d="M12 3v2.5 M12 18.5V21 M3 12h2.5 M18.5 12H21 M5.6 5.6l1.8 1.8 M16.6 16.6l1.8 1.8 M5.6 18.4l1.8-1.8 M16.6 7.4l1.8-1.8"></path></svg>
+      Réglages
+    </a>
+    <p style="margin: 6px 10px 0 10px; font-size: 13px; color: #3C3C43">Synchronisé avec le cloud Subsurface</p>
+  </nav>
+
+  <section aria-label="Liste des plongées" style="width: 340px; flex: none; border-right: 0.5px solid #DADAD6; display: flex; flex-direction: column">
+    <div style="padding: 24px 16px 8px 16px; display: flex; align-items: center; justify-content: space-between">
+      <h1 style="margin: 0; font-size: 28px; font-weight: 700">Carnet</h1>
+      <button aria-label="Ajouter : télécharger, importer ou noter une plongée" style="width: 44px; height: 44px; border: none; background: transparent; display: flex; align-items: center; justify-content: center; padding: 0"><svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #1F2124; stroke-width: 2; stroke-linecap: round"><path d="M12 5v14 M5 12h14"></path></svg></button>
+    </div>
+    <div style="padding: 0 16px 8px 16px">
+      <label style="height: 36px; border-radius: 10px; background: #E8E8E5; display: flex; align-items: center; gap: 6px; padding: 0 8px; color: #3C3C43">
+        <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #3C3C43; stroke-width: 2.2; stroke-linecap: round"><circle cx="10.5" cy="10.5" r="6.5"></circle><path d="M15.5 15.5L20 20"></path></svg>
+        <input type="search" placeholder="Rechercher" style="border: none; background: transparent; font-family: inherit; font-size: 17px; flex: 1; min-width: 0">
+      </label>
+    </div>
+    <sc-for list="{{dives}}" as="d" hint-placeholder-count="5">
+      <a href="#detail" aria-current="{{d.current}}" style="margin: 0 8px; border-radius: 10px; background: {{d.bg}}; display: flex; align-items: center; gap: 12px; padding: 10px 10px; min-height: 64px; box-sizing: border-box; color: #000000; text-decoration: none">
+        <svg width="56" height="36" viewBox="0 0 56 36" preserveAspectRatio="none" role="img" aria-label="{{d.alt}}" style="flex: none; border-radius: 4px; background: #F4F4F2">
+          <defs><linearGradient id="{{d.gid}}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color: #FBE3B2"></stop><stop offset="1" style="stop-color: {{d.bottom}}"></stop></linearGradient></defs>
+          <path d="{{d.area}}" style="fill: url(#{{d.gid}}); stroke: none"></path>
+          <path d="{{d.line}}" style="fill: none; stroke: #1F2124; stroke-width: 1.25; vector-effect: non-scaling-stroke"></path>
+        </svg>
+        <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+          <span style="font-size: 16px; color: {{d.siteColor}}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{d.site}}</span>
+          <span style="font-size: 13px; color: #3C3C43">{{d.date}}</span>
+        </span>
+        <span style="display: flex; flex-direction: column; align-items: flex-end; gap: 2px; font-variant-numeric: tabular-nums">
+          <span style="font-size: 16px; font-weight: 600">{{d.max}}</span>
+          <span style="font-size: 13px; color: #3C3C43">{{d.dur}}</span>
+        </span>
+      </a>
+    </sc-for>
+  </section>
+
+  <section id="detail" aria-label="Plongée 7" style="flex: 1; min-width: 0; padding: 24px 32px; box-sizing: border-box; display: flex; flex-direction: column; gap: 16px">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px">
+      <div style="display: flex; flex-direction: column; gap: 4px">
+        <p style="margin: 0; font-size: 15px; color: #3C3C43">Plongée 7, dimanche 24 avril 2022, 10:30</p>
+        <h2 style="margin: 0; font-size: 28px; line-height: 34px; font-weight: 700">Northern Arch</h2>
+      </div>
+      <button style="height: 36px; padding: 0 14px; border: 1px solid #DADAD6; border-radius: 18px; background: #FFFFFF; font-family: inherit; font-size: 15px; color: #1F2124">Modifier</button>
+    </div>
+
+    <div role="group" aria-label="Couches du profil" style="display: flex; gap: 0; border-radius: 9px; background: #E8E8E5; padding: 2px; align-self: flex-start">
+      <button aria-pressed="true" style="height: 30px; padding: 0 16px; border: none; border-radius: 7px; background: #FFFFFF; font-family: inherit; font-size: 13px; font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,0.12)">Profil seul</button>
+      <button aria-pressed="false" style="height: 30px; padding: 0 16px; border: none; border-radius: 7px; background: transparent; font-family: inherit; font-size: 13px">Plafond</button>
+      <button aria-pressed="false" style="height: 30px; padding: 0 16px; border: none; border-radius: 7px; background: transparent; font-family: inherit; font-size: 13px">ppO2 des cellules</button>
+      <button aria-pressed="false" style="height: 30px; padding: 0 16px; border: none; border-radius: 7px; background: transparent; font-family: inherit; font-size: 13px">Tissus</button>
+    </div>
+
+    <svg width="556" height="300" viewBox="0 0 556 300" role="img" aria-label="Profil de la plongée 7 : 60,2 m au plus profond, 104 minutes">
+      <defs><linearGradient id="water-d7" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color: #FBE3B2"></stop><stop offset="1" style="stop-color: {{bottom}}"></stop></linearGradient></defs>
+      <sc-for list="{{yTicks}}" as="tk" hint-placeholder-count="5">
+        <line x1="40" x2="556" y1="{{tk.y}}" y2="{{tk.y}}" style="stroke: #E8E8E5; stroke-width: 1"></line>
+        <text x="32" y="{{tk.ty}}" style="font-size: 12px; fill: #3C3C43; text-anchor: end; font-family: -apple-system, system-ui, sans-serif">{{tk.label}}</text>
+      </sc-for>
+      <path d="{{area}}" style="fill: url(#water-d7); stroke: none"></path>
+      <path d="{{line}}" style="fill: none; stroke: #1F2124; stroke-width: 2; stroke-linejoin: round"></path>
+      <sc-for list="{{xTicks}}" as="tx" hint-placeholder-count="5">
+        <text x="{{tx.x}}" y="294" style="font-size: 12px; fill: #3C3C43; text-anchor: middle; font-family: -apple-system, system-ui, sans-serif">{{tx.label}}</text>
+      </sc-for>
+    </svg>
+
+    <dl style="margin: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 24px; font-variant-numeric: tabular-nums">
+      <sc-for list="{{facts}}" as="f" hint-placeholder-count="9">
+        <div style="padding: 10px 0; border-top: 0.5px solid #E8E8E5; display: flex; flex-direction: column; gap: 2px">
+          <dt style="font-size: 13px; color: #3C3C43">{{f.label}}</dt>
+          <dd style="margin: 0; font-size: 17px">{{f.value}}</dd>
+        </div>
+      </sc-for>
+    </dl>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1180,"height":820}}'>
+function mix(f) {
+  var a = [0xFB, 0xE3, 0xB2], b = [0xB4, 0x53, 0x0F];
+  f = Math.max(0, Math.min(1, f));
+  return 'rgb(' + a.map(function (v, i) { return Math.round(v + (b[i] - v) * f); }).join(',') + ')';
+}
+function prof(pts, W, H) {
+  var t1 = pts[pts.length - 1][0], maxD = 0;
+  pts.forEach(function (p) { if (p[1] > maxD) maxD = p[1]; });
+  var line = 'M' + pts.map(function (p) { return (p[0] / t1 * W).toFixed(1) + ' ' + (p[1] / maxD * (H - 2)).toFixed(1); }).join(' L');
+  return { line: line, area: line + ' L' + W + ' 0 L0 0 Z', bottom: mix(maxD / 60) };
+}
+var P = {
+  d9: [[10,0.0],[110,7.3],[210,14.4],[310,20.9],[410,25.0],[510,25.9],[610,25.3],[710,25.3],[810,24.8],[910,27.1],[1010,26.2],[1110,25.3],[1210,26.2],[1310,27.5],[1410,26.8],[1510,22.1],[1610,16.7],[1710,16.3],[1810,16.4],[1910,15.2],[2010,14.8],[2110,16.5],[2210,15.3],[2310,15.5],[2410,15.1],[2510,15.9],[2610,15.6],[2710,16.1],[2810,13.7],[2910,13.1],[3010,8.9],[3110,6.3],[3210,6.2],[3310,5.2],[3390,0.0]],
+  d8: [[10,3.4],[210,23.7],[410,51.2],[610,75.7],[810,96.6],[1010,92.7],[1210,68.7],[1410,51.6],[1610,34.1],[1810,28.9],[2010,25.2],[2210,21.4],[2410,18.1],[2610,15.9],[2810,12.4],[3010,14.0],[3210,9.8],[3410,9.1],[3610,9.5],[3810,6.5],[4010,7.0],[4210,7.1],[4410,7.9],[4610,6.6],[4810,6.3],[5010,8.5],[5210,7.9],[5410,7.7],[5610,6.5],[5810,5.8],[6010,4.7],[6160,0.0]],
+  d7: [[0,0.0],[170,24.0],[390,46.4],[610,57.3],[830,59.6],[1050,55.5],[1160,52.9],[1380,32.4],[1553,20.7],[1632,20.6],[1676,21.1],[1750,22.4],[1970,20.7],[2190,22.3],[2410,24.0],[2630,22.6],[2850,18.2],[3070,16.5],[3290,16.5],[3510,14.3],[3730,16.2],[3950,13.3],[4170,10.0],[4390,10.9],[4610,10.5],[4830,9.9],[5050,7.5],[5270,6.1],[5490,7.6],[5710,6.3],[5930,4.5],[6150,5.0],[6240,0.0]],
+  d6: [[0,2.7],[220,8.4],[440,14.1],[660,22.0],[880,22.4],[1100,31.9],[1320,66.3],[1540,78.0],[1760,75.8],[1980,61.2],[2200,45.2],[2420,30.4],[2640,23.4],[2860,21.5],[3080,20.2],[3300,16.1],[3520,12.6],[3740,9.3],[3960,8.7],[4180,7.0],[4400,5.7],[4620,6.0],[4840,4.4],[5060,3.6],[5280,4.0],[5500,4.5],[5720,4.1],[5940,0.0],[6160,0.0],[6380,0.8],[6600,0.0],[6820,0.0],[6880,0.0]],
+  d5: [[2,2.3],[166,14.8],[330,29.1],[494,30.4],[658,25.5],[822,20.9],[986,12.9],[1150,17.6],[1314,22.0],[1478,20.8],[1642,27.9],[1806,31.0],[1970,38.7],[2134,26.7],[2298,25.8],[2462,24.1],[2626,24.1],[2790,20.1],[2954,18.4],[3118,13.7],[3282,8.5],[3446,7.0],[3610,6.8],[3774,6.9],[3938,6.7],[4102,7.1],[4266,6.6],[4430,4.7],[4594,2.4],[4758,0.4],[4922,0.2],[4970,0.2]]
+};
+var ROWS = [
+  { k: 'd9', site: 'Site à préciser', missing: true, date: '7 févr. 2026, 09:09', max: '27,6 m', dur: '55 min' },
+  { k: 'd8', site: 'Site à préciser', missing: true, date: '27 sept. 2025, 11:55', max: '101,5 m', dur: '102 min' },
+  { k: 'd7', site: 'Northern Arch', date: '24 avr. 2022, 10:30', max: '60,2 m', dur: '104 min', sel: true },
+  { k: 'd6', site: 'Hälvälä', date: '23 mai 2015, 13:23', max: '79,6 m', dur: '100 min' },
+  { k: 'd5', site: 'Lake Coleridge', date: '2 avr. 2014, 10:00', max: '39,0 m', dur: '78 min' }
+];
+var X0 = 40, W = 516, H = 270, TMAX = 6240, DMAX = 65;
+function xs(t) { return X0 + t / TMAX * W; }
+function ys(d) { return d / DMAX * H; }
+class Component extends DCLogic {
+  renderVals() {
+    var dives = ROWS.map(function (r) {
+      var p = prof(P[r.k], 56, 36);
+      return { site: r.site, siteColor: r.missing ? '#6B6B70' : '#000000', date: r.date, max: r.max, dur: r.dur, line: p.line, area: p.area, bottom: p.bottom, gid: 'tb-' + r.k, alt: 'Profil, ' + r.max + ' au plus profond', bg: r.sel ? '#E8E8E5' : 'transparent', current: r.sel ? 'true' : 'false' };
+    });
+    var pts = P.d7;
+    var line = 'M' + pts.map(function (p) { return xs(p[0]).toFixed(1) + ' ' + ys(p[1]).toFixed(1); }).join(' L');
+    return {
+      dives: dives,
+      line: line, area: line + ' L' + (X0 + W) + ' 0 L' + X0 + ' 0 Z', bottom: mix(60.2 / 60),
+      yTicks: [0, 15, 30, 45, 60].map(function (d) { return { y: ys(d), ty: Math.max(ys(d) + 4, 11), label: d + ' m' }; }),
+      xTicks: [0, 20, 40, 60, 80, 100].map(function (m) { return { x: Math.min(xs(m * 60), 538), label: m + ' min' }; }),
+      facts: [
+        { label: 'Profondeur maximale', value: '60,2 m' },
+        { label: 'Durée', value: '104 min' },
+        { label: 'Eau', value: '16,9 °C' },
+        { label: 'Mode', value: 'Recycleur (circuit fermé)' },
+        { label: 'Diluants', value: 'Air, 20/30, 18/42, 16/48' },
+        { label: 'Secours', value: '16/48, nitrox 48 %' },
+        { label: 'CNS', value: '59 %' },
+        { label: 'OTU', value: '150' },
+        { label: 'Ordinateur', value: 'AP DiveSight' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

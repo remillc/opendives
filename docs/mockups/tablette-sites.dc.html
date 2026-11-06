@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Sites, iPad</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:#1F2124}a:hover{color:#1F2124}
+</style>
+</helmet>
+<div style="width: 1180px; height: 820px; box-sizing: border-box; background: #FFFFFF; font-family: -apple-system, 'SF Pro Text', system-ui, sans-serif; color: #000000; position: relative; overflow: hidden; display: flex">
+  <nav aria-label="Sections" style="width: 220px; flex: none; background: #F4F4F2; border-right: 0.5px solid #DADAD6; padding: 32px 12px 16px 12px; box-sizing: border-box; display: flex; flex-direction: column; gap: 2px">
+    <span style="font-size: 22px; font-weight: 700; padding: 0 10px 14px 10px">OpenDives</span>
+    <a href="tablette-carnet.dc.html" style="height: 44px; border-radius: 10px; color: #000000; font-size: 17px; text-decoration: none; display: flex; align-items: center; gap: 10px; padding: 0 10px">
+      <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #1F2124; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z M5 17a3 3 0 0 1 3-3h11"></path></svg>
+      Carnet
+    </a>
+    <a href="tablette-sites.dc.html" aria-current="page" style="height: 44px; border-radius: 10px; background: #E8E8E5; color: #1F2124; font-weight: 600; font-size: 17px; text-decoration: none; display: flex; align-items: center; gap: 10px; padding: 0 10px">
+      <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #1F2124; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round"><path d="M12 21s-6-5.3-6-10a6 6 0 0 1 12 0c0 4.7-6 10-6 10z"></path><circle cx="12" cy="11" r="2"></circle></svg>
+      Sites
+    </a>
+    <a href="tablette-stats.dc.html" style="height: 44px; border-radius: 10px; color: #000000; font-size: 17px; text-decoration: none; display: flex; align-items: center; gap: 10px; padding: 0 10px">
+      <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #1F2124; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round"><path d="M5 20V11 M12 20V5 M19 20v-7"></path></svg>
+      Statistiques
+    </a>
+    <a href="tablette-outils.dc.html" style="height: 44px; border-radius: 10px; color: #000000; font-size: 17px; text-decoration: none; display: flex; align-items: center; gap: 10px; padding: 0 10px">
+      <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #1F2124; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round"><path d="M4 7h10 M18 7h2 M4 17h4 M12 17h8"></path><circle cx="16" cy="7" r="2"></circle><circle cx="10" cy="17" r="2"></circle></svg>
+      Outils
+    </a>
+    <span style="flex: 1"></span>
+    <a href="tablette-reglages.dc.html" style="height: 44px; border-radius: 10px; color: #000000; font-size: 17px; text-decoration: none; display: flex; align-items: center; gap: 10px; padding: 0 10px">
+      <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #1F2124; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round"><circle cx="12" cy="12" r="3.5"></circle><path d="M12 3v2.5 M12 18.5V21 M3 12h2.5 M18.5 12H21 M5.6 5.6l1.8 1.8 M16.6 16.6l1.8 1.8 M5.6 18.4l1.8-1.8 M16.6 7.4l1.8-1.8"></path></svg>
+      Réglages
+    </a>
+    <p style="margin: 6px 10px 0 10px; font-size: 13px; color: #3C3C43">Synchronisé avec le cloud Subsurface</p>
+  </nav>
+  <section aria-label="Liste des sites" style="width: 340px; flex: none; border-right: 0.5px solid #DADAD6; background: #F4F4F2; display: flex; flex-direction: column; padding: 0 16px; box-sizing: border-box">
+    <div style="padding: 24px 0 12px 0; display: flex; flex-direction: column; gap: 10px">
+      <h1 style="margin: 0; font-size: 28px; font-weight: 700">Sites</h1>
+      <label style="height: 36px; border-radius: 10px; background: #E8E8E5; display: flex; align-items: center; gap: 6px; padding: 0 8px; font-size: 17px; color: #3C3C43"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #3C3C43; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round"><circle cx="10.5" cy="10.5" r="6.5"></circle><path d="M15.5 15.5L20 20"></path></svg><input type="search" placeholder="Rechercher un site" style="border: none; background: transparent; font-family: inherit; font-size: 17px; flex: 1; min-width: 0"></label>
+    </div>
+    <h2 style="margin: 4px 16px 6px 16px; font-size: 13px; font-weight: 400; color: #3C3C43">3 sites, 9 plongées</h2>
+    <div style="background: #FFFFFF; border-radius: 10px; overflow: hidden">
+      <a href="#site" style="display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 0 16px; border-bottom: 0.5px solid #E8E8E5; color: #000000; text-decoration: none">
+        <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; padding: 5px 0"><span style="font-size: 17px">Northern Arch</span><span style="font-size: 13px; color: #3C3C43">1 plongée, le 24 avril 2022</span></span><span style="font-size: 17px; color: #3C3C43; font-variant-numeric: tabular-nums; text-align: right">60,2 m</span>
+        <svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #8E8E93; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round"><path d="M9 5l7 7-7 7"></path></svg>
+      </a>
+      <a href="#site" style="display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 0 16px; border-bottom: 0.5px solid #E8E8E5; color: #000000; text-decoration: none">
+        <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; padding: 5px 0"><span style="font-size: 17px">Lake Coleridge</span><span style="font-size: 13px; color: #3C3C43">1 plongée, le 2 avril 2014</span></span><span style="font-size: 17px; color: #3C3C43; font-variant-numeric: tabular-nums; text-align: right">39,0 m</span>
+        <svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #8E8E93; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round"><path d="M9 5l7 7-7 7"></path></svg>
+      </a>
+      <a href="#site" style="display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 0 16px; border-bottom: 0.5px solid #E8E8E5; color: #000000; text-decoration: none">
+        <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; padding: 5px 0"><span style="font-size: 17px">Hälvälä</span><span style="font-size: 13px; color: #3C3C43">1 plongée, pas de position GPS</span></span><span style="font-size: 17px; color: #3C3C43; font-variant-numeric: tabular-nums; text-align: right">79,6 m</span>
+        <svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #8E8E93; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round"><path d="M9 5l7 7-7 7"></path></svg>
+      </a>
+    </div>
+    <a href="#sans-site" style="margin-top: 16px; padding: 0 16px; font-size: 17px; color: #1F2124; text-decoration: none; min-height: 44px; display: flex; align-items: center">6 plongées sans site : les associer</a>
+  </section>
+  <section aria-label="Carte" style="flex: 1; position: relative">
+      <svg width="620" height="820" viewBox="0 0 620 820" role="img" aria-label="Carte des sites : Northern Arch au nord, Lake Coleridge au sud" style="display: block">
+        <rect x="0" y="0" width="620" height="820" style="fill: #E8E8E5"></rect>
+        <g style="stroke: #DADAD6; stroke-width: 1"><path d="M0 80H620 M0 160H620 M0 240H620 M0 320H620 M0 400H620 M0 480H620 M0 560H620 M0 640H620 M0 720H620 M0 800H620 M80 0V820 M160 0V820 M240 0V820 M320 0V820 M400 0V820 M480 0V820 M560 0V820"></path></g>
+        <sc-for list="{{pins}}" as="p" hint-placeholder-count="2">
+          <g transform="translate({{p.x}} {{p.y}})">
+            <path d="M0 0c-9-11-14-17-14-24a14 14 0 0 1 28 0c0 7-5 13-14 24z" style="fill: #1F2124; stroke: #FFFFFF; stroke-width: 2"></path>
+            <circle cx="0" cy="-24" r="5" style="fill: #FFFFFF"></circle>
+          </g>
+          <text x="{{p.lx}}" y="{{p.ly}}" style="font-family: -apple-system, 'SF Pro Text', system-ui, sans-serif; font-size: 14px; font-weight: 600; fill: #1F2124; paint-order: stroke; stroke: #E8E8E5; stroke-width: 4px">{{p.name}}</text>
+        </sc-for>
+        <text x="310" y="410" style="font-family: -apple-system, 'SF Pro Text', system-ui, sans-serif; font-size: 14px; fill: #6B6B70; text-anchor: middle">[Fond de carte OpenStreetMap, PMTiles hors ligne]</text>
+      </svg>
+    <p style="position: absolute; right: 8px; bottom: 8px; margin: 0; font-size: 11px; color: #3C3C43; background: rgba(255,255,255,0.85); padding: 2px 6px; border-radius: 4px">© contributeurs OpenStreetMap</p>
+    <button aria-label="Centrer sur ma position" style="position: absolute; right: 16px; top: 24px; width: 44px; height: 44px; border: none; border-radius: 12px; background: #FFFFFF; box-shadow: 0 1px 3px rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #1F2124; stroke-width: 1.8; stroke-linejoin: round"><path d="M20 4L4 11l7 2 2 7z"></path></svg></button>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1180,"height":820}}'>
+// Positions réelles (fichiers d'exemple de Subsurface), projetées sur la zone visible.
+var SITES = [
+  { name: 'Northern Arch', lat: -35.4485, lon: 174.732 },
+  { name: 'Lake Coleridge', lat: -43.342295, lon: 171.545936 }
+];
+function px(lon) { return Math.round((lon - 166) / 14 * 620); }
+function py(lat) { return Math.round(80 + (-34 - lat) / 11 * 620); }
+class Component extends DCLogic {
+  renderVals() {
+    return { pins: SITES.map(function (s) { var x = px(s.lon), y = py(s.lat); return { name: s.name, x: x, y: y, lx: x + 18, ly: y - 20 }; }) };
+  }
+}
+</script>
+</body>
+</html>

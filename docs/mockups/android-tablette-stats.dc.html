@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Statistiques, tablette Android</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:#1F2124}a:hover{color:#1F2124}
+</style>
+</helmet>
+<div style="width: 1180px; height: 820px; box-sizing: border-box; background: #F4F4F2; font-family: Roboto, 'Google Sans', system-ui, sans-serif; color: #1F2124; display: flex; overflow: hidden">
+  <nav aria-label="Sections" style="width: 96px; flex: none; padding: 24px 0 16px 0; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; gap: 12px">
+    <button aria-label="Ajouter : télécharger, importer ou noter une plongée" style="width: 56px; height: 56px; border: none; border-radius: 16px; background: #E8E8E5; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(0,0,0,0.3)"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #1F2124; stroke-width: 2; stroke-linecap: round"><path d="M12 5v14 M5 12h14"></path></svg></button>
+    <a href="android-tablette-carnet.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #4A4D52; text-decoration: none; font-size: 12px; font-weight: 500; letter-spacing: 0.5px">
+      <span style="width: 56px; height: 32px; display: flex; align-items: center; justify-content: center">
+        <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #4A4D52; stroke-width: 1.9; stroke-linejoin: round"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z M5 17a3 3 0 0 1 3-3h11"></path></svg>
+      </span>
+      Carnet
+    </a>
+    <a href="android-tablette-sites.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #4A4D52; text-decoration: none; font-size: 12px; font-weight: 500; letter-spacing: 0.5px">
+      <span style="width: 56px; height: 32px; display: flex; align-items: center; justify-content: center">
+        <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #4A4D52; stroke-width: 1.9; stroke-linejoin: round"><path d="M12 21s-6-5.3-6-10a6 6 0 0 1 12 0c0 4.7-6 10-6 10z"></path><circle cx="12" cy="11" r="2"></circle></svg>
+      </span>
+      Sites
+    </a>
+    <a href="android-tablette-stats.dc.html" aria-current="page" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #1F2124; text-decoration: none; font-size: 12px; font-weight: 600; letter-spacing: 0.5px">
+      <span style="width: 56px; height: 32px; border-radius: 16px; background: #E8E8E5; display: flex; align-items: center; justify-content: center">
+        <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #1F2124; stroke-width: 1.9; stroke-linecap: round"><path d="M5 20V11 M12 20V5 M19 20v-7"></path></svg>
+      </span>
+      Statistiques
+    </a>
+    <a href="android-tablette-outils.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #4A4D52; text-decoration: none; font-size: 12px; font-weight: 500; letter-spacing: 0.5px">
+      <span style="width: 56px; height: 32px; display: flex; align-items: center; justify-content: center">
+        <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #4A4D52; stroke-width: 1.9; stroke-linecap: round"><path d="M4 7h10 M18 7h2 M4 17h4 M12 17h8"></path><circle cx="16" cy="7" r="2"></circle><circle cx="10" cy="17" r="2"></circle></svg>
+      </span>
+      Outils
+    </a>
+  </nav>
+
+  <section aria-label="Statistiques précompilées" style="width: 400px; flex: none; padding: 16px 12px 0 0; box-sizing: border-box; overflow: hidden">
+    <div style="padding: 8px 4px 8px 16px; display: flex; justify-content: space-between; align-items: center">
+      <h1 style="margin: 0; font-size: 28px; line-height: 36px; font-weight: 400">Statistiques</h1>
+      <a href="ios-filtre.dc.html" style="height: 40px; padding: 0 12px 0 8px; border-radius: 20px; display: flex; align-items: center; gap: 8px; color: #1F2124; font-size: 14px; font-weight: 500; text-decoration: none">
+        <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #1F2124; stroke-width: 1.9; stroke-linejoin: round"><path d="M4 5h16l-6 7.5V19l-4-2v-4.5z"></path></svg>
+        Filtre libre
+      </a>
+    </div>
+    <dl style="margin: 8px 0 0 16px; background: #E8E8E5; border-radius: 16px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; font-variant-numeric: tabular-nums">
+      <div style="padding: 14px 12px"><dt style="font-size: 12px; color: #4A4D52; letter-spacing: 0.4px">Plongées</dt><dd style="margin: 2px 0 0 0; font-size: 22px">9</dd></div>
+      <div style="padding: 14px 12px"><dt style="font-size: 12px; color: #4A4D52; letter-spacing: 0.4px">Sous l’eau</dt><dd style="margin: 2px 0 0 0; font-size: 22px">11 h 26</dd></div>
+      <div style="padding: 14px 12px"><dt style="font-size: 12px; color: #4A4D52; letter-spacing: 0.4px">La plus profonde</dt><dd style="margin: 2px 0 0 0; font-size: 22px">101,5 m</dd></div>
+    </dl>
+    <sc-for list="{{sections}}" as="s" hint-placeholder-count="4">
+      <h2 style="margin: 16px 16px 4px 32px; font-size: 14px; line-height: 20px; font-weight: 500; color: #1F2124">{{s.title}}</h2>
+      <sc-if value="{{s.empty}}" hint-placeholder-val="{{ false }}">
+        <p style="margin: 0; padding: 2px 16px 6px 32px; font-size: 14px; line-height: 20px; color: #4A4D52">{{s.emptyText}}</p>
+      </sc-if>
+      <sc-for list="{{s.rows}}" as="r" hint-placeholder-count="2">
+        <a href="#detail" aria-current="{{r.current}}" style="margin-left: 16px; border-radius: 16px; background: {{r.bg}}; min-height: 52px; padding: 4px 16px; display: flex; align-items: center; gap: 12px; text-decoration: none; color: #1F2124; box-sizing: border-box; font-variant-numeric: tabular-nums">
+          <span style="flex: 1; min-width: 0; font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.label}}</span>
+          <span style="font-size: 14px; color: #4A4D52">{{r.count}}</span>
+          <span style="width: 64px; text-align: right; font-size: 16px; font-weight: 500">{{r.time}}</span>
+        </a>
+      </sc-for>
+    </sc-for>
+  </section>
+
+  <section id="detail" aria-label="Suunto Vyper Air" style="flex: 1; min-width: 0; margin: 16px 16px 16px 12px; border-radius: 28px; background: #FFFFFF; padding: 24px 28px; box-sizing: border-box; display: flex; flex-direction: column; gap: 16px">
+    <div style="display: flex; flex-direction: column; gap: 4px">
+      <p style="margin: 0; font-size: 14px; color: #4A4D52">Ordinateur</p>
+      <h2 style="margin: 0; font-size: 28px; line-height: 36px; font-weight: 400">Suunto Vyper Air</h2>
+    </div>
+    <dl style="margin: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 24px; font-variant-numeric: tabular-nums">
+      <sc-for list="{{facts}}" as="f" hint-placeholder-count="6">
+        <div style="padding: 10px 0; border-top: 1px solid #DADAD6; display: flex; flex-direction: column; gap: 2px">
+          <dt style="font-size: 12px; color: #4A4D52; letter-spacing: 0.4px">{{f.label}}</dt>
+          <dd style="margin: 0; font-size: 22px">{{f.value}}</dd>
+        </div>
+      </sc-for>
+    </dl>
+    <h3 style="margin: 8px 0 0 0; font-size: 16px; font-weight: 500">Profondeur maximale par plongée</h3>
+    <svg width="440" height="170" viewBox="0 0 440 170" role="img" aria-label="Profondeur maximale des 4 plongées : 28,7 m, 22,0 m, 21,8 m, 22,4 m">
+      <sc-for list="{{bars}}" as="b" hint-placeholder-count="4">
+        <rect x="{{b.x}}" y="8" width="72" height="{{b.h}}" rx="8" style="fill: {{b.fill}}"></rect>
+        <text x="{{b.cx}}" y="{{b.ty}}" style="font-size: 14px; font-weight: 500; fill: #1F2124; text-anchor: middle; font-family: Roboto, system-ui, sans-serif">{{b.value}}</text>
+        <text x="{{b.cx}}" y="164" style="font-size: 12px; fill: #4A4D52; text-anchor: middle; font-family: Roboto, system-ui, sans-serif">{{b.label}}</text>
+      </sc-for>
+    </svg>
+    <a href="android-tablette-carnet.dc.html" style="align-self: flex-start; height: 40px; padding: 0 24px; border-radius: 20px; background: #E8E8E5; display: flex; align-items: center; font-size: 14px; font-weight: 500; text-decoration: none; color: #1F2124">Voir ces 4 plongées dans le carnet</a>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1180,"height":820}}'>
+var DIVES = [['2 févr., 08:21', 28.7], ['2 févr., 10:53', 22.0], ['2 févr., 13:44', 21.8], ['2 févr., 16:14', 22.4]];
+function mix(f) {
+  var a = [0xFB, 0xE3, 0xB2], b = [0xB4, 0x53, 0x0F];
+  f = Math.max(0, Math.min(1, f));
+  return 'rgb(' + a.map(function (v, i) { return Math.round(v + (b[i] - v) * f); }).join(',') + ')';
+}
+class Component extends DCLogic {
+  renderVals() {
+    function row(label, time, n, sel) { return { label: label, time: time, count: n + (n > 1 ? ' plongées' : ' plongée'), bg: sel ? '#E8E8E5' : 'transparent', current: sel ? 'true' : 'false' }; }
+    var bars = DIVES.map(function (d, i) {
+      var h = d[1] / 30 * 116, x = 8 + i * 108;
+      return { x: x, h: h.toFixed(1), cx: x + 36, ty: (8 + h + 18).toFixed(1), value: String(d[1]).replace('.', ',') + ' m', label: d[0], fill: mix(d[1] / 60) };
+    });
+    return {
+      sections: [
+        { title: 'Par mode', empty: false, rows: [row('Circuit ouvert', '7 h 29', 6), row('Recycleur', '3 h 58', 3)] },
+        { title: 'Par combinaison', empty: true, emptyText: 'Aucune combinaison notée pour l’instant.', rows: [] },
+        { title: 'Par compagnon', empty: true, emptyText: 'Aucun compagnon noté pour l’instant.', rows: [] },
+        { title: 'Par ordinateur', empty: false, rows: [row('Suunto Vyper Air', '4 h 07', 4, true), row('AP DiveSight', '1 h 44', 1), row('Shearwater Perdix 2', '1 h 42', 1)] }
+      ],
+      facts: [
+        { label: 'Temps sous l’eau', value: '4 h 07' },
+        { label: 'Plongées', value: '4' },
+        { label: 'Profondeur maximale', value: '28,7 m' },
+        { label: 'Moyenne des maximales', value: '23,7 m' },
+        { label: 'SAC moyen', value: '10,7 l/min' },
+        { label: 'Eau', value: '25 à 26 °C' }
+      ],
+      bars: bars
+    };
+  }
+}
+</script>
+</body>
+</html>

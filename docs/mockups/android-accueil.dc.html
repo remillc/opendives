@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Premier lancement, Android</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:#1F2124}a:hover{color:#1F2124}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #F4F4F2; font-family: Roboto, 'Google Sans', system-ui, sans-serif; color: #1F2124; position: relative; overflow: hidden">
+  <svg width="390" height="220" viewBox="0 0 390 220" preserveAspectRatio="none" role="img" aria-label="Profil de la plongée à Northern Arch, 60,2 m au plus profond" style="display: block">
+    <defs><linearGradient id="aa-w" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color: #FBE3B2"></stop><stop offset="1" style="stop-color: #1F2124"></stop></linearGradient></defs>
+    <rect x="0" y="0" width="390" height="220" style="fill: #E8E8E5"></rect>
+    <path d="{{area}}" style="fill: url(#aa-w); stroke: none"></path>
+    <path d="{{line}}" style="fill: none; stroke: #1F2124; stroke-width: 2; vector-effect: non-scaling-stroke"></path>
+  </svg>
+  <div style="padding: 20px 24px 0 24px; display: flex; flex-direction: column; gap: 8px">
+    <h1 style="margin: 0; font-size: 32px; line-height: 40px; font-weight: 400">OpenDives</h1>
+    <p style="margin: 0; font-size: 16px; line-height: 24px; color: #4A4D52; letter-spacing: 0.5px">Votre carnet de plongée, sur le téléphone et la tablette. Comment voulez-vous commencer ?</p>
+  </div>
+  <nav aria-label="Façons de commencer" style="margin: 16px 16px 0 16px; display: flex; flex-direction: column; gap: 8px">
+    <a href="android-carnet.dc.html" style="display: flex; flex-direction: column; gap: 4px; padding: 16px; border-radius: 12px; background: #E8E8E5; color: #1F2124; text-decoration: none">
+      <span style="font-size: 16px; line-height: 24px; font-weight: 500; letter-spacing: 0.15px; color: #1F2124">J'ai déjà un compte Subsurface</span>
+      <span style="font-size: 14px; line-height: 20px; color: #1F2124; letter-spacing: 0.25px">Vos plongées sont sauvegardées dans le cloud Subsurface. Une copie reste sur cet appareil : vous la consultez même sans réseau, et elle se met à jour quand le réseau revient.</span>
+    </a>
+    <a href="android-compte-import.dc.html" style="display: flex; flex-direction: column; gap: 4px; padding: 16px; border-radius: 12px; border: 1px solid #C9C9C5; color: #1F2124; text-decoration: none">
+      <span style="font-size: 16px; line-height: 24px; font-weight: 500; letter-spacing: 0.15px; color: #1F2124">Créer un compte Subsurface</span>
+      <span style="font-size: 14px; line-height: 20px; color: #4A4D52; letter-spacing: 0.25px">Gratuit. Vos plongées sont sauvegardées et partagées entre votre téléphone, votre tablette et votre ordinateur. Vous pourrez y reprendre votre carnet divelogs.de.</span>
+    </a>
+    <a href="android-carnet.dc.html" style="display: flex; flex-direction: column; gap: 4px; padding: 16px; border-radius: 12px; border: 1px solid #C9C9C5; color: #1F2124; text-decoration: none">
+      <span style="font-size: 16px; line-height: 24px; font-weight: 500; letter-spacing: 0.15px; color: #1F2124">Commencer sans compte</span>
+      <span style="font-size: 14px; line-height: 20px; color: #4A4D52; letter-spacing: 0.25px">Vos plongées restent seulement sur cet appareil : pas de sauvegarde, et pas de partage avec vos autres appareils. Vous pourrez créer un compte plus tard et y envoyer votre carnet.</span>
+    </a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+var PTS = [[0,0.0],[170,24.0],[390,46.4],[610,57.3],[830,59.6],[1050,55.5],[1160,52.9],[1380,32.4],[1553,20.7],[1632,20.6],[1676,21.1],[1750,22.4],[1970,20.7],[2190,22.3],[2410,24.0],[2630,22.6],[2850,18.2],[3070,16.5],[3290,16.5],[3510,14.3],[3730,16.2],[3950,13.3],[4170,10.0],[4390,10.9],[4610,10.5],[4830,9.9],[5050,7.5],[5270,6.1],[5490,7.6],[5710,6.3],[5930,4.5],[6150,5.0],[6240,0.0]];
+class Component extends DCLogic {
+  renderVals() {
+    var line = 'M' + PTS.map(function (p) { return (p[0] / 6240 * 390).toFixed(1) + ' ' + (40 + p[1] / 60.2 * 160).toFixed(1); }).join(' L');
+    return { line: line, area: line + ' L390 0 L0 0 Z' };
+  }
+}
+</script>
+</body>
+</html>

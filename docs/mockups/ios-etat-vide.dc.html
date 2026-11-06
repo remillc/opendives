@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Carnet vide, iPhone</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:#1F2124}a:hover{color:#1F2124}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #F4F4F2; font-family: -apple-system, 'SF Pro Text', system-ui, sans-serif; color: #000000; position: relative; overflow: hidden">
+  <div style="padding: 54px 16px 0 16px; display: flex; flex-direction: column; gap: 6px">
+    <div style="display: flex; justify-content: space-between; align-items: center; height: 44px">
+      <button aria-label="Menu" aria-haspopup="menu" style="margin-left: -10px; width: 44px; height: 44px; border: none; background: transparent; border-radius: 22px; display: flex; align-items: center; justify-content: center; padding: 0"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #1F2124; stroke-width: 2.2; stroke-linecap: round"><path d="M4 7h16 M4 12h16 M4 17h16"></path></svg></button>
+      <a href="#ajouter" aria-label="Ajouter : télécharger, importer ou noter une plongée" style="width: 44px; height: 44px; margin-right: -10px; display: flex; align-items: center; justify-content: center; padding: 0"><svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #1F2124; stroke-width: 2; stroke-linecap: round"><path d="M12 5v14 M5 12h14"></path></svg></a>
+    </div>
+    <h1 style="margin: 0; font-size: 34px; line-height: 41px; font-weight: 700">Carnet</h1>
+    <p style="margin: 0; font-size: 13px; line-height: 18px; color: #3C3C43; display: flex; align-items: center; gap: 5px">Connecté au cloud Subsurface, aucune plongée</p>
+  </div>
+  <div style="margin: 48px 32px 0 32px; display: flex; flex-direction: column; gap: 12px; align-items: flex-start">
+    <h2 style="margin: 0; font-size: 22px; line-height: 28px; font-weight: 700">Aucune plongée pour l'instant</h2>
+    <p style="margin: 0; font-size: 17px; line-height: 24px; color: #3C3C43">Associez votre ordinateur de plongée pour télécharger vos plongées. Vous pouvez aussi importer un carnet existant ou noter une plongée à la main.</p>
+  </div>
+  <div style="margin: 24px 16px 0 16px; background: #FFFFFF; border-radius: 10px; overflow: hidden">
+    <a href="ios-telechargement.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 0 16px; border-bottom: 0.5px solid #DADAD6; color: #1F2124; text-decoration: none; font-size: 17px; font-weight: 600"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #1F2124; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round"><path d="M7 7l10 10-5 4V3l5 4L7 17"></path></svg>Associer un ordinateur de plongée</a>
+    <a href="#importer" style="display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 0 16px; border-bottom: 0.5px solid #DADAD6; color: #1F2124; text-decoration: none; font-size: 17px"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #1F2124; stroke-width: 1.8; stroke-linejoin: round"><path d="M6 3h8l4 4v14H6z M14 3v4h4"></path></svg>Importer un fichier</a>
+    <a href="ios-compte-import.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 0 16px; border-bottom: 0.5px solid #DADAD6; color: #1F2124; text-decoration: none; font-size: 17px"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #1F2124; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round"><path d="M12 4v11 M7 10l5 5 5-5 M5 20h14"></path></svg>Télécharger depuis divelogs.de</a>
+    <a href="ios-edition.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 0 16px; color: #1F2124; text-decoration: none; font-size: 17px"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #1F2124; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round"><path d="M4 20h4L19 9l-4-4L4 16z M13.5 6.5l4 4"></path></svg>Noter une plongée à la main</a>
+  </div>
+  <p style="margin: 8px 32px 0 32px; font-size: 13px; line-height: 18px; color: #3C3C43">Les fichiers de Subsurface (.ssrf, .xml), de divelogs.de et d'autres carnets s'importent ici.</p>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

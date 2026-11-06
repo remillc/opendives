@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Sites, Android</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:#1F2124}a:hover{color:#1F2124}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #F4F4F2; font-family: Roboto, 'Google Sans', system-ui, sans-serif; color: #1F2124; position: relative; overflow: hidden">
+  <button aria-label="Menu" aria-haspopup="menu" style="position: absolute; left: 4px; top: 48px; z-index: 3; width: 48px; height: 48px; border: none; background: #FFFFFF; border-radius: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; padding: 0"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #1F2124; stroke-width: 2.2; stroke-linecap: round"><path d="M4 7h16 M4 12h16 M4 17h16"></path></svg></button>
+  <div style="position: absolute; left: 0; top: 0; width: 390px; height: 480px; background: #E8E8E5">
+    <svg width="390" height="480" viewBox="0 0 390 480" role="img" aria-label="Carte des sites : Northern Arch au nord, Lake Coleridge au sud" style="display: block">
+      <g style="stroke: #DADAD6; stroke-width: 1"><path d="M0 80H390 M0 160H390 M0 240H390 M0 320H390 M0 400H390 M65 0V480 M130 0V480 M195 0V480 M260 0V480 M325 0V480"></path></g>
+      <sc-for list="{{pins}}" as="p" hint-placeholder-count="2">
+        <g transform="translate({{p.x}} {{p.y}})">
+          <path d="M0 0c-9-11-14-17-14-24a14 14 0 0 1 28 0c0 7-5 13-14 24z" style="fill: #1F2124; stroke: #FFFFFF; stroke-width: 2"></path>
+          <circle cx="0" cy="-24" r="5" style="fill: #FFFFFF"></circle>
+        </g>
+        <text x="{{p.lx}}" y="{{p.ly}}" style="font-family: Roboto, system-ui, sans-serif; font-size: 14px; font-weight: 500; fill: #1F2124; paint-order: stroke; stroke: #E8E8E5; stroke-width: 4px">{{p.name}}</text>
+      </sc-for>
+      <text x="195" y="260" style="font-family: Roboto, system-ui, sans-serif; font-size: 14px; fill: #4A4D52; text-anchor: middle">[Fond de carte OpenStreetMap, PMTiles hors ligne]</text>
+    </svg>
+    <p style="position: absolute; right: 8px; bottom: 44px; margin: 0; font-size: 11px; color: #4A4D52; background: rgba(255,255,255,0.85); padding: 2px 6px; border-radius: 4px">© contributeurs OpenStreetMap</p>
+    <label style="position: absolute; left: 16px; right: 16px; top: 48px; height: 56px; border-radius: 28px; background: #EEEEEC; display: flex; align-items: center; gap: 16px; padding: 0 16px; box-sizing: border-box">
+      <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #4A4D52; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round"><circle cx="10.5" cy="10.5" r="6.5"></circle><path d="M15.5 15.5L20 20"></path></svg>
+      <input type="search" placeholder="Rechercher un site" style="border: none; background: transparent; font-family: inherit; font-size: 16px; flex: 1; min-width: 0">
+    </label>
+    <button aria-label="Centrer sur ma position" style="position: absolute; right: 16px; bottom: 56px; width: 56px; height: 56px; border: none; border-radius: 16px; background: #E8E8E5; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(0,0,0,0.2)"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #1F2124; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round"><circle cx="12" cy="12" r="3.5"></circle><path d="M12 2.5v3 M12 18.5v3 M2.5 12h3 M18.5 12h3"></path><circle cx="12" cy="12" r="7"></circle></svg></button>
+  </div>
+  <section aria-label="Liste des sites" style="position: absolute; left: 0; right: 0; top: 440px; bottom: 80px; background: #F4F4F2; border-radius: 28px 28px 0 0; box-shadow: 0 -1px 4px rgba(0,0,0,0.12)">
+    <span aria-hidden="true" style="display: block; margin: 16px auto 0 auto; width: 32px; height: 4px; border-radius: 2px; background: #75787C"></span>
+    <div style="padding: 12px 24px 4px 16px; display: flex; justify-content: space-between; align-items: baseline">
+      <h1 style="margin: 0; font-size: 22px; line-height: 28px; font-weight: 400">Sites</h1>
+      <span style="font-size: 14px; color: #4A4D52">3 sites, 9 plongées</span>
+    </div>
+    <a href="#site" style="display: flex; align-items: center; gap: 16px; min-height: 72px; padding: 8px 24px 8px 16px; box-sizing: border-box; color: #1F2124; text-decoration: none">
+      <span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><span style="font-size: 16px; line-height: 24px; letter-spacing: 0.15px">Northern Arch</span><span style="font-size: 14px; line-height: 20px; color: #4A4D52; letter-spacing: 0.25px">1 plongée, le 24 avril 2022</span></span><span style="font-size: 16px; color: #1F2124; font-weight: 500; font-variant-numeric: tabular-nums; text-align: right">60,2 m</span>
+    </a>
+    <a href="#site" style="display: flex; align-items: center; gap: 16px; min-height: 72px; padding: 8px 24px 8px 16px; box-sizing: border-box; color: #1F2124; text-decoration: none">
+      <span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><span style="font-size: 16px; line-height: 24px; letter-spacing: 0.15px">Lake Coleridge</span><span style="font-size: 14px; line-height: 20px; color: #4A4D52; letter-spacing: 0.25px">1 plongée, le 2 avril 2014</span></span><span style="font-size: 16px; color: #1F2124; font-weight: 500; font-variant-numeric: tabular-nums; text-align: right">39,0 m</span>
+    </a>
+    <a href="#site" style="display: flex; align-items: center; gap: 16px; min-height: 72px; padding: 8px 24px 8px 16px; box-sizing: border-box; color: #1F2124; text-decoration: none">
+      <span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><span style="font-size: 16px; line-height: 24px; letter-spacing: 0.15px">Hälvälä</span><span style="font-size: 14px; line-height: 20px; color: #4A4D52; letter-spacing: 0.25px">1 plongée, pas de position GPS</span></span><span style="font-size: 16px; color: #1F2124; font-weight: 500; font-variant-numeric: tabular-nums; text-align: right">79,6 m</span>
+    </a>
+    <a href="#sans-site" style="display: flex; align-items: center; min-height: 48px; padding: 0 16px; color: #1F2124; text-decoration: none; font-size: 14px; font-weight: 500; letter-spacing: 0.1px">6 plongées sans site : les associer</a>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+// Positions réelles (fichiers d'exemple de Subsurface), projetées sur la zone visible.
+var SITES = [
+  { name: 'Northern Arch', lat: -35.4485, lon: 174.732 },
+  { name: 'Lake Coleridge', lat: -43.342295, lon: 171.545936 }
+];
+function px(lon) { return Math.round((lon - 168) / 10 * 390); }
+function py(lat) { return Math.round(140 + (-34 - lat) / 11 * 260); }
+class Component extends DCLogic {
+  renderVals() {
+    return { pins: SITES.map(function (s) { var x = px(s.lon), y = py(s.lat); return { name: s.name, x: x, y: y, lx: x + 18, ly: y - 20 }; }) };
+  }
+}
+</script>
+</body>
+</html>
