@@ -44,7 +44,7 @@
    * @param {MouseEvent} e
    */
   function confirmSignOut(e) {
-    e.preventDefault();
+    e?.preventDefault();
     const pending = logbook.pending;
     const text = pending ? t('signOut.textPending', { n: pending }) : t('signOut.textNone');
     const content = `
@@ -177,29 +177,16 @@
     </div>
 
     <div class="block-title">{t('account.leaveGroup')}</div>
-    <div class="list list-strong inset list-dividers">
-      <ul>
-        <li>
-          <a href="#sign-out" class="item-link item-content external no-chevron" role="button" onclick={confirmSignOut}>
-            <div class="item-inner">
-              <div class="item-title">
-                {t('account.signOut')}
-                <div class="item-footer">{t('account.signOutText')}</div>
-              </div>
-            </div>
-          </a>
-        </li>
-        <li>
-          <a href="/account/delete/" class="item-link item-content no-chevron">
-            <div class="item-inner">
-              <div class="item-title">
-                <span class="danger">{t('account.delete')}</span>
-                <div class="item-footer">{t('account.deleteText')}</div>
-              </div>
-            </div>
-          </a>
-        </li>
-      </ul>
+    <!-- Leaving the account: buttons, each with its consequence (spec, section 4). -->
+    <div class="leave">
+      <button type="button" class="od-outlined-button" onclick={confirmSignOut}>{t('account.signOut')}</button>
+      <span class="consequence">{t('account.signOutText')}</span>
+    </div>
+    <div class="leave">
+      <button type="button" class="od-outlined-button danger" onclick={() => f7.views.current?.router.navigate('/account/delete/')}>
+        {t('account.delete')}
+      </button>
+      <span class="consequence">{t('account.deleteText')}</span>
     </div>
 
     {#if serverCaption}<p class="caption">{serverCaption}</p>{/if}
@@ -312,8 +299,20 @@
       color: var(--od-text-2);
     }
 
-    .danger {
-      color: var(--od-alarm);
+    .leave {
+      margin: 0 16px 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+
+      .consequence {
+        max-width: 300px;
+        font-size: 13px;
+        line-height: 18px;
+        color: var(--od-text-2);
+        text-align: center;
+      }
     }
 
     .caption {

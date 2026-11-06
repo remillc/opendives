@@ -284,6 +284,38 @@ html.ios {
     }
   }
 
+  /*
+   * Outlined button ("Sign out", "Delete the account"): same sizes as the
+   * tonal button; ink, or --od-alarm with .danger (text and border).
+   */
+  .od-outlined-button {
+    width: auto;
+    height: 40px;
+    padding: 0 24px;
+    border: 1px solid var(--od-text-2);
+    border-radius: 20px;
+    background: none;
+    color: var(--od-text);
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.1px;
+    text-align: center;
+    cursor: pointer;
+
+    &.danger {
+      border-color: var(--od-alarm);
+      color: var(--od-alarm);
+    }
+
+    .ios & {
+      height: 44px;
+      border-radius: 12px;
+      font-size: 17px;
+      letter-spacing: 0;
+    }
+  }
+
   /* Text for screen readers only. */
   .od-sr-only {
     position: absolute;

@@ -75,7 +75,9 @@ Done in Add the delete-account screen and request (never sent: Christian decided
 
 Build the delete-account screen from `docs/mockups/compte-android-suppression.dc.html` and `docs/ui-specification.md`, section 4, "Delete the account". Port the request from Subsurface (`core/cloudstorage.cpp`, `deleteAccount()`: POST "email password" as text/plain to `<cloud>/delete-account`) into the facade without Qt. Unlike Subsurface, read the reply and treat the account as deleted only when the server confirms; record the exact replies seen on the test account in the report. Sync unsent changes first; keep the dives in a no-cloud local logbook when the box is checked; require the password again. **Wait** before running it against any account other than `OPENDIVES_CLOUD_TEST_EMAIL`; never call the endpoint in automated tests.
 
-## [ ] 2026-11-06-10 Sign out and delete as buttons
+## [x] 2026-11-06-10 Sign out and delete as buttons
+
+Done in Show sign out and delete as buttons on the Account screen
 
 On the Account screen, replace the "Sign out" and "Delete the account" rows with centred outlined buttons, each with its explanation under it (`docs/ui-specification.md`, section 4, "Leaving the account, buttons"). "Delete the account" uses `--od-alarm` for its text and border. Mock-ups: `docs/mockups/compte-*-connecte*.dc.html`.
 
