@@ -643,23 +643,21 @@
       `<li><a href="#" class="item-link popover-close" data-action="${action}"><div class="item-content"><div class="item-inner"><div class="item-title">${label}</div></div></div></a></li>`;
     const popover = f7.popover.create({
       targetEl: /** @type {HTMLElement} */ (e.currentTarget),
-      content: `<div class="popover od-computer-menu"><div class="popover-inner"><div class="list"><ul>${item('rename', t('settings.computers.rename'))}${item('forget', t('settings.computers.forgetOne'))}</ul></div></div></div>`,
+      content: `<div class="popover od-computer-menu"><div class="popover-inner"><div class="list"><ul>${item('forget', t('settings.computers.forgetOne'))}</ul></div></div></div>`,
       on: {
         opened(/** @type {any} */ p) {
           p.$el.find('[data-action]').on('click', (/** @type {Event} */ ev) => {
             ev.preventDefault();
             const action = /** @type {HTMLElement} */ (ev.currentTarget).dataset.action;
-            if (action === 'rename') {
-              // The nickname is the logbook's (divecomputerid), the remembered computers the device's: to be decided.
-              f7.toast.show({ text: t('account.notAvailable'), closeTimeout: 2500 });
-            } else {
+            // Only "Forget": a remembered computer has no serial number, so no
+            // nickname to rename in the logbook (Christian's choice).
+            if (action === 'forget')
               confirmAction({
                 title: t('settings.computers.forgetOneTitle', { name }),
                 text: t('settings.computers.forgetOneText'),
                 action: t('settings.computers.forget'),
                 onConfirm: () => forget(computer.slot),
               });
-            }
           });
         },
         closed: () => popover.destroy(),

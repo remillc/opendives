@@ -404,7 +404,7 @@ import { registerPlugin } from '@capacitor/core';
  *   The core's preferences: units (the loaded log's when it has them), the Settings values.
  * @property {(options: {changes: Partial<CorePrefValues> & {forgetDiveComputer?: number}}) => Promise<void>} setPrefs
  *   Sets core preferences (set_prefs in opendives.h); a device setting, kept by the app.
- * @property {(options: {action: 'list'|'library'|'add'|'size'|'remove'|'rename', name?: string, value?: string, ml?: number, mbar?: number}) => Promise<CylinderTypes>} cylinderTypes
+ * @property {(options: {action: 'list'|'library'|'standard'|'add'|'size'|'remove'|'rename', name?: string, value?: string, ml?: number, mbar?: number}) => Promise<CylinderTypes>} cylinderTypes
  *   Cylinder types of Settings; "rename" (to value) changes the log as one undoable step,
  *   "library" sets the device's library (value: JSON {"library": [...]}).
  * @property {() => Promise<PlannerSetup>} plannerSetup

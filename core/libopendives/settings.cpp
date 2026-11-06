@@ -471,6 +471,13 @@ int cylinder_types(std::string &json)
 	return 0;
 }
 
+void reset_cylinder_library()
+{
+	// "Reset all settings": the device's library back to Subsurface's list.
+	set_tank_info_baseline(default_tank_info_table());
+	reset_tank_info_table(tank_info_table);
+}
+
 int set_cylinder_library(const std::string &library_json, std::string &error)
 {
 	std::vector<std::pair<std::string, JsonValue>> fields;

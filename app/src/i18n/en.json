@@ -409,7 +409,6 @@
       "remembered": "Remembered",
       "none": "No remembered dive computer",
       "more": "More options for {name}",
-      "rename": "Rename",
       "forgetOne": "Forget this computer",
       "forgetOneTitle": "Forget {name}?",
       "forgetOneText": "It will no longer be offered for download. Dives already downloaded do not change.",

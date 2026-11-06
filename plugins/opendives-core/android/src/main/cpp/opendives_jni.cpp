@@ -414,6 +414,10 @@ Java_org_opendives_core_NativeCore_cylinderTypes(JNIEnv *env, jobject, jstring a
 		ret = opendives::cylinder_types(json);
 	else if (action == "library")
 		ret = opendives::set_cylinder_library(value, error) ? -1 : opendives::cylinder_types(json);
+	else if (action == "standard") {
+		opendives::reset_cylinder_library();
+		ret = opendives::cylinder_types(json);
+	}
 	else if (action == "rename")
 		ret = opendives::cylinder_type_rename(name, value, json, error);
 	else

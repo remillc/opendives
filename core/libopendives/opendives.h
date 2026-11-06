@@ -59,6 +59,8 @@ int cylinder_types(std::string &json);
 // The device's library, {"library":[…]} as cylinder_types() writes it, set
 // again at start (Subsurface keeps it in its settings); rebuilds the table.
 int set_cylinder_library(const std::string &library_json, std::string &error);
+// The library back to Subsurface's standard list (Reset all settings).
+void reset_cylinder_library();
 // action: "add" (a new type `name` of `ml` and `mbar`; NAME_IN_USE), "size"
 // (`ml` and `mbar` of the type `name`, in the table and, if it is there, in the
 // library), "remove" (from the library and the table, and as the default

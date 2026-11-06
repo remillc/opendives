@@ -409,7 +409,6 @@
       "remembered": "Mémorisé",
       "none": "Aucun ordinateur mémorisé",
       "more": "Plus d’options pour {name}",
-      "rename": "Renommer",
       "forgetOne": "Oublier cet ordinateur",
       "forgetOneTitle": "Oublier {name} ?",
       "forgetOneText": "Il ne sera plus proposé au téléchargement. Les plongées déjà téléchargées ne changent pas.",

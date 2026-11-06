@@ -177,6 +177,9 @@ export async function resetAllSettings(defaults) {
   await OpenDivesCore.setPrefs({ changes: defaults });
   for (const key of Object.keys(storedCore)) delete storedCore[/** @type {keyof CorePrefValues} */ (key)];
   writeJson(CORE_KEY, null);
+  // The cylinder types too: back to Subsurface's standard list (Christian's choice).
+  await OpenDivesCore.cylinderTypes({ action: 'standard' });
+  writeJson(LIBRARY_KEY, null);
   try {
     localStorage.removeItem('od.extraConditions');
   } catch {
