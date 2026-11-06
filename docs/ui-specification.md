@@ -123,6 +123,8 @@ Six components do not exist in Framework7; each is a single Svelte component, sh
 
 **Manual synchronisation (decided on 6 November 2026).** When "Sync automatically" is turned off in Account, the app behaves like Subsurface-mobile: changes are saved in the local copy, nothing is sent or fetched, and the full exchange (fetch, merge, send) only happens on "Sync now". The setting belongs to the device. In this mode, `<SyncStatus>` says so at all times, at the top of the Logbook and at the bottom of the side menu: "Manual sync: 3 changes not sent", in `--od-pending`; the side menu then offers the "Sync now" button; the Account screen adds a "Changes not sent" row, and the explanation under the switch becomes "Off: changes stay on this device, and those from other devices do not arrive, until you sync".
 
+**Sign out (decided on 6 November 2026).** Subsurface-mobile has no sign-out: you change credentials or switch to no-cloud mode, and the account's local copy stays in the app's storage, not shown, and is reused if you sign in again. OpenDives does the same: "Sign out" forgets the credentials (removed from the keychain), closes the logbook and returns to first launch; the local copy is kept. A confirmation is always shown. If changes are not sent yet, it says so and offers "Sync, then sign out", "Sign out anyway" (they will be sent at the next sign-in to this account, from this device) and "Cancel". A "Also delete the copy on this device" checkbox, off by default, is only available once everything has been sent.
+
 An insufficient gas reserve in the planner is an ordinary list row whose value is in `--od-alarm`, with the gap spelled out ("18 bar short to surface two divers").
 
 ## 5. Screens and data requested from the core
