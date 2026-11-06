@@ -38,6 +38,8 @@ The theme chosen on 5 November 2026 is **black and white, colour reserved for da
 
 **Contrast:** all text at least 4.5:1 on its background, 3:1 for text of 24 px and more and for chart lines. A colour never carries information alone: the alarm and pending states always have text that says what the problem is.
 
+**Text fields (decided on 6 November 2026).** Every text field is a Framework7 MD outline input with a floating label, as in the Framework7 kitchen sink (Inputs, outline, floating labels): when the field is empty and not focused, the label fills the field at full size, with no placeholder; on focus, or once the field has a value, the label moves up onto the outline in small type. Helper text sits under the field. A trailing icon (for example "use my position") is a plain 24 dp icon button, without a filled background. In a full-screen form, the save action is a text button at the right of the top bar ("Enregistrer"), the close action an X at the left. Reference: `docs/mockups/sites-edition-android.dc.html`.
+
 **Logo (decided on 6 November 2026): "Hublot".** A porthole or mask seen from the front, half under water: a thick ink ring, a wavy waterline, the water below in the water gradient (#FBE3B2 to #B4530F in light mode, #E5B961 to #EF7625 in dark mode), and two small bubbles above the line. Light version on #F4F4F2 with an ink ring; dark version on #121314 with a light ring. It is the only place where the water colour appears outside data. Sources in `docs/brand/` (108 × 108 adaptive-icon grid, the mark inside the 66 px safe zone): `opendives-icon-*-fullbleed.svg` for the Android adaptive icon, `*-round.svg` and `*-squircle.svg` as previews of the two masks. Board: `docs/mockups/logo-hublot.dc.html`. Wordmark: "Open" bold and "Dives" regular, system font.
 
 ## 2. Text, numbers and units
@@ -146,6 +148,8 @@ Six components do not exist in Framework7; each is a single Svelte component, sh
 - *Chevron alone:* opens a sub-screen with a Back button.
 Actions are outlined buttons, never rows, centred inside the rounded surface of their group (at its bottom): "Forget remembered dive computers" (confirmation dialog, then the core forgets them) and "Reset all settings" (confirmation dialog; the planning parameters and trip grouping are not reset). The ⋮ of a remembered dive computer opens a menu with "Rename" (the computer's nickname) and "Forget this computer", see `reglages-menu-android.dc.html`.
 
+Choice dialogs follow the MD3 single-choice dialog exactly: 28 dp corners, 24 sp headline, a radio button at the start of each 56 dp row, the label then the example in secondary text at the end of the row, "Cancel" and "OK" as text buttons at the bottom right. Only the radio button shows the selection: no tinted row, no bold; dividers only when the list scrolls.
+
 Layout: titles sit on the page background, 18 px bold; each group is a white surface with 20 px corners and 16 px side margins; no dividers between rows; rows 48 px minimum. In Units, the five units are one group and speeds, duration and GPS coordinates a second group. A search field at the top filters the rows as the user types. No semicolons in UI texts.
 
 | Row | Control | Choices or range (default first) | Core preference |
@@ -157,7 +161,7 @@ Layout: titles sit on the page background, 18 px bold; each group is a white sur
 | Depth, pressure, volume, temperature, weight | choice | m / ft; bar / psi; L / cuft; °C / °F; kg / lb | `units` |
 | Vitesses de remontée et de descente | choice | per minute, per second | `units.vertical_speed_time` |
 | Durée | choice | automatic (mm under one hour, else h:mm), always h:mm, always mm | `units.duration_units` |
-| Coordonnées GPS | choice | degrees and minutes, decimal | `coordinates_traditional` |
+| Coordonnées GPS | choice | decimal (-35.4485, default, unlike the core), degrees and decimal minutes (35° 26.9′ S), degrees, minutes and seconds (35° 26′ 54.6″ S) | `coordinates_traditional` covers only seconds (true) and decimal (false) in `printGPSCoords`: OpenDives formats coordinates itself, in all three forms |
 | Regrouper les plongées en voyages | switch | on | logbook `autogroup` |
 | Afficher les plongées invalides | switch | off | `display_invalid_dives` |
 | Vagues de surface, flux-reflux et froid | switch | off | `extraEnvironmentalDefault` |
