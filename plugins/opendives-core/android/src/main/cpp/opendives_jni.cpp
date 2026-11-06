@@ -105,6 +105,78 @@ Java_org_opendives_core_NativeCore_cloudDeleteAccount(JNIEnv *env, jobject, jstr
 	return env->NewStringUTF(json.c_str());
 }
 
+// Editing (edit.cpp). Each returns {"dive":…, "undo":…, "redo":…} or throws the error code.
+static jstring edit_result(JNIEnv *env, const std::string &dive_json)
+{
+	auto quoted = [](const std::string &text) {
+		std::string out;
+		for (char c: text) {
+			if (c == '"' || c == '\\')
+				out += '\\';
+			out += c;
+		}
+		return out;
+	};
+	std::string json = "{\"dive\":" + dive_json + ",\"undo\":\"" + quoted(opendives::undo_text());
+	json += "\",\"redo\":\"" + quoted(opendives::redo_text()) + "\"}";
+	return env->NewStringUTF(json.c_str());
+}
+
+JNIEXPORT jstring JNICALL
+Java_org_opendives_core_NativeCore_editDive(JNIEnv *env, jobject, jint id, jstring changes)
+{
+	std::string json, error;
+	if (opendives::edit_dive(id, to_string(env, changes), json, error)) {
+		throw_core_error(env, error);
+		return nullptr;
+	}
+	return edit_result(env, json);
+}
+
+JNIEXPORT jstring JNICALL
+Java_org_opendives_core_NativeCore_undo(JNIEnv *env, jobject, jboolean redo)
+{
+	std::string json, error;
+	if (redo ? opendives::redo(json, error) : opendives::undo(json, error)) {
+		throw_core_error(env, error);
+		return nullptr;
+	}
+	return edit_result(env, json);
+}
+
+JNIEXPORT jstring JNICALL
+Java_org_opendives_core_NativeCore_sync(JNIEnv *env, jobject)
+{
+	std::string json, error;
+	if (opendives::sync(json, error)) {
+		throw_core_error(env, error);
+		return nullptr;
+	}
+	return env->NewStringUTF(json.c_str());
+}
+
+JNIEXPORT jstring JNICALL
+Java_org_opendives_core_NativeCore_listLoadedDives(JNIEnv *env, jobject)
+{
+	std::string json;
+	opendives::list_loaded_dives(json);
+	return env->NewStringUTF(json.c_str());
+}
+
+JNIEXPORT void JNICALL
+Java_org_opendives_core_NativeCore_saveLocal(JNIEnv *env, jobject)
+{
+	std::string error;
+	if (opendives::save_local(error))
+		throw_core_error(env, error);
+}
+
+JNIEXPORT void JNICALL
+Java_org_opendives_core_NativeCore_setCloudTestEmail(JNIEnv *env, jobject, jstring email)
+{
+	opendives::set_cloud_test_email(to_string(env, email));
+}
+
 // Local commits of the cloud log not yet on the server, as a JSON array.
 JNIEXPORT jstring JNICALL
 Java_org_opendives_core_NativeCore_pendingChanges(JNIEnv *env, jobject)

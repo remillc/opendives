@@ -204,7 +204,9 @@
   },
   "settings": {
     "title": "Réglages",
-    "comingSoon": "Les réglages viendront ici."
+    "comingSoon": "Les réglages viendront ici.",
+    "extraConditions": "Houle, ressac et froid",
+    "extraConditionsText": "Ajoute ces trois conditions quand on modifie une plongée. Désactivé par défaut, comme dans Subsurface"
   },
   "gas": {
     "air": "Air",
@@ -313,5 +315,46 @@
     "deleted": "Le compte a été supprimé.",
     "notDeleted": "Le compte n'a pas été supprimé ; rien n'a changé.",
     "wrongPassword": "Ce n'est pas le mot de passe du compte ; rien n'a été supprimé."
+  },
+  "edit": {
+    "title": "Modifier la plongée",
+    "save": "Enregistrer",
+    "diveGroup": "La plongée",
+    "number": "Numéro",
+    "dateTime": "Date et heure",
+    "duration": "Durée",
+    "durationNote": "Calculée par l’ordinateur ; modifiable seulement pour une plongée saisie à la main",
+    "site": "Site",
+    "trip": "Voyage",
+    "none": "Aucun",
+    "peopleGroup": "Personnes et notes",
+    "guides": "Guide de palanquée",
+    "buddies": "Compagnons",
+    "tags": "Étiquettes",
+    "notes": "Notes",
+    "listHint": "Plusieurs noms : séparés par des virgules",
+    "conditionsGroup": "Conditions",
+    "rating": "Note globale",
+    "summaryRating": "Note {n} sur 5",
+    "summaryCondition": "{name} {n}",
+    "summaryAir": "air {value}",
+    "summaryWater": "eau {value}",
+    "summaryWaterType": "eau {type}",
+    "equipmentGroup": "Équipement",
+    "cylinders": {
+      "one": "{n} bouteille",
+      "other": "{n} bouteilles"
+    },
+    "summaryWeight": "lest {value}",
+    "computersGroup": "Ordinateurs",
+    "mainSuffix": ", principal",
+    "advancedGroup": "Avancé",
+    "readOnlyNote": "Les champs en gris ne se modifient pas encore dans cette version.",
+    "saved": "Modification enregistrée",
+    "undo": "Annuler",
+    "undone": "Modification annulée",
+    "undoFailed": "La modification ne peut plus être annulée",
+    "failed": "La modification n’a pas pu être enregistrée ; rien n’a changé.",
+    "writeLocked": "Ce compte ne peut pas encore être modifié depuis OpenDives ; rien n’a changé."
   }
 }

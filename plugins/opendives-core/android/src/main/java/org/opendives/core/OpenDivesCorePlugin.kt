@@ -95,6 +95,9 @@ class OpenDivesCorePlugin : Plugin() {
     fun configureCloud(call: PluginCall) = onCoreThread(call) {
         val credentials = readDevCredentials()
         if (credentials != null) NativeCore.cloudConfigure(credentials.first, credentials.second)
+        // Write lock (docs/editing-and-sync-plan.md, section 4): writing to the
+        // cloud is allowed only for the test account named in files/cloud-test.env.
+        NativeCore.setCloudTestEmail(readTestEmail())
         // The account email is shown on the Account screen; the password never leaves the plugin.
         call.resolve(JSObject().put("available", credentials != null).put("email", credentials?.first ?: ""))
     }
@@ -189,6 +192,52 @@ class OpenDivesCorePlugin : Plugin() {
         call.resolve(JSObject().put("json", json))
     }
 
+    /** Edits one dive as one undoable step; `changes` is the JSON object of edit_dive(). */
+    @PluginMethod
+    fun editDive(call: PluginCall) = onCoreThread(call) {
+        val id = call.getInt("id")
+        val changes = call.getObject("changes")
+        if (id == null || changes == null) {
+            call.reject("Missing id or changes", "BAD_ARGUMENT")
+            return@onCoreThread
+        }
+        call.resolve(JSObject().put("json", NativeCore.editDive(id, changes.toString())))
+    }
+
+    @PluginMethod
+    fun undo(call: PluginCall) = onCoreThread(call) {
+        call.resolve(JSObject().put("json", NativeCore.undo(call.getBoolean("redo", false) == true)))
+    }
+
+    /** Local save, then for a cloud log the sync of Subsurface-mobile (fetch, merge, push). */
+    @PluginMethod
+    fun syncChanges(call: PluginCall) = onCoreThread(call) {
+        val json = NativeCore.sync()
+        Log.i(TAG, "syncChanges: $json")
+        call.resolve(JSObject().put("json", json))
+    }
+
+    /** The dives of the log in memory, without loading anything (after a sync that reloaded it). */
+    @PluginMethod
+    fun listLoadedDives(call: PluginCall) = onCoreThread(call) {
+        call.resolve(JSObject().put("json", NativeCore.listLoadedDives()))
+    }
+
+    /** Local save only, without network (manual synchronisation). */
+    @PluginMethod
+    fun saveLocal(call: PluginCall) = onCoreThread(call) {
+        NativeCore.saveLocal()
+        call.resolve()
+    }
+
+    private fun readTestEmail(): String {
+        val file = File(context.filesDir, TEST_ACCOUNT)
+        if (!file.exists()) return ""
+        return file.readLines().map { it.trim() }
+            .firstOrNull { it.startsWith("OPENDIVES_CLOUD_TEST_EMAIL=") }
+            ?.substringAfter('=').orEmpty()
+    }
+
     private fun readDevCredentials(): Pair<String, String>? {
         val file = File(context.filesDir, DEV_CREDENTIALS)
         if (!file.exists()) return null
@@ -235,5 +284,6 @@ class OpenDivesCorePlugin : Plugin() {
         const val TAG = "OpenDives"
         const val SAMPLE_ASSET = "SampleDivesV2.ssrf"
         const val DEV_CREDENTIALS = "cloud-dev.env"
+        const val TEST_ACCOUNT = "cloud-test.env"
     }
 }

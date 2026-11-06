@@ -87,7 +87,9 @@ Done in Bring the dive detail to the full detail3 mock-ups
 
 Bring the dive detail to `docs/mockups/detail3-android.dc.html` (light) and `detail3-android-sombre.dc.html` (dark), following `docs/ui-specification.md`, section 4, "Full dive detail" and "Conditions": gas and equipment block, SAC only when computed, weights per location, notes in full, collapsed Conditions block. Rating and conditions are 1 to 5 stars; hide any condition at 0. Ask Christian before computing anything the core does not provide.
 
-## [ ] 2026-11-06-12 Full editing and settings, conditions switch
+## [x] 2026-11-06-12 Full editing and settings, conditions switch
+
+Done in Add the dive edit screen and the conditions switch (the settings part is task 2026-11-06-16)
 
 Bring the edit screen and Settings to `docs/mockups/android-edition.dc.html` and `android-reglages.dc.html` (section 4, "Full editing and settings" and "Conditions"). Editing shows rating, visibility and current as stars; the Settings switch "Houle, ressac et froid" ("Wave size, surge and chill"), off by default, adds the three others. Store the switch as a device setting. The detail still shows filled-in conditions whatever the switch.
 

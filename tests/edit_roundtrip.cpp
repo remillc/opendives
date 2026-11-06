@@ -91,6 +91,14 @@ static std::string field_value(const dive &d, const std::string &field)
 		return std::to_string(d.rating);
 	if (field == "visibility")
 		return std::to_string(d.visibility);
+	if (field == "wavesize")
+		return std::to_string(d.wavesize);
+	if (field == "current")
+		return std::to_string(d.current);
+	if (field == "surge")
+		return std::to_string(d.surge);
+	if (field == "chill")
+		return std::to_string(d.chill);
 	if (field == "buddies")
 		return json_list(split(d.buddy));
 	if (field == "diveguide")
@@ -114,8 +122,10 @@ static bool make_change(const dive &d, const std::string &field, std::string &re
 		expected = value;
 		return true;
 	}
-	if (field == "rating" || field == "visibility") {
-		int old = field == "rating" ? d.rating : d.visibility;
+	if (field == "rating" || field == "visibility" || field == "wavesize" || field == "current" || field == "surge" ||
+	    field == "chill") {
+		int old = field == "rating" ? d.rating : field == "visibility" ? d.visibility : field == "wavesize" ? d.wavesize
+			: field == "current" ? d.current : field == "surge" ? d.surge : d.chill;
 		int value = (old + 1) % 6;
 		request = "{" + json_string(field) + ":" + std::to_string(value) + "}";
 		expected = std::to_string(value);

@@ -668,12 +668,17 @@ int edit_dive(int id, const std::string &changes_json, std::string &result_json,
 				target = value.text;
 				fields.push_back(key);
 			}
-		} else if (key == "rating" || key == "visibility") {
+		} else if (key == "rating" || key == "visibility" || key == "wavesize" || key == "current" || key == "surge" ||
+			   key == "chill") {
+			// 0 to 5 star ratings (EditRating, EditVisibility, EditWaveSize,
+			// EditCurrent, EditSurge, EditChill); the field name is the command's.
 			if (value.kind != JsonValue::NUMBER || value.number < 0 || value.number > 5) {
 				error = "BAD_REQUEST: " + key + " must be an integer from 0 to 5";
 				return -1;
 			}
-			int &target = key == "rating" ? copy->rating : copy->visibility;
+			int &target = key == "rating" ? copy->rating : key == "visibility" ? copy->visibility
+				    : key == "wavesize" ? copy->wavesize : key == "current" ? copy->current
+				    : key == "surge" ? copy->surge : copy->chill;
 			if (target != value.number) {
 				target = static_cast<int>(value.number);
 				fields.push_back(key);

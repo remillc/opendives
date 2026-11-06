@@ -38,7 +38,65 @@ export const logbook = $state({
   pending: 0,
   /** First launch is shown (after signing out): nothing is loaded until a choice is made. */
   welcome: readWelcome(),
+  /** Last dive changed by an edit or an undo, for the detail screen. */
+  edited: /** @type {{ id: number, dive: import('opendives-core').DiveDetail }|null} */ (null),
+  /** Text of the step that Undo would revert, e.g. "Edit notes [#12]". */
+  undoText: '',
 });
+
+/** Delay before an edit is synced: the time Undo is offered (spec: "a few seconds after a change"). */
+const SYNC_DELAY_MS = 5000;
+/** @type {ReturnType<typeof setTimeout>|undefined} */
+let syncTimer;
+
+/**
+ * Saves an edit of one dive (one undoable step): saved locally at once; with
+ * automatic synchronisation, synced a few seconds later.
+ * @param {number} id
+ * @param {Record<string, string|number|string[]>} changes
+ */
+export async function saveDiveChanges(id, changes) {
+  const result = await OpenDivesCore.editDive({ id, changes });
+  logbook.edited = { id, dive: result.dive };
+  logbook.undoText = result.undo;
+  await persistChanges();
+  return result;
+}
+
+/** Undoes the last edit, saved and synced the same way. */
+export async function undoLastChange() {
+  const result = await OpenDivesCore.undo();
+  logbook.edited = { id: result.dive.id, dive: result.dive };
+  logbook.undoText = result.undo;
+  await persistChanges();
+  return result;
+}
+
+async function persistChanges() {
+  await OpenDivesCore.saveLocal();
+  await countPending();
+  clearTimeout(syncTimer);
+  if (logbook.email && logbook.autoSync) syncTimer = setTimeout(syncEdits, SYNC_DELAY_MS);
+}
+
+/** Sends the saved edits (automatic synchronisation). */
+async function syncEdits() {
+  logbook.sync = 'syncing';
+  try {
+    const status = await OpenDivesCore.syncChanges();
+    if (status.reloaded) {
+      // The merged log was read again: its dives are new objects.
+      logbook.dives = await OpenDivesCore.listLoadedDives();
+      logbook.undoText = '';
+    }
+    logbook.sync = status.status === 'offline' || status.status === 'stopped' ? 'offline' : 'cloud';
+    if (logbook.sync === 'cloud') markSynced();
+  } catch (e) {
+    console.error('Syncing the edits', e);
+    logbook.sync = 'offline';
+  }
+  await countPending();
+}
 
 function readWelcome() {
   try {

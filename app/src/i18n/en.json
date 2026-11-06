@@ -204,7 +204,9 @@
   },
   "settings": {
     "title": "Settings",
-    "comingSoon": "Settings will appear here."
+    "comingSoon": "Settings will appear here.",
+    "extraConditions": "Wave size, surge and chill",
+    "extraConditionsText": "Adds these three conditions when editing a dive. Off by default, as in Subsurface"
   },
   "gas": {
     "air": "Air",
@@ -313,5 +315,46 @@
     "deleted": "The account was deleted.",
     "notDeleted": "The account was not deleted; nothing changed.",
     "wrongPassword": "This is not the account's password; nothing was deleted."
+  },
+  "edit": {
+    "title": "Edit the dive",
+    "save": "Save",
+    "diveGroup": "The dive",
+    "number": "Number",
+    "dateTime": "Date and time",
+    "duration": "Duration",
+    "durationNote": "Computed by the dive computer; editable only for a dive logged by hand",
+    "site": "Site",
+    "trip": "Trip",
+    "none": "None",
+    "peopleGroup": "People and notes",
+    "guides": "Dive guide",
+    "buddies": "Buddies",
+    "tags": "Tags",
+    "notes": "Notes",
+    "listHint": "Several names: separated by commas",
+    "conditionsGroup": "Conditions",
+    "rating": "Overall rating",
+    "summaryRating": "Rating {n} of 5",
+    "summaryCondition": "{name} {n}",
+    "summaryAir": "air {value}",
+    "summaryWater": "water {value}",
+    "summaryWaterType": "{type} water",
+    "equipmentGroup": "Equipment",
+    "cylinders": {
+      "one": "{n} cylinder",
+      "other": "{n} cylinders"
+    },
+    "summaryWeight": "weights {value}",
+    "computersGroup": "Dive computers",
+    "mainSuffix": ", main",
+    "advancedGroup": "Advanced",
+    "readOnlyNote": "Fields in grey cannot be edited yet in this version.",
+    "saved": "Change saved",
+    "undo": "Undo",
+    "undone": "Change undone",
+    "undoFailed": "The change can no longer be undone",
+    "failed": "The change could not be saved; nothing changed.",
+    "writeLocked": "This account cannot be edited from OpenDives yet; nothing changed."
   }
 }

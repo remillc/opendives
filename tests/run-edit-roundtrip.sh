@@ -21,7 +21,7 @@
 # usage: run-edit-roundtrip.sh <edit-roundtrip> <roundtrip> <workdir> <sample>...
 
 ED=$1; RT=$2; W=$3; shift 3
-FIELDS="notes suit rating visibility buddies diveguide tags"
+FIELDS="notes suit rating visibility wavesize current surge chill buddies diveguide tags"
 pass=0; fail=0; skip=0
 tree() { git -C "$1" rev-parse 'main^{tree}'; }
 tip() { git -C "$1" rev-parse main; }

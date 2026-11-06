@@ -114,6 +114,13 @@ import { registerPlugin } from '@capacitor/core';
  */
 
 /**
+ * @typedef {Object} EditResult
+ * @property {DiveDetail} dive the dive after the step
+ * @property {string} undo text of the step that Undo would revert ("Edit notes [#12]"); empty when none
+ * @property {string} redo text of the step that Redo would apply; empty when none
+ */
+
+/**
  * @typedef {Object} OpenDivesCorePlugin
  * @property {() => Promise<{count: number}>} importSample
  *   Saves the sample log as a local git repository.
@@ -137,6 +144,15 @@ import { registerPlugin } from '@capacitor/core';
  * @property {(options: {password: string, keepDives: boolean}) => Promise<{deleted: boolean, status: number, reply: string}>} deleteAccount
  *   Deletes the cloud account; `deleted` only when the server confirmed it.
  *   Rejects with WRONG_PASSWORD, PENDING_CHANGES or NETWORK when nothing was deleted.
+ * @property {(options: {id: number, changes: Record<string, string|number|string[]>}) => Promise<EditResult>} editDive
+ *   One undoable step; only the fields named change (edit_dive in opendives.h).
+ * @property {(options?: {redo?: boolean}) => Promise<EditResult>} undo
+ * @property {() => Promise<Dive[]>} listLoadedDives
+ *   The dives of the log in memory, without loading anything.
+ * @property {() => Promise<void>} saveLocal
+ *   Local save only, without network (manual synchronisation).
+ * @property {() => Promise<{status: string, pending: number, reloaded: boolean}>} syncChanges
+ *   Local save, then the cloud sync (refused with WRITE_LOCKED except on the test account).
  * @property {(options: {id: number}) => Promise<DiveDetail>} getDive
  *   Detail of one dive of the last loaded log.
  * @property {() => Promise<Prefs>} getPrefs
@@ -176,6 +192,19 @@ export const OpenDivesCore = {
   async deleteAccount(options) {
     const { json } = await native.deleteAccount(options);
     return JSON.parse(json);
+  },
+  async editDive(options) {
+    return JSON.parse((await native.editDive(options)).json);
+  },
+  async undo(options = {}) {
+    return JSON.parse((await native.undo(options)).json);
+  },
+  saveLocal: () => native.saveLocal(),
+  async listLoadedDives() {
+    return JSON.parse((await native.listLoadedDives()).json);
+  },
+  async syncChanges() {
+    return JSON.parse((await native.syncChanges()).json);
   },
   getDive: (options) => native.getDive(options),
   getPrefs: () => native.getPrefs(),

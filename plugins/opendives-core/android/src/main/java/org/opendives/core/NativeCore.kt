@@ -19,6 +19,12 @@ internal object NativeCore {
     external fun cloudListCachedDives(): String
     external fun pendingChanges(): String
     external fun cloudSignOut(deleteCopy: Boolean)
+    external fun editDive(id: Int, changes: String): String
+    external fun undo(redo: Boolean): String
+    external fun sync(): String
+    external fun saveLocal()
+    external fun listLoadedDives(): String
+    external fun setCloudTestEmail(email: String)
     external fun cloudDeleteAccount(password: String, keepDivesIn: String): String
 
     /** The one call allowed off the core thread, even during a load (see opendives.h). */

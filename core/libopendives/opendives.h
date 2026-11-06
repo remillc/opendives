@@ -110,7 +110,8 @@ int cloud_branch_status(const std::string &url, bool &exists, std::string &head,
 
 // Applies a set of field changes to one dive of the log in memory as a single
 // undoable step. `changes_json` is an object with any of: "notes", "suit"
-// (strings), "rating", "visibility" (0 to 5), "buddies", "diveguide", "tags"
+// (strings), "rating", "visibility", "wavesize", "current", "surge", "chill"
+// (0 to 5 stars), "buddies", "diveguide", "tags"
 // (lists of strings). Only those fields change; everything else in the dive
 // is kept as loaded. Like Subsurface, lists keep their order: removed entries
 // go, new ones are added at the end. Writes the updated dive, as get_dive()

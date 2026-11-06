@@ -462,7 +462,19 @@ int get_prefs(std::string &json)
 	json += u.volume == units::CUFT ? "\"cuft\"" : "\"l\"";
 	json += ",\"weight\":";
 	json += u.weight == units::LBS ? "\"lbs\"" : "\"kg\"";
-	json += '}';
+	// Planner defaults, read only (Subsurface's preferences).
+	json += ",\"planner\":{\"model\":";
+	json += prefs.planner_deco_mode == VPMB ? "\"vpmb\"" : prefs.planner_deco_mode == RECREATIONAL ? "\"recreational\"" : "\"buehlmann\"";
+	json += ",\"gfLow\":" + std::to_string(prefs.gflow);
+	json += ",\"gfHigh\":" + std::to_string(prefs.gfhigh);
+	json += ",\"vpmbConservatism\":" + std::to_string(prefs.vpmb_conservatism);
+	json += ",\"bottomPo2Mbar\":" + std::to_string(prefs.bottompo2);
+	json += ",\"decoPo2Mbar\":" + std::to_string(prefs.decopo2);
+	json += ",\"bottomSacMlMin\":" + std::to_string(prefs.bottomsac);
+	json += ",\"decoSacMlMin\":" + std::to_string(prefs.decosac);
+	json += ",\"defaultCylinder\":";
+	append_json_string(json, prefs.default_cylinder);
+	json += "}}";
 	return 0;
 }
 

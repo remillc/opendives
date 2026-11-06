@@ -42,6 +42,12 @@
   let failed = $state(false);
   const prefs = $derived(logbook.prefs);
 
+  // After an edit or an undo of this dive, show the result at once.
+  $effect(() => {
+    const edited = logbook.edited;
+    if (edited && dive && edited.id === dive.id) dive = edited.dive;
+  });
+
   onMount(async () => {
     try {
       dive = await OpenDivesCore.getDive({ id: Number(diveId) });
