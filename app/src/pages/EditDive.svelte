@@ -12,6 +12,7 @@
   import Icon from '../components/Icon.svelte';
   import TextField from '../components/TextField.svelte';
   import ChipsField from '../components/ChipsField.svelte';
+  import ComboField from '../components/ComboField.svelte';
   import { logbookValues } from '../lib/people.js';
   import StarsInput from '../components/StarsInput.svelte';
   import { logbook, saveDiveChanges, undoLastChange } from '../lib/logbook.svelte.js';
@@ -45,7 +46,7 @@
   /** @type {string[]} */
   let tags = $state([]);
   /** People and tags already in the logbook, proposed while typing. */
-  let known = $state({ guide: /** @type {string[]} */ ([]), buddy: /** @type {string[]} */ ([]), tag: /** @type {string[]} */ ([]) });
+  let known = $state({ guide: /** @type {string[]} */ ([]), buddy: /** @type {string[]} */ ([]), tag: /** @type {string[]} */ ([]), suit: /** @type {string[]} */ ([]) });
   let notes = $state('');
   let suit = $state('');
   /** @type {Record<string, number>} */
@@ -61,8 +62,8 @@
       guides = [...d.guides];
       buddies = [...d.buddies];
       tags = [...d.tags];
-      const [guide, buddy, tag] = await Promise.all([logbookValues('guide'), logbookValues('buddy'), logbookValues('tag')]);
-      known = { guide, buddy, tag };
+      const [guide, buddy, tag, suitList] = await Promise.all([logbookValues('guide'), logbookValues('buddy'), logbookValues('tag'), logbookValues('suit')]);
+      known = { guide, buddy, tag, suit: suitList };
       notes = d.notes;
       suit = d.suit;
       stars = {
@@ -243,7 +244,7 @@
           </button>
         </li>
         {#if equipmentOpen}
-          <li class="suit"><TextField label={t('detail.suitRow')} bind:value={suit} /></li>
+          <li class="suit"><ComboField label={t('detail.suitRow')} bind:value={suit} options={known.suit} supporting={t('chips.suitHint')} /></li>
           {#each dive.cylinders.filter((c) => c.used) as cylinder, i (i)}
             <li class="item-content readonly">
               <div class="item-inner">

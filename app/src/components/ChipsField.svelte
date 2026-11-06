@@ -80,7 +80,7 @@
   }
 </script>
 
-<div class="field" class:focused class:floated>
+<div class="field" class:focused class:floated class:menu-open={proposals.length || isNew}>
   <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
   <div class="box" onclick={() => input?.focus()}>
     <label class="label" for={id}>{label}</label>
@@ -126,6 +126,18 @@
     .field {
       position: relative;
       margin: 18px var(--od-field-margin, 16px) 0;
+
+      /* The open menu passes over what follows. */
+      &.menu-open {
+        z-index: 30;
+      }
+    }
+
+    /* Framework7 gives each list its own stacking level: the list holding an
+       open menu comes to the front, above the next cards. */
+    :global(:is(.list, .od-form-surface):has(.menu-open)) {
+      position: relative;
+      z-index: 30;
     }
 
     .box {

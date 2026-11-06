@@ -4,7 +4,7 @@
 import { OpenDivesCore } from 'opendives-core';
 
 /**
- * @param {'buddy'|'guide'|'tag'} field
+ * @param {'buddy'|'guide'|'tag'|'suit'} field
  * @returns {Promise<string[]>}
  */
 export async function logbookValues(field) {

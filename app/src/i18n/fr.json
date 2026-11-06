@@ -1508,6 +1508,7 @@
     "buddiesHint": "Plusieurs compagnons possibles",
     "tagsHint": "Choisissez parmi les étiquettes du carnet ou tapez-en une nouvelle",
     "add": "Ajouter « {value} »",
-    "remove": "Retirer {value}"
+    "remove": "Retirer {value}",
+    "suitHint": "Choisissez une combinaison du carnet ou tapez-en une nouvelle"
   }
 }

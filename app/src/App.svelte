@@ -40,6 +40,9 @@
   import AddUnavailable from './pages/AddUnavailable.svelte';
   import DownloadFailed from './pages/DownloadFailed.svelte';
   import NavRail from './components/NavRail.svelte';
+  import RouteBadge from './components/RouteBadge.svelte';
+  /** Development aid: the address of the page on screen (app/.env.local, VITE_SHOW_ROUTE=1). */
+  const showRoute = /** @type {any} */ (import.meta).env?.VITE_SHOW_ROUTE === '1';
   import Download from './pages/Download.svelte';
   import NavMenu from './components/NavMenu.svelte';
   import Welcome from './components/Welcome.svelte';
@@ -127,6 +130,7 @@
 
 <App {...f7params}>
   {#if layout.phone}<NavMenu />{:else}<NavRail />{/if}
+  {#if showRoute}<RouteBadge />{/if}
   <Welcome />
   <Views tabs class="safe-areas {layout.phone ? '' : 'od-tablet'}" style="--f7-page-master-width: {listWidth}px; --od-no-dive: '{t('tablet.noDive')}'">
     <View id="view-logbook" main tab tabActive url="/" masterDetailBreakpoint={splitBreakpoint} />

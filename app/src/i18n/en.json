@@ -1508,6 +1508,7 @@
     "buddiesHint": "Several buddies allowed",
     "tagsHint": "Choose among the tags in the logbook or type a new one",
     "add": "Add “{value}”",
-    "remove": "Remove {value}"
+    "remove": "Remove {value}",
+    "suitHint": "Choose a suit from the logbook or type a new one"
   }
 }
