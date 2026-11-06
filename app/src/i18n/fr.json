@@ -609,7 +609,6 @@
     "buddies": "Compagnons",
     "tags": "Étiquettes",
     "notes": "Notes",
-    "listHint": "Plusieurs noms : séparés par des virgules",
     "conditionsGroup": "Conditions",
     "rating": "Note globale",
     "summaryRating": "Note {n} sur 5",
@@ -1503,5 +1502,12 @@
     "he": "Hélium (%)",
     "gasHint": "Vide : de l'air.",
     "gasInvalid": "Mélange non valide : oxygène de 5 à 100 %, hélium jusqu'à 95 %, 100 % au plus en tout."
+  },
+  "chips": {
+    "peopleHint": "Choisissez parmi les personnes du carnet ou tapez un nouveau nom",
+    "buddiesHint": "Plusieurs compagnons possibles",
+    "tagsHint": "Choisissez parmi les étiquettes du carnet ou tapez-en une nouvelle",
+    "add": "Ajouter « {value} »",
+    "remove": "Retirer {value}"
   }
 }

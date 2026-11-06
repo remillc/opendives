@@ -12,6 +12,8 @@
   import { OpenDivesCore } from 'opendives-core';
   import Icon from '../components/Icon.svelte';
   import TextField from '../components/TextField.svelte';
+  import ChipsField from '../components/ChipsField.svelte';
+  import { logbookValues } from '../lib/people.js';
   import StarsInput from '../components/StarsInput.svelte';
   import WheelDialog from '../components/WheelDialog.svelte';
   import ChoiceDialog from '../components/ChoiceDialog.svelte';
@@ -44,7 +46,10 @@
   let endPressure = $state('');
   let o2 = $state('');
   let he = $state('');
-  let buddies = $state('');
+  /** @type {string[]} */
+  let buddies = $state([]);
+  /** Buddies already in the logbook, proposed while typing. */
+  let knownBuddies = $state(/** @type {string[]} */ ([]));
   let notes = $state('');
   let rating = $state(0);
   let siteSearch = $state('');
@@ -57,6 +62,7 @@
   let cylinderTypes = $state([]);
 
   onMount(async () => {
+    logbookValues('buddy').then((list) => (knownBuddies = list));
     try {
       sites = await OpenDivesCore.siteQuery({ kind: 'list' });
     } catch (e) {
@@ -162,8 +168,7 @@
         fields.o2Permille = Math.round((parseNumber(o2) || 21) * 10);
         fields.hePermille = Math.round((parseNumber(he) || 0) * 10);
       }
-      const names = buddies.split(',').map((b) => b.trim()).filter(Boolean);
-      if (names.length) fields.buddies = names;
+      if (buddies.length) fields.buddies = [...buddies];
       if (notes.trim()) fields.notes = notes;
       const id = await addDive(fields);
       f7router.navigate(id ? `/dive/${id}/` : '/', { reloadCurrent: true });
@@ -292,7 +297,7 @@
 
   <h2 class="group-title">{t('newDive.more')}</h2>
   <div class="od-form-surface">
-    <TextField label={t('newDive.buddies')} bind:value={buddies} supporting={t('edit.listHint')} />
+    <ChipsField label={t('newDive.buddies')} bind:values={buddies} suggestions={knownBuddies} supporting={t('chips.buddiesHint')} />
     <div class="rating">
       <span>{t('newDive.rating')}</span>
       <StarsInput value={rating} label={t('newDive.rating')} onchange={(n) => (rating = n)} />

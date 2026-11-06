@@ -609,7 +609,6 @@
     "buddies": "Buddies",
     "tags": "Tags",
     "notes": "Notes",
-    "listHint": "Several names: separated by commas",
     "conditionsGroup": "Conditions",
     "rating": "Overall rating",
     "summaryRating": "Rating {n} of 5",
@@ -1503,5 +1502,12 @@
     "he": "Helium (%)",
     "gasHint": "Empty: air.",
     "gasInvalid": "Mix not valid: oxygen from 5 to 100 %, helium up to 95 %, 100 % at most in all."
+  },
+  "chips": {
+    "peopleHint": "Choose among the people in the logbook or type a new name",
+    "buddiesHint": "Several buddies allowed",
+    "tagsHint": "Choose among the tags in the logbook or type a new one",
+    "add": "Add “{value}”",
+    "remove": "Remove {value}"
   }
 }

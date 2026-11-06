@@ -11,6 +11,8 @@
   import { OpenDivesCore } from 'opendives-core';
   import Icon from '../components/Icon.svelte';
   import TextField from '../components/TextField.svelte';
+  import ChipsField from '../components/ChipsField.svelte';
+  import { logbookValues } from '../lib/people.js';
   import StarsInput from '../components/StarsInput.svelte';
   import { logbook, saveDiveChanges, undoLastChange } from '../lib/logbook.svelte.js';
   import { settings } from '../lib/settings.svelte.js';
@@ -36,9 +38,14 @@
   const prefs = $derived(logbook.prefs);
 
   // Edited values.
-  let guides = $state('');
-  let buddies = $state('');
-  let tags = $state('');
+  /** @type {string[]} */
+  let guides = $state([]);
+  /** @type {string[]} */
+  let buddies = $state([]);
+  /** @type {string[]} */
+  let tags = $state([]);
+  /** People and tags already in the logbook, proposed while typing. */
+  let known = $state({ guide: /** @type {string[]} */ ([]), buddy: /** @type {string[]} */ ([]), tag: /** @type {string[]} */ ([]) });
   let notes = $state('');
   let suit = $state('');
   /** @type {Record<string, number>} */
@@ -51,9 +58,11 @@
     try {
       const d = await OpenDivesCore.getDive({ id: Number(f7route.params.id) });
       dive = d;
-      guides = d.guides.join(', ');
-      buddies = d.buddies.join(', ');
-      tags = d.tags.join(', ');
+      guides = [...d.guides];
+      buddies = [...d.buddies];
+      tags = [...d.tags];
+      const [guide, buddy, tag] = await Promise.all([logbookValues('guide'), logbookValues('buddy'), logbookValues('tag')]);
+      known = { guide, buddy, tag };
       notes = d.notes;
       suit = d.suit;
       stars = {
@@ -70,8 +79,6 @@
     }
   });
 
-  /** "Michael, Taylor" -> ["Michael", "Taylor"], as Subsurface splits these lists. */
-  const toList = (/** @type {string} */ text) => text.split(',').map((s) => s.trim()).filter(Boolean);
   const sameList = (/** @type {string[]} */ a, /** @type {string[]} */ b) =>
     a.length === b.length && a.every((v, i) => v === b[i]);
 
@@ -88,9 +95,9 @@
     if (!dive) return {};
     /** @type {Record<string, string|number|string[]>} */
     const out = {};
-    if (!sameList(toList(guides), dive.guides)) out.diveguide = toList(guides);
-    if (!sameList(toList(buddies), dive.buddies)) out.buddies = toList(buddies);
-    if (!sameList(toList(tags), dive.tags)) out.tags = toList(tags);
+    if (!sameList(guides, dive.guides)) out.diveguide = [...guides];
+    if (!sameList(buddies, dive.buddies)) out.buddies = [...buddies];
+    if (!sameList(tags, dive.tags)) out.tags = [...tags];
     if (notes !== dive.notes) out.notes = notes;
     if (suit !== dive.suit) out.suit = suit;
     const old = { rating: dive.rating, visibility: dive.visibility, ...(dive.conditions ?? {}) };
@@ -192,9 +199,9 @@
 
     <div class="block-title">{t('edit.peopleGroup')}</div>
     <div class="od-form-surface people">
-      <TextField label={t('edit.guides')} bind:value={guides} supporting={t('edit.listHint')} />
-      <TextField label={t('edit.buddies')} bind:value={buddies} />
-      <TextField label={t('edit.tags')} bind:value={tags} />
+      <ChipsField label={t('edit.guides')} bind:values={guides} suggestions={known.guide} supporting={t('chips.peopleHint')} />
+      <ChipsField label={t('edit.buddies')} bind:values={buddies} suggestions={known.buddy} supporting={t('chips.buddiesHint')} />
+      <ChipsField label={t('edit.tags')} bind:values={tags} suggestions={known.tag} supporting={t('chips.tagsHint')} />
       <TextField label={t('edit.notes')} bind:value={notes} multiline />
     </div>
 
