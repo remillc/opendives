@@ -37,6 +37,12 @@ internal object NativeCore {
     external fun listLoadedDives(): String
     external fun setCloudTestEmail(email: String)
     external fun cloudDeleteAccount(password: String, keepDivesIn: String): String
+    external fun cloudCreateAccount(email: String, password: String): String
+    external fun cloudVerifyPin(email: String, password: String, pin: String): String
+    external fun cloudCreateLog(importPath: String): String
+    external fun importCount(path: String): String
+    external fun divelogsCheck(user: String, password: String): String
+    external fun divelogsDownload(user: String, password: String, outPath: String): String
 
     /** The one call allowed off the core thread, even during a load (see opendives.h). */
     external fun cloudProbe(): String

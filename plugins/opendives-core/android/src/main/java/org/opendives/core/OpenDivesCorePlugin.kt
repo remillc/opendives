@@ -22,6 +22,13 @@ class OpenDivesCorePlugin : Plugin() {
     private val networkThread: ExecutorService = Executors.newSingleThreadExecutor()
     private val repoDir: File by lazy { File(context.filesDir, "carnet") }
     private val repo: String by lazy { "${repoDir.absolutePath}[main]" }
+    private val credentialStore: CredentialStore by lazy { CredentialStore(context) }
+
+    /**
+     * An account being created or signed in to whose logbook does not exist
+     * yet: kept in memory only, and stored once its logbook is created.
+     */
+    private var pendingAccount: Pair<String, String>? = null
 
     override fun load() {
         val home = context.filesDir.absolutePath
@@ -136,9 +143,10 @@ class OpenDivesCorePlugin : Plugin() {
 
 
     /**
-     * Read-only access to the Subsurface cloud. TEMPORARY, for development:
-     * the credentials are read from files/cloud-dev.env, copied with adb
-     * (see app/README.md). They are neither in the APK nor logged.
+     * The Subsurface cloud account of this device: the one signed in to
+     * (Android Keystore, see CredentialStore), or, for development, the
+     * credentials of files/cloud-dev.env copied with adb (see app/README.md).
+     * They are neither in the APK nor logged.
      *
      * configureCloud() sets the account, without network. Then probeCloud()
      * (server's head, network only) and listCloudDives({cached: true}) (the
@@ -146,7 +154,7 @@ class OpenDivesCorePlugin : Plugin() {
      */
     @PluginMethod
     fun configureCloud(call: PluginCall) = onCoreThread(call) {
-        val credentials = readDevCredentials()
+        val credentials = accountCredentials()
         if (credentials != null) NativeCore.cloudConfigure(credentials.first, credentials.second)
         // Write lock (docs/editing-and-sync-plan.md, section 4): writing to the
         // cloud is allowed only for the test account named in files/cloud-test.env.
@@ -187,7 +195,7 @@ class OpenDivesCorePlugin : Plugin() {
         val json = if (cached) {
             NativeCore.cloudListCachedDives()
         } else {
-            val credentials = readDevCredentials()
+            val credentials = accountCredentials()
             if (credentials == null) {
                 call.resolve(JSObject().put("available", false))
                 return@onCoreThread
@@ -207,12 +215,14 @@ class OpenDivesCorePlugin : Plugin() {
     /**
      * Signs out: the core closes the log and forgets the account (and deletes
      * the device copy when asked, never with changes not sent), then the
-     * stored credentials are forgotten. For now they are the development file;
-     * the Android keystore comes with the sign-in screen.
+     * stored credentials are forgotten (Android Keystore, and the
+     * development file).
      */
     @PluginMethod
     fun signOut(call: PluginCall) = onCoreThread(call) {
         NativeCore.cloudSignOut(call.getBoolean("deleteCopy", false) == true)
+        credentialStore.delete()
+        pendingAccount = null
         File(context.filesDir, DEV_CREDENTIALS).delete()
         Log.i(TAG, "signOut: credentials forgotten")
         call.resolve()
@@ -233,6 +243,7 @@ class OpenDivesCorePlugin : Plugin() {
         val json = NativeCore.cloudDeleteAccount(password, if (keepDives) "${kept.absolutePath}[main]" else "")
         val deleted = JSObject(json).optBoolean("deleted")
         if (deleted) {
+            credentialStore.delete()
             File(context.filesDir, DEV_CREDENTIALS).delete()
             if (keepDives) {
                 if (repoDir.exists()) repoDir.renameTo(File(context.filesDir, "carnet.before-${System.currentTimeMillis()}"))
@@ -243,6 +254,192 @@ class OpenDivesCorePlugin : Plugin() {
         }
         Log.i(TAG, "deleteAccount: deleted=$deleted")
         call.resolve(JSObject().put("json", json))
+    }
+
+    /**
+     * Signs in with typed credentials: the account is set, then the server
+     * is asked for its log branch (cloud_probe), which checks the password.
+     * Rejects with INCORRECT (credentials refused) or NETWORK; the previous
+     * account is then set again. With a logbook on the server, the
+     * credentials are stored (Android Keystore); without one (an account that
+     * has no logbook yet), they wait in memory for createLog. Never logged.
+     */
+    @PluginMethod
+    fun signIn(call: PluginCall) = onCoreThread(call) {
+        // "email address MUST be lower case" (Subsurface-mobile).
+        val email = call.getString("email").orEmpty().trim().lowercase()
+        val password = call.getString("password").orEmpty()
+        NativeCore.setCloudTestEmail(readTestEmail())
+        NativeCore.cloudConfigure(email, password)
+        val json = try {
+            NativeCore.cloudProbe()
+        } catch (e: IllegalStateException) {
+            configureStoredAccount()
+            val code = if (e.message?.contains("Credentials rejected") == true) "INCORRECT" else "NETWORK"
+            Log.i(TAG, "signIn: $code")
+            call.reject(code, code)
+            return@onCoreThread
+        }
+        val exists = JSObject(json).optBoolean("exists")
+        if (exists) {
+            credentialStore.write(email, password)
+            pendingAccount = null
+        } else {
+            pendingAccount = email to password
+        }
+        Log.i(TAG, "signIn: verified, logbook on the server: $exists")
+        call.resolve(JSObject().put("exists", exists).put("email", email))
+    }
+
+    /**
+     * New account, step 1 (cloud_create_account; a cloud write, under the
+     * write lock). "need_pin": the server mailed a code, the credentials
+     * wait in memory for verifyPin. "verified": the account already exists
+     * with this password (sign in instead). "incorrect": refused.
+     */
+    @PluginMethod
+    fun createAccount(call: PluginCall) = onCoreThread(call) {
+        val email = call.getString("email").orEmpty().trim().lowercase()
+        val password = call.getString("password").orEmpty()
+        NativeCore.setCloudTestEmail(readTestEmail())
+        val result = JSObject(NativeCore.cloudCreateAccount(email, password))
+        val status = result.optString("status")
+        if (status == "need_pin") pendingAccount = email to password
+        // The server's reply never holds the password.
+        Log.i(TAG, "createAccount: $status (HTTP ${result.optInt("http")}, ${result.optString("reply")})")
+        call.resolve(JSObject().put("status", status).put("email", email))
+    }
+
+    /** "Renvoyer le code": the same request as createAccount, for the account waiting for its code. */
+    @PluginMethod
+    fun resendCode(call: PluginCall) = onCoreThread(call) {
+        val account = pendingAccount
+        if (account == null) {
+            call.reject("NO_ACCOUNT", "NO_ACCOUNT")
+            return@onCoreThread
+        }
+        NativeCore.setCloudTestEmail(readTestEmail())
+        val result = JSObject(NativeCore.cloudCreateAccount(account.first, account.second))
+        val status = result.optString("status")
+        Log.i(TAG, "resendCode: $status (HTTP ${result.optInt("http")}, ${result.optString("reply")})")
+        call.resolve(JSObject().put("status", status))
+    }
+
+    /** New account, the confirmation code (cloud_verify_pin). "verified": the account is set (in memory). */
+    @PluginMethod
+    fun verifyPin(call: PluginCall) = onCoreThread(call) {
+        val account = pendingAccount
+        if (account == null) {
+            call.reject("NO_ACCOUNT", "NO_ACCOUNT")
+            return@onCoreThread
+        }
+        NativeCore.setCloudTestEmail(readTestEmail())
+        val pin = call.getString("pin").orEmpty().trim()
+        val result = JSObject(NativeCore.cloudVerifyPin(account.first, account.second, pin))
+        val status = result.optString("status")
+        if (status == "verified") NativeCore.cloudConfigure(account.first, account.second)
+        Log.i(TAG, "verifyPin: $status (HTTP ${result.optInt("http")}, ${result.optString("reply")})")
+        call.resolve(JSObject().put("status", status))
+    }
+
+    /** Downloads of divelogs.de waiting for the account's first logbook (app cache, deleted after use). */
+    private fun importFile(path: String): File? {
+        val file = File(path)
+        return if (file.parentFile?.canonicalPath == context.cacheDir.canonicalPath && file.name.startsWith(IMPORT_PREFIX)) file else null
+    }
+
+    /**
+     * Import, step 1: downloads the divelogs.de logbook once into the app's
+     * cache. `user` and `password` are only passed to the core, never kept or
+     * logged. Writes {dives, path}; with no dive, no file (path empty).
+     */
+    @PluginMethod
+    fun divelogsDownload(call: PluginCall) = onCoreThread(call) {
+        val target = File(context.cacheDir, "$IMPORT_PREFIX${System.currentTimeMillis()}.dld")
+        try {
+            val result = JSObject(
+                NativeCore.divelogsDownload(call.getString("user").orEmpty(), call.getString("password").orEmpty(), target.absolutePath),
+            )
+            val dives = result.optInt("dives")
+            Log.i(TAG, "divelogsDownload: $dives dives")
+            call.resolve(JSObject().put("dives", dives).put("path", if (dives > 0) target.absolutePath else ""))
+        } catch (e: Exception) {
+            target.delete()
+            throw e
+        }
+    }
+
+    /**
+     * Step 2's "Continuer" with divelogs.de: checks the credentials before
+     * the import starts (divelogs_check), {dives}. Rejects with LOGIN_FAILED,
+     * NETWORK… The credentials are only passed to the core.
+     */
+    @PluginMethod
+    fun divelogsCheck(call: PluginCall) = onCoreThread(call) {
+        call.resolve(JSObject(NativeCore.divelogsCheck(call.getString("user").orEmpty(), call.getString("password").orEmpty())))
+    }
+
+    /** Import, step 2: reads the downloaded file (read-only), {dives}. */
+    @PluginMethod
+    fun importCount(call: PluginCall) = onCoreThread(call) {
+        val file = importFile(call.getString("path").orEmpty())
+        if (file == null) {
+            call.reject("BAD_REQUEST", "BAD_REQUEST")
+            return@onCoreThread
+        }
+        call.resolve(JSObject(NativeCore.importCount(file.absolutePath)))
+    }
+
+    /** Cancelled or failed import: the downloaded file is deleted. */
+    @PluginMethod
+    fun discardImport(call: PluginCall) = onCoreThread(call) {
+        importFile(call.getString("path").orEmpty())?.delete()
+        call.resolve()
+    }
+
+    /**
+     * First logbook of the account just created or signed in to
+     * (cloud_create_log, the only step that writes to the account): "empty";
+     * "import", the file downloaded by divelogsDownload (`path`, deleted
+     * afterwards); or "device", the logbook of this device. The account's
+     * credentials are then stored.
+     */
+    @PluginMethod
+    fun createLog(call: PluginCall) = onCoreThread(call) {
+        val account = pendingAccount
+        if (account == null) {
+            call.reject("NO_ACCOUNT", "NO_ACCOUNT")
+            return@onCoreThread
+        }
+        NativeCore.setCloudTestEmail(readTestEmail())
+        NativeCore.cloudConfigure(account.first, account.second)
+        val source = call.getString("source").orEmpty()
+        var download: File? = null
+        val importPath = when (source) {
+            "import" -> {
+                download = importFile(call.getString("path").orEmpty())
+                if (download == null) {
+                    call.reject("BAD_REQUEST", "BAD_REQUEST")
+                    return@onCoreThread
+                }
+                download.absolutePath
+            }
+            "device" -> if (NativeCore.logExists(repo)) repo else ""
+            "empty" -> ""
+            else -> {
+                call.reject("BAD_REQUEST", "BAD_REQUEST")
+                return@onCoreThread
+            }
+        }
+        try {
+            val json = NativeCore.cloudCreateLog(importPath)
+            credentialStore.write(account.first, account.second)
+            pendingAccount = null
+            Log.i(TAG, "createLog($source): created")
+            call.resolve(JSObject().put("json", json))
+        } finally {
+            download?.delete()
+        }
     }
 
     /** Edits one dive as one undoable step; `changes` is the JSON object of edit_dive(). */
@@ -396,6 +593,19 @@ class OpenDivesCorePlugin : Plugin() {
             ?.substringAfter('=').orEmpty()
     }
 
+    /** The stored account, else the development credentials. */
+    private fun accountCredentials(): Pair<String, String>? = credentialStore.read() ?: readDevCredentials()
+
+    /** After a failed sign-in: the account of this device again, if any. */
+    private fun configureStoredAccount() {
+        val credentials = accountCredentials()
+        try {
+            NativeCore.cloudConfigure(credentials?.first.orEmpty(), credentials?.second.orEmpty())
+        } catch (e: IllegalStateException) {
+            // No account: none is set.
+        }
+    }
+
     private fun readDevCredentials(): Pair<String, String>? {
         val file = File(context.filesDir, DEV_CREDENTIALS)
         if (!file.exists()) return null
@@ -445,5 +655,6 @@ class OpenDivesCorePlugin : Plugin() {
         const val REGIONS_ASSET = "regions.txt"
         const val DEV_CREDENTIALS = "cloud-dev.env"
         const val TEST_ACCOUNT = "cloud-test.env"
+        const val IMPORT_PREFIX = "import-"
     }
 }

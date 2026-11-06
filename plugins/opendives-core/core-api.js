@@ -361,6 +361,29 @@ import { registerPlugin } from '@capacitor/core';
  * @property {(options: {password: string, keepDives: boolean}) => Promise<{deleted: boolean, status: number, reply: string}>} deleteAccount
  *   Deletes the cloud account; `deleted` only when the server confirmed it.
  *   Rejects with WRONG_PASSWORD, PENDING_CHANGES or NETWORK when nothing was deleted.
+ * @property {(options: {email: string, password: string}) => Promise<{exists: boolean, email: string}>} signIn
+ *   Signs in with typed credentials (checked by the server); stored in the Android
+ *   Keystore when the account has a logbook, otherwise kept for createLog.
+ *   Rejects with INCORRECT or NETWORK.
+ * @property {(options: {email: string, password: string}) => Promise<{status: 'verified'|'need_pin'|'incorrect', email: string}>} createAccount
+ *   New account (a cloud write: WRITE_LOCKED except on the test account); need_pin: a code was mailed.
+ * @property {() => Promise<{status: 'verified'|'need_pin'|'incorrect'}>} resendCode
+ *   Asks again for the account being created, so that the server mails its code again.
+ * @property {(options: {pin: string}) => Promise<{status: 'verified'|'need_pin'|'incorrect'}>} verifyPin
+ *   The confirmation code of the account being created; need_pin: wrong code.
+ * @property {(options: {user: string, password: string}) => Promise<{dives: number, path: string}>} divelogsDownload
+ *   Import step 1: the divelogs.de logbook, downloaded once into the app's cache (path empty
+ *   without dives). The credentials are only passed through. Rejects with LOGIN_FAILED,
+ *   NETWORK, INVALID_RESPONSE, INVALID_ARCHIVE.
+ * @property {(options: {user: string, password: string}) => Promise<{dives: number}>} divelogsCheck
+ *   Checks the divelogs.de credentials before the import (LOGIN_FAILED, NETWORK…).
+ * @property {(options: {path: string}) => Promise<{dives: number}>} importCount
+ *   Import step 2, read-only: the dives of the downloaded file (IMPORT_FAILED).
+ * @property {(options: {path: string}) => Promise<void>} discardImport
+ *   Deletes a downloaded file (cancelled or failed import).
+ * @property {(options: {source: 'empty'|'import'|'device', path?: string}) => Promise<CloudDives & {imported: number}>} createLog
+ *   First logbook of the new account (the only step that writes to it), then its
+ *   credentials are stored. "import": the downloaded file, deleted afterwards.
  * @property {(options: {id: number, changes: Record<string, string|number|string[]>}) => Promise<EditResult>} editDive
  *   One undoable step; only the fields named change (edit_dive in opendives.h).
  * @property {(options?: {redo?: boolean}) => Promise<EditResult>} undo
@@ -434,6 +457,17 @@ export const OpenDivesCore = {
     return JSON.parse(json);
   },
   signOut: (options = {}) => native.signOut(options),
+  signIn: (options) => native.signIn(options),
+  createAccount: (options) => native.createAccount(options),
+  resendCode: () => native.resendCode(),
+  verifyPin: (options) => native.verifyPin(options),
+  divelogsCheck: (options) => native.divelogsCheck(options),
+  divelogsDownload: (options) => native.divelogsDownload(options),
+  importCount: (options) => native.importCount(options),
+  discardImport: (options) => native.discardImport(options),
+  async createLog(options) {
+    return JSON.parse((await native.createLog(options)).json);
+  },
   async deleteAccount(options) {
     const { json } = await native.deleteAccount(options);
     return JSON.parse(json);

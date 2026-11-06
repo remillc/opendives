@@ -106,6 +106,67 @@ Java_org_opendives_core_NativeCore_cloudDeleteAccount(JNIEnv *env, jobject, jstr
 	return env->NewStringUTF(json.c_str());
 }
 
+// New account and divelogs.de (account.cpp). Credentials are only passed
+// through: never kept or logged here.
+static jstring json_or_throw(JNIEnv *env, int ret, const std::string &json, const std::string &error)
+{
+	if (ret) {
+		throw_core_error(env, error);
+		return nullptr;
+	}
+	return env->NewStringUTF(json.c_str());
+}
+
+JNIEXPORT jstring JNICALL
+Java_org_opendives_core_NativeCore_cloudCreateAccount(JNIEnv *env, jobject, jstring email, jstring password)
+{
+	std::string json, error;
+	int ret = opendives::cloud_create_account(to_string(env, email), to_string(env, password), json, error);
+	return json_or_throw(env, ret, json, error);
+}
+
+JNIEXPORT jstring JNICALL
+Java_org_opendives_core_NativeCore_cloudVerifyPin(JNIEnv *env, jobject, jstring email, jstring password, jstring pin)
+{
+	std::string json, error;
+	int ret = opendives::cloud_verify_pin(to_string(env, email), to_string(env, password), to_string(env, pin), json,
+					      error);
+	return json_or_throw(env, ret, json, error);
+}
+
+JNIEXPORT jstring JNICALL
+Java_org_opendives_core_NativeCore_cloudCreateLog(JNIEnv *env, jobject, jstring importPath)
+{
+	std::string json, error;
+	int ret = opendives::cloud_create_log(to_string(env, importPath), json, error);
+	return json_or_throw(env, ret, json, error);
+}
+
+JNIEXPORT jstring JNICALL
+Java_org_opendives_core_NativeCore_importCount(JNIEnv *env, jobject, jstring path)
+{
+	std::string json, error;
+	int ret = opendives::import_count(to_string(env, path), json, error);
+	return json_or_throw(env, ret, json, error);
+}
+
+JNIEXPORT jstring JNICALL
+Java_org_opendives_core_NativeCore_divelogsCheck(JNIEnv *env, jobject, jstring user, jstring password)
+{
+	std::string json, error;
+	int ret = opendives::divelogs_check(to_string(env, user), to_string(env, password), json, error);
+	return json_or_throw(env, ret, json, error);
+}
+
+JNIEXPORT jstring JNICALL
+Java_org_opendives_core_NativeCore_divelogsDownload(JNIEnv *env, jobject, jstring user, jstring password, jstring outPath)
+{
+	std::string json, error;
+	int ret = opendives::divelogs_download(to_string(env, user), to_string(env, password), to_string(env, outPath), json,
+					       error);
+	return json_or_throw(env, ret, json, error);
+}
+
 // Editing (edit.cpp). Each returns {"dive":…, "undo":…, "redo":…} or throws the error code.
 static jstring edit_result(JNIEnv *env, const std::string &dive_json)
 {
