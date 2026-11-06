@@ -190,7 +190,7 @@
           </a>
         </li>
         <li>
-          <a href="#delete" class="item-link item-content external no-chevron" role="button" onclick={notAvailable}>
+          <a href="/account/delete/" class="item-link item-content no-chevron">
             <div class="item-inner">
               <div class="item-title">
                 <span class="danger">{t('account.delete')}</span>

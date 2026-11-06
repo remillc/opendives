@@ -56,16 +56,32 @@ function readWelcome() {
  */
 export async function signOut({ deleteCopy = false } = {}) {
   await OpenDivesCore.signOut({ deleteCopy });
+  forgetAccount(true);
+}
+
+/**
+ * After the server confirmed the deletion of the account: with keepDives, the
+ * dives are now the logbook of this device, which is opened; otherwise first
+ * launch is shown, as after signing out.
+ * @param {{ keepDives: boolean }} options
+ */
+export async function accountDeleted({ keepDives }) {
+  forgetAccount(!keepDives);
+  if (keepDives) await loadLogbook();
+}
+
+/** @param {boolean} showWelcome */
+function forgetAccount(showWelcome) {
   logbook.dives = [];
   logbook.email = '';
   logbook.server = '';
   logbook.sync = 'local';
   logbook.pending = 0;
   logbook.lastSync = null;
-  logbook.welcome = true;
+  logbook.welcome = showWelcome;
   try {
     localStorage.removeItem('od.lastSync');
-    localStorage.setItem('od.welcome', 'show');
+    if (showWelcome) localStorage.setItem('od.welcome', 'show');
   } catch {
     // Not fatal.
   }

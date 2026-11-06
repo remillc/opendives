@@ -63,8 +63,10 @@ static std::string decode_chunked(const std::string &in)
 	return out;
 }
 
-int opendives_https_get(const std::string &url, const std::string &user_agent,
-			int timeout_seconds, int &status, std::string &body)
+// One HTTPS request; `request_body` and `content_type` only for a POST.
+static int https_request(const std::string &method, const std::string &url, const std::string &user_agent,
+			 const std::string &accept, const std::string &content_type, const std::string &request_body,
+			 int timeout_seconds, int &status, std::string &body)
 {
 	const std::string scheme = "https://";
 	if (url.compare(0, scheme.size(), scheme) != 0)
@@ -98,8 +100,11 @@ int opendives_https_get(const std::string &url, const std::string &user_agent,
 
 	int ret = -5;
 	if (SSL_connect(ssl) == 1 && SSL_get_verify_result(ssl) == X509_V_OK) {
-		std::string request = "GET " + path + " HTTP/1.1\r\nHost: " + host +
-			"\r\nAccept: text/plain\r\nUser-Agent: " + user_agent + "\r\nConnection: close\r\n\r\n";
+		std::string request = method + " " + path + " HTTP/1.1\r\nHost: " + host +
+			"\r\nAccept: " + accept + "\r\nUser-Agent: " + user_agent;
+		if (method == "POST")
+			request += "\r\nContent-Type: " + content_type + "\r\nContent-Length: " + std::to_string(request_body.size());
+		request += "\r\nConnection: close\r\n\r\n" + request_body;
 		if (SSL_write(ssl, request.data(), (int)request.size()) == (int)request.size()) {
 			std::string response;
 			char buf[4096];
@@ -125,4 +130,17 @@ int opendives_https_get(const std::string &url, const std::string &user_agent,
 	close(fd);
 	SSL_CTX_free(ctx);
 	return ret;
+}
+
+int opendives_https_get(const std::string &url, const std::string &user_agent,
+			int timeout_seconds, int &status, std::string &body)
+{
+	return https_request("GET", url, user_agent, "text/plain", std::string(), std::string(), timeout_seconds, status, body);
+}
+
+int opendives_https_post(const std::string &url, const std::string &user_agent, const std::string &accept,
+			 const std::string &content_type, const std::string &request_body,
+			 int timeout_seconds, int &status, std::string &body)
+{
+	return https_request("POST", url, user_agent, accept, content_type, request_body, timeout_seconds, status, body);
 }

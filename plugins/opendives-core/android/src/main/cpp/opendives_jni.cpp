@@ -94,6 +94,17 @@ Java_org_opendives_core_NativeCore_cloudSignOut(JNIEnv *env, jobject, jboolean d
 		throw_core_error(env, error);
 }
 
+JNIEXPORT jstring JNICALL
+Java_org_opendives_core_NativeCore_cloudDeleteAccount(JNIEnv *env, jobject, jstring password, jstring keepDivesIn)
+{
+	std::string json, error;
+	if (opendives::cloud_delete_account(to_string(env, password), to_string(env, keepDivesIn), json, error)) {
+		throw_core_error(env, error);
+		return nullptr;
+	}
+	return env->NewStringUTF(json.c_str());
+}
+
 // Local commits of the cloud log not yet on the server, as a JSON array.
 JNIEXPORT jstring JNICALL
 Java_org_opendives_core_NativeCore_pendingChanges(JNIEnv *env, jobject)

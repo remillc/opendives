@@ -128,6 +128,9 @@ import { registerPlugin } from '@capacitor/core';
  * @property {(options?: {deleteCopy?: boolean}) => Promise<void>} signOut
  *   Closes the cloud log and forgets the account and its credentials; the
  *   device copy is kept unless deleteCopy (refused with changes not sent).
+ * @property {(options: {password: string, keepDives: boolean}) => Promise<{deleted: boolean, status: number, reply: string}>} deleteAccount
+ *   Deletes the cloud account; `deleted` only when the server confirmed it.
+ *   Rejects with WRONG_PASSWORD, PENDING_CHANGES or NETWORK when nothing was deleted.
  * @property {(options: {id: number}) => Promise<DiveDetail>} getDive
  *   Detail of one dive of the last loaded log.
  * @property {() => Promise<Prefs>} getPrefs
@@ -164,6 +167,10 @@ export const OpenDivesCore = {
     return JSON.parse(json);
   },
   signOut: (options = {}) => native.signOut(options),
+  async deleteAccount(options) {
+    const { json } = await native.deleteAccount(options);
+    return JSON.parse(json);
+  },
   getDive: (options) => native.getDive(options),
   getPrefs: () => native.getPrefs(),
 };

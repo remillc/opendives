@@ -76,6 +76,19 @@ int cloud_list_cached_dives(std::string &json, std::string &error);
 // The app forgets the stored credentials itself.
 int cloud_sign_out(bool delete_copy, std::string &error);
 
+// Deletes the cloud account (spec, section 4, "Delete the account"). NEVER
+// called by automated tests. `password` is the password typed again; it must
+// be the account's (WRONG_PASSWORD, no request). Refused while changes are not
+// sent (PENDING_CHANGES): the app syncs them first. With `keep_dives_in` (a new
+// "path[branch]"), the dives in memory are saved there first, as a log without
+// account. Then posts the request, as Subsurface does, and writes
+// {"deleted":…, "status":<HTTP status>, "reply":<server reply>}. Only when the
+// reply confirms the deletion is the local copy deleted and the account
+// forgotten; otherwise nothing changes. -1 only when nothing was sent
+// (or NETWORK when the request failed).
+int cloud_delete_account(const std::string &password, const std::string &keep_dives_in, std::string &json,
+			 std::string &error);
+
 // Read-only, network only: asks the server for the head of the log branch of
 // the account set by cloud_configure(). Writes {"exists":…, "head":…}.
 // The one façade function that may run on another thread than the core's,

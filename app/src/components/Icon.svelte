@@ -7,7 +7,7 @@
 
   /**
    * @type {{
-   *   name: 'logbook'|'sites'|'statistics'|'tools'|'plus'|'check'|'offline'|'device'|'expand'|'settings'|'edit'|'more'|'moreCircle'|'plan'|'menu'|'sync'|'close'|'download'|'file'|'account'|'cloud',
+   *   name: 'logbook'|'sites'|'statistics'|'tools'|'plus'|'check'|'offline'|'device'|'expand'|'settings'|'edit'|'more'|'moreCircle'|'plan'|'menu'|'sync'|'close'|'download'|'file'|'account'|'cloud'|'warning',
    *   size?: number,
    *   weight?: number,
    * }}
@@ -23,6 +23,7 @@
     plus: 'M12 5v14M5 12h14',
     menu: 'M4 7h16M4 12h16M4 17h16',
     account: 'M12 12a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM5 20c1-3.6 3.8-5.5 7-5.5s6 1.9 7 5.5',
+    warning: 'M12 4l9 16H3zM12 10v4M12 17h.01',
     cloud: 'M7 18h10a4 4 0 0 0 .5-7.97A6 6 0 0 0 6 9.5 4.25 4.25 0 0 0 7 18z',
     close: 'M6 6l12 12M18 6L6 18',
     download: 'M12 4v11M7.5 10.5L12 15l4.5-4.5M5 19.5h14',

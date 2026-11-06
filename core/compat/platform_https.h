@@ -12,6 +12,12 @@
 int opendives_https_get(const std::string &url, const std::string &user_agent,
 			int timeout_seconds, int &status, std::string &body);
 
+// POST of `request_body` (Content-Type `content_type`) on `url`, with the same
+// TLS validation and return values as opendives_https_get().
+int opendives_https_post(const std::string &url, const std::string &user_agent, const std::string &accept,
+			 const std::string &content_type, const std::string &request_body,
+			 int timeout_seconds, int &status, std::string &body);
+
 // PEM file of trusted certificate authorities. Empty: the system default store
 // (Linux). Android has none that OpenSSL can read: the app provides one.
 void opendives_https_set_ca_file(const std::string &path);

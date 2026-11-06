@@ -162,6 +162,33 @@ class OpenDivesCorePlugin : Plugin() {
         call.resolve()
     }
 
+    /**
+     * Deletes the cloud account (see opendives.h). With keepDives, the dives
+     * are first saved as a new log without account; once the server confirms,
+     * it becomes the device's log and the previous one is kept aside, renamed.
+     * The password is never logged.
+     */
+    @PluginMethod
+    fun deleteAccount(call: PluginCall) = onCoreThread(call) {
+        val password = call.getString("password").orEmpty()
+        val keepDives = call.getBoolean("keepDives", true) == true
+        val kept = File(context.filesDir, "carnet.new")
+        if (kept.exists()) kept.deleteRecursively() // left by an earlier attempt
+        val json = NativeCore.cloudDeleteAccount(password, if (keepDives) "${kept.absolutePath}[main]" else "")
+        val deleted = JSObject(json).optBoolean("deleted")
+        if (deleted) {
+            File(context.filesDir, DEV_CREDENTIALS).delete()
+            if (keepDives) {
+                if (repoDir.exists()) repoDir.renameTo(File(context.filesDir, "carnet.before-${System.currentTimeMillis()}"))
+                kept.renameTo(repoDir)
+            }
+        } else if (kept.exists()) {
+            kept.deleteRecursively()
+        }
+        Log.i(TAG, "deleteAccount: deleted=$deleted")
+        call.resolve(JSObject().put("json", json))
+    }
+
     private fun readDevCredentials(): Pair<String, String>? {
         val file = File(context.filesDir, DEV_CREDENTIALS)
         if (!file.exists()) return null

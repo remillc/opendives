@@ -236,5 +236,25 @@
     "cancel": "Cancel",
     "syncFailed": "The changes could not be sent; you are still signed in.",
     "failed": "Signing out did not complete; nothing was deleted."
+  },
+  "deleteAccount": {
+    "back": "Back to the account",
+    "definitive": "This is permanent",
+    "consequence": {
+      "one": "The account {email} and its dive will be deleted from the cloud, on all your devices and in every app that uses this account. There is no way to undo it.",
+      "other": "The account {email} and its {n} dives will be deleted from the cloud, on all your devices and in every app that uses this account. There is no way to undo it."
+    },
+    "keep": "Keep my dives on this device",
+    "keepText": "They move to a logbook without account, on this phone only",
+    "export": "Export a copy of the logbook",
+    "exportText": "A Subsurface file (.ssrf), to keep elsewhere",
+    "password": "Account password",
+    "passwordText": "To confirm that it is you",
+    "note": "Changes not sent yet will be synced first, so that the copy kept is complete. The account is only reported deleted if the server confirms it.",
+    "confirm": "Delete the account permanently",
+    "connectionNeeded": "Connection needed",
+    "deleted": "The account was deleted.",
+    "notDeleted": "The account was not deleted; nothing changed.",
+    "wrongPassword": "This is not the account's password; nothing was deleted."
   }
 }

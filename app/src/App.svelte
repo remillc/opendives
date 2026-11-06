@@ -10,6 +10,7 @@
   import Placeholder from './pages/Placeholder.svelte';
   import Settings from './pages/Settings.svelte';
   import Account from './pages/Account.svelte';
+  import DeleteAccount from './pages/DeleteAccount.svelte';
   import Icon from './components/Icon.svelte';
   import AdaptiveLabel from './components/AdaptiveLabel.svelte';
   import NavMenu from './components/NavMenu.svelte';
@@ -33,6 +34,7 @@
       { path: '/dive/:id/', component: DiveDetail },
       { path: '/settings/', component: Settings },
       { path: '/account/', component: Account },
+      { path: '/account/delete/', component: DeleteAccount },
       // Not built yet: editing a dive, and the planner prefilled from a dive.
       {
         path: '/dive/:id/edit/',

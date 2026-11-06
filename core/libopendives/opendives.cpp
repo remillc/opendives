@@ -583,6 +583,81 @@ int cloud_sign_out(bool delete_copy, std::string &error)
 	return 0;
 }
 
+// Port of CloudStorageAuthenticate::deleteAccount() (core/cloudstorage.cpp):
+// POST "email password" as text/plain to cloud_base_url + "/delete-account",
+// the same URL as Subsurface (the base ends with "/", hence "//").
+// Unlike Subsurface, the reply is read. The server's replies are not
+// documented: the account counts as deleted only on HTTP 200 with a reply
+// that says so; to be checked on the test account and adjusted.
+static bool reply_confirms_deletion(int status, const std::string &reply)
+{
+	if (status != 200)
+		return false;
+	std::string text = reply;
+	for (char &c: text)
+		c = static_cast<char>(tolower(static_cast<unsigned char>(c)));
+	return text.find("delet") != std::string::npos && text.find("error") == std::string::npos &&
+	       text.find("fail") == std::string::npos && text.find("not ") == std::string::npos;
+}
+
+int cloud_delete_account(const std::string &password, const std::string &keep_dives_in, std::string &json,
+			 std::string &error)
+{
+	const std::string url = configured_url;
+	if (url.empty() || prefs.cloud_storage_email.empty()) {
+		error = "NO_ACCOUNT";
+		return -1;
+	}
+	// The password typed again must be the account's: no request otherwise.
+	if (password != prefs.cloud_storage_password) {
+		error = "WRONG_PASSWORD";
+		return -1;
+	}
+	// Unsent changes are synced first by the app; never delete with some left.
+	if (internal::pending_for(url) > 0) {
+		error = "PENDING_CHANGES";
+		return -1;
+	}
+	// Keep the dives first, in a new log without account, before anything is deleted.
+	if (!keep_dives_in.empty()) {
+		std::string repo = keep_dives_in.substr(0, keep_dives_in.find('['));
+		if (log_exists(repo)) {
+			error = "KEEP_TARGET_EXISTS";
+			return -1;
+		}
+		if (git_create_local_repo(keep_dives_in) || save_as(keep_dives_in, error)) {
+			error = "KEEP_FAILED: " + error;
+			return -1;
+		}
+	}
+
+	int status = 0;
+	std::string reply;
+	std::string payload = prefs.cloud_storage_email + " " + password;
+	if (opendives_https_post(prefs.cloud_base_url + "/delete-account", subsurface_user_agent(), "text/xml, text/plain",
+				 "text/plain", payload, 20, status, reply)) {
+		error = "NETWORK";
+		return -1;
+	}
+	bool deleted = reply_confirms_deletion(status, reply);
+	json = "{\"deleted\":";
+	json += deleted ? "true" : "false";
+	json += ",\"status\":" + std::to_string(status) + ",\"reply\":";
+	append_json_string(json, reply);
+	json += '}';
+	if (deleted) {
+		// The account is gone: its local copy has no use any more.
+		struct git_info info;
+		if (is_git_repository(url.c_str(), &info)) {
+			std::error_code ec;
+			std::filesystem::remove_all(info.localdir, ec);
+		}
+		std::string ignored;
+		cloud_sign_out(false, ignored);
+	}
+	return 0;
+}
+
 int cloud_probe(std::string &json, std::string &error)
 {
 	const std::string url = configured_url;
