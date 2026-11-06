@@ -180,3 +180,7 @@ Add the "Décompression" group to Settings, after "Profil de plongée" (`docs/mo
 ## [ ] 2026-11-06-26 Edit a site
 
 Add the edit mode of the site form from `docs/mockups/sites-modifier-android.dc.html` and "Edit a site" in `docs/ui-specification.md` (section 4, Sites): title, prefilled fields, no duplicate note, "Supprimer le site" with a confirmation; deleting keeps the dives and removes their site. Test deletion on the test account only.
+
+## [ ] 2026-11-06-27 Filled text fields everywhere
+
+Every text field of the app now uses the MD3 filled variant (`docs/ui-specification.md`, "Text fields", which replaces the outlined rule of task 20). Change every form already built: dive editing, account deletion, divelogs.de takeover, gas calculator, new statistic, site forms. Mock-ups updated: `android-edition`, `compte-android-suppression`, `android-compte-import`, `android-outils`, `stats-nouvelle-android`, `sites-edition-android`, `sites-modifier-android`.
