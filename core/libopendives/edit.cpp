@@ -125,6 +125,12 @@ struct Step {
 	std::vector<std::pair<std::string, FilterData>> presets_to_add;
 	std::vector<int> presets_to_remove;
 	bool list_applied = false;
+	// A download from a dive computer (download.cpp): the core's fingerprint
+	// table to swap in on the next undo or redo, so that undoing the download
+	// also forgets the fingerprint of its newest dive (an OpenDives addition:
+	// Subsurface keeps it, and the next download then skips those dives).
+	bool swap_fingerprints = false;
+	fingerprint_table fingerprints;
 	// FILTER_PRESET: as CreateFilterPreset, RemoveFilterPreset and
 	// EditFilterPreset (commands/command_filter.cpp).
 	enum PresetOp { CREATE, REMOVE, EDIT } preset_op = CREATE;
@@ -1620,6 +1626,8 @@ static void apply_dive_list(Step &step)
 	step.list.remove_sites = std::move(added_sites);
 	divelog.trips.sort(); // as AddDive::redoit(): adding a dive may reorder trips
 	step.list_applied = !step.list_applied;
+	if (step.swap_fingerprints)
+		std::swap(::fingerprints, step.fingerprints);
 	if (step.list_applied) {
 		for (const device &dev: step.devices)
 			add_to_device_table(divelog.devices, dev);
@@ -2506,21 +2514,12 @@ int delete_dive(int id, std::string &result_json, std::string &error)
 	return 0;
 }
 
-int import_dives(const std::string &file, const std::string &source, std::string &result_json, std::string &error)
+// ImportDives::ImportDives(log, flags, source) as one undoable step; the
+// tables of `log` are consumed. With `fingerprints_before`, the step swaps the
+// core's fingerprint table with it on each undo and redo.
+static int import_log(struct divelog &log, int flags, const std::string &source,
+		      fingerprint_table *fingerprints_before, std::string &result_json, std::string &error)
 {
-	if (check_writable_log(error))
-		return -1;
-	struct divelog log;
-	if (parse_file(file.c_str(), &log)) {
-		error = "IMPORT_FAILED";
-		return -1;
-	}
-	if (log.dives.empty()) {
-		error = "NO_DIVES";
-		return -1;
-	}
-	// ImportDives::ImportDives(log, import_flags::merge_all_trips, source), as
-	// QMLManager::importDivesFromFile() and the desktop import do.
 	Step step;
 	step.kind = Step::DIVE_LIST;
 	size_t n = log.dives.size();
@@ -2528,7 +2527,7 @@ int import_dives(const std::string &file, const std::string &source, std::string
 	for (auto &dv: log.dives)
 		normalize_imported_cylinder_depths(dv.get());
 	auto [dives_to_add, dives_to_remove, trips_to_add, sites_to_add, devices_to_add] =
-		divelog.process_imported_dives(log, import_flags::merge_all_trips);
+		divelog.process_imported_dives(log, flags);
 	step.devices = std::move(devices_to_add);
 	for (auto &trip: trips_to_add)
 		step.list.trips.push_back(std::move(trip));
@@ -2556,11 +2555,55 @@ int import_dives(const std::string &file, const std::string &source, std::string
 		error = "NO_NEW_DIVES";
 		return -1;
 	}
+	if (fingerprints_before) {
+		// The core's table holds the new fingerprint: the step keeps it, and
+		// the table goes back to its state before until the step applies.
+		step.swap_fingerprints = true;
+		step.fingerprints = std::move(*fingerprints_before);
+		std::swap(::fingerprints, step.fingerprints);
+	}
 	apply_dive_list(step);
 	result_json = dive_list_json(step);
 	push_step(std::move(step));
 	return 0;
 }
+
+int import_dives(const std::string &file, const std::string &source, std::string &result_json, std::string &error)
+{
+	if (check_writable_log(error))
+		return -1;
+	struct divelog log;
+	if (parse_file(file.c_str(), &log)) {
+		error = "IMPORT_FAILED";
+		return -1;
+	}
+	if (log.dives.empty()) {
+		error = "NO_DIVES";
+		return -1;
+	}
+	// ImportDives::ImportDives(log, import_flags::merge_all_trips, source), as
+	// QMLManager::importDivesFromFile() and the desktop import do.
+	return import_log(log, import_flags::merge_all_trips, source, nullptr, result_json, error);
+}
+
+namespace internal {
+
+int check_writable(std::string &error)
+{
+	return check_writable_log(error);
+}
+
+int import_downloaded(struct divelog &log, const std::string &source, fingerprint_table &fingerprints_before,
+		      std::string &result_json, std::string &error)
+{
+	if (check_writable_log(error))
+		return -1;
+	// DiveImportedModel::recordDives(): prefer_imported | is_downloaded.
+	return import_log(log, import_flags::prefer_imported | import_flags::is_downloaded, source, &fingerprints_before,
+			  result_json, error);
+}
+
+} // namespace internal
 
 int filter_presets_json(std::string &json)
 {

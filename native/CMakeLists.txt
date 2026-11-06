@@ -19,6 +19,7 @@ list(APPEND SOURCES
   "${COMPAT}/notifier_compat.cpp"
   "${COMPAT}/cloud_compat.cpp"
   "${COMPAT}/https_openssl.cpp"
+  "${COMPAT}/bluetooth_compat.cpp"
   "${ROOT}/core/libopendives/opendives.cpp"
   "${ROOT}/core/libopendives/edit.cpp"
   "${ROOT}/core/libopendives/regions.cpp"
@@ -28,12 +29,16 @@ list(APPEND SOURCES
   "${ROOT}/core/libopendives/filter.cpp"
   "${ROOT}/core/libopendives/account.cpp"
   "${ROOT}/core/libopendives/stats.cpp"
+  "${ROOT}/core/libopendives/download.cpp"
   "${ROOT}/plugins/opendives-core/android/src/main/cpp/opendives_jni.cpp")
 
 file(WRITE "${CMAKE_BINARY_DIR}/gen/build-defs.h" "#define SUBSURFACE_SOURCE \"\"\n")
 
 add_library(opendives SHARED ${SOURCES})
 target_compile_features(opendives PRIVATE cxx_std_20)
+# Subsurface's Bluetooth paths in core/libdivecomputer.cpp, with the transport
+# of core/compat/bluetooth_compat.cpp.
+target_compile_definitions(opendives PRIVATE BT_SUPPORT BLE_SUPPORT)
 target_compile_options(opendives PRIVATE
   -w -O2 -fvisibility=hidden
   "SHELL:-iquote ${COMPAT}/shadow"

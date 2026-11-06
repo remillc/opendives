@@ -214,6 +214,17 @@ int get_prefs(std::string &json)
 		json += '}';
 	}
 	json += ']';
+	// The same, as set_prefs takes them back ("diveComputerList").
+	json += ",\"diveComputerList\":[";
+	for (int slot = 0; slot <= 4; slot++) {
+		const dive_computer_prefs_t &dc = slot ? *dive_computer_slot(prefs, slot) : prefs.dive_computer;
+		for (const std::string *s: { &dc.vendor, &dc.product, &dc.device, &dc.device_name }) {
+			if (json.back() != '[')
+				json += ',';
+			append_string(json, *s);
+		}
+	}
+	json += ']';
 	// Planner-only values (the planner screen); the decompression model and
 	// its parameters are above, shared with the profile.
 	json += ",\"planner\":{";
@@ -380,6 +391,19 @@ static int apply_change(preferences &p, const std::string &key, const JsonValue 
 		}
 		if (!only)
 			forget(p.dive_computer);
+	} else if (key == "diveComputerList") {
+		// The last dive computer used, then the four remembered ones (vendor,
+		// product, device, device name each), as get_prefs writes them: kept
+		// by the app (Subsurface keeps them in its settings).
+		if (v.kind != JsonValue::LIST || v.list.size() != 20)
+			return -1;
+		for (int slot = 0; slot <= 4; slot++) {
+			dive_computer_prefs_t &dc = slot ? *dive_computer_slot(p, slot) : p.dive_computer;
+			dc.vendor = v.list[slot * 4];
+			dc.product = v.list[slot * 4 + 1];
+			dc.device = v.list[slot * 4 + 2];
+			dc.device_name = v.list[slot * 4 + 3];
+		}
 	} else {
 		return -1;
 	}

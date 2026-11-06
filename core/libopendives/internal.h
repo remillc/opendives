@@ -9,8 +9,26 @@
 #include <vector>
 
 struct FilterData;
+struct divelog;
+struct dive;
+struct fingerprint_record;
+using fingerprint_table = std::vector<fingerprint_record>; // core/device.h
 
 namespace opendives::internal {
+
+// Download from a dive computer (edit.cpp): NO_LOG or FORMAT_NEWER when the
+// log in memory cannot take changes.
+int check_writable(std::string &error);
+// The downloaded dives of `log` (consumed) added as one undoable step, as
+// DiveImportedModel::recordDives() does (prefer_imported | is_downloaded);
+// `fingerprints_before` is the core's fingerprint table before the download,
+// swapped in by the step's undo. NO_NEW_DIVES when nothing is added: then
+// `fingerprints_before` is left as it was.
+int import_downloaded(struct divelog &log, const std::string &source, fingerprint_table &fingerprints_before,
+		      std::string &result_json, std::string &error);
+
+// The thumbnail of list_dives() ("profile"), as a JSON array (opendives.cpp).
+std::string profile_json(const struct dive &d);
 
 // Loads `path` into the core's divelog (opendives.cpp). On success, the log
 // becomes the current one: edits apply to it and saves go to it.
