@@ -24,12 +24,12 @@
     "loading": "Chargement du carnet",
     "errorTitle": "Le carnet n'a pas pu être lu",
     "errorNothingChanged": "Aucune plongée n'a été modifiée.",
-    "errorCheck": "À vérifier :",
-    "errorInternet": "la connexion de l'appareil à Internet ;",
-    "errorStorage": "l'espace libre sur l'appareil.",
+    "errorCheck": "À vérifier",
+    "errorInternet": "La connexion de l'appareil à Internet.",
+    "errorStorage": "L'espace libre sur l'appareil.",
     "retry": "Réessayer",
     "emptyTitle": "Aucune plongée pour l'instant",
-    "emptyText": "Ajoutez vos plongées depuis votre ordinateur de plongée, un fichier, ou à la main.",
+    "emptyText": "Associez votre ordinateur de plongée pour télécharger vos plongées. Vous pouvez aussi importer un carnet existant ou noter une plongée à la main.",
     "noResults": "Aucune plongée ne correspond à « {query} ».",
     "count": {
       "one": "{n} plongée",
@@ -38,7 +38,15 @@
     "countFiltered": {
       "one": "{n} plongée sur {total}",
       "other": "{n} plongées sur {total}"
-    }
+    },
+    "filter": "Filtrer les plongées",
+    "filterOn": "Filtrer les plongées, un filtre est appliqué",
+    "filterFailed": "Le filtre n'a pas pu être appliqué. Toutes les plongées sont affichées.",
+    "emptyCloud": "Connecté au cloud Subsurface, aucune plongée",
+    "emptyPair": "Associer un ordinateur de plongée",
+    "emptyDivelogs": "Télécharger depuis divelogs.de",
+    "emptyNote": "Les fichiers de Subsurface (.ssrf, .xml), de divelogs.de et d'autres carnets s'importent ici.",
+    "noFilterResults": "Aucune plongée ne correspond au filtre."
   },
   "sync": {
     "syncing": "Synchronisation avec le cloud Subsurface…",
@@ -48,13 +56,34 @@
     "manual": {
       "one": "Synchronisation manuelle : {n} modification non envoyée",
       "other": "Synchronisation manuelle : {n} modifications non envoyées"
+    },
+    "offlinePending": {
+      "one": "Hors ligne : {n} modification sera envoyée au retour du réseau",
+      "other": "Hors ligne : {n} modifications seront envoyées au retour du réseau"
     }
   },
   "dive": {
     "siteNotSet": "Site à préciser",
     "screenReader": "{site}, {date}, profondeur maximale {depth}, durée {duration}",
     "screenReaderNoDepth": "{site}, {date}, durée {duration}",
-    "thumbnail": "Profil, {depth} au plus profond"
+    "thumbnail": "Profil, {depth} au plus profond",
+    "pending": "{what}, en attente d'envoi",
+    "pendingSeveral": "Modifiée, en attente d'envoi",
+    "pendingFields": {
+      "notes": "Notes modifiées",
+      "suit": "Combinaison modifiée",
+      "rating": "Note modifiée",
+      "visibility": "Visibilité modifiée",
+      "wavesize": "Vagues de surface modifiées",
+      "current": "Courant modifié",
+      "surge": "Flux-reflux modifié",
+      "chill": "Froid modifié",
+      "buddies": "Compagnons modifiés",
+      "diveguide": "Guide modifié",
+      "tags": "Étiquettes modifiées",
+      "site": "Site modifié",
+      "dive": "Plongée modifiée"
+    }
   },
   "trip": {
     "startingOn": "Voyage du {date}",
@@ -513,5 +542,186 @@
   },
   "common": {
     "back": "Retour"
+  },
+  "filter": {
+    "title": "Filtrer",
+    "cancel": "Annuler",
+    "clearAll": "Tout effacer",
+    "searchCriterion": "Chercher un critère",
+    "mode": "Mode de plongée",
+    "modes": {
+      "all": "Tous",
+      "oc": "Circuit ouvert",
+      "rebreather": "Recycleur"
+    },
+    "groups": {
+      "gear": "Matériel",
+      "when": "Quand",
+      "where": "Où",
+      "people": "Avec qui",
+      "dive": "La plongée",
+      "conditions": "Conditions",
+      "text": "Texte"
+    },
+    "hints": {
+      "when": "Date ou période, année, jour de la semaine, heure",
+      "where": "Site, pays et région, voyage",
+      "people": "Compagnons, guide",
+      "dive": "Profondeur max, durée, SAC, note, réelle ou planifiée",
+      "conditions": "Eau et air, visibilité, courant, vagues, flux-reflux, froid",
+      "text": "Notes, recherche dans toute la fiche"
+    },
+    "otherCriteria": "Autres critères",
+    "setCount": {
+      "one": "{n} choisi",
+      "other": "{n} choisis"
+    },
+    "show": "Afficher les plongées",
+    "showCount": {
+      "one": "Afficher {n} plongée",
+      "other": "Afficher les {n} plongées"
+    },
+    "criteria": {
+      "suits": "Combinaison",
+      "computers": "Ordinateur",
+      "cylinderTypes": "Type de bouteille",
+      "cylinderSize": "Taille de bouteille",
+      "o2": "Gaz, oxygène",
+      "he": "Gaz, hélium",
+      "tags": "Autre matériel (étiquettes)",
+      "date": "Date ou période",
+      "year": "Année",
+      "weekdays": "Jour de la semaine",
+      "timeOfDay": "Heure de début",
+      "sites": "Site",
+      "countries": "Pays",
+      "regions": "Région",
+      "trips": "Voyage",
+      "people": "Compagnons et guides",
+      "depth": "Profondeur max",
+      "duration": "Durée",
+      "sac": "Consommation (SAC)",
+      "rating": "Note globale",
+      "planned": "Réelle ou planifiée",
+      "waterTemp": "Température de l'eau",
+      "airTemp": "Température de l'air",
+      "visibility": "Visibilité",
+      "current": "Courant",
+      "wavesize": "Vagues de surface",
+      "surge": "Flux-reflux",
+      "chill": "Froid",
+      "notes": "Notes",
+      "fulltext": "Recherche dans toute la fiche"
+    },
+    "any": "Tous",
+    "several": {
+      "one": "{first} et {n} autre",
+      "other": "{first} et {n} autres"
+    },
+    "rangeBoth": "{min} à {max} {unit}",
+    "rangeBothNoUnit": "{min} à {max}",
+    "rangeMin": "{min} {unit} ou plus",
+    "rangeMinNoUnit": "{min} ou plus",
+    "rangeMax": "{max} {unit} ou moins",
+    "rangeMaxNoUnit": "{max} ou moins",
+    "starsAtLeast": "{n} sur 5 ou plus",
+    "quoted": "« {text} »",
+    "weekdays": {
+      "0": "Dimanche",
+      "1": "Lundi",
+      "2": "Mardi",
+      "3": "Mercredi",
+      "4": "Jeudi",
+      "5": "Vendredi",
+      "6": "Samedi"
+    },
+    "plannedValues": {
+      "logged": "Plongée réelle",
+      "planned": "Plongée planifiée"
+    },
+    "from": "À partir de",
+    "to": "Jusqu'à",
+    "fromUnit": "À partir de ({unit})",
+    "toUnit": "Jusqu'à ({unit})",
+    "dateHint": "Par exemple 2025-06-30",
+    "timeHint": "Par exemple 9:30",
+    "invalid": "Valeur non reconnue",
+    "rangeHint": "Laissez un champ vide pour ne pas fixer de limite.",
+    "cylinderSizeHint": "Volume d'eau de la bouteille, en litres. Laissez un champ vide pour ne pas fixer de limite.",
+    "atLeast": "Au moins",
+    "starsHint": "Touchez de nouveau l'étoile choisie pour retirer le critère.",
+    "fulltextHint": "Les plongées dont un mot commence par ce texte, dans toute la fiche.",
+    "notesHint": "Les plongées dont les notes contiennent ce texte.",
+    "listHint": "Une plongée correspond si elle a l'une des valeurs choisies.",
+    "noValues": "Aucune plongée du carnet n'a de valeur pour ce critère.",
+    "chip": "{name} : {value}",
+    "activeLabel": "Filtre appliqué",
+    "removeCriterion": "Retirer le critère {name}",
+    "matching": {
+      "one": "{n} plongée sur {total}",
+      "other": "{n} plongées sur {total}"
+    },
+    "clear": "Retirer le filtre"
+  },
+  "addUnavailable": {
+    "heading": "Pas encore disponible",
+    "nothingChanged": "Aucune plongée n'a été modifiée.",
+    "meanwhileCloud": "En attendant, les plongées ajoutées avec Subsurface sur un ordinateur ou avec Subsurface-mobile arrivent ici à la prochaine synchronisation.",
+    "download": {
+      "title": "Télécharger",
+      "text": "Le téléchargement depuis l'ordinateur de plongée par Bluetooth viendra dans une prochaine version."
+    },
+    "import": {
+      "title": "Importer un fichier",
+      "text": "L'import d'un fichier (.ssrf, .xml, divelogs.de) viendra dans une prochaine version."
+    },
+    "manual": {
+      "title": "Noter une plongée",
+      "text": "La saisie d'une plongée à la main viendra dans une prochaine version."
+    },
+    "divelogs": {
+      "title": "divelogs.de",
+      "text": "La reprise d'un carnet divelogs.de viendra dans une prochaine version. Vos identifiants divelogs.de ne seront jamais enregistrés."
+    }
+  },
+  "downloadFailed": {
+    "title": "Téléchargement",
+    "close": "Fermer",
+    "notFound": {
+      "title": "{computer} introuvable",
+      "titleNoName": "Ordinateur de plongée introuvable",
+      "text": "Le téléphone n'a pas trouvé l'ordinateur."
+    },
+    "nothingChanged": "Aucune plongée n'a été modifiée.",
+    "check": "À vérifier",
+    "checks": {
+      "on": "L'ordinateur est allumé et en mode transfert Bluetooth.",
+      "near": "Il est à moins d'un mètre du téléphone.",
+      "otherApp": "Aucune autre app (par exemple Subsurface-mobile) n'est connectée à l'ordinateur."
+    },
+    "otherComputer": "Choisir un autre ordinateur",
+    "retry": "Réessayer"
+  },
+  "conflict": {
+    "title": "Plongée modifiée à deux endroits",
+    "text": "{field} de la plongée du {date} ont changé ici et dans le cloud (depuis un autre appareil), et les deux versions ne se combinent pas. Rien n'est perdu tant que vous n'avez pas choisi.",
+    "choiceLabel": "Version à garder",
+    "device": "Garder la version de ce téléphone",
+    "cloud": "Prendre la version du cloud",
+    "compare": "Comparer",
+    "compareLong": "Comparer les deux versions",
+    "continue": "Continuer",
+    "continueLong": "Continuer la synchronisation",
+    "fields": {
+      "notes": "Les notes",
+      "suit": "La combinaison",
+      "rating": "La note",
+      "visibility": "La visibilité",
+      "buddies": "Les compagnons",
+      "diveguide": "Le guide",
+      "tags": "Les étiquettes",
+      "site": "Le site",
+      "dive": "La fiche"
+    }
   }
 }

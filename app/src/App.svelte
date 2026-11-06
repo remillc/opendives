@@ -19,6 +19,10 @@
   import DivesWithoutSite from './pages/DivesWithoutSite.svelte';
   import SitesCleanup from './pages/SitesCleanup.svelte';
   import SitesUnplaced from './pages/SitesUnplaced.svelte';
+  import Filter from './pages/Filter.svelte';
+  import FilterCriterion from './pages/FilterCriterion.svelte';
+  import AddUnavailable from './pages/AddUnavailable.svelte';
+  import DownloadFailed from './pages/DownloadFailed.svelte';
   import Icon from './components/Icon.svelte';
   import AdaptiveLabel from './components/AdaptiveLabel.svelte';
   import NavMenu from './components/NavMenu.svelte';
@@ -42,6 +46,10 @@
     routes: [
       { path: '/', component: Logbook },
       { path: '/dive/:id/', component: DiveDetail },
+      { path: '/filter/', component: Filter },
+      { path: '/filter/:key/', component: FilterCriterion },
+      { path: '/add/:what/', component: AddUnavailable },
+      { path: '/download/failed/', component: DownloadFailed },
       { path: '/settings/', component: Settings },
       { path: '/account/', component: Account },
       { path: '/account/delete/', component: DeleteAccount },
