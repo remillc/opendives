@@ -117,7 +117,9 @@ static jstring edit_result(JNIEnv *env, const std::string &dive_json)
 		}
 		return out;
 	};
-	std::string json = "{\"dive\":" + dive_json + ",\"undo\":\"" + quoted(opendives::undo_text());
+	// A trip step gives the trip ({"tripId":...}), a dive step the dive.
+	const char *key = dive_json.rfind("{\"tripId\"", 0) == 0 ? "trip" : "dive";
+	std::string json = std::string("{\"") + key + "\":" + dive_json + ",\"undo\":\"" + quoted(opendives::undo_text());
 	json += "\",\"redo\":\"" + quoted(opendives::redo_text()) + "\"}";
 	return env->NewStringUTF(json.c_str());
 }
@@ -127,6 +129,51 @@ Java_org_opendives_core_NativeCore_editDive(JNIEnv *env, jobject, jint id, jstri
 {
 	std::string json, error;
 	if (opendives::edit_dive(id, to_string(env, changes), json, error)) {
+		throw_core_error(env, error);
+		return nullptr;
+	}
+	return edit_result(env, json);
+}
+
+JNIEXPORT jstring JNICALL
+Java_org_opendives_core_NativeCore_getTrip(JNIEnv *env, jobject, jint id)
+{
+	std::string json, error;
+	opendives::trip_json(id, json, error);
+	return env->NewStringUTF(json.c_str());
+}
+
+// One trip change: action is location, notes, remove, split, merge, add or ungroup.
+JNIEXPORT jstring JNICALL
+Java_org_opendives_core_NativeCore_tripAction(JNIEnv *env, jobject, jstring actionIn, jint tripId, jint diveId,
+					      jint otherId, jintArray diveIds, jstring valueIn)
+{
+	std::string action = to_string(env, actionIn), value = to_string(env, valueIn), json, error;
+	std::vector<int> ids;
+	if (diveIds) {
+		jsize n = env->GetArrayLength(diveIds);
+		ids.resize(n);
+		if (n)
+			env->GetIntArrayRegion(diveIds, 0, n, ids.data());
+	}
+	int ret;
+	if (action == "location" || action == "notes")
+		ret = opendives::edit_trip(tripId, action, value, json, error);
+	else if (action == "remove")
+		ret = opendives::trip_remove_dive(diveId, json, error);
+	else if (action == "split")
+		ret = opendives::trip_split_at(diveId, json, error);
+	else if (action == "merge")
+		ret = opendives::trips_merge(tripId, otherId, json, error);
+	else if (action == "add")
+		ret = opendives::trip_add_dives(tripId, ids, json, error);
+	else if (action == "ungroup")
+		ret = opendives::trip_ungroup(tripId, json, error);
+	else {
+		ret = -1;
+		error = "BAD_REQUEST: unknown action " + action;
+	}
+	if (ret) {
 		throw_core_error(env, error);
 		return nullptr;
 	}

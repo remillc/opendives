@@ -21,6 +21,8 @@ internal object NativeCore {
     external fun cloudSignOut(deleteCopy: Boolean)
     external fun editDive(id: Int, changes: String): String
     external fun undo(redo: Boolean): String
+    external fun getTrip(id: Int): String
+    external fun tripAction(action: String, tripId: Int, diveId: Int, otherId: Int, diveIds: IntArray?, value: String): String
     external fun sync(): String
     external fun saveLocal()
     external fun listLoadedDives(): String

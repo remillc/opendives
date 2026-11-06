@@ -23,6 +23,7 @@
 #include "core/git-access.h"
 #include "core/pref.h"
 #include "core/tag.h"
+#include "core/trip.h"
 #include "core/version.h"
 #include "commands/command.h"
 
@@ -249,9 +250,25 @@ void append_json_string(std::string &out, const std::string &s)
 // Undo stack: for each step, the dive's previous contents and the command
 // text, as Subsurface's EditDive keeps the old and new dives.
 
+// A dive moved to a trip (null: out of any trip); after a move, `trip` holds
+// the previous one, so the same move done again reverts it.
+struct TripMove {
+	dive *d;
+	dive_trip *trip;
+};
+
 struct Step {
-	int dive_id;
-	std::unique_ptr<dive> other; // contents to swap in on the next undo or redo
+	enum Kind { DIVE, TRIP_FIELD, MOVE } kind = DIVE;
+	// DIVE: the dive and the contents to swap in on the next undo or redo.
+	int dive_id = 0;
+	std::unique_ptr<dive> other;
+	// TRIP_FIELD: the trip, which field, and the value to swap in.
+	dive_trip *trip = nullptr;
+	bool notes = false;
+	std::string value;
+	// MOVE: as Subsurface's DivesToTrip (commands/command_divelist.h).
+	std::vector<TripMove> moves;
+	std::vector<std::unique_ptr<dive_trip>> trips_to_add;
 	std::string text;
 };
 
@@ -322,6 +339,49 @@ void exchange(dive *d, dive &other)
 		new_site->add_dive(d);
 	other.dive_site = old_site;
 	d->invalidate_cache(); // so that save-git writes this dive again
+}
+
+// Port of moveDiveToTrip() (commands/command_divelist.cpp), without the
+// selection and the signals: an emptied trip leaves the trip table and is
+// returned, owned, to be put back on the next undo or redo.
+std::unique_ptr<dive_trip> move_dive_to_trip(TripMove &move)
+{
+	if (move.trip == move.d->divetrip)
+		return {};
+	std::unique_ptr<dive_trip> removed;
+	dive_trip *trip = unregister_dive_from_trip(move.d);
+	if (trip && trip->dives.empty()) {
+		auto [t, idx] = divelog.trips.pull(trip);
+		removed = std::move(t);
+	}
+	std::swap(trip, move.trip);
+	if (trip)
+		trip->add_dive(move.d);
+	move.d->invalidate_cache(); // so that save-git writes this dive again
+	return removed;
+}
+
+// Port of moveDivesBetweenTrips(): put back the trips to add, move each dive,
+// keep the trips that became empty. Doing it twice is a no-op.
+void move_dives_between_trips(Step &step)
+{
+	for (std::unique_ptr<dive_trip> &trip: step.trips_to_add)
+		divelog.trips.put(std::move(trip));
+	step.trips_to_add.clear();
+	for (TripMove &move: step.moves) {
+		std::unique_ptr<dive_trip> removed = move_dive_to_trip(move);
+		if (removed)
+			step.trips_to_add.push_back(std::move(removed));
+	}
+	divelog.trips.sort(); // as TripBase::redoit()
+}
+
+dive_trip *trip_by_id(int id)
+{
+	for (auto &trip: divelog.trips)
+		if (trip->id == id)
+			return trip.get();
+	return nullptr;
 }
 
 // "#12", or "@" and the date when the dive has no number. Subsurface's
@@ -726,14 +786,251 @@ int edit_dive(int id, const std::string &changes_json, std::string &result_json,
 				clean_index = -1;
 			steps.resize(applied);
 		}
-		steps.push_back({ id, std::move(copy), text });
+		Step step;
+		step.dive_id = id;
+		step.other = std::move(copy);
+		step.text = text;
+		steps.push_back(std::move(step));
 		applied++;
 	}
 	return internal::dive_json(id, result_json, error);
 }
 
+// ---------------------------------------------------------------------------
+// Trips (spec, section 4, "Trip"). Trip identifiers are those of the load:
+// valid until the next one, never stored.
+
+static std::string iso_time(timestamp_t when)
+{
+	time_t t = static_cast<time_t>(when);
+	struct tm tm;
+	gmtime_r(&t, &tm);
+	char buf[32];
+	strftime(buf, sizeof(buf), "%Y-%m-%dT%H:%M:%S", &tm);
+	return buf;
+}
+
+int trip_json(int trip_id, std::string &json, std::string &error)
+{
+	(void)error;
+	dive_trip *trip = trip_by_id(trip_id);
+	if (!trip) {
+		json = "{\"tripId\":0}"; // the trip no longer exists (emptied)
+		return 0;
+	}
+	json = "{\"tripId\":" + std::to_string(trip->id) + ",\"location\":";
+	append_json_string(json, trip->location);
+	json += ",\"notes\":";
+	append_json_string(json, trip->notes);
+	json += ",\"autogen\":";
+	json += trip->autogen ? "true" : "false";
+	json += ",\"dives\":[";
+	bool first = true;
+	for (const dive *d: trip->dives) {
+		if (!first)
+			json += ',';
+		first = false;
+		json += "{\"id\":" + std::to_string(d->id) + ",\"number\":" + std::to_string(d->number) + ",\"date\":";
+		append_json_string(json, iso_time(d->when));
+		json += ",\"durationSeconds\":" + std::to_string(d->duration.seconds) + ",\"site\":";
+		append_json_string(json, d->dive_site ? d->dive_site->name : std::string());
+		json += '}';
+	}
+	json += "]}";
+	return 0;
+}
+
+// Adds a step that is already applied, as QUndoStack::push() does.
+static void push_step(Step step)
+{
+	if (applied < steps.size()) {
+		if (clean_index > static_cast<long>(applied))
+			clean_index = -1;
+		steps.resize(applied);
+	}
+	steps.push_back(std::move(step));
+	applied++;
+}
+
+// Port of getListOfDives() (commands/command_base.cpp): at most five
+// numbers, or four and "...".
+static std::string list_of_dives(const std::vector<dive *> &dives)
+{
+	if (dives.size() == divelog.dives.size())
+		return "all dives";
+	std::string out;
+	int i = 0;
+	for (dive *d: dives) {
+		if (++i == 4 && dives.size() >= 5)
+			return out + "...";
+		out += dive_number_or_date(*d) + ", ";
+	}
+	if (!out.empty())
+		out.resize(out.size() - 2);
+	return out;
+}
+
+// Applies a MOVE step and keeps it; the result is the trip shown.
+static int do_move(Step step, int show_trip, std::string &json, std::string &error)
+{
+	if (step.moves.empty()) {
+		error = "NOTHING_TO_DO";
+		return -1;
+	}
+	move_dives_between_trips(step);
+	push_step(std::move(step));
+	return trip_json(show_trip, json, error);
+}
+
+int edit_trip(int trip_id, const std::string &field, const std::string &value, std::string &json, std::string &error)
+{
+	dive_trip *trip = trip_by_id(trip_id);
+	if (!trip) {
+		error = "NOT_FOUND";
+		return -1;
+	}
+	if (field != "location" && field != "notes") {
+		error = "BAD_REQUEST: unknown trip field " + field;
+		return -1;
+	}
+	Step step;
+	step.kind = Step::TRIP_FIELD;
+	step.trip = trip;
+	step.notes = field == "notes";
+	std::string &target = step.notes ? trip->notes : trip->location;
+	if (target != value) { // EditTripBase::workToBeDone()
+		step.value = target;
+		target = value;
+		step.text = step.notes ? "Edit trip notes" : "Edit trip location";
+		push_step(std::move(step));
+	}
+	return trip_json(trip_id, json, error);
+}
+
+// RemoveDivesFromTrip: the dives leave their trip and are not autogrouped again.
+static int remove_from_trip(const std::vector<dive *> &all, int show_trip, std::string &json, std::string &error)
+{
+	std::vector<dive *> dives;
+	for (dive *d: all)
+		if (d->divetrip)
+			dives.push_back(d);
+	Step step;
+	step.kind = Step::MOVE;
+	step.text = "remove " + std::to_string(dives.size()) + " dive(s) from trip [" + list_of_dives(dives) + "]";
+	for (dive *d: dives) {
+		d->notrip = true;
+		step.moves.push_back({ d, nullptr });
+	}
+	return do_move(std::move(step), show_trip, json, error);
+}
+
+int trip_remove_dive(int dive_id, std::string &json, std::string &error)
+{
+	dive *d = divelog.dives.get_by_uniq_id(dive_id);
+	if (!d || !d->divetrip) {
+		error = "NOT_FOUND";
+		return -1;
+	}
+	return remove_from_trip({ d }, d->divetrip->id, json, error);
+}
+
+int trip_ungroup(int trip_id, std::string &json, std::string &error)
+{
+	dive_trip *trip = trip_by_id(trip_id);
+	if (!trip) {
+		error = "NOT_FOUND";
+		return -1;
+	}
+	std::vector<dive *> dives(trip->dives.begin(), trip->dives.end());
+	return remove_from_trip(dives, trip_id, json, error);
+}
+
+int trip_split_at(int dive_id, std::string &json, std::string &error)
+{
+	dive *d = divelog.dives.get_by_uniq_id(dive_id);
+	if (!d || !d->divetrip) {
+		error = "NOT_FOUND";
+		return -1;
+	}
+	// The dives from this one on go into a new trip (CreateTrip).
+	std::vector<dive *> later;
+	for (dive *other: d->divetrip->dives)
+		if (other->when >= d->when)
+			later.push_back(other);
+	if (later.size() == d->divetrip->dives.size()) {
+		error = "NOTHING_TO_DO"; // the first dive: nothing to split
+		return -1;
+	}
+	Step step;
+	step.kind = Step::MOVE;
+	step.text = "create trip";
+	std::unique_ptr<dive_trip> trip = create_trip_from_dive(later[0]);
+	dive_trip *new_trip = trip.get();
+	for (dive *other: later)
+		step.moves.push_back({ other, new_trip });
+	step.trips_to_add.push_back(std::move(trip));
+	int keep = d->divetrip->id;
+	return do_move(std::move(step), keep, json, error);
+}
+
+int trips_merge(int trip_id, int other_id, std::string &json, std::string &error)
+{
+	dive_trip *a = trip_by_id(trip_id), *b = trip_by_id(other_id);
+	if (!a || !b || a == b) {
+		error = "NOT_FOUND";
+		return -1;
+	}
+	// MergeTrips: a new trip combining both (Subsurface sets no command text).
+	Step step;
+	step.kind = Step::MOVE;
+	step.text = "merge trips";
+	std::unique_ptr<dive_trip> trip = combine_trips(a, b);
+	dive_trip *merged = trip.get();
+	for (dive *d: a->dives)
+		step.moves.push_back({ d, merged });
+	for (dive *d: b->dives)
+		step.moves.push_back({ d, merged });
+	step.trips_to_add.push_back(std::move(trip));
+	int show = merged->id;
+	return do_move(std::move(step), show, json, error);
+}
+
+int trip_add_dives(int trip_id, const std::vector<int> &dive_ids, std::string &json, std::string &error)
+{
+	dive_trip *trip = trip_by_id(trip_id);
+	if (!trip) {
+		error = "NOT_FOUND";
+		return -1;
+	}
+	std::vector<dive *> dives;
+	for (int id: dive_ids) {
+		dive *d = divelog.dives.get_by_uniq_id(id);
+		if (d && d->divetrip != trip)
+			dives.push_back(d);
+	}
+	Step step;
+	step.kind = Step::MOVE;
+	step.text = "add " + std::to_string(dives.size()) + " dives to trip [" + list_of_dives(dives) + "]";
+	for (dive *d: dives)
+		step.moves.push_back({ d, trip });
+	return do_move(std::move(step), trip_id, json, error);
+}
+
 static int swap_step(Step &step, std::string &result_json, std::string &error)
 {
+	if (step.kind == Step::TRIP_FIELD) {
+		std::string &field = step.notes ? step.trip->notes : step.trip->location;
+		std::swap(field, step.value);
+		return trip_json(step.trip->id, result_json, error);
+	}
+	if (step.kind == Step::MOVE) {
+		move_dives_between_trips(step);
+		// The trip shown: the one the first dive is in now, or was in.
+		dive_trip *trip = step.moves.empty() ? nullptr : step.moves[0].d->divetrip;
+		if (!trip && !step.moves.empty())
+			trip = step.moves[0].trip;
+		return trip_json(trip ? trip->id : 0, result_json, error);
+	}
 	dive *d = divelog.dives.get_by_uniq_id(step.dive_id);
 	if (!d) {
 		error = "NOT_FOUND";

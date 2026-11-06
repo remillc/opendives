@@ -15,7 +15,10 @@
 #        - one commit was added, whose message contains the command text.
 #   3. For each field, on a copy of B: edit, save, undo, save: the tree is
 #      the original one again, and the last message has the "(undo)" text.
-#   4. On a copy of B: edit, then save into an unrelated repository: refused
+#   4. On a copy of B with trips: split, remove a dive, ungroup, merge, edit
+#      the location, add a dive; each saved, undone and saved: the tree is
+#      the original one again.
+#   5. On a copy of B: edit, then save into an unrelated repository: refused
 #      with SAVE_REPLACEMENT, and that repository is unchanged.
 #
 # usage: run-edit-roundtrip.sh <edit-roundtrip> <roundtrip> <workdir> <sample>...
@@ -80,6 +83,20 @@ for s in "$@"; do
     utext=$(value undo_text "$E.out")
     git -C "$E" log -1 --format=%B | grep -qF "$utext" || { why="$f undo: commit message lacks '$utext'"; break; }
   done
+
+  if [ -z "$why" ]; then
+    # Trip operations (split, remove, ungroup, merge, location, add), each
+    # undone: the tree is the original one again. Logs without trips skip it.
+    E="$d/trips"; rm -rf "$E"; cp -r "$d/B" "$E"
+    "$ED" trips "$E[main]" - >"$E.out" 2>"$E.err"; rc=$?
+    if [ $rc = 1 ]; then why="trips: $(value error "$E.out")"
+    elif [ $rc = 0 ] && [ "$(tree "$E")" != "$T0" ] &&
+         git -C "$E" diff "$T0" 'main^{tree}' | grep '^[-+]' | grep -v '^+++' | grep -v '^---' | grep -qvx '+notrip'; then
+      # Only "notrip" may remain: Subsurface's RemoveDivesFromTrip sets it and
+      # deliberately does not reset it on undo.
+      why="trips: tree differs after undo: $(echo $(git -C "$E" diff --name-only "$T0" 'main^{tree}'))"
+    elif [ $rc = 0 ]; then echo "$(grep -c '^step=' "$E.out") trip steps" > "$d/trips.ok"; fi
+  fi
 
   if [ -z "$why" ]; then
     # Save into an unrelated repository: refused, nothing written.

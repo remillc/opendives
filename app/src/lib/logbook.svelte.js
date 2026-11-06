@@ -40,9 +40,25 @@ export const logbook = $state({
   welcome: readWelcome(),
   /** Last dive changed by an edit or an undo, for the detail screen. */
   edited: /** @type {{ id: number, dive: import('opendives-core').DiveDetail }|null} */ (null),
+  /** Last trip changed by a trip change or an undo, for the trip screen. */
+  editedTrip: /** @type {import('opendives-core').TripDetail|null} */ (null),
   /** Text of the step that Undo would revert, e.g. "Edit notes [#12]". */
   undoText: '',
 });
+
+/**
+ * One trip change (spec, section 4, "Trip"), saved and synced like a dive
+ * edit; the logbook list is read again, as trips changed.
+ * @param {Parameters<import('opendives-core').OpenDivesCorePlugin['tripAction']>[0]} options
+ */
+export async function tripChange(options) {
+  const result = await OpenDivesCore.tripAction(options);
+  logbook.editedTrip = result.trip ?? null;
+  logbook.undoText = result.undo;
+  logbook.dives = await OpenDivesCore.listLoadedDives();
+  await persistChanges();
+  return result;
+}
 
 /** Delay before an edit is synced: the time Undo is offered (spec: "a few seconds after a change"). */
 const SYNC_DELAY_MS = 5000;
@@ -66,7 +82,11 @@ export async function saveDiveChanges(id, changes) {
 /** Undoes the last edit, saved and synced the same way. */
 export async function undoLastChange() {
   const result = await OpenDivesCore.undo();
-  logbook.edited = { id: result.dive.id, dive: result.dive };
+  if (result.dive) logbook.edited = { id: result.dive.id, dive: result.dive };
+  if (result.trip) {
+    logbook.editedTrip = result.trip;
+    logbook.dives = await OpenDivesCore.listLoadedDives();
+  }
   logbook.undoText = result.undo;
   await persistChanges();
   return result;

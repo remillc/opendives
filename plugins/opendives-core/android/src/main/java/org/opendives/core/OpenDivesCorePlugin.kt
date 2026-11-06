@@ -204,6 +204,27 @@ class OpenDivesCorePlugin : Plugin() {
         call.resolve(JSObject().put("json", NativeCore.editDive(id, changes.toString())))
     }
 
+    /** A trip of the loaded log; its id comes from listDives and is valid until the next load. */
+    @PluginMethod
+    fun getTrip(call: PluginCall) = onCoreThread(call) {
+        call.resolve(JSObject().put("json", NativeCore.getTrip(call.getInt("tripId") ?: 0)))
+    }
+
+    /** One undoable trip change (see opendives.h): location, notes, remove, split, merge, add, ungroup. */
+    @PluginMethod
+    fun tripAction(call: PluginCall) = onCoreThread(call) {
+        val ids = call.getArray("diveIds")?.toList<Int>()?.toIntArray()
+        val json = NativeCore.tripAction(
+            call.getString("action").orEmpty(),
+            call.getInt("tripId") ?: 0,
+            call.getInt("diveId") ?: 0,
+            call.getInt("otherId") ?: 0,
+            ids,
+            call.getString("value").orEmpty(),
+        )
+        call.resolve(JSObject().put("json", json))
+    }
+
     @PluginMethod
     fun undo(call: PluginCall) = onCoreThread(call) {
         call.resolve(JSObject().put("json", NativeCore.undo(call.getBoolean("redo", false) == true)))

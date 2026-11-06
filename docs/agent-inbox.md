@@ -93,7 +93,9 @@ Done in Add the dive edit screen and the conditions switch (the settings part is
 
 Bring the edit screen and Settings to `docs/mockups/android-edition.dc.html` and `android-reglages.dc.html` (section 4, "Full editing and settings" and "Conditions"). Editing shows rating, visibility and current as stars; the Settings switch "Houle, ressac et froid" ("Wave size, surge and chill"), off by default, adds the three others. Store the switch as a device setting. The detail still shows filled-in conditions whatever the switch.
 
-## [ ] 2026-11-06-13 Trip screen
+## [x] 2026-11-06-13 Trip screen
+
+Done in Add the trip screen and undoable trip changes
 
 Build the trip screen from `docs/mockups/voyage-android.dc.html` and section 4, "Trip". Automatic trips have no stable identifier: never store one.
 

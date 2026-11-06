@@ -63,7 +63,9 @@
       "other": "{n} dives"
     },
     "summarySingle": "{dives}, {depth}",
-    "summaryRange": "{dives}, {min} to {max}"
+    "summaryRange": "{dives}, {min} to {max}",
+    "expand": "Expand the trip",
+    "collapse": "Collapse the trip"
   },
   "detail": {
     "back": "Back to logbook",
@@ -356,5 +358,40 @@
     "undoFailed": "The change can no longer be undone",
     "failed": "The change could not be saved; nothing changed.",
     "writeLocked": "This account cannot be edited from OpenDives yet; nothing changed."
+  },
+  "tripScreen": {
+    "kicker": "Trip · {range}",
+    "placeToSpecify": "Place to be specified",
+    "dives": {
+      "one": "{n} dive",
+      "other": "{n} dives"
+    },
+    "divesAuto": {
+      "one": "{n} dive, grouped automatically",
+      "other": "{n} dives, grouped automatically"
+    },
+    "trip": "The trip",
+    "place": "Place",
+    "addPlace": "Add a place",
+    "notes": "Notes",
+    "addNotes": "Add notes",
+    "placePrompt": "Place of the trip",
+    "notesPrompt": "Notes of the trip",
+    "divesTitle": "Dives",
+    "openDive": "Open the dive",
+    "removeDive": "Remove from the trip",
+    "splitHere": "Split the trip here",
+    "merge": "Merge with another trip",
+    "mergeWith": "Merge with",
+    "addDives": "Add dives",
+    "addDive": "Add to the trip",
+    "ungroup": "Ungroup the trip",
+    "ungroupTitle": "Ungroup the trip?",
+    "ungroupText": "The dives stay in the logbook, outside any trip.",
+    "noOtherTrip": "No other trip in the logbook",
+    "noLooseDive": "Every dive is already in a trip",
+    "edit": "Edit the trip",
+    "done": "Trip changed",
+    "help": "Each dive's menu removes it from the trip or splits the trip there. The top menu merges this trip with another, adds dives or ungroups the trip."
   }
 }

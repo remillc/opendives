@@ -18,6 +18,9 @@
 #include "core/dive.h"
 #include "core/divelog.h"
 #include "core/tag.h"
+#include "core/trip.h"
+
+#include <functional>
 
 #include <algorithm>
 #include <cstdio>
@@ -144,6 +147,22 @@ static bool make_change(const dive &d, const std::string &field, std::string &re
 	return false;
 }
 
+static size_t trip_by_id_size(int id)
+{
+	for (auto &t: divelog.trips)
+		if (t->id == id)
+			return t->dives.size();
+	return 0;
+}
+
+static std::string trip_location(int id)
+{
+	for (auto &t: divelog.trips)
+		if (t->id == id)
+			return t->location;
+	return std::string();
+}
+
 static dive *first_dive()
 {
 	return divelog.dives.empty() ? nullptr : divelog.dives[0].get();
@@ -199,6 +218,73 @@ int main(int argc, char **argv)
 
 	if (int ret = open_log(repo))
 		return ret;
+
+	if (mode == "trips") {
+		// Each trip operation: applied and checked, saved, undone, saved again.
+		// The script then checks that the tree is the original one.
+		auto trips_with = [](size_t min) {
+			std::vector<dive_trip *> out;
+			for (auto &t: divelog.trips)
+				if (t->dives.size() >= min)
+					out.push_back(t.get());
+			return out;
+		};
+		std::vector<dive_trip *> big = trips_with(3);
+		if (big.empty() || divelog.trips.size() < 2) {
+			printf("error=no trip with 3 dives and another trip\n");
+			return 2;
+		}
+		dive_trip *trip = big[0];
+		dive_trip *other = divelog.trips[0].get() == trip ? divelog.trips[1].get() : divelog.trips[0].get();
+		int trip_id = trip->id, other_id = other->id;
+		size_t trips0 = divelog.trips.size(), size0 = trip->dives.size();
+		int second = trip->dives[1]->id;
+		dive *loose = nullptr;
+		for (auto &d: divelog.dives)
+			if (!d->divetrip)
+				loose = d.get();
+		struct Op {
+			const char *name;
+			std::function<int(std::string &, std::string &)> run;
+			std::function<bool()> check;
+		};
+		std::vector<Op> ops = {
+			{ "split", [&](std::string &j, std::string &e) { return trip_split_at(second, j, e); },
+			  [&] { return divelog.trips.size() == trips0 + 1; } },
+			{ "remove", [&](std::string &j, std::string &e) { return trip_remove_dive(second, j, e); },
+			  [&] { return trip_by_id_size(trip_id) == size0 - 1; } },
+			{ "ungroup", [&](std::string &j, std::string &e) { return trip_ungroup(trip_id, j, e); },
+			  [&] { return divelog.trips.size() == trips0 - 1; } },
+			{ "merge", [&](std::string &j, std::string &e) { return trips_merge(trip_id, other_id, j, e); },
+			  [&] { return divelog.trips.size() == trips0 - 1; } },
+			{ "location", [&](std::string &j, std::string &e) { return edit_trip(trip_id, "location", "OpenDives test", j, e); },
+			  [&] { return trip_location(trip_id) == "OpenDives test"; } },
+		};
+		if (loose)
+			ops.push_back({ "add", [&](std::string &j, std::string &e) { return trip_add_dives(trip_id, { loose->id }, j, e); },
+					[&] { return trip_by_id_size(trip_id) == size0 + 1; } });
+		for (Op &op: ops) {
+			std::string json, error;
+			if (op.run(json, error)) {
+				printf("error=%s: %s\n", op.name, error.c_str());
+				return 1;
+			}
+			if (!op.check()) {
+				printf("error=%s: unexpected result\n", op.name);
+				return 1;
+			}
+			printf("step=%s\n", undo_text().c_str());
+			if (save_local(error) || undo(json, error) || save_local(error)) {
+				printf("error=%s: save or undo: %s\n", op.name, error.c_str());
+				return 1;
+			}
+			if (divelog.trips.size() != trips0 || trip_by_id_size(trip_id) != size0) {
+				printf("error=%s: undo did not restore the trips\n", op.name);
+				return 1;
+			}
+		}
+		return 0;
+	}
 
 	if (mode == "baseline") {
 		// The app loads through list_dives(), which runs process_loaded_dives()

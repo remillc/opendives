@@ -114,8 +114,19 @@ import { registerPlugin } from '@capacitor/core';
  */
 
 /**
+ * A trip of the loaded log; tripId is 0 when it no longer exists.
+ * @typedef {Object} TripDetail
+ * @property {number} tripId valid until the next load; never stored
+ * @property {string} location empty when not named
+ * @property {string} notes
+ * @property {boolean} autogen grouped automatically by the core
+ * @property {{id: number, number: number, date: string, durationSeconds: number, site: string}[]} dives
+ */
+
+/**
  * @typedef {Object} EditResult
- * @property {DiveDetail} dive the dive after the step
+ * @property {DiveDetail} [dive] the dive after a dive step
+ * @property {TripDetail} [trip] the trip after a trip step
  * @property {string} undo text of the step that Undo would revert ("Edit notes [#12]"); empty when none
  * @property {string} redo text of the step that Redo would apply; empty when none
  */
@@ -147,6 +158,9 @@ import { registerPlugin } from '@capacitor/core';
  * @property {(options: {id: number, changes: Record<string, string|number|string[]>}) => Promise<EditResult>} editDive
  *   One undoable step; only the fields named change (edit_dive in opendives.h).
  * @property {(options?: {redo?: boolean}) => Promise<EditResult>} undo
+ * @property {(options: {tripId: number}) => Promise<TripDetail>} getTrip
+ * @property {(options: {action: 'location'|'notes'|'remove'|'split'|'merge'|'add'|'ungroup', tripId?: number, diveId?: number, otherId?: number, diveIds?: number[], value?: string}) => Promise<EditResult>} tripAction
+ *   One undoable trip change, as Subsurface's trip commands.
  * @property {() => Promise<Dive[]>} listLoadedDives
  *   The dives of the log in memory, without loading anything.
  * @property {() => Promise<void>} saveLocal
@@ -195,6 +209,12 @@ export const OpenDivesCore = {
   },
   async editDive(options) {
     return JSON.parse((await native.editDive(options)).json);
+  },
+  async getTrip(options) {
+    return JSON.parse((await native.getTrip(options)).json);
+  },
+  async tripAction(options) {
+    return JSON.parse((await native.tripAction(options)).json);
   },
   async undo(options = {}) {
     return JSON.parse((await native.undo(options)).json);

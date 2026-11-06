@@ -41,27 +41,15 @@
   /** @param {MouseEvent} e */
   function toggle(e) {
     e.preventDefault();
+    e.stopPropagation();
     ontoggle();
   }
 
-  /** @param {KeyboardEvent} e */
-  function onKey(e) {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      ontoggle();
-    }
-  }
 </script>
 
 <li class="trip-row" data-virtual-list-index={index} style:top={top === undefined ? undefined : `${top}px`}>
-  <div
-    class="item-link item-content no-chevron"
-    role="button"
-    tabindex="0"
-    aria-expanded={expanded}
-    onclick={toggle}
-    onkeydown={onKey}
-  >
+  <!-- The row opens the trip screen (spec, section 4, "Trip"); the arrow expands the trip in place. -->
+  <a href="/trip/{dives[0].trip?.id}/" class="item-link item-content no-chevron">
     <div class="item-media">
       <div class="grid" aria-hidden="true">
         {#each preview as d (d.id)}
@@ -75,9 +63,17 @@
         <div class="item-text od-value">{summary}</div>
         {#if location}<div class="item-text">{t('trip.startingOn', { date: formatLongDate(start) })}</div>{/if}
       </div>
-      <span class="arrow" class:expanded><Icon name="expand" /></span>
+      <button
+        type="button"
+        class="expand"
+        aria-expanded={expanded}
+        aria-label={t(expanded ? 'trip.collapse' : 'trip.expand')}
+        onclick={toggle}
+      >
+        <span class="arrow" class:expanded><Icon name="expand" /></span>
+      </button>
     </div>
-  </div>
+  </a>
 </li>
 
 <style>
@@ -89,6 +85,20 @@
       grid-template-columns: 1fr 1fr;
       grid-template-rows: 1fr 1fr;
       gap: 2px;
+    }
+
+    /* 48 px touch target for the arrow, separate from the row's link. */
+    .expand {
+      width: 48px;
+      height: 48px;
+      margin-right: -12px;
+      border: none;
+      background: none;
+      color: var(--od-text-2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: none;
     }
 
     .arrow {

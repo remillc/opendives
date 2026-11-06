@@ -6,6 +6,7 @@
 #define OPENDIVES_H
 
 #include <string>
+#include <vector>
 
 namespace opendives {
 
@@ -118,6 +119,21 @@ int cloud_branch_status(const std::string &url, bool &exists, std::string &head,
 // does. Nothing changes and no step is added when the values are the same.
 // FORMAT_NEWER when the log was written by a newer format than this core's.
 int edit_dive(int id, const std::string &changes_json, std::string &result_json, std::string &error);
+
+// Trips (spec, section 4, "Trip"), each change one undoable step, as
+// Subsurface's EditTripLocation/EditTripNotes, RemoveDivesFromTrip,
+// CreateTrip, MergeTrips and AddDivesToTrip do it. Trip identifiers are those
+// of the load (list_dives): valid until the next load, never stored. Each
+// writes the trip as trip_json() does; {"tripId":0} when it no longer exists:
+// {"tripId", "location", "notes", "autogen", "dives":[{"id", "number",
+// "date", "durationSeconds", "site"}]}.
+int trip_json(int trip_id, std::string &json, std::string &error);
+int edit_trip(int trip_id, const std::string &field, const std::string &value, std::string &json, std::string &error);
+int trip_remove_dive(int dive_id, std::string &json, std::string &error);
+int trip_split_at(int dive_id, std::string &json, std::string &error); // this dive and the later ones form a new trip
+int trips_merge(int trip_id, int other_id, std::string &json, std::string &error);
+int trip_add_dives(int trip_id, const std::vector<int> &dive_ids, std::string &json, std::string &error);
+int trip_ungroup(int trip_id, std::string &json, std::string &error);
 
 // Undo stack of the session; cleared by every load. The result is the dive
 // changed, as get_dive() gives it.

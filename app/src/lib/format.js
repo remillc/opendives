@@ -232,3 +232,13 @@ export function formatGas(o2Permille, hePermille) {
   if (o2 === 0 || o2 === 21) return t('gas.air');
   return t('gas.nitrox', { o2: String(o2) });
 }
+
+/**
+ * A range of days, e.g. "2–4 février 2013" (device format, Intl.formatRange);
+ * a single day when both are the same.
+ * @param {string} isoStart
+ * @param {string} isoEnd
+ */
+export function formatDateRange(isoStart, isoEnd) {
+  return firstOfMonth(longDateFormat.formatRange(toDate(isoStart), toDate(isoEnd)));
+}

@@ -63,7 +63,9 @@
       "other": "{n} plongées"
     },
     "summarySingle": "{dives}, {depth}",
-    "summaryRange": "{dives}, de {min} à {max}"
+    "summaryRange": "{dives}, de {min} à {max}",
+    "expand": "Déplier le voyage",
+    "collapse": "Replier le voyage"
   },
   "detail": {
     "back": "Retour au carnet",
@@ -356,5 +358,40 @@
     "undoFailed": "La modification ne peut plus être annulée",
     "failed": "La modification n’a pas pu être enregistrée ; rien n’a changé.",
     "writeLocked": "Ce compte ne peut pas encore être modifié depuis OpenDives ; rien n’a changé."
+  },
+  "tripScreen": {
+    "kicker": "Voyage · {range}",
+    "placeToSpecify": "Lieu à préciser",
+    "dives": {
+      "one": "{n} plongée",
+      "other": "{n} plongées"
+    },
+    "divesAuto": {
+      "one": "{n} plongée, regroupée automatiquement",
+      "other": "{n} plongées, regroupées automatiquement"
+    },
+    "trip": "Le voyage",
+    "place": "Lieu",
+    "addPlace": "Ajouter un lieu",
+    "notes": "Notes",
+    "addNotes": "Ajouter des notes",
+    "placePrompt": "Lieu du voyage",
+    "notesPrompt": "Notes du voyage",
+    "divesTitle": "Plongées",
+    "openDive": "Ouvrir la plongée",
+    "removeDive": "Retirer du voyage",
+    "splitHere": "Couper le voyage ici",
+    "merge": "Fusionner avec un autre voyage",
+    "mergeWith": "Fusionner avec",
+    "addDives": "Ajouter des plongées",
+    "addDive": "Ajouter au voyage",
+    "ungroup": "Défaire le voyage",
+    "ungroupTitle": "Défaire le voyage ?",
+    "ungroupText": "Les plongées restent dans le carnet, hors de tout voyage.",
+    "noOtherTrip": "Aucun autre voyage dans le carnet",
+    "noLooseDive": "Toutes les plongées sont déjà dans un voyage",
+    "edit": "Modifier le voyage",
+    "done": "Voyage modifié",
+    "help": "Le menu de chaque plongée la retire du voyage ou coupe le voyage à cet endroit. Le menu du haut fusionne ce voyage avec un autre, ajoute des plongées ou défait le voyage."
   }
 }
