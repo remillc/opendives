@@ -137,6 +137,52 @@ Six components do not exist in Framework7; each is a single Svelte component, sh
 
 **Settings, modelled on Subsurface (decided on 6 November 2026, replacing the settings part above).** The Settings screen follows Subsurface's preferences (desktop `desktop-widgets/preferences/*.ui`, mobile `mobile-widgets/qml/Settings.qml`), with Subsurface's defaults (`core/pref.cpp`), in this order: *Language and formats* (app language, date format, time format, each "System" by default); *Units* (Metric / Imperial / Personalised, then depth, pressure, volume, temperature, weight, ascent and descent speeds per minute or per second, duration "automatic" (minutes under an hour), GPS coordinates in degrees and minutes or decimal); *Logbook* (group dives into trips, on; show invalid dives, off; surface waves, surge and chill, off; edit water salinity, off); *Equipment* (default cylinder, show unused cylinders, offer standard sizes, cylinder types); *Dive profile* (mean depth, on; depth grid 1-2-5-10 or by 3; ceiling from the dive computer, on; ceiling in red, off; calculated ceiling, off, with Bühlmann GF 30/75 or VPM-B +3; tank bar, off); *Partial pressures* (pO₂ 0.16–1.6 bar, pN₂ 4.0, pHe 13.0, pO₂ for the MOD 1.6); *Rebreather* (default CCR setpoint 1.1 bar, O₂ sensors, setpoints, open-circuit gas as diluent, pSCR O₂ consumption 0.72 L/min, dilution 1:10, equivalent OC pO₂); *Dive computers* (remembered computers, forget them, show all Bluetooth devices); *Display* (theme, text size following the device); *Offline maps*; *Advanced* (reset all settings). As in Subsurface, these settings belong to the device; only trip grouping (`autogroup`) is stored in the logbook. The earlier statement that decompression and planning defaults are stored in the logbook was wrong: the planner settings (rates, reserve, SAC, ppO₂, deco model) stay in the planner, as in Subsurface-mobile ("Dive planner setup"). Left out on purpose, being desktop-only or covered elsewhere: proxy, fonts and animation speed, default file, cloud credentials (Account), media and video thumbnails, map short names, developer menu. Reference: `docs/mockups/android-reglages.dc.html`.
 
+**Settings: what each row does (decided on 6 November 2026).** Four kinds of row, and nothing else:
+- *Switch:* the whole row toggles it; the value is saved at once, no confirmation.
+- *Value on the right:* opens an MD3 single-choice dialog (radio buttons, "Cancel" / "OK"), see `docs/mockups/reglages-choix-android.dc.html`; each choice shows an example of its effect.
+- *Number on the right:* opens an MD3 dialog with one outlined number field per value, the unit after it, the default under it, and "Default values" / "Cancel" / "OK", see `reglages-nombre-android.dc.html`. Out-of-range values are refused under the field; "OK" stays disabled until all are valid. Numbers are typed and shown in the user's units and locale.
+- *Chevron:* opens a sub-screen with a Back button.
+Actions are outlined buttons, never rows, centred inside the rounded surface of their group (at its bottom): "Forget remembered dive computers" (confirmation dialog, then the core forgets them) and "Reset all settings" (confirmation dialog). The ⋮ of a remembered dive computer opens a menu with "Rename" (the computer's nickname, stored in the logbook as in the core's device table) and "Forget this computer", see `reglages-menu-android.dc.html`.
+
+| Row | Control | Choices or range (default first) | Core preference |
+| --- | --- | --- | --- |
+| Langue de l'app | choice | System, Français, English | app setting |
+| Format de la date | choice | System, day-month-year, month-day-year, year-month-day | `date_format`, `date_format_override` |
+| Format de l'heure | choice | System, 24-hour, 12-hour | `time_format`, `time_format_override` |
+| Unit system | segmented | Metric, Imperial, Personalised (set when one unit is changed) | `unit_system` |
+| Depth, pressure, volume, temperature, weight | choice | m / ft; bar / psi; L / cuft; °C / °F; kg / lb | `units` |
+| Vitesses de remontée et de descente | choice | per minute, per second | `units.vertical_speed_time` |
+| Durée | choice | automatic (mm under one hour, else h:mm), always h:mm, always mm | `units.duration_units` |
+| Coordonnées GPS | choice | degrees and minutes, decimal | `coordinates_traditional` |
+| Regrouper les plongées en voyages | switch | on | logbook `autogroup` |
+| Afficher les plongées invalides | switch | off | `display_invalid_dives` |
+| Vagues de surface, flux-reflux et froid | switch | off | `extraEnvironmentalDefault` |
+| Modifier la salinité de l'eau | switch | off | `salinityEditDefault` |
+| Bouteille par défaut | choice | None, then the cylinder types | `default_cylinder` |
+| Afficher les bouteilles inutilisées | switch | off | `include_unused_tanks` |
+| Proposer les tailles standard | switch | on | `display_default_tank_infos` |
+| Types de bouteilles | chevron | sub-screen, see below | core tank info table |
+| Profondeur moyenne | switch | on | `show_average_depth` |
+| Grille de profondeur | choice | 1, 2, 5, 10; by 3 (3, 6, 15) | `three_m_based_grid` |
+| Plafond donné par l'ordinateur | switch | on | `dcceiling` |
+| Plafond en rouge | switch | off | `redceiling` |
+| Plafond calculé | switch | off; when on, two more rows appear under it: model (Bühlmann, VPM-B) and GF low 10–150 % / GF high 40–150 % (30 / 75) or VPM-B conservatism 0–4 (+3) | `calcceiling`, `display_deco_mode`, `gflow`, `gfhigh`, `vpmb_conservatism` |
+| Barre des bouteilles | switch | off | `tankbar` |
+| Seuils de pO₂ | number | min 0.16, max 1.6 bar, step 0.01 / 0.1 | `pp_graphs.po2_threshold_min/max` |
+| Seuil de pN₂ | number | 4.0 bar, step 0.1 | `pp_graphs.pn2_threshold` |
+| Seuil de pHe | number | 13.0 bar, step 0.1 | `pp_graphs.phe_threshold` |
+| pO₂ pour la MOD | number | 1.6 bar, step 0.1 | `modpO2` |
+| Consigne par défaut (CCR) | number | 1.1 bar, 0–10, step 0.1 | `defaultsetpoint` |
+| Capteurs d'O₂, consignes, gaz OC comme diluant, pO₂ équivalente OC | switch | off | `show_ccr_sensors`, `show_ccr_setpoint`, `allowOcGasAsDiluent`, `show_scr_ocpo2` |
+| Consommation métabolique d'O₂ (pSCR) | number | 0.72 L/min, 3 decimals | `o2consumption` |
+| Rapport de dilution (pSCR) | number | 1:10 (the user types 10) | `pscr_ratio` = 1000 / value |
+| Montrer tous les appareils Bluetooth | switch | off | Bluetooth scan filter |
+| Thème | choice | System, Light, Dark | app setting |
+| Taille du texte | info | follows the device; not a control | none |
+| Régions téléchargées | chevron | offline maps sub-screen (to be designed) | app setting |
+
+*Cylinder types sub-screen* (`reglages-bouteilles-android.dc.html`): "Your types" (from the logbook) then "Standard" (the core's default table: AL80, ALU7, 10L 232 bar, …), each row showing volume and working pressure; a tap opens the type's sheet (name, volume, working pressure, Delete); the "Add a type" floating button opens an empty sheet. Renaming a type also renames the matching cylinders in the logbook; resizing or removing it does not change existing dives (same rule as the core's cylinder-type manager).
+
 **Trip (decided on 6 November 2026).** Tapping a trip opens its screen: dates, place (or "Place to be specified"), number of dives and whether the trip was grouped automatically; place and notes are editable; each dive has a menu to remove it from the trip or split the trip there; the top menu merges with another trip, adds dives or ungroups. Reference: `docs/mockups/voyage-android.dc.html`.
 
 **Sites (decided on 6 November 2026).** Four screens, from `docs/mockups/sites-*-android.dc.html`:

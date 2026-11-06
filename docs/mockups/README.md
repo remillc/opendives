@@ -72,3 +72,7 @@ When a mock-up and `docs/ui-specification.md` disagree, the specification wins. 
 | `sites-edition-android.dc.html` | Sites, Android, nouveau site |
 | `sites-sans-site-android.dc.html` | Sites, Android, plongées sans site |
 | `sites-nettoyer-android.dc.html` | Sites, Android, nettoyer les sites |
+| `reglages-choix-android.dc.html` | Réglages, choix d’une valeur · Android |
+| `reglages-nombre-android.dc.html` | Réglages, saisie d’un nombre · Android |
+| `reglages-menu-android.dc.html` | Réglages, menu d’un ordinateur · Android |
+| `reglages-bouteilles-android.dc.html` | Types de bouteilles · Android |

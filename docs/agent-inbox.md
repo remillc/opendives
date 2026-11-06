@@ -123,3 +123,7 @@ Rules for this task:
 ## [ ] 2026-11-06-16 Settings modelled on Subsurface
 
 Rebuild Settings from `docs/mockups/android-reglages.dc.html` and `docs/ui-specification.md`, section 4, "Settings, modelled on Subsurface" (it supersedes the settings part of task 12 and the old settings boards). Read and write each value through the core's preferences (`core/pref.h`), with Subsurface's defaults; keep them per device, except trip grouping, which is the logbook's `autogroup`. Do not move planner settings here: they belong to the planner screen. Rename the conditions to Subsurface's French labels ("Vagues de surface", "Flux-reflux", "Froid") in `fr.json`. Do this task before task 15.
+
+## [ ] 2026-11-06-17 Settings: behaviour of every row
+
+Part of task 16. Wire every Settings row as in `docs/ui-specification.md`, section 4, "Settings: what each row does": the four row kinds (switch, single-choice dialog, number dialog, chevron), the two action buttons with their confirmation dialogs, the ⋮ menu of a remembered dive computer, and the cylinder types sub-screen. Mock-ups: `docs/mockups/android-reglages.dc.html`, `reglages-choix-android.dc.html`, `reglages-nombre-android.dc.html`, `reglages-menu-android.dc.html`, `reglages-bouteilles-android.dc.html`. Check each preference name in `core/pref.h` before using it; if one in the table does not exist or behaves differently, stop and ask Christian. The offline maps sub-screen is not designed yet: leave the row disabled.
