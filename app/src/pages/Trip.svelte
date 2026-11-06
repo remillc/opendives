@@ -14,6 +14,7 @@
   import { formatDateRange, formatDateTime, formatDuration, formatLongDate } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
   import { confirmAction } from '../lib/dialogs.js';
+  import { offerUndo } from '../lib/undo.js';
 
   /** @type {{ f7route: { params: { id: string } }, f7router: any }} */
   let { f7route, f7router } = $props();
@@ -55,30 +56,12 @@
         tripId = next.tripId;
         trip = next;
       }
-      f7.toast
-        .create({
-          text: t('tripScreen.done'),
-          closeButton: true,
-          closeButtonText: t('edit.undo'),
-          closeTimeout: 5000,
-          position: 'bottom',
-          on: {
-            closeButtonClick: async () => {
-              try {
-                const undone = await undoLastChange();
-                if (undone.trip && undone.trip.tripId) {
-                  tripId = undone.trip.tripId;
-                  trip = undone.trip;
-                }
-                toast(t('edit.undone'));
-              } catch (e) {
-                console.error('Undo', e);
-                toast(t('edit.undoFailed'));
-              }
-            },
-          },
-        })
-        .open();
+      offerUndo(t('tripScreen.done'), (undone) => {
+        if (undone.trip && undone.trip.tripId) {
+          tripId = undone.trip.tripId;
+          trip = undone.trip;
+        }
+      });
     } catch (e) {
       const code = String(/** @type {any} */ (e)?.message ?? '');
       console.error('Trip change', code);

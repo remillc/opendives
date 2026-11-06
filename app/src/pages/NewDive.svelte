@@ -1,35 +1,48 @@
 <script>
   // @ts-check
   // Log a dive by hand (spec, section 3, "Add"; the fields of the quick entry
-  // board docs/mockups/ios-saisie.dc.html): date and time, duration, maximum
-  // depth, site, buddies, rating, notes. Full-screen form: close at the left,
-  // "Save" as a text button at the right. Saving adds the dive as one
-  // undoable step, with the simple profile Subsurface-mobile makes from the
-  // depth and the duration, then opens it; everything else is edited there.
+  // board docs/mockups/ios-saisie.dc.html): date and time (wheel pickers, as
+  // in Settings), duration, maximum depth, water temperature, the cylinder
+  // (type, start and end pressures, oxygen and helium), site, buddies, rating,
+  // notes. Full-screen form: close at the left, "Save" as a text button at the
+  // right. Saving adds the dive as one undoable step, with the simple profile
+  // Subsurface-mobile makes from the depth and the duration, then opens it.
   import { onMount } from 'svelte';
   import { Page, Navbar, Link, f7, theme } from 'framework7-svelte';
   import { OpenDivesCore } from 'opendives-core';
   import Icon from '../components/Icon.svelte';
   import TextField from '../components/TextField.svelte';
   import StarsInput from '../components/StarsInput.svelte';
-  import { logbook, addDive, undoLastChange } from '../lib/logbook.svelte.js';
+  import WheelDialog from '../components/WheelDialog.svelte';
+  import ChoiceDialog from '../components/ChoiceDialog.svelte';
+  import { logbook, addDive } from '../lib/logbook.svelte.js';
   import { parseNumber } from '../lib/filter.svelte.js';
-  import { depthUnit, formatLongDate } from '../lib/format.js';
+  import { depthUnit, formatCylinderSize, formatLongDate, locale } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
+  import { offerUndo } from '../lib/undo.js';
 
   /** @type {{ f7router: any }} */
   let { f7router } = $props();
 
-  /** Now, to the minute, in the form's format. */
-  function now() {
-    const d = new Date();
-    const p = (/** @type {number} */ n) => String(n).padStart(2, '0');
-    return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
-  }
+  const prefs = $derived(logbook.prefs);
+  const start = new Date();
+  // Date and time of the dive, local; now, to the minute, at first.
+  let year = $state(start.getFullYear());
+  let month = $state(start.getMonth()); // 0 to 11
+  let day = $state(start.getDate());
+  let hour = $state(start.getHours());
+  let minute = $state(start.getMinutes());
+  /** @type {'date'|'time'|'cylinder'|null} */
+  let dialog = $state(null);
 
-  let date = $state(now());
   let duration = $state('');
   let depth = $state('');
+  let water = $state('');
+  let cylinderType = $state('');
+  let startPressure = $state('');
+  let endPressure = $state('');
+  let o2 = $state('');
+  let he = $state('');
   let buddies = $state('');
   let notes = $state('');
   let rating = $state(0);
@@ -39,6 +52,8 @@
   let tried = $state(false);
   /** @type {import('opendives-core').SiteSummary[]} */
   let sites = $state([]);
+  /** @type {import('opendives-core').CylinderType[]} */
+  let cylinderTypes = $state([]);
 
   onMount(async () => {
     try {
@@ -46,19 +61,55 @@
     } catch (e) {
       console.error('Reading the sites', e);
     }
+    try {
+      cylinderTypes = (await OpenDivesCore.cylinderTypes({ action: 'list' })).types;
+    } catch (e) {
+      console.error('Reading the cylinder types', e);
+    }
   });
 
-  /** "YYYY-MM-DD HH:MM" → "YYYY-MM-DDTHH:MM", or null. */
-  const isoDate = $derived.by(() => {
-    const m = /^(\d{4})-(\d{1,2})-(\d{1,2})[ T](\d{1,2})[:h](\d{2})$/.exec(date.trim());
-    if (!m || Number(m[2]) > 12 || Number(m[3]) > 31 || Number(m[4]) > 23 || Number(m[5]) > 59) return null;
-    const p = (/** @type {string} */ s) => s.padStart(2, '0');
-    return `${m[1]}-${p(m[2])}-${p(m[3])}T${p(m[4])}:${m[5]}`;
-  });
+  const two = (/** @type {number} */ n) => String(n).padStart(2, '0');
+  const daysIn = (/** @type {number} */ y, /** @type {number} */ m) => new Date(y, m + 1, 0).getDate();
+  const dateText = $derived(new Date(year, month, day).toLocaleDateString(locale, { dateStyle: 'long' }));
+  const timeText = $derived(new Date(2000, 0, 1, hour, minute).toLocaleTimeString(locale, { timeStyle: 'short' }));
+  const isoDate = $derived(`${year}-${two(month + 1)}-${two(Math.min(day, daysIn(year, month)))}T${two(hour)}:${two(minute)}`);
+
+  // Wheels: day, month, year; hour, minute.
+  const years = Array.from({ length: start.getFullYear() + 2 - 1950 }, (_, i) => 1950 + i);
+  const monthNames = Array.from({ length: 12 }, (_, m) => new Date(2000, m, 1).toLocaleDateString(locale, { month: 'short' }));
+  const dateWheels = $derived([
+    { label: t('newDive.day'), values: Array.from({ length: 31 }, (_, i) => String(i + 1)), index: day - 1, defaultIndex: start.getDate() - 1 },
+    { label: t('newDive.month'), values: monthNames, index: month, defaultIndex: start.getMonth() },
+    { label: t('newDive.year'), values: years.map(String), index: years.indexOf(year), defaultIndex: years.indexOf(start.getFullYear()) },
+  ]);
+  const timeWheels = $derived([
+    { label: t('newDive.hour'), values: Array.from({ length: 24 }, (_, i) => two(i)), index: hour, defaultIndex: start.getHours() },
+    { label: t('newDive.minute'), values: Array.from({ length: 60 }, (_, i) => two(i)), index: minute, defaultIndex: start.getMinutes() },
+  ]);
+
   const minutes = $derived(parseNumber(duration));
   const depthValue = $derived(parseNumber(depth));
   const durationOk = $derived(minutes > 0 && minutes < 48 * 60);
-  const depthOk = $derived(depthValue > 0 && depthValue <= (logbook.prefs.length === 'ft' ? 1640 : 500));
+  const depthOk = $derived(depthValue > 0 && depthValue <= (prefs.length === 'ft' ? 1640 : 500));
+  /** An optional number: empty, or valid within [min, max]. @param {string} text @param {number} min @param {number} max */
+  const optionalOk = (text, min, max) => !text.trim() || (parseNumber(text) >= min && parseNumber(text) <= max);
+  const waterOk = $derived(optionalOk(water, prefs.temperature === 'F' ? 28 : -2, prefs.temperature === 'F' ? 110 : 45));
+  const maxPressure = $derived(prefs.pressure === 'psi' ? 7000 : 500);
+  const startOk = $derived(optionalOk(startPressure, 0, maxPressure));
+  const endOk = $derived(optionalOk(endPressure, 0, maxPressure));
+  const gasOk = $derived(
+    optionalOk(o2, 5, 100) && optionalOk(he, 0, 95) && (parseNumber(o2) || 21) + (parseNumber(he) || 0) <= 100,
+  );
+
+  const pressureUnit = $derived(prefs.pressure === 'psi' ? t('units.psi') : t('units.bar'));
+  const temperatureUnit = $derived(prefs.temperature === 'F' ? t('units.fahrenheit') : t('units.celsius'));
+  /** @param {string} text */
+  const toMbar = (text) => Math.round(prefs.pressure === 'psi' ? parseNumber(text) * 68.9476 : parseNumber(text) * 1000);
+
+  const cylinderOptions = $derived([
+    { value: '', label: t('newDive.defaultCylinder') },
+    ...cylinderTypes.map((c) => ({ value: c.name, label: c.name, example: formatCylinderSize(c.ml, c.mbar, prefs) ?? undefined })),
+  ]);
 
   /** Sites offered: the most recent first; the search filters by name. */
   const shownSites = $derived.by(() => {
@@ -73,42 +124,34 @@
 
   async function save() {
     tried = true;
-    if (saving || !isoDate || !durationOk || !depthOk) return;
+    if (saving || !durationOk || !depthOk || !waterOk || !startOk || !endOk || !gasOk) return;
     saving = true;
     try {
-      const mm = Math.round(logbook.prefs.length === 'ft' ? depthValue * 304.8 : depthValue * 1000);
       /** @type {Record<string, string|number|string[]>} */
       const fields = {
         date: isoDate,
         durationSeconds: Math.round(minutes * 60),
-        maxDepthMm: mm,
+        maxDepthMm: Math.round(prefs.length === 'ft' ? depthValue * 304.8 : depthValue * 1000),
         site,
         rating,
       };
+      if (water.trim()) {
+        const w = parseNumber(water);
+        fields.waterTempMk = Math.round(((prefs.temperature === 'F' ? ((w - 32) * 5) / 9 : w) + 273.15) * 1000);
+      }
+      if (cylinderType) fields.cylinderType = cylinderType;
+      if (startPressure.trim()) fields.startMbar = toMbar(startPressure);
+      if (endPressure.trim()) fields.endMbar = toMbar(endPressure);
+      if (o2.trim() || he.trim()) {
+        fields.o2Permille = Math.round((parseNumber(o2) || 21) * 10);
+        fields.hePermille = Math.round((parseNumber(he) || 0) * 10);
+      }
       const names = buddies.split(',').map((b) => b.trim()).filter(Boolean);
       if (names.length) fields.buddies = names;
       if (notes.trim()) fields.notes = notes;
       const id = await addDive(fields);
       f7router.navigate(id ? `/dive/${id}/` : '/', { reloadCurrent: true });
-      f7.toast
-        .create({
-          text: t('newDive.saved'),
-          closeButton: true,
-          closeButtonText: t('edit.undo'),
-          closeTimeout: 5000,
-          position: 'bottom',
-          on: {
-            closeButtonClick: async () => {
-              try {
-                await undoLastChange();
-                f7router.navigate('/', { reloadCurrent: true });
-              } catch (e) {
-                console.error('Undo', e);
-              }
-            },
-          },
-        })
-        .open();
+      offerUndo(t('newDive.saved'), () => f7router.navigate('/', { reloadCurrent: true }));
     } catch (e) {
       const code = String(/** @type {any} */ (e)?.message ?? '');
       console.error('Log a dive', code);
@@ -136,12 +179,16 @@
   </Navbar>
 
   <div class="od-form-surface">
-    <TextField
-      label={t('newDive.dateTime')}
-      bind:value={date}
-      invalid={tried && !isoDate}
-      supporting={tried && !isoDate ? t('newDive.dateInvalid') : t('newDive.dateHint')}
-    />
+    <button type="button" class="row" onclick={() => (dialog = 'date')}>
+      <span class="row-label">{t('newDive.date')}</span>
+      <span class="row-value">{dateText}</span>
+      <Icon name="chevron" size={18} />
+    </button>
+    <button type="button" class="row" onclick={() => (dialog = 'time')}>
+      <span class="row-label">{t('newDive.time')}</span>
+      <span class="row-value">{timeText}</span>
+      <Icon name="chevron" size={18} />
+    </button>
     <TextField
       label={t('newDive.duration')}
       bind:value={duration}
@@ -150,12 +197,47 @@
       supporting={tried && !durationOk ? t('newDive.required') : ''}
     />
     <TextField
-      label={t('newDive.depth', { unit: depthUnit(logbook.prefs) })}
+      label={t('newDive.depth', { unit: depthUnit(prefs) })}
       bind:value={depth}
       inputmode="decimal"
       invalid={tried && !depthOk}
       supporting={tried && !depthOk ? t('newDive.required') : t('newDive.profileHint')}
     />
+    <TextField
+      label={t('newDive.water', { unit: temperatureUnit })}
+      bind:value={water}
+      inputmode="decimal"
+      invalid={tried && !waterOk}
+      supporting={tried && !waterOk ? t('newDive.invalid') : ''}
+    />
+  </div>
+
+  <h2 class="group-title">{t('newDive.cylinder')}</h2>
+  <div class="od-form-surface">
+    <button type="button" class="row" onclick={() => (dialog = 'cylinder')}>
+      <span class="row-label">{t('newDive.cylinderType')}</span>
+      <span class="row-value">{cylinderType || t('newDive.defaultCylinder')}</span>
+      <Icon name="chevron" size={18} />
+    </button>
+    <div class="pair">
+      <TextField
+        label={t('newDive.startPressure', { unit: pressureUnit })}
+        bind:value={startPressure}
+        inputmode="decimal"
+        invalid={tried && !startOk}
+      />
+      <TextField
+        label={t('newDive.endPressure', { unit: pressureUnit })}
+        bind:value={endPressure}
+        inputmode="decimal"
+        invalid={tried && !endOk}
+      />
+    </div>
+    <div class="pair">
+      <TextField label={t('newDive.o2')} bind:value={o2} inputmode="decimal" invalid={tried && !gasOk} />
+      <TextField label={t('newDive.he')} bind:value={he} inputmode="decimal" invalid={tried && !gasOk} />
+    </div>
+    <p class="note">{tried && !gasOk ? t('newDive.gasInvalid') : t('newDive.gasHint')}</p>
   </div>
 
   <h2 class="group-title" id="od-new-site">{t('newDive.site')}</h2>
@@ -190,6 +272,42 @@
   </div>
 </Page>
 
+{#if dialog === 'date'}
+  <WheelDialog
+    title={t('newDive.date')}
+    wheels={dateWheels}
+    oncancel={() => (dialog = null)}
+    onconfirm={([d, m, y]) => {
+      year = years[y];
+      month = m;
+      day = Math.min(d + 1, daysIn(years[y], m));
+      dialog = null;
+    }}
+  />
+{:else if dialog === 'time'}
+  <WheelDialog
+    title={t('newDive.time')}
+    wheels={timeWheels}
+    oncancel={() => (dialog = null)}
+    onconfirm={([h, m]) => {
+      hour = h;
+      minute = m;
+      dialog = null;
+    }}
+  />
+{:else if dialog === 'cylinder'}
+  <ChoiceDialog
+    title={t('newDive.cylinderType')}
+    options={cylinderOptions}
+    value={cylinderType}
+    oncancel={() => (dialog = null)}
+    onselect={(v) => {
+      cylinderType = v;
+      dialog = null;
+    }}
+  />
+{/if}
+
 <style>
   @layer od.components {
     :global(.od-new-dive .page-content) {
@@ -206,6 +324,41 @@
         font-weight: 400;
         color: var(--od-text-2);
       }
+    }
+
+    /* A value row, as in Settings: label, value, then a small chevron; it opens a dialog. */
+    .row {
+      width: 100%;
+      min-height: 56px;
+      padding: 0 12px;
+      border: none;
+      background: none;
+      color: var(--od-text);
+      font: inherit;
+      font-size: 16px;
+      text-align: start;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+
+      .row-label {
+        flex: 1;
+      }
+
+      .row-value {
+        color: var(--od-text-2);
+        font-variant-numeric: tabular-nums;
+      }
+
+      :global(.od-icon) {
+        color: var(--od-text-2);
+      }
+    }
+
+    .pair {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
     }
 
     .sites {

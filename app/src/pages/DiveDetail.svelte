@@ -8,12 +8,14 @@
   // in full. Edit and an overflow menu in the navbar. A row without a value is
   // never shown.
   import { onMount } from 'svelte';
-  import { Page, Navbar, Link, List, ListItem, Block, Popover, theme } from 'framework7-svelte';
+  import { Page, Navbar, Link, List, ListItem, Block, Popover, f7, theme } from 'framework7-svelte';
   import { OpenDivesCore } from 'opendives-core';
   import DiveProfile from '../components/DiveProfile.svelte';
   import Icon from '../components/Icon.svelte';
   import Stars from '../components/Stars.svelte';
-  import { logbook } from '../lib/logbook.svelte.js';
+  import { logbook, deleteDive } from '../lib/logbook.svelte.js';
+  import { confirmAction } from '../lib/dialogs.js';
+  import { offerUndo } from '../lib/undo.js';
   import {
     formatCylinderSize,
     formatDepth,
@@ -30,12 +32,39 @@
   } from '../lib/format.js';
   import { t, tIfExists } from '../lib/i18n.js';
 
-  /** @type {{ f7route: { params: { id: string } } }} */
-  let { f7route } = $props();
+  /** @type {{ f7route: { params: { id: string } }, f7router: any }} */
+  let { f7route, f7router } = $props();
 
   const uid = $props.id();
   const menuId = `dive-menu-${uid}`;
   const diveId = $derived(f7route.params.id);
+
+  // "Delete the dive" (⋮ menu): a confirmation, then one undoable step; back
+  // to the logbook with the Undo message.
+  function askDelete() {
+    confirmAction({
+      title: t('detail.deleteTitle'),
+      text: t('detail.deleteText'),
+      action: t('detail.deleteAction'),
+      onConfirm: async () => {
+        try {
+          await deleteDive(Number(diveId));
+          f7router.back();
+          offerUndo(t('detail.deleted'));
+        } catch (e) {
+          const code = String(/** @type {any} */ (e)?.message ?? '');
+          console.error('Delete a dive', code);
+          f7.dialog
+            .create({
+              title: t('detail.deleteTitle'),
+              text: code.startsWith('WRITE_LOCKED') ? t('edit.writeLocked') : t('detail.deleteFailed'),
+              buttons: [{ text: t('dialog.ok') }],
+            })
+            .open();
+        }
+      },
+    });
+  }
 
   /** @type {import('opendives-core').DiveDetail|null} */
   let dive = $state(null);
@@ -231,9 +260,16 @@
         <ListItem link="/plan/{diveId}/" popoverClose title={t('detail.plan')}>
           {#snippet after()}<Icon name="plan" />{/snippet}
         </ListItem>
+        <!-- iOS: a destructive action in the alarm colour (Human Interface Guidelines). -->
+        <ListItem link="#" popoverClose title={t('detail.delete')} class="destructive" onClick={askDelete}>
+          {#snippet after()}<Icon name="delete" />{/snippet}
+        </ListItem>
       {:else}
         <ListItem link="/plan/{diveId}/" popoverClose title={t('detail.plan')}>
           {#snippet media()}<Icon name="plan" weight={2} />{/snippet}
+        </ListItem>
+        <ListItem link="#" popoverClose title={t('detail.delete')} onClick={askDelete}>
+          {#snippet media()}<Icon name="delete" weight={2} />{/snippet}
         </ListItem>
       {/if}
     </List>
@@ -777,6 +813,11 @@
     :global(.ios .dive-menu .item-title) {
       font-size: 17px;
       font-weight: 400;
+    }
+
+    :global(.ios .dive-menu .destructive .item-title),
+    :global(.ios .dive-menu .destructive .item-after) {
+      color: var(--od-alarm);
     }
 
     :global(.ios .dive-menu .item-after) {

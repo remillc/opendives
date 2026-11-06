@@ -215,7 +215,13 @@
       "one": "{n} photo",
       "other": "{n} photos"
     },
-    "photoNote": "Sur un autre appareil : seule leur référence est synchronisée"
+    "photoNote": "Sur un autre appareil : seule leur référence est synchronisée",
+    "delete": "Supprimer la plongée",
+    "deleteTitle": "Supprimer la plongée",
+    "deleteText": "La plongée est retirée du carnet, sur cet appareil et dans le cloud. Vous pourrez l'annuler pendant quelques secondes.",
+    "deleteAction": "Supprimer",
+    "deleted": "Plongée supprimée",
+    "deleteFailed": "La plongée n'a pas pu être supprimée. Aucune plongée n'a été modifiée."
   },
   "profile": {
     "hint": "Posez le doigt sur le profil pour lire temps et profondeur.",
@@ -1304,24 +1310,24 @@
       "other": "fiche de la plongée"
     },
     "textNoDate": "Une plongée a été modifiée ici et dans le cloud (depuis un autre appareil) : {field}. Les deux versions ne se combinent pas. Rien n'est perdu tant que vous n'avez pas choisi.",
-    "more": {
-      "one": "Une autre plongée est dans le même cas.",
-      "other": "{n} autres plongées sont dans le même cas."
-    },
     "deviceWhen": "Modifiée le {when}",
     "cloudWhen": "Envoyée depuis un autre appareil le {when}",
     "thisDevice": "Ce téléphone :",
     "theCloud": "Cloud :",
     "empty": "(vide)",
-    "failed": "Le choix n'a pas pu être enregistré. Rien n'a changé."
+    "failed": "Le choix n'a pas pu être enregistré. Rien n'a changé.",
+    "textMany": {
+      "one": "{n} plongée a été modifiée ici et dans le cloud (depuis un autre appareil), et les deux versions ne se combinent pas. Rien n'est perdu tant que vous n'avez pas choisi.",
+      "other": "{n} plongées ont été modifiées ici et dans le cloud (depuis un autre appareil), et les deux versions ne se combinent pas. Rien n'est perdu tant que vous n'avez pas choisi."
+    },
+    "diveTitle": "N° {number}, {date}",
+    "unknownDive": "Plongée sans date",
+    "forAll": "Appliquer ce choix à toutes les plongées"
   },
   "newDive": {
     "title": "Noter une plongée",
     "cancel": "Annuler",
     "save": "Enregistrer",
-    "dateTime": "Date et heure",
-    "dateHint": "Par exemple 2026-11-06 09:30",
-    "dateInvalid": "Date non reconnue, par exemple 2026-11-06 09:30",
     "duration": "Durée (min)",
     "depth": "Profondeur maximale ({unit})",
     "required": "Valeur requise",
@@ -1336,6 +1342,24 @@
     "rating": "Note globale",
     "notes": "Notes",
     "saved": "Plongée ajoutée",
-    "failed": "La plongée n'a pas pu être ajoutée. Aucune plongée n'a été modifiée."
+    "failed": "La plongée n'a pas pu être ajoutée. Aucune plongée n'a été modifiée.",
+    "date": "Date",
+    "time": "Heure",
+    "day": "Jour",
+    "month": "Mois",
+    "year": "Année",
+    "hour": "Heure",
+    "minute": "Minute",
+    "water": "Température de l'eau ({unit})",
+    "invalid": "Valeur non reconnue",
+    "cylinder": "Bouteille",
+    "cylinderType": "Type de bouteille",
+    "defaultCylinder": "Bouteille par défaut",
+    "startPressure": "Pression de départ ({unit})",
+    "endPressure": "Pression d'arrivée ({unit})",
+    "o2": "Oxygène (%)",
+    "he": "Hélium (%)",
+    "gasHint": "Vide : de l'air.",
+    "gasInvalid": "Mélange non valide : oxygène de 5 à 100 %, hélium jusqu'à 95 %, 100 % au plus en tout."
   }
 }
