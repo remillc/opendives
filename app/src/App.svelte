@@ -29,6 +29,8 @@
   import StatisticNew from './pages/StatisticNew.svelte';
   import Tools from './pages/Tools.svelte';
   import Desaturation from './pages/Desaturation.svelte';
+  import Planner from './pages/Planner.svelte';
+  import PlannerSetup from './pages/PlannerSetup.svelte';
   import Icon from './components/Icon.svelte';
   import AdaptiveLabel from './components/AdaptiveLabel.svelte';
   import NavMenu from './components/NavMenu.svelte';
@@ -70,14 +72,11 @@
       { path: '/welcome/sign-in/', component: SignIn },
       { path: '/welcome/create/', component: CreateAccount, options: { props: { welcome: true } } },
       { path: '/welcome/import/', component: BringLogbook },
-      // Not built yet: the planner prefilled from a dive.
       { path: '/dive/:id/edit/', component: EditDive },
       { path: '/trip/:id/', component: Trip },
-      {
-        path: '/plan/:id/',
-        component: Placeholder,
-        options: { props: { title: t('detail.plan'), text: t('placeholders.planText') } },
-      },
+      // The planner: /plan/new/ for a new dive, /plan/<dive id>/ from a logbook dive.
+      { path: '/plan/setup/', component: PlannerSetup },
+      { path: '/plan/:id/', component: Planner },
       { path: '/sites/', component: Sites },
       { path: '/sites/without/', component: DivesWithoutSite },
       { path: '/sites/cleanup/', component: SitesCleanup },

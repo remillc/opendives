@@ -247,6 +247,43 @@ int gas_cylinder_types(std::string &json);
 // tissue graph: 50 = ambient pressure, 100 = M-value), "surfaceGf", "n2Bar",
 // "heBar", "halfTimeMin"}}.
 int desaturation(int64_t now, std::string &json);
+// --- Dive planner (plan.cpp; spec, section 4, "Planner") -------------------
+//
+// Read-only: nothing is added to the logbook and the preferences are left as
+// they were. The deco model, gradient factors and VPM-B conservatism are the
+// core's preferences (Settings, "Décompression").
+
+// The planner's settings as the preferences hold them:
+// {"model":"buehlmann"|"vpmb"|"recreational", "gfLow", "gfHigh",
+//  "vpmbConservatism", and the planner-only ones: "bottomSacMlMin",
+//  "decoSacMlMin", "bottomPo2Mbar", "decoPo2Mbar", "descentMmMin",
+//  "ascent75MmMin", "ascent50MmMin", "ascentStopsMmMin", "ascentLast6mMmMin",
+//  "lastStop6m", "safetyStop", "switchAtRequiredStop", "minSwitchSeconds",
+//  "o2Breaks", "reserveMbar" (recreational mode), "problemSolvingMinutes",
+//  "sacFactor" (x100)}.
+int planner_setup(std::string &json);
+
+// Runs Subsurface's planner on a square profile. `request`: {"depthMm",
+// "bottomTimeSeconds" (descent included), "cylinders":[{"o2Permille",
+// "hePermille", "sizeMl", "startMbar"}] (the first is the bottom gas, the
+// others are switched to at their depth for the ppO2 for deco), optional
+// "surfacePressureMbar" (1013), "salinity" (10300, sea water), "when" (local
+// timestamp; default an hour from now, or after the latest dive), and any
+// planner-only setting of planner_setup(), for this plan only}.
+// Writes {"error":""|"TIMEOUT"|"INAPPROPRIATE_GAS"|"NO_SUITABLE_BAILOUT_GAS"|
+// "RECREATIONAL_EXCEEDS_NDL", "setup":{…as used}, "effGfLow", "effGfHigh",
+// "when", "surfaceIntervalSeconds", "runtimeSeconds", "maxDepthMm", "cns",
+// "otu", "points":[[s, mm]…], "segments":[{"timeSeconds", "depthMm",
+// "cylinder", "entered"}], "stops":[{"depthMm", "durationSeconds",
+// "runtimeSeconds", "cylinder", "gasChange"}], "cylinders":[{"o2Permille",
+// "hePermille", "sizeMl", "startMbar", "endMbar", "gasUsedMl",
+// "decoGasUsedMl", "decoPressureMbar", "switchDepthMm", "bottomModMm",
+// "warning":""|"MORE_THAN_AVAILABLE"|"NO_RESERVE_FOR_SHARING"|
+// "NO_GAS_FOR_PROBLEM_SOLVING"}], "minimumGas":null|{"cylinder", "depthMm",
+// "pressureMbar", "deltaMbar" (negative: short), "sacFactor",
+// "problemSolvingMinutes"}}, as plannernotes.cpp computes them.
+// -1 with BAD_REQUEST.
+int plan_dive(const std::string &request, std::string &json, std::string &error);
 
 // Undo stack of the session; cleared by every load. The result is the dive
 // changed, as get_dive() gives it.

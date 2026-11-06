@@ -147,6 +147,82 @@ import { registerPlugin } from '@capacitor/core';
  * @property {string[]} library the device's library, to keep as is and set again at start
  * @property {string} undo
  * @property {string} redo
+ * Planner settings (plan_dive in opendives.h). The deco model, gradient
+ * factors and VPM-B conservatism are the shared preferences (Settings); the
+ * others are the planner's own, rates in mm per minute.
+ * @typedef {Object} PlannerSetup
+ * @property {'buehlmann'|'vpmb'|'recreational'} model
+ * @property {number} gfLow
+ * @property {number} gfHigh
+ * @property {number} vpmbConservatism
+ * @property {number} bottomSacMlMin
+ * @property {number} decoSacMlMin
+ * @property {number} bottomPo2Mbar
+ * @property {number} decoPo2Mbar
+ * @property {number} descentMmMin
+ * @property {number} ascent75MmMin
+ * @property {number} ascent50MmMin
+ * @property {number} ascentStopsMmMin
+ * @property {number} ascentLast6mMmMin
+ * @property {boolean} lastStop6m
+ * @property {boolean} safetyStop
+ * @property {boolean} switchAtRequiredStop
+ * @property {number} minSwitchSeconds
+ * @property {boolean} o2Breaks
+ * @property {number} reserveMbar
+ * @property {number} problemSolvingMinutes
+ * @property {number} sacFactor x100
+ */
+
+/**
+ * @typedef {Object} PlanCylinderRequest
+ * @property {number} o2Permille
+ * @property {number} hePermille
+ * @property {number} sizeMl
+ * @property {number} startMbar
+ */
+
+/**
+ * A square profile and the planner-only settings for this plan.
+ * @typedef {Partial<Omit<PlannerSetup, 'model'|'gfLow'|'gfHigh'|'vpmbConservatism'>> & {
+ *   depthMm: number, bottomTimeSeconds: number, cylinders: PlanCylinderRequest[],
+ *   surfacePressureMbar?: number, salinity?: number, when?: number
+ * }} PlanRequest
+ */
+
+/**
+ * @typedef {Object} PlanCylinder
+ * @property {number} o2Permille
+ * @property {number} hePermille
+ * @property {number} sizeMl
+ * @property {number} startMbar
+ * @property {number} endMbar
+ * @property {number} gasUsedMl
+ * @property {number} decoGasUsedMl
+ * @property {number} decoPressureMbar
+ * @property {number} switchDepthMm
+ * @property {number} bottomModMm
+ * @property {''|'MORE_THAN_AVAILABLE'|'NO_RESERVE_FOR_SHARING'|'NO_GAS_FOR_PROBLEM_SOLVING'} warning
+ */
+
+/**
+ * Result of the core's planner.
+ * @typedef {Object} PlanResult
+ * @property {''|'TIMEOUT'|'INAPPROPRIATE_GAS'|'NO_SUITABLE_BAILOUT_GAS'|'RECREATIONAL_EXCEEDS_NDL'} error
+ * @property {PlannerSetup} setup the settings used
+ * @property {number} effGfLow VPM-B only
+ * @property {number} effGfHigh
+ * @property {number} runtimeSeconds
+ * @property {number} maxDepthMm
+ * @property {number} cns
+ * @property {number} otu
+ * @property {number} surfaceIntervalSeconds
+ * @property {[number, number][]} points seconds, mm
+ * @property {{timeSeconds: number, depthMm: number, cylinder: number, entered: boolean}[]} segments
+ * @property {{depthMm: number, durationSeconds: number, runtimeSeconds: number, cylinder: number, gasChange: boolean}[]} stops
+ * @property {PlanCylinder[]} cylinders
+ * @property {{cylinder: number, depthMm: number, pressureMbar: number, deltaMbar: number, sacFactor: number, problemSolvingMinutes: number}|null} minimumGas
+ *   deltaMbar negative: that much short of the minimum gas
  */
 
 /**
@@ -300,6 +376,11 @@ import { registerPlugin } from '@capacitor/core';
  * @property {(options: {action: 'list'|'library'|'add'|'size'|'remove'|'rename', name?: string, value?: string, ml?: number, mbar?: number}) => Promise<CylinderTypes>} cylinderTypes
  *   Cylinder types of Settings; "rename" (to value) changes the log as one undoable step,
  *   "library" sets the device's library (value: JSON {"library": [...]}).
+ *   Units of the last loaded log.
+ * @property {() => Promise<PlannerSetup>} plannerSetup
+ *   The planner's settings as the core's preferences hold them.
+ * @property {(request: PlanRequest) => Promise<PlanResult>} planDive
+ *   Runs Subsurface's planner; read only, nothing is added to the logbook.
  */
 
 /** @type {any} */
@@ -372,5 +453,11 @@ export const OpenDivesCore = {
   async cylinderTypes(options) {
     const result = JSON.parse((await native.cylinderTypes(options)).json);
     return { ...result.cylinderTypes, undo: result.undo, redo: result.redo };
+  },
+  async plannerSetup() {
+    return JSON.parse((await native.plannerSetup()).json);
+  },
+  async planDive(request) {
+    return JSON.parse((await native.planDive({ request })).json);
   },
 };

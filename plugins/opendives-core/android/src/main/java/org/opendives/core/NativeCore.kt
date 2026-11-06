@@ -15,6 +15,8 @@ internal object NativeCore {
     external fun getPrefs(): String
     external fun setPrefs(changes: String)
     external fun cylinderTypes(action: String, name: String, value: String, ml: Int, mbar: Int): String
+    external fun plannerSetup(): String
+    external fun planDive(request: String): String
     external fun setCaFile(path: String)
     external fun cloudListDives(email: String, password: String): String
     external fun cloudConfigure(email: String, password: String)

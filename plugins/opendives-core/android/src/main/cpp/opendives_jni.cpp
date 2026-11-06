@@ -394,6 +394,26 @@ Java_org_opendives_core_NativeCore_cylinderTypes(JNIEnv *env, jobject, jstring a
 	return edit_result(env, json);
 }
 
+// Dive planner (plan.cpp): read only, nothing is added to the logbook.
+JNIEXPORT jstring JNICALL
+Java_org_opendives_core_NativeCore_plannerSetup(JNIEnv *env, jobject)
+{
+	std::string json;
+	opendives::planner_setup(json);
+	return env->NewStringUTF(json.c_str());
+}
+
+JNIEXPORT jstring JNICALL
+Java_org_opendives_core_NativeCore_planDive(JNIEnv *env, jobject, jstring request)
+{
+	std::string json, error;
+	if (opendives::plan_dive(to_string(env, request), json, error)) {
+		throw_core_error(env, error);
+		return nullptr;
+	}
+	return env->NewStringUTF(json.c_str());
+}
+
 JNIEXPORT jstring JNICALL
 Java_org_opendives_core_NativeCore_listDives(JNIEnv *env, jobject, jstring repo)
 {

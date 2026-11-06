@@ -223,12 +223,19 @@
     {/snippet}
   </Navbar>
 
-  <!-- Overflow menu (MD3 menu on Android, pull-down menu on iOS). One item for now. -->
+  <!-- Overflow menu (detail2 mock-ups): an MD3 menu on Android, icon before the
+       label; an iOS pull-down menu, label then icon at the end, no arrow. -->
   <Popover id={menuId} class="dive-menu" backdrop={false}>
     <List noChevron>
-      <ListItem link="/plan/{diveId}/" popoverClose title={t('detail.plan')}>
-        {#snippet media()}<Icon name="plan" weight={2} />{/snippet}
-      </ListItem>
+      {#if theme.ios}
+        <ListItem link="/plan/{diveId}/" popoverClose title={t('detail.plan')}>
+          {#snippet after()}<Icon name="plan" />{/snippet}
+        </ListItem>
+      {:else}
+        <ListItem link="/plan/{diveId}/" popoverClose title={t('detail.plan')}>
+          {#snippet media()}<Icon name="plan" weight={2} />{/snippet}
+        </ListItem>
+      {/if}
     </List>
   </Popover>
 
@@ -741,6 +748,38 @@
       font-weight: 500;
       white-space: nowrap;
       overflow: visible;
+      color: var(--od-text);
+    }
+
+    /* iOS pull-down menu: 260 pt wide, 13 pt corners, 17 pt label, icon at the end. */
+    :global(.ios .popover.dive-menu) {
+      --f7-popover-width: 260px;
+      --f7-popover-border-radius: 13px;
+      min-width: 0;
+      max-width: none;
+      background: color-mix(in srgb, var(--od-surface) 94%, transparent);
+      backdrop-filter: blur(20px);
+    }
+
+    :global(.ios .dive-menu .popover-arrow) {
+      display: none;
+    }
+
+    :global(.ios .dive-menu .list) {
+      margin: 0;
+    }
+
+    :global(.ios .dive-menu .item-content) {
+      min-height: 44px;
+      padding-left: 16px;
+    }
+
+    :global(.ios .dive-menu .item-title) {
+      font-size: 17px;
+      font-weight: 400;
+    }
+
+    :global(.ios .dive-menu .item-after) {
       color: var(--od-text);
     }
   }
