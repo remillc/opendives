@@ -117,3 +117,7 @@ Rules for this task:
 - Stop and ask Christian before adding a native dependency (Bluetooth for dive computers, offline map tiles, file pickers), before exposing a new core function that is not read-only, or when a mock-up and the specification disagree.
 - Anything that writes to a cloud account runs on `OPENDIVES_CLOUD_TEST_EMAIL` only.
 - Report, at the end, which screens are built, which are partial and why.
+
+## [ ] 2026-11-06-16 Settings modelled on Subsurface
+
+Rebuild Settings from `docs/mockups/android-reglages.dc.html` and `docs/ui-specification.md`, section 4, "Settings, modelled on Subsurface" (it supersedes the settings part of task 12 and the old settings boards). Read and write each value through the core's preferences (`core/pref.h`), with Subsurface's defaults; keep them per device, except trip grouping, which is the logbook's `autogroup`. Do not move planner settings here: they belong to the planner screen. Rename the conditions to Subsurface's French labels ("Vagues de surface", "Flux-reflux", "Froid") in `fr.json`. Do this task before task 15.
