@@ -139,8 +139,11 @@
   @layer od.components {
     /* Tablet: the views leave room for the sidebar or the rail (NavRail.svelte). */
     :global(.views.od-tablet) {
-      margin-left: var(--od-nav-width);
-      width: calc(100% - var(--od-nav-width));
+      /* The rail or sidebar takes the left safe area (camera cut-out in
+         landscape): the pages beside it must not add it again. */
+      --f7-safe-area-left: 0px;
+      margin-left: calc(var(--od-nav-width) + env(safe-area-inset-left));
+      width: calc(100% - var(--od-nav-width) - env(safe-area-inset-left));
     }
 
     /* Logbook, list and dive side by side (Framework7 master-detail). */
