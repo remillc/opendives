@@ -66,6 +66,10 @@ The work directory must be on a Linux file system (not `/mnt/*`), as for the clo
 tests/run-cloud-write-test.sh build/poc/cloud-write ~/.opendives/cloud-dev.env ~/.opendives/cloud-test.env ~/cwt
 ```
 
+## Dive planner (6 November 2026)
+
+`build/poc/plan` (`tests/plan_test.cpp`) runs the façade's read-only `plan_dive` (`core/libopendives/plan.cpp`, Subsurface's `plan()` set up as `DivePlannerPointsModel` does) on the cases of Subsurface's own `tests/testplan.cpp`, with the same settings: `testMetric` (minimum gas 148 bar, EAN36 at 33 m, oxygen at 6 m, run time 109 min exactly), `testVpmbMetric45m30minTx` (minimum gas 108 bar) and `testVpmbMetric60m30minAir` (minimum gas 180 bar, run time 139 min 20 s, Subsurface's known value). It then checks that no dive was added and that the preferences are restored, and plans the mock-up dive (28 m, 30 min, EAN33 12 L 195 bar, SAC 10.3 L/min, GF 30/70): 38 min, stops at 6 and 3 m, CNS 16 %, 44 OTU. Result: 0 failed.
+
 ## Reproduce
 
 Linux or WSL is required. The required packages are listed at the top of `poc/build.sh`.

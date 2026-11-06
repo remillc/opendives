@@ -86,6 +86,23 @@ class OpenDivesCorePlugin : Plugin() {
         call.resolve(JSObject(NativeCore.getDive(id)))
     }
 
+    /** Planner settings as the core's preferences hold them (plan.cpp). */
+    @PluginMethod
+    fun plannerSetup(call: PluginCall) = onCoreThread(call) {
+        call.resolve(JSObject().put("json", NativeCore.plannerSetup()))
+    }
+
+    /** Runs the core's planner; read only (see opendives.h, plan_dive). */
+    @PluginMethod
+    fun planDive(call: PluginCall) = onCoreThread(call) {
+        val request = call.getObject("request")
+        if (request == null) {
+            call.reject("Missing plan request", "BAD_ARGUMENT")
+            return@onCoreThread
+        }
+        call.resolve(JSObject().put("json", NativeCore.planDive(request.toString())))
+    }
+
     /** Units of the loaded log, one per quantity. */
     @PluginMethod
     fun getPrefs(call: PluginCall) = onCoreThread(call) {
