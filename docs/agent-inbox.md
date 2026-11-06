@@ -221,3 +221,7 @@ Mock-ups, Android then iPhone:
 - `docs/mockups/compte-creation-ios.dc.html`
 - `docs/mockups/compte-code-ios.dc.html`, `compte-code-erreur-ios.dc.html`
 - Links updated in `android-accueil`, `ios-accueil`, `compte-android-sans-compte`, `compte-ios-sans-compte`.
+
+## [ ] 2026-11-06-31 New account step 2: "Continuer" button
+
+On "Reprendre votre carnet ?", the main button at the bottom applies to the selected choice, so its label is now "Continuer" instead of "Télécharger mes plongées": divelogs.de starts the download, file opens the file picker, empty logbook opens the logbook. Mock-ups: `docs/mockups/android-compte-import.dc.html`, `docs/mockups/ios-compte-import.dc.html`.
