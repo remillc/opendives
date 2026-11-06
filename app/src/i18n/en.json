@@ -280,7 +280,8 @@
     "create": "Create a Subsurface account",
     "createText": "Free. Your dives are backed up and shared between your phone, your tablet and your computer. You can bring your divelogs.de logbook into it.",
     "noAccount": "Start without an account",
-    "noAccountText": "Your dives stay on this device only: no backup, and no sharing with your other devices. You can create an account later and send your logbook to it."
+    "noAccountText": "Your dives stay on this device only: no backup, and no sharing with your other devices. You can create an account later and send your logbook to it.",
+    "choicesLabel": "Ways to start"
   },
   "signOut": {
     "title": "Sign out?",
@@ -690,5 +691,55 @@
     "noDives": "No logbook dive counts in this calculation.",
     "note": "This calculation only knows the dives in the logbook. A missing dive makes it wrong. Your dive computer prevails.",
     "recommendation": "The wait before flying is an OpenDives recommendation, not a result of the model: 18 hours after several dives in a day, 12 hours after a single one. It is never a guarantee."
+  },
+  "accountStep": {
+    "back": "Back"
+  },
+  "signIn": {
+    "title": "Sign in",
+    "heading": "Your Subsurface account",
+    "intro": "The same account as in Subsurface on the computer or in Subsurface-mobile. Your dives are read from the cloud, then a copy stays on this device.",
+    "email": "Email address",
+    "password": "Password",
+    "passwordText": "Kept only in the secure storage of this device",
+    "submit": "Sign in"
+  },
+  "createAccount": {
+    "title": "New account",
+    "step1": "Step 1 of 2",
+    "step2": "Step 2 of 2",
+    "heading": "Create your Subsurface account",
+    "intro": "Free. A code is sent to you by email to confirm the address.",
+    "email": "Email address",
+    "password": "Password",
+    "passwordText": "Unaccented letters, digits and @ . + _ - only",
+    "invalidEmail": "This email address is not valid",
+    "submit": "Create the account"
+  },
+  "bringLogbook": {
+    "heading": "Bring your logbook?",
+    "intro": "Your Subsurface account is ready. You can fill it right away with the dives you already have.",
+    "previewIntro": "Preview of this step. No account was created.",
+    "sourceLabel": "Source of the logbook",
+    "divelogs": "From divelogs.de",
+    "divelogsText": "The dives are downloaded once, then saved in your Subsurface account. After that, divelogs.de and OpenDives do not sync: you can send dives back to it whenever you like.",
+    "user": "divelogs.de user name",
+    "password": "divelogs.de password",
+    "credentialsNote": "These credentials are only used for this download. OpenDives does not keep them.",
+    "file": "From a file",
+    "fileText": "Subsurface logbook (.ssrf, .xml), divelogs.de export (.dld) or from another program",
+    "empty": "Start with an empty logbook",
+    "download": "Download my dives",
+    "chooseFile": "Choose a file",
+    "start": "Start"
+  },
+  "notAvailable": {
+    "title": "Not available yet",
+    "signIn": "Signing in with an account typed here is not built yet. Nothing was sent or kept.",
+    "create": "Creating an account is not built yet. No account was created and nothing was sent.",
+    "previewStep2": "See step 2",
+    "divelogs": "Downloading from divelogs.de is not built yet. Your credentials were neither sent nor kept.",
+    "file": "Importing a file is not built yet.",
+    "empty": "Opening the empty logbook of a new account is not built yet."
   }
 }
