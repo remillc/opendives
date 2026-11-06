@@ -27,25 +27,47 @@ export const logbook = $state({
 });
 
 /**
- * Cloud log: the device's copy first, shown at once without network, then
- * the sync. When the server has nothing new, the copy shown stays as is.
+ * Cloud log: the device's copy is read (no network) while the server is asked
+ * for its head (network only), at the same time. The copy is shown as soon as
+ * it is read; when the server's head is the copy's, the log is up to date and
+ * nothing else is done. Otherwise the core syncs and reads the log again.
  * @returns {Promise<boolean>} false when no cloud account is configured
  */
 async function loadCloud() {
-  let shown = false;
+  if (!(await OpenDivesCore.configureCloud()).available) return false;
+  const probe = OpenDivesCore.probeCloud().then(
+    (head) => ({ ok: true, ...head }),
+    (/** @type {unknown} */ error) => ({ ok: false, exists: false, head: '', error }),
+  );
+
+  /** @type {string|null} commit of the copy shown */
+  let shownHead = null;
   try {
     const cached = await OpenDivesCore.listCloudDives({ cached: true });
-    if (!cached.available) return false;
     if (cached.dives) {
       logbook.dives = cached.dives;
       logbook.prefs = await OpenDivesCore.getPrefs();
       logbook.sync = 'syncing';
       logbook.loading = false;
-      shown = true;
+      shownHead = cached.head ?? '';
     }
   } catch (e) {
     // An unreadable copy is not fatal: the sync below reads the log again.
     console.error('Reading the device copy of the cloud log', e);
+  }
+
+  const server = await probe;
+  if (shownHead !== null) {
+    if (server.ok && server.exists && server.head === shownHead) {
+      logbook.sync = 'cloud';
+      return true;
+    }
+    if (!server.ok) {
+      // The server did not answer: the copy shown is the offline logbook.
+      console.error('Asking the cloud server for its head', server.error);
+      logbook.sync = 'offline';
+      return true;
+    }
   }
   try {
     const fresh = await OpenDivesCore.listCloudDives();
@@ -55,7 +77,7 @@ async function loadCloud() {
     }
     logbook.sync = fresh.synced ? 'cloud' : 'offline';
   } catch (e) {
-    if (!shown) throw e;
+    if (shownHead === null) throw e;
     // The copy shown stays usable: the logbook is only out of date.
     console.error('Syncing with the cloud', e);
     logbook.sync = 'offline';

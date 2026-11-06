@@ -15,5 +15,9 @@ internal object NativeCore {
     external fun getPrefs(): String
     external fun setCaFile(path: String)
     external fun cloudListDives(email: String, password: String): String
-    external fun cloudListCachedDives(email: String, password: String): String
+    external fun cloudConfigure(email: String, password: String)
+    external fun cloudListCachedDives(): String
+
+    /** The one call allowed off the core thread, even during a load (see opendives.h). */
+    external fun cloudProbe(): String
 }

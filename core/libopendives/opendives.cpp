@@ -18,6 +18,7 @@
 #include "core/compat/platform_https.h"
 
 #include <git2.h>
+#include <chrono>
 #include <cstdio>
 #include <ctime>
 
@@ -453,14 +454,20 @@ static std::string cloud_json(const std::string &head, bool synced, const std::s
 	return json;
 }
 
-int cloud_list_cached_dives(const std::string &email, const std::string &password, std::string &json, std::string &error)
+// Durations of the last cloud_branch_status() steps, in ms, for cloud_probe.
+static long probe_connect_ms = 0, probe_list_ms = 0;
+
+// Log address set by the last successful cloud_configure().
+static std::string configured_url;
+
+int cloud_list_cached_dives(std::string &json, std::string &error)
 {
-	std::string url;
 	json.clear();
-	if (cloud_configure(email, password, url)) {
-		error = "Incomplete cloud credentials";
+	if (configured_url.empty()) {
+		error = "Cloud account not configured";
 		return -1;
 	}
+	const std::string url = configured_url;
 	struct git_info info;
 	if (!is_git_repository(url.c_str(), &info) || !log_exists(info.localdir))
 		return 1;
@@ -527,10 +534,32 @@ int cloud_configure(const std::string &email, const std::string &password, std::
 {
 	prefs.cloud_storage_email = email;
 	prefs.cloud_storage_password = password;
+	configured_url.clear();
 	auto cloud_url = getCloudURL();
 	if (!cloud_url)
 		return -1;
-	url = *cloud_url;
+	url = configured_url = *cloud_url;
+	return 0;
+}
+
+int cloud_probe(std::string &json, std::string &error)
+{
+	const std::string url = configured_url;
+	if (url.empty()) {
+		error = "Cloud account not configured";
+		return -1;
+	}
+	bool exists = false;
+	std::string head;
+	if (cloud_branch_status(url, exists, head, error))
+		return -1;
+	json = "{\"exists\":";
+	json += exists ? "true" : "false";
+	json += ",\"head\":";
+	append_json_string(json, head);
+	json += ",\"connectMs\":" + std::to_string(probe_connect_ms);
+	json += ",\"listMs\":" + std::to_string(probe_list_ms);
+	json += '}';
 	return 0;
 }
 
@@ -542,6 +571,11 @@ static int probe_credentials(git_credential **out, const char *, const char *, u
 		return GIT_EUSER;
 	return git_credential_userpass_plaintext_new(out, prefs.cloud_storage_email_encoded.c_str(),
 						     prefs.cloud_storage_password.c_str());
+}
+
+static long ms_since(const std::chrono::steady_clock::time_point &start)
+{
+	return static_cast<long>(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start).count());
 }
 
 int cloud_branch_status(const std::string &url, bool &exists, std::string &head, std::string &error)
@@ -566,11 +600,16 @@ int cloud_branch_status(const std::string &url, bool &exists, std::string &head,
 	callbacks.credentials = probe_credentials;
 	callbacks.payload = &attempts;
 	// No certificate_check: libgit2 applies its normal validation.
+	auto start = std::chrono::steady_clock::now();
 	int ret = git_remote_connect(remote, GIT_DIRECTION_FETCH, &callbacks, nullptr, nullptr);
+	probe_connect_ms = ms_since(start);
+	probe_list_ms = 0;
 	if (ret == 0) {
 		const git_remote_head **heads = nullptr;
 		size_t count = 0;
+		start = std::chrono::steady_clock::now();
 		ret = git_remote_ls(&heads, &count, remote);
+		probe_list_ms = ms_since(start);
 		for (size_t i = 0; ret == 0 && i < count; i++) {
 			if (branch_ref == heads[i]->name) {
 				char sha[41];

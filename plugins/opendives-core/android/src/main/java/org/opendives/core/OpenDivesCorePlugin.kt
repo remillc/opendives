@@ -17,6 +17,9 @@ import java.util.concurrent.Executors
 @CapacitorPlugin(name = "OpenDivesCore")
 class OpenDivesCorePlugin : Plugin() {
     private val coreThread: ExecutorService = Executors.newSingleThreadExecutor()
+
+    /** Network only (probeCloud): runs while the core thread loads the log. */
+    private val networkThread: ExecutorService = Executors.newSingleThreadExecutor()
     private val repoDir: File by lazy { File(context.filesDir, "carnet") }
     private val repo: String by lazy { "${repoDir.absolutePath}[main]" }
 
@@ -83,21 +86,55 @@ class OpenDivesCorePlugin : Plugin() {
      * Read-only access to the Subsurface cloud. TEMPORARY, for development:
      * the credentials are read from files/cloud-dev.env, copied with adb
      * (see app/README.md). They are neither in the APK nor logged.
-     * `cached: true` reads the device's copy only, without network; `json`
-     * is then empty when there is no copy yet.
+     *
+     * configureCloud() sets the account, without network. Then probeCloud()
+     * (server's head, network only) and listCloudDives({cached: true}) (the
+     * device's copy, no network) can run at the same time.
+     */
+    @PluginMethod
+    fun configureCloud(call: PluginCall) = onCoreThread(call) {
+        val credentials = readDevCredentials()
+        if (credentials != null) NativeCore.cloudConfigure(credentials.first, credentials.second)
+        call.resolve(JSObject().put("available", credentials != null))
+    }
+
+    @PluginMethod
+    fun probeCloud(call: PluginCall) {
+        networkThread.execute {
+            try {
+                val start = System.currentTimeMillis()
+                val json = NativeCore.cloudProbe()
+                val steps = JSObject(json)
+                Log.i(
+                    TAG,
+                    "probeCloud: ${System.currentTimeMillis() - start} ms " +
+                        "(connect ${steps.optLong("connectMs")} ms, list ${steps.optLong("listMs")} ms)",
+                )
+                call.resolve(JSObject().put("json", json))
+            } catch (e: Exception) {
+                Log.e(TAG, "Cloud probe error", e)
+                call.reject(e.message, "CORE_ERROR", e)
+            }
+        }
+    }
+
+    /**
+     * `cached: true` reads the device's copy only, without network (after
+     * configureCloud); `json` is then empty when there is no copy yet.
+     * Otherwise syncs with the server, then reads the log.
      */
     @PluginMethod
     fun listCloudDives(call: PluginCall) = onCoreThread(call) {
-        val credentials = readDevCredentials()
-        if (credentials == null) {
-            call.resolve(JSObject().put("available", false))
-            return@onCoreThread
-        }
         val cached = call.getBoolean("cached", false) == true
         val start = System.currentTimeMillis()
         val json = if (cached) {
-            NativeCore.cloudListCachedDives(credentials.first, credentials.second)
+            NativeCore.cloudListCachedDives()
         } else {
+            val credentials = readDevCredentials()
+            if (credentials == null) {
+                call.resolve(JSObject().put("available", false))
+                return@onCoreThread
+            }
             NativeCore.cloudListDives(credentials.first, credentials.second)
         }
         Log.i(TAG, "listCloudDives(cached=$cached): ${json.length} chars, ${System.currentTimeMillis() - start} ms")

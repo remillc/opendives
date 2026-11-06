@@ -69,13 +69,13 @@
         {/each}
       </div>
     </div>
-    <div class="item-inner">
-      <div class="item-title-row">
+    <div class="item-inner od-row">
+      <div class="od-row-text">
         <div class="item-title">{title}</div>
-        <div class="item-after"><span class="arrow" class:expanded><Icon name="expand" /></span></div>
+        <div class="item-text od-value">{summary}</div>
+        {#if location}<div class="item-text">{t('trip.startingOn', { date: formatLongDate(start) })}</div>{/if}
       </div>
-      <div class="item-text od-value">{summary}</div>
-      {#if location}<div class="item-text">{t('trip.startingOn', { date: formatLongDate(start) })}</div>{/if}
+      <span class="arrow" class:expanded><Icon name="expand" /></span>
     </div>
   </div>
 </li>
@@ -89,10 +89,6 @@
       grid-template-columns: 1fr 1fr;
       grid-template-rows: 1fr 1fr;
       gap: 2px;
-    }
-
-    .item-title {
-      white-space: normal;
     }
 
     .arrow {

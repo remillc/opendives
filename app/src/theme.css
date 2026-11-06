@@ -177,9 +177,13 @@ html.ios {
    * alternative text, TalkBack and VoiceOver would read "chevron_right" or
    * "search_md".
    */
-  /* Framework7 puts the chevron on item-inner, or on item-title-row in a media list. */
+  /*
+   * Framework7 puts the chevron on item-inner, or on item-title-row in a media
+   * list, or on item-inner again in a "chevron-center" media list.
+   */
   .list:not(.media-list) .item-link .item-inner::before,
-  .media-list .item-link .item-title-row::before {
+  .media-list .item-link .item-title-row::before,
+  .media-list.chevron-center .item-link .item-inner::before {
     content: var(--f7-list-chevron-icon-right) / '';
   }
 
@@ -194,6 +198,55 @@ html.ios {
     .icon-back::after { content: 'chevron_left_ios' / ''; }
     .searchbar-icon::after { content: 'search_ios' / ''; }
     .input-clear-button::after { content: 'delete_round_ios' / ''; }
+  }
+
+  /*
+   * Logbook rows (<DiveRow>, <TripRow>, the skeleton): thumbnail, then the
+   * title with its lines right under it, then the values; all centred on the
+   * row. Replaces Framework7's media-list layout, which pushed the date down
+   * under a two-line value column. The list has Framework7's "chevron-center"
+   * class: the chevron is centred on the row too.
+   */
+  .media-list .item-content:has(> .od-row) {
+    align-items: center;
+
+    > .item-media {
+      align-self: center;
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+  }
+
+  .media-list .item-inner.od-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-sizing: border-box;
+    min-height: 64px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+
+    .od-row-text {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .item-title {
+      font-size: 17px;
+      line-height: 22px;
+      font-weight: 600;
+      white-space: normal;
+    }
+
+    .item-text {
+      font-size: 14px;
+      line-height: 20px;
+      color: var(--od-text-2);
+      max-height: none;
+    }
   }
 
   /* Text for screen readers only. */

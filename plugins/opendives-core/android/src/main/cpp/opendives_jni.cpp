@@ -66,12 +66,31 @@ Java_org_opendives_core_NativeCore_cloudListDives(JNIEnv *env, jobject, jstring 
 	return env->NewStringUTF(json.c_str());
 }
 
+JNIEXPORT void JNICALL
+Java_org_opendives_core_NativeCore_cloudConfigure(JNIEnv *env, jobject, jstring email, jstring password)
+{
+	std::string url;
+	if (opendives::cloud_configure(to_string(env, email), to_string(env, password), url))
+		throw_core_error(env, "Incomplete cloud credentials");
+}
+
 // Empty string: no local cache yet.
 JNIEXPORT jstring JNICALL
-Java_org_opendives_core_NativeCore_cloudListCachedDives(JNIEnv *env, jobject, jstring email, jstring password)
+Java_org_opendives_core_NativeCore_cloudListCachedDives(JNIEnv *env, jobject)
 {
 	std::string json, error;
-	if (opendives::cloud_list_cached_dives(to_string(env, email), to_string(env, password), json, error) < 0) {
+	if (opendives::cloud_list_cached_dives(json, error) < 0) {
+		throw_core_error(env, error);
+		return nullptr;
+	}
+	return env->NewStringUTF(json.c_str());
+}
+
+JNIEXPORT jstring JNICALL
+Java_org_opendives_core_NativeCore_cloudProbe(JNIEnv *env, jobject)
+{
+	std::string json, error;
+	if (opendives::cloud_probe(json, error)) {
 		throw_core_error(env, error);
 		return nullptr;
 	}

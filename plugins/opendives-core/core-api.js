@@ -113,9 +113,15 @@ import { registerPlugin } from '@capacitor/core';
  *   Saves the sample log as a local git repository.
  * @property {() => Promise<{exists: boolean, dives: Dive[]}>} listDives
  *   Reads the local git repository again. `exists` is false until a repository has been created.
+ * @property {() => Promise<{available: boolean}>} configureCloud
+ *   Sets the cloud account (development credentials), without network.
+ *   `available` is false when none is configured.
+ * @property {() => Promise<{exists: boolean, head: string}>} probeCloud
+ *   Head of the log branch on the server, network only; may run during a load.
  * @property {(options?: {cached?: boolean}) => Promise<CloudDives>} listCloudDives
  *   Read-only access to the Subsurface cloud log (development credentials).
- *   `cached`: the device's copy only, without network, to show the log at once.
+ *   `cached`: the device's copy only, without network, to show the log at once
+ *   (after configureCloud).
  * @property {(options: {id: number}) => Promise<DiveDetail>} getDive
  *   Detail of one dive of the last loaded log.
  * @property {() => Promise<Prefs>} getPrefs
@@ -132,6 +138,11 @@ const native = registerPlugin('OpenDivesCore');
  */
 export const OpenDivesCore = {
   importSample: () => native.importSample(),
+  configureCloud: () => native.configureCloud(),
+  async probeCloud() {
+    const { json } = await native.probeCloud();
+    return JSON.parse(json);
+  },
   async listDives() {
     const { exists, json } = await native.listDives();
     return { exists, dives: JSON.parse(json) };

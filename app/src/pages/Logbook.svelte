@@ -231,7 +231,8 @@
   <!-- While loading, the count and the status are not known yet: nothing is shown. -->
   {#if !logbook.loading && !logbook.error}
     {#if sorted.length}<p class="count od-value" role="status">{count}</p>{/if}
-    <SyncStatus sync={logbook.sync} />
+    <!-- Only offline, when the logbook may be out of date; the side menu shows every state. -->
+    {#if logbook.sync === 'offline'}<SyncStatus sync={logbook.sync} />{/if}
   {/if}
 
   {#if logbook.loading}
@@ -244,21 +245,21 @@
     <div class="loading skeleton-effect-wave" aria-busy="true" aria-label={t('logbook.loading')} role="status">
       <div aria-hidden="true">
         <p class="count"><span class="skeleton-block bar" style:width="7.5em"></span></p>
-        <p class="status-line"><span class="skeleton-block bar" style:width="15em"></span></p>
-        <List mediaList dividers>
+        <List mediaList dividers class="chevron-center">
           {#each Array(14) as _, i (i)}
             <li>
-              <div class="item-content">
+              <!-- item-link: the same chevron space as the real rows. -->
+              <div class="item-content item-link">
                 <div class="item-media"><div class="skeleton-block skeleton-thumbnail"></div></div>
-                <div class="item-inner">
-                  <div class="item-title-row">
+                <div class="item-inner od-row">
+                  <div class="od-row-text">
                     <div class="item-title"><span class="skeleton-block bar" style:width="{40 + ((i * 17) % 35)}%"></span></div>
-                    <div class="item-after skeleton-values">
-                      <span><span class="skeleton-block bar" style:width="3em"></span></span>
-                      <span><span class="skeleton-block bar" style:width="2.5em"></span></span>
-                    </div>
+                    <div class="item-text"><span class="skeleton-block bar" style:width="9em"></span></div>
                   </div>
-                  <div class="item-text"><span class="skeleton-block bar" style:width="9em"></span></div>
+                  <div class="skeleton-values">
+                    <span class="value"><span class="skeleton-block bar" style:width="3em"></span></span>
+                    <span class="duration"><span class="skeleton-block bar" style:width="2.5em"></span></span>
+                  </div>
                 </div>
               </div>
             </li>
@@ -288,7 +289,7 @@
   {/if}
 
   {#if !logbook.loading && !logbook.error && rows.length}
-    <div class="list media-list dividers virtual-list" bind:this={listEl}>
+    <div class="list media-list chevron-center dividers virtual-list" bind:this={listEl}>
       <ul>
         {#each visible.items as row (row.key)}
           {#if row.kind === 'trip'}
@@ -373,8 +374,15 @@
       display: flex;
       flex-direction: column;
       align-items: flex-end;
-      margin-left: 12px;
       flex: 0 0 auto;
+
+      .value {
+        line-height: 22px;
+      }
+
+      .duration {
+        line-height: 18px;
+      }
     }
 
     /* A greyed bar one line of text high. */
@@ -386,15 +394,5 @@
       vertical-align: middle;
     }
 
-    /* Same place as the <SyncStatus> line: 8 px padding, 20 px line. */
-    .status-line {
-      margin: 0;
-      padding: 8px 16px;
-      line-height: 20px;
-    }
-
-    .loading .item-title {
-      width: 100%;
-    }
   }
 </style>

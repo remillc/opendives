@@ -245,8 +245,11 @@ Checked on the Pixel with the cloud log (1,353 dives).
 - **Virtual list:** Framework7's VirtualList with `renderExternal`; about 20 rows are in the document instead of 1,353. Rows have different heights (text size, site names on two lines): each rendered row is measured and its height kept by row key, so that expanding a trip does not make the list jump.
 - **Loading time:** cold start to the full list went from about 8.2 s to about 0.5 s.
   - `cloud_list_cached_dives()` reads the device's copy of the cloud log without network (430 ms for 1,353 dives); the list is shown with "Syncing with the Subsurface cloud…".
-  - `cloud_list_dives()` then probes the server: when its head is the commit already loaded (`loaded_git_commit`), nothing is fetched or read again (1.5 s, network only), as Subsurface's `remote_repo_uptodate()` does. Otherwise the log is reloaded and the list replaced.
+  - At the same time, on a separate network thread, `cloud_probe()` asks the server for the head of the branch. When it is the commit of the copy shown, nothing else is done, as Subsurface's `remote_repo_uptodate()` decides. Otherwise `cloud_list_dives()` syncs and reads the log again, and the list is replaced.
+  - The probe takes 1.5 to 2.8 s on the phone, all of it in `git_remote_connect`: with a 204 ms round trip to `ssrf-cloud-eu`, two HTTPS requests (the first one refused with 401 before the credentials are sent) make about 8 round trips. It runs in the background: the list is already shown.
   - The plugin passes the core's JSON as a string, parsed once in JavaScript, instead of parsing it into `JSObject` and serialising it again.
+- **Sync line:** the Logbook shows it only when offline; synced, syncing and device-only states are in the side menu only.
+- **Rows:** site, then "N° 1234 · date" right under it; depth and duration on the right, centred on the row, with Framework7's centred chevron (`chevron-center`). Trip dives are indented on the left only.
 - **Skeleton:** greyed bars (Framework7 `skeleton-block`, wave effect) laid out like a real row and one line of text high, so that nothing moves when the dives arrive; count and sync lines included. Framework7's skeleton font did not apply in the WebView, hence the bars.
 - **Known limit:** if the server has new commits, the list is replaced after the sync and dive identifiers change; a detail opened from the old list in the meantime cannot be read again.
 - **Tests:** round trip 97 passed, 1 known failure.

@@ -19,9 +19,12 @@
    */
   let { dive, prefs, inTrip = false, index = undefined, top = undefined } = $props();
 
-  // Name read by TalkBack and VoiceOver: site, date, then the values.
+  // Dive number as in the detail ("N° 1234"); 0 means not numbered.
+  const number = $derived(dive.number ? t('detail.number', { number: String(dive.number) }) : '');
+
+  // Name read by TalkBack and VoiceOver: number, site, date, then the values.
   // A zero depth means "unknown" in the core: it is not read.
-  const label = $derived(
+  const details = $derived(
     t(dive.maxDepthMm ? 'dive.screenReader' : 'dive.screenReaderNoDepth', {
       site: dive.site || t('dive.siteNotSet'),
       date: formatDateTime(dive.date),
@@ -29,6 +32,7 @@
       duration: formatDuration(dive.durationSeconds),
     }),
   );
+  const label = $derived(number ? `${number}, ${details}` : details);
 </script>
 
 <li class:in-trip={inTrip} data-virtual-list-index={index} style:top={top === undefined ? undefined : `${top}px`}>
@@ -36,29 +40,30 @@
     <div class="item-media">
       <ProfileThumbnail profile={dive.profile} maxDepthMm={dive.maxDepthMm} {prefs} />
     </div>
-    <div class="item-inner">
-      <div class="item-title-row">
+    <div class="item-inner od-row">
+      <div class="od-row-text">
         <div class="item-title">
           {#if dive.site}{dive.site}{:else}<span class="not-set">{t('dive.siteNotSet')}</span>{/if}
         </div>
-        <div class="item-after values od-value">
-          {#if dive.maxDepthMm}<strong>{formatDepth(dive.maxDepthMm, prefs)}</strong>{/if}
-          <span>{formatDuration(dive.durationSeconds)}</span>
-        </div>
+        <div class="item-text">{#if number}{number}<span class="separator" aria-hidden="true">·</span>{/if}{formatDateTime(dive.date)}</div>
       </div>
-      <div class="item-text">{formatDateTime(dive.date)}</div>
+      <div class="values od-value">
+        {#if dive.maxDepthMm}<strong>{formatDepth(dive.maxDepthMm, prefs)}</strong>{/if}
+        <span>{formatDuration(dive.durationSeconds)}</span>
+      </div>
     </div>
   </a>
 </li>
 
 <style>
   @layer od.components {
-    .in-trip {
-      --f7-list-item-padding-horizontal: 32px;
+    /* Shifted on the left only: values and chevron stay aligned with the other rows. */
+    .in-trip .item-content {
+      padding-left: calc(32px + var(--f7-safe-area-left));
     }
 
-    .item-title {
-      white-space: normal;
+    .separator {
+      margin: 0 0.4em;
     }
 
     .not-set {
@@ -66,16 +71,25 @@
       font-weight: normal;
     }
 
+    /* Depth first, the duration small under it; both centred on the row. */
     .values {
       display: flex;
       flex-direction: column;
       align-items: flex-end;
       text-align: right;
       flex-shrink: 0;
-      margin-left: 12px;
 
       strong {
-        color: var(--f7-list-item-title-text-color, inherit);
+        font-size: 17px;
+        line-height: 22px;
+        font-weight: 700;
+        color: var(--od-text);
+      }
+
+      span {
+        font-size: 13px;
+        line-height: 18px;
+        color: var(--od-text-2);
       }
     }
   }

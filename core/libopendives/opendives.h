@@ -41,6 +41,7 @@ int list_dives(const std::string &log, std::string &json, std::string &error);
 
 // Sets the Subsurface cloud account and writes the log address into `url`,
 // in Subsurface's format: "https://<server>/git/<email>[<email>]".
+// Needs no network.
 int cloud_configure(const std::string &email, const std::string &password, std::string &url);
 
 // PEM file of trusted certificate authorities, for libgit2 and server
@@ -61,11 +62,19 @@ int set_ca_file(const std::string &path);
 // Refuses to load if the branch is missing: the core would create it by pushing.
 int cloud_list_dives(const std::string &email, const std::string &password, std::string &json, std::string &error);
 
-// Read-only, no network: loads the local cache of the cloud log, as left by
-// the last sync, so that the logbook can be shown at once. Same object as
-// cloud_list_dives, with "synced":false and "head" the commit read.
+// Read-only, no network: loads the local cache of the cloud log of the
+// account set by cloud_configure(), as left by the last sync, so that the
+// logbook can be shown at once. Same object as cloud_list_dives, with
+// "synced":false and "head" the commit read.
 // Returns 1, with `json` empty, when there is no local cache yet.
-int cloud_list_cached_dives(const std::string &email, const std::string &password, std::string &json, std::string &error);
+int cloud_list_cached_dives(std::string &json, std::string &error);
+
+// Read-only, network only: asks the server for the head of the log branch of
+// the account set by cloud_configure(). Writes {"exists":…, "head":…}.
+// The one façade function that may run on another thread than the core's,
+// at the same time as a load: it only reads the configured account, and
+// libgit2 is thread-safe. Not while cloud_configure() runs.
+int cloud_probe(std::string &json, std::string &error);
 
 // Read-only: asks the server for its list of branches, with libgit2's normal
 // TLS validation, and tells whether the log branch exists.
