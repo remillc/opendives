@@ -96,3 +96,22 @@ Build the trip screen from `docs/mockups/voyage-android.dc.html` and section 4, 
 ## [ ] 2026-11-06-14 Sites screens
 
 Build the four Sites screens from `docs/mockups/sites-fiche-android.dc.html`, `sites-edition-android.dc.html`, `sites-sans-site-android.dc.html` and `sites-nettoyer-android.dc.html`, following section 4, "Sites", and add the duplicates row and links to `android-sites.dc.html`. Use the core functions named there; country and region lookup goes through GeoNames like Subsurface. Merging and deleting sites change the logbook: confirm before each, and test on the test account only.
+
+## [ ] 2026-11-06-15 Implement every screen of the mock-ups
+
+Christian asks for every interface designed so far to be built. After tasks 11 to 14, go through `docs/mockups/README.md` and build each screen not built yet, in this order, one commit per screen (or per small group), ticking nothing here until all are done:
+
+1. Logbook additions: "+" menu (download, import a file, log by hand), free filter (`ios-filtre`), and the states: empty logbook, download failed, offline with pending changes, sync conflict (`*-etat-*`).
+2. Dive detail top menu with "Plan from this dive" (`detail2-*-menu`), then the planner (`*-planificateur`, real result from the core).
+3. Tools and gas calculator (`*-outils`).
+4. Statistics, precompiled table and row detail (`*-stats*`).
+5. Sites map and list (`*-sites`), with the Sites screens of task 14.
+6. Quick entry on the boat (`ios-saisie`) and download from the dive computer (`ios-telechargement`).
+7. First launch and new account taking over a divelogs.de logbook (`*-accueil`, `*-compte-import`). Never store divelogs.de credentials.
+8. Tablet layouts (`tablette-*`, `android-tablette-*`): list and detail side by side, rail.
+
+Rules for this task:
+- `docs/ui-specification.md` wins. Older boards predate later decisions (side menu instead of the bottom bar, full detail `detail3-*`, conditions as stars, account buttons): apply the specification to them. The Android boards are the most recent; build iOS from the same structure with the iOS look of the iOS boards.
+- Stop and ask Christian before adding a native dependency (Bluetooth for dive computers, offline map tiles, file pickers), before exposing a new core function that is not read-only, or when a mock-up and the specification disagree.
+- Anything that writes to a cloud account runs on `OPENDIVES_CLOUD_TEST_EMAIL` only.
+- Report, at the end, which screens are built, which are partial and why.
