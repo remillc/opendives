@@ -78,6 +78,10 @@ When a mock-up and `docs/ui-specification.md` disagree, the specification wins. 
 | `compte-creation-ios.dc.html` | Nouveau compte, étape 1 sur 2 · iPhone |
 | `compte-code-ios.dc.html` | Nouveau compte, code de confirmation · iPhone |
 | `compte-code-erreur-ios.dc.html` | Nouveau compte, code incorrect · iPhone |
+| `compte-import-encours-android.dc.html` | Nouveau compte, import en cours · Android |
+| `compte-import-echec-android.dc.html` | Nouveau compte, import échoué · Android |
+| `compte-import-encours-ios.dc.html` | Nouveau compte, import en cours · iPhone |
+| `compte-import-echec-ios.dc.html` | Nouveau compte, import échoué · iPhone |
 | `alarme-sombre-1.dc.html` | Couleurs alarme et en attente, sombre |
 | `voyage-android.dc.html` | Voyage, Android |
 | `sites-fiche-android.dc.html` | Sites, Android, fiche d'un site |

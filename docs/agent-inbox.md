@@ -225,3 +225,7 @@ Mock-ups, Android then iPhone:
 ## [ ] 2026-11-06-31 New account step 2: "Continuer" button
 
 On "Reprendre votre carnet ?", the main button at the bottom applies to the selected choice, so its label is now "Continuer" instead of "Télécharger mes plongées": divelogs.de starts the download, file opens the file picker, empty logbook opens the logbook. Mock-ups: `docs/mockups/android-compte-import.dc.html`, `docs/mockups/ios-compte-import.dc.html`.
+
+## [ ] 2026-11-06-32 New account: import progress and failure
+
+After "Continuer" on step 2, show the import progress screen, then the Logbook, or the failure screen. See `docs/ui-specification.md` (section 4, "Sign in and new account"). Mock-ups: `docs/mockups/compte-import-encours-android.dc.html`, `compte-import-echec-android.dc.html`, `compte-import-encours-ios.dc.html`, `compte-import-echec-ios.dc.html`.
