@@ -193,7 +193,7 @@ Layout: titles sit on the page background, 18 px bold; each group is a white sur
 | Décompression · Conservatisme VPM-B | number (wheel) | 0–4 (+3), shown dimmed with Bühlmann | `vpmb_conservatism` |
 | Décompression · Oxygène narcotique | switch | on | `o2narcotic` |
 | Décompression · END maximale du meilleur mélange | number (wheel) | 30 m | `bestmixend` |
-| Barre des bouteilles | switch | off | `tankbar` |
+| Bande des bouteilles (under the profile, which cylinder is in use at each moment) | switch | off | `tankbar` |
 | Seuils de pO₂ | number | min 0.16, max 1.6 bar, step 0.01 / 0.1 | `pp_graphs.po2_threshold_min/max` |
 | Seuil de pN₂ | number | 4.0 bar, step 0.1 | `pp_graphs.pn2_threshold` |
 | Seuil de pHe | number | 13.0 bar, step 0.1 | `pp_graphs.phe_threshold` |
