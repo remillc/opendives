@@ -123,6 +123,20 @@
         .filter(Boolean)
         .join(', '),
     },
+    {
+      key: 'deco',
+      label: t('plan.decoGases'),
+      // Each gas and its switch depth, as the core set it (the MOD at the ppO2 for deco by default).
+      value: planner.decoGases.length
+        ? planner.decoGases
+            .map((g, i) => {
+              const depth = g.switchDepthMm || result?.cylinders[i + 1]?.switchDepthMm || 0;
+              const name = formatGas(g.o2Permille, g.hePermille);
+              return depth ? t('plan.decoGasAt', { gas: name, depth: depthText(depth) }) : name;
+            })
+            .join(', ')
+        : t('plan.decoGasesNone'),
+    },
     { key: 'sac', label: t('plan.sac'), value: formatSac(planner.bottomSacMlMin, prefs) },
   ]);
 

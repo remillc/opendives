@@ -1094,7 +1094,15 @@
     "reset": "Back to Subsurface's values",
     "resetTitle": "Back to Subsurface's values?",
     "resetText": "Speeds, reserve, pO₂ and stops go back to Subsurface's defaults. The dive to plan does not change.",
-    "resetAction": "Reset values"
+    "resetAction": "Reset values",
+    "decoGases": "Deco gases",
+    "decoGasAt": "{gas} at {depth}",
+    "decoGasesNone": "None",
+    "groupDecoGases": "Deco gases",
+    "addDecoGas": "Add a deco gas",
+    "removeDecoGas": "Remove",
+    "switchDepth": "Switch depth",
+    "switchDepthAuto": "Empty: the MOD at the decompression pO₂, as in Subsurface"
   },
   "filter": {
     "title": "Filter",
