@@ -493,6 +493,9 @@
     "nitrox": "Nitrox {o2}",
     "trimix": "Trimix {o2}/{he}"
   },
+  "tablet": {
+    "noDive": "Choisissez une plongée pour la voir ici"
+  },
   "menu": {
     "open": "Menu",
     "title": "OpenDives",

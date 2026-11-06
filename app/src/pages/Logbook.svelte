@@ -15,6 +15,8 @@
   import ConflictSheet from '../components/ConflictSheet.svelte';
   import { logbook, loadLogbook, importFile, undoLastChange, resolveConflict } from '../lib/logbook.svelte.js';
   import { filter, loadOptions, applyFilter, isEmpty } from '../lib/filter.svelte.js';
+  import { layout } from '../lib/layout.svelte.js';
+  import { navigation } from '../lib/navigation.svelte.js';
   import { formatDateTime } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
   import { offerUndo } from '../lib/undo.js';
@@ -274,6 +276,15 @@
       .open();
   }
 
+  // Android tablet: the "+" button of the rail asks for the choices (an action sheet).
+  let seenRequests = navigation.addRequests;
+  $effect(() => {
+    const n = navigation.addRequests;
+    if (n === seenRequests) return;
+    seenRequests = n;
+    add();
+  });
+
   // Android "+": a floating button that opens its choices above it. The links
   // are "external" (no routing), which Framework7's own click handling skips:
   // the button and the choices open and close it here; Framework7 closes it
@@ -446,7 +457,7 @@
   {#if importing}<p class="od-sr-only" role="status">{t('logbook.importing')}</p>{/if}
 
   {#snippet fixedContent()}
-    {#if !theme.ios && logbook.dives.length}
+    {#if !theme.ios && layout.phone && logbook.dives.length}
       <!--
         Written by hand: the Fab component of framework7-svelte 9 calls onclick
         twice and leaves the link without a name for screen readers.

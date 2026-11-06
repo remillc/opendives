@@ -30,6 +30,7 @@
     formatTimeOfDay,
     formatWeight,
   } from '../lib/format.js';
+  import { navigation } from '../lib/navigation.svelte.js';
   import { t, tIfExists } from '../lib/i18n.js';
 
   /** @type {{ f7route: { params: { id: string } }, f7router: any }} */
@@ -65,6 +66,15 @@
       },
     });
   }
+
+  // The list beside it highlights the dive shown.
+  $effect(() => {
+    const id = diveId;
+    navigation.dive = id;
+    return () => {
+      if (navigation.dive === id) navigation.dive = null;
+    };
+  });
 
   /** @type {import('opendives-core').DiveDetail|null} */
   let dive = $state(null);

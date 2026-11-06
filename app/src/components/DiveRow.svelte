@@ -4,6 +4,8 @@
   // set"), date and time; on the right the maximum depth, then the duration.
   import ProfileThumbnail from './ProfileThumbnail.svelte';
   import { formatDateTime, formatDepth, formatDuration } from '../lib/format.js';
+  import { layout } from '../lib/layout.svelte.js';
+  import { navigation } from '../lib/navigation.svelte.js';
   import { t } from '../lib/i18n.js';
 
   /**
@@ -46,8 +48,9 @@
   const label = $derived([number, details, pendingText].filter(Boolean).join(', '));
 </script>
 
-<li class:in-trip={inTrip} data-virtual-list-index={index} style:top={top === undefined ? undefined : `${top}px`}>
-  <a href="/dive/{dive.id}/" class="item-link item-content dive-row" aria-label={label}>
+<li class:in-trip={inTrip} class:selected={layout.split && navigation.dive === String(dive.id)} data-virtual-list-index={index} style:top={top === undefined ? undefined : `${top}px`}>
+  <!-- data-reload-detail: beside the list (tablet), the dive replaces the one shown. -->
+  <a href="/dive/{dive.id}/" data-reload-detail="true" class="item-link item-content dive-row" aria-label={label}>
     <div class="item-media">
       <ProfileThumbnail profile={dive.profile} maxDepthMm={dive.maxDepthMm} {prefs} />
     </div>
@@ -75,6 +78,12 @@
     /* Shifted on the left only: values and chevron stay aligned with the other rows. */
     .in-trip .item-content {
       padding-left: calc(32px + var(--f7-safe-area-left));
+    }
+
+    /* Beside the list (tablet), the row of the dive shown. */
+    .selected {
+      background: var(--od-tint);
+      color: var(--od-on-tint);
     }
 
     .separator {

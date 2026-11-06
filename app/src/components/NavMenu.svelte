@@ -6,11 +6,11 @@
   // Opens only with the ☰ button: the panel follows a swipe to close, never
   // an edge swipe to open, which stays iOS's swipe back.
   import { onDestroy } from 'svelte';
-  import { Panel, f7 } from 'framework7-svelte';
+  import { Panel } from 'framework7-svelte';
   import Icon from './Icon.svelte';
   import SyncStatus from './SyncStatus.svelte';
   import { logbook, syncNow } from '../lib/logbook.svelte.js';
-  import { navigation, sections, showSection, closeMenu, restoreFocus } from '../lib/navigation.svelte.js';
+  import { navigation, sections, showSection, closeMenu, restoreFocus, openSettings } from '../lib/navigation.svelte.js';
   import { t } from '../lib/i18n.js';
 
   /** @type {Record<string, 'logbook'|'sites'|'statistics'|'tools'>} */
@@ -46,11 +46,6 @@
     e.preventDefault();
     closeMenu();
     go();
-  }
-
-  function openSettings() {
-    const router = f7.views.current?.router;
-    if (router && router.currentRoute?.path !== '/settings/') router.navigate('/settings/');
   }
 
   onDestroy(() => setBackgroundInert(false));
