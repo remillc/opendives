@@ -118,7 +118,13 @@ import { registerPlugin } from '@capacitor/core';
  *   setpointMbar: number, showCcrSensors: boolean, showCcrSetpoint: boolean,
  *   allowOcGasAsDiluent: boolean, showScrOcPo2: boolean,
  *   o2ConsumptionMlMin: number, pscrRatio: number,
+ *   bottomPo2Mbar: number, decoPo2Mbar: number, bottomSacMlMin: number, decoSacMlMin: number,
+ *   descentMmMin: number, ascent75MmMin: number, ascent50MmMin: number, ascentStopsMmMin: number,
+ *   ascentLast6mMmMin: number, lastStop6m: boolean, safetyStop: boolean, switchAtRequiredStop: boolean,
+ *   minSwitchSeconds: number, o2Breaks: boolean, reserveMbar: number, problemSolvingMinutes: number,
+ *   sacFactor: number,
  * }} CorePrefValues
+ * The planner's own values (rates in mm per minute, sacFactor x100) are set from the planner screen.
  */
 
 /**
@@ -147,6 +153,9 @@ import { registerPlugin } from '@capacitor/core';
  * @property {string[]} library the device's library, to keep as is and set again at start
  * @property {string} undo
  * @property {string} redo
+ */
+
+/**
  * Planner settings (plan_dive in opendives.h). The deco model, gradient
  * factors and VPM-B conservatism are the shared preferences (Settings); the
  * others are the planner's own, rates in mm per minute.
@@ -180,6 +189,7 @@ import { registerPlugin } from '@capacitor/core';
  * @property {number} hePermille
  * @property {number} sizeMl
  * @property {number} startMbar
+ * @property {number} [switchDepthMm] deco gases: 0 or absent for the MOD at the ppO2 for deco
  */
 
 /**
@@ -397,7 +407,6 @@ import { registerPlugin } from '@capacitor/core';
  * @property {(options: {action: 'list'|'library'|'add'|'size'|'remove'|'rename', name?: string, value?: string, ml?: number, mbar?: number}) => Promise<CylinderTypes>} cylinderTypes
  *   Cylinder types of Settings; "rename" (to value) changes the log as one undoable step,
  *   "library" sets the device's library (value: JSON {"library": [...]}).
- *   Units of the last loaded log.
  * @property {() => Promise<PlannerSetup>} plannerSetup
  *   The planner's settings as the core's preferences hold them.
  * @property {(request: PlanRequest) => Promise<PlanResult>} planDive

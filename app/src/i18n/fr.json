@@ -1094,7 +1094,15 @@
     "reset": "Revenir aux valeurs de Subsurface",
     "resetTitle": "Revenir aux valeurs de Subsurface ?",
     "resetText": "Les vitesses, la réserve, les pO₂ et les paliers reprennent les valeurs par défaut de Subsurface. La plongée à planifier ne change pas.",
-    "resetAction": "Revenir aux valeurs"
+    "resetAction": "Revenir aux valeurs",
+    "decoGases": "Gaz de décompression",
+    "decoGasAt": "{gas} à {depth}",
+    "decoGasesNone": "Aucun",
+    "groupDecoGases": "Gaz de décompression",
+    "addDecoGas": "Ajouter un gaz de décompression",
+    "removeDecoGas": "Retirer",
+    "switchDepth": "Profondeur de changement",
+    "switchDepthAuto": "Vide : la MOD à la pO₂ de décompression, comme dans Subsurface"
   },
   "filter": {
     "title": "Filtrer",

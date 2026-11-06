@@ -265,8 +265,9 @@ int planner_setup(std::string &json);
 
 // Runs Subsurface's planner on a square profile. `request`: {"depthMm",
 // "bottomTimeSeconds" (descent included), "cylinders":[{"o2Permille",
-// "hePermille", "sizeMl", "startMbar"}] (the first is the bottom gas, the
-// others are switched to at their depth for the ppO2 for deco), optional
+// "hePermille", "sizeMl", "startMbar", optional "switchDepthMm"}] (the first
+// is the bottom gas, the others are switched to at their switch depth, by
+// default the MOD at the ppO2 for deco rounded to 3 m / 10 ft), optional
 // "surfacePressureMbar" (1013), "salinity" (10300, sea water), "when" (local
 // timestamp; default an hour from now, or after the latest dive), and any
 // planner-only setting of planner_setup(), for this plan only}.

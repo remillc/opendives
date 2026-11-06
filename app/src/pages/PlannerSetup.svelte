@@ -1,15 +1,24 @@
 <script>
   // @ts-check
-  // The dive to plan and the planner-only settings (spec, section 4,
-  // "Settings, modelled on Subsurface": rates, reserve, SAC, ppO2 at the
-  // bottom and at deco, last stop, gas switches stay in the planner, as
-  // Subsurface-mobile's "Dive planner setup"). The deco model, gradient
-  // factors and VPM-B conservatism are only shown: they are set in Settings.
+  // The dive to plan (with its deco gases) and the planner-only settings
+  // (spec, section 4, "Settings, modelled on Subsurface": rates, reserve, SAC,
+  // ppO2 at the bottom and at deco, last stop, gas switches stay in the
+  // planner, as Subsurface-mobile's "Dive planner setup"; they are the core's
+  // preferences, kept on this device). The deco model, gradient factors and
+  // VPM-B conservatism are only shown: they are set in Settings.
   // A change applies at once; the plan is computed again on return.
   import { Page, Navbar, Link } from 'framework7-svelte';
   import TextField from '../components/TextField.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
-  import { planner, setting, setSetting, resetSettings } from '../lib/planner.svelte.js';
+  import {
+    planner,
+    setting,
+    setSetting,
+    resetSettings,
+    addDecoGas,
+    removeDecoGas,
+  } from '../lib/planner.svelte.js';
+  import { formatGas } from '../lib/format.js';
   import { confirmAction } from '../lib/dialogs.js';
   import { locale, depthUnit } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
@@ -46,8 +55,10 @@
 
   /**
    * One numeric field: its value in the field's unit, and how it is stored.
+   * `optional`: an empty field means 0 (automatic), shown with `empty` under it.
    * @typedef {{ key: string, label: string, unit: string, decimals?: number, min: number, max: number,
-   *   get: () => number, set: (v: number) => void }} Field
+   *   optional?: boolean, empty?: string,
+   *   get: () => number, set: (v: number) => unknown }} Field
    */
 
   /** @type {Field[]} */
@@ -82,9 +93,9 @@
 
   /** @type {Field[]} */
   const sacFields = [
-    { key: 'bottomSac', label: t('plan.bottomSac'), unit: sacU, decimals: cuft ? 2 : 1, min: 0.01, max: 100,
+    { key: 'bottomSac', label: t('plan.bottomSac'), unit: sacU, decimals: cuft ? 2 : 1, min: sacValue(1000), max: sacValue(99000),
       get: () => sacValue(planner.bottomSacMlMin), set: (v) => (planner.bottomSacMlMin = sacStored(v)) },
-    { key: 'decoSac', label: t('plan.decoSac'), unit: sacU, decimals: cuft ? 2 : 1, min: 0.01, max: 100,
+    { key: 'decoSac', label: t('plan.decoSac'), unit: sacU, decimals: cuft ? 2 : 1, min: sacValue(1000), max: sacValue(99000),
       get: () => sacValue(Number(setting('decoSacMlMin'))), set: (v) => setSetting('decoSacMlMin', sacStored(v)) },
   ];
 
@@ -94,7 +105,7 @@
    * @param {string} label
    * @returns {Field}
    */
-  const rate = (key, label) => ({ key, label, unit: rateU, min: 1, max: feet ? 330 : 100,
+  const rate = (key, label) => ({ key, label, unit: rateU, min: feet ? 4 : 1, max: feet ? 320 : 99,
     get: () => Number(setting(key)) / MM_PER_UNIT, set: (v) => setSetting(key, Math.round(v * MM_PER_UNIT)) });
 
   /** @type {Field[]} */
@@ -112,7 +123,7 @@
       get: () => Number(setting('bottomPo2Mbar')) / 1000, set: (v) => setSetting('bottomPo2Mbar', Math.round(v * 1000)) },
     { key: 'decoPo2', label: t('plan.decoPo2'), unit: t('units.bar'), decimals: 2, min: 0.16, max: 2,
       get: () => Number(setting('decoPo2Mbar')) / 1000, set: (v) => setSetting('decoPo2Mbar', Math.round(v * 1000)) },
-    { key: 'minSwitch', label: t('plan.minSwitch'), unit: t('units.minutes'), min: 0, max: 10,
+    { key: 'minSwitch', label: t('plan.minSwitch'), unit: t('units.minutes'), min: 0, max: 9,
       get: () => Number(setting('minSwitchSeconds')) / 60, set: (v) => setSetting('minSwitchSeconds', Math.round(v * 60)) },
   ];
 
@@ -120,11 +131,38 @@
   const reserveFields = [
     { key: 'problem', label: t('plan.problemSolving'), unit: t('units.minutes'), min: 0, max: 10,
       get: () => Number(setting('problemSolvingMinutes')), set: (v) => setSetting('problemSolvingMinutes', Math.round(v)) },
-    { key: 'sacFactor', label: t('plan.sacFactor'), unit: t('plan.timesUnit'), decimals: 1, min: 1, max: 10,
+    { key: 'sacFactor', label: t('plan.sacFactor'), unit: t('plan.timesUnit'), decimals: 1, min: 1, max: 9,
       get: () => Number(setting('sacFactor')) / 100, set: (v) => setSetting('sacFactor', Math.round(v * 100)) },
-    { key: 'reserve', label: t('plan.reserveRecreational'), unit: pressureU, min: 0, max: 300000 / MBAR_PER_UNIT,
+    { key: 'reserve', label: t('plan.reserveRecreational'), unit: pressureU, min: 0, max: 400000 / MBAR_PER_UNIT,
       get: () => Number(setting('reserveMbar')) / MBAR_PER_UNIT, set: (v) => setSetting('reserveMbar', Math.round(v * MBAR_PER_UNIT)) },
   ];
+
+  /**
+   * The fields of one deco gas. Its switch depth is empty for Subsurface's
+   * default: the MOD at the ppO2 for deco, rounded to 3 m (10 ft).
+   * @param {number} i
+   * @returns {Field[]}
+   */
+  function decoFields(i) {
+    const gas = () => planner.decoGases[i];
+    return [
+      { key: `deco${i}-o2`, label: t('plan.oxygenPercent'), unit: t('units.percent'), min: 1, max: 100,
+        get: () => gas().o2Permille / 10, set: (v) => {
+          gas().o2Permille = Math.round(v * 10);
+          gas().hePermille = Math.min(gas().hePermille, 1000 - gas().o2Permille);
+        } },
+      { key: `deco${i}-he`, label: t('plan.heliumPercent'), unit: t('units.percent'), min: 0, max: 99,
+        get: () => gas().hePermille / 10, set: (v) => (gas().hePermille = Math.min(Math.round(v * 10), 1000 - gas().o2Permille)) },
+      { key: `deco${i}-size`, label: t('plan.cylinderSize'), unit: t(cuft ? 'units.cubicFeet' : 'units.liters'), decimals: 1, min: 0.1, max: cuft ? 600 : 100,
+        get: () => (cuft ? (gas().sizeMl / ML_PER_CUFT) * (gas().startMbar / 1013.25) : gas().sizeMl / 1000),
+        set: (v) => (gas().sizeMl = cuft ? (v * ML_PER_CUFT) / (gas().startMbar / 1013.25) : v * 1000) },
+      { key: `deco${i}-pressure`, label: t('plan.startPressure'), unit: pressureU, min: 10000 / MBAR_PER_UNIT, max: 350000 / MBAR_PER_UNIT,
+        get: () => gas().startMbar / MBAR_PER_UNIT, set: (v) => (gas().startMbar = v * MBAR_PER_UNIT) },
+      { key: `deco${i}-switch`, label: t('plan.switchDepth'), unit: depthU, min: 1, max: feet ? 980 : 300,
+        optional: true, empty: t('plan.switchDepthAuto'),
+        get: () => gas().switchDepthMm / MM_PER_UNIT, set: (v) => (gas().switchDepthMm = Math.round(v * MM_PER_UNIT)) },
+    ];
+  }
 
   const all = [...diveFields, ...gasFields, ...sacFields, ...rateFields, ...gasSettingFields, ...reserveFields];
 
@@ -133,22 +171,47 @@
   /** @type {Record<string, boolean>} */
   let invalid = $state({});
 
+  /** @param {Field} f */
+  function text(f) {
+    const v = f.get();
+    return f.optional && !v ? '' : show(v, f.decimals ?? 0);
+  }
+
   function fill() {
-    for (const f of all) texts[f.key] = show(f.get(), f.decimals ?? 0);
+    for (const f of all) texts[f.key] = text(f);
+    planner.decoGases.forEach((_, i) => {
+      for (const f of decoFields(i)) texts[f.key] = text(f);
+    });
     invalid = {};
   }
   fill();
 
   /** @param {Field} f */
-  function commit(f) {
-    const v = parse(texts[f.key]);
-    if (Number.isNaN(v) || v < f.min || v > f.max) {
+  async function commit(f) {
+    const v = f.optional && !texts[f.key].trim() ? 0 : parse(texts[f.key]);
+    if (Number.isNaN(v) || (v < f.min && !(f.optional && v === 0)) || v > f.max) {
       invalid[f.key] = true;
       return;
     }
     invalid[f.key] = false;
-    f.set(v);
-    planner.version++;
+    try {
+      await f.set(v);
+      planner.version++;
+    } catch (e) {
+      console.error('Planner setting', e);
+      invalid[f.key] = true;
+    }
+  }
+
+  function addGas() {
+    addDecoGas();
+    fill();
+  }
+
+  /** @param {number} i */
+  function removeGas(i) {
+    removeDecoGas(i);
+    fill();
   }
 
   /** @type {{ key: 'lastStop6m'|'safetyStop'|'switchAtRequiredStop'|'o2Breaks', label: string, text?: string }[]} */
@@ -172,8 +235,8 @@
       title: t('plan.resetTitle'),
       text: t('plan.resetText'),
       action: t('plan.resetAction'),
-      onConfirm: () => {
-        resetSettings();
+      onConfirm: async () => {
+        await resetSettings();
         fill();
       },
     });
@@ -187,7 +250,11 @@
       bind:value={texts[f.key]}
       inputmode="decimal"
       invalid={invalid[f.key]}
-      supporting={invalid[f.key] ? t('plan.outOfRange', { min: show(f.min, f.decimals ?? 0), max: show(f.max, f.decimals ?? 0) }) : ''}
+      supporting={invalid[f.key]
+        ? t('plan.outOfRange', { min: show(f.min, f.decimals ?? 0), max: show(f.max, f.decimals ?? 0) })
+        : f.optional && !texts[f.key]
+          ? (f.empty ?? '')
+          : ''}
       onchange={() => commit(f)}
     />
   {/each}
@@ -208,6 +275,20 @@
 
   <div class="block-title">{t('plan.groupGas')}</div>
   <div class="od-form-surface">{@render fields(gasFields)}</div>
+
+  <div class="block-title">{t('plan.groupDecoGases')}</div>
+  {#each planner.decoGases as gas, i (i)}
+    <div class="od-form-surface">
+      <div class="gas-head">
+        <span class="gas-name">{formatGas(gas.o2Permille, gas.hePermille)}</span>
+        <button type="button" class="od-text-button" onclick={() => removeGas(i)}>{t('plan.removeDecoGas')}</button>
+      </div>
+      {@render fields(decoFields(i))}
+    </div>
+  {/each}
+  <div class="actions add">
+    <button type="button" class="od-tonal-button" onclick={addGas}>{t('plan.addDecoGas')}</button>
+  </div>
 
   <div class="block-title">{t('plan.groupSac')}</div>
   <div class="od-form-surface">{@render fields(sacFields)}</div>
@@ -301,6 +382,27 @@
       margin: 24px 16px 0;
       display: flex;
       justify-content: center;
+
+      &.add {
+        margin-top: 16px;
+        justify-content: flex-start;
+      }
+    }
+
+    /* A deco gas: its name, and Remove at the end. */
+    .gas-head {
+      min-height: 48px;
+      padding: 8px 4px 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .gas-name {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--od-text);
     }
 
     .end {
