@@ -199,6 +199,8 @@ Done in Delete a site from its edit screen, filled fields everywhere
 
 Every text field of the app now uses the MD3 filled variant (`docs/ui-specification.md`, "Text fields", which replaces the outlined rule of task 20). Change every form already built: dive editing, account deletion, divelogs.de takeover, gas calculator, new statistic, site forms. Mock-ups updated: `android-edition`, `compte-android-suppression`, `android-compte-import`, `android-outils`, `stats-nouvelle-android`, `sites-edition-android`, `sites-modifier-android`.
 
-## [ ] 2026-11-06-28 Sites: "New site" FAB
+## [x] 2026-11-06-28 Sites: "New site" FAB
+
+Done in Sites: new site FAB, smaller centre-on-me button
 
 The Sites screen gets back its FAB "+" (56 dp, aria-label "Nouveau site") at the bottom right over the list panel, opening the new site form. The "Centrer sur ma position" button becomes a small 40 dp button at the bottom right of the visible map. The panel keeps 88 dp of bottom padding. See `docs/ui-specification.md` (Sites) and `docs/mockups/android-sites.dc.html`.

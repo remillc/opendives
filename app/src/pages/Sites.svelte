@@ -60,6 +60,12 @@
 </script>
 
 <Page onPageReinit={load}>
+  {#snippet fixedContent()}
+    <!-- MD3 FAB, 56 dp, over the list panel: a new site. -->
+    <div class="fab fab-right-bottom od-fab-add">
+      <a href="/site/new/" aria-label={t('sites.newSite')}><i class="icon"><Icon name="plus" /></i></a>
+    </div>
+  {/snippet}
   <Navbar title={t('sites.title')}>
     {#snippet left()}<MenuButton />{/snippet}
     <NavRight>
@@ -79,7 +85,7 @@
     <div class="map">
       <SiteMap bind:this={siteMap} sites={located} onselect={open} height="45vh" />
       <button type="button" class="locate" onclick={centreOnDevice}>
-        <Icon name="locate" />
+        <Icon name="locate" size={20} />
         <span class="od-sr-only">{t('sites.centreOnMe')}</span>
       </button>
     </div>
@@ -136,15 +142,15 @@
       position: relative;
     }
 
-    /* MD3 FAB, 56 dp with 16 dp corners, on the map. */
+    /* Small button (40 dp, in a 48 dp target) at the bottom right of the map. */
     .locate {
       position: absolute;
-      right: 16px;
-      bottom: 16px;
-      width: 56px;
-      height: 56px;
+      right: 12px;
+      bottom: 48px; /* above the credits button */
+      width: 40px;
+      height: 40px;
       border: none;
-      border-radius: 16px;
+      border-radius: 12px;
       background: var(--od-surface-2);
       color: var(--od-text);
       display: flex;
@@ -155,6 +161,8 @@
 
     .sites-panel {
       border-top: 1px solid var(--od-separator);
+      /* Room for the FAB under the last site. */
+      padding-bottom: 88px;
     }
 
     .count {
