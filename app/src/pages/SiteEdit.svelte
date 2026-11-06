@@ -41,7 +41,18 @@
   let lookups = 0;
 
   onMount(async () => {
-    if (!editing) return;
+    if (!editing) {
+      // A new site starts where the diver is (often on the boat or the
+      // shore); without a position, the map stays as it is, silently.
+      navigator.geolocation?.getCurrentPosition(
+        (pos) => {
+          if (!position) setPosition({ latUdeg: Math.round(pos.coords.latitude * 1e6), lonUdeg: Math.round(pos.coords.longitude * 1e6) });
+        },
+        () => {},
+        { enableHighAccuracy: true, timeout: 15000 },
+      );
+      return;
+    }
     const s = await OpenDivesCore.siteQuery({ kind: 'site', uuid: editing });
     original = s;
     name = s.name;

@@ -24,7 +24,7 @@
     "errorTitle": "The logbook could not be read",
     "errorNothingChanged": "No dive was changed.",
     "errorCheck": "Please check:",
-    "errorInternet": "the device's Internet connection;",
+    "errorInternet": "the device's Internet connection",
     "errorStorage": "the free space on the device.",
     "retry": "Try again",
     "emptyTitle": "No dives yet",
@@ -260,8 +260,8 @@
     "pitch": "A Subsurface account backs up your logbook and shares it between your devices, and with Subsurface on a computer. It is free.",
     "create": "Create an account",
     "createText": {
-      "one": "Your dive is sent to it; a confirmation code arrives by email",
-      "other": "Your {n} dives are sent to it; a confirmation code arrives by email"
+      "one": "Your dive is sent to it. A confirmation code arrives by email",
+      "other": "Your {n} dives are sent to it. A confirmation code arrives by email"
     },
     "signIn": "Sign in to an existing account",
     "signInText": {
@@ -295,8 +295,8 @@
     "syncThenSignOut": "Sync, then sign out",
     "signOutAnyway": "Sign out anyway",
     "cancel": "Cancel",
-    "syncFailed": "The changes could not be sent; you are still signed in.",
-    "failed": "Signing out did not complete; nothing was deleted."
+    "syncFailed": "The changes could not be sent. You are still signed in.",
+    "failed": "Signing out did not complete. Nothing was deleted."
   },
   "deleteAccount": {
     "back": "Back to the account",
@@ -315,8 +315,8 @@
     "confirm": "Delete the account permanently",
     "connectionNeeded": "Connection needed",
     "deleted": "The account was deleted.",
-    "notDeleted": "The account was not deleted; nothing changed.",
-    "wrongPassword": "This is not the account's password; nothing was deleted."
+    "notDeleted": "The account was not deleted. Nothing changed.",
+    "wrongPassword": "This is not the account's password. Nothing was deleted."
   },
   "edit": {
     "title": "Edit the dive",
@@ -325,7 +325,7 @@
     "number": "Number",
     "dateTime": "Date and time",
     "duration": "Duration",
-    "durationNote": "Computed by the dive computer; editable only for a dive logged by hand",
+    "durationNote": "Computed by the dive computer. Editable only for a dive logged by hand",
     "site": "Site",
     "trip": "Trip",
     "none": "None",
@@ -356,8 +356,8 @@
     "undo": "Undo",
     "undone": "Change undone",
     "undoFailed": "The change can no longer be undone",
-    "failed": "The change could not be saved; nothing changed.",
-    "writeLocked": "This account cannot be edited from OpenDives yet; nothing changed."
+    "failed": "The change could not be saved. Nothing changed.",
+    "writeLocked": "This account cannot be edited from OpenDives yet. Nothing changed."
   },
   "tripScreen": {
     "kicker": "Trip · {range}",
@@ -524,7 +524,7 @@
     "figureDeepest": "Deepest",
     "pendingValue": "Waiting for the core’s calculation",
     "pending": "Computed by the Subsurface core: coming",
-    "pendingNote": "The totals will be computed by the Subsurface core; the per-dive charts already show the logbook.",
+    "pendingNote": "The totals will be computed by the Subsurface core. The per-dive charts already show the logbook.",
     "charts": "Charts",
     "chartDepth": "Maximum depth",
     "chartDepthLabel": {

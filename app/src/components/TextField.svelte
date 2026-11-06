@@ -130,7 +130,7 @@
     .label {
       position: absolute;
       left: 0;
-      top: 16px;
+      top: 8px; /* at rest: centred in the 56 dp field */
       max-width: 100%;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -156,11 +156,6 @@
 
       .invalid & {
         color: var(--od-alarm);
-      }
-
-      /* Multi-line, at rest: on the first line, as the mock-up. */
-      .multiline:not(.floated) & {
-        top: 8px;
       }
     }
 

@@ -24,7 +24,7 @@
     "errorTitle": "Le carnet n'a pas pu être lu",
     "errorNothingChanged": "Aucune plongée n'a été modifiée.",
     "errorCheck": "À vérifier :",
-    "errorInternet": "la connexion de l'appareil à Internet ;",
+    "errorInternet": "la connexion de l'appareil à Internet",
     "errorStorage": "l'espace libre sur l'appareil.",
     "retry": "Réessayer",
     "emptyTitle": "Aucune plongée pour l'instant",
@@ -260,8 +260,8 @@
     "pitch": "Un compte Subsurface sauvegarde votre carnet et le partage entre vos appareils, et avec Subsurface sur ordinateur. Il est gratuit.",
     "create": "Créer un compte",
     "createText": {
-      "one": "Votre plongée y est envoyée ; un code de confirmation arrive par courriel",
-      "other": "Vos {n} plongées y sont envoyées ; un code de confirmation arrive par courriel"
+      "one": "Votre plongée y est envoyée. Un code de confirmation arrive par courriel",
+      "other": "Vos {n} plongées y sont envoyées. Un code de confirmation arrive par courriel"
     },
     "signIn": "Se connecter à un compte existant",
     "signInText": {
@@ -295,8 +295,8 @@
     "syncThenSignOut": "Synchroniser puis se déconnecter",
     "signOutAnyway": "Se déconnecter quand même",
     "cancel": "Annuler",
-    "syncFailed": "Les modifications n'ont pas pu être envoyées ; vous restez connecté.",
-    "failed": "La déconnexion n'a pas abouti ; rien n'a été effacé."
+    "syncFailed": "Les modifications n'ont pas pu être envoyées. Vous restez connecté.",
+    "failed": "La déconnexion n'a pas abouti. Rien n'a été effacé."
   },
   "deleteAccount": {
     "back": "Retour au compte",
@@ -315,8 +315,8 @@
     "confirm": "Supprimer définitivement le compte",
     "connectionNeeded": "Connexion nécessaire",
     "deleted": "Le compte a été supprimé.",
-    "notDeleted": "Le compte n'a pas été supprimé ; rien n'a changé.",
-    "wrongPassword": "Ce n'est pas le mot de passe du compte ; rien n'a été supprimé."
+    "notDeleted": "Le compte n'a pas été supprimé. Rien n'a changé.",
+    "wrongPassword": "Ce n'est pas le mot de passe du compte. Rien n'a été supprimé."
   },
   "edit": {
     "title": "Modifier la plongée",
@@ -325,7 +325,7 @@
     "number": "Numéro",
     "dateTime": "Date et heure",
     "duration": "Durée",
-    "durationNote": "Calculée par l’ordinateur ; modifiable seulement pour une plongée saisie à la main",
+    "durationNote": "Calculée par l’ordinateur. Modifiable seulement pour une plongée saisie à la main",
     "site": "Site",
     "trip": "Voyage",
     "none": "Aucun",
@@ -356,8 +356,8 @@
     "undo": "Annuler",
     "undone": "Modification annulée",
     "undoFailed": "La modification ne peut plus être annulée",
-    "failed": "La modification n’a pas pu être enregistrée ; rien n’a changé.",
-    "writeLocked": "Ce compte ne peut pas encore être modifié depuis OpenDives ; rien n’a changé."
+    "failed": "La modification n’a pas pu être enregistrée. Rien n’a changé.",
+    "writeLocked": "Ce compte ne peut pas encore être modifié depuis OpenDives. Rien n’a changé."
   },
   "tripScreen": {
     "kicker": "Voyage · {range}",
@@ -524,7 +524,7 @@
     "figureDeepest": "La plus profonde",
     "pendingValue": "En attente du calcul par le cœur",
     "pending": "Calcul par le cœur de Subsurface : à venir",
-    "pendingNote": "Les totaux seront calculés par le cœur de Subsurface ; les graphiques par plongée montrent déjà le carnet.",
+    "pendingNote": "Les totaux seront calculés par le cœur de Subsurface. Les graphiques par plongée montrent déjà le carnet.",
     "charts": "Graphiques",
     "chartDepth": "Profondeur maximale",
     "chartDepthLabel": {

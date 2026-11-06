@@ -221,6 +221,8 @@
 
     /* Top bar text button with its icon (MD3 text button, 12 dp side padding). */
     :global(.md .filter-button) {
+      width: auto;
+      white-space: nowrap;
       gap: 8px;
       padding: 0 12px;
       font-size: 14px;
