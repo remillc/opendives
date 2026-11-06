@@ -148,7 +148,9 @@ Done in Replace the app icon with the Hublot logo
 
 Replace the app icon with the "Hublot" logo (`docs/ui-specification.md`, "Logo"). Android: an adaptive icon built from `docs/brand/opendives-icon-light-fullbleed.svg` (background #F4F4F2, the rest as foreground, as a vector drawable), plus a monochrome layer (ring, waterline and bubbles in one colour) for themed icons; check it in the round and squircle masks. iOS: a 1024 × 1024 icon from the same drawing, light and dark variants. Also the splash screen and the web favicon. Do not change the drawing; if something does not convert well, stop and ask Christian.
 
-## [ ] 2026-11-06-20 Text fields, choice dialogs, coordinates
+## [x] 2026-11-06-20 Text fields, choice dialogs, coordinates
+
+Done in Use floating-label outline fields and MD3 buttons on the built screens, then Rebuild Settings modelled on Subsurface (choice dialogs, coordinates row); the fields became filled ones with task 27
 
 Apply three updates of `docs/ui-specification.md`, section 4, everywhere they occur:
 1. "Text fields": Framework7 MD outline inputs with floating labels (label inside the empty field, moving onto the outline on focus or when filled, no placeholder), plain trailing icon buttons, a text "Enregistrer" button in the top bar of full-screen forms. Check every form already built (Account, delete account, dive editing, sites) and the new site screen `docs/mockups/sites-edition-android.dc.html`, which also gained a "site already within 100 m" note with a "Utiliser ce site" button.
