@@ -18,6 +18,8 @@
   import SiteEdit from './pages/SiteEdit.svelte';
   import DivesWithoutSite from './pages/DivesWithoutSite.svelte';
   import SitesCleanup from './pages/SitesCleanup.svelte';
+  import Tools from './pages/Tools.svelte';
+  import Desaturation from './pages/Desaturation.svelte';
   import Icon from './components/Icon.svelte';
   import AdaptiveLabel from './components/AdaptiveLabel.svelte';
   import NavMenu from './components/NavMenu.svelte';
@@ -63,11 +65,8 @@
         component: Placeholder,
         options: { props: { title: t('tabs.statistics'), text: t('placeholders.statisticsText') } },
       },
-      {
-        path: '/tools/',
-        component: Placeholder,
-        options: { props: { title: t('tabs.tools'), text: t('placeholders.toolsText') } },
-      },
+      { path: '/tools/', component: Tools },
+      { path: '/tools/desaturation/', component: Desaturation },
     ],
   };
 
