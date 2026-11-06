@@ -7,7 +7,7 @@
 
   /**
    * @type {{
-   *   name: 'logbook'|'sites'|'statistics'|'tools'|'plus'|'check'|'offline'|'device'|'expand'|'settings'|'edit'|'more'|'moreCircle'|'plan'|'menu'|'sync'|'close'|'download'|'file'|'account'|'cloud'|'warning'|'locate'|'fullscreen'|'exitFullscreen'|'place'|'search'|'openInNew'|'filter',
+   *   name: 'logbook'|'sites'|'statistics'|'tools'|'plus'|'check'|'offline'|'device'|'expand'|'settings'|'edit'|'more'|'moreCircle'|'plan'|'menu'|'sync'|'close'|'download'|'file'|'account'|'cloud'|'warning'|'locate'|'fullscreen'|'exitFullscreen'|'place'|'search'|'openInNew'|'filter'|'info',
    *   size?: number,
    *   weight?: number,
    * }}
@@ -40,6 +40,7 @@
     offline: 'M7 18h10a4 4 0 0 0 .6-8A6 6 0 0 0 6.5 9 4.5 4.5 0 0 0 7 18zM4 4l16 16',
     device: 'M8 3h8a1.5 1.5 0 0 1 1.5 1.5v15A1.5 1.5 0 0 1 16 21H8a1.5 1.5 0 0 1-1.5-1.5v-15A1.5 1.5 0 0 1 8 3zM11 18h2',
     expand: 'M6.5 9.5L12 15l5.5-5.5',
+    info: 'M12 8v.01M11 12h1v5h1M12 3a9 9 0 1 0 0 18 9 9 0 1 0 0-18',
     edit: 'M4 20h4L19 9l-4-4L4 16zM13.5 6.5l4 4',
     more: 'M12 5.5h.01M12 12h.01M12 18.5h.01',
     moreCircle: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM8 12h.01M12 12h.01M16 12h.01',

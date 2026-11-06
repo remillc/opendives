@@ -23,6 +23,8 @@
   import StatisticsYear from './pages/StatisticsYear.svelte';
   import StatisticsResult from './pages/StatisticsResult.svelte';
   import StatisticNew from './pages/StatisticNew.svelte';
+  import Tools from './pages/Tools.svelte';
+  import Desaturation from './pages/Desaturation.svelte';
   import Icon from './components/Icon.svelte';
   import AdaptiveLabel from './components/AdaptiveLabel.svelte';
   import NavMenu from './components/NavMenu.svelte';
@@ -69,11 +71,8 @@
       { path: '/statistics/result/', component: StatisticsResult },
       // Android: a full-screen dialog; iPhone: a sheet (the popup pushes the view back).
       { path: '/statistics/new/', popup: { component: StatisticNew } },
-      {
-        path: '/tools/',
-        component: Placeholder,
-        options: { props: { title: t('tabs.tools'), text: t('placeholders.toolsText') } },
-      },
+      { path: '/tools/', component: Tools },
+      { path: '/tools/desaturation/', component: Desaturation },
     ],
   };
 

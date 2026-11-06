@@ -169,6 +169,33 @@ int site_delete(uint32_t uuid, std::string &json, std::string &error);
 // Dives without a site: [{"id", "number", "date", "durationSeconds", "suggestedSite"}].
 int dives_without_site(std::string &json);
 
+// --- Tools (tools.cpp; spec, section 1, "Tools"), read-only ---------------
+
+// Gas calculator, as Subsurface-mobile's (sea water, 1013 mbar). Gas in per
+// mille, pO2 limit in mbar, planned depth in mm. Writes {"o2", "he",
+// "po2Mbar", "modMm" (core's gas_mod, rounded to 1 m), "eadMm" (EAD at the
+// MOD), "endMm" (END at the MOD, O2 narcotic per prefs.o2narcotic),
+// "o2Narcotic", "plannedDepthMm", "bestO2", "bestHe" (core's best_o2 at the
+// given pO2 and best_he with prefs.bestmixend), "bestMixEndMm"}. -1 with
+// BAD_REQUEST when the gas does not exist.
+int gas_calculator(int o2_permille, int he_permille, int po2_mbar, int planned_depth_mm, std::string &json,
+		   std::string &error);
+
+// Cylinder types offered in Subsurface's lists (formatFullCylinderList):
+// {"default": prefs.default_cylinder, "types": [{"name", "ml", "workingPressureMbar"}]}.
+int cylinder_types(std::string &json);
+
+// Tissues at `now` (local wall-clock seconds, as the core's dive times; 0 for
+// the current time), loaded by the core's init_decompression() with the
+// logbook dives before now, as the planner does for a new dive, with the
+// planner's model and gradient factors. Writes {"now", "surfaceSeconds" (since
+// the last dive, -1 when no dive counts), "model", "gfLow", "gfHigh",
+// "vpmbConservatism", "dives": [{"id", "number", "date", "endDate", "site",
+// "maxDepthMm", "durationSeconds"}], "tissues": 16 × {"percent" (Subsurface's
+// tissue graph: 50 = ambient pressure, 100 = M-value), "surfaceGf", "n2Bar",
+// "heBar", "halfTimeMin"}}.
+int desaturation(int64_t now, std::string &json);
+
 // Undo stack of the session; cleared by every load. The result is the dive
 // changed, as get_dive() gives it.
 int undo(std::string &result_json, std::string &error);

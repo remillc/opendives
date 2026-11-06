@@ -146,6 +146,43 @@ import { registerPlugin } from '@capacitor/core';
  */
 
 /**
+ * Gas calculator result (gas_calculator in opendives.h): sea water, 1013 mbar.
+ * @typedef {Object} GasResult
+ * @property {number} o2 per mille
+ * @property {number} he per mille
+ * @property {number} po2Mbar
+ * @property {number} modMm core's gas_mod, rounded to 1 m
+ * @property {number} eadMm equivalent air depth at the MOD
+ * @property {number} endMm equivalent narcotic depth at the MOD
+ * @property {boolean} o2Narcotic oxygen counted as narcotic in endMm (core preference)
+ * @property {number} plannedDepthMm
+ * @property {number} bestO2 per mille, best mix for the planned depth at po2Mbar
+ * @property {number} bestHe per mille, for the core's best-mix END
+ * @property {number} bestMixEndMm
+ */
+
+/**
+ * @typedef {Object} CylinderTypes
+ * @property {string} default the default cylinder preference; empty when none
+ * @property {{name: string, ml: number, workingPressureMbar: number}[]} types
+ */
+
+/**
+ * Tissues now, loaded by the core with the logbook dives before now
+ * (desaturation in opendives.h).
+ * @typedef {Object} Desaturation
+ * @property {string} now local time used
+ * @property {number} surfaceSeconds since the end of the last dive; -1 when no dive counts
+ * @property {'buehlmann'|'vpmb'|'recreational'} model planner model
+ * @property {number} gfLow
+ * @property {number} gfHigh
+ * @property {number} vpmbConservatism
+ * @property {{id: number, number: number, date: string, endDate: string, site: string, maxDepthMm: number, durationSeconds: number}[]} dives
+ * @property {{percent: number, surfaceGf: number, n2Bar: number, heBar: number, halfTimeMin: number}[]} tissues
+ *   16 compartments, fastest first; percent as in Subsurface's tissue graph (50 = ambient, 100 = M-value)
+ */
+
+/**
  * @typedef {Object} EditResult
  * @property {DiveDetail} [dive] the dive after a dive step
  * @property {SiteDetail} [site] the site after a site step
@@ -186,6 +223,10 @@ import { registerPlugin } from '@capacitor/core';
  *   within a metres of lat/lon (or null), possible duplicates (a: same name within a m,
  *   b: other names within b m), dives without a site, and place: {country, region, city,
  *   offline} at lat/lon in the language text (Nominatim, else offline Natural Earth), or null.
+ * @property {(options: {kind: 'gas'|'cylinders'|'desaturation', o2?: number, he?: number, po2?: number, depth?: number}) => Promise<any>} toolQuery
+ *   Read-only tools (opendives.h): gas, a GasResult (o2, he per mille, po2 in mbar,
+ *   planned depth in mm; rejects with BAD_REQUEST); cylinders, the CylinderTypes;
+ *   desaturation, the Desaturation now.
  * @property {(options: {action: 'create'|'edit'|'geocode'|'merge'|'delete'|'deleteSite', uuid?: number, other?: number, uuids?: number[], field?: string, value?: string, lat?: number, lon?: number}) => Promise<EditResult>} siteAction
  *   One undoable site change, as Subsurface's site commands.
  * @property {(options: {tripId: number}) => Promise<TripDetail>} getTrip
@@ -242,6 +283,9 @@ export const OpenDivesCore = {
   },
   async siteQuery(options) {
     return JSON.parse((await native.siteQuery(options)).json);
+  },
+  async toolQuery(options) {
+    return JSON.parse((await native.toolQuery(options)).json);
   },
   async siteAction(options) {
     return JSON.parse((await native.siteAction(options)).json);
