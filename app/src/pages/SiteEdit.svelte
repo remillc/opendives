@@ -11,11 +11,12 @@
   import { Page, Navbar, Link, f7 } from 'framework7-svelte';
   import { OpenDivesCore } from 'opendives-core';
   import Icon from '../components/Icon.svelte';
-  import OutlinedField from '../components/OutlinedField.svelte';
+  import TextField from '../components/TextField.svelte';
   import SiteMap from '../components/SiteMap.svelte';
   import { saveDiveChanges } from '../lib/logbook.svelte.js';
   import { formatCoordinates, geocodeSite, parseCoordinates, siteChange } from '../lib/sites.svelte.js';
   import { language, t } from '../lib/i18n.js';
+  import { confirmAction } from '../lib/dialogs.js';
 
   /** @type {{ f7route: { params: { uuid?: string }, query: { dive?: string } }, f7router: any }} */
   let { f7route, f7router } = $props();
@@ -131,6 +132,30 @@
     }
   }
 
+  /**
+   * Edit mode: delete the site after a confirmation (DeleteDiveSites). Its
+   * dives stay in the logbook without a site; undoable. Back to the list,
+   * as the site's own sheet is gone.
+   */
+  function deleteSite() {
+    const n = original?.diveList.length ?? 0;
+    confirmAction({
+      title: t('sites.deleteSiteTitle'),
+      text: n ? t('sites.deleteSiteText', { n }) : t('sites.deleteSiteTextUnused'),
+      action: t('sites.delete'),
+      onConfirm: async () => {
+        try {
+          await siteChange({ action: 'deleteSite', uuid: editing });
+          f7router.back('/sites/', { force: true });
+        } catch (e) {
+          const code = String(/** @type {any} */ (e)?.message ?? '');
+          console.error('Delete site', code);
+          f7.toast.create({ text: code.startsWith('WRITE_LOCKED') ? t('edit.writeLocked') : t('edit.failed'), closeTimeout: 3000 }).open();
+        }
+      },
+    });
+  }
+
   /** The existing site instead of a duplicate. */
   async function useNearby(/** @type {MouseEvent} */ e) {
     e.preventDefault();
@@ -174,9 +199,7 @@
     {/snippet}
   </Navbar>
 
-  <div class="list name">
-    <ul><OutlinedField label={t('sites.name')} bind:value={name} /></ul>
-  </div>
+  <TextField label={t('sites.name')} bind:value={name} />
 
   <div class="map-card" class:fullscreen use:lift={fullscreen}>
     <SiteMap pin={position} editable onmove={setPosition} height={fullscreen ? '100%' : '190px'} />
@@ -188,40 +211,43 @@
     {#if fullscreen && coordsText}<span class="coords od-value">{coordsText}</span>{/if}
   </div>
 
-  <!-- Position: coordinates, then country and region found from them. -->
-  <div class="list list-strong inset surface">
-    <ul>
-      <OutlinedField
-        label={t('sites.coordinates')}
-        bind:value={coordsText}
-        onchange={typedCoordinates}
-        invalid={coordsError}
-        supporting={coordsError ? t('sites.coordinatesInvalid') : t('sites.coordinatesHint')}
-      >
-        {#snippet trailing()}
-          <button type="button" class="od-icon-button" onclick={useDevicePosition}>
-            <Icon name="locate" />
-            <span class="od-sr-only">{t('sites.useDevicePosition')}</span>
-          </button>
-        {/snippet}
-      </OutlinedField>
-      <OutlinedField label={t('sites.country')} bind:value={country} supporting={country && country === autoCountry ? t('sites.fromPosition') : ''} />
-      <OutlinedField label={t('sites.region')} bind:value={region} supporting={region && region === autoRegion ? t('sites.fromPosition') : ''} />
-      <li class="explain">{t('sites.placeExplain')}</li>
-    </ul>
-  </div>
-
-  <div class="list list-strong inset surface">
-    <ul>
-      <OutlinedField label={t('sites.description')} bind:value={description} multiline />
-      <OutlinedField label={t('sites.notes')} bind:value={notes} multiline />
-    </ul>
-  </div>
-
-  {#if nearby}
+  {#if !editing && nearby}
     <div class="nearby" role="note">
       <span>{t('sites.nearbyShort', { site: nearby.name || t('sites.noName') })}</span>
       <button type="button" class="od-text-button use" onclick={useNearby}>{t('sites.useNearby')}</button>
+    </div>
+  {/if}
+
+  <!-- Position: coordinates, then country and region found from them. -->
+  <div class="od-form-surface">
+    <TextField
+      label={t('sites.coordinates')}
+      bind:value={coordsText}
+      onchange={typedCoordinates}
+      invalid={coordsError}
+      supporting={coordsError ? t('sites.coordinatesInvalid') : t('sites.coordinatesHint')}
+    >
+      {#snippet trailing()}
+        <button type="button" class="od-icon-button" onclick={useDevicePosition}>
+          <Icon name="locate" />
+          <span class="od-sr-only">{t('sites.useDevicePosition')}</span>
+        </button>
+      {/snippet}
+    </TextField>
+    <TextField label={t('sites.country')} bind:value={country} supporting={country && country === autoCountry ? t('sites.fromPosition') : ''} />
+    <TextField label={t('sites.region')} bind:value={region} supporting={region && region === autoRegion ? t('sites.fromPosition') : ''} />
+    <p class="explain">{t('sites.placeExplain')}</p>
+  </div>
+
+  <div class="od-form-surface">
+    <TextField label={t('sites.description')} bind:value={description} multiline />
+    <TextField label={t('sites.notes')} bind:value={notes} multiline />
+  </div>
+
+  {#if editing}
+    <div class="od-form-surface delete">
+      <button type="button" class="od-outlined-button danger" onclick={deleteSite}>{t('sites.deleteSite')}</button>
+      <p class="explain">{t('sites.deleteSiteHint')}</p>
     </div>
   {/if}
   <div class="end"></div>
@@ -229,11 +255,6 @@
 
 <style>
   @layer od.components {
-    .name {
-      margin-top: 8px;
-      margin-bottom: 0;
-    }
-
     .map-card {
       position: relative;
       margin: 8px 16px 0;
@@ -309,21 +330,19 @@
       white-space: nowrap;
     }
 
-    .surface {
-      margin-top: 18px;
-
-      /* Room above the first label, which sits on the outline. */
-      ul {
-        padding-top: 8px;
-        padding-bottom: 4px;
-      }
-    }
-
     .explain {
-      margin: 4px 16px 12px;
+      margin: 12px 16px 0;
       font-size: 13px;
       line-height: 18px;
       color: var(--od-text-2);
+    }
+
+    .delete {
+      padding: 16px 12px;
+
+      .explain {
+        margin: 8px 4px 0;
+      }
     }
 
     .nearby {

@@ -6,7 +6,7 @@
   // request is never sent by automated tests.
   import { Page, Navbar, Link, f7 } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
-  import OutlinedField from '../components/OutlinedField.svelte';
+  import TextField from '../components/TextField.svelte';
   import { logbook, accountDeleted, syncNow } from '../lib/logbook.svelte.js';
   import { OpenDivesCore } from 'opendives-core';
   import { t } from '../lib/i18n.js';
@@ -88,17 +88,14 @@
     <span class="hint">{t('deleteAccount.exportText')}</span>
   </div>
 
-  <div class="list list-strong inset">
-    <ul>
-      <OutlinedField
-        label={t('deleteAccount.password')}
-        type="password"
-        autocomplete="current-password"
-        bind:value={password}
-        supporting={t('deleteAccount.passwordText')}
-      />
-    </ul>
-  </div>
+    <TextField
+      label={t('deleteAccount.password')}
+      type="password"
+      autocomplete="current-password"
+      bind:value={password}
+      supporting={t('deleteAccount.passwordText')}
+    />
+
 
   <p class="note">{t('deleteAccount.note')}</p>
 

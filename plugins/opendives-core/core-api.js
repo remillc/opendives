@@ -186,7 +186,7 @@ import { registerPlugin } from '@capacitor/core';
  *   within a metres of lat/lon (or null), possible duplicates (a: same name within a m,
  *   b: other names within b m), dives without a site, and place: {country, region, city,
  *   offline} at lat/lon in the language text (Nominatim, else offline Natural Earth), or null.
- * @property {(options: {action: 'create'|'edit'|'geocode'|'merge'|'delete', uuid?: number, other?: number, uuids?: number[], field?: string, value?: string, lat?: number, lon?: number}) => Promise<EditResult>} siteAction
+ * @property {(options: {action: 'create'|'edit'|'geocode'|'merge'|'delete'|'deleteSite', uuid?: number, other?: number, uuids?: number[], field?: string, value?: string, lat?: number, lon?: number}) => Promise<EditResult>} siteAction
  *   One undoable site change, as Subsurface's site commands.
  * @property {(options: {tripId: number}) => Promise<TripDetail>} getTrip
  * @property {(options: {action: 'location'|'notes'|'remove'|'split'|'merge'|'add'|'ungroup', tripId?: number, diveId?: number, otherId?: number, diveIds?: number[], value?: string}) => Promise<EditResult>} tripAction

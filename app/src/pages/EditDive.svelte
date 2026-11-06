@@ -10,7 +10,7 @@
   import { Page, Navbar, Link, f7 } from 'framework7-svelte';
   import { OpenDivesCore } from 'opendives-core';
   import Icon from '../components/Icon.svelte';
-  import OutlinedField from '../components/OutlinedField.svelte';
+  import TextField from '../components/TextField.svelte';
   import StarsInput from '../components/StarsInput.svelte';
   import { logbook, saveDiveChanges, undoLastChange } from '../lib/logbook.svelte.js';
   import { settings } from '../lib/settings.svelte.js';
@@ -209,13 +209,11 @@
     </div>
 
     <div class="block-title">{t('edit.peopleGroup')}</div>
-    <div class="list list-strong inset">
-      <ul>
-        <OutlinedField label={t('edit.guides')} bind:value={guides} supporting={t('edit.listHint')} />
-        <OutlinedField label={t('edit.buddies')} bind:value={buddies} />
-        <OutlinedField label={t('edit.tags')} bind:value={tags} />
-        <OutlinedField label={t('edit.notes')} bind:value={notes} multiline />
-      </ul>
+    <div class="od-form-surface people">
+      <TextField label={t('edit.guides')} bind:value={guides} supporting={t('edit.listHint')} />
+      <TextField label={t('edit.buddies')} bind:value={buddies} />
+      <TextField label={t('edit.tags')} bind:value={tags} />
+      <TextField label={t('edit.notes')} bind:value={notes} multiline />
     </div>
 
     <div class="list list-strong inset list-dividers group">
@@ -256,7 +254,7 @@
           </button>
         </li>
         {#if equipmentOpen}
-          <OutlinedField label={t('detail.suitRow')} bind:value={suit} />
+          <li class="suit"><TextField label={t('detail.suitRow')} bind:value={suit} /></li>
           {#each dive.cylinders.filter((c) => c.used) as cylinder, i (i)}
             <li class="item-content readonly">
               <div class="item-inner">
@@ -295,6 +293,11 @@
 
 <style>
   @layer od.components {
+    /* The suit field inside the equipment list. */
+    .suit {
+      padding-bottom: 12px;
+    }
+
     .subtitle {
       margin: 12px 20px 0;
       font-size: 14px;

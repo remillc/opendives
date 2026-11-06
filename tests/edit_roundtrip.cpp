@@ -271,6 +271,19 @@ int main(int argc, char **argv)
 		}
 		if (divelog.sites.size() != sites0 - 1 || !undo_and_save("merge"))
 			return 1;
+		// Delete a used site: its dives stay, without a site, until the undo.
+		size_t a_dives = divelog.sites.get_by_uuid(a)->dives.size();
+		dive *a_dive = divelog.sites.get_by_uuid(a)->dives[0];
+		if (site_delete(a, json, error) || divelog.sites.size() != sites0 - 1 || a_dive->dive_site) {
+			printf("error=delete used site: %s\n", error.c_str());
+			return 1;
+		}
+		if (!undo_and_save("delete used site"))
+			return 1;
+		if (a_dive->dive_site != divelog.sites.get_by_uuid(a) || divelog.sites.get_by_uuid(a)->dives.size() != a_dives) {
+			printf("error=delete used site: the undo did not give the dives their site back\n");
+			return 1;
+		}
 		if (site_create("OpenDives new site", 45500000, -73500000, json, error)) {
 			printf("error=create: %s\n", error.c_str());
 			return 1;

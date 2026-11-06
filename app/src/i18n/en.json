@@ -497,7 +497,15 @@
     },
     "unplacedTitle": "Sites without coordinates",
     "unplacedIntro": "These sites have dives but no position. Open one to place it on the map.",
-    "opensElsewhere": "opens in another app"
+    "opensElsewhere": "opens in another app",
+    "deleteSite": "Delete the site",
+    "deleteSiteHint": "The dives that use it stay in the logbook, without a site. You will be asked to confirm.",
+    "deleteSiteTitle": "Delete the site?",
+    "deleteSiteText": {
+      "one": "The dive that uses it stays in the logbook, without a site. It can be undone.",
+      "other": "The {n} dives that use it stay in the logbook, without a site. It can be undone."
+    },
+    "deleteSiteTextUnused": "No dive uses it. It can be undone."
   },
   "dialog": {
     "ok": "OK",

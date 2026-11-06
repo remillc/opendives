@@ -497,7 +497,15 @@
     },
     "unplacedTitle": "Sites sans coordonnées",
     "unplacedIntro": "Ces sites ont des plongées mais pas de position. Ouvrez-en un pour le placer sur la carte.",
-    "opensElsewhere": "s’ouvre dans une autre app"
+    "opensElsewhere": "s’ouvre dans une autre app",
+    "deleteSite": "Supprimer le site",
+    "deleteSiteHint": "Les plongées qui l’utilisent restent dans le carnet, sans site. Une confirmation est demandée.",
+    "deleteSiteTitle": "Supprimer le site ?",
+    "deleteSiteText": {
+      "one": "La plongée qui l’utilise reste dans le carnet, sans site. C’est annulable.",
+      "other": "Les {n} plongées qui l’utilisent restent dans le carnet, sans site. C’est annulable."
+    },
+    "deleteSiteTextUnused": "Aucune plongée ne l’utilise. C’est annulable."
   },
   "dialog": {
     "ok": "OK",

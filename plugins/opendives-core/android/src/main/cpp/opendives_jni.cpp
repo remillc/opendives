@@ -232,6 +232,8 @@ Java_org_opendives_core_NativeCore_siteAction(JNIEnv *env, jobject, jstring acti
 		ret = opendives::sites_merge(static_cast<uint32_t>(uuid), static_cast<uint32_t>(other), json, error);
 	else if (action == "delete")
 		ret = opendives::sites_delete_unused(uuids, json, error);
+	else if (action == "deleteSite")
+		ret = opendives::site_delete(static_cast<uint32_t>(uuid), json, error);
 	else {
 		ret = -1;
 		error = "BAD_REQUEST: unknown action " + action;

@@ -164,6 +164,8 @@ bool offline_region(int lat_udeg, int lon_udeg, const std::string &lang, std::st
 int sites_duplicates(int same_name_m, int same_place_m, std::string &json);
 int sites_merge(uint32_t keep, uint32_t other, std::string &json, std::string &error); // MergeDiveSites
 int sites_delete_unused(const std::vector<uint32_t> &uuids, std::string &json, std::string &error);
+// One site, used or not (DeleteDiveSites): its dives stay without a site.
+int site_delete(uint32_t uuid, std::string &json, std::string &error);
 // Dives without a site: [{"id", "number", "date", "durationSeconds", "suggestedSite"}].
 int dives_without_site(std::string &json);
 

@@ -129,6 +129,16 @@ html.ios {
     font-variant-numeric: tabular-nums;
   }
 
+  /* A white surface holding text fields (site forms, dive editing): 20 px
+     corners, 16 px side margins; the fields inside sit 12 px from its edges. */
+  .od-form-surface {
+    margin: 18px 16px 0;
+    padding: 2px 0 16px;
+    border-radius: 20px;
+    background: var(--od-surface);
+    --od-field-margin: 12px;
+  }
+
   /* MD3: check boxes (18 dp) and radio buttons (20 dp) keep their size in
      any flex layout. */
   .checkbox,

@@ -1533,6 +1533,25 @@ int sites_delete_unused(const std::vector<uint32_t> &uuids, std::string &json, s
 	return 0;
 }
 
+int site_delete(uint32_t uuid, std::string &json, std::string &error)
+{
+	// DeleteDiveSites for one site, used or not: its dives stay in the
+	// logbook without a site, and get it back on undo.
+	dive_site *ds = divelog.sites.get_by_uuid(uuid);
+	if (!ds) {
+		error = "NOT_FOUND";
+		return -1;
+	}
+	Step step;
+	step.kind = Step::SITES;
+	step.sites_to_remove.push_back(ds);
+	step.text = "delete 1 dive site(s)"; // DeleteDiveSites, tr("delete %n dive site(s)")
+	apply_sites(step);
+	push_step(std::move(step));
+	json = "{\"uuid\":0}";
+	return 0;
+}
+
 int dives_without_site(std::string &json)
 {
 	json = "[";
