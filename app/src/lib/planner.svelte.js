@@ -16,6 +16,7 @@
 //   preferences of Settings, "Décompression": shown, never set here.
 import { OpenDivesCore } from 'opendives-core';
 import { setCorePrefs, resetCorePrefs } from './settings.svelte.js';
+import { SEA_WATER_SALINITY, salinityOfWaterType } from './tools.js';
 
 /** @typedef {import('opendives-core').PlannerSetup} PlannerSetup */
 /** @typedef {import('opendives-core').DiveDetail} DiveDetail */
@@ -66,6 +67,8 @@ export const planner = $state({
   bottomTimeSeconds: 20 * 60,
   o2Permille: 209,
   hePermille: 0,
+  /** Water type as a salinity in kg per 10000 l (the dive's when it has one, else sea water). */
+  salinity: 10300,
   sizeMl: 12000,
   startMbar: 200000,
   /** SAC at the bottom, ml/min (the measured one from a dive). */
@@ -145,6 +148,8 @@ export function startFromDive(dive, source, feet) {
       switchDepthMm: 0,
     }));
   if (dive.sacMlMin > 0) planner.bottomSacMlMin = dive.sacMlMin;
+  // The dive's water type when it has one, else sea water.
+  planner.salinity = salinityOfWaterType(dive.waterType);
   planner.version++;
 }
 
@@ -155,6 +160,7 @@ export function startNewDive() {
   planner.bottomTimeSeconds = 20 * 60;
   planner.o2Permille = 209;
   planner.hePermille = 0;
+  planner.salinity = SEA_WATER_SALINITY;
   planner.sizeMl = 12000;
   planner.startMbar = 200000;
   planner.bottomSacMlMin = planner.setup?.bottomSacMlMin ?? 20000;
@@ -184,6 +190,7 @@ export function planRequest() {
     depthMm: Math.round(planner.depthMm),
     bottomTimeSeconds: Math.round(planner.bottomTimeSeconds),
     bottomSacMlMin: Math.round(planner.bottomSacMlMin),
+    salinity: planner.salinity,
     cylinders: [
       {
         o2Permille: planner.o2Permille,

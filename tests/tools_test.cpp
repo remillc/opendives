@@ -62,6 +62,113 @@ int main(int argc, char **argv)
 	check("best He at 50 m", number(json, "bestHe"), 340);
 	check("bad gas refused", opendives::gas_calculator(800, 300, 1400, 30000, json, error), -1);
 
+	// Fresh water (10000 kg per 10000 l): 3362 mbar above the surface at 9.80665 kPa
+	// per metre of 1000 kg/m3 = 34.28 m, rounded to 34 m (sea water: 33 m).
+	opendives::gas_calculator(320, 0, 1400, 30000, json, error, -1, 10000);
+	check("EAN32 MOD in fresh water", number(json, "modMm"), 34000);
+	// Best mix at 30 m in fresh water: 30 m is 3943 mbar, 140000 / 3943 = 35.5 -> 350.
+	check("best O2 at 30 m in fresh water", number(json, "bestO2"), 350);
+	// EAD and END at the planned depth: EAN32 at 30 m, O2 narcotic: END = 30 m.
+	opendives::gas_calculator(320, 0, 1400, 30000, json, error);
+	check_true("END at the planned depth about 30 m", std::abs(number(json, "endPlannedMm") - 30000) < 100);
+	check_true("EAD at the planned depth about 24 m", number(json, "eadPlannedMm") > 23500 && number(json, "eadPlannedMm") < 25000);
+	// Best nitrox alone at 30 m is EAN34, narcotic fraction 100 %: END = 30 m.
+	check_true("END of the best nitrox about 30 m", std::abs(number(json, "nitroxEndMm") - 30000) < 100);
+	// END of 30 m for the best mix is the default Settings limit; here limited to 20 m.
+	opendives::gas_calculator(210, 0, 1400, 50000, json, error, 20000);
+	check("best mix END override", number(json, "bestMixEndMm"), 20000);
+	check_true("best mix END override: more helium than at 30 m", number(json, "bestHe") > 340);
+	opendives::gas_calculator(210, 0, 1400, 50000, json, error);
+	check("best mix END back to the preference", number(json, "bestHe"), 340);
+	check("bad salinity refused", opendives::gas_calculator(210, 0, 1400, 30000, json, error, -1, 5000), -1);
+
+	// --- Gas blender (real gases) -------------------------------------------------
+	// Amounts are checked against an ideal-gas hand calculation, within a few
+	// percent (the compressibility of helium and oxygen at 200 bar is 1 to 4 %),
+	// and the fill is checked for coherence: pressures rise, the last is the
+	// wanted final pressure.
+	auto step = [&](const std::string &j, int n, const char *key) {
+		size_t at = j.find("\"steps\":[");
+		for (int i = 0; at != std::string::npos && i <= n; i++)
+			at = j.find('{', at + 1);
+		return number(j, key, at);
+	};
+	auto near = [](long got, double expected, double tol) { return std::abs(got - expected) <= tol * expected; };
+
+	// EAN32 from empty, 200 bar, 12 L, filled with air. No helium. Ideal: oxygen
+	// to 0.32 * 200 - 0.21 * 120 ... N2 0.68 * 200 = 136 bar from air, so air
+	// 172.2 bar (O2 36.2), oxygen added 64 - 36.2 = 27.8 bar, pressure after
+	// oxygen 27.8 bar.
+	check("nitrox: blend accepted", opendives::gas_blend(320, 0, 200000, 12000, 0, 0, 0, 210, json, error), 0);
+	printf("%s\n", json.c_str());
+	check_true("nitrox: feasible", json.find("\"feasible\":true") != std::string::npos);
+	check("nitrox: no helium added", step(json, 0, "addedMbar"), 0);
+	check_true("nitrox: oxygen about 27.8 bar", near(step(json, 1, "addedMbar"), 27800, 0.06));
+	check_true("nitrox: oxygen volume about 27.8 bar x 12 L", near(step(json, 1, "volumeMl"), 27.8 * 12000, 0.06));
+	check("nitrox: ends at the wanted pressure", step(json, 2, "toMbar"), 200000);
+	check_true("nitrox: pressures rise", step(json, 1, "toMbar") >= step(json, 0, "toMbar") && step(json, 2, "toMbar") > step(json, 1, "toMbar"));
+
+	// Trimix 21/35 to 220 bar from empty, air top-up. Ideal: helium 77 bar; air
+	// 0.44 * 220 / 0.79 = 122.5 bar (O2 25.7); oxygen 46.2 - 25.7 = 20.5 bar.
+	opendives::gas_blend(210, 350, 220000, 12000, 0, 0, 0, 210, json, error);
+	printf("%s\n", json.c_str());
+	check_true("trimix: feasible", json.find("\"feasible\":true") != std::string::npos);
+	check_true("trimix: helium about 77 bar", near(step(json, 0, "addedMbar"), 77000, 0.08));
+	check_true("trimix: oxygen about 20.5 bar", near(step(json, 1, "addedMbar"), 20500, 0.10));
+	check_true("trimix: air about 122.5 bar", near(step(json, 2, "addedMbar"), 122500, 0.08));
+	check("trimix: ends at the wanted pressure", step(json, 2, "toMbar"), 220000);
+	check_true("trimix: helium volume", near(step(json, 0, "volumeMl"), 77.0 * 12000, 0.08));
+
+	// Oxygen first: the same amounts, read in the other order; the top-up is last.
+	std::string he_first = json;
+	opendives::gas_blend(210, 350, 220000, 12000, 0, 0, 0, 210, json, error, true);
+	check_true("oxygen first: oxygen step before helium", json.find("\"gas\":\"o2\"") < json.find("\"gas\":\"he\"") && json.find("\"gas\":\"he\"") < json.find("\"gas\":\"topup\""));
+	check_true("oxygen first: oxygen about 20.5 bar", near(step(json, 0, "addedMbar"), 20500, 0.10));
+	check_true("oxygen first: helium within 3 % of helium first", near(step(json, 1, "addedMbar"), step(he_first, 0, "addedMbar"), 0.03));
+	check("oxygen first: ends at the wanted pressure", step(json, 2, "toMbar"), 220000);
+	check_true("oxygen first: pressures rise", step(json, 0, "toMbar") < step(json, 1, "toMbar") && step(json, 1, "toMbar") < step(json, 2, "toMbar"));
+
+	// Partly filled: 50 bar of 21/35 in the cylinder, same wanted mix. Ideal:
+	// helium 0.35 * (220 - 50) = 59.5 bar; air 0.44 * 170 / 0.79 = 94.7 bar
+	// (O2 19.9); oxygen 0.21 * 170 - 19.9 = 15.8 bar.
+	opendives::gas_blend(210, 350, 220000, 12000, 50000, 210, 350, 210, json, error);
+	check_true("partly filled, same mix: feasible", json.find("\"feasible\":true") != std::string::npos);
+	check_true("partly filled, same mix: helium about 59.5 bar", near(step(json, 0, "addedMbar"), 59500, 0.10));
+	check_true("partly filled, same mix: oxygen about 15.8 bar", near(step(json, 1, "addedMbar"), 15800, 0.10));
+	check("partly filled, same mix: ends at the wanted pressure", step(json, 2, "toMbar"), 220000);
+
+	// Partly filled with air (50 bar), EAN32 wanted at 200 bar: the residual air
+	// brings oxygen, so less is added than from an empty cylinder (27.7 bar).
+	opendives::gas_blend(320, 0, 200000, 12000, 50000, 210, 0, 210, json, error);
+	check_true("air residual: feasible", json.find("\"feasible\":true") != std::string::npos);
+	check_true("air residual: oxygen added between 20 and 27 bar", step(json, 1, "addedMbar") > 20000 && step(json, 1, "addedMbar") < 27000);
+	check("air residual: oxygen starts after the residual", step(json, 1, "toMbar") - step(json, 1, "addedMbar"), step(json, 0, "toMbar"));
+	check("air residual: no helium", step(json, 0, "addedMbar"), 0);
+	check("air residual: first step starts at the cylinder pressure", step(json, 0, "toMbar"), 50000);
+
+	// Impossible: 150 bar of air left in the cylinder, EAN36 wanted at 150 bar:
+	// the nitrogen alone, 0.79 * 150 = 118.5 bar, exceeds 0.64 * 150 = 96 bar.
+	// Bleed down to 96 / 0.79 = 121.5 bar (ideal), then oxygen up to 150 bar.
+	opendives::gas_blend(360, 0, 150000, 12000, 150000, 210, 0, 210, json, error);
+	printf("%s\n", json.c_str());
+	check_true("too much residual: not feasible", json.find("\"feasible\":false") != std::string::npos);
+	check_true("too much residual: error", json.find("RESIDUAL_TOO_HIGH") != std::string::npos);
+	long bleed = number(json, "bleedToMbar");
+	check_true("too much residual: bleed to about 121.5 bar", near(bleed, 121500, 0.03));
+	check_true("too much residual: the fill starts from the bleed pressure", step(json, 0, "toMbar") == bleed);
+	check("too much residual: ends at the wanted pressure", step(json, 2, "toMbar"), 150000);
+
+	// Impossible: helium left in the cylinder while a nitrox is wanted: empty it.
+	opendives::gas_blend(320, 0, 200000, 12000, 30000, 210, 350, 210, json, error);
+	check_true("helium left, nitrox wanted: bleed to empty", json.find("RESIDUAL_TOO_HIGH") != std::string::npos && number(json, "bleedToMbar") == 0);
+
+	// Impossible whatever is bled: top-up gas richer than the wanted mix (EAN32
+	// wanted from EAN50 top-up cannot be reached with only oxygen/helium added).
+	opendives::gas_blend(210, 350, 220000, 12000, 0, 0, 0, 500, json, error);
+	check_true("top-up too rich: error", json.find("TOPUP_TOO_RICH") != std::string::npos);
+	check("bad blend refused", opendives::gas_blend(0, 0, 200000, 12000, 0, 0, 0, 210, json, error), -1);
+	check("bad top-up refused", opendives::gas_blend(320, 0, 200000, 12000, 0, 0, 0, 1000, json, error), -1);
+
 	opendives::gas_cylinder_types(json);
 	check_true("cylinder types listed", json.find("\"name\":\"AL80\"") != std::string::npos);
 

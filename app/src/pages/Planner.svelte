@@ -23,6 +23,7 @@
     depthUnit,
   } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
+  import { waterTypeName, waterTypeOfSalinity } from '../lib/tools.js';
 
   /** @type {{ f7route: { params: { id: string } }, f7router: { navigate: (url: string) => void } }} */
   let { f7route, f7router } = $props();
@@ -138,6 +139,7 @@
         : t('plan.decoGasesNone'),
     },
     { key: 'sac', label: t('plan.sac'), value: formatSac(planner.bottomSacMlMin, prefs) },
+    { key: 'water', label: t('plan.waterType'), value: waterTypeName(waterTypeOfSalinity(planner.salinity)) },
   ]);
 
   /** The shared deco settings, read from the core's preferences; set in Settings. */

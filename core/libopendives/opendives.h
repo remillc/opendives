@@ -300,12 +300,33 @@ int dives_without_site(std::string &json);
 // Gas calculator, as Subsurface-mobile's (sea water, 1013 mbar). Gas in per
 // mille, pO2 limit in mbar, planned depth in mm. Writes {"o2", "he",
 // "po2Mbar", "modMm" (core's gas_mod, rounded to 1 m), "eadMm" (EAD at the
-// MOD), "endMm" (END at the MOD, O2 narcotic per prefs.o2narcotic),
+// MOD), "eadPlannedMm" and "endPlannedMm" (the same at the planned depth), "endMm" (END at the MOD, O2 narcotic per prefs.o2narcotic),
 // "o2Narcotic", "plannedDepthMm", "bestO2", "bestHe" (core's best_o2 at the
-// given pO2 and best_he with prefs.bestmixend), "bestMixEndMm"}. -1 with
+// given pO2 and best_he with prefs.bestmixend), "bestMixEndMm", "nitroxEndMm" (END of the best nitrox alone, no helium, at the
+// planned depth)}. -1 with
 // BAD_REQUEST when the gas does not exist.
+// best_mix_end_mm, when not negative, replaces prefs.bestmixend for this call.
+// salinity is the water type in kg per 10000 l (10000 fresh, 10100 brackish,
+// 10200 EN 13319, 10300 sea water), used for every depth to pressure
+// conversion.
 int gas_calculator(int o2_permille, int he_permille, int po2_mbar, int planned_depth_mm, std::string &json,
-		   std::string &error);
+		   std::string &error, int best_mix_end_mm = -1, int salinity = 10300);
+
+// Gas blender: partial pressure blending of nitrox and trimix, helium first,
+// then oxygen, then a nitrox top-up gas (air is 210). Read-only. Wanted mix and
+// top-up gas in per mille, pressures in mbar, cylinder volume in ml, start
+// mbar 0 for an empty cylinder (its mix is then ignored). Real gases: amounts
+// are P V / Z with the core's gas_compressibility_factor(), at the temperature
+// of a cooled cylinder. Writes {"feasible", "error": ""|"RESIDUAL_TOO_HIGH"|
+// "TOPUP_TOO_RICH", "startMbar", "bleedToMbar" (RESIDUAL_TOO_HIGH only: the
+// pressure to bleed the cylinder down to; the fill below starts from it),
+// "steps" in the order of the fill (helium, oxygen, top-up; oxygen first when
+// oxygen_first): [{"gas": "he"|"o2"|"topup", "toMbar", "addedMbar", "volumeMl" (gas
+// used, at 1 bar)}] (empty for TOPUP_TOO_RICH)}. -1 with BAD_REQUEST when an
+// argument is out of range.
+int gas_blend(int o2_permille, int he_permille, int final_mbar, int cylinder_ml, int start_mbar,
+	      int start_o2_permille, int start_he_permille, int topup_o2_permille, std::string &json,
+	      std::string &error, bool oxygen_first = false);
 
 // Gas calculator: cylinder types offered in Subsurface's lists (formatFullCylinderList):
 // {"default": prefs.default_cylinder, "types": [{"name", "ml", "workingPressureMbar"}]}.

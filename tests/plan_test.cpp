@@ -158,6 +158,18 @@ int main()
 	check(at9, "deco gas: switch to EAN50 on the 9 m stop");
 	check(num(deco, "gasUsedMl", item(deco, "cylinders", 1)) > 0, "deco gas: its gas use");
 
+	// Water type: fresh water (salinity 10000) is lighter than the default sea
+	// water (10300), so the same 30 m for 20 min on air breathes less gas.
+	std::string water_cyl = "\"cylinders\":[{\"o2Permille\":209,\"hePermille\":0,\"sizeMl\":12000,\"startMbar\":200000}]}";
+	std::string sea = run("{\"depthMm\":30000,\"bottomTimeSeconds\":1200,\"when\":1000000000," + water_cyl);
+	std::string sea_explicit = run("{\"depthMm\":30000,\"bottomTimeSeconds\":1200,\"salinity\":10300,\"when\":1000000000," + water_cyl);
+	std::string fresh = run("{\"depthMm\":30000,\"bottomTimeSeconds\":1200,\"salinity\":10000,\"when\":1000000000," + water_cyl);
+	long sea_gas = num(sea, "gasUsedMl", item(sea, "cylinders", 0));
+	long fresh_gas = num(fresh, "gasUsedMl", item(fresh, "cylinders", 0));
+	printf("     gas used: sea %ld ml, fresh %ld ml\n", sea_gas, fresh_gas);
+	check(sea_gas > 0 && sea_gas == num(sea_explicit, "gasUsedMl", item(sea_explicit, "cylinders", 0)), "water: sea water is the default");
+	check(fresh_gas > 0 && fresh_gas < sea_gas, "water: fresh water uses less gas than sea water");
+
 	std::string bad, error;
 	check(opendives::plan_dive("{\"depthMm\":0}", bad, error) == -1 && error.rfind("BAD_REQUEST", 0) == 0, "bad request refused");
 

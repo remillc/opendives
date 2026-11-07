@@ -294,6 +294,50 @@ New and final version of the logo, replacing tasks 04 and 05. A white disc (dark
 
 Done in "App icon: final Hublot logo, the ring only under the water".
 
-## [ ] 2026-11-07-07 Tools: list page and three gas tools
+## [x] 2026-11-07-07 Tools: list page and three gas tools
 
 The Tools page becomes a list of links in two groups (Plongée: planner, desaturation; Gaz: EAD et MOD, Meilleur mélange, Mélangeur de gaz). The inline gas calculator is removed and split into "EAD et MOD" and "Meilleur mélange" screens. Add a new "Mélangeur de gaz" screen for partial pressure blending of nitrox and trimix (helium, then oxygen, then top-up gas, with real-gas compressibility), with its warnings. See `docs/ui-specification.md` ("Tools page and gas tools"). Mock-ups: `docs/mockups/android-outils.dc.html`, `outils-ead-mod-android.dc.html`, `outils-meilleur-melange-android.dc.html`, `outils-melangeur-android.dc.html`.
+
+Done in "Tools: list page, gas tools, water type and gas blender".
+
+## [x] 2026-11-07-08 Gas tools: ppO₂ wheel
+
+In "EAD et MOD" and "Meilleur mélange", the maximum ppO₂ is chosen with an inline wheel (1,0 to 1,6 bar by 0,1, default 1,4), not a segmented control. The wheel sits on a white surface with the label "ppO₂ maximale" on the left and "bar" on the right. Mock-ups: `docs/mockups/outils-ead-mod-android.dc.html`, `outils-meilleur-melange-android.dc.html`.
+
+Done in "Tools: list page, gas tools, water type and gas blender".
+
+## [x] 2026-11-07-09 Water type in depth calculations
+
+Add a "Type d’eau" choice (Eau douce, Eau saumâtre, EN 13319, Eau de mer, default Eau de mer, Subsurface's salinity values) to "EAD et MOD", "Meilleur mélange" and the planner (row "Type d’eau" before the gradient factors, taken from the starting dive when it has a salinity). Use it for every depth to pressure conversion in these tools. See `docs/ui-specification.md` ("Tools page and gas tools", Water type). Mock-ups: `outils-ead-mod-android`, `outils-meilleur-melange-android`, `android-planificateur`.
+
+Done in "Tools: list page, gas tools, water type and gas blender".
+
+## [x] 2026-11-07-10 Best mix: "Nitrox" label
+
+In "Meilleur mélange", the second result row is labelled "Nitrox" (not "Nitrox seul"). Mock-up: `docs/mockups/outils-meilleur-melange-android.dc.html`.
+
+Done in "Tools: list page, gas tools, water type and gas blender".
+
+## [x] 2026-11-07-11 Best mix: nitrox first
+
+In "Meilleur mélange", the "Nitrox" row comes first, then "Trimix". Mock-up: `docs/mockups/outils-meilleur-melange-android.dc.html`.
+
+Done in "Tools: list page, gas tools, water type and gas blender".
+
+## [x] 2026-11-07-12 Gas blender: Nitrox and Trimix modes
+
+The gas blender stays one tool, with a segmented control "Nitrox | Trimix" at the top, remembered on the device. Nitrox mode hides the helium fields and the helium step (oxygen, then top-up gas). Trimix mode is the current screen. See `docs/ui-specification.md` ("Mélangeur de gaz"). Mock-ups: `docs/mockups/outils-melangeur-nitrox-android.dc.html`, `outils-melangeur-android.dc.html`.
+
+Done in "Tools: list page, gas tools, water type and gas blender".
+
+## [x] 2026-11-07-13 Gas blender: residual oxygen and helium
+
+In Trimix mode, what is already in the cylinder is entered as pressure, then oxygen % and helium % in two separate dropdowns (any combination), instead of one mix dropdown. Mock-up: `docs/mockups/outils-melangeur-android.dc.html`.
+
+Done in "Tools: list page, gas tools, water type and gas blender".
+
+## [x] 2026-11-07-14 Gas blender: helium or oxygen first
+
+In Trimix mode, add a segmented control "Hélium d’abord | Oxygène d’abord" above the fill steps (default helium first, remembered on the device). The steps and their target pressures follow the chosen order; the top-up gas stays last. Mock-up: `docs/mockups/outils-melangeur-android.dc.html`.
+
+Done in "Tools: list page, gas tools, water type and gas blender".
