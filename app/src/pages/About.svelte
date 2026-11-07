@@ -18,7 +18,7 @@
 
   /**
    * The support address of "Signaler un problème", a build-time setting
-   * (VITE_SUPPORT_EMAIL in app/.env*): the row is hidden while it is empty.
+   * (VITE_SUPPORT_EMAIL in app/.env): the row is hidden while it is empty.
    */
   const SUPPORT_EMAIL = String(/** @type {any} */ (import.meta).env?.VITE_SUPPORT_EMAIL ?? '').trim();
 

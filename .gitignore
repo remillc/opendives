@@ -17,9 +17,10 @@ local.properties
 *.apk
 *.aab
 
-# Environnement
+# Environment (app/.env holds public build settings and is committed)
 .env
 .env.*
+!app/.env
 
 # Claude Code: local settings and the inbox hook state
 .claude/inbox-seen.json
