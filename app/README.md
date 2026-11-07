@@ -256,7 +256,7 @@ Checked on the Pixel with the cloud log (1,353 dives).
 
 ## Start-up time (6 November 2026)
 
-Measured on the emulator (1,353 dives), cold starts after `am force-stop`; times in ms from the process start, medians of 9 to 10 runs. The WebView logs `[perf] name ms` marks (`src/lib/perf.js`, tag Capacitor/Console, ms since the navigation started) and the plugin logs `perf:` lines (tag OpenDives).
+Measured on the emulator (1,353 dives), cold starts after `am force-stop`; times in ms from the process start, medians of 9 to 10 runs. The WebView logs `[perf] name ms` marks (`src/lib/perf.js`, tag Capacitor/Console, ms since the navigation started; only with `VITE_SHOW_PERF=1` in `app/.env.local`) and the plugin logs `perf:` lines (tag OpenDives).
 
 | | before | after |
 | --- | --- | --- |

@@ -61,6 +61,42 @@
     return () => clearTimeout(timer);
   });
 
+  /**
+   * A tap on the start snapshot, kept until the real list is there: the
+   * snapshot's dive identifiers are of the previous load, so the dive is
+   * found again by its date and number.
+   * @type {{ date: string, number: number, expand: boolean }|null}
+   */
+  let heldTap = null;
+
+  /** @param {MouseEvent} e */
+  function holdTap(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const target = /** @type {HTMLElement} */ (e.target);
+    const li = target.closest('li');
+    const index = li ? [...(li.parentElement?.children ?? [])].indexOf(li) : -1;
+    const entry = logbook.preview?.entries[index];
+    if (!entry) return;
+    const dive = entry.type === 'trip' ? entry.dives[0] : entry.dive;
+    heldTap = { date: dive.date, number: dive.number, expand: entry.type === 'trip' && !!target.closest('.expand') };
+  }
+
+  // The held tap is replayed on the real row once the dives are loaded.
+  $effect(() => {
+    if (logbook.loading || !heldTap) return;
+    const tap = heldTap;
+    heldTap = null;
+    const dive = logbook.dives.find((d) => d.date === tap.date && d.number === tap.number);
+    if (!dive) return;
+    tick().then(() => {
+      // At start, only the logbook holds links to dives and trips.
+      const href = dive.trip ? `/trip/${dive.trip.id}/` : `/dive/${dive.id}/`;
+      const link = /** @type {HTMLElement|null} */ (document.querySelector(`a[href="${href}"]`));
+      /** @type {HTMLElement|null} */ (tap.expand ? link?.querySelector('.expand') : link)?.click();
+    });
+  });
+
   // Each load gives new dive identifiers and maybe new values: the criteria
   // are read again and the filter applied again.
   $effect(() => {
@@ -373,10 +409,11 @@
   {#if logbook.loading && logbook.preview}
     <!--
       Start: the top of the list as it was at the last load, drawn while the
-      core reads the log. Rows cannot be tapped (their identifiers are of
-      the previous load); the real list replaces them.
+      core reads the log. A tap is held and replayed on the real row when
+      the list replaces them (their identifiers are of the previous load).
     -->
-    <div class="preview" aria-busy="true" aria-label={t('logbook.loading')} role="status">
+    <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
+    <div class="preview" aria-busy="true" aria-label={t('logbook.loading')} role="status" onclickcapture={holdTap}>
       <div aria-hidden="true">
         <p class="count od-value">{t('logbook.count', { n: logbook.preview.total })}</p>
         <div class="list media-list chevron-center dividers">
@@ -561,9 +598,8 @@
       color: var(--od-alarm);
     }
 
-    /* The snapshot of the start: a picture of the list, nothing to tap yet. */
+    /* The snapshot of the start: a tap is held until the real list is there. */
     .preview {
-      pointer-events: none;
       user-select: none;
     }
 
