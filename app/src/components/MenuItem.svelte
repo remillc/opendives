@@ -21,7 +21,15 @@
   let { icon, text, link = '#', onclick = undefined, destructive = false } = $props();
 </script>
 
-<ListItem {link} popoverClose title={text} class={destructive ? 'destructive' : ''} onClick={onclick}>
-  {#snippet media()}{#if !theme.ios}<Icon name={icon} weight={2} />{/if}{/snippet}
-  {#snippet after()}{#if theme.ios}<Icon name={icon} />{/if}{/snippet}
-</ListItem>
+{#snippet leading()}<Icon name={icon} weight={2} />{/snippet}
+{#snippet trailing()}<Icon name={icon} />{/snippet}
+
+<!-- Only the slot of this platform: an empty one would still take room. -->
+<ListItem
+  {link}
+  popoverClose
+  title={text}
+  class={destructive ? 'destructive' : ''}
+  onClick={onclick}
+  {...theme.ios ? { after: trailing } : { media: leading }}
+/>

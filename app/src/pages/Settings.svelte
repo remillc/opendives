@@ -644,11 +644,16 @@
    */
   function computerMenu(e, computer) {
     const name = computerName(computer);
+    // The shared menu style (theme.css, od-menu): Android, a 24 dp leading
+    // icon (the "delete" one of Icon.svelte); iOS, the icon at the end.
+    const icon = `<svg class="od-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${f7.theme === 'ios' ? 1.8 : 2}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 7h15M10 11v6M14 11v6M6.5 7l1 13h9l1-13M9.5 7V4.5h5V7"/></svg>`;
     const item = (/** @type {string} */ action, /** @type {string} */ label) =>
-      `<li><a href="#" class="item-link popover-close" data-action="${action}"><div class="item-content"><div class="item-inner"><div class="item-title">${label}</div></div></div></a></li>`;
+      f7.theme === 'ios'
+        ? `<li><a href="#" class="item-link item-content popover-close destructive" data-action="${action}"><div class="item-inner"><div class="item-title">${label}</div><div class="item-after">${icon}</div></div></a></li>`
+        : `<li><a href="#" class="item-link item-content popover-close" data-action="${action}"><div class="item-media">${icon}</div><div class="item-inner"><div class="item-title">${label}</div></div></a></li>`;
     const popover = f7.popover.create({
       targetEl: /** @type {HTMLElement} */ (e.currentTarget),
-      content: `<div class="popover od-computer-menu"><div class="popover-inner"><div class="list"><ul>${item('forget', t('settings.computers.forgetOne'))}</ul></div></div></div>`,
+      content: `<div class="popover od-menu od-computer-menu"><div class="popover-inner"><div class="list no-chevron"><ul>${item('forget', t('settings.computers.forgetOne'))}</ul></div></div></div>`,
       on: {
         opened(/** @type {any} */ p) {
           p.$el.find('[data-action]').on('click', (/** @type {Event} */ ev) => {

@@ -50,6 +50,8 @@
     --od-drawer: #F0F0EE;
     /* Dialogs (MD3 surface-container-high) and the scrim under them. */
     --od-dialog: #F0F0EE;
+    /* Android ⋮ menus (MD3 surface-container). */
+    --od-menu: #EEEEEC;
     --od-scrim: rgb(0 0 0 / 0.32);
   }
 
@@ -78,6 +80,7 @@
     --od-thumbnail-background: var(--f7-md-surface-variant);
     --od-drawer: var(--f7-md-surface-1);
     --od-dialog: var(--f7-md-surface-3);
+    --od-menu: var(--f7-md-surface-2);
   }
 }
 
@@ -466,28 +469,48 @@ html.ios {
 
 /* Overflow menus (⋮), components/MenuItem.svelte. */
 @layer od.components {
-    /* MD3 menu, as in the mock-up: small corners, no backdrop, width of its label (280 px at most). */
+    /*
+     * Android menu (spec, section 1, "Menus"): 16 dp corners (decided on
+     * 7 November 2026), surface-container, elevation level 2, 8 dp above and
+     * below the items, no backdrop, as wide as its longest label from 112 to
+     * 280 dp.
+     */
     .popover.od-menu {
       --f7-popover-width: max-content;
-      --f7-popover-border-radius: 4px;
+      --f7-popover-border-radius: 16px;
       min-width: 112px;
       max-width: 280px;
-      background: var(--od-surface);
+      background: var(--od-menu);
       box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 6px 2px rgba(0, 0, 0, 0.15);
     }
 
     .od-menu .list {
       margin: 8px 0;
+
+      ul {
+        background: none;
+      }
     }
 
+    /* Items 48 dp high, 12 dp at both ends, a 24 dp icon then 12 dp before the label. */
     .od-menu .item-content {
       min-height: 48px;
       padding-left: 12px;
     }
 
+    .od-menu .item-inner {
+      min-height: 48px;
+      padding-right: 12px;
+    }
+
     .od-menu .item-media {
       min-width: 24px;
+      padding: 0;
       color: var(--od-text);
+
+      & + .item-inner {
+        margin-left: 12px;
+      }
     }
 
     .od-menu .item-title {
