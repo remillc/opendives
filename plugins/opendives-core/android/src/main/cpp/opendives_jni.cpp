@@ -460,7 +460,7 @@ Java_org_opendives_core_NativeCore_tripAction(JNIEnv *env, jobject, jstring acti
 	if (action == "location" || action == "notes")
 		ret = opendives::edit_trip(tripId, action, value, json, error);
 	else if (action == "remove")
-		ret = opendives::trip_remove_dive(diveId, json, error);
+		ret = ids.empty() ? opendives::trip_remove_dive(diveId, json, error) : opendives::trip_remove_dives(ids, json, error);
 	else if (action == "split")
 		ret = opendives::trip_split_at(diveId, json, error);
 	else if (action == "merge")

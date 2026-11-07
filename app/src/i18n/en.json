@@ -69,6 +69,14 @@
       "other": "{n} dives added to the trip"
     },
     "selectionFailed": "The change could not be made. No dive was changed.",
+    "menuRemoveFromTrip": {
+      "one": "Remove the dive from its trip",
+      "other": "Remove the dives from their trips"
+    },
+    "removedFromTrip": {
+      "one": "Dive removed from its trip",
+      "other": "{n} dives removed from their trips"
+    },
     "selectionClose": "Leave the selection",
     "countFiltered": {
       "one": "{n} dive of {total}",

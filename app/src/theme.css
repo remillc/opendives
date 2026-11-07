@@ -535,3 +535,94 @@ html.ios {
       color: var(--od-text);
     }
 }
+
+/*
+ * Reached by a swipe (a dive from the next or previous one, a section from
+ * the next or previous one): the screen slides in from the side it came from.
+ */
+@layer od.components {
+  .od-slide-next .page-content {
+    animation: od-slide-next 220ms ease-out;
+  }
+
+  .od-slide-previous .page-content {
+    animation: od-slide-previous 220ms ease-out;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .od-slide-next .page-content,
+    .od-slide-previous .page-content {
+      animation: none;
+    }
+  }
+}
+
+@keyframes od-slide-next {
+  from {
+    opacity: 0;
+    transform: translateX(40%);
+  }
+}
+
+@keyframes od-slide-previous {
+  from {
+    opacity: 0;
+    transform: translateX(-40%);
+  }
+}
+
+/*
+ * A swipe between main sections (lib/navigation.svelte.js): the section left
+ * stays shown while it slides out, the new one follows it in.
+ */
+@layer od.components {
+  .views.od-tab-sliding {
+    overflow: hidden;
+  }
+
+  .views > .view.od-tab-leaving {
+    display: block;
+    position: absolute;
+    inset: 0;
+  }
+
+  .view.od-tab-out-next {
+    animation: od-tab-out-next 280ms ease-in-out both;
+  }
+
+  .view.od-tab-in-next {
+    animation: od-tab-in-next 280ms ease-in-out both;
+  }
+
+  .view.od-tab-out-previous {
+    animation: od-tab-out-previous 280ms ease-in-out both;
+  }
+
+  .view.od-tab-in-previous {
+    animation: od-tab-in-previous 280ms ease-in-out both;
+  }
+}
+
+@keyframes od-tab-out-next {
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes od-tab-in-next {
+  from {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes od-tab-out-previous {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes od-tab-in-previous {
+  from {
+    transform: translateX(-100%);
+  }
+}

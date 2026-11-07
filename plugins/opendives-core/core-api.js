@@ -489,6 +489,7 @@ import { registerPlugin } from '@capacitor/core';
  * @property {(options: {action: 'create'|'edit'|'geocode'|'merge'|'delete'|'deleteSite', uuid?: number, other?: number, uuids?: number[], field?: string, value?: string, lat?: number, lon?: number}) => Promise<EditResult>} siteAction
  *   One undoable site change, as Subsurface's site commands.
  * @property {(options: {tripId: number}) => Promise<TripDetail>} getTrip
+ *   "remove" takes diveId, or diveIds for several dives in one step.
  * @property {(options: {action: 'location'|'notes'|'remove'|'split'|'merge'|'add'|'ungroup'|'create'|'autogroup', tripId?: number, diveId?: number, otherId?: number, diveIds?: number[], value?: string}) => Promise<EditResult>} tripAction
  *   One undoable trip change, as Subsurface's trip commands; "autogroup" (value "on" or
  *   "off") sets the log's trip grouping, as Subsurface's View > Autogroup.

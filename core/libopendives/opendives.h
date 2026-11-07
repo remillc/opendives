@@ -240,6 +240,8 @@ int edit_dive(int id, const std::string &changes_json, std::string &result_json,
 int trip_json(int trip_id, std::string &json, std::string &error);
 int edit_trip(int trip_id, const std::string &field, const std::string &value, std::string &json, std::string &error);
 int trip_remove_dive(int dive_id, std::string &json, std::string &error);
+// The same for several dives (those in no trip are left out), one step.
+int trip_remove_dives(const std::vector<int> &dive_ids, std::string &json, std::string &error);
 int trip_split_at(int dive_id, std::string &json, std::string &error); // this dive and the later ones form a new trip
 int trips_merge(int trip_id, int other_id, std::string &json, std::string &error);
 int trip_add_dives(int trip_id, const std::vector<int> &dive_ids, std::string &json, std::string &error);

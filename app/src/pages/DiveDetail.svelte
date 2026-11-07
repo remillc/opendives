@@ -13,6 +13,7 @@
   import DiveProfile from '../components/DiveProfile.svelte';
   import Icon from '../components/Icon.svelte';
   import MenuItem from '../components/MenuItem.svelte';
+  import { filter } from '../lib/filter.svelte.js';
   import Stars from '../components/Stars.svelte';
   import { logbook, deleteDive } from '../lib/logbook.svelte.js';
   import { confirmAction } from '../lib/dialogs.js';
@@ -34,8 +35,59 @@
   import { navigation } from '../lib/navigation.svelte.js';
   import { t, tIfExists } from '../lib/i18n.js';
 
-  /** @type {{ f7route: { params: { id: string } }, f7router: any }} */
-  let { f7route, f7router } = $props();
+  /**
+   * `slide`: the dive was reached by a swipe from the next or previous one.
+   * @type {{ f7route: { params: { id: string }, url: string }, f7router: any, slide?: 'next'|'previous' }}
+   */
+  let { f7route, f7router, slide = undefined } = $props();
+
+  // --- Swipe left or right: the next (older) or previous (more recent) dive,
+  // in the order of the logbook list, its filter applied. Not from the
+  // profile, which reads time and depth under the finger.
+
+  /** The dive ids of the list, from the most recent to the oldest. */
+  function listOrder() {
+    return [...logbook.dives]
+      .filter((d) => !filter.ids || filter.ids.has(d.id))
+      .sort((a, b) => b.date.localeCompare(a.date))
+      .map((d) => d.id);
+  }
+
+  /** @param {1|-1} step 1: the next (older) dive; -1: the previous one */
+  function goTo(step) {
+    const ids = listOrder();
+    const at = ids.indexOf(Number(diveId));
+    const id = at < 0 ? undefined : ids[at + step];
+    if (id === undefined) return;
+    // The same kind of route as this one (/dive/ beside the list, /dives/ elsewhere).
+    const base = f7route.url.startsWith('/dives/') ? '/dives/' : '/dive/';
+    f7router.navigate(`${base}${id}/`, { reloadCurrent: true, props: { slide: step > 0 ? 'next' : 'previous' } });
+  }
+
+  /** @param {any} page Framework7's page */
+  function watchSwipes(page) {
+    const content = /** @type {HTMLElement|null} */ (page.el.querySelector('.page-content'));
+    if (!content) return;
+    let x = 0;
+    let y = 0;
+    let at = 0;
+    let tracking = false;
+    content.addEventListener('touchstart', (/** @type {TouchEvent} */ e) => {
+      const target = /** @type {HTMLElement} */ (e.target);
+      tracking = e.touches.length === 1 && !target.closest('.profile');
+      x = e.touches[0].clientX;
+      y = e.touches[0].clientY;
+      at = e.timeStamp;
+    }, { passive: true });
+    content.addEventListener('touchend', (/** @type {TouchEvent} */ e) => {
+      if (!tracking) return;
+      tracking = false;
+      const dx = e.changedTouches[0].clientX - x;
+      const dy = e.changedTouches[0].clientY - y;
+      if (Math.abs(dx) < 80 || Math.abs(dy) > Math.abs(dx) / 2 || e.timeStamp - at > 700) return;
+      goTo(dx < 0 ? 1 : -1);
+    }, { passive: true });
+  }
 
   const uid = $props.id();
   const menuId = `dive-menu-${uid}`;
@@ -237,7 +289,7 @@
   );
 </script>
 
-<Page>
+<Page onPageInit={watchSwipes} class={slide ? `od-slide-${slide}` : ''}>
   <Navbar>
     <!-- Named back link: in MD3, Framework7 hides its text and TalkBack would read "#". -->
     {#snippet left()}

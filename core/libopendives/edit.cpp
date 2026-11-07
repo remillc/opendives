@@ -924,12 +924,22 @@ static int remove_from_trip(const std::vector<dive *> &all, int show_trip, std::
 
 int trip_remove_dive(int dive_id, std::string &json, std::string &error)
 {
-	dive *d = divelog.dives.get_by_uniq_id(dive_id);
-	if (!d || !d->divetrip) {
+	return trip_remove_dives({ dive_id }, json, error);
+}
+
+int trip_remove_dives(const std::vector<int> &dive_ids, std::string &json, std::string &error)
+{
+	std::vector<dive *> dives;
+	for (int id: dive_ids) {
+		dive *d = divelog.dives.get_by_uniq_id(id);
+		if (d && d->divetrip && std::find(dives.begin(), dives.end(), d) == dives.end())
+			dives.push_back(d);
+	}
+	if (dives.empty()) {
 		error = "NOT_FOUND";
 		return -1;
 	}
-	return remove_from_trip({ d }, d->divetrip->id, json, error);
+	return remove_from_trip(dives, dives[0]->divetrip->id, json, error);
 }
 
 int trip_ungroup(int trip_id, std::string &json, std::string &error)

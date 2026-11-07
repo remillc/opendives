@@ -239,6 +239,20 @@
     }
   }
 
+  /** Checked dives that belong to a trip: "Remove from the trip". */
+  const checkedInTrip = $derived(logbook.dives.filter((d) => d.trip && checked[d.id]).map((d) => d.id));
+
+  async function removeFromTrip() {
+    const n = checkedInTrip.length;
+    try {
+      await tripChange({ action: 'remove', diveIds: checkedInTrip });
+      endSelection();
+      offerUndo(t('logbook.removedFromTrip', { n }));
+    } catch (e) {
+      changeFailed(e);
+    }
+  }
+
   /** @param {number} tripId */
   async function addToTrip(tripId) {
     const n = checkedIds.length;
@@ -256,6 +270,7 @@
   // trip above or below): it is placed again for its new size.
   $effect(() => {
     neighbourTrips;
+    checkedInTrip.length;
     tick().then(() => /** @type {any} */ (f7.popover.get('.od-logbook-menu'))?.resize());
   });
 
@@ -329,8 +344,9 @@
       }
       if (!selecting) return;
       const row = diveOf(e);
-      // In selection mode a dive is checked, not opened; a trip only expands.
-      if (row) toggleChecked(Number(row.dataset.dive));
+      // In selection mode a dive is checked, not opened; a trip still opens.
+      if (!row) return;
+      toggleChecked(Number(row.dataset.dive));
       e.preventDefault();
       e.stopPropagation();
     }
@@ -782,6 +798,9 @@
       {#if selecting}
         <MenuItem icon="delete" text={t('logbook.menuDelete')} destructive onclick={deleteChecked} />
         <MenuItem icon="plus" text={t('logbook.menuCreateTrip')} onclick={createTrip} />
+        {#if checkedInTrip.length}
+          <MenuItem icon="remove" text={t('logbook.menuRemoveFromTrip', { n: checkedInTrip.length })} onclick={removeFromTrip} />
+        {/if}
         {#if neighbourTrips.above}
           {@const id = neighbourTrips.above}
           <MenuItem icon="arrowUp" text={t('logbook.menuAddAbove', { n: checkedCount })} onclick={() => addToTrip(id)} />

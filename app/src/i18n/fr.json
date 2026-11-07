@@ -69,6 +69,14 @@
       "other": "{n} plongées ajoutées au voyage"
     },
     "selectionFailed": "La modification n'a pas pu être faite. Aucune plongée n'a été modifiée.",
+    "menuRemoveFromTrip": {
+      "one": "Retirer la plongée du voyage",
+      "other": "Retirer les plongées du voyage"
+    },
+    "removedFromTrip": {
+      "one": "Plongée retirée du voyage",
+      "other": "{n} plongées retirées du voyage"
+    },
     "selectionClose": "Quitter la sélection",
     "countFiltered": {
       "one": "{n} plongée sur {total}",

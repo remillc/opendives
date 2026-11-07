@@ -214,9 +214,10 @@
       background: var(--od-text);
       box-shadow: 0 1px 3px rgb(0 0 0 / 0.3);
       cursor: pointer;
-      position: relative;
 
-      /* 16 dp dot, 48 dp touch target. */
+      /* 16 dp dot, 48 dp touch target, around the dot: MapLibre places the
+         marker with position: absolute, which also holds the target (no
+         position here, which would win over MapLibre's layer). */
       &::after {
         content: '';
         position: absolute;

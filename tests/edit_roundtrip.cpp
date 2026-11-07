@@ -339,6 +339,7 @@ int main(int argc, char **argv)
 		int trip_id = trip->id, other_id = other->id;
 		size_t trips0 = divelog.trips.size(), size0 = trip->dives.size();
 		int second = trip->dives[1]->id;
+		int first_in_trip = trip->dives[0]->id;
 		dive *loose = nullptr;
 		for (auto &d: divelog.dives)
 			if (!d->divetrip)
@@ -359,6 +360,8 @@ int main(int argc, char **argv)
 			  [&] { return divelog.trips.size() == trips0 - 1; } },
 			{ "location", [&](std::string &j, std::string &e) { return edit_trip(trip_id, "location", "OpenDives test", j, e); },
 			  [&] { return trip_location(trip_id) == "OpenDives test"; } },
+			{ "remove2", [&](std::string &j, std::string &e) { return trip_remove_dives({ first_in_trip, second }, j, e); },
+			  [&] { return size0 > 2 ? trip_by_id_size(trip_id) == size0 - 2 : divelog.trips.size() == trips0 - 1; } },
 			{ "create", [&](std::string &j, std::string &e) { return trip_create({ second }, j, e); },
 			  [&] { return divelog.trips.size() == trips0 + 1 && trip_by_id_size(trip_id) == size0 - 1; } },
 		};
