@@ -498,3 +498,12 @@ With a single entry, keep the current row (location as supporting text, weight o
 
 Mock-ups: `docs/mockups/detail3-android.dc.html`, `detail3-android-sombre.dc.html` (iOS: `detail3-ios.dc.html`). Spec: section 4, "Full dive detail".
 
+## [ ] 2026-11-07-28 Dive detail menu: "Supprimer la plongée"
+
+Add a second item to the ⋮ menu of the dive detail (Android MD3 menu, iOS pull-down menu), after a 1 dp divider (`#C9C9C5`, 8 dp above and below): trash icon 24 dp, label "Supprimer la plongée", 14 sp medium, ink. Not in `--od-alarm`: that colour is for errors only.
+- No confirmation dialog. Delete the dive through the core's undoable delete (as Subsurface does), go back to the logbook, and show a snackbar "Plongée supprimée" with the action "Annuler" for 10 seconds. "Annuler" restores the dive and its place in the list.
+- The deletion is saved and synced with the cloud like any other change.
+- On a tablet (master-detail), the detail pane shows the next dive in the list, or the empty pane when none is left.
+
+Mock-up: `docs/mockups/detail2-android-menu.dc.html`. Spec: section 4, "Dive detail" row of the screens table.
+
