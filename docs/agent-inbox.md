@@ -305,3 +305,7 @@ In "EAD et MOD" and "Meilleur mélange", the maximum ppO₂ is chosen with an in
 ## [ ] 2026-11-07-09 Water type in depth calculations
 
 Add a "Type d’eau" choice (Eau douce, Eau saumâtre, EN 13319, Eau de mer, default Eau de mer, Subsurface's salinity values) to "EAD et MOD", "Meilleur mélange" and the planner (row "Type d’eau" before the gradient factors, taken from the starting dive when it has a salinity). Use it for every depth to pressure conversion in these tools. See `docs/ui-specification.md` ("Tools page and gas tools", Water type). Mock-ups: `outils-ead-mod-android`, `outils-meilleur-melange-android`, `android-planificateur`.
+
+## [ ] 2026-11-07-10 Best mix: "Nitrox" label
+
+In "Meilleur mélange", the second result row is labelled "Nitrox" (not "Nitrox seul"). Mock-up: `docs/mockups/outils-meilleur-melange-android.dc.html`.
