@@ -278,6 +278,6 @@ Done in "Sites: compact one-line maintenance rows".
 
 ## [x] 2026-11-07-04 New app icon: Hublot mi-fin
 
-The logo was redrawn: the ring is half as thick and there is less water in the circle. Regenerate the app icons (Android adaptive icon, iOS) and any in-app logo from the updated `docs/brand/opendives-icon-*.svg`. See `docs/ui-specification.md` ("Logo") and `docs/mockups/logo-hublot-moyen.dc.html`.
+The logo was redrawn: no ring in light mode (a white disc on the paper background), a thin light ring in dark mode, and less water in the circle. Regenerate the app icons (Android adaptive icon, iOS) and any in-app logo from the updated `docs/brand/opendives-icon-*.svg`. See `docs/ui-specification.md` ("Logo") and `docs/mockups/logo-hublot-moyen.dc.html`.
 
 Done in "App icon: thinner Hublot logo on Android, iOS and the web".
