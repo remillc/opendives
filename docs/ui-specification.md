@@ -57,7 +57,7 @@ The theme chosen on 5 November 2026 is **black and white, colour reserved for da
 
 ## 2. Text, numbers and units
 
-Fonts are the system ones: SF Pro on iOS, Roboto on Android. Sizes follow each platform's scale and respect the text size chosen in the phone's settings.
+**Fonts (decided on 7 November 2026, replacing "system fonts only").** Body text uses **Source Sans 3** (SIL Open Font License) on Android and iOS: list rows, values, captions and helper text, fields, buttons, chips, menus, notes, tables. Titles keep the system font: screen and section titles, top bar titles, and the large key figures at the top of a dive (depth, duration, temperature), in Roboto on Android and SF Pro on iOS. The font is bundled with the app (weights 400, 500, 600, 700, with the Latin Extended range so that ₂, ‰ and the other symbols render), registered as the app's body font, and scaled with the text size chosen in the phone's settings (Android `sp`, iOS Dynamic Type through `UIFontMetrics`). Tabular figures stay on for every dive value. Sizes follow each platform's scale. Reference: `docs/mockups/police-source-android.dc.html`; the Latin files used for the mock-up and the licence are in `docs/brand/fonts/`. The other mock-ups still show the system font in their body text until they are redrawn.
 
 | Role | iOS | Android (MD3) |
 | --- | --- | --- |

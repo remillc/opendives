@@ -263,3 +263,7 @@ On "Reprendre votre carnet ?", the choices are now in this order: "Commencer ave
 Every ⋮ menu on Android: 16 dp corners, items 48 dp high with 12 dp side padding, 24 dp leading icon, labels 14 sp medium, elevation level 2, width 112 to 280 dp. See `docs/ui-specification.md` (Android follows Material 3). Mock-ups: `docs/mockups/detail2-android-menu.dc.html`, `docs/mockups/reglages-menu-android.dc.html`.
 
 Done in "Android menus: 16 dp corners, surface-container, MD3 item spacing".
+
+## [ ] 2026-11-07-02 Body font: Source Sans 3
+
+Bundle Source Sans 3 (OFL, weights 400 to 700, Latin and Latin Extended: take the full files from the upstream release, the ones in `docs/brand/fonts/` are the Latin subset used for the mock-up) and use it for all body text on Android and iOS. Titles and the large key figures keep the system font (Roboto, SF Pro). It must scale with the phone's text size. Keep `tabular-nums` on dive values. See `docs/ui-specification.md` ("Fonts") and `docs/mockups/police-source-android.dc.html`.
