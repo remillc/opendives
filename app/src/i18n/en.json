@@ -77,6 +77,11 @@
       "one": "Dive removed from its trip",
       "other": "{n} dives removed from their trips"
     },
+    "dragAdd": "Add to {trip}",
+    "dragRemove": "Remove from the trip",
+    "menuUndo": "Undo the last action",
+    "menuRedo": "Redo",
+    "menuRenumber": "Renumber the dives",
     "selectionClose": "Leave the selection",
     "countFiltered": {
       "one": "{n} dive of {total}",
@@ -673,6 +678,7 @@
     "saved": "Change saved",
     "undo": "Undo",
     "undone": "Change undone",
+    "redone": "Change redone",
     "undoFailed": "The change can no longer be undone",
     "failed": "The change could not be saved. Nothing changed.",
     "writeLocked": "This account cannot be edited from OpenDives yet. Nothing changed."

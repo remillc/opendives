@@ -70,6 +70,8 @@ export const logbook = $state({
   editedTrip: /** @type {import('opendives-core').TripDetail|null} */ (null),
   /** Text of the step that Undo would revert, e.g. "Edit notes [#12]". */
   undoText: '',
+  /** Text of the step that Redo would apply again; empty when none. */
+  redoText: '',
   /** Increases at each site change, so that site screens read the sites again. */
   sitesVersion: 0,
 });
@@ -83,6 +85,7 @@ export async function tripChange(options) {
   const result = await OpenDivesCore.tripAction(options);
   logbook.editedTrip = result.trip ?? null;
   logbook.undoText = result.undo;
+  logbook.redoText = result.redo ?? '';
   logbook.dives = await OpenDivesCore.listLoadedDives();
   await persistChanges();
   return result;
@@ -96,6 +99,7 @@ export async function tripChange(options) {
 export async function setAutogroup(on) {
   const result = await OpenDivesCore.tripAction({ action: 'autogroup', value: on ? 'on' : 'off' });
   logbook.undoText = result.undo;
+  logbook.redoText = result.redo ?? '';
   logbook.dives = await OpenDivesCore.listLoadedDives();
   logbook.prefs = await OpenDivesCore.getPrefs();
   await persistChanges();
@@ -111,6 +115,7 @@ export async function renameCylinderType(name, newName) {
   const result = await OpenDivesCore.cylinderTypes({ action: 'rename', name, value: newName });
   keepCylinderLibrary(result.library);
   logbook.undoText = result.undo;
+  logbook.redoText = result.redo ?? '';
   await persistChanges();
   return result;
 }
@@ -130,6 +135,7 @@ export async function saveDiveChanges(id, changes) {
   const result = await OpenDivesCore.editDive({ id, changes });
   logbook.edited = { id, dive: result.dive };
   logbook.undoText = result.undo;
+  logbook.redoText = result.redo ?? '';
   await persistChanges();
   return result;
 }
@@ -141,6 +147,7 @@ export async function saveDiveChanges(id, changes) {
  */
 export async function refreshAfterChange(undoText) {
   logbook.undoText = undoText;
+  logbook.redoText = '';
   logbook.dives = await OpenDivesCore.listLoadedDives();
   logbook.sitesVersion++;
   await persistChanges();
@@ -162,6 +169,7 @@ export async function deleteDive(id) {
 export async function deleteDives(ids) {
   const result = await OpenDivesCore.deleteDive({ ids });
   logbook.undoText = result.undo;
+  logbook.redoText = result.redo ?? '';
   logbook.dives = await OpenDivesCore.listLoadedDives();
   logbook.sitesVersion++;
   await persistChanges();
@@ -176,6 +184,7 @@ export async function deleteDives(ids) {
 export async function renumberDives(ids, start) {
   const result = await OpenDivesCore.renumberDives({ ids, start });
   logbook.undoText = result.undo;
+  logbook.redoText = result.redo ?? '';
   logbook.dives = await OpenDivesCore.listLoadedDives();
   await persistChanges();
 }
@@ -202,6 +211,7 @@ export function renumberPlanFrom(id) {
 export async function addDive(fields) {
   const result = await OpenDivesCore.createDive({ fields });
   logbook.undoText = result.undo;
+  logbook.redoText = result.redo ?? '';
   logbook.dives = await OpenDivesCore.listLoadedDives();
   await persistChanges();
   return result.list?.id ?? 0;
@@ -224,6 +234,7 @@ export async function importFile(file) {
   });
   const result = await OpenDivesCore.importDives({ name: file.name, data });
   logbook.undoText = result.undo;
+  logbook.redoText = result.redo ?? '';
   logbook.dives = await OpenDivesCore.listLoadedDives();
   logbook.sitesVersion++;
   await persistChanges();
@@ -246,6 +257,7 @@ export async function afterDownload(result) {
   }
   if (!result?.downloaded) return;
   logbook.undoText = result.undo;
+  logbook.redoText = '';
   logbook.dives = await OpenDivesCore.listLoadedDives();
   logbook.sitesVersion++;
   await persistChanges();
@@ -279,8 +291,12 @@ export async function resolveConflict(choices) {
 }
 
 /** Undoes the last edit, saved and synced the same way. */
-export async function undoLastChange() {
-  const result = await OpenDivesCore.undo();
+/**
+ * Undoes the last change, or applies again the last one undone (`redo`).
+ * @param {boolean} [redo]
+ */
+export async function undoLastChange(redo = false) {
+  const result = await OpenDivesCore.undo({ redo });
   if (result.dive) logbook.edited = { id: result.dive.id, dive: result.dive };
   if (result.list) {
     logbook.dives = await OpenDivesCore.listLoadedDives();
@@ -296,6 +312,7 @@ export async function undoLastChange() {
   }
   if (result.cylinderTypes) keepCylinderLibrary(result.cylinderTypes.library);
   logbook.undoText = result.undo;
+  logbook.redoText = result.redo ?? '';
   await persistChanges();
   return result;
 }
@@ -310,6 +327,7 @@ async function persistChanges() {
 /** The core's undo history was emptied (a load): no "Undo" may be offered any more. */
 function undoCleared() {
   logbook.undoText = '';
+  logbook.redoText = '';
   if (typeof window !== 'undefined') window.dispatchEvent(new Event('od-undo-cleared'));
 }
 

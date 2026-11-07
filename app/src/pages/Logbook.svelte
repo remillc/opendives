@@ -14,12 +14,13 @@
   import MenuButton from '../components/MenuButton.svelte';
   import ActiveFilter from '../components/ActiveFilter.svelte';
   import ConflictSheet from '../components/ConflictSheet.svelte';
+  import RenumberDialog from '../components/RenumberDialog.svelte';
   import { logbook, loadLogbook, importFile, undoLastChange, resolveConflict, deleteDives, tripChange } from '../lib/logbook.svelte.js';
   import { confirmAction } from '../lib/dialogs.js';
   import { filter, loadOptions, applyFilter, isEmpty } from '../lib/filter.svelte.js';
   import { layout } from '../lib/layout.svelte.js';
   import { navigation } from '../lib/navigation.svelte.js';
-  import { formatDateTime } from '../lib/format.js';
+  import { formatDateTime, formatLongDate } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
   import { mark } from '../lib/perf.js';
   import { buildSnapshot, saveSnapshot } from '../lib/snapshot.js';
@@ -253,6 +254,23 @@
     }
   }
 
+  /** "Renumber the dives" of the menu: Subsurface's Renumber dialog, all the dives. */
+  let renumbering = $state(false);
+
+  /**
+   * Undo or Redo from the menu, one step each time: the history of this
+   * session's changes, as Subsurface's Edit menu.
+   * @param {boolean} redo
+   */
+  async function undoRedo(redo) {
+    try {
+      await undoLastChange(redo);
+      f7.toast.create({ text: t(redo ? 'edit.redone' : 'edit.undone'), closeTimeout: 2500, position: 'bottom' }).open();
+    } catch (e) {
+      changeFailed(e);
+    }
+  }
+
   /** @param {number} tripId */
   async function addToTrip(tripId) {
     const n = checkedIds.length;
@@ -292,6 +310,11 @@
     /** The press became a long press: the click that follows is dropped. */
     let pressed = false;
     const cancel = () => clearTimeout(timer);
+    /** After a long press on a dive: the dives a move of the finger would drag. */
+    /** @type {number[]|null} */
+    let dragIds = null;
+    /** @type {HTMLElement|null} */
+    let dragRow = null;
 
     /** @param {Event} e */
     const diveOf = (e) => /** @type {HTMLElement|null} */ (/** @type {HTMLElement} */ (e.target).closest('a.dive-row'));
@@ -299,13 +322,21 @@
     /** @param {PointerEvent} e */
     function down(e) {
       pressed = false;
+      dragIds = null;
       const row = diveOf(e);
-      if (!row || selecting) return;
+      if (!row) return;
       startX = e.clientX;
       startY = e.clientY;
+      const id = Number(row.dataset.dive);
       timer = setTimeout(() => {
         pressed = true;
-        startSelection(Number(row.dataset.dive));
+        // A long press starts the selection with this dive; in selection
+        // mode it checks the dive. Moving the finger then drags the dives
+        // checked (to a trip, or out of theirs).
+        if (!selecting) startSelection(id);
+        else checked[id] = true;
+        dragIds = Object.keys(checked).filter((k) => checked[Number(k)]).map(Number);
+        dragRow = row.closest('li');
       }, LONG_PRESS_MS);
     }
     /** @param {PointerEvent} e */
@@ -353,14 +384,176 @@
     /** @param {Event} e The WebView's own long-press menu is not wanted. */
     const menu = (e) => diveOf(e) && e.preventDefault();
 
+    // --- Dragging dives after a long press: dropped on a trip (its row or one
+    // of its dives), they join it; dropped on a dive in no trip, they leave
+    // theirs. A floating copy of the row follows the finger with what the
+    // drop would do; the list scrolls near its top and bottom.
+    let dragging = false;
+    let touchX = 0;
+    let touchY = 0;
+    let grabY = 0;
+    /** @type {HTMLElement|null} */
+    let ghost = null;
+    /** @type {HTMLElement|null} */
+    let label = null;
+    /** @type {{ action: 'add', tripId: number } | { action: 'remove' } | null} */
+    let target = null;
+    let scrolling = 0;
+
+    /** @param {number} id */
+    const diveById = (id) => logbook.dives.find((d) => d.id === id);
+
+    function beginDrag() {
+      if (!dragRow) return;
+      dragging = true;
+      const rect = dragRow.getBoundingClientRect();
+      grabY = startY - rect.top;
+      ghost = document.createElement('div');
+      ghost.className = 'list media-list od-drag-ghost';
+      ghost.style.left = `${rect.left}px`;
+      ghost.style.width = `${rect.width}px`;
+      const ul = document.createElement('ul');
+      const copy = /** @type {HTMLElement} */ (dragRow.cloneNode(true));
+      copy.style.top = '';
+      copy.style.position = 'static';
+      ul.append(copy);
+      label = document.createElement('span');
+      label.className = 'od-drag-label';
+      ghost.append(ul, label);
+      document.body.append(ghost);
+      dragRow.classList.add('od-drag-source');
+      placeGhost();
+      autoScroll();
+    }
+
+    function placeGhost() {
+      if (ghost) ghost.style.top = `${touchY - grabY}px`;
+    }
+
+    function updateTarget() {
+      el?.querySelectorAll('.od-drop-target').forEach((n) => n.classList.remove('od-drop-target'));
+      target = null;
+      const under = document.elementFromPoint(touchX, touchY);
+      const li = /** @type {HTMLElement|null} */ (under?.closest('li'));
+      const dragged = (dragIds ?? []).map(diveById).filter((d) => d !== undefined);
+      if (li && el?.contains(li) && dragged.length) {
+        const tripId = Number(li.dataset.trip) || 0;
+        if (tripId && dragged.some((d) => d.trip?.id !== tripId)) {
+          target = { action: 'add', tripId };
+          el.querySelectorAll(`li[data-trip="${tripId}"]`).forEach((n) => n.classList.add('od-drop-target'));
+        } else if (!tripId && dragged.some((d) => d.trip)) {
+          target = { action: 'remove' };
+        }
+      }
+      if (!label) return;
+      if (target?.action === 'add') {
+        const id = target.tripId;
+        const inTrip = logbook.dives.filter((d) => d.trip?.id === id).sort((a, b) => a.date.localeCompare(b.date));
+        const name = inTrip[0]?.trip?.location || (inTrip[0] ? t('trip.startingOn', { date: formatLongDate(inTrip[0].date) }) : '');
+        label.textContent = t('logbook.dragAdd', { trip: name });
+      } else if (target?.action === 'remove') {
+        label.textContent = t('logbook.dragRemove');
+      }
+      label.hidden = !target;
+    }
+
+    /** Near the top or the bottom of the screen, the list scrolls under the finger. */
+    function autoScroll() {
+      const content = /** @type {HTMLElement|null} */ (el?.closest('.page-content'));
+      const step = () => {
+        if (!dragging || !content) return;
+        const rect = content.getBoundingClientRect();
+        const edge = 80;
+        let speed = 0;
+        if (touchY < rect.top + edge + 120) speed = -Math.ceil((rect.top + edge + 120 - touchY) / 6);
+        else if (touchY > rect.bottom - edge) speed = Math.ceil((touchY - (rect.bottom - edge)) / 6);
+        if (speed) {
+          content.scrollTop += speed;
+          updateTarget();
+        }
+        scrolling = requestAnimationFrame(step);
+      };
+      scrolling = requestAnimationFrame(step);
+    }
+
+    function endDrag() {
+      dragging = false;
+      cancelAnimationFrame(scrolling);
+      ghost?.remove();
+      ghost = null;
+      label = null;
+      dragRow?.classList.remove('od-drag-source');
+      el?.querySelectorAll('.od-drop-target').forEach((n) => n.classList.remove('od-drop-target'));
+    }
+
+    async function drop() {
+      const ids = dragIds ?? [];
+      const what = target;
+      endDrag();
+      if (!what || !ids.length) return;
+      const n = ids.length;
+      try {
+        if (what.action === 'add') {
+          await tripChange({ action: 'add', tripId: what.tripId, diveIds: ids });
+          endSelection();
+          expanded[what.tripId] = true;
+          offerUndo(t('logbook.addedToTrip', { n }));
+        } else {
+          const inTrip = ids.filter((id) => diveById(id)?.trip);
+          await tripChange({ action: 'remove', diveIds: inTrip });
+          endSelection();
+          offerUndo(t('logbook.removedFromTrip', { n: inTrip.length }));
+        }
+      } catch (e) {
+        changeFailed(e);
+      }
+    }
+
+    /** @param {TouchEvent} e */
+    function touchMove(e) {
+      if (!dragIds) return;
+      touchX = e.touches[0].clientX;
+      touchY = e.touches[0].clientY;
+      if (!dragging) {
+        if (Math.hypot(touchX - startX, touchY - startY) < 8) return;
+        beginDrag();
+      }
+      // The list does not scroll and the sections do not slide under a drag.
+      e.preventDefault();
+      e.stopPropagation();
+      placeGhost();
+      updateTarget();
+    }
+
+    /** @param {TouchEvent} e */
+    function touchEnd(e) {
+      if (dragging) {
+        e.stopPropagation();
+        drop();
+      }
+      dragIds = null;
+    }
+
+    function touchCancel() {
+      if (dragging) endDrag();
+      dragIds = null;
+    }
+
     el.addEventListener('pointerdown', down);
     el.addEventListener('pointermove', move);
     el.addEventListener('pointerup', cancel);
     el.addEventListener('pointercancel', cancel);
     window.addEventListener('click', click, true);
     el.addEventListener('contextmenu', menu);
+    el.addEventListener('touchmove', touchMove, { passive: false });
+    el.addEventListener('touchend', touchEnd);
+    el.addEventListener('touchcancel', touchCancel);
     return () => {
       cancel();
+      endDrag();
+      el.removeEventListener('touchmove', touchMove);
+      el.removeEventListener('touchend', touchEnd);
+      el.removeEventListener('touchcancel', touchCancel);
       el.removeEventListener('pointerdown', down);
       el.removeEventListener('pointermove', move);
       el.removeEventListener('pointerup', cancel);
@@ -794,7 +987,17 @@
   -->
   <Popover class="od-menu od-logbook-menu" backdrop={false}>
     <List noChevron>
+      <!-- Undo and Redo always come first. -->
+      {#if logbook.undoText}
+        <MenuItem icon="undo" text={t('logbook.menuUndo')} onclick={() => undoRedo(false)} />
+      {/if}
+      {#if logbook.redoText}
+        <MenuItem icon="redo" text={t('logbook.menuRedo')} onclick={() => undoRedo(true)} />
+      {/if}
       <MenuItem icon="filter" text={t(filtered ? 'logbook.menuFilterOn' : 'logbook.menuFilter')} link="/filter/" />
+      {#if !selecting}
+        <MenuItem icon="renumber" text={t('logbook.menuRenumber')} onclick={() => (renumbering = true)} />
+      {/if}
       {#if selecting}
         <MenuItem icon="delete" text={t('logbook.menuDelete')} destructive onclick={deleteChecked} />
         <MenuItem icon="plus" text={t('logbook.menuCreateTrip')} onclick={createTrip} />
@@ -843,6 +1046,10 @@
         {/each}
       </ul>
     </div>
+  {/if}
+
+  {#if renumbering}
+    <RenumberDialog oncancel={() => (renumbering = false)} ondone={() => (renumbering = false)} />
   {/if}
 
   <!-- Not reported by the core yet: logbook.conflict stays null (see the report). -->
@@ -978,6 +1185,44 @@
 
     .selection-more {
       margin-left: auto;
+    }
+
+    /* Dragging dives to a trip or out of it: the row lifted under the finger,
+       its place faded, the trip it would join tinted. */
+    :global(.od-drag-ghost) {
+      position: fixed;
+      z-index: 9000;
+      margin: 0;
+      pointer-events: none;
+      border-radius: 12px;
+      background: var(--od-surface);
+      box-shadow: 0 4px 8px 3px rgb(0 0 0 / 0.15), 0 1px 3px rgb(0 0 0 / 0.3);
+
+      ul {
+        background: none;
+      }
+    }
+
+    :global(.od-drag-label) {
+      position: absolute;
+      right: 12px;
+      top: -14px;
+      padding: 4px 10px;
+      border-radius: 8px;
+      background: var(--od-text);
+      color: var(--od-surface);
+      font-size: 13px;
+      line-height: 18px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    :global(.od-drag-source) {
+      opacity: 0.35;
+    }
+
+    :global(li.od-drop-target) {
+      background: var(--od-tint);
     }
 
     /* The dives follow the count and the sync status closely. */

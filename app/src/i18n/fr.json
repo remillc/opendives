@@ -77,6 +77,11 @@
       "one": "Plongée retirée du voyage",
       "other": "{n} plongées retirées du voyage"
     },
+    "dragAdd": "Ajouter à {trip}",
+    "dragRemove": "Retirer du voyage",
+    "menuUndo": "Annuler la dernière action",
+    "menuRedo": "Rétablir",
+    "menuRenumber": "Renuméroter les plongées",
     "selectionClose": "Quitter la sélection",
     "countFiltered": {
       "one": "{n} plongée sur {total}",
@@ -673,6 +678,7 @@
     "saved": "Modification enregistrée",
     "undo": "Annuler",
     "undone": "Modification annulée",
+    "redone": "Modification rétablie",
     "undoFailed": "La modification ne peut plus être annulée",
     "failed": "La modification n’a pas pu être enregistrée. Rien n’a changé.",
     "writeLocked": "Ce compte ne peut pas encore être modifié depuis OpenDives. Rien n’a changé."
