@@ -367,7 +367,7 @@
   });
 </script>
 
-<Page>
+<Page class="od-logbook">
   <Navbar large title={t('logbook.title')}>
     {#snippet left()}<MenuButton />{/snippet}
     <NavRight>
@@ -586,6 +586,16 @@
 </Page>
 
 <style>
+  /*
+   * Android: a shorter large title (less space above "Logbook") and a taller
+   * search band, for some air under the search box. Outside the layers:
+   * Framework7's own variables are set without one.
+   */
+  :global(.md .od-logbook) {
+    --f7-navbar-large-title-height: 72px;
+    --f7-subnavbar-height: 76px;
+  }
+
   @layer od.components {
     .count {
       margin: 8px 16px 0;
@@ -605,7 +615,7 @@
 
     /* The dives follow the count and the sync status closely. */
     :global(.list.dives) {
-      margin-top: 8px;
+      margin-top: 0;
     }
 
     /* The filter button says when a filter is applied: a tinted circle. */
