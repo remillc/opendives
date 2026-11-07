@@ -50,7 +50,7 @@ export function horizontalSwipe(target, { accept, move, end }) {
       const dy = touch.clientY - y0;
       if (state === 'pending') {
         // Decided early, and a slightly slanted move still counts as sideways.
-        if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
+        if (Math.abs(dx) < 4 && Math.abs(dy) < 4) return;
         state = Math.abs(dx) > Math.abs(dy) * 0.8 ? 'h' : 'v';
         if (state === 'v') return;
       }
