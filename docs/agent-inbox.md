@@ -297,3 +297,7 @@ Done in "App icon: final Hublot logo, the ring only under the water".
 ## [ ] 2026-11-07-07 Tools: list page and three gas tools
 
 The Tools page becomes a list of links in two groups (Plongée: planner, desaturation; Gaz: EAD et MOD, Meilleur mélange, Mélangeur de gaz). The inline gas calculator is removed and split into "EAD et MOD" and "Meilleur mélange" screens. Add a new "Mélangeur de gaz" screen for partial pressure blending of nitrox and trimix (helium, then oxygen, then top-up gas, with real-gas compressibility), with its warnings. See `docs/ui-specification.md` ("Tools page and gas tools"). Mock-ups: `docs/mockups/android-outils.dc.html`, `outils-ead-mod-android.dc.html`, `outils-meilleur-melange-android.dc.html`, `outils-melangeur-android.dc.html`.
+
+## [ ] 2026-11-07-08 Gas tools: ppO₂ wheel
+
+In "EAD et MOD" and "Meilleur mélange", the maximum ppO₂ is chosen with an inline wheel (1,0 to 1,6 bar by 0,1, default 1,4), not a segmented control. The wheel sits on a white surface with the label "ppO₂ maximale" on the left and "bar" on the right. Mock-ups: `docs/mockups/outils-ead-mod-android.dc.html`, `outils-meilleur-melange-android.dc.html`.
