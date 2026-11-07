@@ -276,8 +276,6 @@
     "photoNote": "On another device: only their reference is synced",
     "delete": "Delete the dive",
     "deleteTitle": "Delete the dive",
-    "deleteText": "The dive is removed from the logbook, on this device and in the cloud. You can undo it for a few seconds.",
-    "deleteAction": "Delete",
     "deleted": "Dive deleted",
     "deleteFailed": "The dive could not be deleted. No dive was changed."
   },

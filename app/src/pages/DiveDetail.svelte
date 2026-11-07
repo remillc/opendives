@@ -17,7 +17,7 @@
   import { horizontalSwipe, swipeGoesThrough } from '../lib/swipe.js';
   import Stars from '../components/Stars.svelte';
   import { logbook, deleteDive } from '../lib/logbook.svelte.js';
-  import { confirmAction } from '../lib/dialogs.js';
+  import { layout } from '../lib/layout.svelte.js';
   import { offerUndo } from '../lib/undo.js';
   import {
     formatCylinderSize,
@@ -110,31 +110,32 @@
   const menuId = `dive-menu-${uid}`;
   const diveId = $derived(f7route.params.id);
 
-  // "Delete the dive" (⋮ menu): a confirmation, then one undoable step; back
-  // to the logbook with the Undo message.
-  function askDelete() {
-    confirmAction({
-      title: t('detail.deleteTitle'),
-      text: t('detail.deleteText'),
-      action: t('detail.deleteAction'),
-      onConfirm: async () => {
-        try {
-          await deleteDive(Number(diveId));
-          f7router.back();
-          offerUndo(t('detail.deleted'));
-        } catch (e) {
-          const code = String(/** @type {any} */ (e)?.message ?? '');
-          console.error('Delete a dive', code);
-          f7.dialog
-            .create({
-              title: t('detail.deleteTitle'),
-              text: code.startsWith('WRITE_LOCKED') ? t('edit.writeLocked') : t('detail.deleteFailed'),
-              buttons: [{ text: t('dialog.ok') }],
-            })
-            .open();
-        }
-      },
-    });
+  // "Delete the dive" (⋮ menu, task 2026-11-07-28): no confirmation, the
+  // core's undoable delete as in Subsurface, then back to the logbook with
+  // "Annuler" for 10 seconds; undone, the dive is back at its place. Beside
+  // the list (tablet), the next dive of the list takes its place, or the
+  // empty pane when none is left.
+  async function deleteNow() {
+    const id = Number(diveId);
+    const order = [...logbook.dives].sort((a, b) => b.date.localeCompare(a.date));
+    const at = order.findIndex((d) => d.id === id);
+    const next = order[at + 1] ?? order[at - 1];
+    try {
+      await deleteDive(id);
+      if (layout.split && next) f7router.navigate(`/dive/${next.id}/`, { reloadDetail: true });
+      else f7router.back();
+      offerUndo(t('detail.deleted'), undefined, 10000);
+    } catch (e) {
+      const code = String(/** @type {any} */ (e)?.message ?? '');
+      console.error('Delete a dive', code);
+      f7.dialog
+        .create({
+          title: t('detail.deleteTitle'),
+          text: code.startsWith('WRITE_LOCKED') ? t('edit.writeLocked') : t('detail.deleteFailed'),
+          buttons: [{ text: t('dialog.ok') }],
+        })
+        .open();
+    }
   }
 
   // The list beside it highlights the dive shown.
@@ -342,7 +343,9 @@
   <Popover id={menuId} class="od-menu" backdrop={false}>
     <List noChevron>
       <MenuItem icon="plan" text={t('detail.plan')} link="/plan/{diveId}/" />
-      <MenuItem icon="delete" text={t('detail.delete')} destructive onclick={askDelete} />
+      <li class="od-menu-divider" role="separator"></li>
+      <!-- In ink, not in the alarm colour: that one is for errors only. -->
+      <MenuItem icon="delete" text={t('detail.delete')} onclick={deleteNow} />
     </List>
   </Popover>
 

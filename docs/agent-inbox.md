@@ -502,7 +502,7 @@ Mock-ups: `docs/mockups/detail3-android.dc.html`, `detail3-android-sombre.dc.htm
 
 Done in "Dive detail: weights as a total plus one line per location". Checked on a dive of the logbook with two entries (10 lb and 2 lb, total 12 lb). The secondary lines use `--od-text-2`, which is the dark value of the specification in dark mode.
 
-## [ ] 2026-11-07-28 Dive detail menu: "Supprimer la plongée"
+## [x] 2026-11-07-28 Dive detail menu: "Supprimer la plongée"
 
 Add a second item to the ⋮ menu of the dive detail (Android MD3 menu, iOS pull-down menu), after a 1 dp divider (`#C9C9C5`, 8 dp above and below): trash icon 24 dp, label "Supprimer la plongée", 14 sp medium, ink. Not in `--od-alarm`: that colour is for errors only.
 - No confirmation dialog. Delete the dive through the core's undoable delete (as Subsurface does), go back to the logbook, and show a snackbar "Plongée supprimée" with the action "Annuler" for 10 seconds. "Annuler" restores the dive and its place in the list.
@@ -510,4 +510,6 @@ Add a second item to the ⋮ menu of the dive detail (Android MD3 menu, iOS pull
 - On a tablet (master-detail), the detail pane shows the next dive in the list, or the empty pane when none is left.
 
 Mock-up: `docs/mockups/detail2-android-menu.dc.html`. Spec: section 4, "Dive detail" row of the screens table.
+
+Done in "Dive detail menu: delete without confirmation, Annuler for 10 seconds". Checked on the phone with the test account (roger.bourdieu): the dive leaves the list (1 352 dives), "Plongée supprimée" offers "Annuler", and "Annuler" puts it back at its place. The tablet case (next dive beside the list) is written but not checked on a tablet. The item is in ink on iOS too, as this task asks, although the HIG would draw a destructive item in red.
 
