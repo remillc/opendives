@@ -1,0 +1,105 @@
+/*
+ * Style of the public web pages (site/build.mjs): the app's light theme
+ * (docs/ui-specification.md, section 1), body text in Source Sans 3 with the
+ * app's metrics, titles in the system font.
+ */
+@font-face {
+  font-family: 'Source Sans 3';
+  font-style: normal;
+  font-weight: 400 900;
+  font-display: swap;
+  size-adjust: 108%;
+  ascent-override: 85.9%;
+  descent-override: 22.6%;
+  line-gap-override: 0%;
+  src: url('SourceSans3VF-Upright.ttf.woff2') format('woff2');
+}
+
+:root {
+  --od-background: #F4F4F2;
+  --od-surface: #FFFFFF;
+  --od-text: #1F2124;
+  --od-text-2: #4A4D52;
+  --od-separator: #DADAD6;
+  color-scheme: light;
+}
+
+body {
+  margin: 0;
+  background: var(--od-background);
+  color: var(--od-text);
+  font-family: 'Source Sans 3', system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+}
+
+header,
+main {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+header {
+  padding-top: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.name {
+  flex: 1;
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.other {
+  color: var(--od-text);
+  font-size: 14px;
+}
+
+main {
+  margin-top: 24px;
+  margin-bottom: 48px;
+  padding: 8px 24px 24px;
+  border-radius: 20px;
+  background: var(--od-surface);
+}
+
+h1,
+h2 {
+  font-family: system-ui, sans-serif;
+}
+
+h1 {
+  font-size: 28px;
+  line-height: 34px;
+  font-weight: 800;
+}
+
+h2 {
+  margin: 28px 0 8px;
+  font-size: 18px;
+  line-height: 24px;
+  font-weight: 700;
+}
+
+p,
+ul {
+  margin: 0 0 12px;
+}
+
+ul {
+  padding-left: 20px;
+}
+
+li {
+  margin-bottom: 6px;
+}
+
+.updated {
+  font-size: 14px;
+  color: var(--od-text-2);
+}

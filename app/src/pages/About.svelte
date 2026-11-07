@@ -22,10 +22,8 @@
    */
   const SUPPORT_EMAIL = String(/** @type {any} */ (import.meta).env?.VITE_SUPPORT_EMAIL ?? '').trim();
 
-  /** The privacy policy address is a placeholder until Christian gives the real one. */
   const LINKS = {
     source: 'https://github.com/remillc/opendives',
-    privacy: 'https://github.com/opendives/opendives/blob/main/PRIVACY.md',
     osm: 'https://www.openstreetmap.org/copyright',
     geonames: 'https://www.geonames.org/about.html',
   };
@@ -92,7 +90,7 @@
     },
     {
       title: t('about.privacy'),
-      rows: [{ key: 'privacy', text: t('about.privacyPolicy'), sub: t('about.privacyText'), href: LINKS.privacy, external: true }],
+      rows: [{ key: 'privacy', text: t('about.privacyPolicy'), sub: t('about.privacyText'), href: '/about/privacy/' }],
     },
   ];
 </script>

@@ -1,0 +1,47 @@
+<!-- OpenDives privacy policy, in English. Single source: the app shows it
+     (About), site/build.mjs turns it into the public web page.
+     Content HTML only: h2 headings, paragraphs, lists, links. -->
+<p class="updated">Updated on 7 November 2026</p>
+
+<p>OpenDives is a free and open-source dive log (GNU GPL version 2), developed by Christian Rémillard. This page says which data the app uses, where it goes and how to erase it.</p>
+
+<h2>In short</h2>
+<ul>
+  <li>There is no OpenDives account: the developer receives none of your data.</li>
+  <li>No advertising, no analytics, no trackers.</li>
+  <li>Your logbook stays on your device, and in your Subsurface cloud account if you use one.</li>
+  <li>Your photos stay on your device.</li>
+</ul>
+
+<h2>On your device</h2>
+<p>The logbook (dives, sites, equipment, notes), your settings and the references to your photos are stored in the app's private storage. Without an account, nothing else leaves it, except what "Online services" below describes.</p>
+
+<h2>With a Subsurface account</h2>
+<p>If you sign in to a Subsurface cloud account, or create one, your logbook is synced with the servers of the Subsurface project (ssrf-cloud-*.subsurface-divelog.org). This service is not run by OpenDives: its own terms apply. The logbook is stored there the way Subsurface stores it; photos are not sent, only their reference.</p>
+<p>Your email address and password are kept on the device, encrypted by the system (Android Keystore), so that syncing does not ask for them again. They are only sent to the Subsurface servers.</p>
+
+<h2>Online services</h2>
+<ul>
+  <li><strong>Maps</strong>: the base maps come from OpenFreeMap (tiles.openfreemap.org), built from OpenStreetMap data. As with any website, this service sees your IP address and the area of the map shown.</li>
+  <li><strong>Country, region and city of a site</strong>: the position of a site is sent to OpenStreetMap's Nominatim service (nominatim.openstreetmap.org) to find its country, region and city. Offline, a built-in, less precise map is used instead.</li>
+  <li><strong>divelogs.de</strong>: only if you choose to import your divelogs.de logbook when creating an account. Your divelogs.de credentials are sent to divelogs.de for this import, then forgotten: they are never stored.</li>
+</ul>
+
+<h2>Permissions</h2>
+<ul>
+  <li><strong>Location</strong>: to centre the map on you and to place a site. It is only stored if you use it for a site. Android versions before 12 also require it to search for a dive computer over Bluetooth.</li>
+  <li><strong>Bluetooth</strong>: to download the dives from your dive computer.</li>
+  <li><strong>Internet</strong>: for syncing and the services above.</li>
+</ul>
+
+<h2>Reporting a problem</h2>
+<p>"Question / report a problem", in About, opens your email app with a message to support@opendives.app that contains technical details: OpenDives version, system and model of the device, language, units, with or without an account, number of dives, last sync and last error. You see this message and decide whether to send it.</p>
+
+<h2>Erasing your data</h2>
+<ul>
+  <li>Uninstalling OpenDives erases everything it stored on the device.</li>
+  <li>"Delete account", in Account, deletes your account and your logbook from the Subsurface cloud.</li>
+</ul>
+
+<h2>Contact</h2>
+<p>For any question about this policy: support@opendives.app.</p>

@@ -99,6 +99,7 @@
       { path: '/about/', component: About },
       { path: '/about/notes/', component: AboutText, options: { props: { which: 'notes' } } },
       { path: '/about/licence/', component: AboutText, options: { props: { which: 'licence' } } },
+      { path: '/about/privacy/', component: AboutText, options: { props: { which: 'privacy' } } },
       { path: '/about/libraries/', component: AboutLibraries },
       { path: '/settings/cylinders/', component: CylinderTypes },
       { path: '/settings/cylinders/new/', component: CylinderType },
