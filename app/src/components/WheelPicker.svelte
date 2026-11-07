@@ -13,9 +13,10 @@
    *   values: string[],
    *   index: number,
    *   defaultText?: string,
+   *   inline?: boolean,
    * }}
    */
-  let { label, values, index = $bindable(), defaultText = '' } = $props();
+  let { label, values, index = $bindable(), defaultText = '', inline = false } = $props();
 
   const ITEM = 40;
   const id = `od-wheel-${Math.random().toString(36).slice(2, 9)}`;
@@ -67,8 +68,8 @@
   }
 </script>
 
-<div class="wheel no-swipeback">
-  <span class="label" id={id}>{label}</span>
+<div class="wheel no-swipeback" class:inline>
+  <span class="label" class:od-sr-only={inline} id={id}>{label}</span>
   <div
     class="window"
     role="spinbutton"
@@ -169,6 +170,37 @@
       &.current {
         font-size: 22px;
         font-weight: 600;
+      }
+    }
+
+    /* Inline (the gas tools' pO2 wheel): three values visible, the current one
+       framed, on a white surface; docs/mockups/outils-ead-mod-android.dc.html. */
+    .inline {
+      flex: none;
+      width: 96px;
+
+      .window {
+        height: 120px;
+        overflow: hidden;
+      }
+
+      .lines {
+        left: 4px;
+        right: 4px;
+        top: 40px;
+      }
+
+      .scroller::before,
+      .scroller::after {
+        height: 40px;
+      }
+
+      .item {
+        font-size: 17px;
+
+        &.current {
+          font-size: 22px;
+        }
       }
     }
 

@@ -32,6 +32,9 @@
   import StatisticNew from './pages/StatisticNew.svelte';
   import Tools from './pages/Tools.svelte';
   import Desaturation from './pages/Desaturation.svelte';
+  import GasEadMod from './pages/GasEadMod.svelte';
+  import GasBestMix from './pages/GasBestMix.svelte';
+  import GasBlender from './pages/GasBlender.svelte';
   import Planner from './pages/Planner.svelte';
   import PlannerSetup from './pages/PlannerSetup.svelte';
   import Filter from './pages/Filter.svelte';
@@ -135,6 +138,9 @@
       { path: '/statistics/new/', popup: { component: StatisticNew } },
       { path: '/tools/', component: Tools },
       { path: '/tools/desaturation/', component: Desaturation },
+      { path: '/tools/ead-mod/', component: GasEadMod },
+      { path: '/tools/best-mix/', component: GasBestMix },
+      { path: '/tools/blender/', component: GasBlender },
     ],
   };
 

@@ -595,6 +595,7 @@ class OpenDivesCorePlugin : Plugin() {
             call.getInt("he") ?: 0,
             call.getInt("po2") ?: 0,
             call.getInt("depth") ?: 0,
+            call.getArray("args")?.toList<Int>()?.toIntArray(),
         )
         call.resolve(JSObject().put("json", json))
     }

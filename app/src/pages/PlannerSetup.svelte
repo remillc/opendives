@@ -9,6 +9,7 @@
   // A change applies at once; the plan is computed again on return.
   import { Page, Navbar, Link } from 'framework7-svelte';
   import TextField from '../components/TextField.svelte';
+  import SelectField from '../components/SelectField.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
   import {
     planner,
@@ -22,6 +23,7 @@
   import { confirmAction } from '../lib/dialogs.js';
   import { locale, depthUnit } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
+  import { WATER_TYPES, waterTypeName, waterTypeOfSalinity } from '../lib/tools.js';
 
   // The units when the screen opens; the fields are built for them.
   const prefs = logbook.prefs;
@@ -68,6 +70,17 @@
     { key: 'time', label: t('plan.bottomTime'), unit: t('units.minutes'), min: 1, max: 360,
       get: () => planner.bottomTimeSeconds / 60, set: (v) => (planner.bottomTimeSeconds = Math.round(v * 60)) },
   ];
+
+  // The water type: every depth to pressure conversion of the plan uses it.
+  // svelte-ignore state_referenced_locally
+  let water = $state(waterTypeOfSalinity(planner.salinity));
+  $effect(() => {
+    const salinity = WATER_TYPES.find((w) => w.id === water)?.salinity;
+    if (salinity && salinity !== planner.salinity) {
+      planner.salinity = salinity;
+      planner.version++;
+    }
+  });
 
   /** @type {Field[]} */
   const gasFields = [
@@ -271,7 +284,10 @@
   </Navbar>
 
   <div class="block-title">{t('plan.groupDive')}</div>
-  <div class="od-form-surface">{@render fields(diveFields)}</div>
+  <div class="od-form-surface">
+    {@render fields(diveFields)}
+    <SelectField label={t('plan.waterType')} bind:value={water} options={WATER_TYPES.map((w) => ({ value: w.id, label: waterTypeName(w.id) }))} />
+  </div>
 
   <div class="block-title">{t('plan.groupGas')}</div>
   <div class="od-form-surface">{@render fields(gasFields)}</div>

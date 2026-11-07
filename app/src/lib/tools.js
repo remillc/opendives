@@ -36,3 +36,41 @@ export function formatHoursMinutes(seconds) {
     m: String(minutes % 60).padStart(2, '0'),
   });
 }
+
+/**
+ * Subsurface's water types, with their salinity in kg per 10000 l as the core
+ * keeps it (core/units.h: FRESHWATER_SALINITY, BRACKISH_SALINITY,
+ * EN13319_SALINITY, SEAWATER_SALINITY). `id` is the core's `waterType`.
+ */
+export const WATER_TYPES = /** @type {const} */ ([
+  { id: 'fresh', salinity: 10000 },
+  { id: 'brackish', salinity: 10100 },
+  { id: 'en13319', salinity: 10200 },
+  { id: 'salt', salinity: 10300 },
+]);
+
+export const SEA_WATER_SALINITY = 10300;
+
+/** The name of a water type, e.g. "Eau de mer". @param {string} id */
+export function waterTypeName(id) {
+  return t(`tools.waterTypes.${id}`);
+}
+
+/** Salinity of a dive's water type (empty or unknown: sea water). @param {string|undefined} id */
+export function salinityOfWaterType(id) {
+  return WATER_TYPES.find((w) => w.id === id)?.salinity ?? SEA_WATER_SALINITY;
+}
+
+/** The water type of a salinity (the nearest one). @param {number} salinity */
+export function waterTypeOfSalinity(salinity) {
+  return WATER_TYPES.reduce((best, w) => (Math.abs(w.salinity - salinity) < Math.abs(best.salinity - salinity) ? w : best)).id;
+}
+
+/**
+ * A number typed by the user ("12,5" or "12.5"), NaN when it is not one.
+ * @param {string} text
+ */
+export function parseDecimal(text) {
+  const clean = text.trim().replace(',', '.');
+  return /^\d+(\.\d+)?$/.test(clean) ? Number(clean) : NaN;
+}
