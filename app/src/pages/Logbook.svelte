@@ -47,6 +47,22 @@
   let query = $state('');
   /** Expanded trips, by trip identifier of the current load. */
   let expanded = $state(/** @type {Record<number, boolean>} */ ({}));
+  /** The trip just expanded: its dives slide into place (DiveRow `appear`). */
+  let appearing = $state(0);
+  /** @type {ReturnType<typeof setTimeout>|undefined} */
+  let appearTimer;
+
+  /** @param {number} id */
+  function toggleTrip(id) {
+    if (!id) return;
+    if (!expanded[id]) {
+      appearing = id;
+      clearTimeout(appearTimer);
+      // Only while it opens: rows scrolled into view later do not slide.
+      appearTimer = setTimeout(() => (appearing = 0), 400);
+    }
+    expanded[id] = !expanded[id];
+  }
 
   const all = $derived([...logbook.dives].sort((a, b) => b.date.localeCompare(a.date)));
   /** The dives that match the free filter (all of them without one). */
@@ -275,14 +291,21 @@
         e.stopPropagation();
         return;
       }
+      // A trip's arrow expands it in place (accordion), without opening it:
+      // its button sits in the row's link, which Framework7 would follow.
+      const arrow = /** @type {HTMLElement} */ (e.target).closest('.trip-row .expand');
+      if (arrow) {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleTrip(Number(/** @type {HTMLElement|null} */ (arrow.closest('li'))?.dataset.trip));
+        return;
+      }
       if (!selecting) return;
       const row = diveOf(e);
       // In selection mode a dive is checked, not opened; a trip only expands.
       if (row) toggleChecked(Number(row.dataset.dive));
-      if (row || !/** @type {HTMLElement} */ (e.target).closest('.expand')) {
-        e.preventDefault();
-        e.stopPropagation();
-      }
+      e.preventDefault();
+      e.stopPropagation();
     }
     /** @param {Event} e The WebView's own long-press menu is not wanted. */
     const menu = (e) => diveOf(e) && e.preventDefault();
@@ -754,7 +777,7 @@
               location={row.location}
               prefs={logbook.prefs}
               expanded={!!expanded[row.id]}
-              ontoggle={() => (expanded[row.id] = !expanded[row.id])}
+              ontoggle={() => toggleTrip(row.id)}
               index={row.index}
               top={visible.topPosition}
             />
@@ -768,6 +791,7 @@
               pending={row.dive.number ? (logbook.pendingByDive[row.dive.number] ?? []) : []}
               {selecting}
               checked={!!checked[row.dive.id]}
+              appear={row.kind === 'inTrip' && row.dive.trip?.id === appearing}
             />
           {/if}
         {/each}

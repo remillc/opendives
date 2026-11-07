@@ -47,7 +47,7 @@
 
 </script>
 
-<li class="trip-row" data-virtual-list-index={index} style:top={top === undefined ? undefined : `${top}px`}>
+<li class="trip-row" data-trip={dives[0].trip?.id} data-virtual-list-index={index} style:top={top === undefined ? undefined : `${top}px`}>
   <!-- The row opens the trip screen (spec, section 4, "Trip"); the arrow expands the trip in place. -->
   <a href="/trip/{dives[0].trip?.id}/" class="item-link item-content no-chevron">
     <div class="item-media">
@@ -103,6 +103,7 @@
 
     .arrow {
       display: block;
+      transition: transform 200ms;
 
       &.expanded {
         transform: rotate(180deg);

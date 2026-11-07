@@ -20,12 +20,14 @@
    *   pending?: string[],
    *   selecting?: boolean,
    *   checked?: boolean,
+   *   appear?: boolean,
    * }}
    * `pending`: fields edited and not sent yet; the date gives way to them.
    * `selecting`: the logbook's selection mode, a check box before the row;
    * the logbook handles the taps (data-dive gives the dive).
+   * `appear`: the row of a trip just expanded slides into place (accordion).
    */
-  let { dive, prefs, inTrip = false, index = undefined, top = undefined, pending = [], selecting = false, checked = false } = $props();
+  let { dive, prefs, inTrip = false, index = undefined, top = undefined, pending = [], selecting = false, checked = false, appear = false } = $props();
 
   // "Notes edited, waiting to be sent" (spec, section 4, <DiveRow>).
   const pendingText = $derived(
@@ -52,7 +54,7 @@
   const label = $derived([number, details, pendingText].filter(Boolean).join(', '));
 </script>
 
-<li class:in-trip={inTrip} class:selected={layout.split && navigation.dive === String(dive.id)} data-virtual-list-index={index} style:top={top === undefined ? undefined : `${top}px`}>
+<li class:in-trip={inTrip} class:appear class:selected={layout.split && navigation.dive === String(dive.id)} data-virtual-list-index={index} style:top={top === undefined ? undefined : `${top}px`}>
   <!-- data-reload-detail: beside the list (tablet), the dive replaces the one shown. -->
   <a
     href="/dive/{dive.id}/"
@@ -100,6 +102,24 @@
     .selected {
       background: var(--od-tint);
       color: var(--od-on-tint);
+    }
+
+    /* A trip just expanded: its dives slide down into place. */
+    .appear {
+      animation: od-row-appear 220ms ease-out;
+    }
+
+    @keyframes od-row-appear {
+      from {
+        opacity: 0;
+        transform: translateY(-16px);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .appear {
+        animation: none;
+      }
     }
 
     /* Selection mode: the check box before the thumbnail. */
