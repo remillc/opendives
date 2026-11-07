@@ -389,3 +389,46 @@ Done in "Logo: grey arc on small sizes, large logo without it". First launch sho
 My mistake in task 21: the splash screen shows the logo large, so it must not have the grey arc. Remove the grey arc from `ic_splash_mark.xml` (light and night) and from any iOS or web launch screen. Only the launcher icons, the favicon, notification marks and the small logo beside the name keep it. See `docs/ui-specification.md` ("Logo", size rule).
 
 Done in "Splash screen: logo without the grey arc". The app has no iOS project or web launch screen yet.
+
+## [ ] 2026-11-07-23 Visual audit: match the mock-ups (Sites first)
+
+Christian finds that several screens, the whole Sites section first, do not look like the mock-ups. I rendered the app (Vite, Android user agent, 390 × 844, the core mocked with sample data, map tiles offline) next to each mock-up: `docs/audit/2026-11-07/*.png`, mock-up on the left of each pair, app on the right. Ignore what comes from the sample data (empty Statistics and Desaturation, NaN in the gas tools, missing map tiles) and the 40 dp status bar offset of the mock-ups. Fix the points below, then check each screen yourself against its mock-up at 390 × 844 the same way, and list in this task anything you could not match and why.
+
+**1. Global type scale (most of the "not the same look" comes from here).** The app uses 12 to 13 px for supporting text where the mock-ups use 14. Apply everywhere, through shared CSS (`theme.css`), not screen by screen:
+- List item headline: 16/24, ink `#1F2124`. Supporting text: 14/20, `#4A4D52`. Field labels and helper text stay 12/16 (MD3).
+- Trailing values in lists: in Settings 14/20 `#4A4D52`; elsewhere (site depth, results) as in each mock-up (16 to 22, weight 500 to 700, tabular figures).
+- Section titles on the page background (Settings, Tools, About, gas tool results): 18/24, weight 700, 20 dp side margin. The About screen still uses 14 medium: change it.
+- Intro paragraph at the top of a screen (Account, Dives without a site, Clean up the sites): 16/24.
+- Chevrons: 24 dp, `#4A4D52`, the same icon as in Settings. Framework7's default small light chevron must not appear anywhere (Sites, About, site sheet, statistics rows).
+
+**2. Sites list** (`android-sites`, `sites-1-liste-fiche.png`, left pair):
+- Map height: from under the top app bar to 400 dp from the top of an 844 dp screen, about 36 % of the height (the app uses 45vh, too tall). OSM attribution at the bottom right of the map.
+- "Centrer sur ma position": 40 dp, white surface, 12 dp corners, 16 dp from the right and bottom edges of the map, elevation level 1.
+- Maintenance rows: 48 dp, 14/20 ink text, 24 dp chevron in `#1F2124`.
+- Site rows: 72 dp two-line items. Name 16/24 ink, supporting 14/20 `#4A4D52` ("1 plongée, le 24 avril 2022"), trailing maximum depth 16/24 weight 500 ink with tabular figures. **No chevron** on site rows.
+
+**3. Site sheet** (`sites-fiche-android`, right pair of `sites-1-liste-fiche.png`):
+- Map: inside the page margins (16 dp), 16 dp corners, **4:5 portrait ratio** (358 × 448 dp on a 390 dp phone), attribution bottom right. Not full-bleed, not 200 dp high.
+- "À propos du site" rows: headline 16, supporting 14.
+- "Plongées à ce site": each row has the 48 dp profile thumbnail on the left (same as the Logbook rows), the long date in 16/24 weight 600 ("24 avril 2022, 10:30"), then "104 min · Buddy Diver · recycleur" in 14/20; no "1:44" duration format here, minutes as in the mock-up.
+
+**4. New site / Edit site** (`sites-2-nouveau-modifier.png`): close to the mock-ups. The map card hint reads "Déplacez l’épingle pour corriger" in the mock-up; keep the map card 190 dp high with the attribution. On creation, the "Un site existe déjà à moins de 100 m" note sits under the map (spec).
+
+**5. Dives without a site** (`sites-3-sans-site-nettoyer.png`, left pair):
+- All dives in **one** white surface (20 dp corners) with dividers, not one card per dive.
+- Row: date and time 16/24 weight 500 ("7 févr. 2026, 09:09", no "N° 8 ·"), then "55 min, recycleur" 14/20, then the actions.
+- Actions are small outlined buttons, 32 dp high, 8 dp corners (as drawn), "Choisir un site" and "Nouveau site"; when a site is suggested, a filled tonal chip with the site name comes first and a line "Suggestion : Même voyage que 3 plongées à Hälvälä" under the buttons.
+- After the list, "et 3 autres plongées" when the list is cut.
+
+**6. Clean up the sites** (`sites-3-sans-site-nettoyer.png`, right pair):
+- One surface per duplicate group: header with the site name 16/24 weight 600 and the reason 14/20 ("Même nom à la casse près, à 40 m l’un de l’autre").
+- The candidates are radio rows (MD3 radio, 48 dp), the first selected: the kept site.
+- Actions right-aligned at the bottom of the group: text button "Pas des doublons", filled button "Fusionner" (ink background).
+- Then the section "Sites sans plongée": title on the page background, an explanation, a "Tout sélectionner" checkbox row, one checkbox row per unused site, and the delete button (see the mock-up).
+
+**7. Other screens seen in the audit:**
+- About (`apropos-detail.png`, left pair): no leading icons on the rows (the mock-up has none); logo 112 dp; group titles 18/700 as in point 1.
+- Tools list (`stats-outils.png`, right pair): row descriptions on one line, as in the mock-up ("Nouvelle ou depuis le carnet", "Profondeurs d’un mélange", "Pour une profondeur donnée", "Gonfler un nitrox ou un trimix"); icons as drawn.
+- EAD et MOD: the MOD row says "EAN32 à 1,4 bar" (the core's mix name), not "Nx 32".
+- Gas blender (`melangeur-desaturation.png`, left pair): section labels "Mélange voulu" and "Dans la bouteille" are 14/20 weight 500 above the fields, not 18 bold titles; the residual oxygen and helium dropdowns are always shown in Trimix mode (oxygen alone in Nitrox mode), not only after a pressure is typed; the bottle size dropdown shows its value ("12 L").
+- Account (`compte-reglages.png`, left pair): the top app bar is the small one with "Compte" as its title (64 dp), not a large collapsing title; intro paragraph 16/24.
