@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>À propos, Android</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:#1F2124}a:hover{color:#1F2124}
+@keyframes odlin{0%{left:-40%}100%{left:100%}}
+@keyframes odspin{to{transform:rotate(360deg)}}
+input::placeholder{color:#8E8E93;-webkit-text-fill-color:#8E8E93}
+</style>
+</helmet>
+<div style="width: 390px; height: 1100px; box-sizing: border-box; background: #F4F4F2; font-family: Roboto, 'Google Sans', system-ui, sans-serif; color: #1F2124; position: relative; overflow: hidden">
+  <div style="padding: 40px 8px 0 4px; height: 104px; box-sizing: border-box; display: flex; align-items: center; gap: 4px">
+    <a href="appbar-tiroir-android-ouvert.dc.html" aria-label="Retour" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #1F2124; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M20 12H5 M11 6l-6 6 6 6"></path></svg></a>
+    <span style="flex: 1; font-size: 22px; line-height: 28px">À propos</span>
+  </div>
+  <div style="padding: 8px 24px 4px 24px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 4px">
+    <svg width="112" height="112" viewBox="21 21 66 66" role="img" aria-label="Logo OpenDives"><defs><linearGradient id="ap" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color: #FBE3B2"></stop><stop offset="1" style="stop-color: #B4530F"></stop></linearGradient></defs><circle cx="54" cy="54" r="30" style="fill: #FFFFFF"></circle><clipPath id="apc"><circle cx="54" cy="54" r="29"></circle></clipPath><g clip-path="url(#apc)"><path d="M20 61 Q32 55 44 61 T68 61 T92 61 V100 H20 Z" style="fill: url(#ap)"></path></g><path d="M24.83 61 A30 30 0 0 0 83.17 61" style="fill: none; stroke: #1F2124; stroke-width: 3; stroke-linecap: round"></path><circle cx="62" cy="44" r="3" style="fill: #1F2124"></circle><circle cx="56.5" cy="36.5" r="2.1" style="fill: #1F2124"></circle></svg>
+    <h1 style="margin: 8px 0 0 0; font-size: 24px; line-height: 32px; font-weight: 700">OpenDives</h1>
+    <p style="margin: 0; font-size: 14px; color: #4A4D52; font-variant-numeric: tabular-nums">Version 0.1.0 (12)</p>
+    <p style="margin: 8px 0 0 0; font-size: 14px; line-height: 20px; color: #4A4D52">Carnet de plongée libre et gratuit, compatible avec les carnets Subsurface.</p>
+  </div>
+  <h2 style="margin: 20px 20px 8px 20px; font-size: 18px; line-height: 24px; font-weight: 700">Projet</h2>
+  <nav aria-label="Projet" style="margin: 0 16px; background: #FFFFFF; border-radius: 20px; overflow: hidden">
+      <a href="#" style="border-bottom: 1px solid #ECECEA; display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 8px 20px 8px 16px; box-sizing: border-box; color: #1F2124; text-decoration: none"><span style="flex: 1; min-width: 0"><span style="display: block; font-size: 16px; line-height: 24px">Nouveautés</span><span style="display: block; font-size: 13px; line-height: 18px; color: #4A4D52">Ce qui a changé dans cette version</span></span><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" style="flex: none; fill: none; stroke: #4A4D52; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M10 6l6 6-6 6"></path></svg></a>
+      <a href="#" aria-label="Code source (s’ouvre dans le navigateur)" style="border-bottom: 1px solid #ECECEA; display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 8px 20px 8px 16px; box-sizing: border-box; color: #1F2124; text-decoration: none"><span style="flex: 1; min-width: 0"><span style="display: block; font-size: 16px; line-height: 24px">Code source</span><span style="display: block; font-size: 13px; line-height: 18px; color: #4A4D52">github.com/opendives</span></span><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" style="flex: none; fill: none; stroke: #4A4D52; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M14 4h6v6 M20 4l-9 9 M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"></path></svg></a>
+      <a href="#" aria-label="Signaler un problème (s’ouvre dans le navigateur)" style="display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 8px 20px 8px 16px; box-sizing: border-box; color: #1F2124; text-decoration: none"><span style="flex: 1; min-width: 0"><span style="display: block; font-size: 16px; line-height: 24px">Signaler un problème</span></span><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" style="flex: none; fill: none; stroke: #4A4D52; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M14 4h6v6 M20 4l-9 9 M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"></path></svg></a>
+  </nav>
+  <h2 style="margin: 20px 20px 8px 20px; font-size: 18px; line-height: 24px; font-weight: 700">Licences</h2>
+  <nav aria-label="Licences" style="margin: 0 16px; background: #FFFFFF; border-radius: 20px; overflow: hidden">
+      <a href="#" style="border-bottom: 1px solid #ECECEA; display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 8px 20px 8px 16px; box-sizing: border-box; color: #1F2124; text-decoration: none"><span style="flex: 1; min-width: 0"><span style="display: block; font-size: 16px; line-height: 24px">Licence</span><span style="display: block; font-size: 13px; line-height: 18px; color: #4A4D52">GNU GPL version 2</span></span><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" style="flex: none; fill: none; stroke: #4A4D52; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M10 6l6 6-6 6"></path></svg></a>
+      <a href="#" style="border-bottom: 1px solid #ECECEA; display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 8px 20px 8px 16px; box-sizing: border-box; color: #1F2124; text-decoration: none"><span style="flex: 1; min-width: 0"><span style="display: block; font-size: 16px; line-height: 24px">Bibliothèques libres</span><span style="display: block; font-size: 13px; line-height: 18px; color: #4A4D52">Subsurface, libdivecomputer, Capacitor, Framework7, Svelte</span></span><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" style="flex: none; fill: none; stroke: #4A4D52; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M10 6l6 6-6 6"></path></svg></a>
+      <a href="#" aria-label="Cartes (s’ouvre dans le navigateur)" style="border-bottom: 1px solid #ECECEA; display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 8px 20px 8px 16px; box-sizing: border-box; color: #1F2124; text-decoration: none"><span style="flex: 1; min-width: 0"><span style="display: block; font-size: 16px; line-height: 24px">Cartes</span><span style="display: block; font-size: 13px; line-height: 18px; color: #4A4D52">© contributeurs OpenStreetMap, ODbL</span></span><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" style="flex: none; fill: none; stroke: #4A4D52; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M14 4h6v6 M20 4l-9 9 M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"></path></svg></a>
+      <a href="#" aria-label="Pays et régions (s’ouvre dans le navigateur)" style="display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 8px 20px 8px 16px; box-sizing: border-box; color: #1F2124; text-decoration: none"><span style="flex: 1; min-width: 0"><span style="display: block; font-size: 16px; line-height: 24px">Pays et régions</span><span style="display: block; font-size: 13px; line-height: 18px; color: #4A4D52">GeoNames, CC BY 4.0</span></span><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" style="flex: none; fill: none; stroke: #4A4D52; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M14 4h6v6 M20 4l-9 9 M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"></path></svg></a>
+  </nav>
+  <h2 style="margin: 20px 20px 8px 20px; font-size: 18px; line-height: 24px; font-weight: 700">Confidentialité</h2>
+  <nav aria-label="Confidentialité" style="margin: 0 16px; background: #FFFFFF; border-radius: 20px; overflow: hidden">
+      <a href="#" aria-label="Politique de confidentialité (s’ouvre dans le navigateur)" style="display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 8px 20px 8px 16px; box-sizing: border-box; color: #1F2124; text-decoration: none"><span style="flex: 1; min-width: 0"><span style="display: block; font-size: 16px; line-height: 24px">Politique de confidentialité</span><span style="display: block; font-size: 13px; line-height: 18px; color: #4A4D52">Vos plongées restent sur l’appareil et dans votre compte</span></span><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" style="flex: none; fill: none; stroke: #4A4D52; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M14 4h6v6 M20 4l-9 9 M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"></path></svg></a>
+  </nav>
+  <p style="margin: 16px 24px 0 24px; font-size: 13px; line-height: 18px; color: #4A4D52; text-align: center">Le cœur de calcul vient de Subsurface, créé par Linus Torvalds et Dirk Hohndel, et de ses contributeurs.</p>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

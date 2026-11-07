@@ -110,3 +110,4 @@ When a mock-up and `docs/ui-specification.md` disagree, the specification wins. 
 | `outils-meilleur-melange-android.dc.html` | Outils, meilleur mélange · Android |
 | `outils-melangeur-nitrox-android.dc.html` | Outils, mélangeur de gaz, nitrox · Android |
 | `outils-melangeur-android.dc.html` | Outils, mélangeur de gaz, trimix · Android |
+| `apropos-android.dc.html` | À propos · Android |
