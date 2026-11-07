@@ -490,7 +490,7 @@ Spec: section 1, "Fonts". Mock-ups: every file in `docs/mockups/` (each has the 
 
 Done in "Source Sans 3: metrics of the mock-ups, weights 400 to 900". Upstream (release 3.052R) has no static 800, so the app bundles the upstream variable font (one 170 KB file, weights 400 to 900, Latin Extended) instead of the four static files. Measured in the WebView: 14 px Source Sans 3 now has the x-height and ascent of 14 px Roboto. No size had been raised in the app, so none was set back.
 
-## [ ] 2026-11-07-27 Dive detail: weights as a total plus one line per location
+## [x] 2026-11-07-27 Dive detail: weights as a total plus one line per location
 
 In "Gaz et équipement" on the dive detail, when the dive has several weight entries:
 - first line: "Lest" 16/24 ink on the left, the total on the right, 16/24 weight 600, tabular figures (sum of all entries, in the weight unit of the settings);
@@ -499,6 +499,8 @@ In "Gaz et équipement" on the dive detail, when the dive has several weight ent
 With a single entry, keep the current row (location as supporting text, weight on the right). An entry without a location shows "Lest" as its label.
 
 Mock-ups: `docs/mockups/detail3-android.dc.html`, `detail3-android-sombre.dc.html` (iOS: `detail3-ios.dc.html`). Spec: section 4, "Full dive detail".
+
+Done in "Dive detail: weights as a total plus one line per location". Checked on a dive of the logbook with two entries (10 lb and 2 lb, total 12 lb). The secondary lines use `--od-text-2`, which is the dark value of the specification in dark mode.
 
 ## [ ] 2026-11-07-28 Dive detail menu: "Supprimer la plongée"
 

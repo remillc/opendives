@@ -208,6 +208,7 @@
     "sacFull": "Surface air consumption (SAC)",
     "suitRow": "Suit",
     "weights": "Weights",
+    "weightsByPlace": "Weights by location",
     "weightPlaces": {
       "integrated": "Integrated",
       "belt": "Belt",

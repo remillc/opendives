@@ -208,6 +208,7 @@
     "sacFull": "Consommation en surface (SAC)",
     "suitRow": "Combinaison",
     "weights": "Lest",
+    "weightsByPlace": "Lest par emplacement",
     "weightPlaces": {
       "integrated": "Intégré au gilet",
       "belt": "Ceinture",
