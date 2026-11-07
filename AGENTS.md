@@ -114,6 +114,8 @@ Gradle does not rebuild the native code: rerun `native/build-android.sh` when th
 
 - The app is versioned with Semantic Versioning 2.0.0: `MAJOR.MINOR.PATCH`, with an optional pre-release such as `0.2.0-beta.1`. The current version is **0.1.0**. Its one source is `app/package.json`: Android `versionName`, iOS `CFBundleShortVersionString` and the web build read it. Build numbers (`versionCode`, `CFBundleVersion`) are internal and only increase.
 - Branch names always start with a prefix that says what the branch is for: `feature/...`, `fix/...`, `release/1.0.0`, and so on.
+- One branch per problem or task, created before its first change. Branches are merged when Christian asks.
+- Every commit is pushed right away (`git push`, or `git push -u origin <branch>` for a new branch); so is every merge.
 - Commit messages in English, imperative mood, short summary line.
 - Author of every commit: Christian Rémillard. No `Co-Authored-By` or `Claude-Session` line in commit messages.
 - Code files taken from or derived from Subsurface: `SPDX-License-Identifier: GPL-2.0` header. OpenDives is GPLv2 because it reuses Subsurface's core.
