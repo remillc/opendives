@@ -11,9 +11,17 @@
 <style>
 body{margin:0}
 a{color:#1F2124}a:hover{color:#1F2124}
+/* Source Sans 3 for body text, sized to match the system font (size-adjust 108%) */
+@font-face{font-family:'Source Sans 3 OD';font-weight:400;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(../brand/fonts/source-sans-3-latin-400-normal.woff2) format('woff2')}
+@font-face{font-family:'Source Sans 3 OD';font-weight:500;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(../brand/fonts/source-sans-3-latin-500-normal.woff2) format('woff2')}
+@font-face{font-family:'Source Sans 3 OD';font-weight:600;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(../brand/fonts/source-sans-3-latin-600-normal.woff2) format('woff2')}
+@font-face{font-family:'Source Sans 3 OD';font-weight:700;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(../brand/fonts/source-sans-3-latin-700-normal.woff2) format('woff2')}
+@font-face{font-family:'Source Sans 3 OD';font-weight:800;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(../brand/fonts/source-sans-3-latin-800-normal.woff2) format('woff2')}
+@font-face{font-family:'Source Sans 3 OD';font-weight:900;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(../brand/fonts/source-sans-3-latin-900-normal.woff2) format('woff2')}
+h1,h2,h3,h4,h1 *,h2 *,h3 *,h4 *,[style*='font-size: 2'],[style*='font-size: 3'],[style*='font-size: 4'],[style*='font-size: 2'] *,[style*='font-size: 3'] *,[style*='font-size: 4'] *{font-family:Roboto, 'Google Sans', system-ui, sans-serif !important}
 </style>
 </helmet>
-<div style="width: 1180px; height: 820px; box-sizing: border-box; background: #F4F4F2; font-family: Roboto, 'Google Sans', system-ui, sans-serif; color: #1F2124; display: flex; overflow: hidden">
+<div style="width: 1180px; height: 820px; box-sizing: border-box; background: #F4F4F2; font-family: 'Source Sans 3 OD', Roboto, 'Google Sans', system-ui, sans-serif; color: #1F2124; display: flex; overflow: hidden">
   <nav aria-label="Sections" style="width: 96px; flex: none; padding: 24px 0 16px 0; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; gap: 12px">
     <button aria-label="Ajouter : télécharger, importer ou noter une plongée" style="width: 56px; height: 56px; border: none; border-radius: 16px; background: #E8E8E5; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(0,0,0,0.3)"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #1F2124; stroke-width: 2; stroke-linecap: round"><path d="M12 5v14 M5 12h14"></path></svg></button>
     <a href="android-tablette-carnet.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #4A4D52; text-decoration: none; font-size: 12px; font-weight: 500; letter-spacing: 0.5px">
@@ -87,8 +95,8 @@ a{color:#1F2124}a:hover{color:#1F2124}
     <svg width="440" height="170" viewBox="0 0 440 170" role="img" aria-label="Profondeur maximale des 4 plongées : 28,7 m, 22,0 m, 21,8 m, 22,4 m">
       <sc-for list="{{bars}}" as="b" hint-placeholder-count="4">
         <rect x="{{b.x}}" y="8" width="72" height="{{b.h}}" rx="8" style="fill: {{b.fill}}"></rect>
-        <text x="{{b.cx}}" y="{{b.ty}}" style="font-size: 14px; font-weight: 500; fill: #1F2124; text-anchor: middle; font-family: Roboto, system-ui, sans-serif">{{b.value}}</text>
-        <text x="{{b.cx}}" y="164" style="font-size: 12px; fill: #4A4D52; text-anchor: middle; font-family: Roboto, system-ui, sans-serif">{{b.label}}</text>
+        <text x="{{b.cx}}" y="{{b.ty}}" style="font-size: 14px; font-weight: 500; fill: #1F2124; text-anchor: middle; font-family: 'Source Sans 3 OD', Roboto, system-ui, sans-serif">{{b.value}}</text>
+        <text x="{{b.cx}}" y="164" style="font-size: 12px; fill: #4A4D52; text-anchor: middle; font-family: 'Source Sans 3 OD', Roboto, system-ui, sans-serif">{{b.label}}</text>
       </sc-for>
     </svg>
     <a href="android-tablette-carnet.dc.html" style="align-self: flex-start; height: 40px; padding: 0 24px; border-radius: 20px; background: #E8E8E5; display: flex; align-items: center; font-size: 14px; font-weight: 500; text-decoration: none; color: #1F2124">Voir ces 4 plongées dans le carnet</a>
