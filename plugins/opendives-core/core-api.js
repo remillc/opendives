@@ -450,6 +450,9 @@ import { registerPlugin } from '@capacitor/core';
  * @property {(options: {path: string}) => Promise<void>} discardImport
  *   Deletes a downloaded file (cancelled or failed import).
  * @property {(options: {source: 'empty'|'import'|'device', path?: string}) => Promise<CloudDives & {imported: number}>} createLog
+ * @property {(options: {action: 'count'|'import'}) => Promise<any>} deviceLog
+ *   The dives logged on this device without an account: "count" ({count}),
+ *   read apart; "import" adds them to the account's log, one undoable step (EditResult).
  *   First logbook of the new account (the only step that writes to it), then its
  *   credentials are stored. "import": the downloaded file, deleted afterwards.
  * @property {(options: {id: number, changes: Record<string, string|number|string[]>}) => Promise<EditResult>} editDive
@@ -585,6 +588,10 @@ export const OpenDivesCore = {
   discardImport: (options) => native.discardImport(options),
   async createLog(options) {
     return JSON.parse((await native.createLog(options)).json);
+  },
+  async deviceLog(options) {
+    const result = await native.deviceLog(options);
+    return options.action === 'count' ? { count: result.count } : JSON.parse(result.json);
   },
   async deleteAccount(options) {
     const { json } = await native.deleteAccount(options);

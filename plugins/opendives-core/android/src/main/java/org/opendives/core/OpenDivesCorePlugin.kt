@@ -714,6 +714,29 @@ class OpenDivesCorePlugin : Plugin() {
         }
     }
 
+    /**
+     * The dives logged on this device without an account (its own log), once
+     * an account is used: "count" reads them apart; "import" adds them to the
+     * account's log in memory as one undoable step (import_dives, Subsurface's
+     * merge rules: a dive already there is not doubled). The device's log
+     * itself is kept as it is.
+     */
+    @PluginMethod
+    fun deviceLog(call: PluginCall) = onCoreThread(call) {
+        val exists = NativeCore.logExists(repo)
+        when (call.getString("action")) {
+            "count" -> call.resolve(JSObject().put("count", if (exists) NativeCore.countDives(repo) else 0))
+            "import" -> {
+                if (!exists) {
+                    call.reject("NO_DIVES", "NO_DIVES")
+                    return@onCoreThread
+                }
+                call.resolve(JSObject().put("json", NativeCore.importDives(repo, "this device")))
+            }
+            else -> call.reject("BAD_REQUEST", "BAD_REQUEST")
+        }
+    }
+
     /** Filter presets of the log: list, save (undoable), delete (undoable). */
     @PluginMethod
     fun filterPresets(call: PluginCall) = onCoreThread(call) {

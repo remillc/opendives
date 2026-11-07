@@ -16,6 +16,10 @@ int init();
 
 // True if `repo` (in "path[branch]" format) names an already saved repository.
 bool log_exists(const std::string &repo);
+// Number of dives in a log ("path[branch]" or a file), read-only and apart
+// from the log loaded in memory; -1 with `error` (IMPORT_FAILED) when it
+// cannot be read.
+int count_dives(const std::string &log, std::string &error);
 
 // Detail of one dive of the loaded log (identifier `id` from list_dives):
 // facts, cylinders and gases, gas changes, buddies, tags, notes,

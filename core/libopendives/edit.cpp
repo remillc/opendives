@@ -2681,7 +2681,13 @@ int import_dives(const std::string &file, const std::string &source, std::string
 	if (check_writable_log(error))
 		return -1;
 	struct divelog log;
-	if (parse_file(file.c_str(), &log)) {
+	// A git log read here (this device's log) sets the loaded commit, which
+	// the next save of the log in memory checks against its destination:
+	// it is put back, or that save would be refused (SAVE_REPLACEMENT).
+	std::string loaded = loaded_git_commit;
+	int parsed = parse_file(file.c_str(), &log);
+	loaded_git_commit = loaded;
+	if (parsed) {
 		error = "IMPORT_FAILED";
 		return -1;
 	}

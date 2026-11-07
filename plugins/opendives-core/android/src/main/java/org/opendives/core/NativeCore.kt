@@ -9,6 +9,7 @@ internal object NativeCore {
 
     external fun init(home: String)
     external fun logExists(repo: String): Boolean
+    external fun countDives(log: String): Int
     external fun importFile(source: String, repo: String): Int
     external fun listDives(repo: String): String
     external fun getDive(id: Int): String

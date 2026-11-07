@@ -3,7 +3,9 @@
 // same screens open from first launch (routes /welcome/…) and from Account
 // without an account (routes /account/…).
 import { f7 } from 'framework7-svelte';
-import { accountReady } from './logbook.svelte.js';
+import { accountReady, deviceDiveCount, importDeviceDives, logbook } from './logbook.svelte.js';
+import { confirmAction } from './dialogs.js';
+import { offerUndo } from './undo.js';
 import { t } from './i18n.js';
 
 /**
@@ -57,11 +59,57 @@ export function showFailure(code) {
  * @param {any} router
  * @param {boolean} welcome
  */
-export function finishAccount(router, welcome) {
+export function finishAccount(router, welcome, { offerDeviceDives = false } = {}) {
   accountFlow.confirmedEmail = '';
   if (!welcome) {
     const first = router.history[0];
     if (first && router.history.length > 1) router.back(first, { force: true });
   }
-  accountReady();
+  const loading = accountReady();
+  // Signed in to an account that has a logbook: the dives logged on this
+  // device without an account are offered once, when the account's logbook
+  // is there.
+  if (offerDeviceDives) Promise.resolve(loading).then(() => offerDeviceDivesOnce(logbook.email));
+}
+
+/** @param {string} email */
+async function offerDeviceDivesOnce(email) {
+  const key = `od.deviceDivesOffered:${email}`;
+  try {
+    if (!email || localStorage.getItem(key)) return;
+  } catch {
+    return;
+  }
+  const n = await deviceDiveCount();
+  if (!n) return;
+  try {
+    localStorage.setItem(key, '1');
+  } catch {
+    // Offered again next time: not harmful.
+  }
+  confirmAction({
+    title: t('deviceDives.title'),
+    text: t('deviceDives.text', { n }),
+    action: t('deviceDives.add'),
+    cancel: t('deviceDives.keep'),
+    onConfirm: addDeviceDives,
+  });
+}
+
+/** Adds the device's dives to the account's logbook, then offers Undo. */
+export async function addDeviceDives() {
+  try {
+    const n = await importDeviceDives();
+    offerUndo(t('deviceDives.added', { n }));
+  } catch (e) {
+    const code = errorCode(e);
+    if (code === 'NO_NEW_DIVES') toastText(t('deviceDives.nothingNew'));
+    else if (code === 'WRITE_LOCKED') toastText(t('edit.writeLocked'));
+    else showFailure(code);
+  }
+}
+
+/** @param {string} text */
+function toastText(text) {
+  f7.toast.create({ text, closeTimeout: 4000, position: 'bottom' }).open();
 }

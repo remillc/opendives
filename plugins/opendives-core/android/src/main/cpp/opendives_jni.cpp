@@ -273,6 +273,19 @@ Java_org_opendives_core_NativeCore_logExists(JNIEnv *env, jobject, jstring repo)
 	return opendives::log_exists(to_string(env, repo)) ? JNI_TRUE : JNI_FALSE;
 }
 
+// Dives of a log read apart (count_dives): the device's log while the account's is loaded.
+JNIEXPORT jint JNICALL
+Java_org_opendives_core_NativeCore_countDives(JNIEnv *env, jobject, jstring log)
+{
+	std::string error;
+	int count = opendives::count_dives(to_string(env, log), error);
+	if (count < 0) {
+		throw_core_error(env, error);
+		return 0;
+	}
+	return count;
+}
+
 JNIEXPORT jint JNICALL
 Java_org_opendives_core_NativeCore_importFile(JNIEnv *env, jobject, jstring source, jstring repo)
 {

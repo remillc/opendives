@@ -45,7 +45,7 @@
         // The account exists with this password: sign in to it.
         const signedIn = await OpenDivesCore.signIn({ email: email.trim(), password });
         password = '';
-        if (signedIn.exists) finishAccount(f7router, welcome);
+        if (signedIn.exists) finishAccount(f7router, welcome, { offerDeviceDives: true });
         else f7router.navigate(`${base}/import/`, { props: { signedIn: true } });
       } else {
         passwordError = t('signIn.incorrect');

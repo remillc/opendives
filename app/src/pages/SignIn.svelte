@@ -30,7 +30,7 @@
     try {
       const result = await OpenDivesCore.signIn({ email: email.trim(), password });
       password = '';
-      if (result.exists) finishAccount(f7router, welcome);
+      if (result.exists) finishAccount(f7router, welcome, { offerDeviceDives: true });
       else f7router.navigate(`${welcome ? '/welcome' : '/account'}/import/`, { props: { signedIn: true } });
     } catch (e) {
       const code = errorCode(e);

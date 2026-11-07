@@ -241,6 +241,32 @@ export async function importFile(file) {
   return Math.max(0, logbook.dives.length - before);
 }
 
+/** Dives logged on this device without an account (0 when none, or unreadable). */
+export async function deviceDiveCount() {
+  try {
+    return (await OpenDivesCore.deviceLog({ action: 'count' })).count;
+  } catch (e) {
+    console.error('Device dives', e);
+    return 0;
+  }
+}
+
+/**
+ * Adds the dives logged on this device without an account to the account's
+ * logbook: one undoable step, saved and synced like an import.
+ * @returns {Promise<number>} the number of dives added
+ */
+export async function importDeviceDives() {
+  const before = logbook.dives.length;
+  const result = await OpenDivesCore.deviceLog({ action: 'import' });
+  logbook.undoText = result.undo;
+  logbook.redoText = result.redo ?? '';
+  logbook.dives = await OpenDivesCore.listLoadedDives();
+  logbook.sitesVersion++;
+  await persistChanges();
+  return Math.max(0, logbook.dives.length - before);
+}
+
 /**
  * After a download from a dive computer (OpenDivesCore.downloadDives): the
  * new dives are one undoable step already made by the core; it is saved and

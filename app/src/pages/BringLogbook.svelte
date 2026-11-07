@@ -17,6 +17,7 @@
   import AccountStep from '../components/AccountStep.svelte';
   import { notAvailableYet } from '../lib/not-available.js';
   import { accountFlow, errorCode, finishAccount, showFailure } from '../lib/account.js';
+  import { deviceDiveCount } from '../lib/logbook.svelte.js';
   import { t } from '../lib/i18n.js';
 
   /**
@@ -27,8 +28,14 @@
   const welcome = $derived(String(f7route.path ?? '').startsWith('/welcome/'));
   const base = $derived(welcome ? '/welcome' : '/account');
 
-  /** @type {'divelogs'|'file'|'empty'} */
+  /** @type {'device'|'divelogs'|'file'|'empty'} */
   let source = $state('divelogs');
+  /** Dives logged on this device without an account: offered first, and chosen, when there are some. */
+  let deviceCount = $state(0);
+  deviceDiveCount().then((n) => {
+    deviceCount = n;
+    if (n) source = 'device';
+  });
   let user = $state('');
   let password = $state('');
   let busy = $state(false);
@@ -62,7 +69,7 @@
         f7router.navigate(`${base}/importing/`, { props: { source: 'divelogs', ...credentials } });
         return;
       }
-      await OpenDivesCore.createLog({ source: 'empty' });
+      await OpenDivesCore.createLog({ source: source === 'device' ? 'device' : 'empty' });
       finishAccount(f7router, welcome);
     } catch (e) {
       const code = errorCode(e);
@@ -119,6 +126,16 @@
 >
   <input type="file" class="od-sr-only" tabindex="-1" aria-hidden="true" bind:this={fileInput} onchange={fileChosen} />
   <div class="sources" role="radiogroup" aria-label={t('bringLogbook.sourceLabel')}>
+    {#if deviceCount}
+      <!-- The dives already on this device come first when there are some. -->
+      <label class="source">
+        <span class="radio"><input type="radio" name="od-source" value="device" bind:group={source} disabled={busy} /><i class="icon-radio"></i></span>
+        <span class="text">
+          <span class="label">{t('bringLogbook.device', { n: deviceCount })}</span>
+          <span class="consequence">{t('bringLogbook.deviceText')}</span>
+        </span>
+      </label>
+    {/if}
     <!-- Order of the mock-ups: empty logbook, divelogs.de, file (divelogs.de stays the default). -->
     <label class="source">
       <span class="radio"><input type="radio" name="od-source" value="empty" bind:group={source} disabled={busy} /><i class="icon-radio"></i></span>

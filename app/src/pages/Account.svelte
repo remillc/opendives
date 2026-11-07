@@ -1,5 +1,6 @@
 <script>
   // @ts-check
+  import { addDeviceDives } from '../lib/account.js';
   // Account screen (docs/mockups/compte-*.dc.html; docs/agent-inbox.md, task
   // 2026-11-06-02): the Subsurface cloud account, or the choices to get one.
   // Change password is shown but not wired yet. Create and sign in open the
@@ -7,12 +8,18 @@
   import { Page, Navbar, f7 } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
   import MenuButton from '../components/MenuButton.svelte';
-  import { logbook, setAutoSync, signOut, syncNow } from '../lib/logbook.svelte.js';
+  import { logbook, setAutoSync, signOut, syncNow, deviceDiveCount } from '../lib/logbook.svelte.js';
   import { showSection } from '../lib/navigation.svelte.js';
   import { formatDateTime, formatNumber, formatTimeOfDay } from '../lib/format.js';
   import { t, tIfExists } from '../lib/i18n.js';
 
   const signedIn = $derived(!!logbook.email);
+
+  /** Dives logged on this device without an account, which the account can take (0: none). */
+  let deviceCount = $state(0);
+  $effect(() => {
+    if (signedIn && !logbook.loading) deviceDiveCount().then((n) => (deviceCount = n));
+  });
   const count = $derived(logbook.dives.length);
 
   /** "today, 06:58", or the full date for an older sync. */
@@ -154,6 +161,18 @@
             </div>
           </div>
         </li>
+        {#if deviceCount}
+          <li>
+            <a href="#device-dives" class="item-link item-content external" role="button" onclick={(e) => { e.preventDefault(); addDeviceDives(); }}>
+              <div class="item-inner">
+                <div class="item-title">
+                  {t('account.addDeviceDives')}
+                  <div class="item-footer">{t('account.addDeviceDivesText', { n: deviceCount })}</div>
+                </div>
+              </div>
+            </a>
+          </li>
+        {/if}
         <li class="sync-now">
           <button type="button" class="od-tonal-button" disabled={logbook.loading} onclick={() => syncNow()}>{t('account.syncNow')}</button>
         </li>

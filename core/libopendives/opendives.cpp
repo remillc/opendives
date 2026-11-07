@@ -130,6 +130,22 @@ bool log_exists(const std::string &repo)
 	return true;
 }
 
+// Read apart (its own divelog): the log loaded in memory is not touched.
+// Reading a git log sets the loaded commit (set_git_id()), which the next
+// save checks against its destination: it is put back.
+int count_dives(const std::string &log, std::string &error)
+{
+	struct divelog other;
+	std::string loaded = loaded_git_commit;
+	int ret = parse_file(log.c_str(), &other);
+	loaded_git_commit = loaded;
+	if (ret) {
+		error = "IMPORT_FAILED";
+		return -1;
+	}
+	return static_cast<int>(other.dives.size());
+}
+
 int import_file(const std::string &source, const std::string &repo, std::string &error)
 {
 	if (load(source, error))
