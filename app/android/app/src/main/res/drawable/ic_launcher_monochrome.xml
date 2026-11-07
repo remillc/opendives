@@ -1,22 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Themed icon layer of the "Hublot" logo (docs/brand): ring, waterline and bubbles in one colour. -->
+<!-- Themed icon layer of the "Hublot" logo (docs/brand) in one colour: the
+     porthole as a light disc (the white disc of the light logo, no ring), the
+     water and the bubbles in the full colour. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- Waterline: the top edge of the water, clipped to the porthole (circle r 29). -->
-    <group>
-        <clip-path android:pathData="M25,54a29,29 0,1 0,58 0a29,29 0,1 0,-58 0Z" />
-        <path
-            android:pathData="M20,61 Q32,55 44,61 T68,61 T92,61"
-            android:strokeColor="#FF000000"
-            android:strokeWidth="2" />
-    </group>
     <path
-        android:pathData="M24,54a30,30 0,1 0,60 0a30,30 0,1 0,-60 0Z"
-        android:strokeColor="#FF000000"
-        android:strokeWidth="3" />
+        android:fillColor="#4D000000"
+        android:pathData="M24,54a30,30 0,1 0,60 0a30,30 0,1 0,-60 0Z" />
+    <group>
+        <clip-path android:pathData="M24,54a30,30 0,1 0,60 0a30,30 0,1 0,-60 0Z" />
+        <path
+            android:fillColor="#FF000000"
+            android:pathData="M20,61 Q32,55 44,61 T68,61 T92,61 V100 H20 Z" />
+    </group>
     <path android:fillColor="#FF000000" android:pathData="M59.4,44a2.6,2.6 0,1 0,5.2 0a2.6,2.6 0,1 0,-5.2 0Z" />
     <path android:fillColor="#FF000000" android:pathData="M55.2,37a1.8,1.8 0,1 0,3.6 0a1.8,1.8 0,1 0,-3.6 0Z" />
 </vector>

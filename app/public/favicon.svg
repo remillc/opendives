@@ -1,21 +1,24 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="108" height="108" viewBox="0 0 108 108">
   <!-- The "Hublot" logo in the round mask (docs/brand/opendives-icon-*-round.svg),
-       light or dark following the system. -->
+       light or dark following the system: a white disc in light mode, a thin
+       ring in dark mode. -->
   <style>
-    .bg { fill: #F4F4F2 } .ink { fill: #1F2124 } .ring { fill: none; stroke: #1F2124; stroke-width: 3 }
+    .bg { fill: #F4F4F2 } .ink { fill: #1F2124 } .disc { fill: #FFFFFF } .ring { display: none }
     .top { stop-color: #FBE3B2 } .bottom { stop-color: #B4530F }
     @media (prefers-color-scheme: dark) {
-      .bg { fill: #121314 } .ink { fill: #F4F4F2 } .ring { stroke: #F4F4F2 }
+      .bg { fill: #121314 } .ink { fill: #F4F4F2 } .disc { fill: none }
+      .ring { display: inline; fill: none; stroke: #F4F4F2; stroke-width: 3 }
       .top { stop-color: #E5B961 } .bottom { stop-color: #EF7625 }
     }
   </style>
   <defs>
     <linearGradient id="h" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="top"/><stop offset="1" class="bottom"/></linearGradient>
     <clipPath id="hm"><circle cx="54" cy="54" r="54"/></clipPath>
-    <clipPath id="hc"><circle cx="54" cy="54" r="29"/></clipPath>
+    <clipPath id="hc"><circle cx="54" cy="54" r="30"/></clipPath>
   </defs>
   <g clip-path="url(#hm)">
     <rect width="108" height="108" class="bg"/>
+    <circle cx="54" cy="54" r="30" class="disc"/>
     <g clip-path="url(#hc)"><path d="M20 61 Q32 55 44 61 T68 61 T92 61 V100 H20 Z" fill="url(#h)"/></g>
     <circle cx="54" cy="54" r="30" class="ring"/>
     <circle cx="62" cy="44" r="2.6" class="ink"/>

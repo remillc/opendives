@@ -6,9 +6,13 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- Water, clipped to the porthole (circle r 29). -->
+    <!-- The porthole: a white disc (circle r 30), no ring in light mode. -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M24,54a30,30 0,1 0,60 0a30,30 0,1 0,-60 0Z" />
+    <!-- Water, clipped to the porthole (circle r 30). -->
     <group>
-        <clip-path android:pathData="M25,54a29,29 0,1 0,58 0a29,29 0,1 0,-58 0Z" />
+        <clip-path android:pathData="M24,54a30,30 0,1 0,60 0a30,30 0,1 0,-60 0Z" />
         <path android:pathData="M20,61 Q32,55 44,61 T68,61 T92,61 V100 H20 Z">
             <aapt:attr name="android:fillColor">
                 <gradient
@@ -23,11 +27,6 @@
             </aapt:attr>
         </path>
     </group>
-    <!-- Ring: circle r 30, stroke 3. -->
-    <path
-        android:pathData="M24,54a30,30 0,1 0,60 0a30,30 0,1 0,-60 0Z"
-        android:strokeColor="#FF1F2124"
-        android:strokeWidth="3" />
     <!-- Bubbles. -->
     <path android:fillColor="#FF1F2124" android:pathData="M59.4,44a2.6,2.6 0,1 0,5.2 0a2.6,2.6 0,1 0,-5.2 0Z" />
     <path android:fillColor="#FF1F2124" android:pathData="M55.2,37a1.8,1.8 0,1 0,3.6 0a1.8,1.8 0,1 0,-3.6 0Z" />
