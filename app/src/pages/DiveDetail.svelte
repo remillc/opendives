@@ -548,7 +548,9 @@
       display: flex;
       flex-direction: column;
 
+      /* Large key figures: the system font, as the titles (spec, "Fonts"). */
       .value {
+        font-family: var(--od-title-font);
         font-size: 28px;
         line-height: 34px;
         font-weight: 800;

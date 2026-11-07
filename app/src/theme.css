@@ -130,7 +130,82 @@ html.ios {
   }
 }
 
+/*
+ * Fonts (spec, section 1, "Fonts"): Source Sans 3 (SIL Open Font License,
+ * fonts/OFL.txt; the full upstream files, Latin Extended included) for the
+ * body text; the system font (Roboto, SF Pro) for titles and the large key
+ * figures of a dive. Sizes are CSS px, which the WebView scales with the
+ * phone's text size.
+ */
+@font-face {
+  font-family: 'Source Sans 3';
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url('./fonts/SourceSans3-Regular.ttf.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Source Sans 3';
+  font-style: normal;
+  font-weight: 500;
+  font-display: block;
+  src: url('./fonts/SourceSans3-Medium.ttf.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Source Sans 3';
+  font-style: normal;
+  font-weight: 600;
+  font-display: block;
+  src: url('./fonts/SourceSans3-Semibold.ttf.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Source Sans 3';
+  font-style: normal;
+  font-weight: 700 900;
+  font-display: block;
+  src: url('./fonts/SourceSans3-Bold.ttf.woff2') format('woff2');
+}
+
+/* Framework7 sets its font per platform, outside our layers: overridden here too. */
+.md {
+  --od-title-font: Roboto, system-ui, sans-serif;
+  --f7-font-family: 'Source Sans 3', Roboto, system-ui, sans-serif;
+}
+
+.ios {
+  --od-title-font: -apple-system, 'SF Pro Display', system-ui, sans-serif;
+  --f7-font-family: 'Source Sans 3', -apple-system, system-ui, sans-serif;
+}
+
 @layer od.base {
+  body {
+    font-family: var(--f7-font-family);
+  }
+
+  /* Buttons and fields do not inherit the font by default. */
+  button,
+  input,
+  textarea,
+  select {
+    font-family: inherit;
+  }
+
+  /* Titles keep the system font: screen, top bar, section and dialog titles. */
+  h1,
+  h2,
+  h3,
+  .navbar .title,
+  .title-large-text,
+  .block-title,
+  .dialog-title,
+  .od-state-title,
+  .od-title-font {
+    font-family: var(--od-title-font);
+  }
+
   /* Spec, section 2: tabular figures for every dive value. */
   .od-value {
     font-variant-numeric: tabular-nums;

@@ -264,9 +264,11 @@ Every ⋮ menu on Android: 16 dp corners, items 48 dp high with 12 dp side paddi
 
 Done in "Android menus: 16 dp corners, surface-container, MD3 item spacing".
 
-## [ ] 2026-11-07-02 Body font: Source Sans 3
+## [x] 2026-11-07-02 Body font: Source Sans 3
 
 Bundle Source Sans 3 (OFL, weights 400 to 700, Latin and Latin Extended: take the full files from the upstream release, the ones in `docs/brand/fonts/` are the Latin subset used for the mock-up) and use it for all body text on Android and iOS. Titles and the large key figures keep the system font (Roboto, SF Pro). It must scale with the phone's text size. Keep `tabular-nums` on dive values. See `docs/ui-specification.md` ("Fonts") and `docs/mockups/police-source-android.dc.html`.
+
+Done in "Source Sans 3 for body text, system font for titles and key figures".
 
 ## [ ] 2026-11-07-03 Sites: compact maintenance rows
 
