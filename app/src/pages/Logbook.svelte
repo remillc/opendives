@@ -331,11 +331,11 @@
       timer = setTimeout(() => {
         pressed = true;
         // A long press starts the selection with this dive; in selection
-        // mode it checks the dive. Moving the finger then drags the dives
-        // checked (to a trip, or out of theirs).
+        // mode it checks the dive. Moving the finger then drags this dive,
+        // the one under the finger (to a trip, or out of its own).
         if (!selecting) startSelection(id);
         else checked[id] = true;
-        dragIds = Object.keys(checked).filter((k) => checked[Number(k)]).map(Number);
+        dragIds = [id];
         dragRow = row.closest('li');
       }, LONG_PRESS_MS);
     }
@@ -391,7 +391,6 @@
     let dragging = false;
     let touchX = 0;
     let touchY = 0;
-    let grabY = 0;
     /** @type {HTMLElement|null} */
     let ghost = null;
     /** @type {HTMLElement|null} */
@@ -403,31 +402,33 @@
     /** @param {number} id */
     const diveById = (id) => logbook.dives.find((d) => d.id === id);
 
+    /**
+     * As Gmail's drag: a small raised chip follows the finger, above it so the
+     * row under it stays visible; it names the dive's site, then says what
+     * the drop would do.
+     */
     function beginDrag() {
       if (!dragRow) return;
       dragging = true;
-      const rect = dragRow.getBoundingClientRect();
-      grabY = startY - rect.top;
       ghost = document.createElement('div');
-      ghost.className = 'list media-list od-drag-ghost';
-      ghost.style.left = `${rect.left}px`;
-      ghost.style.width = `${rect.width}px`;
-      const ul = document.createElement('ul');
-      const copy = /** @type {HTMLElement} */ (dragRow.cloneNode(true));
-      copy.style.top = '';
-      copy.style.position = 'static';
-      ul.append(copy);
+      ghost.className = 'od-drag-chip';
+      ghost.innerHTML =
+        '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5C6.5 4.5 9.5 4.5 12 6c2.5-1.5 5.5-1.5 8-.5v13c-2.5-1-5.5-1-8 .5-2.5-1.5-5.5-1.5-8-.5zM12 6v13.5"/></svg>';
       label = document.createElement('span');
-      label.className = 'od-drag-label';
-      ghost.append(ul, label);
+      ghost.append(label);
       document.body.append(ghost);
       dragRow.classList.add('od-drag-source');
+      updateTarget();
       placeGhost();
       autoScroll();
     }
 
     function placeGhost() {
-      if (ghost) ghost.style.top = `${touchY - grabY}px`;
+      if (!ghost) return;
+      const width = ghost.offsetWidth;
+      const left = Math.min(Math.max(8, touchX - width / 2), innerWidth - width - 8);
+      ghost.style.left = `${left}px`;
+      ghost.style.top = `${touchY - 72}px`;
     }
 
     function updateTarget() {
@@ -446,15 +447,18 @@
         }
       }
       if (!label) return;
-      if (target?.action === 'add') {
+      if (!target) {
+        label.textContent = dragged[0]?.site || t('dive.siteNotSet');
+      } else if (target.action === 'add') {
         const id = target.tripId;
         const inTrip = logbook.dives.filter((d) => d.trip?.id === id).sort((a, b) => a.date.localeCompare(b.date));
         const name = inTrip[0]?.trip?.location || (inTrip[0] ? t('trip.startingOn', { date: formatLongDate(inTrip[0].date) }) : '');
         label.textContent = t('logbook.dragAdd', { trip: name });
-      } else if (target?.action === 'remove') {
+      } else {
         label.textContent = t('logbook.dragRemove');
       }
-      label.hidden = !target;
+      ghost?.classList.toggle('od-drag-chip-target', !!target);
+      placeGhost();
     }
 
     /** Near the top or the bottom of the screen, the list scrolls under the finger. */
@@ -479,7 +483,8 @@
     function endDrag() {
       dragging = false;
       cancelAnimationFrame(scrolling);
-      ghost?.remove();
+      // Every chip, also one left by a drag the list reload cut short.
+      document.querySelectorAll('.od-drag-chip').forEach((n) => n.remove());
       ghost = null;
       label = null;
       dragRow?.classList.remove('od-drag-source');
@@ -530,7 +535,7 @@
       if (dragging) {
         e.stopPropagation();
         drop();
-      }
+      } else if (document.querySelector('.od-drag-chip')) endDrag();
       dragIds = null;
     }
 
@@ -545,15 +550,17 @@
     el.addEventListener('pointercancel', cancel);
     window.addEventListener('click', click, true);
     el.addEventListener('contextmenu', menu);
-    el.addEventListener('touchmove', touchMove, { passive: false });
-    el.addEventListener('touchend', touchEnd);
-    el.addEventListener('touchcancel', touchCancel);
+    // On the document: the row the finger started on may leave the list while
+    // it scrolls or re-renders, and its touches would no longer reach it.
+    document.addEventListener('touchmove', touchMove, { capture: true, passive: false });
+    document.addEventListener('touchend', touchEnd, true);
+    document.addEventListener('touchcancel', touchCancel, true);
     return () => {
       cancel();
       endDrag();
-      el.removeEventListener('touchmove', touchMove);
-      el.removeEventListener('touchend', touchEnd);
-      el.removeEventListener('touchcancel', touchCancel);
+      document.removeEventListener('touchmove', touchMove, true);
+      document.removeEventListener('touchend', touchEnd, true);
+      document.removeEventListener('touchcancel', touchCancel, true);
       el.removeEventListener('pointerdown', down);
       el.removeEventListener('pointermove', move);
       el.removeEventListener('pointerup', cancel);
@@ -1189,32 +1196,35 @@
 
     /* Dragging dives to a trip or out of it: the row lifted under the finger,
        its place faded, the trip it would join tinted. */
-    :global(.od-drag-ghost) {
+    :global(.od-drag-chip) {
       position: fixed;
       z-index: 9000;
-      margin: 0;
-      pointer-events: none;
-      border-radius: 12px;
+      max-width: calc(100vw - 16px);
+      height: 40px;
+      padding: 0 16px 0 12px;
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 20px;
       background: var(--od-surface);
+      color: var(--od-text);
+      font-size: 14px;
+      font-weight: 600;
+      white-space: nowrap;
+      pointer-events: none;
       box-shadow: 0 4px 8px 3px rgb(0 0 0 / 0.15), 0 1px 3px rgb(0 0 0 / 0.3);
 
-      ul {
-        background: none;
+      span {
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
     }
 
-    :global(.od-drag-label) {
-      position: absolute;
-      right: 12px;
-      top: -14px;
-      padding: 4px 10px;
-      border-radius: 8px;
+    /* Over a place where the dives can go: the chip in ink. */
+    :global(.od-drag-chip.od-drag-chip-target) {
       background: var(--od-text);
       color: var(--od-surface);
-      font-size: 13px;
-      line-height: 18px;
-      font-weight: 600;
-      white-space: nowrap;
     }
 
     :global(.od-drag-source) {
