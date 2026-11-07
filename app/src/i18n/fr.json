@@ -1159,7 +1159,11 @@
       "Carnet synchronisé avec le cloud Subsurface, ou gardé sur l'appareil seulement.",
       "Fiches de plongée avec le profil, voyages et sites sur la carte.",
       "Téléchargement depuis l'ordinateur de plongée par Bluetooth (Android).",
-      "Statistiques, planificateur et outils de gaz."
+      "Statistiques, planificateur et outils de gaz.",
+      "Sites : carte, fiche, plongées sans site, sites sans coordonnées et nettoyage des doublons.",
+      "Suppression d'une plongée depuis son menu, avec « Annuler » pendant 10 secondes.",
+      "Glisser à gauche ou à droite pour passer d'une section du menu à l'autre.",
+      "Politique de confidentialité et « Question / signaler un problème » dans À propos."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",

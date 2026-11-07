@@ -1159,7 +1159,11 @@
       "Logbook synced with the Subsurface cloud, or kept on this device only.",
       "Dive pages with the profile, trips and sites on the map.",
       "Download from the dive computer over Bluetooth (Android).",
-      "Statistics, planner and gas tools."
+      "Statistics, planner and gas tools.",
+      "Sites: map, site page, dives without a site, sites without coordinates and duplicate clean-up.",
+      "Delete a dive from its menu, with “Undo” for 10 seconds.",
+      "Swipe left or right to go from one section of the menu to the next.",
+      "Privacy policy and “Question / report a problem” in About."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
