@@ -333,3 +333,7 @@ Add an "À propos" entry in the side menu after Réglages, opening a new About s
 ## [ ] 2026-11-07-16 Versions: Semantic Versioning, version only in About
 
 The About screen shows only "Version X.Y.Z", without the build number. Use Semantic Versioning 2.0.0 for the app version (MAJOR.MINOR.PATCH, optional pre-release like 0.2.0-beta.1), with one source of truth for Android `versionName`, iOS `CFBundleShortVersionString` and the web build; keep the build number (`versionCode`, `CFBundleVersion`) internal and increasing. See `docs/ui-specification.md` ("About"). Mock-up: `docs/mockups/apropos-android.dc.html`.
+
+## [ ] 2026-11-07-17 About: author
+
+On the About screen, add "Par Christian Rémillard" under the description, and start the bottom line with "© 2026 Christian Rémillard." before the Subsurface credit. Mock-up: `docs/mockups/apropos-android.dc.html`.
