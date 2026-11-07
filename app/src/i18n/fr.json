@@ -559,6 +559,11 @@
     "sections": "Sections"
   },
   "account": {
+    "addDeviceDives": "Ajouter les plongées de cet appareil",
+    "addDeviceDivesText": {
+      "one": "1 plongée notée sur cet appareil sans compte",
+      "other": "{n} plongées notées sur cet appareil sans compte"
+    },
     "title": "Compte",
     "verified": "Compte Subsurface vérifié",
     "syncGroup": "Synchronisation",
@@ -1069,7 +1074,64 @@
     "busy": "Création…",
     "confirmedText": "Votre compte est créé et son adresse est confirmée. Continuez pour choisir comment le remplir."
   },
+  "deviceDives": {
+    "title": "Plongées de cet appareil",
+    "text": {
+      "one": "Cet appareil garde 1 plongée notée sans compte. L'ajouter au carnet de ce compte ? Une plongée qui y est déjà n'est pas doublée.",
+      "other": "Cet appareil garde {n} plongées notées sans compte. Les ajouter au carnet de ce compte ? Celles qui y sont déjà ne sont pas doublées."
+    },
+    "add": "Ajouter",
+    "keep": "Ne pas ajouter",
+    "added": {
+      "one": "Plongée ajoutée au carnet",
+      "other": "{n} plongées ajoutées au carnet"
+    },
+    "nothingNew": "Ces plongées sont déjà dans le carnet du compte"
+  },
+  "about": {
+    "title": "À propos",
+    "version": "Version {version}",
+    "author": "Par {name}",
+    "copyright": "© {year} {name}.",
+    "tagline": "Carnet de plongée libre et gratuit, compatible avec les carnets Subsurface.",
+    "project": "Projet",
+    "notes": "Nouveautés",
+    "notesText": "Ce qui a changé dans cette version",
+    "notesHeading": "Version 0.1.0",
+    "releaseNotes": [
+      "Première version d'essai.",
+      "Carnet synchronisé avec le cloud Subsurface, ou gardé sur l'appareil seulement.",
+      "Fiches de plongée avec le profil, voyages et sites sur la carte.",
+      "Téléchargement depuis l'ordinateur de plongée par Bluetooth (Android).",
+      "Statistiques, planificateur et outils de gaz."
+    ],
+    "source": "Code source",
+    "issues": "Signaler un problème",
+    "licences": "Licences",
+    "licence": "Licence",
+    "licenceText": "GNU GPL version 2",
+    "libraries": "Bibliothèques libres",
+    "librariesText": "Subsurface, libdivecomputer, Capacitor, Framework7, Svelte",
+    "librariesGroups": {
+      "core": "Cœur de calcul",
+      "app": "Application"
+    },
+    "maps": "Cartes",
+    "mapsText": "© contributeurs OpenStreetMap, ODbL",
+    "regions": "Pays et régions",
+    "regionsText": "GeoNames, CC BY 4.0",
+    "privacy": "Confidentialité",
+    "privacyPolicy": "Politique de confidentialité",
+    "privacyText": "Vos plongées restent sur l'appareil et dans votre compte",
+    "opensElsewhere": "s'ouvre dans le navigateur",
+    "credit": "Le cœur de calcul vient de Subsurface, créé par Linus Torvalds et Dirk Hohndel, et de ses contributeurs."
+  },
   "bringLogbook": {
+    "device": {
+      "one": "La plongée de cet appareil",
+      "other": "Les {n} plongées de cet appareil"
+    },
+    "deviceText": "Notées sur cet appareil sans compte",
     "signedInTitle": "Votre compte",
     "signedInIntro": "Ce compte n'a pas encore de carnet. Vous pouvez le remplir tout de suite avec les plongées que vous avez déjà.",
     "heading": "Reprendre votre carnet ?",

@@ -1,5 +1,10 @@
 apply plugin: 'com.android.application'
 
+// The app's version (Semantic Versioning 2.0.0, MAJOR.MINOR.PATCH with an
+// optional pre-release such as 0.2.0-beta.1) has one source: app/package.json.
+// versionCode is the internal build number: it only increases.
+def appVersion = new groovy.json.JsonSlurper().parse(file('../../package.json')).version
+
 android {
     namespace "org.opendives.app"
     compileSdk rootProject.ext.compileSdkVersion
@@ -8,7 +13,7 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
-        versionName "1.0"
+        versionName appVersion
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.

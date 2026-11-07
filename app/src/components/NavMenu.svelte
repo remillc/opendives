@@ -10,7 +10,7 @@
   import Icon from './Icon.svelte';
   import SyncStatus from './SyncStatus.svelte';
   import { logbook, syncNow } from '../lib/logbook.svelte.js';
-  import { navigation, sections, showSection, closeMenu, restoreFocus, openSettings } from '../lib/navigation.svelte.js';
+  import { navigation, sections, showSection, closeMenu, restoreFocus, openSettings, openAbout } from '../lib/navigation.svelte.js';
   import { t } from '../lib/i18n.js';
 
   /** @type {Record<string, 'logbook'|'sites'|'statistics'|'tools'>} */
@@ -92,6 +92,10 @@
     <a href="#settings" class="item" onclick={(e) => choose(e, openSettings)}>
       <Icon name="settings" />
       <span>{t('settings.title')}</span>
+    </a>
+    <a href="#about" class="item" onclick={(e) => choose(e, openAbout)}>
+      <Icon name="info" />
+      <span>{t('about.title')}</span>
     </a>
     <div class="spacer"></div>
     {#if !logbook.loading && !logbook.error}

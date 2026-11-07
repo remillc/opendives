@@ -117,7 +117,7 @@
   );
 </script>
 
-<div class="profile od-block">
+<div class="profile od-block no-swipeback">
   <div class="readout od-value" aria-hidden="true">
     {#if cursor !== null}
       <span>{t('profile.time')} <strong>{formatMinSec(times[cursor])}</strong></span>

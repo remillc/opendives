@@ -55,6 +55,9 @@
   import { settings } from './lib/settings.svelte.js';
   import CylinderTypes from './pages/CylinderTypes.svelte';
   import CylinderType from './pages/CylinderType.svelte';
+  import About from './pages/About.svelte';
+  import AboutText from './pages/AboutText.svelte';
+  import AboutLibraries from './pages/AboutLibraries.svelte';
 
   const f7params = {
     name: 'OpenDives',
@@ -66,6 +69,16 @@
     colors: { primary: getComputedStyle(document.documentElement).getPropertyValue('--od-action').trim() },
     // Framework7's own dialog buttons are in English.
     dialog: { buttonOk: t('dialog.ok'), buttonCancel: t('dialog.cancel') },
+    // A screen with a back arrow goes back with a swipe to the right, from
+    // anywhere on it (not only from the edge); the page follows the finger.
+    // Not where the swipe already means something: the dive detail (previous
+    // dive), the map, the profile, the wheels (class no-swipeback).
+    view: {
+      mdSwipeBack: true,
+      iosSwipeBack: true,
+      mdSwipeBackActiveArea: 10000,
+      iosSwipeBackActiveArea: 10000,
+    },
     routes: [
       // The Logbook is the master of a master-detail pair on a wide enough tablet:
       // a dive then opens beside the list, and full screen otherwise.
@@ -77,6 +90,10 @@
       { path: '/download/', component: Download },
       { path: '/download/failed/', component: DownloadFailed },
       { path: '/settings/', component: Settings },
+      { path: '/about/', component: About },
+      { path: '/about/notes/', component: AboutText, options: { props: { which: 'notes' } } },
+      { path: '/about/licence/', component: AboutText, options: { props: { which: 'licence' } } },
+      { path: '/about/libraries/', component: AboutLibraries },
       { path: '/settings/cylinders/', component: CylinderTypes },
       { path: '/settings/cylinders/new/', component: CylinderType },
       { path: '/settings/cylinders/type/', component: CylinderType },

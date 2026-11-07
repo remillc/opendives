@@ -38,6 +38,12 @@ export function openSettings() {
   if (router && router.currentRoute?.path !== '/settings/') router.navigate('/settings/');
 }
 
+/** About opens over the current section, from the side menu or the tablet navigation. */
+export function openAbout() {
+  const router = f7.views.current?.router;
+  if (router && router.currentRoute?.path !== '/about/') router.navigate('/about/');
+}
+
 /** The "+" button of the Android rail: shows the Logbook, which offers the choices. */
 export function requestAdd() {
   showSection('logbook');

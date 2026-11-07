@@ -306,7 +306,8 @@
   );
 </script>
 
-<Page onPageInit={watchSwipes} class={slide ? `od-slide-${slide}` : ''}>
+<!-- no-swipeback: here a swipe to the right shows the previous dive. -->
+<Page onPageInit={watchSwipes} class="no-swipeback {slide ? `od-slide-${slide}` : ''}">
   <Navbar>
     <!-- Named back link: in MD3, Framework7 hides its text and TalkBack would read "#". -->
     {#snippet left()}

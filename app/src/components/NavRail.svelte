@@ -8,7 +8,7 @@
   import SyncStatus from './SyncStatus.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
   import { ios } from '../lib/layout.svelte.js';
-  import { navigation, sections, showSection, openSettings, requestAdd } from '../lib/navigation.svelte.js';
+  import { navigation, sections, showSection, openSettings, openAbout, requestAdd } from '../lib/navigation.svelte.js';
   import { t } from '../lib/i18n.js';
 
   /**
@@ -54,6 +54,10 @@
   <a href="#settings" class="item bottom" onclick={(e) => choose(e, openSettings)}>
     <span class="icon"><Icon name="settings" size={ios ? 22 : 24} /></span>
     <span class="label" class:od-sr-only={!ios}>{t('settings.title')}</span>
+  </a>
+  <a href="#about" class="item" onclick={(e) => choose(e, openAbout)}>
+    <span class="icon"><Icon name="info" size={ios ? 22 : 24} /></span>
+    <span class="label" class:od-sr-only={!ios}>{t('about.title')}</span>
   </a>
   {#if ios && !logbook.loading && !logbook.error}
     <div class="status"><SyncStatus sync={logbook.sync} pending={logbook.pending} live={false} /></div>

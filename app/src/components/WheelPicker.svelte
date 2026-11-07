@@ -67,7 +67,7 @@
   }
 </script>
 
-<div class="wheel">
+<div class="wheel no-swipeback">
   <span class="label" id={id}>{label}</span>
   <div
     class="window"

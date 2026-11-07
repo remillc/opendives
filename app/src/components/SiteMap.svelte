@@ -161,7 +161,7 @@
   onDestroy(() => map?.remove());
 </script>
 
-<div class="site-map" style:height role="region" aria-label={t('sites.map')}>
+<div class="site-map no-swipeback" style:height role="region" aria-label={t('sites.map')}>
   <div class="canvas" bind:this={container}></div>
   {#if editable}
     <!-- The tip of the pin is the centre of the map. -->

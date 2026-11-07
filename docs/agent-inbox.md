@@ -326,14 +326,20 @@ In Trimix mode, what is already in the cylinder is entered as pressure, then oxy
 
 In Trimix mode, add a segmented control "Hélium d’abord | Oxygène d’abord" above the fill steps (default helium first, remembered on the device). The steps and their target pressures follow the chosen order; the top-up gas stays last. Mock-up: `docs/mockups/outils-melangeur-android.dc.html`.
 
-## [ ] 2026-11-07-15 About page
+## [x] 2026-11-07-15 About page
 
 Add an "À propos" entry in the side menu after Réglages, opening a new About screen: logo, name, version and build, one sentence, then Projet (release notes, source code, report a problem), Licences (GPL v2 text, open source components, OpenStreetMap, GeoNames), Confidentialité (privacy policy), and the credit to Subsurface at the bottom. External links get the external-link icon. The source code, issue tracker and privacy policy URLs are placeholders until Christian gives the real ones. See `docs/ui-specification.md` ("About"). Mock-ups: `docs/mockups/apropos-android.dc.html`, `appbar-tiroir-android-ouvert.dc.html`.
 
-## [ ] 2026-11-07-16 Versions: Semantic Versioning, version only in About
+Done in "About screen, version from package.json".
+
+## [x] 2026-11-07-16 Versions: Semantic Versioning, version only in About
 
 The About screen shows only "Version X.Y.Z", without the build number. Use Semantic Versioning 2.0.0 for the app version (MAJOR.MINOR.PATCH, optional pre-release like 0.2.0-beta.1), with one source of truth for Android `versionName`, iOS `CFBundleShortVersionString` and the web build; keep the build number (`versionCode`, `CFBundleVersion`) internal and increasing. See `docs/ui-specification.md` ("About"). Mock-up: `docs/mockups/apropos-android.dc.html`.
 
-## [ ] 2026-11-07-17 About: author
+Done in "About screen, version from package.json".
+
+## [x] 2026-11-07-17 About: author
 
 On the About screen, add "Par Christian Rémillard" under the description, and start the bottom line with "© 2026 Christian Rémillard." before the Subsurface credit. Mock-up: `docs/mockups/apropos-android.dc.html`.
+
+Done in "About screen, version from package.json".

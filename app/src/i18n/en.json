@@ -559,6 +559,11 @@
     "sections": "Sections"
   },
   "account": {
+    "addDeviceDives": "Add the dives of this device",
+    "addDeviceDivesText": {
+      "one": "1 dive logged on this device without an account",
+      "other": "{n} dives logged on this device without an account"
+    },
     "title": "Account",
     "verified": "Subsurface account verified",
     "syncGroup": "Synchronisation",
@@ -1069,7 +1074,64 @@
     "busy": "Creating…",
     "confirmedText": "Your account is created and its address is confirmed. Continue to choose how to fill it."
   },
+  "deviceDives": {
+    "title": "Dives on this device",
+    "text": {
+      "one": "This device keeps 1 dive logged without an account. Add it to the logbook of this account? A dive already there is not doubled.",
+      "other": "This device keeps {n} dives logged without an account. Add them to the logbook of this account? The ones already there are not doubled."
+    },
+    "add": "Add",
+    "keep": "Do not add",
+    "added": {
+      "one": "Dive added to the logbook",
+      "other": "{n} dives added to the logbook"
+    },
+    "nothingNew": "These dives are already in the logbook of the account"
+  },
+  "about": {
+    "title": "About",
+    "version": "Version {version}",
+    "author": "By {name}",
+    "copyright": "© {year} {name}.",
+    "tagline": "Free and open dive logbook, compatible with Subsurface logbooks.",
+    "project": "Project",
+    "notes": "What's new",
+    "notesText": "What changed in this version",
+    "notesHeading": "Version 0.1.0",
+    "releaseNotes": [
+      "First test version.",
+      "Logbook synced with the Subsurface cloud, or kept on this device only.",
+      "Dive pages with the profile, trips and sites on the map.",
+      "Download from the dive computer over Bluetooth (Android).",
+      "Statistics, planner and gas tools."
+    ],
+    "source": "Source code",
+    "issues": "Report a problem",
+    "licences": "Licences",
+    "licence": "Licence",
+    "licenceText": "GNU GPL version 2",
+    "libraries": "Open source libraries",
+    "librariesText": "Subsurface, libdivecomputer, Capacitor, Framework7, Svelte",
+    "librariesGroups": {
+      "core": "Dive core",
+      "app": "App"
+    },
+    "maps": "Maps",
+    "mapsText": "© OpenStreetMap contributors, ODbL",
+    "regions": "Countries and regions",
+    "regionsText": "GeoNames, CC BY 4.0",
+    "privacy": "Privacy",
+    "privacyPolicy": "Privacy policy",
+    "privacyText": "Your dives stay on the device and in your account",
+    "opensElsewhere": "opens in the browser",
+    "credit": "The dive core comes from Subsurface, created by Linus Torvalds and Dirk Hohndel, and its contributors."
+  },
   "bringLogbook": {
+    "device": {
+      "one": "The dive of this device",
+      "other": "The {n} dives of this device"
+    },
+    "deviceText": "Logged on this device without an account",
     "signedInTitle": "Your account",
     "signedInIntro": "This account has no logbook yet. You can fill it right away with the dives you already have.",
     "heading": "Bring your logbook?",
