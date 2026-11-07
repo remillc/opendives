@@ -22,7 +22,7 @@
     notSetLabel,
     valueLabel,
   } from '../lib/statistics.svelte.js';
-  import { formatHours, depthUnit } from '../lib/format.js';
+  import { formatHours } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
 
   /** @type {{ f7route: { query: { c?: string, saved?: string } } }} */
@@ -94,9 +94,11 @@
 
   <KeyFigures figures={result?.total ?? null} prefs={logbook.prefs} />
 
-  <div class="block-title">{t('stats.depthPerDive')}</div>
+  <!-- As stats-filtre-android.dc.html: one bar per dive in the water colour
+       of its depth, the year under each, no axis (task 2026-11-07-24). -->
+  <h2 class="chart-title">{t('stats.depthPerDive')}</h2>
   <div class="chart-block">
-    <BarChart {bars} depth height={120} scale={logbook.prefs.length === 'ft' ? 304.8 : 1000} unit={depthUnit(logbook.prefs)} label={t('stats.chartDepthLabel', { n: dives.length })} />
+    <BarChart {bars} depth axis={false} labelSize={12} height={120} label={`${t('stats.chartDepthLabel', { n: dives.length })}, ${title}`} />
   </div>
 
   <StatsDetails
@@ -197,6 +199,14 @@
       :global(.ios) & {
         font-size: 15px;
       }
+    }
+
+    .chart-title {
+      margin: 22px 16px 8px;
+      font-size: 14px;
+      line-height: 20px;
+      font-weight: 500;
+      color: var(--od-text-2);
     }
 
     .chart-block {

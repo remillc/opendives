@@ -99,12 +99,12 @@
       <section class="chart-card">
         <h3>{t('stats.chartYears')}</h3>
         <p>{result ? t('stats.chartYearsText', { dives: t('trip.dives', { n: result.total.dives }), n: yearBars.length }) : ''}</p>
-        <BarChart bars={yearBars} label={t('stats.chartYears')} />
+        <BarChart bars={yearBars} tinted label={t('stats.chartYears')} />
       </section>
       <section class="chart-card">
         <h3>{t('stats.chartDurations')}</h3>
         <p>{durationRange}</p>
-        <BarChart bars={durationBars} scale={60} unit={t('units.minutes')} label={t('stats.chartDurationsLabel', { n: dives.length })} />
+        <BarChart bars={durationBars} tinted scale={60} unit={t('units.minutes')} label={t('stats.chartDurationsLabel', { n: dives.length })} />
       </section>
     </div>
 

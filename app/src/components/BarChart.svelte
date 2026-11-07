@@ -15,17 +15,31 @@
    *   height?: number,
    *   scale?: number,
    *   unit?: string,
+   *   axis?: boolean,
+   *   labelSize?: number,
+   *   tinted?: boolean,
    * }}
+   * `tinted`: the bars of a chart that is not about depth (ready-made charts
+   * of the Statistics screen) take the water colours by their value within
+   * the chart: 70 % of the gradient for the smallest, the bottom colour for
+   * the tallest (task 2026-11-07-25).
    * `value`: millimetres for a depth chart (`depth`), else any positive number.
    * `scale`: values per unit of the y axis (60 for seconds shown in minutes,
    * 1000 or 304.8 for millimetres in metres or feet); `unit` is written after
-   * the top value of the axis.
+   * the top value of the axis. `axis: false`: no axis lines nor values, the
+   * bars over the whole width. `labelSize`: px of the labels under the bars.
    */
-  let { bars, label, depth = false, height = 110, scale = 1, unit = '' } = $props();
+  let { bars, label, depth = false, height = 110, scale = 1, unit = '', axis: withAxis = true, labelSize = 10, tinted = false } = $props();
+
+  /** @param {number} value @param {number} max */
+  const tint = (value, max) => {
+    const percent = Math.round((0.7 + (0.3 * value) / max) * 1000) / 10;
+    return `color-mix(in srgb, var(--od-water-bottom) ${percent}%, var(--od-water-top))`;
+  };
 
   let width = $state(0);
 
-  const LABEL_HEIGHT = 16;
+  const LABEL_HEIGHT = $derived(labelSize + 6);
   const MAX_LABELS = 8;
   const showLabels = $derived(bars.length <= MAX_LABELS && bars.some((b) => b.label));
   /** The bottom of the bars: above the labels, or above room for the axis' "0". */
@@ -53,7 +67,7 @@
   };
 
   /** Room on the left for the values of the y axis: the longest one, 10 px digits. */
-  const AXIS_WIDTH = $derived(Math.max(...axis.ticks.map((v) => tickText(v).length)) * 6 + 8);
+  const AXIS_WIDTH = $derived(withAxis ? Math.max(...axis.ticks.map((v) => tickText(v).length)) * 6 + 8 : 0);
 
   const rects = $derived.by(() => {
     const n = bars.length;
@@ -62,14 +76,17 @@
     // A gap between bars while they stay readable; a dense chart becomes a silhouette.
     const gap = n <= 40 ? Math.min(6, (plotWidth / n) * 0.22) : 0;
     const barWidth = (plotWidth - gap * (n - 1)) / n;
+    const highest = Math.max(...bars.map((b) => b.value), 1);
     return bars.map((b, i) => {
-      const h = b.value > 0 ? Math.max(2, (b.value / axis.max) * (plot - 6)) : 0;
+      // Without an axis, the tallest bar reaches the top.
+      const max = withAxis ? axis.max : highest;
+      const h = b.value > 0 ? Math.max(2, (b.value / max) * (plot - 6)) : 0;
       return {
         x: AXIS_WIDTH + i * (barWidth + gap),
         y: plot - h,
         w: barWidth,
         h,
-        fill: depth ? waterBottomColor(b.value) : 'var(--od-text)',
+        fill: depth ? waterBottomColor(b.value) : tinted ? tint(b.value, highest) : 'var(--od-text)',
         label: b.label ?? '',
       };
     });
@@ -81,15 +98,17 @@
   {#if width}
     <svg {width} {height} viewBox="0 0 {width} {height}" role="img" aria-label={label}>
       <!-- The y axis: a thin line and the value at each round step. -->
-      {#each axis.ticks as tick (tick)}
-        {@const y = plot - (tick * scale / axis.max) * (plot - 6)}
-        <line x1={AXIS_WIDTH} x2={width} y1={y} y2={y} class="grid" />
-        <text x={AXIS_WIDTH - 4} {y} class="tick">{tickText(tick)}</text>
-      {/each}
+      {#if withAxis}
+        {#each axis.ticks as tick (tick)}
+          {@const y = plot - (tick * scale / axis.max) * (plot - 6)}
+          <line x1={AXIS_WIDTH} x2={width} y1={y} y2={y} class="grid" />
+          <text x={AXIS_WIDTH - 4} {y} class="tick">{tickText(tick)}</text>
+        {/each}
+      {/if}
       {#each rects as r, i (i)}
         <rect x={r.x} y={r.y} width={r.w} height={r.h} {rx} style:fill={r.fill} />
         {#if showLabels}
-          <text x={r.x + r.w / 2} y={height - 3} class="label">{r.label}</text>
+          <text x={r.x + r.w / 2} y={height - 3} class="label" style:font-size="{labelSize}px">{r.label}</text>
         {/if}
       {/each}
     </svg>

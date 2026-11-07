@@ -441,7 +441,7 @@ Done in "Visual audit: Sites screens, shared chevron and section titles" and "Vi
 - Dives without a site: "et 3 autres plongées" never shows, because the app does not cut the list. The date is 16/24 weight 500 as written here (the mock-up draws 600).
 - Gas blender: the bottle shows the core's cylinder name and size ("AL80, 80,0 pi³"); "12 L" was the mock-up's sample.
 
-## [ ] 2026-11-07-24 Corrections to the visual audit (task 23): Sites maps, Sites panel on surfaces, Statistics charts
+## [x] 2026-11-07-24 Corrections to the visual audit (task 23): Sites maps, Sites panel on surfaces, Statistics charts
 
 Christian changed some points of task 23. Where this task and task 23 disagree, this task wins.
 
@@ -458,8 +458,12 @@ Mock-up: `docs/mockups/android-sites.dc.html`.
 
 **Filtered result screen ("Mode : circuit ouvert", `/statistics/result/`):** replace the app's chart with the mock-up's (`docs/mockups/stats-filtre-android.dc.html`): title "Profondeur maximale par plongée", one bar per dive in date order, 120 dp high in the card, bars with 3 dp corners and about 6 dp gaps, each bar coloured with the water gradient by its depth (same scale as the water column: `--od-water-top` to `--od-water-bottom` at 60 m and deeper), the year under each bar in 12 sp `#4A4D52`, no axis lines, an accessible label "Profondeur maximale des N plongées en circuit ouvert".
 
+Done in "Visual audit: Sites screens, shared chevron and section titles" (Sites) and "Statistics: filtered result chart and coloured ready-made charts" (Statistics). Notes:
+- "Centrer sur ma position" is 32 dp above the bottom of the map, not 16, so as not to cover the credits line (see task 23).
+- Result chart: the years under the bars show only up to 8 bars, as before; with more dives the bars become a silhouette. The accessible label ends with the screen's title ("…, Mode : circuit ouvert"), since the criteria vary.
+- The Statistics main screen keeps its section titles 14 medium; a shared rule of task 23 that made them 18 bold was taken back.
 
-## [ ] 2026-11-07-25 Statistics main screen: coloured ready-made charts
+## [x] 2026-11-07-25 Statistics main screen: coloured ready-made charts
 
 Christian wants the two ready-made charts of `/statistics/` ("Plongées par année", "Durée des plongées") in colour. This changes only their colours. Task 24 still applies for everything else (keep the charts as they are in the app now).
 
@@ -468,3 +472,5 @@ Christian wants the two ready-made charts of `/statistics/` ("Plongées par ann�
 - Labels, sizes, corners and gaps do not change.
 
 Mock-ups: `docs/mockups/android-stats.dc.html`, `docs/mockups/ios-stats-tableau.dc.html`. Spec: section 4, "Statistics", main screen.
+
+Done in "Statistics: filtered result chart and coloured ready-made charts". The colour is a CSS mix of the two water tokens, so dark mode follows by itself.

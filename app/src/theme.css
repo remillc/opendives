@@ -379,19 +379,16 @@ html.ios {
   }
 
   /*
-   * Android section titles on the page background (Settings, Tools, About,
-   * gas results): 18/24, bold, ink, 20 dp from the sides.
+   * Android section titles on the page background, as in Settings, Tools and
+   * the gas results: 18/24, bold, ink, 20 dp from the sides (About).
    */
-  .md {
-    --f7-block-title-font-size: 18px;
-    --f7-block-title-line-height: 24px;
-    --f7-block-title-font-weight: 700;
-    --f7-block-title-text-color: var(--od-text);
-
-    .block-title {
-      margin-left: calc(20px + var(--f7-safe-area-left));
-      margin-right: calc(20px + var(--f7-safe-area-right));
-    }
+  .md .od-section-title {
+    margin: 0;
+    padding: 22px calc(20px + var(--f7-safe-area-right)) 8px calc(20px + var(--f7-safe-area-left));
+    font-size: 18px;
+    line-height: 24px;
+    font-weight: 700;
+    color: var(--od-text);
   }
 
   /* Intro paragraph at the top of a screen (Account, Dives without a site, Clean up the sites). */

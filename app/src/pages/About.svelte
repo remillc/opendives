@@ -118,7 +118,7 @@
   </header>
 
   {#each groups as group (group.title)}
-    <h2 class="block-title">{group.title}</h2>
+    <h2 class="block-title od-section-title">{group.title}</h2>
     <nav class="list list-strong inset list-dividers" aria-label={group.title}>
       <ul>
         {#each group.rows as row (row.key)}
@@ -200,6 +200,12 @@
       font-size: 15px;
       line-height: 21px;
       color: var(--od-text-2);
+    }
+
+    /* The section titles hold the space between the groups. */
+    .list {
+      margin-top: 0;
+      margin-bottom: 0;
     }
 
     /* Rows: headline 16/24, supporting text 14/20 (task 2026-11-07-23). */
