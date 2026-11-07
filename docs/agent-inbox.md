@@ -383,3 +383,7 @@ Done in "About: Question / report a problem".
 The logo now has two forms. At 64 px and below (launcher icons on Android, iOS and web, splash and notification marks, the logo beside the name in headers) the top of the circle is completed by a grey arc: regenerate those from the updated `docs/brand/opendives-icon-*.svg`. Above 64 px, when the logo stands alone (About screen, first launch), use the new `docs/brand/opendives-logo-{light,dark}.svg`, without the grey arc. See `docs/ui-specification.md` ("Logo", size rule) and `docs/mockups/logo-anneau-adaptatif.dc.html`.
 
 Done in "Logo: grey arc on small sizes, large logo without it". First launch shows no logo today, so only About uses the large one.
+
+## [ ] 2026-11-07-22 Splash screen: no grey arc
+
+My mistake in task 21: the splash screen shows the logo large, so it must not have the grey arc. Remove the grey arc from `ic_splash_mark.xml` (light and night) and from any iOS or web launch screen. Only the launcher icons, the favicon, notification marks and the small logo beside the name keep it. See `docs/ui-specification.md` ("Logo", size rule).
