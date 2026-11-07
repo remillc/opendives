@@ -2,6 +2,7 @@
 // Main sections and the side menu of the phone layout (spec, section 3).
 import { f7 } from 'framework7-svelte';
 import { layout } from './layout.svelte.js';
+import { horizontalSwipe, swipeGoesThrough } from './swipe.js';
 
 /** @typedef {'logbook'|'sites'|'statistics'|'tools'|'account'} Section */
 
@@ -73,16 +74,22 @@ export function restoreFocus() {
 
 /**
  * Phone: a swipe left or right on the first screen of a main section shows
- * the next or previous section, in the order of the menu. Not on what has
- * its own gestures (map, profile, charts, fields, anything that scrolls
- * sideways), nor while a menu, a dialog, a search or the logbook's selection
- * is open.
+ * the next or previous section, in the order of the menu. The section follows
+ * the finger, the next one coming in beside it; lifted past a quarter of the
+ * width (or flicked), the next one takes the screen, otherwise both go back.
+ * Not on what has its own gestures (map, profile, fields, anything that
+ * scrolls sideways), nor while a menu, a dialog, a search or the logbook's
+ * selection is open.
  */
 export function enableSectionSwipes() {
-  let x = 0;
-  let y = 0;
-  let at = 0;
-  let tracking = false;
+  /** @type {HTMLElement|null} */
+  let from = null;
+  /** @type {HTMLElement|null} */
+  let neighbour = null;
+  /** @type {HTMLElement|null} */
+  let views = null;
+  let width = 0;
+  let settling = false;
 
   /** @param {HTMLElement} el */
   function hasOwnGesture(el) {
@@ -105,57 +112,68 @@ export function enableSectionSwipes() {
     );
   }
 
-  document.addEventListener(
-    'touchstart',
-    (e) => {
-      tracking = e.touches.length === 1 && atSectionRoot() && !hasOwnGesture(/** @type {HTMLElement} */ (e.target));
-      x = e.touches[0].clientX;
-      y = e.touches[0].clientY;
-      at = e.timeStamp;
-    },
-    { passive: true },
-  );
-  document.addEventListener(
-    'touchend',
-    (e) => {
-      if (!tracking) return;
-      tracking = false;
-      const dx = e.changedTouches[0].clientX - x;
-      const dy = e.changedTouches[0].clientY - y;
-      if (Math.abs(dx) < 80 || Math.abs(dy) > Math.abs(dx) / 2 || e.timeStamp - at > 700) return;
-      const step = dx < 0 ? 1 : -1;
-      const next = sections[sections.indexOf(navigation.section) + step];
-      if (!next) return;
-      slideToSection(next, step > 0 ? 'next' : 'previous');
-    },
-    { passive: true },
-  );
-}
+  /** @param {number} dx */
+  const sectionToward = (dx) => sections[sections.indexOf(navigation.section) + (dx < 0 ? 1 : -1)];
 
-/** Length of the slide between two sections, in ms (theme.css, od-tab-*). */
-const SLIDE_MS = 280;
-
-/**
- * Shows a section by sliding: the section left goes out on one side while
- * the new one comes in from the other, following it (theme.css, od-tab-*).
- * @param {Section} next
- * @param {'next'|'previous'} direction
- */
-function slideToSection(next, direction) {
-  const from = document.querySelector('.views > .view.tab-active');
-  const to = document.getElementById(`view-${next}`);
-  const views = from?.parentElement;
-  if (!from || !to || !views || matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    showSection(next);
-    return;
+  /** @param {HTMLElement|null} el */
+  function release(el) {
+    if (!el) return;
+    el.classList.remove('od-tab-peek');
+    el.style.transform = '';
+    el.style.transition = '';
   }
-  views.classList.add('od-tab-sliding');
-  from.classList.add('od-tab-leaving', `od-tab-out-${direction}`);
-  to.classList.add(`od-tab-in-${direction}`);
-  showSection(next);
-  setTimeout(() => {
-    views.classList.remove('od-tab-sliding');
-    from.classList.remove('od-tab-leaving', `od-tab-out-${direction}`);
-    to.classList.remove(`od-tab-in-${direction}`);
-  }, SLIDE_MS);
+
+  horizontalSwipe(document, {
+    accept: (e) => !settling && atSectionRoot() && !hasOwnGesture(/** @type {HTMLElement} */ (e.target)),
+    move(dx) {
+      if (!from) {
+        from = /** @type {HTMLElement|null} */ (document.querySelector('.views > .view.tab-active'));
+        views = from?.parentElement ?? null;
+        if (!from || !views) return;
+        width = views.clientWidth;
+        views.classList.add('od-tab-sliding');
+      }
+      const next = sectionToward(dx);
+      const el = next ? document.getElementById(`view-${next}`) : null;
+      if (neighbour !== el) {
+        release(neighbour);
+        neighbour = el;
+      }
+      // At the end of the menu, the section only gives a little.
+      const shown = el ? dx : dx / 3;
+      from.style.transform = `translateX(${shown}px)`;
+      if (el) {
+        el.classList.add('od-tab-peek');
+        el.style.transform = `translateX(${shown + (dx < 0 ? width : -width)}px)`;
+      }
+    },
+    end(dx, velocity) {
+      if (!from || !views) return;
+      const next = sectionToward(dx);
+      const through = !!next && !!neighbour && swipeGoesThrough(dx, velocity, width);
+      const left = from;
+      const coming = neighbour;
+      const container = views;
+      settling = true;
+      const transition = `transform ${SETTLE_MS}ms ease-out`;
+      left.style.transition = transition;
+      if (coming) coming.style.transition = transition;
+      left.style.transform = through ? `translateX(${dx < 0 ? -width : width}px)` : '';
+      if (coming) coming.style.transform = through ? 'translateX(0)' : `translateX(${dx < 0 ? width : -width}px)`;
+      setTimeout(() => {
+        if (through && next) showSection(next);
+        left.style.transform = '';
+        left.style.transition = '';
+        release(coming);
+        container.classList.remove('od-tab-sliding');
+        settling = false;
+      }, SETTLE_MS);
+      from = null;
+      neighbour = null;
+      views = null;
+    },
+  });
 }
+
+/** Time for the sections to settle once the finger is lifted, in ms. */
+const SETTLE_MS = 220;

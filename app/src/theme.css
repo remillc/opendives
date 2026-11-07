@@ -595,57 +595,17 @@ html.ios {
 }
 
 /*
- * A swipe between main sections (lib/navigation.svelte.js): the section left
- * stays shown while it slides out, the new one follows it in.
+ * A swipe between main sections (lib/navigation.svelte.js): while the finger
+ * moves, the next section is shown beside the current one.
  */
 @layer od.components {
   .views.od-tab-sliding {
     overflow: hidden;
   }
 
-  .views > .view.od-tab-leaving {
+  .views > .view.od-tab-peek {
     display: block;
     position: absolute;
     inset: 0;
-  }
-
-  .view.od-tab-out-next {
-    animation: od-tab-out-next 280ms ease-in-out both;
-  }
-
-  .view.od-tab-in-next {
-    animation: od-tab-in-next 280ms ease-in-out both;
-  }
-
-  .view.od-tab-out-previous {
-    animation: od-tab-out-previous 280ms ease-in-out both;
-  }
-
-  .view.od-tab-in-previous {
-    animation: od-tab-in-previous 280ms ease-in-out both;
-  }
-}
-
-@keyframes od-tab-out-next {
-  to {
-    transform: translateX(-100%);
-  }
-}
-
-@keyframes od-tab-in-next {
-  from {
-    transform: translateX(100%);
-  }
-}
-
-@keyframes od-tab-out-previous {
-  to {
-    transform: translateX(100%);
-  }
-}
-
-@keyframes od-tab-in-previous {
-  from {
-    transform: translateX(-100%);
   }
 }

@@ -14,6 +14,7 @@
   import Icon from '../components/Icon.svelte';
   import MenuItem from '../components/MenuItem.svelte';
   import { filter } from '../lib/filter.svelte.js';
+  import { horizontalSwipe, swipeGoesThrough } from '../lib/swipe.js';
   import Stars from '../components/Stars.svelte';
   import { logbook, deleteDive } from '../lib/logbook.svelte.js';
   import { confirmAction } from '../lib/dialogs.js';
@@ -64,30 +65,46 @@
     f7router.navigate(`${base}${id}/`, { reloadCurrent: true, props: { slide: step > 0 ? 'next' : 'previous' } });
   }
 
-  /** @param {any} page Framework7's page */
+  /**
+   * The page follows the finger; lifted past a quarter of the width (or
+   * flicked), it goes out on that side and the next dive comes in from the
+   * other; otherwise it comes back. At the first or last dive it only gives
+   * a little.
+   * @param {any} page Framework7's page
+   */
   function watchSwipes(page) {
     const content = /** @type {HTMLElement|null} */ (page.el.querySelector('.page-content'));
     if (!content) return;
-    let x = 0;
-    let y = 0;
-    let at = 0;
-    let tracking = false;
-    content.addEventListener('touchstart', (/** @type {TouchEvent} */ e) => {
-      const target = /** @type {HTMLElement} */ (e.target);
-      tracking = e.touches.length === 1 && !target.closest('.profile');
-      x = e.touches[0].clientX;
-      y = e.touches[0].clientY;
-      at = e.timeStamp;
-    }, { passive: true });
-    content.addEventListener('touchend', (/** @type {TouchEvent} */ e) => {
-      if (!tracking) return;
-      tracking = false;
-      const dx = e.changedTouches[0].clientX - x;
-      const dy = e.changedTouches[0].clientY - y;
-      if (Math.abs(dx) < 80 || Math.abs(dy) > Math.abs(dx) / 2 || e.timeStamp - at > 700) return;
-      goTo(dx < 0 ? 1 : -1);
-    }, { passive: true });
+    /** @param {number} dx */
+    const hasNeighbour = (dx) => {
+      const ids = listOrder();
+      const at = ids.indexOf(Number(diveId));
+      return at >= 0 && ids[at + (dx < 0 ? 1 : -1)] !== undefined;
+    };
+    horizontalSwipe(content, {
+      accept: (e) => !(/** @type {HTMLElement} */ (e.target).closest('.profile')) && !document.querySelector('.modal-in'),
+      move(dx) {
+        const shown = hasNeighbour(dx) ? dx : dx / 3;
+        content.style.transition = '';
+        content.style.transform = `translateX(${shown}px)`;
+        content.style.opacity = String(1 - Math.min(Math.abs(shown) / content.clientWidth, 1) / 2);
+      },
+      end(dx, velocity) {
+        const width = content.clientWidth;
+        const through = hasNeighbour(dx) && swipeGoesThrough(dx, velocity, width);
+        content.style.transition = 'transform 160ms ease-out, opacity 160ms ease-out';
+        if (through) {
+          content.style.transform = `translateX(${dx < 0 ? -width : width}px)`;
+          content.style.opacity = '0';
+          setTimeout(() => goTo(dx < 0 ? 1 : -1), 160);
+        } else {
+          content.style.transform = '';
+          content.style.opacity = '';
+        }
+      },
+    });
   }
+
 
   const uid = $props.id();
   const menuId = `dive-menu-${uid}`;
