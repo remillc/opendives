@@ -301,3 +301,7 @@ The Tools page becomes a list of links in two groups (Plongée: planner, desatur
 ## [ ] 2026-11-07-08 Gas tools: ppO₂ wheel
 
 In "EAD et MOD" and "Meilleur mélange", the maximum ppO₂ is chosen with an inline wheel (1,0 to 1,6 bar by 0,1, default 1,4), not a segmented control. The wheel sits on a white surface with the label "ppO₂ maximale" on the left and "bar" on the right. Mock-ups: `docs/mockups/outils-ead-mod-android.dc.html`, `outils-meilleur-melange-android.dc.html`.
+
+## [ ] 2026-11-07-09 Water type in depth calculations
+
+Add a "Type d’eau" choice (Eau douce, Eau saumâtre, EN 13319, Eau de mer, default Eau de mer, Subsurface's salinity values) to "EAD et MOD", "Meilleur mélange" and the planner (row "Type d’eau" before the gradient factors, taken from the starting dive when it has a salinity). Use it for every depth to pressure conversion in these tools. See `docs/ui-specification.md` ("Tools page and gas tools", Water type). Mock-ups: `outils-ead-mod-android`, `outils-meilleur-melange-android`, `android-planificateur`.
