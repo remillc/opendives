@@ -2,7 +2,7 @@
   <!-- The "Hublot" logo in the round mask (docs/brand/opendives-icon-*-round.svg),
        light or dark following the system. -->
   <style>
-    .bg { fill: #F4F4F2 } .ink { fill: #1F2124 } .ring { fill: none; stroke: #1F2124; stroke-width: 6 }
+    .bg { fill: #F4F4F2 } .ink { fill: #1F2124 } .ring { fill: none; stroke: #1F2124; stroke-width: 3 }
     .top { stop-color: #FBE3B2 } .bottom { stop-color: #B4530F }
     @media (prefers-color-scheme: dark) {
       .bg { fill: #121314 } .ink { fill: #F4F4F2 } .ring { stroke: #F4F4F2 }
@@ -12,13 +12,13 @@
   <defs>
     <linearGradient id="h" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="top"/><stop offset="1" class="bottom"/></linearGradient>
     <clipPath id="hm"><circle cx="54" cy="54" r="54"/></clipPath>
-    <clipPath id="hc"><circle cx="54" cy="54" r="28"/></clipPath>
+    <clipPath id="hc"><circle cx="54" cy="54" r="29"/></clipPath>
   </defs>
   <g clip-path="url(#hm)">
     <rect width="108" height="108" class="bg"/>
-    <g clip-path="url(#hc)"><path d="M20 50 Q32 44 44 50 T68 50 T92 50 V100 H20 Z" fill="url(#h)"/></g>
+    <g clip-path="url(#hc)"><path d="M20 61 Q32 55 44 61 T68 61 T92 61 V100 H20 Z" fill="url(#h)"/></g>
     <circle cx="54" cy="54" r="30" class="ring"/>
-    <circle cx="62" cy="40" r="2.6" class="ink"/>
-    <circle cx="57" cy="33" r="1.8" class="ink"/>
+    <circle cx="62" cy="44" r="2.6" class="ink"/>
+    <circle cx="57" cy="37" r="1.8" class="ink"/>
   </g>
 </svg>
