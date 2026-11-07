@@ -488,3 +488,13 @@ The visual audit (task 23) compared the app with mock-ups drawn in Roboto. Sourc
 
 Spec: section 1, "Fonts". Mock-ups: every file in `docs/mockups/` (each has the `@font-face` rules in its `<helmet>`).
 
+## [ ] 2026-11-07-27 Dive detail: weights as a total plus one line per location
+
+In "Gaz et équipement" on the dive detail, when the dive has several weight entries:
+- first line: "Lest" 16/24 ink on the left, the total on the right, 16/24 weight 600, tabular figures (sum of all entries, in the weight unit of the settings);
+- then one line per entry, in the order stored by the core: location on the left ("Intégré au gilet", "Ceinture"…, or the type stored in the logbook), weight on the right, both 14/20 `#4A4D52` (dark: `#B5B8BC`), tabular figures, 4 dp between lines, no dividers between them;
+- block padding 16 dp top, 14 dp bottom, 16 dp sides, divider above as for the other rows.
+With a single entry, keep the current row (location as supporting text, weight on the right). An entry without a location shows "Lest" as its label.
+
+Mock-ups: `docs/mockups/detail3-android.dc.html`, `detail3-android-sombre.dc.html` (iOS: `detail3-ios.dc.html`). Spec: section 4, "Full dive detail".
+
