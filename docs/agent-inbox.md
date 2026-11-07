@@ -309,3 +309,7 @@ Add a "Type d’eau" choice (Eau douce, Eau saumâtre, EN 13319, Eau de mer, def
 ## [ ] 2026-11-07-10 Best mix: "Nitrox" label
 
 In "Meilleur mélange", the second result row is labelled "Nitrox" (not "Nitrox seul"). Mock-up: `docs/mockups/outils-meilleur-melange-android.dc.html`.
+
+## [ ] 2026-11-07-11 Best mix: nitrox first
+
+In "Meilleur mélange", the "Nitrox" row comes first, then "Trimix". Mock-up: `docs/mockups/outils-meilleur-melange-android.dc.html`.
