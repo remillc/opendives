@@ -37,24 +37,30 @@ export function enableBackButton() {
       else if (modal.classList.contains('popover')) f7.popover.close();
       return;
     }
-    // 4. An active search closes.
+    // 4. The logbook's selection mode is left.
+    const selection = document.querySelector('.selection-bar');
+    if (selection) {
+      selection.dispatchEvent(new CustomEvent('od-cancel'));
+      return;
+    }
+    // 5. An active search closes.
     const search = document.querySelector('.searchbar-enabled');
     if (search) {
       f7.searchbar.disable(/** @type {HTMLElement} */ (search));
       return;
     }
-    // 5. Back to the previous screen of the section.
+    // 6. Back to the previous screen of the section.
     const view = f7.views.current;
     if (view && view.router.history.length > 1) {
       view.router.back();
       return;
     }
-    // 6. From another section, back to the Logbook.
+    // 7. From another section, back to the Logbook.
     if (view && view.el?.id !== 'view-logbook') {
       f7.tab.show('#view-logbook');
       return;
     }
-    // 7. From the Logbook: the app goes to the background, as on Android.
+    // 8. From the Logbook: the app goes to the background, as on Android.
     CapacitorApp.minimizeApp();
   });
 }

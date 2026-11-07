@@ -97,6 +97,124 @@
     });
   });
 
+  // --- Selection mode: a long press on a dive shows a check box before every
+  // dive, the pressed one checked. A tap then checks or unchecks a dive; the
+  // ✕ of the top bar, Android's Back or unchecking the last dive leaves it.
+
+  let selecting = $state(false);
+  /** Checked dives, by identifier of the current load. */
+  let checked = $state(/** @type {Record<number, boolean>} */ ({}));
+  const checkedCount = $derived(Object.values(checked).filter(Boolean).length);
+  const LONG_PRESS_MS = 500;
+
+  /** @param {number} id */
+  function startSelection(id) {
+    checked = { [id]: true };
+    selecting = true;
+    if (fabEl) f7.fab.close(fabEl);
+  }
+
+  function endSelection() {
+    selecting = false;
+    checked = {};
+  }
+
+  /** @param {number} id */
+  function toggleChecked(id) {
+    checked[id] = !checked[id];
+    if (!Object.values(checked).some(Boolean)) endSelection();
+  }
+
+  // A new load gives new identifiers: the selection is left.
+  $effect(() => {
+    logbook.dives;
+    untrack(endSelection);
+  });
+
+  // The long press and the taps of the selection mode, on the list itself
+  // (its rows come and go with the scrolling).
+  $effect(() => {
+    const el = listEl;
+    if (!el) return;
+    /** @type {ReturnType<typeof setTimeout>|undefined} */
+    let timer;
+    let startX = 0;
+    let startY = 0;
+    /** The press became a long press: the click that follows is dropped. */
+    let pressed = false;
+    const cancel = () => clearTimeout(timer);
+
+    /** @param {Event} e */
+    const diveOf = (e) => /** @type {HTMLElement|null} */ (/** @type {HTMLElement} */ (e.target).closest('a.dive-row'));
+
+    /** @param {PointerEvent} e */
+    function down(e) {
+      pressed = false;
+      const row = diveOf(e);
+      if (!row || selecting) return;
+      startX = e.clientX;
+      startY = e.clientY;
+      timer = setTimeout(() => {
+        pressed = true;
+        startSelection(Number(row.dataset.dive));
+      }, LONG_PRESS_MS);
+    }
+    /** @param {PointerEvent} e */
+    function move(e) {
+      if (Math.hypot(e.clientX - startX, e.clientY - startY) > 10) cancel();
+    }
+    /**
+     * On the window, in the capture phase: Framework7 follows the links from
+     * the document's own capture phase, which would open the dive.
+     * @param {MouseEvent} e
+     */
+    function click(e) {
+      if (!el.contains(/** @type {Node} */ (e.target))) return;
+      if (pressed) {
+        pressed = false;
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+      if (!selecting) return;
+      const row = diveOf(e);
+      // In selection mode a dive is checked, not opened; a trip only expands.
+      if (row) toggleChecked(Number(row.dataset.dive));
+      if (row || !/** @type {HTMLElement} */ (e.target).closest('.expand')) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    }
+    /** @param {Event} e The WebView's own long-press menu is not wanted. */
+    const menu = (e) => diveOf(e) && e.preventDefault();
+
+    el.addEventListener('pointerdown', down);
+    el.addEventListener('pointermove', move);
+    el.addEventListener('pointerup', cancel);
+    el.addEventListener('pointercancel', cancel);
+    window.addEventListener('click', click, true);
+    el.addEventListener('contextmenu', menu);
+    return () => {
+      cancel();
+      el.removeEventListener('pointerdown', down);
+      el.removeEventListener('pointermove', move);
+      el.removeEventListener('pointerup', cancel);
+      el.removeEventListener('pointercancel', cancel);
+      window.removeEventListener('click', click, true);
+      el.removeEventListener('contextmenu', menu);
+    };
+  });
+
+  // Android's Back leaves the selection (lib/back-button.js).
+  /** @type {HTMLElement|undefined} */
+  let selectionBar = $state();
+  $effect(() => {
+    const el = selectionBar;
+    if (!el) return;
+    el.addEventListener('od-cancel', endSelection);
+    return () => el.removeEventListener('od-cancel', endSelection);
+  });
+
   // Each load gives new dive identifiers and maybe new values: the criteria
   // are read again and the filter applied again.
   $effect(() => {
@@ -526,6 +644,8 @@
               index={row.index}
               top={visible.topPosition}
               pending={row.dive.number ? (logbook.pendingByDive[row.dive.number] ?? []) : []}
+              {selecting}
+              checked={!!checked[row.dive.id]}
             />
           {/if}
         {/each}
@@ -541,7 +661,16 @@
   {#if importing}<p class="od-sr-only" role="status">{t('logbook.importing')}</p>{/if}
 
   {#snippet fixedContent()}
-    {#if !theme.ios && layout.phone && logbook.dives.length}
+    {#if selecting}
+      <!-- Selection mode: the top bar gives way to the number of dives checked. -->
+      <div class="selection-bar" bind:this={selectionBar}>
+        <button type="button" class="od-icon-button" onclick={endSelection}>
+          <Icon name="close" /><span class="od-sr-only">{t('logbook.selectionClose')}</span>
+        </button>
+        <span class="selection-count od-value" role="status">{t('logbook.selected', { n: checkedCount })}</span>
+      </div>
+    {/if}
+    {#if !theme.ios && layout.phone && logbook.dives.length && !selecting}
       <!--
         Written by hand: the Fab component of framework7-svelte 9 calls onclick
         twice and leaves the link without a name for screen readers.
@@ -611,6 +740,28 @@
     /* The snapshot of the start: a tap is held until the real list is there. */
     .preview {
       user-select: none;
+    }
+
+    /* Selection mode: over the top bar, the same height. */
+    .selection-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 600;
+      height: calc(var(--f7-navbar-height) + var(--f7-safe-area-top));
+      padding: var(--f7-safe-area-top) 8px 0 4px;
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--od-surface-2);
+    }
+
+    .selection-count {
+      font-size: 22px;
+      line-height: 28px;
+      color: var(--od-text);
     }
 
     /* The dives follow the count and the sync status closely. */

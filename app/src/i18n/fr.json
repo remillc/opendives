@@ -34,6 +34,11 @@
       "one": "{n} plongée",
       "other": "{n} plongées"
     },
+    "selected": {
+      "one": "{n} sélectionnée",
+      "other": "{n} sélectionnées"
+    },
+    "selectionClose": "Quitter la sélection",
     "countFiltered": {
       "one": "{n} plongée sur {total}",
       "other": "{n} plongées sur {total}"

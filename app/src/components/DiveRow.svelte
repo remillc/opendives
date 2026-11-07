@@ -18,10 +18,14 @@
    *   index?: number,
    *   top?: number,
    *   pending?: string[],
+   *   selecting?: boolean,
+   *   checked?: boolean,
    * }}
    * `pending`: fields edited and not sent yet; the date gives way to them.
+   * `selecting`: the logbook's selection mode, a check box before the row;
+   * the logbook handles the taps (data-dive gives the dive).
    */
-  let { dive, prefs, inTrip = false, index = undefined, top = undefined, pending = [] } = $props();
+  let { dive, prefs, inTrip = false, index = undefined, top = undefined, pending = [], selecting = false, checked = false } = $props();
 
   // "Notes edited, waiting to be sent" (spec, section 4, <DiveRow>).
   const pendingText = $derived(
@@ -50,7 +54,19 @@
 
 <li class:in-trip={inTrip} class:selected={layout.split && navigation.dive === String(dive.id)} data-virtual-list-index={index} style:top={top === undefined ? undefined : `${top}px`}>
   <!-- data-reload-detail: beside the list (tablet), the dive replaces the one shown. -->
-  <a href="/dive/{dive.id}/" data-reload-detail="true" class="item-link item-content dive-row" aria-label={label}>
+  <a
+    href="/dive/{dive.id}/"
+    data-reload-detail="true"
+    data-dive={dive.id}
+    class="item-link item-content dive-row"
+    class:no-chevron={selecting}
+    role={selecting ? 'checkbox' : undefined}
+    aria-checked={selecting ? checked : undefined}
+    aria-label={label}
+  >
+    {#if selecting}
+      <span class="checkbox" aria-hidden="true"><input type="checkbox" {checked} tabindex="-1" /><i class="icon-checkbox"></i></span>
+    {/if}
     <div class="item-media">
       <ProfileThumbnail profile={dive.profile} maxDepthMm={dive.maxDepthMm} {prefs} />
     </div>
@@ -84,6 +100,13 @@
     .selected {
       background: var(--od-tint);
       color: var(--od-on-tint);
+    }
+
+    /* Selection mode: the check box before the thumbnail. */
+    .checkbox {
+      flex: none;
+      margin-right: 16px;
+      pointer-events: none;
     }
 
     .separator {

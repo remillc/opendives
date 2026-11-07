@@ -34,6 +34,11 @@
       "one": "{n} dive",
       "other": "{n} dives"
     },
+    "selected": {
+      "one": "{n} selected",
+      "other": "{n} selected"
+    },
+    "selectionClose": "Leave the selection",
     "countFiltered": {
       "one": "{n} dive of {total}",
       "other": "{n} dives of {total}"
