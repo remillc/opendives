@@ -372,6 +372,8 @@ The support address now works. Set `SUPPORT_EMAIL` to `support@opendives.app` an
 
 Done in "About: show Report a problem with support@opendives.app" (`app/.env`, `VITE_SUPPORT_EMAIL`).
 
-## [ ] 2026-11-07-20 About: "Question / signaler un problème"
+## [x] 2026-11-07-20 About: "Question / signaler un problème"
 
 Rename the About row "Signaler un problème" to "Question / signaler un problème", and the email subject to "OpenDives X.Y.Z : question ou problème". Mock-up: `docs/mockups/apropos-android.dc.html`.
+
+Done in "About: Question / report a problem".

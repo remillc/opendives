@@ -1159,7 +1159,7 @@
       "Statistics, planner and gas tools."
     ],
     "source": "Source code",
-    "issues": "Report a problem",
+    "issues": "Question / report a problem",
     "licences": "Licences",
     "licence": "Licence",
     "licenceText": "GNU GPL version 2",
@@ -1178,7 +1178,7 @@
     "privacyText": "Your dives stay on the device and in your account",
     "opensMail": "opens in the mail app",
     "report": {
-      "subject": "OpenDives {version}: problem",
+      "subject": "OpenDives {version}: question or problem",
       "technical": "Technical information (please leave it in the message)",
       "version": "App version",
       "platform": "System",

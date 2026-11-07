@@ -1159,7 +1159,7 @@
       "Statistiques, planificateur et outils de gaz."
     ],
     "source": "Code source",
-    "issues": "Signaler un problème",
+    "issues": "Question / signaler un problème",
     "licences": "Licences",
     "licence": "Licence",
     "licenceText": "GNU GPL version 2",
@@ -1178,7 +1178,7 @@
     "privacyText": "Vos plongées restent sur l'appareil et dans votre compte",
     "opensMail": "s'ouvre dans l'application de courriel",
     "report": {
-      "subject": "OpenDives {version} : problème",
+      "subject": "OpenDives {version} : question ou problème",
       "technical": "Informations techniques (à laisser dans le message)",
       "version": "Version de l'app",
       "platform": "Système",

@@ -17,7 +17,7 @@
   const AUTHOR = 'Christian Rémillard';
 
   /**
-   * The support address of "Signaler un problème", a build-time setting
+   * The support address of "Question / signaler un problème", a build-time setting
    * (VITE_SUPPORT_EMAIL in app/.env): the row is hidden while it is empty.
    */
   const SUPPORT_EMAIL = String(/** @type {any} */ (import.meta).env?.VITE_SUPPORT_EMAIL ?? '').trim();
@@ -41,7 +41,7 @@
     .catch(() => {});
 
   /**
-   * "Signaler un problème": the phone's mail app, with an empty line for the
+   * "Question / signaler un problème": the phone's mail app, with an empty line for the
    * description, then the technical block (spec, "Reporting a problem").
    * Nothing else: no credentials, no email address, no dive data, no place.
    */
