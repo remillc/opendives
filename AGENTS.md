@@ -117,7 +117,7 @@ Gradle does not rebuild the native code: rerun `native/build-android.sh` when th
 - Release notes (About → Nouveautés, `about.releaseNotes` in `app/src/i18n/fr.json` and `en.json`) describe the current version. Every change a user can see adds or updates a line there in the same commit; a new version starts a new list.
 - Addresses, in the app's routes and on the public site: a resource has no trailing slash (`/about`, `/dive/42`, `/site/7/edit`, `/privacy`); a collection has one (`/sites/`, `/tools/`, `/settings/`, `/statistics/`); the home page is `/`.
 - Branch names always start with a prefix that says what the branch is for: `feature/...`, `fix/...`, `release/1.0.0`, and so on.
-- One branch per problem or task, created before its first change. Branches are merged when Christian asks.
+- One branch per problem or task, created from `main` before its first change. `main` is the integration branch; branches are merged into it when Christian asks.
 - Every commit is pushed right away (`git push`, or `git push -u origin <branch>` for a new branch); so is every merge.
 - Commit messages in English, imperative mood, short summary line.
 - Author of every commit: Christian Rémillard. No `Co-Authored-By` or `Claude-Session` line in commit messages.
