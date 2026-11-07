@@ -171,10 +171,11 @@
       if (buddies.length) fields.buddies = [...buddies];
       if (notes.trim()) fields.notes = notes;
       const id = await addDive(fields);
-      // /dives/: from this screen, the master-detail route would reload the
-      // Logbook. Back to the Logbook below, never a new one ("/" reloaded).
-      if (id) f7router.navigate(`/dives/${id}`, { reloadCurrent: true });
-      else f7router.back();
+      // Back to the Logbook, then the new dive opens from the list: from this
+      // screen, the Logbook's /dives/<id> (beside the list on a tablet) would
+      // load a second Logbook.
+      f7router.back({ animate: !id });
+      if (id) f7router.navigate(`/dives/${id}`);
       const back = () => f7router.back();
       // A dive logged between others has no number (0): offer to renumber the
       // logbook from its date onward, as Subsurface's Renumber does.

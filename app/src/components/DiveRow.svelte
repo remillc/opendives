@@ -57,7 +57,7 @@
 <li data-trip={inTrip ? dive.trip?.id : undefined} class:in-trip={inTrip} class:appear class:selected={layout.split && navigation.dive === String(dive.id)} data-virtual-list-index={index} style:top={top === undefined ? undefined : `${top}px`}>
   <!-- data-reload-detail: beside the list (tablet), the dive replaces the one shown. -->
   <a
-    href="/dive/{dive.id}"
+    href="/dives/{dive.id}"
     data-reload-detail="true"
     data-dive={dive.id}
     draggable="false"

@@ -258,7 +258,7 @@
     <List noChevron>
       {#if menuDive}
         {@const d = menuDive}
-        <MenuItem icon="arrowRight" text={t('tripScreen.openDive')} onclick={() => f7router.navigate(`/dives/${d.id}`)} />
+        <MenuItem icon="arrowRight" text={t('tripScreen.openDive')} onclick={() => f7router.navigate(`/trips/${tripId}/dives/${d.id}`)} />
         <MenuItem icon="remove" text={t('tripScreen.removeDive')} onclick={() => change({ action: 'remove', diveId: d.id })} />
         {#if d.index > 0}
           <MenuItem icon="split" text={t('tripScreen.splitHere')} onclick={() => change({ action: 'split', diveId: d.id })} />

@@ -49,7 +49,7 @@
 
 <li class="trip-row" data-trip={dives[0].trip?.id} data-virtual-list-index={index} style:top={top === undefined ? undefined : `${top}px`}>
   <!-- The row opens the trip screen (spec, section 4, "Trip"); the arrow expands the trip in place. -->
-  <a href="/trip/{dives[0].trip?.id}/" draggable="false" class="item-link item-content no-chevron">
+  <a href="/trips/{dives[0].trip?.id}" draggable="false" class="item-link item-content no-chevron">
     <div class="item-media">
       <div class="grid" aria-hidden="true">
         {#each preview as d (d.id)}

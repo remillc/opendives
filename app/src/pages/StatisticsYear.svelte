@@ -111,7 +111,7 @@
       <ul>
         {#each trips as trip (trip.start)}
           <li>
-            <a href="/trip/{trip.id}" class="item-link item-content">
+            <a href="/trips/{trip.id}" class="item-link item-content">
               <div class="item-inner">
                 <div class="item-title-row"><div class="item-title">{tripName(trip)}</div></div>
                 <div class="item-text od-value">

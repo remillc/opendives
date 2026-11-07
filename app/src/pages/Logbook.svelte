@@ -111,7 +111,7 @@
     if (!dive) return;
     tick().then(() => {
       // At start, only the logbook holds links to dives and trips.
-      const href = dive.trip ? `/trip/${dive.trip.id}` : `/dive/${dive.id}`;
+      const href = dive.trip ? `/trips/${dive.trip.id}` : `/dives/${dive.id}`;
       const link = /** @type {HTMLElement|null} */ (document.querySelector(`a[href="${href}"]`));
       /** @type {HTMLElement|null} */ (tap.expand ? link?.querySelector('.expand') : link)?.click();
     });
@@ -796,7 +796,7 @@
    */
   const routes = /** @type {Record<string, string>} */ ({
     download: downloadRoute,
-    manual: '/dive/new',
+    manual: '/dives/new',
     divelogs: '/welcome/import',
   });
 
@@ -1014,7 +1014,7 @@
         </a>
         <button type="button" class="od-outlined-button" onclick={() => choose('import')}>{t('logbook.addImport')}</button>
         <a href="/welcome/import" class="od-outlined-button">{t('logbook.emptyDivelogs')}</a>
-        <a href="/dive/new" class="od-text-button">{t('logbook.addManual')}</a>
+        <a href="/dives/new" class="od-text-button">{t('logbook.addManual')}</a>
       </div>
     {/if}
     <p class="empty-note">{t('logbook.emptyNote')}</p>

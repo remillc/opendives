@@ -180,7 +180,7 @@
       logbook.sitesVersion++;
       f7router.back();
     } else {
-      f7router.navigate(`/site/${nearby.uuid}`, { reloadCurrent: true });
+      f7router.navigate(`/sites/${nearby.uuid}`, { reloadCurrent: true });
     }
   }
 

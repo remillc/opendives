@@ -60,8 +60,9 @@
     const at = ids.indexOf(Number(diveId));
     const id = at < 0 ? undefined : ids[at + step];
     if (id === undefined) return;
-    // The same kind of route as this one (/dive/ beside the list, /dives/ elsewhere).
-    const base = f7route.url.startsWith('/dives/') ? '/dives/' : '/dive/';
+    // The same kind of route as this one: /dives/<id> (beside the list in the
+    // Logbook) or /trips/<trip>/dives/<id>; only the dive changes.
+    const base = f7route.url.replace(/[^/?]+(\?.*)?$/, '');
     f7router.navigate(`${base}${id}`, { reloadCurrent: true, props: { slide: step > 0 ? 'next' : 'previous' } });
   }
 
@@ -122,7 +123,7 @@
     const next = order[at + 1] ?? order[at - 1];
     try {
       await deleteDive(id);
-      if (layout.split && next) f7router.navigate(`/dive/${next.id}`, { reloadDetail: true });
+      if (layout.split && next) f7router.navigate(`/dives/${next.id}`, { reloadDetail: true });
       else f7router.back();
       offerUndo(t('detail.deleted'), undefined, 10000);
     } catch (e) {
@@ -323,12 +324,12 @@
     {/snippet}
     {#snippet right()}
       {#if theme.ios}
-        <Link href="/dive/{diveId}/edit">{t('detail.edit')}</Link>
+        <Link href="/dives/{diveId}/edit">{t('detail.edit')}</Link>
         <Link iconOnly popoverOpen="#{menuId}">
           <Icon name="moreCircle" /><span class="od-sr-only">{t('detail.moreOptions')}</span>
         </Link>
       {:else}
-        <Link iconOnly href="/dive/{diveId}/edit">
+        <Link iconOnly href="/dives/{diveId}/edit">
           <Icon name="edit" weight={2.2} /><span class="od-sr-only">{t('detail.edit')}</span>
         </Link>
         <Link iconOnly popoverOpen="#{menuId}">

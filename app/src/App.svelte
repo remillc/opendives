@@ -62,6 +62,79 @@
   import AboutText from './pages/AboutText.svelte';
   import AboutLibraries from './pages/AboutLibraries.svelte';
 
+  // Addresses: a resource has no trailing slash, a collection has one (AGENTS.md).
+  const appRoutes = [
+    { path: '/dives/new', component: NewDive },
+    { path: '/filter', component: Filter },
+    { path: '/filter/:key', component: FilterCriterion },
+    { path: '/add/:what', component: AddUnavailable },
+    { path: '/download', component: Download },
+    { path: '/download/failed', component: DownloadFailed },
+    { path: '/settings/', component: Settings },
+    { path: '/about', component: About },
+    { path: '/about/notes', component: AboutText, options: { props: { which: 'notes' } } },
+    { path: '/about/licence', component: AboutText, options: { props: { which: 'licence' } } },
+    { path: '/about/privacy', component: AboutText, options: { props: { which: 'privacy' } } },
+    { path: '/about/libraries', component: AboutLibraries },
+    { path: '/settings/cylinders/', component: CylinderTypes },
+    { path: '/settings/cylinders/new', component: CylinderType },
+    { path: '/settings/cylinders/type', component: CylinderType },
+    { path: '/account', component: Account },
+    { path: '/account/delete', component: DeleteAccount },
+    // Signing in and creating an account, from the Account screen without an account.
+    { path: '/account/sign-in', component: SignIn },
+    { path: '/account/create', component: CreateAccount },
+    { path: '/account/code', component: ConfirmCode },
+    { path: '/account/import', component: BringLogbook },
+    { path: '/account/importing', component: ImportProgress },
+    // First launch, in the view of its popup (components/Welcome.svelte).
+    { path: '/welcome', component: WelcomeStart },
+    { path: '/welcome/sign-in', component: SignIn, options: { props: { welcome: true } } },
+    { path: '/welcome/create', component: CreateAccount, options: { props: { welcome: true } } },
+    { path: '/welcome/code', component: ConfirmCode, options: { props: { welcome: true } } },
+    { path: '/welcome/import', component: BringLogbook },
+    { path: '/welcome/importing', component: ImportProgress },
+    { path: '/dives/:id/edit', component: EditDive },
+    // A dive opened from another section (site, tools) or from a trip: the
+    // same screen, without the master-detail routing of the Logbook, which
+    // would put a second Logbook in the history.
+    { path: '/dives/:id', component: DiveDetail },
+    { path: '/trips/:id', component: Trip },
+    { path: '/trips/:trip/dives/:id', component: DiveDetail },
+    // The planner: /plan/new/ for a new dive, /plan/<dive id>/ from a logbook dive.
+    { path: '/plan/setup', component: PlannerSetup },
+    { path: '/plan/:id', component: Planner },
+    { path: '/sites/', component: Sites },
+    { path: '/sites/without/', component: DivesWithoutSite },
+    { path: '/sites/cleanup', component: SitesCleanup },
+    { path: '/sites/unplaced/', component: SitesUnplaced },
+    { path: '/sites/new', component: SiteEdit },
+    { path: '/sites/:uuid', component: SiteSheet },
+    { path: '/sites/:uuid/edit', component: SiteEdit },
+    { path: '/statistics/', component: Statistics },
+    { path: '/statistics/year/:year', component: StatisticsYear },
+    { path: '/statistics/result', component: StatisticsResult },
+    // Android: a full-screen dialog; iPhone: a sheet (the popup pushes the view back).
+    { path: '/statistics/new', popup: { component: StatisticNew } },
+    { path: '/tools/', component: Tools },
+    { path: '/tools/desaturation', component: Desaturation },
+    { path: '/tools/ead-mod', component: GasEadMod },
+    { path: '/tools/best-mix', component: GasBestMix },
+    { path: '/tools/blender', component: GasBlender },
+  ];
+
+  /**
+   * The Logbook view's routes: the Logbook is the master of a master-detail
+   * pair, so a dive (/dives/<id>) opens beside the list on a wide enough
+   * tablet, and full screen otherwise. Only this view has it, before the
+   * other routes; /dives/new comes first, or it would be taken for a dive.
+   */
+  const logbookRoutes = [
+    appRoutes[0],
+    { path: '/', component: Logbook, master: true, detailRoutes: [{ path: '/dives/:id', component: DiveDetail }] },
+    ...appRoutes,
+  ];
+
   const f7params = {
     name: 'OpenDives',
     theme: ios ? 'ios' : 'md',
@@ -85,67 +158,7 @@
       mdSwipeBackAnimateOpacity: false,
       mdSwipeBackAnimateShadow: false,
     },
-    routes: [
-      // The Logbook is the master of a master-detail pair on a wide enough tablet:
-      // a dive then opens beside the list, and full screen otherwise.
-      { path: '/', component: Logbook, master: true, detailRoutes: [{ path: '/dive/:id', component: DiveDetail }] },
-      { path: '/dive/new', component: NewDive },
-      { path: '/filter', component: Filter },
-      { path: '/filter/:key', component: FilterCriterion },
-      { path: '/add/:what', component: AddUnavailable },
-      { path: '/download', component: Download },
-      { path: '/download/failed', component: DownloadFailed },
-      { path: '/settings/', component: Settings },
-      { path: '/about', component: About },
-      { path: '/about/notes', component: AboutText, options: { props: { which: 'notes' } } },
-      { path: '/about/licence', component: AboutText, options: { props: { which: 'licence' } } },
-      { path: '/about/privacy', component: AboutText, options: { props: { which: 'privacy' } } },
-      { path: '/about/libraries', component: AboutLibraries },
-      { path: '/settings/cylinders/', component: CylinderTypes },
-      { path: '/settings/cylinders/new', component: CylinderType },
-      { path: '/settings/cylinders/type', component: CylinderType },
-      { path: '/account', component: Account },
-      { path: '/account/delete', component: DeleteAccount },
-      // Signing in and creating an account, from the Account screen without an account.
-      { path: '/account/sign-in', component: SignIn },
-      { path: '/account/create', component: CreateAccount },
-      { path: '/account/code', component: ConfirmCode },
-      { path: '/account/import', component: BringLogbook },
-      { path: '/account/importing', component: ImportProgress },
-      // First launch, in the view of its popup (components/Welcome.svelte).
-      { path: '/welcome', component: WelcomeStart },
-      { path: '/welcome/sign-in', component: SignIn, options: { props: { welcome: true } } },
-      { path: '/welcome/create', component: CreateAccount, options: { props: { welcome: true } } },
-      { path: '/welcome/code', component: ConfirmCode, options: { props: { welcome: true } } },
-      { path: '/welcome/import', component: BringLogbook },
-      { path: '/welcome/importing', component: ImportProgress },
-      { path: '/dive/:id/edit', component: EditDive },
-      // A dive opened from another screen than the Logbook (trip, site, tools):
-      // the same screen, without the master-detail routing, which would put a
-      // second Logbook in the history.
-      { path: '/dives/:id', component: DiveDetail },
-      { path: '/trip/:id', component: Trip },
-      // The planner: /plan/new/ for a new dive, /plan/<dive id>/ from a logbook dive.
-      { path: '/plan/setup', component: PlannerSetup },
-      { path: '/plan/:id', component: Planner },
-      { path: '/sites/', component: Sites },
-      { path: '/sites/without/', component: DivesWithoutSite },
-      { path: '/sites/cleanup', component: SitesCleanup },
-      { path: '/sites/unplaced/', component: SitesUnplaced },
-      { path: '/site/new', component: SiteEdit },
-      { path: '/site/:uuid', component: SiteSheet },
-      { path: '/site/:uuid/edit', component: SiteEdit },
-      { path: '/statistics/', component: Statistics },
-      { path: '/statistics/year/:year', component: StatisticsYear },
-      { path: '/statistics/result', component: StatisticsResult },
-      // Android: a full-screen dialog; iPhone: a sheet (the popup pushes the view back).
-      { path: '/statistics/new', popup: { component: StatisticNew } },
-      { path: '/tools/', component: Tools },
-      { path: '/tools/desaturation', component: Desaturation },
-      { path: '/tools/ead-mod', component: GasEadMod },
-      { path: '/tools/best-mix', component: GasBestMix },
-      { path: '/tools/blender', component: GasBlender },
-    ],
+    routes: appRoutes,
   };
 
   onMount(() => {
@@ -165,7 +178,7 @@
   {#if showRoute}<RouteBadge />{/if}
   <Welcome />
   <Views tabs class="safe-areas {layout.phone ? '' : 'od-tablet'}" style="--f7-page-master-width: {listWidth}px; --od-no-dive: '{t('tablet.noDive')}'">
-    <View id="view-logbook" main tab tabActive url="/" masterDetailBreakpoint={splitBreakpoint} />
+    <View id="view-logbook" main tab tabActive url="/" routes={logbookRoutes} masterDetailBreakpoint={splitBreakpoint} />
     <View id="view-sites" tab url="/sites/" />
     <View id="view-statistics" tab url="/statistics/" />
     <View id="view-tools" tab url="/tools/" />
