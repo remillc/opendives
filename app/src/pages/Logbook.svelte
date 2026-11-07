@@ -416,7 +416,7 @@
     <div class="preview" aria-busy="true" aria-label={t('logbook.loading')} role="status" onclickcapture={holdTap}>
       <div aria-hidden="true">
         <p class="count od-value">{t('logbook.count', { n: logbook.preview.total })}</p>
-        <div class="list media-list chevron-center dividers">
+        <div class="list media-list chevron-center dividers dives">
           <ul>
             {#each logbook.preview.entries as entry, i (i)}
               {#if entry.type === 'trip'}
@@ -439,7 +439,7 @@
     <div class="loading skeleton-effect-wave" aria-busy="true" aria-label={t('logbook.loading')} role="status">
       <div aria-hidden="true">
         <p class="count"><span class="skeleton-block bar" style:width="7.5em"></span></p>
-        <List mediaList dividers class="chevron-center">
+        <List mediaList dividers class="chevron-center dives">
           {#each Array(14) as _, i (i)}
             <li>
               <!-- item-link: the same chevron space as the real rows. -->
@@ -505,7 +505,7 @@
   {/if}
 
   {#if !logbook.loading && !logbook.error && rows.length}
-    <div class="list media-list chevron-center dividers virtual-list" bind:this={listEl}>
+    <div class="list media-list chevron-center dividers virtual-list dives" bind:this={listEl}>
       <ul>
         {#each visible.items as row (row.key)}
           {#if row.kind === 'trip'}
@@ -601,6 +601,11 @@
     /* The snapshot of the start: a tap is held until the real list is there. */
     .preview {
       user-select: none;
+    }
+
+    /* The dives follow the count and the sync status closely. */
+    :global(.list.dives) {
+      margin-top: 8px;
     }
 
     /* The filter button says when a filter is applied: a tinted circle. */
