@@ -68,31 +68,31 @@
   }
 
   /**
-   * @type {{ title: string, rows: { key: string, icon: import('svelte').ComponentProps<typeof Icon>['name'], text: string, sub: string, href: string, external?: boolean, mail?: boolean, onclick?: () => void }[] }[]}
+   * @type {{ title: string, rows: { key: string, text: string, sub: string, href: string, external?: boolean, mail?: boolean, onclick?: () => void }[] }[]}
    */
   const groups = [
     {
       title: t('about.project'),
       rows: [
-        { key: 'notes', icon: 'info', text: t('about.notes'), sub: t('about.notesText'), href: '/about/notes/' },
-        { key: 'source', icon: 'file', text: t('about.source'), sub: LINKS.source.replace('https://', ''), href: LINKS.source, external: true },
+        { key: 'notes', text: t('about.notes'), sub: t('about.notesText'), href: '/about/notes/' },
+        { key: 'source', text: t('about.source'), sub: LINKS.source.replace('https://', ''), href: LINKS.source, external: true },
         ...(SUPPORT_EMAIL
-          ? [{ key: 'issues', icon: /** @type {const} */ ('warning'), text: t('about.issues'), sub: '', href: '#report', mail: true, onclick: reportProblem }]
+          ? [{ key: 'issues', text: t('about.issues'), sub: t('about.issuesText'), href: '#report', mail: true, onclick: reportProblem }]
           : []),
       ],
     },
     {
       title: t('about.licences'),
       rows: [
-        { key: 'licence', icon: 'file', text: t('about.licence'), sub: t('about.licenceText'), href: '/about/licence/' },
-        { key: 'libraries', icon: 'logbook', text: t('about.libraries'), sub: t('about.librariesText'), href: '/about/libraries/' },
-        { key: 'maps', icon: 'sites', text: t('about.maps'), sub: t('about.mapsText'), href: LINKS.osm, external: true },
-        { key: 'regions', icon: 'place', text: t('about.regions'), sub: t('about.regionsText'), href: LINKS.geonames, external: true },
+        { key: 'licence', text: t('about.licence'), sub: t('about.licenceText'), href: '/about/licence/' },
+        { key: 'libraries', text: t('about.libraries'), sub: t('about.librariesText'), href: '/about/libraries/' },
+        { key: 'maps', text: t('about.maps'), sub: t('about.mapsText'), href: LINKS.osm, external: true },
+        { key: 'regions', text: t('about.regions'), sub: t('about.regionsText'), href: LINKS.geonames, external: true },
       ],
     },
     {
       title: t('about.privacy'),
-      rows: [{ key: 'privacy', icon: 'account', text: t('about.privacyPolicy'), sub: t('about.privacyText'), href: LINKS.privacy, external: true }],
+      rows: [{ key: 'privacy', text: t('about.privacyPolicy'), sub: t('about.privacyText'), href: LINKS.privacy, external: true }],
     },
   ];
 </script>
@@ -109,8 +109,8 @@
 
   <header class="head">
     <!-- The large standalone logo, without the grey arc of the small sizes (spec, "Logo"). -->
-    <img class="logo light" src="logo-light.svg" alt="" width="88" height="88" />
-    <img class="logo dark" src="logo-dark.svg" alt="" width="88" height="88" />
+    <img class="logo light" src="logo-light.svg" alt="" width="112" height="112" />
+    <img class="logo dark" src="logo-dark.svg" alt="" width="112" height="112" />
     <h1>OpenDives</h1>
     {#if version}<p class="version od-value">{version}</p>{/if}
     <p class="tagline">{t('about.tagline')}</p>
@@ -135,16 +135,15 @@
                   }
                 : undefined}
             >
-              <div class="item-media"><Icon name={row.icon} /></div>
               <div class="item-inner">
                 <div class="item-title">
                   {row.text}
                   {#if row.sub}<div class="item-footer">{row.sub}</div>{/if}
                 </div>
                 {#if row.external}
-                  <div class="item-after"><Icon name="openInNew" size={20} /><span class="od-sr-only">{t('about.opensElsewhere')}</span></div>
+                  <div class="item-after"><Icon name="openInNew" size={24} /><span class="od-sr-only">{t('about.opensElsewhere')}</span></div>
                 {:else if row.mail}
-                  <div class="item-after"><Icon name="mail" size={20} /><span class="od-sr-only">{t('about.opensMail')}</span></div>
+                  <div class="item-after"><Icon name="mail" size={24} /><span class="od-sr-only">{t('about.opensMail')}</span></div>
                 {/if}
               </div>
             </a>
@@ -203,8 +202,17 @@
       color: var(--od-text-2);
     }
 
-    .item-media {
-      color: var(--od-text);
+    /* Rows: headline 16/24, supporting text 14/20 (task 2026-11-07-23). */
+    .item-title {
+      font-size: 16px;
+      line-height: 24px;
+    }
+
+    .item-footer {
+      font-size: 14px;
+      line-height: 20px;
+      color: var(--od-text-2);
+      white-space: normal;
     }
 
     .item-after {

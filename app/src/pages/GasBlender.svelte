@@ -218,7 +218,7 @@
     {/each}
   </div>
 
-  <h2 class="title">{t('tools.blendWanted')}</h2>
+  <h2 class="label">{t('tools.blendWanted')}</h2>
   <div class="pair">
     <TextField label={t('tools.oxygen')} bind:value={o2} inputmode="decimal" invalid={wantedInvalid} supporting={wantedInvalid ? t('tools.gasInvalid') : ''}>
       {#snippet trailing()}<span class="unit">{t('units.percent')}</span>{/snippet}
@@ -244,7 +244,7 @@
     <SelectField label={t('tools.blendCylinder')} bind:value={cylinder} options={cylinderOptions} />
   {/if}
 
-  <h2 class="title">{t('tools.blendInside')}</h2>
+  <h2 class="label">{t('tools.blendInside')}</h2>
   <div class="pair">
     <TextField
       label={t('tools.blendInsidePressure')}
@@ -256,14 +256,13 @@
       {#snippet trailing()}<span class="unit">{pressureUnit}</span>{/snippet}
     </TextField>
   </div>
-  {#if insideValue > 0}
-    <div class="pair">
-      <SelectField label={t('tools.blendInsideOxygen')} bind:value={insideO2} options={percentOptions} />
-      {#if trimix}
-        <SelectField label={t('tools.blendInsideHelium')} bind:value={insideHe} options={percentOptions} />
-      {/if}
-    </div>
-  {/if}
+  <!-- Always shown: oxygen, and helium in trimix mode (task 2026-11-07-23). -->
+  <div class="pair">
+    <SelectField label={t('tools.blendInsideOxygen')} bind:value={insideO2} options={percentOptions} />
+    {#if trimix}
+      <SelectField label={t('tools.blendInsideHelium')} bind:value={insideHe} options={percentOptions} />
+    {/if}
+  </div>
   <SelectField label={t('tools.blendTopUp')} bind:value={topUp} options={topUpOptions} />
   {#if topUp === 'nitrox'}
     <TextField label={t('tools.blendTopUpOxygen')} bind:value={topUpO2} inputmode="decimal" invalid={topUpInvalid}>
@@ -389,6 +388,16 @@
       font-size: 18px;
       line-height: 24px;
       font-weight: 700;
+    }
+
+    /* "Mélange voulu", "Dans la bouteille": small labels above the fields. */
+    .label {
+      margin: 0;
+      padding: 16px 20px 0;
+      font-size: 14px;
+      line-height: 20px;
+      font-weight: 500;
+      color: var(--od-text);
     }
 
     .pair {

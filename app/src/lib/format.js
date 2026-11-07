@@ -319,6 +319,21 @@ export function formatGas(o2Permille, hePermille) {
 }
 
 /**
+ * Mix name as the core writes it (gasname in Subsurface's gas.cpp): air,
+ * EAN32, oxygen, (18/45).
+ * @param {number} o2Permille
+ * @param {number} hePermille
+ */
+export function formatMixName(o2Permille, hePermille) {
+  const o2 = Math.round(o2Permille / 10);
+  const he = Math.round(hePermille / 10);
+  if (he === 0 && (o2 === 0 || o2 === 21)) return t('gas.air');
+  if (he === 0 && o2 >= 100) return t('gas.oxygen');
+  if (he === 0) return `EAN${o2}`;
+  return `(${o2}/${he})`;
+}
+
+/**
  * A range of days, e.g. "2–4 février 2013" (device format, Intl.formatRange);
  * a single day when both are the same.
  * @param {string} isoStart

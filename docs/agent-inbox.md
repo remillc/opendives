@@ -390,7 +390,7 @@ My mistake in task 21: the splash screen shows the logo large, so it must not ha
 
 Done in "Splash screen: logo without the grey arc". The app has no iOS project or web launch screen yet.
 
-## [ ] 2026-11-07-23 Visual audit: match the mock-ups (Sites first)
+## [x] 2026-11-07-23 Visual audit: match the mock-ups (Sites first)
 
 Christian finds that several screens, the whole Sites section first, do not look like the mock-ups. I rendered the app (Vite, Android user agent, 390 × 844, the core mocked with sample data, map tiles offline) next to each mock-up: `docs/audit/2026-11-07/*.png`, mock-up on the left of each pair, app on the right. Ignore what comes from the sample data (empty Statistics and Desaturation, NaN in the gas tools, missing map tiles) and the 40 dp status bar offset of the mock-ups. Fix the points below, then check each screen yourself against its mock-up at 390 × 844 the same way, and list in this task anything you could not match and why.
 
@@ -432,6 +432,14 @@ Christian finds that several screens, the whole Sites section first, do not look
 - EAD et MOD: the MOD row says "EAN32 à 1,4 bar" (the core's mix name), not "Nx 32".
 - Gas blender (`melangeur-desaturation.png`, left pair): section labels "Mélange voulu" and "Dans la bouteille" are 14/20 weight 500 above the fields, not 18 bold titles; the residual oxygen and helium dropdowns are always shown in Trimix mode (oxygen alone in Nitrox mode), not only after a pressure is typed; the bottle size dropdown shows its value ("12 L").
 - Account (`compte-reglages.png`, left pair): the top app bar is the small one with "Compte" as its title (64 dp), not a large collapsing title; intro paragraph 16/24.
+
+Done in "Visual audit: Sites screens, shared chevron and section titles" and "Visual audit: About, Tools, gas tools, Account", with the Sites corrections of task 24. Checked on a Pixel 10 Pro XL (443 × 986 dp) with the real logbook, not at 390 × 844 with sample data. What does not match, and why:
+- Point 1, type scale: the sizes were already those of the mock-ups (16/24 headline, 14/20 supporting). The difference seen comes from the font: the mock-ups use Roboto, the app Source Sans 3 (task 2026-11-07-02), whose x-height is about 10 % smaller. Christian chose to have the mock-ups redrawn in Source Sans 3 first (prompt sent to the design session); the app sizes are unchanged until then.
+- Settings keeps its 18 and 20 dp chevrons (the reference screen); the other lists now use the same icon at 24 dp in `--od-text-2`, Framework7's chevron no longer appears on Android.
+- Sites list: "Centrer sur ma position" is 32 dp above the bottom of the map, as drawn, not 16, so that it does not cover the credits line. The credits read "© OpenFreeMap, OpenMapTiles, contributeurs OpenStreetMap": the tile provider asks for its name too.
+- Site sheet: section titles stay 14 medium `#4A4D52`, as in its mock-up (point 1 lists them only for Settings, Tools, About and the gas results).
+- Dives without a site: "et 3 autres plongées" never shows, because the app does not cut the list. The date is 16/24 weight 500 as written here (the mock-up draws 600).
+- Gas blender: the bottle shows the core's cylinder name and size ("AL80, 80,0 pi³"); "12 L" was the mock-up's sample.
 
 ## [ ] 2026-11-07-24 Corrections to the visual audit (task 23): Sites maps, Sites panel on surfaces, Statistics charts
 

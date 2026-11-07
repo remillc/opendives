@@ -103,7 +103,7 @@
 </script>
 
 <Page>
-  <Navbar large title={t('account.title')}>
+  <Navbar title={t('account.title')}>
     {#snippet left()}<MenuButton />{/snippet}
   </Navbar>
 
@@ -349,8 +349,8 @@
 
     .pitch {
       margin: 18px 20px 0;
-      font-size: 15px;
-      line-height: 21px;
+      font-size: 16px;
+      line-height: 24px;
       color: var(--od-text-2);
     }
 

@@ -16,7 +16,7 @@
   import Po2Wheel from '../components/Po2Wheel.svelte';
   import GasResults from '../components/GasResults.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
-  import { depthUnit, formatGas, formatNumber } from '../lib/format.js';
+  import { depthUnit, formatMixName, formatNumber } from '../lib/format.js';
   import { WATER_TYPES, waterTypeName, salinityOfWaterType, parseDecimal } from '../lib/tools.js';
   import { t } from '../lib/i18n.js';
 
@@ -61,7 +61,7 @@
   const rows = $derived(
     result
       ? [
-          { title: t('tools.mod'), sub: t('tools.modSub', { gas: formatGas(result.o2, result.he), po2: formatNumber(result.po2Mbar / 1000, 1) }), value: wholeDepth(result.modMm) },
+          { title: t('tools.mod'), sub: t('tools.modSub', { gas: formatMixName(result.o2, result.he), po2: formatNumber(result.po2Mbar / 1000, 1) }), value: wholeDepth(result.modMm) },
           { title: t('tools.ead'), sub: t('tools.eadSub', { depth: wholeDepth(depthMm) }), value: wholeDepth(result.eadPlannedMm) },
           { title: t('tools.end'), sub: t(result.o2Narcotic ? 'tools.endSub' : 'tools.endSubNotNarcotic'), value: wholeDepth(result.endPlannedMm) },
         ]

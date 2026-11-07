@@ -44,7 +44,7 @@
               <span class="label">{row.name}</span>
               <span class="supporting">{row.text}</span>
             </span>
-            <span class="chevron"><Icon name="chevron" size={18} weight={2} /></span>
+            <span class="chevron"><Icon name="chevron" size={24} weight={2} /></span>
           </a>
         </div>
       {/each}
