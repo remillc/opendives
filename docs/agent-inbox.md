@@ -313,3 +313,7 @@ In "Meilleur mélange", the second result row is labelled "Nitrox" (not "Nitrox 
 ## [ ] 2026-11-07-11 Best mix: nitrox first
 
 In "Meilleur mélange", the "Nitrox" row comes first, then "Trimix". Mock-up: `docs/mockups/outils-meilleur-melange-android.dc.html`.
+
+## [ ] 2026-11-07-12 Gas blender: Nitrox and Trimix modes
+
+The gas blender stays one tool, with a segmented control "Nitrox | Trimix" at the top, remembered on the device. Nitrox mode hides the helium fields and the helium step (oxygen, then top-up gas). Trimix mode is the current screen. See `docs/ui-specification.md` ("Mélangeur de gaz"). Mock-ups: `docs/mockups/outils-melangeur-nitrox-android.dc.html`, `outils-melangeur-android.dc.html`.
