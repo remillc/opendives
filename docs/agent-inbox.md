@@ -475,7 +475,7 @@ Mock-ups: `docs/mockups/android-stats.dc.html`, `docs/mockups/ios-stats-tableau.
 
 Done in "Statistics: filtered result chart and coloured ready-made charts". The colour is a CSS mix of the two water tokens, so dark mode follows by itself.
 
-## [ ] 2026-11-07-26 Source Sans 3: same perceived size as the system font
+## [x] 2026-11-07-26 Source Sans 3: same perceived size as the system font
 
 The visual audit (task 23) compared the app with mock-ups drawn in Roboto. Source Sans 3 looks about 8 % smaller at the same size, so part of the "text too small" finding came from the font, not from the sizes. The mock-ups now use Source Sans 3 too, and the sizes stay as they are in the specification.
 
@@ -488,7 +488,9 @@ The visual audit (task 23) compared the app with mock-ups drawn in Roboto. Sourc
 
 Spec: section 1, "Fonts". Mock-ups: every file in `docs/mockups/` (each has the `@font-face` rules in its `<helmet>`).
 
-## [ ] 2026-11-07-27 Dive detail: weights as a total plus one line per location
+Done in "Source Sans 3: metrics of the mock-ups, weights 400 to 900". Upstream (release 3.052R) has no static 800, so the app bundles the upstream variable font (one 170 KB file, weights 400 to 900, Latin Extended) instead of the four static files. Measured in the WebView: 14 px Source Sans 3 now has the x-height and ascent of 14 px Roboto. No size had been raised in the app, so none was set back.
+
+## [x] 2026-11-07-27 Dive detail: weights as a total plus one line per location
 
 In "Gaz et équipement" on the dive detail, when the dive has several weight entries:
 - first line: "Lest" 16/24 ink on the left, the total on the right, 16/24 weight 600, tabular figures (sum of all entries, in the weight unit of the settings);
@@ -497,4 +499,29 @@ In "Gaz et équipement" on the dive detail, when the dive has several weight ent
 With a single entry, keep the current row (location as supporting text, weight on the right). An entry without a location shows "Lest" as its label.
 
 Mock-ups: `docs/mockups/detail3-android.dc.html`, `detail3-android-sombre.dc.html` (iOS: `detail3-ios.dc.html`). Spec: section 4, "Full dive detail".
+
+Done in "Dive detail: weights as a total plus one line per location". Checked on a dive of the logbook with two entries (10 lb and 2 lb, total 12 lb). The secondary lines use `--od-text-2`, which is the dark value of the specification in dark mode.
+
+## [x] 2026-11-07-28 Dive detail menu: "Supprimer la plongée"
+
+Add a second item to the ⋮ menu of the dive detail (Android MD3 menu, iOS pull-down menu), after a 1 dp divider (`#C9C9C5`, 8 dp above and below): trash icon 24 dp, label "Supprimer la plongée", 14 sp medium, ink. Not in `--od-alarm`: that colour is for errors only.
+- No confirmation dialog. Delete the dive through the core's undoable delete (as Subsurface does), go back to the logbook, and show a snackbar "Plongée supprimée" with the action "Annuler" for 10 seconds. "Annuler" restores the dive and its place in the list.
+- The deletion is saved and synced with the cloud like any other change.
+- On a tablet (master-detail), the detail pane shows the next dive in the list, or the empty pane when none is left.
+
+Mock-up: `docs/mockups/detail2-android-menu.dc.html`. Spec: section 4, "Dive detail" row of the screens table.
+
+Done in "Dive detail menu: delete without confirmation, Annuler for 10 seconds". Checked on the phone with the test account (roger.bourdieu): the dive leaves the list (1 352 dives), "Plongée supprimée" offers "Annuler", and "Annuler" puts it back at its place. The tablet case (next dive beside the list) is written but not checked on a tablet. The item is in ink on iOS too, as this task asks, although the HIG would draw a destructive item in red.
+
+## [x] 2026-11-07-29 New file docs/TODOS.md: who does what
+
+Christian created `docs/TODOS.md`, a short numbered list of his to-dos (#1, #2…). Done items are deleted so that a person can read the file at a glance. Read the rules at the top of the file. In short:
+- When Christian writes "todo: …" to you, add the item at the end with the next number, in his words, update "Next number", and commit. Do not add items on your own initiative.
+- When you finish an item that is yours (anything that is not mock-ups or the specification), delete it in the same commit as the work. Never renumber.
+- Items about the mock-ups or the specification are for the design agent, which turns them into inbox tasks for you and deletes them.
+- If you think an item is already done or obsolete, ask Christian before deleting it.
+
+Nothing to change in the app for this task: check it once you have read the file.
+
+Done in "Inbox: TODOS.md read". Rules read and followed from now on. The list is empty; the only "todo" Christian gave the code agent this session (keep the Logbook search when coming back from a dive) was already fixed in "Back key: close only the search of the screen shown", so it was not added.
 

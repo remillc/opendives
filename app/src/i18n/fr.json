@@ -208,6 +208,7 @@
     "sacFull": "Consommation en surface (SAC)",
     "suitRow": "Combinaison",
     "weights": "Lest",
+    "weightsByPlace": "Lest par emplacement",
     "weightPlaces": {
       "integrated": "Intégré au gilet",
       "belt": "Ceinture",
@@ -275,8 +276,6 @@
     "photoNote": "Sur un autre appareil : seule leur référence est synchronisée",
     "delete": "Supprimer la plongée",
     "deleteTitle": "Supprimer la plongée",
-    "deleteText": "La plongée est retirée du carnet, sur cet appareil et dans le cloud. Vous pourrez l'annuler pendant quelques secondes.",
-    "deleteAction": "Supprimer",
     "deleted": "Plongée supprimée",
     "deleteFailed": "La plongée n'a pas pu être supprimée. Aucune plongée n'a été modifiée."
   },

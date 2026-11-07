@@ -17,7 +17,7 @@
   import { horizontalSwipe, swipeGoesThrough } from '../lib/swipe.js';
   import Stars from '../components/Stars.svelte';
   import { logbook, deleteDive } from '../lib/logbook.svelte.js';
-  import { confirmAction } from '../lib/dialogs.js';
+  import { layout } from '../lib/layout.svelte.js';
   import { offerUndo } from '../lib/undo.js';
   import {
     formatCylinderSize,
@@ -110,31 +110,32 @@
   const menuId = `dive-menu-${uid}`;
   const diveId = $derived(f7route.params.id);
 
-  // "Delete the dive" (⋮ menu): a confirmation, then one undoable step; back
-  // to the logbook with the Undo message.
-  function askDelete() {
-    confirmAction({
-      title: t('detail.deleteTitle'),
-      text: t('detail.deleteText'),
-      action: t('detail.deleteAction'),
-      onConfirm: async () => {
-        try {
-          await deleteDive(Number(diveId));
-          f7router.back();
-          offerUndo(t('detail.deleted'));
-        } catch (e) {
-          const code = String(/** @type {any} */ (e)?.message ?? '');
-          console.error('Delete a dive', code);
-          f7.dialog
-            .create({
-              title: t('detail.deleteTitle'),
-              text: code.startsWith('WRITE_LOCKED') ? t('edit.writeLocked') : t('detail.deleteFailed'),
-              buttons: [{ text: t('dialog.ok') }],
-            })
-            .open();
-        }
-      },
-    });
+  // "Delete the dive" (⋮ menu, task 2026-11-07-28): no confirmation, the
+  // core's undoable delete as in Subsurface, then back to the logbook with
+  // "Annuler" for 10 seconds; undone, the dive is back at its place. Beside
+  // the list (tablet), the next dive of the list takes its place, or the
+  // empty pane when none is left.
+  async function deleteNow() {
+    const id = Number(diveId);
+    const order = [...logbook.dives].sort((a, b) => b.date.localeCompare(a.date));
+    const at = order.findIndex((d) => d.id === id);
+    const next = order[at + 1] ?? order[at - 1];
+    try {
+      await deleteDive(id);
+      if (layout.split && next) f7router.navigate(`/dive/${next.id}/`, { reloadDetail: true });
+      else f7router.back();
+      offerUndo(t('detail.deleted'), undefined, 10000);
+    } catch (e) {
+      const code = String(/** @type {any} */ (e)?.message ?? '');
+      console.error('Delete a dive', code);
+      f7.dialog
+        .create({
+          title: t('detail.deleteTitle'),
+          text: code.startsWith('WRITE_LOCKED') ? t('edit.writeLocked') : t('detail.deleteFailed'),
+          buttons: [{ text: t('dialog.ok') }],
+        })
+        .open();
+    }
   }
 
   // The list beside it highlights the dive shown.
@@ -279,16 +280,20 @@
   /** SAC: only when the core computes one, never on a rebreather dive. */
   const sac = $derived(dive && !rebreather && dive.sacMlMin > 0 ? formatSac(dive.sacMlMin, prefs) : '');
 
-  /** Weights: one line per location, no total (spec, section 4, "Full dive detail"). */
+  /**
+   * Weights in the order stored by the core (spec, section 4, "Full dive
+   * detail"): one entry, a row; several, the total then one line per location
+   * (task 2026-11-07-27).
+   */
+  const weightEntries = $derived((dive?.weights ?? []).filter((w) => w.grams > 0));
   const weights = $derived(
-    (dive?.weights ?? [])
-      .filter((w) => w.grams > 0)
-      .map((w) => ({
-        // Locations as stored by Subsurface (integrated, belt...), translated when known.
-        place: w.description ? (tIfExists(`detail.weightPlaces.${w.description}`) ?? w.description) : '',
-        weight: formatWeight(w.grams, prefs),
-      })),
+    weightEntries.map((w) => ({
+      // Locations as stored by Subsurface (integrated, belt...), translated when known.
+      place: w.description ? (tIfExists(`detail.weightPlaces.${w.description}`) ?? w.description) : '',
+      weight: formatWeight(w.grams, prefs),
+    })),
   );
+  const weightTotal = $derived(formatWeight(weightEntries.reduce((sum, w) => sum + w.grams, 0), prefs));
 
   const hasEquipment = $derived(cylinders.length > 0 || !!sac || !!dive?.suit || weights.length > 0);
 
@@ -338,7 +343,9 @@
   <Popover id={menuId} class="od-menu" backdrop={false}>
     <List noChevron>
       <MenuItem icon="plan" text={t('detail.plan')} link="/plan/{diveId}/" />
-      <MenuItem icon="delete" text={t('detail.delete')} destructive onclick={askDelete} />
+      <li class="od-menu-divider" role="separator"></li>
+      <!-- In ink, not in the alarm colour: that one is for errors only. -->
+      <MenuItem icon="delete" text={t('detail.delete')} onclick={deleteNow} />
     </List>
   </Popover>
 
@@ -464,12 +471,21 @@
           {#if dive.suit}
             <div class="row"><span>{t('detail.suitRow')}</span><span class="value">{dive.suit}</span></div>
           {/if}
-          {#each weights as weight, i (i)}
+          {#if weights.length === 1}
             <div class="row">
-              <span class="stacked"><span>{t('detail.weights')}</span>{#if weight.place}<span class="sub">{weight.place}</span>{/if}</span>
-              <span class="value od-value">{weight.weight}</span>
+              <span class="stacked"><span>{t('detail.weights')}</span>{#if weights[0].place}<span class="sub">{weights[0].place}</span>{/if}</span>
+              <span class="value od-value">{weights[0].weight}</span>
             </div>
-          {/each}
+          {:else if weights.length > 1}
+            <div class="weights">
+              <div class="total"><span>{t('detail.weights')}</span><span class="od-value">{weightTotal}</span></div>
+              <ul aria-label={t('detail.weightsByPlace')}>
+                {#each weights as weight, i (i)}
+                  <li class="od-value"><span>{weight.place || t('detail.weights')}</span><span>{weight.weight}</span></li>
+                {/each}
+              </ul>
+            </div>
+          {/if}
         </div>
       </section>
     {/if}
@@ -712,6 +728,44 @@
     }
 
     /* A label with a second line under it (weight location, computer role, photos). */
+    /* Several weights: the total, then one line per location, no dividers. */
+    .weights {
+      padding: 16px 16px 14px;
+      border-top: 1px solid var(--od-separator);
+
+      .total {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 12px;
+        font-size: 16px;
+        line-height: 24px;
+        color: var(--od-text);
+
+        .od-value {
+          font-weight: 600;
+        }
+      }
+
+      ul {
+        margin: 4px 0 0;
+        padding: 0;
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      li {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        font-size: 14px;
+        line-height: 20px;
+        color: var(--od-text-2);
+      }
+    }
+
     .stacked {
       padding: 10px 0;
       display: flex;

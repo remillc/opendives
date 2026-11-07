@@ -43,14 +43,18 @@ export function enableBackButton() {
       selection.dispatchEvent(new CustomEvent('od-cancel'));
       return;
     }
-    // 5. An active search closes.
-    const search = document.querySelector('.searchbar-enabled');
+    // 5. An active search of the screen shown closes. Only that screen's: the
+    // Logbook's search stays active under an opened dive, and Back then
+    // returns to the list with its search, like the back arrow.
+    const view = f7.views.current;
+    const search = view?.el?.querySelector(
+      ':scope > .page-current .searchbar-enabled, :scope.view-master-detail > .page-master .searchbar-enabled',
+    );
     if (search) {
       f7.searchbar.disable(/** @type {HTMLElement} */ (search));
       return;
     }
     // 6. Back to the previous screen of the section.
-    const view = f7.views.current;
     if (view && view.router.history.length > 1) {
       view.router.back();
       return;
