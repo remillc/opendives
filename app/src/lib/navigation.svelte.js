@@ -248,13 +248,14 @@ export function enableSectionSwipes() {
       }
     },
     end(dx, velocity) {
+      // Where the swipe leads, read before its starting point is forgotten.
+      const next = toward(dx);
       start = null;
       if (push) {
         endPush(dx, velocity);
         return;
       }
       if (!from || !views) return;
-      const next = toward(dx);
       const through = !!next && 'tab' in next && !!neighbour && swipeGoesThrough(dx, velocity, width);
       const left = from;
       const coming = neighbour;
