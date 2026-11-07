@@ -77,6 +77,10 @@
       "one": "Plongée retirée du voyage",
       "other": "{n} plongées retirées du voyage"
     },
+    "dragCount": {
+      "one": "{n} plongée",
+      "other": "{n} plongées"
+    },
     "dragAdd": "Ajouter à {trip}",
     "dragRemove": "Retirer du voyage",
     "menuUndo": "Annuler la dernière action",

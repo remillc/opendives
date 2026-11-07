@@ -332,9 +332,10 @@
         // A long press lifts the row; what follows decides, as on Android's
         // home screen: the finger lifted without moving selects the dive
         // (selection mode, or one more check in it); the finger moving drags
-        // it to a trip or out of its own, and nothing is checked.
+        // it to a trip or out of its own, and nothing is checked. A checked
+        // dive takes the other checked dives with it, as in Gmail.
         pressed = true;
-        dragIds = [id];
+        dragIds = checked[id] ? Object.keys(checked).filter((k) => checked[Number(k)]).map(Number) : [id];
         dragRow = row.closest('li');
         dragRow?.classList.add('od-drag-lift');
       }, LONG_PRESS_MS);
@@ -404,8 +405,8 @@
 
     /**
      * As Gmail's drag: a small raised chip follows the finger, above it so the
-     * row under it stays visible; it names the dive's site, then says what
-     * the drop would do.
+     * row under it stays visible; it names the dive's site (or says how many
+     * dives when the checked ones move together), then what the drop would do.
      */
     function beginDrag() {
       if (!dragRow) return;
@@ -448,7 +449,7 @@
       }
       if (!label) return;
       if (!target) {
-        label.textContent = dragged[0]?.site || t('dive.siteNotSet');
+        label.textContent = dragged.length > 1 ? t('logbook.dragCount', { n: dragged.length }) : dragged[0]?.site || t('dive.siteNotSet');
       } else if (target.action === 'add') {
         const id = target.tripId;
         const inTrip = logbook.dives.filter((d) => d.trip?.id === id).sort((a, b) => a.date.localeCompare(b.date));

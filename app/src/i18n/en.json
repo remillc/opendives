@@ -77,6 +77,10 @@
       "one": "Dive removed from its trip",
       "other": "{n} dives removed from their trips"
     },
+    "dragCount": {
+      "one": "{n} dive",
+      "other": "{n} dives"
+    },
     "dragAdd": "Add to {trip}",
     "dragRemove": "Remove from the trip",
     "menuUndo": "Undo the last action",
