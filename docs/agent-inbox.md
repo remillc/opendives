@@ -394,7 +394,7 @@ Done in "Splash screen: logo without the grey arc". The app has no iOS project o
 
 Christian finds that several screens, the whole Sites section first, do not look like the mock-ups. I rendered the app (Vite, Android user agent, 390 × 844, the core mocked with sample data, map tiles offline) next to each mock-up: `docs/audit/2026-11-07/*.png`, mock-up on the left of each pair, app on the right. Ignore what comes from the sample data (empty Statistics and Desaturation, NaN in the gas tools, missing map tiles) and the 40 dp status bar offset of the mock-ups. Fix the points below, then check each screen yourself against its mock-up at 390 × 844 the same way, and list in this task anything you could not match and why.
 
-**1. Global type scale (most of the "not the same look" comes from here).** The app uses 12 to 13 px for supporting text where the mock-ups use 14. Apply everywhere, through shared CSS (`theme.css`), not screen by screen:
+**1. Global type scale (most of the "not the same look" comes from here).** Sizes below are those of the specification, unchanged with Source Sans 3 (see task 2026-11-07-26). Apply everywhere, through shared CSS (`theme.css`), not screen by screen:
 - List item headline: 16/24, ink `#1F2124`. Supporting text: 14/20, `#4A4D52`. Field labels and helper text stay 12/16 (MD3).
 - Trailing values in lists: in Settings 14/20 `#4A4D52`; elsewhere (site depth, results) as in each mock-up (16 to 22, weight 500 to 700, tabular figures).
 - Section titles on the page background (Settings, Tools, About, gas tool results): 18/24, weight 700, 20 dp side margin. The About screen still uses 14 medium: change it.
@@ -474,3 +474,17 @@ Christian wants the two ready-made charts of `/statistics/` ("Plongées par ann�
 Mock-ups: `docs/mockups/android-stats.dc.html`, `docs/mockups/ios-stats-tableau.dc.html`. Spec: section 4, "Statistics", main screen.
 
 Done in "Statistics: filtered result chart and coloured ready-made charts". The colour is a CSS mix of the two water tokens, so dark mode follows by itself.
+
+## [ ] 2026-11-07-26 Source Sans 3: same perceived size as the system font
+
+The visual audit (task 23) compared the app with mock-ups drawn in Roboto. Source Sans 3 looks about 8 % smaller at the same size, so part of the "text too small" finding came from the font, not from the sizes. The mock-ups now use Source Sans 3 too, and the sizes stay as they are in the specification.
+
+1. Register Source Sans 3 with the same metrics adjustment as the mock-ups, in each `@font-face` rule of the body font:
+   `size-adjust: 108%; ascent-override: 85.9%; descent-override: 22.6%; line-gap-override: 0%;`
+   With it, 14 px Source Sans 3 has the x-height and line box of 14 px Roboto.
+2. Keep the sizes of the specification and of task 23 point 1: supporting text 14/20, headline 16/24, labels and helper text 12/16, section titles 18/24, intro 16/24. If the app raised a size only because the text looked small next to the mock-ups, set it back to these values.
+3. Bundle weights 400 to 900 (800 and 900 are new in `docs/brand/fonts/`, used for bold figures in rows), Latin and Latin Extended.
+4. Titles keep the system font (Roboto on Android, SF Pro on iOS): screen titles, top bar and section titles, dialog titles, large key figures. Tabular figures stay on for dive values.
+
+Spec: section 1, "Fonts". Mock-ups: every file in `docs/mockups/` (each has the `@font-face` rules in its `<helmet>`).
+
