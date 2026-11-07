@@ -525,3 +525,9 @@ Nothing to change in the app for this task: check it once you have read the file
 
 Done in "Inbox: TODOS.md read". Rules read and followed from now on. The list is empty; the only "todo" Christian gave the code agent this session (keep the Logbook search when coming back from a dive) was already fixed in "Back key: close only the search of the screen shown", so it was not added.
 
+## [ ] 2026-11-07-30 docs/TODOS.md: tag every item [design] or [code]
+
+New rule in `docs/TODOS.md` (read it at the top of the file): every item starts with `[design]` or `[code]` right after its number, for example `#4 [code] …`. The agent that adds the item sets the tag: `[design]` for mock-ups, visuals, screen texts and the specification, `[code]` for everything else. When you are not sure, ask Christian. I tagged #1 and #2 as `[code]`.
+
+Nothing to change in the app: check this task once you have read the rule.
+
