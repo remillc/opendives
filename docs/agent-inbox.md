@@ -513,7 +513,7 @@ Mock-up: `docs/mockups/detail2-android-menu.dc.html`. Spec: section 4, "Dive det
 
 Done in "Dive detail menu: delete without confirmation, Annuler for 10 seconds". Checked on the phone with the test account (roger.bourdieu): the dive leaves the list (1 352 dives), "Plongée supprimée" offers "Annuler", and "Annuler" puts it back at its place. The tablet case (next dive beside the list) is written but not checked on a tablet. The item is in ink on iOS too, as this task asks, although the HIG would draw a destructive item in red.
 
-## [ ] 2026-11-07-29 New file docs/TODOS.md: who does what
+## [x] 2026-11-07-29 New file docs/TODOS.md: who does what
 
 Christian created `docs/TODOS.md`, a short numbered list of his to-dos (#1, #2…). Done items are deleted so that a person can read the file at a glance. Read the rules at the top of the file. In short:
 - When Christian writes "todo: …" to you, add the item at the end with the next number, in his words, update "Next number", and commit. Do not add items on your own initiative.
@@ -522,4 +522,6 @@ Christian created `docs/TODOS.md`, a short numbered list of his to-dos (#1, #2�
 - If you think an item is already done or obsolete, ask Christian before deleting it.
 
 Nothing to change in the app for this task: check it once you have read the file.
+
+Done in "Inbox: TODOS.md read". Rules read and followed from now on. The list is empty; the only "todo" Christian gave the code agent this session (keep the Logbook search when coming back from a dive) was already fixed in "Back key: close only the search of the screen shown", so it was not added.
 
