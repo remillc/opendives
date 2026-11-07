@@ -43,7 +43,7 @@
       <Link back iconOnly><i class="icon icon-back"></i><span class="od-sr-only">{t('common.back')}</span></Link>
     {/snippet}
     {#snippet right()}
-      <Link iconOnly href="/site/{uuid}/edit/"><Icon name="edit" weight={2.2} /><span class="od-sr-only">{t('sites.edit')}</span></Link>
+      <Link iconOnly href="/site/{uuid}/edit"><Icon name="edit" weight={2.2} /><span class="od-sr-only">{t('sites.edit')}</span></Link>
     {/snippet}
   </Navbar>
 
@@ -90,7 +90,7 @@
         {#each latestFirst as dive (dive.id)}
           {@const listed = byId.get(dive.id)}
           <li>
-            <a href="/dives/{dive.id}/" class="row dive">
+            <a href="/dives/{dive.id}" class="row dive">
               {#if listed}
                 <ProfileThumbnail profile={listed.profile} maxDepthMm={listed.maxDepthMm} prefs={logbook.prefs} />
               {/if}

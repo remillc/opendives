@@ -13,16 +13,16 @@
     {
       title: t('tools.groupDive'),
       rows: [
-        { href: '/plan/new/', icon: 'plan', name: t('tools.planner'), text: t('tools.plannerText') },
-        { href: '/tools/desaturation/', icon: 'desaturation', name: t('tools.desaturation'), text: t('tools.desaturationText') },
+        { href: '/plan/new', icon: 'plan', name: t('tools.planner'), text: t('tools.plannerText') },
+        { href: '/tools/desaturation', icon: 'desaturation', name: t('tools.desaturation'), text: t('tools.desaturationText') },
       ],
     },
     {
       title: t('tools.groupGas'),
       rows: [
-        { href: '/tools/ead-mod/', icon: 'depthGauge', name: t('tools.eadMod'), text: t('tools.eadModText') },
-        { href: '/tools/best-mix/', icon: 'bestMix', name: t('tools.bestMixTool'), text: t('tools.bestMixText') },
-        { href: '/tools/blender/', icon: 'blender', name: t('tools.blender'), text: t('tools.blenderText') },
+        { href: '/tools/ead-mod', icon: 'depthGauge', name: t('tools.eadMod'), text: t('tools.eadModText') },
+        { href: '/tools/best-mix', icon: 'bestMix', name: t('tools.bestMixTool'), text: t('tools.bestMixText') },
+        { href: '/tools/blender', icon: 'blender', name: t('tools.blender'), text: t('tools.blenderText') },
       ],
     },
   ]);

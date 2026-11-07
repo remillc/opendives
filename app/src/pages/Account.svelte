@@ -202,7 +202,7 @@
       <span class="consequence">{t('account.signOutText')}</span>
     </div>
     <div class="leave">
-      <button type="button" class="od-outlined-button danger" onclick={() => f7.views.current?.router.navigate('/account/delete/')}>
+      <button type="button" class="od-outlined-button danger" onclick={() => f7.views.current?.router.navigate('/account/delete')}>
         {t('account.delete')}
       </button>
       <span class="consequence">{t('account.deleteText')}</span>
@@ -219,11 +219,11 @@
     </div>
     <p class="pitch">{t('account.pitch')}</p>
     <div class="choices">
-      <a href="/account/create/" class="choice primary">
+      <a href="/account/create" class="choice primary">
         <span class="label">{t('account.create')}</span>
         <span class="consequence">{t('account.createText', { n: count })}</span>
       </a>
-      <a href="/account/sign-in/" class="choice">
+      <a href="/account/sign-in" class="choice">
         <span class="label">{t('account.signIn')}</span>
         <span class="consequence">{t('account.signInText', { n: count })}</span>
       </a>

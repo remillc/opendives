@@ -31,7 +31,7 @@
       }
       accountFlow.confirmedEmail = email;
       if (welcome) {
-        f7router.navigate('/welcome/import/');
+        f7router.navigate('/welcome/import');
       } else {
         // From Account: the dives of this device are sent to the new account.
         await OpenDivesCore.createLog({ source: 'device' });

@@ -19,5 +19,5 @@
 </script>
 
 <Popup class="od-welcome" opened={logbook.welcome} swipeToClose={false} closeByBackdropClick={false} onPopupClosed={reset}>
-  <View name="welcome" url="/welcome/" />
+  <View name="welcome" url="/welcome" />
 </Popup>

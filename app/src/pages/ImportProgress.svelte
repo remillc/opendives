@@ -24,7 +24,7 @@
    * @type {{ f7router: any, f7route: any, source?: 'divelogs'|'file', user?: string, password?: string, path?: string }}
    */
   let { f7router, f7route, source = 'divelogs', user = '', password = '', path: picked = '' } = $props();
-  const welcome = $derived(String(f7route.path ?? '').startsWith('/welcome/'));
+  const welcome = $derived(String(f7route.path ?? '').startsWith('/welcome'));
   const ios = f7.theme === 'ios';
 
   /** @typedef {'download'|'read'|'save'} StepKey */

@@ -41,7 +41,7 @@ export function openSettings() {
 /** About opens over the current section, from the side menu or the tablet navigation. */
 export function openAbout() {
   const router = f7.views.current?.router;
-  if (router && router.currentRoute?.path !== '/about/') router.navigate('/about/');
+  if (router && router.currentRoute?.path !== '/about') router.navigate('/about');
 }
 
 /** The "+" button of the Android rail: shows the Logbook, which offers the choices. */
@@ -139,7 +139,7 @@ export function enableSectionSwipes() {
    */
   function toward(dx) {
     if (!start) return null;
-    if (start.kind === 'settings') return dx < 0 ? { route: '/about/' } : null;
+    if (start.kind === 'settings') return dx < 0 ? { route: '/about' } : null;
     if (dx < 0 && start.section === 'account') return { route: '/settings/' };
     const next = swipeOrder[swipeOrder.indexOf(start.section) + (dx < 0 ? 1 : -1)];
     return next ? { tab: /** @type {Section} */ (next) } : null;

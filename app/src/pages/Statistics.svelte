@@ -68,7 +68,7 @@
   );
 
   /** @param {string} field @param {string} value */
-  const resultHref = (field, value) => `/statistics/result/?c=${encodeCriteria([{ field, values: [value] }])}`;
+  const resultHref = (field, value) => `/statistics/result?c=${encodeCriteria([{ field, values: [value] }])}`;
 </script>
 
 <Page>
@@ -76,9 +76,9 @@
     {#snippet left()}<MenuButton />{/snippet}
     <NavRight>
       {#if theme.ios}
-        <Link href="/filter/">{t('stats.filterShort')}</Link>
+        <Link href="/filter">{t('stats.filterShort')}</Link>
       {:else}
-        <Link class="filter-button" href="/filter/"><Icon name="filter" size={18} weight={2} />{t('stats.freeFilter')}</Link>
+        <Link class="filter-button" href="/filter"><Icon name="filter" size={18} weight={2} />{t('stats.freeFilter')}</Link>
       {/if}
     </NavRight>
   </Navbar>
@@ -114,7 +114,7 @@
         <ul>
           {#each myStatistics.list as s (s.id)}
             <li>
-              <a href="/statistics/result/?c={encodeCriteria(s.criteria)}&saved={s.id}" class="item-link item-content">
+              <a href="/statistics/result?c={encodeCriteria(s.criteria)}&saved={s.id}" class="item-link item-content">
                 <div class="item-inner">
                   <div class="item-title-row"><div class="item-title">{s.name}</div></div>
                   <div class="item-text od-value">{summaryLine(saved[s.id], logbook.prefs)}</div>
@@ -124,7 +124,7 @@
           {/each}
           {#if theme.ios}
             <!-- iOS: the action is a row of the group (HIG), not a button. -->
-            <li><a href="/statistics/new/" class="item-content action-row"><div class="item-inner"><div class="item-title">{t('stats.newEllipsis')}</div></div></a></li>
+            <li><a href="/statistics/new" class="item-content action-row"><div class="item-inner"><div class="item-title">{t('stats.newEllipsis')}</div></div></a></li>
           {/if}
         </ul>
       </div>
@@ -132,7 +132,7 @@
     {#if !myStatistics.list.length}<p class="note">{t('stats.mineEmpty')}</p>{/if}
     {#if !theme.ios}
       <div class="new">
-        <a href="/statistics/new/" class="od-tonal-button new-button"><Icon name="plus" size={18} weight={2} />{t('stats.new')}</a>
+        <a href="/statistics/new" class="od-tonal-button new-button"><Icon name="plus" size={18} weight={2} />{t('stats.new')}</a>
       </div>
     {/if}
 
@@ -150,7 +150,7 @@
       <ul>
         {#each yearly as y (y.year)}
           <li>
-            <a href="/statistics/year/{y.year}/" class="item-link item-content">
+            <a href="/statistics/year/{y.year}" class="item-link item-content">
               <div class="item-inner">
                 <div class="item-title-row"><div class="item-title od-value">{y.year}</div></div>
                 <div class="item-text od-value">{summaryLine(y, logbook.prefs)}</div>

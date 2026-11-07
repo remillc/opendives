@@ -72,7 +72,7 @@
     {
       title: t('about.project'),
       rows: [
-        { key: 'notes', text: t('about.notes'), sub: t('about.notesText'), href: '/about/notes/' },
+        { key: 'notes', text: t('about.notes'), sub: t('about.notesText'), href: '/about/notes' },
         { key: 'source', text: t('about.source'), sub: LINKS.source.replace('https://', ''), href: LINKS.source, external: true },
         ...(SUPPORT_EMAIL
           ? [{ key: 'issues', text: t('about.issues'), sub: t('about.issuesText'), href: '#report', mail: true, onclick: reportProblem }]
@@ -82,15 +82,15 @@
     {
       title: t('about.licences'),
       rows: [
-        { key: 'licence', text: t('about.licence'), sub: t('about.licenceText'), href: '/about/licence/' },
-        { key: 'libraries', text: t('about.libraries'), sub: t('about.librariesText'), href: '/about/libraries/' },
+        { key: 'licence', text: t('about.licence'), sub: t('about.licenceText'), href: '/about/licence' },
+        { key: 'libraries', text: t('about.libraries'), sub: t('about.librariesText'), href: '/about/libraries' },
         { key: 'maps', text: t('about.maps'), sub: t('about.mapsText'), href: LINKS.osm, external: true },
         { key: 'regions', text: t('about.regions'), sub: t('about.regionsText'), href: LINKS.geonames, external: true },
       ],
     },
     {
       title: t('about.privacy'),
-      rows: [{ key: 'privacy', text: t('about.privacyPolicy'), sub: t('about.privacyText'), href: '/about/privacy/' }],
+      rows: [{ key: 'privacy', text: t('about.privacyPolicy'), sub: t('about.privacyText'), href: '/about/privacy' }],
     },
   ];
 </script>

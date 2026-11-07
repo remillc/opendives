@@ -55,14 +55,14 @@
   </div>
 
   <nav class="choices" aria-label={t('welcome.choicesLabel')}>
-    <a href="/welcome/sign-in/" class="choice filled" onclick={(e) => go(e, '/welcome/sign-in/')}>
+    <a href="/welcome/sign-in" class="choice filled" onclick={(e) => go(e, '/welcome/sign-in')}>
       <span class="text">
         <span class="label">{t('welcome.existing')}</span>
         <span class="consequence">{t('welcome.existingText')}</span>
       </span>
       <span class="chevron"><Icon name="expand" size={16} /></span>
     </a>
-    <a href="/welcome/create/" class="choice" onclick={(e) => go(e, '/welcome/create/')}>
+    <a href="/welcome/create" class="choice" onclick={(e) => go(e, '/welcome/create')}>
       <span class="text">
         <span class="label">{t('welcome.create')}</span>
         <span class="consequence">{t('welcome.createText')}</span>

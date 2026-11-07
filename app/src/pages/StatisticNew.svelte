@@ -95,7 +95,7 @@
     name = /** @type {HTMLInputElement} */ (e.currentTarget).value;
   }
 
-  const resultHref = $derived(`/statistics/result/?c=${encodeCriteria(chosen)}`);
+  const resultHref = $derived(`/statistics/result?c=${encodeCriteria(chosen)}`);
 
   /** Opens the filtered result in the Statistics section, behind this dialog. */
   function openResult(/** @type {MouseEvent} */ e) {

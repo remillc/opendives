@@ -25,7 +25,7 @@
    * @type {{ f7router: any, f7route: any, signedIn?: boolean }}
    */
   let { f7router, f7route, signedIn = false } = $props();
-  const welcome = $derived(String(f7route.path ?? '').startsWith('/welcome/'));
+  const welcome = $derived(String(f7route.path ?? '').startsWith('/welcome'));
   const base = $derived(welcome ? '/welcome' : '/account');
 
   /** @type {'device'|'divelogs'|'file'|'empty'} */
@@ -66,7 +66,7 @@
         // Back here from the import ("Précédent" or a cancel), the fields are empty.
         user = '';
         password = '';
-        f7router.navigate(`${base}/importing/`, { props: { source: 'divelogs', ...credentials } });
+        f7router.navigate(`${base}/importing`, { props: { source: 'divelogs', ...credentials } });
         return;
       }
       await OpenDivesCore.createLog({ source: source === 'device' ? 'device' : 'empty' });
@@ -96,7 +96,7 @@
         reader.readAsDataURL(file);
       });
       const { path } = await OpenDivesCore.stageImport({ name: file.name, data: base64 });
-      f7router.navigate(`${base}/importing/`, { props: { source: 'file', path } });
+      f7router.navigate(`${base}/importing`, { props: { source: 'file', path } });
     } catch (e) {
       showFailure(errorCode(e));
     } finally {
@@ -106,7 +106,7 @@
 
   /** Back to step 1; after a creation it only shows the account's email. */
   function previous() {
-    if (accountFlow.confirmedEmail && !signedIn) f7router.back(`${base}/create/`, { force: true });
+    if (accountFlow.confirmedEmail && !signedIn) f7router.back(`${base}/create`, { force: true });
     else f7router.back();
   }
 </script>

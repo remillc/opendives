@@ -253,7 +253,7 @@
   }
 
   function openSetup() {
-    f7router.navigate('/plan/setup/');
+    f7router.navigate('/plan/setup');
   }
 </script>
 

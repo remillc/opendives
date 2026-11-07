@@ -31,7 +31,7 @@
     <ul>
       {#each sites as site (site.uuid)}
         <li>
-          <a href="/site/{site.uuid}/edit/" class="item-link item-content">
+          <a href="/site/{site.uuid}/edit" class="item-link item-content">
             <div class="item-inner">
               <div class="item-title">{site.name || t('sites.noName')}</div>
               <div class="item-text">{t('sites.diveCount', { n: site.dives })}</div>

@@ -135,7 +135,7 @@
       try {
         await renumberDives(plan.ids, plan.start);
         // The dive page shows the number it had: open it again.
-        f7router.navigate(`/dives/${plan.ids[0]}/`, { reloadCurrent: true });
+        f7router.navigate(`/dives/${plan.ids[0]}`, { reloadCurrent: true });
         offerUndo(t('renumber.done'), back);
       } catch (e) {
         console.error('Renumber', e);
@@ -173,7 +173,7 @@
       const id = await addDive(fields);
       // /dives/: from this screen, the master-detail route would reload the
       // Logbook. Back to the Logbook below, never a new one ("/" reloaded).
-      if (id) f7router.navigate(`/dives/${id}/`, { reloadCurrent: true });
+      if (id) f7router.navigate(`/dives/${id}`, { reloadCurrent: true });
       else f7router.back();
       const back = () => f7router.back();
       // A dive logged between others has no number (0): offer to renumber the

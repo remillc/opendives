@@ -62,7 +62,7 @@
     if (id === undefined) return;
     // The same kind of route as this one (/dive/ beside the list, /dives/ elsewhere).
     const base = f7route.url.startsWith('/dives/') ? '/dives/' : '/dive/';
-    f7router.navigate(`${base}${id}/`, { reloadCurrent: true, props: { slide: step > 0 ? 'next' : 'previous' } });
+    f7router.navigate(`${base}${id}`, { reloadCurrent: true, props: { slide: step > 0 ? 'next' : 'previous' } });
   }
 
   /**
@@ -122,7 +122,7 @@
     const next = order[at + 1] ?? order[at - 1];
     try {
       await deleteDive(id);
-      if (layout.split && next) f7router.navigate(`/dive/${next.id}/`, { reloadDetail: true });
+      if (layout.split && next) f7router.navigate(`/dive/${next.id}`, { reloadDetail: true });
       else f7router.back();
       offerUndo(t('detail.deleted'), undefined, 10000);
     } catch (e) {
@@ -323,12 +323,12 @@
     {/snippet}
     {#snippet right()}
       {#if theme.ios}
-        <Link href="/dive/{diveId}/edit/">{t('detail.edit')}</Link>
+        <Link href="/dive/{diveId}/edit">{t('detail.edit')}</Link>
         <Link iconOnly popoverOpen="#{menuId}">
           <Icon name="moreCircle" /><span class="od-sr-only">{t('detail.moreOptions')}</span>
         </Link>
       {:else}
-        <Link iconOnly href="/dive/{diveId}/edit/">
+        <Link iconOnly href="/dive/{diveId}/edit">
           <Icon name="edit" weight={2.2} /><span class="od-sr-only">{t('detail.edit')}</span>
         </Link>
         <Link iconOnly popoverOpen="#{menuId}">
@@ -342,7 +342,7 @@
        label; an iOS pull-down menu, label then icon at the end, no arrow. -->
   <Popover id={menuId} class="od-menu" backdrop={false}>
     <List noChevron>
-      <MenuItem icon="plan" text={t('detail.plan')} link="/plan/{diveId}/" />
+      <MenuItem icon="plan" text={t('detail.plan')} link="/plan/{diveId}" />
       <li class="od-menu-divider" role="separator"></li>
       <!-- In ink, not in the alarm colour: that one is for errors only. -->
       <MenuItem icon="delete" text={t('detail.delete')} onclick={deleteNow} />

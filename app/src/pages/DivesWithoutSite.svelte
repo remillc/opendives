@@ -95,7 +95,7 @@
               </button>
             {/if}
             <button type="button" class="small" onclick={() => chooseSite(dive.id)}>{t('sites.chooseSite')}</button>
-            <button type="button" class="small" onclick={() => f7router.navigate(`/site/new/?dive=${dive.id}`)}>{t('sites.newSite')}</button>
+            <button type="button" class="small" onclick={() => f7router.navigate(`/site/new?dive=${dive.id}`)}>{t('sites.newSite')}</button>
           </span>
           {#if dive.suggestedSite}
             <span class="why">{t('sites.suggestionLine', { n: sameTrip(dive.id, dive.suggestedSite), site: siteName(dive.suggestedSite) })}</span>

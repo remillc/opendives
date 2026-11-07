@@ -217,7 +217,7 @@
         leaving = true;
         const reason = code === 'NOT_FOUND' ? 'notFound' : 'lost';
         f7router.navigate(
-          `/download/failed/?computer=${encodeURIComponent(c.product)}&reason=${reason}&received=${kept}`,
+          `/download/failed?computer=${encodeURIComponent(c.product)}&reason=${reason}&received=${kept}`,
           { reloadCurrent: true },
         );
       } else if (code === 'BLUETOOTH_OFF' || code === 'PERMISSION') {

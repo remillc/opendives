@@ -236,7 +236,7 @@
         <List inset={theme.ios} strong={theme.ios} dividers={theme.ios} class="criteria">
           {#each g.keys as k (k.key)}
             <ListItem
-              link="/filter/{k.key}/"
+              link="/filter/{k.key}"
               title={label(k.key)}
               after={valueText(k.key, filter.draft, logbook.prefs, (id) => tripNames.get(id) ?? id)}
               class={isSet(k.key, filter.draft) ? 'set' : ''}
@@ -266,7 +266,7 @@
           {#if opened[g.group] || search.trim()}
             {#each g.keys as k (k.key)}
               <ListItem
-                link="/filter/{k.key}/"
+                link="/filter/{k.key}"
                 title={label(k.key)}
                 after={valueText(k.key, filter.draft, logbook.prefs, (id) => tripNames.get(id) ?? id)}
                 class={isSet(k.key, filter.draft) ? 'set in-group' : 'in-group'}

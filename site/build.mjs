@@ -1,8 +1,10 @@
 // Builds the public web pages of OpenDives from the app's own files, into
 // build/site/ (not in git), ready to be published on Cloudflare Pages:
-//   build/site/privacy/index.html     privacy policy, English
-//   build/site/privacy/fr/index.html  privacy policy, French
-//   build/site/assets/                the app's body font and logo
+//   build/site/privacy.html     privacy policy, English: /privacy
+//   build/site/privacy/fr.html  privacy policy, French: /privacy/fr
+//   build/site/assets/          the app's body font and logo
+// Cloudflare Pages serves page.html at /page: a page (a resource) has no
+// trailing slash, only a collection does.
 // The text is app/public/privacy/<language>.html, the same file the app shows
 // in About: one source for both. Run from anywhere: node site/build.mjs
 import { copyFile, mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
@@ -15,18 +17,18 @@ const out = join(root, 'build', 'site');
 /** Texts of the page around the policy, per language. */
 const pages = {
   en: {
-    path: 'privacy/index.html',
+    path: 'privacy.html',
     title: 'OpenDives privacy policy',
     heading: 'Privacy policy',
     description: 'Which data the OpenDives dive log uses, where it goes and how to erase it.',
-    other: { lang: 'fr', href: '/privacy/fr/', label: 'Version française' },
+    other: { lang: 'fr', href: '/privacy/fr', label: 'Version française' },
   },
   fr: {
-    path: 'privacy/fr/index.html',
+    path: 'privacy/fr.html',
     title: 'Politique de confidentialité d’OpenDives',
     heading: 'Politique de confidentialité',
     description: 'Les données qu’utilise le carnet de plongée OpenDives, où elles vont et comment les effacer.',
-    other: { lang: 'en', href: '/privacy/', label: 'English version' },
+    other: { lang: 'en', href: '/privacy', label: 'English version' },
   },
 };
 
@@ -40,8 +42,8 @@ const page = (lang, p, body) => `<!doctype html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${p.title}</title>
 <meta name="description" content="${p.description}">
-<link rel="alternate" hreflang="en" href="/privacy/">
-<link rel="alternate" hreflang="fr" href="/privacy/fr/">
+<link rel="alternate" hreflang="en" href="/privacy">
+<link rel="alternate" hreflang="fr" href="/privacy/fr">
 <link rel="icon" href="/assets/logo-light.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/assets/site.css">
 </head>

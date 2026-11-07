@@ -115,6 +115,7 @@ Gradle does not rebuild the native code: rerun `native/build-android.sh` when th
 
 - The app is versioned with Semantic Versioning 2.0.0: `MAJOR.MINOR.PATCH`, with an optional pre-release such as `0.2.0-beta.1`. The current version is **0.1.0**. Its one source is `app/package.json`: Android `versionName`, iOS `CFBundleShortVersionString` and the web build read it. Build numbers (`versionCode`, `CFBundleVersion`) are internal and only increase.
 - Release notes (About → Nouveautés, `about.releaseNotes` in `app/src/i18n/fr.json` and `en.json`) describe the current version. Every change a user can see adds or updates a line there in the same commit; a new version starts a new list.
+- Addresses, in the app's routes and on the public site: a resource has no trailing slash (`/about`, `/dive/42`, `/site/7/edit`, `/privacy`); a collection has one (`/sites/`, `/tools/`, `/settings/`, `/statistics/`); the home page is `/`.
 - Branch names always start with a prefix that says what the branch is for: `feature/...`, `fix/...`, `release/1.0.0`, and so on.
 - One branch per problem or task, created before its first change. Branches are merged when Christian asks.
 - Every commit is pushed right away (`git push`, or `git push -u origin <branch>` for a new branch); so is every merge.

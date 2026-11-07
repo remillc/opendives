@@ -44,7 +44,7 @@
   let { f7router } = $props();
 
   /** Download from the dive computer: Android only for now (Bluetooth). */
-  const downloadRoute = Capacitor.getPlatform() === 'android' ? '/download/' : '/add/download/';
+  const downloadRoute = Capacitor.getPlatform() === 'android' ? '/download' : '/add/download';
 
   let query = $state('');
   /** Expanded trips, by trip identifier of the current load. */
@@ -111,7 +111,7 @@
     if (!dive) return;
     tick().then(() => {
       // At start, only the logbook holds links to dives and trips.
-      const href = dive.trip ? `/trip/${dive.trip.id}/` : `/dive/${dive.id}/`;
+      const href = dive.trip ? `/trip/${dive.trip.id}` : `/dive/${dive.id}`;
       const link = /** @type {HTMLElement|null} */ (document.querySelector(`a[href="${href}"]`));
       /** @type {HTMLElement|null} */ (tap.expand ? link?.querySelector('.expand') : link)?.click();
     });
@@ -796,8 +796,8 @@
    */
   const routes = /** @type {Record<string, string>} */ ({
     download: downloadRoute,
-    manual: '/dive/new/',
-    divelogs: '/welcome/import/',
+    manual: '/dive/new',
+    divelogs: '/welcome/import',
   });
 
   /** @param {string} key download, import, manual, divelogs */
@@ -1013,8 +1013,8 @@
           <Icon name="download" size={18} weight={2} />{t('logbook.emptyPair')}
         </a>
         <button type="button" class="od-outlined-button" onclick={() => choose('import')}>{t('logbook.addImport')}</button>
-        <a href="/welcome/import/" class="od-outlined-button">{t('logbook.emptyDivelogs')}</a>
-        <a href="/dive/new/" class="od-text-button">{t('logbook.addManual')}</a>
+        <a href="/welcome/import" class="od-outlined-button">{t('logbook.emptyDivelogs')}</a>
+        <a href="/dive/new" class="od-text-button">{t('logbook.addManual')}</a>
       </div>
     {/if}
     <p class="empty-note">{t('logbook.emptyNote')}</p>
@@ -1037,7 +1037,7 @@
       {#if logbook.redoText}
         <MenuItem icon="redo" text={t('logbook.menuRedo')} onclick={() => undoRedo(true)} />
       {/if}
-      <MenuItem icon="filter" text={t(filtered ? 'logbook.menuFilterOn' : 'logbook.menuFilter')} link="/filter/" />
+      <MenuItem icon="filter" text={t(filtered ? 'logbook.menuFilterOn' : 'logbook.menuFilter')} link="/filter" />
       {#if !selecting}
         <MenuItem icon="renumber" text={t('logbook.menuRenumber')} onclick={() => (renumbering = true)} />
       {:else}

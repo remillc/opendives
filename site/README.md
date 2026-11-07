@@ -7,8 +7,10 @@ The pages of opendives.app that come from the app: for now the privacy policy.
 
 | Page | Address once published |
 | --- | --- |
-| `build/site/privacy/index.html` | `https://opendives.app/privacy/` (English) |
-| `build/site/privacy/fr/index.html` | `https://opendives.app/privacy/fr/` (French) |
+| `build/site/privacy.html` | `https://opendives.app/privacy` (English) |
+| `build/site/privacy/fr.html` | `https://opendives.app/privacy/fr` (French) |
+
+Addresses follow the rule of the project: a resource (a page) has no trailing slash, a collection has one; the home page is `/`.
 
 ## Publishing on Cloudflare Pages
 

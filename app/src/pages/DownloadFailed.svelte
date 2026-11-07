@@ -42,7 +42,7 @@
 
   /** The download screen again, in this one's place: the same attempt (retry) or the list. @param {boolean} retry */
   function again(retry) {
-    f7router.navigate('/download/', { reloadCurrent: true, props: { retry } });
+    f7router.navigate('/download', { reloadCurrent: true, props: { retry } });
   }
 </script>
 

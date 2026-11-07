@@ -46,7 +46,7 @@
   });
 
   /** @param {number} uuid */
-  const open = (uuid) => f7.views.current?.router.navigate(`/site/${uuid}/`);
+  const open = (uuid) => f7.views.current?.router.navigate(`/site/${uuid}`);
 
   function centreOnDevice() {
     const failed = () => f7.toast.create({ text: t('sites.noDevicePosition'), closeTimeout: 3000 }).open();
@@ -63,7 +63,7 @@
   {#snippet fixedContent()}
     <!-- MD3 FAB, 56 dp, over the list panel: a new site. -->
     <div class="fab fab-right-bottom od-fab-add">
-      <a href="/site/new/" aria-label={t('sites.newSite')}><i class="icon"><Icon name="plus" /></i></a>
+      <a href="/site/new" aria-label={t('sites.newSite')}><i class="icon"><Icon name="plus" /></i></a>
     </div>
   {/snippet}
   <Navbar title={t('sites.title')}>
@@ -105,7 +105,7 @@
             <li><a href="/sites/unplaced/" class="item-link item-content"><div class="item-inner"><div class="item-title">{t('sites.unplacedLink', { n: unplaced })}</div></div></a></li>
           {/if}
           {#if duplicates}
-            <li><a href="/sites/cleanup/" class="item-link item-content"><div class="item-inner"><div class="item-title">{t('sites.duplicatesLink', { n: duplicates })}</div></div></a></li>
+            <li><a href="/sites/cleanup" class="item-link item-content"><div class="item-inner"><div class="item-title">{t('sites.duplicatesLink', { n: duplicates })}</div></div></a></li>
           {/if}
         </ul>
       </div>
@@ -117,7 +117,7 @@
         <ul>
           {#each used as site (site.uuid)}
             <li>
-              <a href="/site/{site.uuid}/" class="item-link item-content">
+              <a href="/site/{site.uuid}" class="item-link item-content">
                 <div class="item-inner">
                   <div class="text">
                     <div class="item-title od-site-name">{site.name || t('sites.noName')}</div>

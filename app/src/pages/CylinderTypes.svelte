@@ -35,7 +35,7 @@
 
   /** @param {string} name */
   function open(name) {
-    f7.views.current.router.navigate(`/settings/cylinders/type/?name=${encodeURIComponent(name)}`);
+    f7.views.current.router.navigate(`/settings/cylinders/type?name=${encodeURIComponent(name)}`);
   }
 </script>
 
@@ -81,7 +81,7 @@
   {#snippet fixedContent()}
     <!-- Extended floating button, written by hand as in the Logbook. -->
     <div class="fab fab-right-bottom fab-extended od-fab-add">
-      <a href="/settings/cylinders/new/">
+      <a href="/settings/cylinders/new">
         <i class="icon"><Icon name="plus" /></i>
         <div class="fab-text">{t('settings.cylinders.add')}</div>
       </a>

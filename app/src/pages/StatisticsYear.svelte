@@ -69,7 +69,7 @@
 
   /** @param {number} month */
   const monthHref = (month) =>
-    `/statistics/result/?c=${encodeCriteria([{ field: 'month', values: [`${year}-${String(month).padStart(2, '0')}`] }])}`;
+    `/statistics/result?c=${encodeCriteria([{ field: 'month', values: [`${year}-${String(month).padStart(2, '0')}`] }])}`;
 </script>
 
 <Page>
@@ -111,7 +111,7 @@
       <ul>
         {#each trips as trip (trip.start)}
           <li>
-            <a href="/trip/{trip.id}/" class="item-link item-content">
+            <a href="/trip/{trip.id}" class="item-link item-content">
               <div class="item-inner">
                 <div class="item-title-row"><div class="item-title">{tripName(trip)}</div></div>
                 <div class="item-text od-value">

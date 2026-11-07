@@ -29,7 +29,7 @@
 
   async function create() {
     if (confirmed) {
-      f7router.navigate(`${base}/import/`);
+      f7router.navigate(`${base}/import`);
       return;
     }
     emailError = validEmail(email.trim()) ? '' : t('createAccount.invalidEmail');
@@ -40,13 +40,13 @@
       const result = await OpenDivesCore.createAccount({ email: email.trim(), password });
       if (result.status === 'need_pin') {
         password = '';
-        f7router.navigate(`${base}/code/`, { props: { email: result.email } });
+        f7router.navigate(`${base}/code`, { props: { email: result.email } });
       } else if (result.status === 'verified') {
         // The account exists with this password: sign in to it.
         const signedIn = await OpenDivesCore.signIn({ email: email.trim(), password });
         password = '';
         if (signedIn.exists) finishAccount(f7router, welcome, { offerDeviceDives: true });
-        else f7router.navigate(`${base}/import/`, { props: { signedIn: true } });
+        else f7router.navigate(`${base}/import`, { props: { signedIn: true } });
       } else {
         passwordError = t('signIn.incorrect');
       }
