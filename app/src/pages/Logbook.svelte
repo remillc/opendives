@@ -285,6 +285,14 @@
      */
     function click(e) {
       if (!el?.contains(/** @type {Node} */ (e.target))) return;
+      // While another screen slides in over the Logbook, its rows are still
+      // visible: a tap then would open a dive from that screen, which
+      // Framework7's master-detail routing turns into a second Logbook.
+      if (!el.closest('.page')?.classList.contains('page-current')) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
       if (pressed) {
         pressed = false;
         e.preventDefault();
