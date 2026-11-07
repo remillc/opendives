@@ -8,6 +8,8 @@
   // external-link icon.
   import { Page, Navbar, Link } from 'framework7-svelte';
   import { App } from '@capacitor/app';
+  import { Capacitor } from '@capacitor/core';
+  import { logbook } from '../lib/logbook.svelte.js';
   import Icon from '../components/Icon.svelte';
   import { t } from '../lib/i18n.js';
 
@@ -15,12 +17,14 @@
   const AUTHOR = 'Christian Rémillard';
 
   /**
-   * Placeholders until Christian gives the real addresses (inbox task
-   * 2026-11-07-15): source code, issue tracker, privacy policy.
+   * The support address of "Signaler un problème", a build-time setting
+   * (VITE_SUPPORT_EMAIL in app/.env*): the row is hidden while it is empty.
    */
+  const SUPPORT_EMAIL = String(/** @type {any} */ (import.meta).env?.VITE_SUPPORT_EMAIL ?? '').trim();
+
+  /** The privacy policy address is a placeholder until Christian gives the real one. */
   const LINKS = {
-    source: 'https://github.com/opendives',
-    issues: 'https://github.com/opendives/opendives/issues',
+    source: 'https://github.com/remillc/opendives',
     privacy: 'https://github.com/opendives/opendives/blob/main/PRIVACY.md',
     osm: 'https://www.openstreetmap.org/copyright',
     geonames: 'https://www.geonames.org/about.html',
@@ -30,13 +34,41 @@
    * "Version 0.1.0": the installed package's version (its build number stays
    * internal); in a browser, the one of the web build (package.json).
    */
-  let version = $state(t('about.version', { version: __APP_VERSION__ }));
+  let appVersion = $state(__APP_VERSION__);
+  const version = $derived(t('about.version', { version: appVersion }));
   App.getInfo()
-    .then((info) => (version = t('about.version', { version: info.version })))
+    .then((info) => (appVersion = info.version))
     .catch(() => {});
 
   /**
-   * @type {{ title: string, rows: { key: string, icon: import('svelte').ComponentProps<typeof Icon>['name'], text: string, sub: string, href: string, external?: boolean }[] }[]}
+   * "Signaler un problème": the phone's mail app, with an empty line for the
+   * description, then the technical block (spec, "Reporting a problem").
+   * Nothing else: no credentials, no email address, no dive data, no place.
+   */
+  function reportProblem() {
+    const ua = navigator.userAgent;
+    const os = /Android [\d.]+/.exec(ua)?.[0] ?? /(?:iPhone|CPU) OS [\d_]+/.exec(ua)?.[0]?.replace(/_/g, '.') ?? '';
+    const model = /Android [\d.]+; ([^;)]+?)(?: Build|\))/.exec(ua)?.[1] ?? (/iPad/.test(ua) ? 'iPad' : /iPhone/.test(ua) ? 'iPhone' : '');
+    const p = logbook.prefs;
+    const units = p ? [p.length, p.pressure, p.volume, p.temperature, p.weight].filter(Boolean).join(', ') : '';
+    const lines = [
+      [t('about.report.version'), appVersion],
+      [t('about.report.platform'), [Capacitor.getPlatform(), os].filter(Boolean).join(', ')],
+      [t('about.report.device'), model],
+      [t('about.report.language'), document.documentElement.lang],
+      [t('about.report.units'), units],
+      [t('about.report.mode'), t(logbook.email ? 'about.report.cloud' : 'about.report.noAccount')],
+      [t('about.report.dives'), String(logbook.dives.length)],
+      [t('about.report.lastSync'), [logbook.lastSync ?? '—', logbook.sync].join(', ')],
+      [t('about.report.lastError'), logbook.error ?? '—'],
+    ];
+    const body = ['', '', t('about.report.technical'), ...lines.map(([k, v]) => `${k} : ${v || '—'}`)].join('\n');
+    const subject = t('about.report.subject', { version: appVersion });
+    location.href = `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  }
+
+  /**
+   * @type {{ title: string, rows: { key: string, icon: import('svelte').ComponentProps<typeof Icon>['name'], text: string, sub: string, href: string, external?: boolean, mail?: boolean, onclick?: () => void }[] }[]}
    */
   const groups = [
     {
@@ -44,7 +76,9 @@
       rows: [
         { key: 'notes', icon: 'info', text: t('about.notes'), sub: t('about.notesText'), href: '/about/notes/' },
         { key: 'source', icon: 'file', text: t('about.source'), sub: LINKS.source.replace('https://', ''), href: LINKS.source, external: true },
-        { key: 'issues', icon: 'warning', text: t('about.issues'), sub: '', href: LINKS.issues, external: true },
+        ...(SUPPORT_EMAIL
+          ? [{ key: 'issues', icon: /** @type {const} */ ('warning'), text: t('about.issues'), sub: '', href: '#report', mail: true, onclick: reportProblem }]
+          : []),
       ],
     },
     {
@@ -89,9 +123,15 @@
           <li>
             <a
               href={row.href}
-              class="item-link item-content {row.external ? 'external no-chevron' : ''}"
+              class="item-link item-content {row.external || row.mail ? 'external no-chevron' : ''}"
               target={row.external ? '_blank' : undefined}
               rel={row.external ? 'noopener' : undefined}
+              onclick={row.onclick
+                ? (e) => {
+                    e.preventDefault();
+                    row.onclick?.();
+                  }
+                : undefined}
             >
               <div class="item-media"><Icon name={row.icon} /></div>
               <div class="item-inner">
@@ -101,6 +141,8 @@
                 </div>
                 {#if row.external}
                   <div class="item-after"><Icon name="openInNew" size={20} /><span class="od-sr-only">{t('about.opensElsewhere')}</span></div>
+                {:else if row.mail}
+                  <div class="item-after"><Icon name="mail" size={20} /><span class="od-sr-only">{t('about.opensMail')}</span></div>
                 {/if}
               </div>
             </a>

@@ -1176,6 +1176,22 @@
     "privacy": "Privacy",
     "privacyPolicy": "Privacy policy",
     "privacyText": "Your dives stay on the device and in your account",
+    "opensMail": "opens in the mail app",
+    "report": {
+      "subject": "OpenDives {version}: problem",
+      "technical": "Technical information (please leave it in the message)",
+      "version": "App version",
+      "platform": "System",
+      "device": "Device",
+      "language": "Language",
+      "units": "Units",
+      "mode": "Logbook",
+      "cloud": "Subsurface account",
+      "noAccount": "no account",
+      "dives": "Dives",
+      "lastSync": "Last synchronisation",
+      "lastError": "Last error"
+    },
     "opensElsewhere": "opens in the browser",
     "credit": "The dive core comes from Subsurface, created by Linus Torvalds and Dirk Hohndel, and its contributors."
   },

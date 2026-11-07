@@ -1176,6 +1176,22 @@
     "privacy": "Confidentialité",
     "privacyPolicy": "Politique de confidentialité",
     "privacyText": "Vos plongées restent sur l'appareil et dans votre compte",
+    "opensMail": "s'ouvre dans l'application de courriel",
+    "report": {
+      "subject": "OpenDives {version} : problème",
+      "technical": "Informations techniques (à laisser dans le message)",
+      "version": "Version de l'app",
+      "platform": "Système",
+      "device": "Appareil",
+      "language": "Langue",
+      "units": "Unités",
+      "mode": "Carnet",
+      "cloud": "compte Subsurface",
+      "noAccount": "sans compte",
+      "dives": "Plongées",
+      "lastSync": "Dernière synchronisation",
+      "lastError": "Dernière erreur"
+    },
     "opensElsewhere": "s'ouvre dans le navigateur",
     "credit": "Le cœur de calcul vient de Subsurface, créé par Linus Torvalds et Dirk Hohndel, et de ses contributeurs."
   },
