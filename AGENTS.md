@@ -70,6 +70,7 @@ poc/                      proof of concept: build.sh + report (README.md)
 tests/                    roundtrip.cpp, run-roundtrip.sh, facade.cpp
 third_party/subsurface/   pinned Subsurface submodule (+ its libdivecomputer submodule)
 docs/                     design documents
+site/                     public web pages built from the app's files (privacy policy) + README
 ```
 
 ## Commands
