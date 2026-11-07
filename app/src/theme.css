@@ -687,7 +687,7 @@ html.ios {
    * coming in moves with the finger at once: shown from display: none, it
    * would first take a long frame (Sites, with its map, about 150 ms).
    */
-  .views:not(.od-tablet) > .view.tab:not(.tab-active) {
+  .views:not(.od-tablet) > .view.tab:not(.tab-active, .od-tab-peek) {
     display: block;
     position: absolute;
     inset: 0;
