@@ -702,7 +702,6 @@
     "noLooseDive": "Toutes les plongées sont déjà dans un voyage",
     "edit": "Modifier le voyage",
     "done": "Voyage modifié",
-    "help": "Le menu de chaque plongée la retire du voyage ou coupe le voyage à cet endroit. Le menu du haut fusionne ce voyage avec un autre, ajoute des plongées ou défait le voyage.",
     "ungroupConfirm": "Défaire"
   },
   "sites": {

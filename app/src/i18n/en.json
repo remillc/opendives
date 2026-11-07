@@ -702,7 +702,6 @@
     "noLooseDive": "Every dive is already in a trip",
     "edit": "Edit the trip",
     "done": "Trip changed",
-    "help": "Each dive's menu removes it from the trip or splits the trip there. The top menu merges this trip with another, adds dives or ungroups the trip.",
     "ungroupConfirm": "Ungroup"
   },
   "sites": {

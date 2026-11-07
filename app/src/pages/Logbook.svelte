@@ -10,6 +10,7 @@
   import DiveRow from '../components/DiveRow.svelte';
   import TripRow from '../components/TripRow.svelte';
   import Icon from '../components/Icon.svelte';
+  import MenuItem from '../components/MenuItem.svelte';
   import MenuButton from '../components/MenuButton.svelte';
   import ActiveFilter from '../components/ActiveFilter.svelte';
   import ConflictSheet from '../components/ConflictSheet.svelte';
@@ -722,35 +723,22 @@
   {/if}
 
   <!--
-    Overflow menu (the dive detail's, components styles "dive-menu"): Filter,
-    and with a selection Delete, Create a trip, Add to the trip above / below.
+    Overflow menu: Filter, and with a selection Delete, Create a trip, Add to
+    the trip above / below.
   -->
-  <Popover class="dive-menu od-logbook-menu" backdrop={false}>
+  <Popover class="od-menu od-logbook-menu" backdrop={false}>
     <List noChevron>
-      <ListItem link="/filter/" popoverClose title={t(filtered ? 'logbook.menuFilterOn' : 'logbook.menuFilter')}>
-        {#snippet media()}{#if !theme.ios}<Icon name="filter" weight={2} />{/if}{/snippet}
-        {#snippet after()}{#if theme.ios}<Icon name="filter" />{/if}{/snippet}
-      </ListItem>
+      <MenuItem icon="filter" text={t(filtered ? 'logbook.menuFilterOn' : 'logbook.menuFilter')} link="/filter/" />
       {#if selecting}
-        <ListItem link="#" popoverClose title={t('logbook.menuDelete')} class="destructive" onClick={deleteChecked}>
-          {#snippet media()}{#if !theme.ios}<Icon name="delete" weight={2} />{/if}{/snippet}
-          {#snippet after()}{#if theme.ios}<Icon name="delete" />{/if}{/snippet}
-        </ListItem>
-        <ListItem link="#" popoverClose title={t('logbook.menuCreateTrip')} onClick={createTrip}>
-          {#snippet media()}{#if !theme.ios}<Icon name="plus" weight={2} />{/if}{/snippet}
-          {#snippet after()}{#if theme.ios}<Icon name="plus" />{/if}{/snippet}
-        </ListItem>
+        <MenuItem icon="delete" text={t('logbook.menuDelete')} destructive onclick={deleteChecked} />
+        <MenuItem icon="plus" text={t('logbook.menuCreateTrip')} onclick={createTrip} />
         {#if neighbourTrips.above}
           {@const id = neighbourTrips.above}
-          <ListItem link="#" popoverClose title={t('logbook.menuAddAbove', { n: checkedCount })} onClick={() => addToTrip(id)}>
-            {#snippet media()}{#if !theme.ios}<span class="menu-blank"></span>{/if}{/snippet}
-          </ListItem>
+          <MenuItem icon="arrowUp" text={t('logbook.menuAddAbove', { n: checkedCount })} onclick={() => addToTrip(id)} />
         {/if}
         {#if neighbourTrips.below}
           {@const id = neighbourTrips.below}
-          <ListItem link="#" popoverClose title={t('logbook.menuAddBelow', { n: checkedCount })} onClick={() => addToTrip(id)}>
-            {#snippet media()}{#if !theme.ios}<span class="menu-blank"></span>{/if}{/snippet}
-          </ListItem>
+          <MenuItem icon="arrowDown" text={t('logbook.menuAddBelow', { n: checkedCount })} onclick={() => addToTrip(id)} />
         {/if}
       {/if}
     </List>
@@ -859,8 +847,14 @@
    * Framework7's own variables are set without one.
    */
   :global(.md .od-logbook) {
-    --f7-navbar-large-title-height: 72px;
+    --f7-navbar-large-title-height: 64px;
     --f7-subnavbar-height: 76px;
+  }
+
+  /* The title and the search box at the top of their bands: the room is under the search box. */
+  :global(.md .od-logbook .title-large),
+  :global(.md .od-logbook .subnavbar) {
+    align-items: flex-start;
   }
 
   @layer od.components {
@@ -914,11 +908,6 @@
 
     .selection-more {
       margin-left: auto;
-    }
-
-    :global(.od-logbook-menu .menu-blank) {
-      display: block;
-      width: 24px;
     }
 
     /* The dives follow the count and the sync status closely. */

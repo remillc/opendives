@@ -463,3 +463,75 @@ html.ios {
     }
   }
 }
+
+/* Overflow menus (⋮), components/MenuItem.svelte. */
+@layer od.components {
+    /* MD3 menu, as in the mock-up: small corners, no backdrop, width of its label (280 px at most). */
+    .popover.od-menu {
+      --f7-popover-width: max-content;
+      --f7-popover-border-radius: 4px;
+      min-width: 112px;
+      max-width: 280px;
+      background: var(--od-surface);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 6px 2px rgba(0, 0, 0, 0.15);
+    }
+
+    .od-menu .list {
+      margin: 8px 0;
+    }
+
+    .od-menu .item-content {
+      min-height: 48px;
+      padding-left: 12px;
+    }
+
+    .od-menu .item-media {
+      min-width: 24px;
+      color: var(--od-text);
+    }
+
+    .od-menu .item-title {
+      font-size: 14px;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: visible;
+      color: var(--od-text);
+    }
+
+    /* iOS pull-down menu: 260 pt wide, 13 pt corners, 17 pt label, icon at the end. */
+    .ios .popover.od-menu {
+      --f7-popover-width: 260px;
+      --f7-popover-border-radius: 13px;
+      min-width: 0;
+      max-width: none;
+      background: color-mix(in srgb, var(--od-surface) 94%, transparent);
+      backdrop-filter: blur(20px);
+    }
+
+    .ios .od-menu .popover-arrow {
+      display: none;
+    }
+
+    .ios .od-menu .list {
+      margin: 0;
+    }
+
+    .ios .od-menu .item-content {
+      min-height: 44px;
+      padding-left: 16px;
+    }
+
+    .ios .od-menu .item-title {
+      font-size: 17px;
+      font-weight: 400;
+    }
+
+    .ios .od-menu .destructive .item-title,
+    .ios .od-menu .destructive .item-after {
+      color: var(--od-alarm);
+    }
+
+    .ios .od-menu .item-after {
+      color: var(--od-text);
+    }
+}

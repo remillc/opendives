@@ -7,7 +7,7 @@
 
   /**
    * @type {{
-   *   name: 'logbook'|'sites'|'statistics'|'tools'|'plus'|'check'|'offline'|'device'|'expand'|'settings'|'edit'|'more'|'moreCircle'|'plan'|'menu'|'sync'|'close'|'download'|'file'|'account'|'cloud'|'warning'|'locate'|'fullscreen'|'exitFullscreen'|'place'|'search'|'openInNew'|'filter'|'info'|'error'|'visibility'|'visibilityOff'|'refresh'|'delete'|'chevron'|'bluetooth',
+   *   name: 'logbook'|'sites'|'statistics'|'tools'|'plus'|'check'|'offline'|'device'|'expand'|'settings'|'edit'|'more'|'moreCircle'|'plan'|'menu'|'sync'|'close'|'download'|'file'|'account'|'cloud'|'warning'|'locate'|'fullscreen'|'exitFullscreen'|'place'|'search'|'openInNew'|'filter'|'info'|'error'|'visibility'|'visibilityOff'|'refresh'|'delete'|'chevron'|'bluetooth'|'merge'|'split'|'ungroup'|'remove'|'arrowRight'|'arrowUp'|'arrowDown',
    *   size?: number,
    *   weight?: number,
    * }}
@@ -25,6 +25,13 @@
     delete: 'M4.5 7h15M10 11v6M14 11v6M6.5 7l1 13h9l1-13M9.5 7V4.5h5V7',
     chevron: 'M9 5l7 7-7 7',
     bluetooth: 'M7 7l10 10-5 4V3l5 4L7 17',
+    merge: 'M6 3v4c0 3 6 5 6 8v6M18 3v4c0 3-6 5-6 8',
+    split: 'M12 3v6c0 3-6 5-6 8v4M12 9c0 3 6 5 6 8v4',
+    ungroup: 'M4 4h6v6H4zM14 14h6v6h-6z',
+    remove: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM8 12h8',
+    arrowRight: 'M5 12h14M13 6l6 6-6 6',
+    arrowUp: 'M12 19V5M6 11l6-6 6 6',
+    arrowDown: 'M12 5v14M6 13l6 6 6-6',
     menu: 'M4 7h16M4 12h16M4 17h16',
     account: 'M12 12a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM5 20c1-3.6 3.8-5.5 7-5.5s6 1.9 7 5.5',
     warning: 'M12 4l9 16H3zM12 10v4M12 17h.01',

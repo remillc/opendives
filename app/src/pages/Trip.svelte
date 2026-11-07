@@ -6,8 +6,9 @@
   // there) and a top menu (merge with another trip, add dives, ungroup). Each
   // change is one undoable step, as Subsurface's trip commands. The trip id is
   // that of the current load: never stored.
-  import { onMount } from 'svelte';
-  import { Page, Navbar, Link, f7 } from 'framework7-svelte';
+  import { onMount, tick } from 'svelte';
+  import { Page, Navbar, Link, List, Popover, f7 } from 'framework7-svelte';
+  import MenuItem from '../components/MenuItem.svelte';
   import { OpenDivesCore } from 'opendives-core';
   import Icon from '../components/Icon.svelte';
   import { logbook, tripChange, undoLastChange } from '../lib/logbook.svelte.js';
@@ -82,20 +83,18 @@
     );
   }
 
-  /** @param {{id: number}} dive @param {number} index */
-  function diveMenu(dive, index) {
-    f7.actions
-      .create({
-        buttons: [
-          [
-            { text: t('tripScreen.openDive'), onClick: () => f7router.navigate(`/dive/${dive.id}/`) },
-            { text: t('tripScreen.removeDive'), onClick: () => change({ action: 'remove', diveId: dive.id }) },
-            ...(index > 0 ? [{ text: t('tripScreen.splitHere'), onClick: () => change({ action: 'split', diveId: dive.id }) }] : []),
-          ],
-          [{ text: t('logbook.cancel'), bold: true }],
-        ],
-      })
-      .open();
+  /** The dive whose ⋮ menu is open, and its place in the trip. */
+  let menuDive = $state(/** @type {{ id: number, index: number }|null} */ (null));
+
+  /**
+   * A dive's ⋮ menu, under its button.
+   * @param {MouseEvent} e @param {{id: number}} dive @param {number} index
+   */
+  async function diveMenu(e, dive, index) {
+    const target = /** @type {HTMLElement} */ (e.currentTarget);
+    menuDive = { id: dive.id, index };
+    await tick();
+    f7.popover.open('.od-trip-dive-menu', target);
   }
 
   /** Trips of the logbook other than this one, the closest in time first. */
@@ -124,21 +123,6 @@
       .filter((d) => !d.trip)
       .sort((a, b) => Math.abs(new Date(a.date).getTime() - start) - Math.abs(new Date(b.date).getTime() - start))
       .slice(0, 8);
-  }
-
-  function topMenu() {
-    f7.actions
-      .create({
-        buttons: [
-          [
-            { text: t('tripScreen.merge'), onClick: chooseTripToMerge },
-            { text: t('tripScreen.addDives'), onClick: chooseDiveToAdd },
-            { text: t('tripScreen.ungroup'), color: 'red', onClick: confirmUngroup },
-          ],
-          [{ text: t('logbook.cancel'), bold: true }],
-        ],
-      })
-      .open();
   }
 
   function chooseTripToMerge() {
@@ -201,7 +185,7 @@
       <Link iconOnly onClick={() => editField('location')}>
         <Icon name="edit" weight={2.2} /><span class="od-sr-only">{t('tripScreen.edit')}</span>
       </Link>
-      <Link iconOnly onClick={topMenu}>
+      <Link iconOnly popoverOpen=".od-trip-menu">
         <Icon name="more" weight={4} /><span class="od-sr-only">{t('detail.moreOptions')}</span>
       </Link>
     {/snippet}
@@ -251,7 +235,7 @@
                 <div class="item-footer">{formatDuration(dive.durationSeconds)} · {dive.site || t('dive.siteNotSet')}</div>
               </div>
               <div class="item-after">
-                <button type="button" class="more" onclick={() => diveMenu(dive, i)}>
+                <button type="button" class="more" onclick={(e) => diveMenu(e, dive, i)}>
                   <Icon name="more" weight={4} /><span class="od-sr-only">{t('detail.moreOptions')}</span>
                 </button>
               </div>
@@ -260,9 +244,28 @@
         {/each}
       </ul>
     </div>
-
-    <p class="note">{t('tripScreen.help')}</p>
   {/if}
+
+  <!-- The ⋮ menus (components/MenuItem.svelte): the trip's, and a dive's. -->
+  <Popover class="od-menu od-trip-menu" backdrop={false}>
+    <List noChevron>
+      <MenuItem icon="merge" text={t('tripScreen.merge')} onclick={chooseTripToMerge} />
+      <MenuItem icon="plus" text={t('tripScreen.addDives')} onclick={chooseDiveToAdd} />
+      <MenuItem icon="ungroup" text={t('tripScreen.ungroup')} destructive onclick={confirmUngroup} />
+    </List>
+  </Popover>
+  <Popover class="od-menu od-trip-dive-menu" backdrop={false}>
+    <List noChevron>
+      {#if menuDive}
+        {@const d = menuDive}
+        <MenuItem icon="arrowRight" text={t('tripScreen.openDive')} onclick={() => f7router.navigate(`/dives/${d.id}/`)} />
+        <MenuItem icon="remove" text={t('tripScreen.removeDive')} onclick={() => change({ action: 'remove', diveId: d.id })} />
+        {#if d.index > 0}
+          <MenuItem icon="split" text={t('tripScreen.splitHere')} onclick={() => change({ action: 'split', diveId: d.id })} />
+        {/if}
+      {/if}
+    </List>
+  </Popover>
 </Page>
 
 <style>
@@ -313,11 +316,5 @@
       justify-content: center;
     }
 
-    .note {
-      margin: 16px 20px 32px;
-      font-size: 13px;
-      line-height: 18px;
-      color: var(--od-text-2);
-    }
   }
 </style>

@@ -133,7 +133,7 @@
         <ul>
           {#each [...desat.dives].reverse() as dive (dive.id)}
             <li>
-              <a href="/dive/{dive.id}/" class="item-link item-content">
+              <a href="/dives/{dive.id}/" class="item-link item-content">
                 <div class="item-inner">
                   <div class="item-title od-value">{formatDateTime(dive.date)}</div>
                   <div class="item-text">

@@ -12,6 +12,7 @@
   import { OpenDivesCore } from 'opendives-core';
   import DiveProfile from '../components/DiveProfile.svelte';
   import Icon from '../components/Icon.svelte';
+  import MenuItem from '../components/MenuItem.svelte';
   import Stars from '../components/Stars.svelte';
   import { logbook, deleteDive } from '../lib/logbook.svelte.js';
   import { confirmAction } from '../lib/dialogs.js';
@@ -264,24 +265,10 @@
 
   <!-- Overflow menu (detail2 mock-ups): an MD3 menu on Android, icon before the
        label; an iOS pull-down menu, label then icon at the end, no arrow. -->
-  <Popover id={menuId} class="dive-menu" backdrop={false}>
+  <Popover id={menuId} class="od-menu" backdrop={false}>
     <List noChevron>
-      {#if theme.ios}
-        <ListItem link="/plan/{diveId}/" popoverClose title={t('detail.plan')}>
-          {#snippet after()}<Icon name="plan" />{/snippet}
-        </ListItem>
-        <!-- iOS: a destructive action in the alarm colour (Human Interface Guidelines). -->
-        <ListItem link="#" popoverClose title={t('detail.delete')} class="destructive" onClick={askDelete}>
-          {#snippet after()}<Icon name="delete" />{/snippet}
-        </ListItem>
-      {:else}
-        <ListItem link="/plan/{diveId}/" popoverClose title={t('detail.plan')}>
-          {#snippet media()}<Icon name="plan" weight={2} />{/snippet}
-        </ListItem>
-        <ListItem link="#" popoverClose title={t('detail.delete')} onClick={askDelete}>
-          {#snippet media()}<Icon name="delete" weight={2} />{/snippet}
-        </ListItem>
-      {/if}
+      <MenuItem icon="plan" text={t('detail.plan')} link="/plan/{diveId}/" />
+      <MenuItem icon="delete" text={t('detail.delete')} destructive onclick={askDelete} />
     </List>
   </Popover>
 
@@ -768,75 +755,6 @@
       font-size: 16px;
       line-height: 22px;
       white-space: pre-line;
-    }
-
-    /* MD3 menu, as in the mock-up: small corners, no backdrop, width of its label (280 px at most). */
-    :global(.popover.dive-menu) {
-      --f7-popover-width: max-content;
-      --f7-popover-border-radius: 4px;
-      min-width: 112px;
-      max-width: 280px;
-      background: var(--od-surface);
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 6px 2px rgba(0, 0, 0, 0.15);
-    }
-
-    :global(.dive-menu .list) {
-      margin: 8px 0;
-    }
-
-    :global(.dive-menu .item-content) {
-      min-height: 48px;
-      padding-left: 12px;
-    }
-
-    :global(.dive-menu .item-media) {
-      min-width: 24px;
-      color: var(--od-text);
-    }
-
-    :global(.dive-menu .item-title) {
-      font-size: 14px;
-      font-weight: 500;
-      white-space: nowrap;
-      overflow: visible;
-      color: var(--od-text);
-    }
-
-    /* iOS pull-down menu: 260 pt wide, 13 pt corners, 17 pt label, icon at the end. */
-    :global(.ios .popover.dive-menu) {
-      --f7-popover-width: 260px;
-      --f7-popover-border-radius: 13px;
-      min-width: 0;
-      max-width: none;
-      background: color-mix(in srgb, var(--od-surface) 94%, transparent);
-      backdrop-filter: blur(20px);
-    }
-
-    :global(.ios .dive-menu .popover-arrow) {
-      display: none;
-    }
-
-    :global(.ios .dive-menu .list) {
-      margin: 0;
-    }
-
-    :global(.ios .dive-menu .item-content) {
-      min-height: 44px;
-      padding-left: 16px;
-    }
-
-    :global(.ios .dive-menu .item-title) {
-      font-size: 17px;
-      font-weight: 400;
-    }
-
-    :global(.ios .dive-menu .destructive .item-title),
-    :global(.ios .dive-menu .destructive .item-after) {
-      color: var(--od-alarm);
-    }
-
-    :global(.ios .dive-menu .item-after) {
-      color: var(--od-text);
     }
   }
 </style>

@@ -96,6 +96,10 @@
       { path: '/welcome/import/', component: BringLogbook },
       { path: '/welcome/importing/', component: ImportProgress },
       { path: '/dive/:id/edit/', component: EditDive },
+      // A dive opened from another screen than the Logbook (trip, site, tools):
+      // the same screen, without the master-detail routing, which would put a
+      // second Logbook in the history.
+      { path: '/dives/:id/', component: DiveDetail },
       { path: '/trip/:id/', component: Trip },
       // The planner: /plan/new/ for a new dive, /plan/<dive id>/ from a logbook dive.
       { path: '/plan/setup/', component: PlannerSetup },
