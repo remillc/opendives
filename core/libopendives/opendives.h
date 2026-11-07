@@ -385,6 +385,10 @@ struct filter_rule {
 // "airTemp", "planned" (both planned and logged dives), "notes", "rating",
 // "visibility", "current", "wavesize", "surge", "chill"}.
 int filter_options(std::string &json);
+// The Logbook's search box, read-only: the identifiers of the dives that
+// Subsurface's fulltext index finds for `text` (words starting with it), or
+// whose site's region or city contains it; [] for an empty text.
+int search_dives(const std::string &text, std::string &json, std::string &error);
 
 // Identifiers of the dives of the loaded log that match every rule and the
 // fulltext query (mode "starts_with" by default, "substring" or "exact"),

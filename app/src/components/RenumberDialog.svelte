@@ -11,10 +11,19 @@
   import { offerUndo } from '../lib/undo.js';
   import { t } from '../lib/i18n.js';
 
-  /** @type {{ oncancel: () => void, ondone: () => void }} */
-  let { oncancel, ondone } = $props();
+  /**
+   * `ids`: only these dives (the Logbook's checked ones), in date order;
+   * all the dives without it.
+   * @type {{ oncancel: () => void, ondone: () => void, ids?: number[] }}
+   */
+  let { oncancel, ondone, ids = undefined } = $props();
 
-  let start = $state('1');
+  /** Checked dives start from the smallest number they have, as a suggestion (read once, on opening). */
+  function suggestedStart() {
+    const numbered = ids ? logbook.dives.filter((d) => ids.includes(d.id) && d.number > 0).map((d) => d.number) : [];
+    return String(numbered.length ? Math.min(...numbered) : 1);
+  }
+  let start = $state(suggestedStart());
   let tried = $state(false);
   let busy = $state(false);
 
@@ -25,7 +34,7 @@
     if (busy || first < 1) return;
     busy = true;
     try {
-      await renumberDives([], first);
+      await renumberDives(ids ?? [], first);
       ondone();
       offerUndo(t('renumber.done'));
     } catch (e) {
@@ -39,7 +48,11 @@
   }
 </script>
 
-<Md3Dialog title={t('renumber.title')} text={t('renumber.dialogText', { count: logbook.dives.length })} {oncancel}>
+<Md3Dialog
+  title={t(ids ? 'renumber.titleChecked' : 'renumber.title')}
+  text={t(ids ? 'renumber.dialogTextChecked' : 'renumber.dialogText', { count: ids ? ids.length : logbook.dives.length })}
+  {oncancel}
+>
   <div class="field">
     <TextField
       label={t('renumber.start')}

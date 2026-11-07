@@ -464,7 +464,8 @@ import { registerPlugin } from '@capacitor/core';
  *   Read-only tools (opendives.h): gas, a GasResult (o2, he per mille, po2 in mbar,
  *   planned depth in mm; rejects with BAD_REQUEST); cylinders, the GasCylinderTypes;
  *   desaturation, the Desaturation now.
- * @property {(options: {kind: 'options'} | {kind: 'dives', fulltext?: string, mode?: string, rules: FilterRule[]}) => Promise<any>} filterQuery
+ * @property {(options: {kind: 'options'} | {kind: 'search', fulltext: string} | {kind: 'dives', fulltext?: string, mode?: string, rules: FilterRule[]}) => Promise<any>} filterQuery
+ *   "search": the Logbook's search box (search_dives), the matching dive ids.
  *   Read-only free filter (opendives.h): FilterOptions, or the identifiers of the
  *   dives matching every rule and the fulltext query (number[]).
  * @property {(options: {fields: Record<string, string|number|string[]>}) => Promise<EditResult>} createDive

@@ -59,7 +59,10 @@
           max: formatLongDuration(Math.max(...durations)),
         })
       : '',
-  );
+  );
+  /** The "By …" groups that are open (all closed at first). */
+  let open = $state(/** @type {Record<string, boolean>} */ ({}));
+
   const yearBars = $derived(
     [...(result?.yearly ?? [])].sort((a, b) => a.year - b.year).map((y) => ({ value: y.dives, label: String(y.year) })),
   );
@@ -101,7 +104,7 @@
       <section class="chart-card">
         <h3>{t('stats.chartDurations')}</h3>
         <p>{durationRange}</p>
-        <BarChart bars={durationBars} label={t('stats.chartDurationsLabel', { n: dives.length })} />
+        <BarChart bars={durationBars} scale={60} unit={t('units.minutes')} label={t('stats.chartDurationsLabel', { n: dives.length })} />
       </section>
     </div>
 
@@ -133,7 +136,16 @@
       </div>
     {/if}
 
-    <div class="block-title">{t('stats.byYear')}</div>
+    <!-- Each "By …" group is an accordion, closed at first. -->
+    {#snippet accordion(/** @type {string} */ id, /** @type {string} */ title)}
+      <button type="button" class="block-title accordion" aria-expanded={!!open[id]} onclick={() => (open[id] = !open[id])}>
+        <span>{title}</span>
+        <span class="arrow" class:up={open[id]}><Icon name="expand" /></span>
+      </button>
+    {/snippet}
+
+    {@render accordion('year', t('stats.byYear'))}
+    {#if open.year}
     <div class="list list-strong inset list-dividers media-list chevron-center">
       <ul>
         {#each yearly as y (y.year)}
@@ -148,10 +160,12 @@
         {/each}
       </ul>
     </div>
+    {/if}
 
     {#snippet group(/** @type {string} */ title, /** @type {{key: string, label: string, figures: import('../lib/statistics.svelte.js').StatsFigures}[]|null} */ rows, /** @type {string} */ field)}
       {#if rows?.length}
-        <div class="block-title">{title}</div>
+        {@render accordion(field, title)}
+        {#if open[field]}
         <div class="list list-strong inset list-dividers media-list chevron-center">
           <ul>
             {#each rows as row (row.key)}
@@ -169,6 +183,7 @@
             {/each}
           </ul>
         </div>
+        {/if}
       {/if}
     {/snippet}
 
@@ -193,6 +208,33 @@
 
 <style>
   @layer od.components {
+    /* A "By …" title that opens its group: the title row, an arrow at the end. */
+    .accordion.block-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-sizing: border-box;
+      width: calc(100% - 32px);
+      min-height: 48px;
+      margin: 0 16px;
+      padding: 0 4px;
+      border: none;
+      background: none;
+      font: inherit;
+      text-align: start;
+      cursor: pointer;
+
+      .arrow {
+        display: flex;
+        color: var(--od-text-2);
+        transition: transform 200ms;
+
+        &.up {
+          transform: rotate(180deg);
+        }
+      }
+    }
+
     .empty {
       margin: 32px 20px;
       color: var(--od-text-2);

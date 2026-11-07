@@ -22,7 +22,7 @@
     notSetLabel,
     valueLabel,
   } from '../lib/statistics.svelte.js';
-  import { formatHours } from '../lib/format.js';
+  import { formatHours, depthUnit } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
 
   /** @type {{ f7route: { query: { c?: string, saved?: string } } }} */
@@ -96,7 +96,7 @@
 
   <div class="block-title">{t('stats.depthPerDive')}</div>
   <div class="chart-block">
-    <BarChart {bars} depth height={120} label={t('stats.chartDepthLabel', { n: dives.length })} />
+    <BarChart {bars} depth height={120} scale={logbook.prefs.length === 'ft' ? 304.8 : 1000} unit={depthUnit(logbook.prefs)} label={t('stats.chartDepthLabel', { n: dives.length })} />
   </div>
 
   <StatsDetails

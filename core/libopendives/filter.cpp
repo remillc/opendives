@@ -413,6 +413,47 @@ void append_filter_data(std::string &json, const FilterData &data)
 
 } // namespace internal
 
+// The Logbook's search box: Subsurface's fulltext index (notes, dive guide,
+// buddies, suit, tags, cylinder and weight types, site name and country, trip
+// name), words starting with the text as in the desktop's quick filter, plus
+// the region and the city of the site, which the index leaves out. Both
+// compared as the index does: Unicode compatibility decomposition, upper case.
+int search_dives(const std::string &text, std::string &json, std::string &)
+{
+	FullTextQuery query;
+	query = QString::fromStdString(text);
+	bool do_fulltext = query.doit();
+	auto folded = [](const std::string &s) {
+		QString w = QString::fromStdString(s).normalized(QString::NormalizationForm_KD);
+		return QLocale().toUpper(w).toStdString();
+	};
+	std::string needle = folded(trimmed(text));
+
+	json = "[";
+	bool first = true;
+	for (const auto &dp: divelog.dives) {
+		const dive *d = dp.get();
+		bool match = do_fulltext && fulltext_dive_matches(d, query, StringFilterMode::STARTSWITH);
+		if (!match && !needle.empty() && d->dive_site) {
+			for (taxonomy_category cat: { TC_ADMIN_L1, TC_ADMIN_L2, TC_LOCALNAME }) {
+				std::string value = taxonomy_get_value(d->dive_site->taxonomy, cat);
+				if (!value.empty() && folded(value).find(needle) != std::string::npos) {
+					match = true;
+					break;
+				}
+			}
+		}
+		if (!match)
+			continue;
+		if (!first)
+			json += ',';
+		first = false;
+		json += std::to_string(d->id);
+	}
+	json += ']';
+	return 0;
+}
+
 int filter_dives(const std::string &fulltext, const std::string &fulltext_mode, const std::vector<filter_rule> &rules,
 		 std::string &json, std::string &error)
 {

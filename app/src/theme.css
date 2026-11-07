@@ -676,6 +676,10 @@ html.ios {
 @layer od.components {
   .views.od-tab-sliding {
     overflow: hidden;
+
+    > .view {
+      will-change: transform;
+    }
   }
 
   .views > .view.od-tab-peek {

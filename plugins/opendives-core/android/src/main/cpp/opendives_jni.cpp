@@ -520,6 +520,10 @@ Java_org_opendives_core_NativeCore_filterQuery(JNIEnv *env, jobject, jstring kin
 		opendives::filter_options(json);
 		return env->NewStringUTF(json.c_str());
 	}
+	if (kind == "search") {
+		opendives::search_dives(to_string(env, fulltextIn), json, error);
+		return env->NewStringUTF(json.c_str());
+	}
 	std::vector<std::string> flat;
 	jsize n = rulesIn ? env->GetArrayLength(rulesIn) : 0;
 	for (jsize i = 0; i < n; i++) {

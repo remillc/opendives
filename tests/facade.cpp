@@ -93,6 +93,15 @@ int main(int argc, char **argv)
 		check(opendives::cylinder_type_action("remove", "Test 7L", 0, 0, json, error), "remove");
 		return 0;
 	}
+	if (argc >= 4 && !strcmp(argv[1], "search")) {
+		// search <log> <text>: the identifiers of the dives the search box finds.
+		if (opendives::list_dives(argv[2], json, error) || opendives::search_dives(argv[3], json, error)) {
+			fprintf(stderr, "%s\n", error.c_str());
+			return 1;
+		}
+		printf("%s\n", json.c_str());
+		return 0;
+	}
 	if (argc >= 4 && !strcmp(argv[1], "filter")) {
 		// filter <log> <fulltext> [type:string_mode:range_mode:negate:data]...
 		// Prints the filter options, then the identifiers of the matching dives.

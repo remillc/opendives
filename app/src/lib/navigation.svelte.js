@@ -176,4 +176,4 @@ export function enableSectionSwipes() {
 }
 
 /** Time for the sections to settle once the finger is lifted, in ms. */
-const SETTLE_MS = 220;
+const SETTLE_MS = 180;

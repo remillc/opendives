@@ -26,6 +26,7 @@
   import { buildSnapshot, saveSnapshot } from '../lib/snapshot.js';
   import { offerUndo } from '../lib/undo.js';
   import { Capacitor } from '@capacitor/core';
+  import { OpenDivesCore } from 'opendives-core';
 
   /** @typedef {import('opendives-core').Dive} Dive */
   /**
@@ -622,12 +623,38 @@
     return list;
   });
 
-  /** Search: site, trip, number or date; flat result. */
+  /**
+   * Search, in the core: Subsurface's fulltext index (notes, buddies, dive
+   * guide, suit, tags, cylinder and weight types, site name and country, trip
+   * name) and the site's region and city. Asked a moment after the last key.
+   */
+  let searchIds = $state(/** @type {Set<number>|null} */ (null));
+  $effect(() => {
+    const q = query.trim();
+    logbook.dives;
+    if (!q) {
+      searchIds = null;
+      return;
+    }
+    const timer = setTimeout(async () => {
+      try {
+        /** @type {number[]} */
+        const ids = await OpenDivesCore.filterQuery({ kind: 'search', fulltext: q });
+        if (query.trim() === q) searchIds = new Set(ids);
+      } catch (e) {
+        console.error('Search', e);
+      }
+    }, 150);
+    return () => clearTimeout(timer);
+  });
+
+  /** Search: what the core finds, and the site, trip, number or date as shown; flat result. */
   const results = $derived.by(() => {
     const q = query.trim().toLocaleLowerCase();
     if (!q) return null;
     return sorted.filter(
       (d) =>
+        searchIds?.has(d.id) ||
         d.site.toLocaleLowerCase().includes(q) ||
         (d.trip?.location ?? '').toLocaleLowerCase().includes(q) ||
         String(d.number) === q ||
@@ -1013,6 +1040,8 @@
       <MenuItem icon="filter" text={t(filtered ? 'logbook.menuFilterOn' : 'logbook.menuFilter')} link="/filter/" />
       {#if !selecting}
         <MenuItem icon="renumber" text={t('logbook.menuRenumber')} onclick={() => (renumbering = true)} />
+      {:else}
+        <MenuItem icon="renumber" text={t('logbook.menuRenumberChecked', { n: checkedCount })} onclick={() => (renumbering = true)} />
       {/if}
       {#if selecting}
         <MenuItem icon="delete" text={t('logbook.menuDelete')} destructive onclick={deleteChecked} />
@@ -1065,7 +1094,14 @@
   {/if}
 
   {#if renumbering}
-    <RenumberDialog oncancel={() => (renumbering = false)} ondone={() => (renumbering = false)} />
+    <RenumberDialog
+      ids={selecting ? checkedIds : undefined}
+      oncancel={() => (renumbering = false)}
+      ondone={() => {
+        renumbering = false;
+        endSelection();
+      }}
+    />
   {/if}
 
   <!-- Not reported by the core yet: logbook.conflict stays null (see the report). -->

@@ -85,6 +85,10 @@
     "dragRemove": "Remove from the trip",
     "menuUndo": "Undo the last action",
     "menuRedo": "Redo",
+    "menuRenumberChecked": {
+      "one": "Renumber the checked dive",
+      "other": "Renumber the checked dives"
+    },
     "menuRenumber": "Renumber the dives",
     "selectionClose": "Leave the selection",
     "countFiltered": {
@@ -835,6 +839,11 @@
     "deleteSiteTextUnused": "No dive uses it. It can be undone."
   },
   "renumber": {
+    "titleChecked": "Renumber the checked dives?",
+    "dialogTextChecked": {
+      "one": "The checked dive gets the number below. Its current number is replaced, in the logbook and in Subsurface. You can undo it right after.",
+      "other": "The {count} checked dives get consecutive numbers, in date order, from the number below. Their current numbers are replaced, in the logbook and in Subsurface. You can undo it right after."
+    },
     "label": "Renumber dives",
     "text": "Consecutive numbers in date order",
     "title": "Renumber all dives?",

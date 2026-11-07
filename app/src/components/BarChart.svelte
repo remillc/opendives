@@ -13,29 +13,59 @@
    *   label: string,
    *   depth?: boolean,
    *   height?: number,
+   *   scale?: number,
+   *   unit?: string,
    * }}
    * `value`: millimetres for a depth chart (`depth`), else any positive number.
+   * `scale`: values per unit of the y axis (60 for seconds shown in minutes,
+   * 1000 or 304.8 for millimetres in metres or feet); `unit` is written after
+   * the top value of the axis.
    */
-  let { bars, label, depth = false, height = 110 } = $props();
+  let { bars, label, depth = false, height = 110, scale = 1, unit = '' } = $props();
 
   let width = $state(0);
 
   const LABEL_HEIGHT = 16;
   const MAX_LABELS = 8;
-
   const showLabels = $derived(bars.length <= MAX_LABELS && bars.some((b) => b.label));
+  /** The bottom of the bars: above the labels, or above room for the axis' "0". */
+  const plot = $derived(height - (showLabels ? LABEL_HEIGHT : 7));
+
+  /**
+   * The y axis: 0 and round steps (1, 2 or 5 × 10ⁿ in the axis unit), about
+   * three of them; the top step is at or above the highest bar.
+   */
+  const axis = $derived.by(() => {
+    const top = Math.max(...bars.map((b) => b.value), 0) / scale;
+    if (!(top > 0)) return { max: scale, ticks: [0] };
+    const rough = top / 3;
+    const magnitude = 10 ** Math.floor(Math.log10(rough));
+    const step = [1, 2, 5, 10].map((m) => m * magnitude).find((s) => s >= rough) ?? 10 * magnitude;
+    const count = Math.ceil(top / step);
+    const ticks = Array.from({ length: count + 1 }, (_, i) => i * step);
+    return { max: count * step * scale, ticks };
+  });
+
+  /** @param {number} value in the axis unit */
+  const tickText = (value) => {
+    const text = Number.isInteger(value) ? String(value) : value.toFixed(1);
+    return value === axis.ticks[axis.ticks.length - 1] && unit ? `${text} ${unit}` : text;
+  };
+
+  /** Room on the left for the values of the y axis: the longest one, 10 px digits. */
+  const AXIS_WIDTH = $derived(Math.max(...axis.ticks.map((v) => tickText(v).length)) * 6 + 8);
+
   const rects = $derived.by(() => {
     const n = bars.length;
     if (!n || !width) return [];
-    const max = Math.max(...bars.map((b) => b.value), 1);
-    const plot = height - (showLabels ? LABEL_HEIGHT : 0);
+    const plotWidth = width - AXIS_WIDTH;
     // A gap between bars while they stay readable; a dense chart becomes a silhouette.
-    const gap = n <= 40 ? Math.min(6, (width / n) * 0.22) : 0;
-    const barWidth = (width - gap * (n - 1)) / n;
+    const gap = n <= 40 ? Math.min(6, (plotWidth / n) * 0.22) : 0;
+    const barWidth = (plotWidth - gap * (n - 1)) / n;
     return bars.map((b, i) => {
-      const h = b.value > 0 ? Math.max(2, (b.value / max) * plot) : 0;
+      const h = b.value > 0 ? Math.max(2, (b.value / axis.max) * (plot - 6)) : 0;
       return {
-        x: i * (barWidth + gap),
+        x: AXIS_WIDTH + i * (barWidth + gap),
         y: plot - h,
         w: barWidth,
         h,
@@ -50,6 +80,12 @@
 <div class="chart" style:height="{height}px" bind:clientWidth={width}>
   {#if width}
     <svg {width} {height} viewBox="0 0 {width} {height}" role="img" aria-label={label}>
+      <!-- The y axis: a thin line and the value at each round step. -->
+      {#each axis.ticks as tick (tick)}
+        {@const y = plot - (tick * scale / axis.max) * (plot - 6)}
+        <line x1={AXIS_WIDTH} x2={width} y1={y} y2={y} class="grid" />
+        <text x={AXIS_WIDTH - 4} {y} class="tick">{tickText(tick)}</text>
+      {/each}
       {#each rects as r, i (i)}
         <rect x={r.x} y={r.y} width={r.w} height={r.h} {rx} style:fill={r.fill} />
         {#if showLabels}
@@ -68,6 +104,19 @@
 
     svg {
       display: block;
+    }
+
+    .grid {
+      stroke: var(--od-separator);
+      stroke-width: 1;
+    }
+
+    .tick {
+      font-size: 10px;
+      fill: var(--od-text-2);
+      text-anchor: end;
+      dominant-baseline: middle;
+      font-variant-numeric: tabular-nums;
     }
 
     .label {

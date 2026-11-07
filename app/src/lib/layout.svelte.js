@@ -22,12 +22,12 @@ if (typeof document !== 'undefined') document.documentElement.style.setProperty(
 export const listWidth = 340;
 
 /**
- * Both panes of a list and detail pair show from the width where the detail
- * keeps at least 400 px beside the navigation and the list: 836 px on
- * Android (Material 3's 840 dp breakpoint), 960 px on iPad. Narrower (iPad in
- * portrait, a foldable half open), the detail replaces the list.
+ * Both panes of a list and detail pair show from 768 px, as soon as the
+ * tablet layout starts (Christian's choice, 7 November 2026): iPad in
+ * portrait included, the detail then narrower beside the navigation and the
+ * list. Below, the phone layout: the detail replaces the list.
  */
-export const splitBreakpoint = navWidth + listWidth + 400;
+export const splitBreakpoint = 768;
 
 const query = typeof matchMedia === 'function' ? matchMedia('(max-width: 767.98px)') : null;
 const splitQuery = typeof matchMedia === 'function' ? matchMedia(`(min-width: ${splitBreakpoint}px)`) : null;

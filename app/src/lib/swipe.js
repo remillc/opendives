@@ -49,13 +49,15 @@ export function horizontalSwipe(target, { accept, move, end }) {
       dx = touch.clientX - x0;
       const dy = touch.clientY - y0;
       if (state === 'pending') {
-        if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
-        state = Math.abs(dx) > Math.abs(dy) ? 'h' : 'v';
+        // Decided early, and a slightly slanted move still counts as sideways.
+        if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
+        state = Math.abs(dx) > Math.abs(dy) * 0.8 ? 'h' : 'v';
         if (state === 'v') return;
       }
       e.preventDefault();
+      // Speed over the last moves, smoothed: one late event does not hide a flick.
       const dt = e.timeStamp - lastT;
-      if (dt > 0) velocity = (touch.clientX - lastX) / dt;
+      if (dt > 0) velocity = velocity * 0.4 + ((touch.clientX - lastX) / dt) * 0.6;
       lastX = touch.clientX;
       lastT = e.timeStamp;
       move(dx);
@@ -77,12 +79,12 @@ export function horizontalSwipe(target, { accept, move, end }) {
 }
 
 /**
- * Whether a swipe of `dx` px at `velocity` px/ms goes through: a quarter of
- * the width, or a quick flick in the same direction.
+ * Whether a swipe of `dx` px at `velocity` px/ms goes through: a fifth of the
+ * width, or a quick flick in the same direction.
  * @param {number} dx
  * @param {number} velocity
  * @param {number} width
  */
 export function swipeGoesThrough(dx, velocity, width) {
-  return Math.abs(dx) > width / 4 || (Math.abs(velocity) > 0.4 && Math.sign(velocity) === Math.sign(dx) && Math.abs(dx) > 24);
+  return Math.abs(dx) > width / 5 || (Math.abs(velocity) > 0.25 && Math.sign(velocity) === Math.sign(dx) && Math.abs(dx) > 16);
 }

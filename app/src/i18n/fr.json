@@ -85,6 +85,10 @@
     "dragRemove": "Retirer du voyage",
     "menuUndo": "Annuler la dernière action",
     "menuRedo": "Rétablir",
+    "menuRenumberChecked": {
+      "one": "Renuméroter la plongée cochée",
+      "other": "Renuméroter les plongées cochées"
+    },
     "menuRenumber": "Renuméroter les plongées",
     "selectionClose": "Quitter la sélection",
     "countFiltered": {
@@ -835,6 +839,11 @@
     "deleteSiteTextUnused": "Aucune plongée ne l’utilise. C’est annulable."
   },
   "renumber": {
+    "titleChecked": "Renuméroter les plongées cochées ?",
+    "dialogTextChecked": {
+      "one": "La plongée cochée reçoit le numéro ci-dessous. Son numéro actuel est remplacé, dans le carnet et dans Subsurface. Vous pourrez annuler juste après.",
+      "other": "Les {count} plongées cochées reçoivent des numéros consécutifs, dans l'ordre des dates, à partir du numéro ci-dessous. Leurs numéros actuels sont remplacés, dans le carnet et dans Subsurface. Vous pourrez annuler juste après."
+    },
     "label": "Renuméroter les plongées",
     "text": "Numéros consécutifs, dans l'ordre des dates",
     "title": "Renuméroter toutes les plongées ?",

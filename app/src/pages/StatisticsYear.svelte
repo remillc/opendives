@@ -19,7 +19,7 @@
     tripName,
     tripsOf,
   } from '../lib/statistics.svelte.js';
-  import { depthValue, formatDepth, formatLongDate, formatTimeOfDay, locale } from '../lib/format.js';
+  import { depthValue, formatDepth, formatLongDate, formatTimeOfDay, locale, depthUnit } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
 
   /** @type {{ f7route: { params: { year: string } } }} */
@@ -86,7 +86,7 @@
 
   <div class="block-title">{t('stats.depthPerDive')}</div>
   <div class="chart-block">
-    <BarChart {bars} depth height={120} label={chartLabel} />
+    <BarChart {bars} depth height={120} scale={logbook.prefs.length === 'ft' ? 304.8 : 1000} unit={depthUnit(logbook.prefs)} label={chartLabel} />
   </div>
 
   <div class="block-title">{t('stats.byMonth')}</div>
