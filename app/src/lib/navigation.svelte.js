@@ -79,15 +79,24 @@ export function restoreFocus() {
 }
 
 /**
- * Phone: a swipe left or right on the first screen of a main section shows
- * the next or previous section, in the order of the menu. The section follows
- * the finger, the next one coming in beside it; lifted past a quarter of the
- * width (or flicked), the next one takes the screen, otherwise both go back.
- * Not on what has its own gestures (map, profile, fields, anything that
- * scrolls sideways), nor while a menu, a dialog, a search or the logbook's
- * selection is open.
+ * Phone: a swipe left or right goes to the next or previous entry of the
+ * menu, in its order: the four sections, Account, then Settings and About.
+ * Between sections the section follows the finger, the next one coming in
+ * beside it; lifted past a fifth of the width (or flicked), the next one takes
+ * the screen, otherwise both go back. From Account a swipe left opens
+ * Settings, and from Settings it opens About, as pages over the section: the
+ * screen only gives a little under the finger, and a swipe right on them goes
+ * back like on every page with a back arrow. Not on what has its own gestures
+ * (map, profile, fields, anything that scrolls sideways), nor while a menu, a
+ * dialog, a search or the logbook's selection is open.
  */
 export function enableSectionSwipes() {
+  /** The menu entries a swipe goes through, in order: the sections are tabs. */
+  const swipeOrder = [...sections, 'account'];
+
+  /** Where the swipe started: a section's first screen, or the Settings page. */
+  /** @type {null|{ kind: 'tab', section: string }|{ kind: 'settings' }} */
+  let start = null;
   /** @type {HTMLElement|null} */
   let from = null;
   /** @type {HTMLElement|null} */
@@ -107,19 +116,31 @@ export function enableSectionSwipes() {
     return false;
   }
 
-  function atSectionRoot() {
+  /** @returns {typeof start} */
+  function startingPoint() {
+    if (!layout.phone || document.querySelector('.panel-in, .modal-in, .searchbar-enabled, .selection-bar')) return null;
     const view = f7.views.current;
-    const section = /** @type {Section} */ (view?.el?.id?.replace('view-', ''));
-    return (
-      layout.phone &&
-      sections.includes(section) &&
-      view.router.history.length === 1 &&
-      !document.querySelector('.panel-in, .modal-in, .searchbar-enabled, .selection-bar')
-    );
+    const section = view?.el?.id?.replace('view-', '');
+    if (!swipeOrder.includes(section)) return null;
+    if (view.router.history.length === 1) return { kind: 'tab', section };
+    if (view.router.currentRoute?.path === '/settings/') return { kind: 'settings' };
+    return null;
   }
 
-  /** @param {number} dx */
-  const sectionToward = (dx) => sections[sections.indexOf(navigation.section) + (dx < 0 ? 1 : -1)];
+  /**
+   * What a swipe of `dx` leads to: a section (tab), a page to open (route),
+   * or nothing; a swipe right on Settings is left to the back gesture.
+   * @param {number} dx
+   * @returns {null|{ tab: Section }|{ route: string }}
+   */
+  function toward(dx) {
+    if (!start) return null;
+    if (start.kind === 'settings') return dx < 0 ? { route: '/about/' } : null;
+    const i = swipeOrder.indexOf(start.section);
+    if (dx < 0 && start.section === 'account') return { route: '/settings/' };
+    const next = swipeOrder[i + (dx < 0 ? 1 : -1)];
+    return next ? { tab: /** @type {Section} */ (next) } : null;
+  }
 
   /** @param {HTMLElement|null} el */
   function release(el) {
@@ -130,8 +151,13 @@ export function enableSectionSwipes() {
   }
 
   horizontalSwipe(document, {
-    accept: (e) => !settling && atSectionRoot() && !hasOwnGesture(/** @type {HTMLElement} */ (e.target)),
+    accept(e) {
+      if (settling || hasOwnGesture(/** @type {HTMLElement} */ (e.target))) return false;
+      start = startingPoint();
+      return !!start;
+    },
     move(dx) {
+      if (!start) return;
       if (!from) {
         from = /** @type {HTMLElement|null} */ (document.querySelector('.views > .view.tab-active'));
         views = from?.parentElement ?? null;
@@ -139,27 +165,43 @@ export function enableSectionSwipes() {
         width = views.clientWidth;
         views.classList.add('od-tab-sliding');
       }
-      const next = sectionToward(dx);
-      const el = next ? document.getElementById(`view-${next}`) : null;
+      const next = toward(dx);
+      const el = next && 'tab' in next ? document.getElementById(`view-${next.tab}`) : null;
       if (neighbour !== el) {
         release(neighbour);
         neighbour = el;
       }
-      // At the end of the menu, the section only gives a little.
-      const shown = el ? dx : dx / 3;
-      from.style.transform = `translateX(${shown}px)`;
+      // Towards another section the screen follows the finger; towards a page
+      // to open, or at the end of the menu, it only gives a little. A swipe
+      // right on Settings belongs to the back gesture.
+      const shown = el ? dx : start.kind === 'settings' && dx > 0 ? 0 : dx / 3;
+      from.style.transform = shown ? `translateX(${shown}px)` : '';
       if (el) {
         el.classList.add('od-tab-peek');
         el.style.transform = `translateX(${shown + (dx < 0 ? width : -width)}px)`;
       }
     },
     end(dx, velocity) {
-      if (!from || !views) return;
-      const next = sectionToward(dx);
-      const through = !!next && !!neighbour && swipeGoesThrough(dx, velocity, width);
+      if (!from || !views) {
+        start = null;
+        return;
+      }
+      const next = toward(dx);
+      const goes = swipeGoesThrough(dx, velocity, width);
       const left = from;
       const coming = neighbour;
       const container = views;
+      start = null;
+      from = null;
+      neighbour = null;
+      views = null;
+      if (next && 'route' in next && goes) {
+        left.style.transform = '';
+        container.classList.remove('od-tab-sliding');
+        f7.views.current?.router.navigate(next.route);
+        return;
+      }
+      const through = !!next && 'tab' in next && !!coming && goes;
       settling = true;
       const transition = `transform ${SETTLE_MS}ms ease-out`;
       left.style.transition = transition;
@@ -167,16 +209,13 @@ export function enableSectionSwipes() {
       left.style.transform = through ? `translateX(${dx < 0 ? -width : width}px)` : '';
       if (coming) coming.style.transform = through ? 'translateX(0)' : `translateX(${dx < 0 ? width : -width}px)`;
       setTimeout(() => {
-        if (through && next) showSection(next);
+        if (through && next && 'tab' in next) showSection(next.tab);
         left.style.transform = '';
         left.style.transition = '';
         release(coming);
         container.classList.remove('od-tab-sliding');
         settling = false;
       }, SETTLE_MS);
-      from = null;
-      neighbour = null;
-      views = null;
     },
   });
 }
