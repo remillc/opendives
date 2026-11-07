@@ -321,3 +321,7 @@ The gas blender stays one tool, with a segmented control "Nitrox | Trimix" at th
 ## [ ] 2026-11-07-13 Gas blender: residual oxygen and helium
 
 In Trimix mode, what is already in the cylinder is entered as pressure, then oxygen % and helium % in two separate dropdowns (any combination), instead of one mix dropdown. Mock-up: `docs/mockups/outils-melangeur-android.dc.html`.
+
+## [ ] 2026-11-07-14 Gas blender: helium or oxygen first
+
+In Trimix mode, add a segmented control "Hélium d’abord | Oxygène d’abord" above the fill steps (default helium first, remembered on the device). The steps and their target pressures follow the chosen order; the top-up gas stays last. Mock-up: `docs/mockups/outils-melangeur-android.dc.html`.
