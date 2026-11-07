@@ -475,7 +475,7 @@ Mock-ups: `docs/mockups/android-stats.dc.html`, `docs/mockups/ios-stats-tableau.
 
 Done in "Statistics: filtered result chart and coloured ready-made charts". The colour is a CSS mix of the two water tokens, so dark mode follows by itself.
 
-## [ ] 2026-11-07-26 Source Sans 3: same perceived size as the system font
+## [x] 2026-11-07-26 Source Sans 3: same perceived size as the system font
 
 The visual audit (task 23) compared the app with mock-ups drawn in Roboto. Source Sans 3 looks about 8 % smaller at the same size, so part of the "text too small" finding came from the font, not from the sizes. The mock-ups now use Source Sans 3 too, and the sizes stay as they are in the specification.
 
@@ -487,6 +487,8 @@ The visual audit (task 23) compared the app with mock-ups drawn in Roboto. Sourc
 4. Titles keep the system font (Roboto on Android, SF Pro on iOS): screen titles, top bar and section titles, dialog titles, large key figures. Tabular figures stay on for dive values.
 
 Spec: section 1, "Fonts". Mock-ups: every file in `docs/mockups/` (each has the `@font-face` rules in its `<helmet>`).
+
+Done in "Source Sans 3: metrics of the mock-ups, weights 400 to 900". Upstream (release 3.052R) has no static 800, so the app bundles the upstream variable font (one 170 KB file, weights 400 to 900, Latin Extended) instead of the four static files. Measured in the WebView: 14 px Source Sans 3 now has the x-height and ascent of 14 px Roboto. No size had been raised in the app, so none was set back.
 
 ## [ ] 2026-11-07-27 Dive detail: weights as a total plus one line per location
 

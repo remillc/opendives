@@ -132,41 +132,24 @@ html.ios {
 
 /*
  * Fonts (spec, section 1, "Fonts"): Source Sans 3 (SIL Open Font License,
- * fonts/OFL.txt; the full upstream files, Latin Extended included) for the
- * body text; the system font (Roboto, SF Pro) for titles and the large key
- * figures of a dive. Sizes are CSS px, which the WebView scales with the
+ * fonts/OFL.txt) for the body text; the system font (Roboto, SF Pro) for
+ * titles and the large key figures of a dive. One file: the upstream variable
+ * font (release 3.052R), Latin Extended included, every weight from 400 to
+ * 900 (upstream has no static 800). Its metrics are those of the mock-ups:
+ * 14 px Source Sans 3 has the x-height and the line box of 14 px Roboto
+ * (task 2026-11-07-26). Sizes are CSS px, which the WebView scales with the
  * phone's text size.
  */
 @font-face {
   font-family: 'Source Sans 3';
   font-style: normal;
-  font-weight: 400;
+  font-weight: 400 900;
   font-display: block;
-  src: url('./fonts/SourceSans3-Regular.ttf.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Source Sans 3';
-  font-style: normal;
-  font-weight: 500;
-  font-display: block;
-  src: url('./fonts/SourceSans3-Medium.ttf.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Source Sans 3';
-  font-style: normal;
-  font-weight: 600;
-  font-display: block;
-  src: url('./fonts/SourceSans3-Semibold.ttf.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Source Sans 3';
-  font-style: normal;
-  font-weight: 700 900;
-  font-display: block;
-  src: url('./fonts/SourceSans3-Bold.ttf.woff2') format('woff2');
+  size-adjust: 108%;
+  ascent-override: 85.9%;
+  descent-override: 22.6%;
+  line-gap-override: 0%;
+  src: url('./fonts/SourceSans3VF-Upright.ttf.woff2') format('woff2');
 }
 
 /* Framework7 sets its font per platform, outside our layers: overridden here too. */
