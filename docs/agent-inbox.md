@@ -384,6 +384,8 @@ The logo now has two forms. At 64 px and below (launcher icons on Android, iOS a
 
 Done in "Logo: grey arc on small sizes, large logo without it". First launch shows no logo today, so only About uses the large one.
 
-## [ ] 2026-11-07-22 Splash screen: no grey arc
+## [x] 2026-11-07-22 Splash screen: no grey arc
 
 My mistake in task 21: the splash screen shows the logo large, so it must not have the grey arc. Remove the grey arc from `ic_splash_mark.xml` (light and night) and from any iOS or web launch screen. Only the launcher icons, the favicon, notification marks and the small logo beside the name keep it. See `docs/ui-specification.md` ("Logo", size rule).
+
+Done in "Splash screen: logo without the grey arc". The app has no iOS project or web launch screen yet.

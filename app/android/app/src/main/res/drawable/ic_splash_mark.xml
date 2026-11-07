@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Splash screen mark: the light "Hublot" logo (docs/brand/opendives-icon-light-fullbleed.svg) without its background. -->
+<!-- Splash screen mark, shown large, so without the grey arc of the small sizes: the light "Hublot" logo (docs/brand/opendives-icon-light-fullbleed.svg) without its background. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:aapt="http://schemas.android.com/aapt"
     android:width="108dp"
@@ -26,12 +26,6 @@
         </path>
     </group>
     <!-- The ring, only under the water: an arc from one end of the waterline to the other. -->
-    <!-- Above the water, the circle completed in grey: small sizes only (spec, "Logo", size rule). -->
-    <path
-        android:pathData="M24.83,61 A30,30 0 1,1 83.17,61"
-        android:strokeColor="#FFA3A5A8"
-        android:strokeWidth="3"
-        android:strokeLineCap="round" />
     <path
         android:pathData="M24.83,61 A30,30 0 0,0 83.17,61"
         android:strokeColor="#FF1F2124"
