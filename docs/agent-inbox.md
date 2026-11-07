@@ -366,6 +366,8 @@ Done in "About screen, version from package.json".
 
 Done in "About: report a problem by email, source code on GitHub".
 
-## [ ] 2026-11-07-19 Support address: support@opendives.app
+## [x] 2026-11-07-19 Support address: support@opendives.app
 
 The support address now works. Set `SUPPORT_EMAIL` to `support@opendives.app` and show the "Signaler un problème" row on the About screen (task 2026-11-07-18). See `docs/ui-specification.md` ("Reporting a problem").
+
+Done in "About: show Report a problem with support@opendives.app" (`app/.env`, `VITE_SUPPORT_EMAIL`).
