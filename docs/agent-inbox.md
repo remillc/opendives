@@ -270,6 +270,8 @@ Bundle Source Sans 3 (OFL, weights 400 to 700, Latin and Latin Extended: take th
 
 Done in "Source Sans 3 for body text, system font for titles and key figures".
 
-## [ ] 2026-11-07-03 Sites: compact maintenance rows
+## [x] 2026-11-07-03 Sites: compact maintenance rows
 
 The three rows under the Sites count ("N plongées sans site", "N sites sans coordonnées", "N doublons possibles") are now compact one-line list items: 48 dp high, no vertical padding, 14 sp text, chevron kept. The site rows below are unchanged. Mock-up: `docs/mockups/android-sites.dc.html`.
+
+Done in "Sites: compact one-line maintenance rows".

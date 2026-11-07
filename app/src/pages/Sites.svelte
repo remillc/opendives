@@ -173,8 +173,26 @@
       color: var(--od-text-2);
     }
 
+    /* Maintenance rows: compact one-line items, 48 dp, 14 sp, chevron kept
+       (android-sites.dc.html); the site rows below keep their size. */
     .links {
       margin: 0;
+
+      .item-content,
+      .item-inner {
+        min-height: 48px;
+      }
+
+      .item-inner {
+        padding-top: 0;
+        padding-bottom: 0;
+      }
+
+      .item-title {
+        font-size: 14px;
+        line-height: 20px;
+        letter-spacing: 0.25px;
+      }
     }
 
     .divider {
