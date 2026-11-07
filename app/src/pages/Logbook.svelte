@@ -115,6 +115,25 @@
     });
   });
 
+  /**
+   * The Logbook is the master route of a master-detail view: framework7-svelte
+   * does not render it as the view's first page but loads it through the
+   * router, and Framework7 then appends it after the end anchor of the
+   * view's page list. Every later page, rendered by Svelte before that anchor,
+   * then no longer follows the Logbook: Framework7 moves it to the end too,
+   * out of Svelte's reach, and going back leaves it in the view (a frozen
+   * page, a second Logbook). Put back before the anchor, the Logbook is
+   * followed by the pages Svelte adds, which stay where Svelte put them.
+   * @param {any} page Framework7's page
+   */
+  function keepInSvelteRange(page) {
+    /** @type {HTMLElement} */
+    const el = page.el;
+    let anchor = el.previousSibling;
+    while (anchor && anchor.nodeType === Node.TEXT_NODE) anchor = anchor.previousSibling;
+    if (anchor && anchor.nodeType === Node.COMMENT_NODE && el.nextSibling === null) el.parentNode?.insertBefore(el, anchor);
+  }
+
   // --- Selection mode: a long press on a dive shows a check box before every
   // dive, the pressed one checked. A tap then checks or unchecks a dive; the
   // ✕ of the top bar, Android's Back or unchecking the last dive leaves it.
@@ -615,7 +634,7 @@
   });
 </script>
 
-<Page class="od-logbook">
+<Page class="od-logbook" onPageInit={keepInSvelteRange}>
   <Navbar large title={t('logbook.title')}>
     {#snippet left()}<MenuButton />{/snippet}
     <NavRight>
