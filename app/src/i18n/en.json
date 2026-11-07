@@ -1055,6 +1055,7 @@
     "incorrect": "Wrong email or password"
   },
   "createAccount": {
+    "createdHeading": "Your Subsurface account",
     "title": "New account",
     "step1": "Step 1 of 2",
     "step2": "Step 2 of 2",
@@ -1066,9 +1067,11 @@
     "invalidEmail": "This email address is not valid",
     "submit": "Create the account",
     "busy": "Creating…",
-    "confirmedText": "Your account is created and its address is confirmed."
+    "confirmedText": "Your account is created and its address is confirmed. Continue to choose how to fill it."
   },
   "bringLogbook": {
+    "signedInTitle": "Your account",
+    "signedInIntro": "This account has no logbook yet. You can fill it right away with the dives you already have.",
     "heading": "Bring your logbook?",
     "intro": "Your Subsurface account is ready. You can fill it right away with the dives you already have.",
     "sourceLabel": "Source of the logbook",

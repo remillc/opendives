@@ -1055,6 +1055,7 @@
     "incorrect": "Adresse ou mot de passe incorrect"
   },
   "createAccount": {
+    "createdHeading": "Votre compte Subsurface",
     "title": "Nouveau compte",
     "step1": "Étape 1 sur 2",
     "step2": "Étape 2 sur 2",
@@ -1066,9 +1067,11 @@
     "invalidEmail": "Cette adresse e-mail n'est pas valide",
     "submit": "Créer le compte",
     "busy": "Création…",
-    "confirmedText": "Votre compte est créé et son adresse est confirmée."
+    "confirmedText": "Votre compte est créé et son adresse est confirmée. Continuez pour choisir comment le remplir."
   },
   "bringLogbook": {
+    "signedInTitle": "Votre compte",
+    "signedInIntro": "Ce compte n'a pas encore de carnet. Vous pouvez le remplir tout de suite avec les plongées que vous avez déjà.",
     "heading": "Reprendre votre carnet ?",
     "intro": "Votre compte Subsurface est prêt. Vous pouvez le remplir tout de suite avec les plongées que vous avez déjà.",
     "sourceLabel": "Source du carnet",

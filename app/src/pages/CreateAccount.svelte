@@ -46,7 +46,7 @@
         const signedIn = await OpenDivesCore.signIn({ email: email.trim(), password });
         password = '';
         if (signedIn.exists) finishAccount(f7router, welcome);
-        else f7router.navigate(`${base}/import/`);
+        else f7router.navigate(`${base}/import/`, { props: { signedIn: true } });
       } else {
         passwordError = t('signIn.incorrect');
       }
@@ -64,7 +64,7 @@
 <AccountStep
   title={t('createAccount.title')}
   step={t('createAccount.step1')}
-  heading={t('createAccount.heading')}
+  heading={confirmed ? t('createAccount.createdHeading') : t('createAccount.heading')}
   intro={confirmed ? t('createAccount.confirmedText') : t('createAccount.intro')}
   action={confirmed ? t('bringLogbook.continue') : t('createAccount.submit')}
   busyLabel={t('createAccount.busy')}

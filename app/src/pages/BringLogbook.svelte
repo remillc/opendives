@@ -19,8 +19,11 @@
   import { accountFlow, errorCode, finishAccount, showFailure } from '../lib/account.js';
   import { t } from '../lib/i18n.js';
 
-  /** @type {{ f7router: any, f7route: any }} */
-  let { f7router, f7route } = $props();
+  /**
+   * `signedIn`: reached by signing in to an account without a logbook, not by creating one.
+   * @type {{ f7router: any, f7route: any, signedIn?: boolean }}
+   */
+  let { f7router, f7route, signedIn = false } = $props();
   const welcome = $derived(String(f7route.path ?? '').startsWith('/welcome/'));
   const base = $derived(welcome ? '/welcome' : '/account');
 
@@ -96,16 +99,16 @@
 
   /** Back to step 1; after a creation it only shows the account's email. */
   function previous() {
-    if (accountFlow.confirmedEmail) f7router.back(`${base}/create/`, { force: true });
+    if (accountFlow.confirmedEmail && !signedIn) f7router.back(`${base}/create/`, { force: true });
     else f7router.back();
   }
 </script>
 
 <AccountStep
-  title={t('createAccount.title')}
-  step={t('createAccount.step2')}
+  title={signedIn ? t('bringLogbook.signedInTitle') : t('createAccount.title')}
+  step={signedIn ? '' : t('createAccount.step2')}
   heading={t('bringLogbook.heading')}
-  intro={t('bringLogbook.intro')}
+  intro={signedIn ? t('bringLogbook.signedInIntro') : t('bringLogbook.intro')}
   action={t('bringLogbook.continue')}
   busyLabel={source === 'divelogs' ? t('bringLogbook.checking') : t('bringLogbook.creating')}
   {busy}
