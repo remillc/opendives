@@ -371,3 +371,7 @@ Done in "About: report a problem by email, source code on GitHub".
 The support address now works. Set `SUPPORT_EMAIL` to `support@opendives.app` and show the "Signaler un problème" row on the About screen (task 2026-11-07-18). See `docs/ui-specification.md` ("Reporting a problem").
 
 Done in "About: show Report a problem with support@opendives.app" (`app/.env`, `VITE_SUPPORT_EMAIL`).
+
+## [ ] 2026-11-07-20 About: "Question / signaler un problème"
+
+Rename the About row "Signaler un problème" to "Question / signaler un problème", and the email subject to "OpenDives X.Y.Z : question ou problème". Mock-up: `docs/mockups/apropos-android.dc.html`.
