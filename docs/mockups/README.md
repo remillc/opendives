@@ -97,7 +97,7 @@ When a mock-up and `docs/ui-specification.md` disagree, the specification wins. 
 | `reglages-vitesse-android.dc.html` | Réglages, vitesses · Android |
 | `reglages-duree-android.dc.html` | Réglages, durée · Android |
 | `reglages-coordonnees-android.dc.html` | Réglages, coordonnées GPS · Android |
-| `logo-anneau-sous-eau.dc.html` | Logo · Hublot, anneau sous l’eau (retenu) |
+| `logo-anneau-adaptatif.dc.html` | Logo · Hublot, gris seulement en petit (retenu) |
 | `stats-annee-android.dc.html` | Statistiques, une année · Android |
 | `stats-filtre-android.dc.html` | Statistiques, résultat filtré · Android |
 | `stats-nouvelle-android.dc.html` | Nouvelle statistique · Android |
