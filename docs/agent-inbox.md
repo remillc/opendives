@@ -365,3 +365,7 @@ Done in "About screen, version from package.json".
 "Signaler un problème" opens a prefilled email (`mailto:`) to `SUPPORT_EMAIL`, a build-time setting. Subject "OpenDives X.Y.Z : problème", body with an empty line for the description, then a technical block (app version, platform and OS, device model, language, units, cloud account or not without the email, number of dives, last sync date and result, last error code). Never credentials, dive data or location. Mail icon on the row. "Code source" points to https://github.com/remillc/opendives. Leave `SUPPORT_EMAIL` empty for now and hide the row while it is empty. See `docs/ui-specification.md` ("Reporting a problem"). Mock-up: `docs/mockups/apropos-android.dc.html`.
 
 Done in "About: report a problem by email, source code on GitHub".
+
+## [ ] 2026-11-07-19 Support address: support@opendives.app
+
+The support address now works. Set `SUPPORT_EMAIL` to `support@opendives.app` and show the "Signaler un problème" row on the About screen (task 2026-11-07-18). See `docs/ui-specification.md` ("Reporting a problem").
