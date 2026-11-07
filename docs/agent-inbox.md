@@ -513,3 +513,13 @@ Mock-up: `docs/mockups/detail2-android-menu.dc.html`. Spec: section 4, "Dive det
 
 Done in "Dive detail menu: delete without confirmation, Annuler for 10 seconds". Checked on the phone with the test account (roger.bourdieu): the dive leaves the list (1 352 dives), "Plongée supprimée" offers "Annuler", and "Annuler" puts it back at its place. The tablet case (next dive beside the list) is written but not checked on a tablet. The item is in ink on iOS too, as this task asks, although the HIG would draw a destructive item in red.
 
+## [ ] 2026-11-07-29 New file docs/TODOS.md: who does what
+
+Christian created `docs/TODOS.md`, a short numbered list of his to-dos (#1, #2…). Done items are deleted so that a person can read the file at a glance. Read the rules at the top of the file. In short:
+- When Christian writes "todo: …" to you, add the item at the end with the next number, in his words, update "Next number", and commit. Do not add items on your own initiative.
+- When you finish an item that is yours (anything that is not mock-ups or the specification), delete it in the same commit as the work. Never renumber.
+- Items about the mock-ups or the specification are for the design agent, which turns them into inbox tasks for you and deletes them.
+- If you think an item is already done or obsolete, ask Christian before deleting it.
+
+Nothing to change in the app for this task: check it once you have read the file.
+
