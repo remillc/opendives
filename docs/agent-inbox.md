@@ -449,3 +449,14 @@ Mock-up: `docs/mockups/android-sites.dc.html`.
 **Statistics main screen (`/statistics/`):** keep the ready-made charts exactly as they are in the app now. Task 23 does not apply to them.
 
 **Filtered result screen ("Mode : circuit ouvert", `/statistics/result/`):** replace the app's chart with the mock-up's (`docs/mockups/stats-filtre-android.dc.html`): title "Profondeur maximale par plongée", one bar per dive in date order, 120 dp high in the card, bars with 3 dp corners and about 6 dp gaps, each bar coloured with the water gradient by its depth (same scale as the water column: `--od-water-top` to `--od-water-bottom` at 60 m and deeper), the year under each bar in 12 sp `#4A4D52`, no axis lines, an accessible label "Profondeur maximale des N plongées en circuit ouvert".
+
+
+## [ ] 2026-11-07-25 Statistics main screen: coloured ready-made charts
+
+Christian wants the two ready-made charts of `/statistics/` ("Plongées par année", "Durée des plongées") in colour. This changes only their colours. Task 24 still applies for everything else (keep the charts as they are in the app now).
+
+- Each bar is coloured with the water gradient by its value within its own chart: t = 0.7 + 0.3 × value / max value, colour = mix of `--od-water-top` (#FBE3B2) and `--od-water-bottom` (#B4530F) at t. The tallest bar is #B4530F, the shortest is never lighter than #C97E40 (3:1 on white).
+- In dark mode, use the dark water tokens (#E5B961 to #EF7625) with the same formula.
+- Labels, sizes, corners and gaps do not change.
+
+Mock-ups: `docs/mockups/android-stats.dc.html`, `docs/mockups/ios-stats-tableau.dc.html`. Spec: section 4, "Statistics", main screen.
