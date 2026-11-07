@@ -257,3 +257,7 @@ On step 2, "Continuer" with divelogs.de checks the credentials before the import
 Done in New account step 2: empty logbook first
 
 On "Reprendre votre carnet ?", the choices are now in this order: "Commencer avec un carnet vide", "Depuis divelogs.de", "Depuis un fichier". Mock-ups: `android-compte-import`, `ios-compte-import`, `compte-import-identifiants-android`, `compte-import-identifiants-ios`.
+
+## [ ] 2026-11-07-01 Android menus: rounder corners and MD3 details
+
+Every ⋮ menu on Android: 16 dp corners, items 48 dp high with 12 dp side padding, 24 dp leading icon, labels 14 sp medium, elevation level 2, width 112 to 280 dp. See `docs/ui-specification.md` (Android follows Material 3). Mock-ups: `docs/mockups/detail2-android-menu.dc.html`, `docs/mockups/reglages-menu-android.dc.html`.
