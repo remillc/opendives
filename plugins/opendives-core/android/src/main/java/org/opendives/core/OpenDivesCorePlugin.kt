@@ -539,7 +539,7 @@ class OpenDivesCorePlugin : Plugin() {
         call.resolve(JSObject().put("json", NativeCore.getTrip(call.getInt("tripId") ?: 0)))
     }
 
-    /** One undoable trip change (see opendives.h): location, notes, remove, split, merge, add, ungroup. */
+    /** One undoable trip change (see opendives.h): location, notes, remove, split, merge, add, ungroup, create. */
     @PluginMethod
     fun tripAction(call: PluginCall) = onCoreThread(call) {
         val ids = call.getArray("diveIds")?.toList<Int>()?.toIntArray()
@@ -670,12 +670,13 @@ class OpenDivesCorePlugin : Plugin() {
     /** Deletes a dive (delete_dive): one undoable step. */
     @PluginMethod
     fun deleteDive(call: PluginCall) = onCoreThread(call) {
-        val id = call.getInt("id")
-        if (id == null) {
+        // One dive ("id") or several ("ids"), one undoable step.
+        val ids = call.getArray("ids")?.toList<Int>()?.toIntArray() ?: call.getInt("id")?.let { intArrayOf(it) }
+        if (ids == null || ids.isEmpty()) {
             call.reject("Missing id", "BAD_ARGUMENT")
             return@onCoreThread
         }
-        call.resolve(JSObject().put("json", NativeCore.deleteDive(id)))
+        call.resolve(JSObject().put("json", NativeCore.deleteDive(ids)))
     }
 
     /** Renumbers dives in date order (renumber_dives): all of them if no ids, one undoable step. */

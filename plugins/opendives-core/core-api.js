@@ -469,7 +469,8 @@ import { registerPlugin } from '@capacitor/core';
  *   dives matching every rule and the fulltext query (number[]).
  * @property {(options: {fields: Record<string, string|number|string[]>}) => Promise<EditResult>} createDive
  *   Logs a dive by hand, one undoable step (create_dive in opendives.h).
- * @property {(options: {id: number}) => Promise<EditResult>} deleteDive
+ * @property {(options: {id?: number, ids?: number[]}) => Promise<EditResult>} deleteDive
+ *   One dive (id) or several (ids), one undoable step.
  *   Deletes a dive, one undoable step (delete_dive).
  * @property {(options: {ids: number[], start: number}) => Promise<EditResult>} renumberDives
  *   Renumbers the dives (all if ids is empty) in date order from start, one undoable step (renumber_dives).
@@ -488,7 +489,7 @@ import { registerPlugin } from '@capacitor/core';
  * @property {(options: {action: 'create'|'edit'|'geocode'|'merge'|'delete'|'deleteSite', uuid?: number, other?: number, uuids?: number[], field?: string, value?: string, lat?: number, lon?: number}) => Promise<EditResult>} siteAction
  *   One undoable site change, as Subsurface's site commands.
  * @property {(options: {tripId: number}) => Promise<TripDetail>} getTrip
- * @property {(options: {action: 'location'|'notes'|'remove'|'split'|'merge'|'add'|'ungroup'|'autogroup', tripId?: number, diveId?: number, otherId?: number, diveIds?: number[], value?: string}) => Promise<EditResult>} tripAction
+ * @property {(options: {action: 'location'|'notes'|'remove'|'split'|'merge'|'add'|'ungroup'|'create'|'autogroup', tripId?: number, diveId?: number, otherId?: number, diveIds?: number[], value?: string}) => Promise<EditResult>} tripAction
  *   One undoable trip change, as Subsurface's trip commands; "autogroup" (value "on" or
  *   "off") sets the log's trip grouping, as Subsurface's View > Autogroup.
  * @property {() => Promise<Dive[]>} listLoadedDives

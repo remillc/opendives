@@ -1014,6 +1014,37 @@ int trip_add_dives(int trip_id, const std::vector<int> &dive_ids, std::string &j
 	return do_move(std::move(step), trip_id, json, error);
 }
 
+// CreateTrip (commands/command_divelist.cpp), as the dive list's "Create new
+// trip above": a new trip made from the first dive, then every dive moved to it.
+int trip_create(const std::vector<int> &dive_ids, std::string &json, std::string &error)
+{
+	std::vector<dive *> dives;
+	for (int id: dive_ids) {
+		dive *d = divelog.dives.get_by_uniq_id(id);
+		if (!d) {
+			error = "NOT_FOUND";
+			return -1;
+		}
+		dives.push_back(d);
+	}
+	if (dives.empty()) {
+		error = "NOTHING_TO_DO";
+		return -1;
+	}
+	// The selection in the order of the dive table (by date), as Subsurface's.
+	std::sort(dives.begin(), dives.end(), [](const dive *a, const dive *b) { return a->when < b->when; });
+	Step step;
+	step.kind = Step::MOVE;
+	step.text = "create trip";
+	std::unique_ptr<dive_trip> trip = create_trip_from_dive(dives[0]);
+	dive_trip *new_trip = trip.get();
+	for (dive *d: dives)
+		step.moves.push_back({ d, new_trip });
+	step.trips_to_add.push_back(std::move(trip));
+	int show = new_trip->id;
+	return do_move(std::move(step), show, json, error);
+}
+
 // MainWindow::on_actionAutoGroup_triggered(): the flag, then AutogroupDives or
 // RemoveAutogenTrips (commands/command_divelist.cpp).
 int trips_autogroup(bool on, std::string &json, std::string &error)
@@ -2509,19 +2540,33 @@ int create_dive(const std::string &fields_json, std::string &result_json, std::s
 
 int delete_dive(int id, std::string &result_json, std::string &error)
 {
+	return delete_dives({ id }, result_json, error);
+}
+
+int delete_dives(const std::vector<int> &ids, std::string &result_json, std::string &error)
+{
 	if (check_writable_log(error))
 		return -1;
-	dive *d = divelog.dives.get_by_uniq_id(id);
-	if (!d) {
-		error = "NOT_FOUND";
+	std::vector<dive *> dives;
+	for (int id: ids) {
+		dive *d = divelog.dives.get_by_uniq_id(id);
+		if (!d) {
+			error = "NOT_FOUND";
+			return -1;
+		}
+		if (std::find(dives.begin(), dives.end(), d) == dives.end())
+			dives.push_back(d);
+	}
+	if (dives.empty()) {
+		error = "NOTHING_TO_DO";
 		return -1;
 	}
-	// DeleteDive::DeleteDive() and redoit(): the dive leaves the log, with its
-	// trip if it was the last one.
+	// DeleteDive::DeleteDive() and redoit(): the dives leave the log, each trip
+	// with them when they were its last ones.
 	Step step;
 	step.kind = Step::DIVE_LIST;
-	step.list.remove_dives = { d };
-	step.text = "delete 1 dive(s) [" + list_of_dives(step.list.remove_dives) + "]";
+	step.list.remove_dives = dives;
+	step.text = "delete " + std::to_string(dives.size()) + " dive(s) [" + list_of_dives(step.list.remove_dives) + "]";
 	apply_dive_list(step);
 	result_json = dive_list_json(step);
 	push_step(std::move(step));

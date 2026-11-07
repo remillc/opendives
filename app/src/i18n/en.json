@@ -38,6 +38,37 @@
       "one": "{n} selected",
       "other": "{n} selected"
     },
+    "menuFilter": "Filter",
+    "menuFilterOn": "Filter (filter applied)",
+    "menuDelete": "Delete",
+    "menuCreateTrip": "Create a trip",
+    "menuAddAbove": {
+      "one": "Add the dive to the trip above",
+      "other": "Add the dives to the trip above"
+    },
+    "menuAddBelow": {
+      "one": "Add the dive to the trip below",
+      "other": "Add the dives to the trip below"
+    },
+    "deleteTitle": {
+      "one": "Delete the dive",
+      "other": "Delete the {n} dives"
+    },
+    "deleteText": {
+      "one": "The dive is removed from the logbook, on this device and in the cloud. You can undo it for a few seconds.",
+      "other": "The {n} dives are removed from the logbook, on this device and in the cloud. You can undo it for a few seconds."
+    },
+    "deleteAction": "Delete",
+    "deleted": {
+      "one": "Dive deleted",
+      "other": "{n} dives deleted"
+    },
+    "tripCreated": "Trip created",
+    "addedToTrip": {
+      "one": "Dive added to the trip",
+      "other": "{n} dives added to the trip"
+    },
+    "selectionFailed": "The change could not be made. No dive was changed.",
     "selectionClose": "Leave the selection",
     "countFiltered": {
       "one": "{n} dive of {total}",

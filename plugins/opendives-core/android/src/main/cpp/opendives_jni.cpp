@@ -443,7 +443,7 @@ Java_org_opendives_core_NativeCore_getTrip(JNIEnv *env, jobject, jint id)
 	return env->NewStringUTF(json.c_str());
 }
 
-// One trip change: action is location, notes, remove, split, merge, add or ungroup.
+// One trip change: action is location, notes, remove, split, merge, add, ungroup or create.
 JNIEXPORT jstring JNICALL
 Java_org_opendives_core_NativeCore_tripAction(JNIEnv *env, jobject, jstring actionIn, jint tripId, jint diveId,
 					      jint otherId, jintArray diveIds, jstring valueIn)
@@ -469,6 +469,8 @@ Java_org_opendives_core_NativeCore_tripAction(JNIEnv *env, jobject, jstring acti
 		ret = opendives::trip_add_dives(tripId, ids, json, error);
 	else if (action == "ungroup")
 		ret = opendives::trip_ungroup(tripId, json, error);
+	else if (action == "create")
+		ret = opendives::trip_create(ids, json, error);
 	else if (action == "autogroup")
 		ret = opendives::trips_autogroup(value == "on", json, error);
 	else {
@@ -550,10 +552,17 @@ Java_org_opendives_core_NativeCore_createDive(JNIEnv *env, jobject, jstring fiel
 
 // Deletes a dive: one undoable step (delete_dive).
 JNIEXPORT jstring JNICALL
-Java_org_opendives_core_NativeCore_deleteDive(JNIEnv *env, jobject, jint id)
+Java_org_opendives_core_NativeCore_deleteDive(JNIEnv *env, jobject, jintArray diveIds)
 {
+	std::vector<int> ids;
+	if (diveIds) {
+		jsize n = env->GetArrayLength(diveIds);
+		ids.resize(n);
+		if (n)
+			env->GetIntArrayRegion(diveIds, 0, n, ids.data());
+	}
 	std::string json, error;
-	if (opendives::delete_dive(id, json, error)) {
+	if (opendives::delete_dives(ids, json, error)) {
 		throw_core_error(env, error);
 		return nullptr;
 	}

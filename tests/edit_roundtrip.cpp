@@ -359,6 +359,8 @@ int main(int argc, char **argv)
 			  [&] { return divelog.trips.size() == trips0 - 1; } },
 			{ "location", [&](std::string &j, std::string &e) { return edit_trip(trip_id, "location", "OpenDives test", j, e); },
 			  [&] { return trip_location(trip_id) == "OpenDives test"; } },
+			{ "create", [&](std::string &j, std::string &e) { return trip_create({ second }, j, e); },
+			  [&] { return divelog.trips.size() == trips0 + 1 && trip_by_id_size(trip_id) == size0 - 1; } },
 		};
 		if (loose)
 			ops.push_back({ "add", [&](std::string &j, std::string &e) { return trip_add_dives(trip_id, { loose->id }, j, e); },
@@ -433,6 +435,17 @@ int main(int argc, char **argv)
 		}
 		if (!undo_and_save("delete") || divelog.trips.size() != trips0)
 			return 1;
+		// Delete the first two dives in one step, then undo.
+		if (divelog.dives.size() >= 2) {
+			std::vector<int> two = { divelog.dives[0]->id, divelog.dives[1]->id };
+			if (delete_dives(two, json, error) || divelog.dives.size() != dives0 - 2 ||
+			    undo_text().rfind("delete 2 dive(s) [", 0) != 0) {
+				printf("error=delete2: %s\n", error.c_str());
+				return 1;
+			}
+			if (!undo_and_save("delete2") || divelog.trips.size() != trips0)
+				return 1;
+		}
 		// Renumber: all the dives from 100, then the last half only from 7; the
 		// numbers are consecutive in date order; each saved and undone.
 		for (int pass = 0; pass < 2; pass++) {

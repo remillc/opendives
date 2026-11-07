@@ -151,7 +151,16 @@ export async function refreshAfterChange(undoText) {
  * @param {number} id
  */
 export async function deleteDive(id) {
-  const result = await OpenDivesCore.deleteDive({ id });
+  return deleteDives([id]);
+}
+
+/**
+ * Deletes several dives in one undoable step (the logbook's selection),
+ * saved and synced like an edit.
+ * @param {number[]} ids
+ */
+export async function deleteDives(ids) {
+  const result = await OpenDivesCore.deleteDive({ ids });
   logbook.undoText = result.undo;
   logbook.dives = await OpenDivesCore.listLoadedDives();
   logbook.sitesVersion++;
@@ -386,7 +395,9 @@ export function boot() {
     const cached = OpenDivesCore.listCloudDives({ cached: true });
     let probe = null;
     try {
-      if (logbook.autoSync && localStorage.getItem(ACCOUNT_HINT)) probe = OpenDivesCore.probeCloud();
+      // The probe runs on the plugin's network thread, not in the core's
+      // order: it is sent once the account is set, or it finds none.
+      if (logbook.autoSync && localStorage.getItem(ACCOUNT_HINT)) probe = configure.then(() => OpenDivesCore.probeCloud());
     } catch {
       // No hint: loadCloud sends the probe.
     }

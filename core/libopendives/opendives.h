@@ -244,6 +244,8 @@ int trip_split_at(int dive_id, std::string &json, std::string &error); // this d
 int trips_merge(int trip_id, int other_id, std::string &json, std::string &error);
 int trip_add_dives(int trip_id, const std::vector<int> &dive_ids, std::string &json, std::string &error);
 int trip_ungroup(int trip_id, std::string &json, std::string &error);
+// CreateTrip: a new trip holding these dives, taken out of their trips.
+int trip_create(const std::vector<int> &dive_ids, std::string &json, std::string &error);
 // "Group dives into trips" (the log's autogroup), as Subsurface desktop's
 // View > Autogroup: sets the flag, then one undoable step, AutogroupDives when
 // on, RemoveAutogenTrips when off (no step when no dive moves; the flag itself
@@ -408,6 +410,8 @@ int create_dive(const std::string &fields_json, std::string &result_json, std::s
 // Deletes a dive (DeleteDive, commands/command_divelist.cpp): its trip goes
 // too if it was the last one; undo puts both back.
 int delete_dive(int id, std::string &result_json, std::string &error);
+// The same for several dives, one undoable step ("delete N dive(s) [...]").
+int delete_dives(const std::vector<int> &ids, std::string &result_json, std::string &error);
 
 // Renumbers dives as Subsurface's Renumber dialog (RenumberDialog, then
 // RenumberDives in commands/command_divelist.cpp): the listed dives (all of

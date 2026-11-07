@@ -38,6 +38,37 @@
       "one": "{n} sélectionnée",
       "other": "{n} sélectionnées"
     },
+    "menuFilter": "Filtrer",
+    "menuFilterOn": "Filtrer (filtre appliqué)",
+    "menuDelete": "Supprimer",
+    "menuCreateTrip": "Créer un voyage",
+    "menuAddAbove": {
+      "one": "Ajouter la plongée au voyage au-dessus",
+      "other": "Ajouter les plongées au voyage au-dessus"
+    },
+    "menuAddBelow": {
+      "one": "Ajouter la plongée au voyage en dessous",
+      "other": "Ajouter les plongées au voyage en dessous"
+    },
+    "deleteTitle": {
+      "one": "Supprimer la plongée",
+      "other": "Supprimer les {n} plongées"
+    },
+    "deleteText": {
+      "one": "La plongée est retirée du carnet, sur cet appareil et dans le cloud. Vous pourrez l'annuler pendant quelques secondes.",
+      "other": "Les {n} plongées sont retirées du carnet, sur cet appareil et dans le cloud. Vous pourrez l'annuler pendant quelques secondes."
+    },
+    "deleteAction": "Supprimer",
+    "deleted": {
+      "one": "Plongée supprimée",
+      "other": "{n} plongées supprimées"
+    },
+    "tripCreated": "Voyage créé",
+    "addedToTrip": {
+      "one": "Plongée ajoutée au voyage",
+      "other": "{n} plongées ajoutées au voyage"
+    },
+    "selectionFailed": "La modification n'a pas pu être faite. Aucune plongée n'a été modifiée.",
     "selectionClose": "Quitter la sélection",
     "countFiltered": {
       "one": "{n} plongée sur {total}",

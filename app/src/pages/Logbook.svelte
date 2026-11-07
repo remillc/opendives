@@ -5,7 +5,7 @@
   // error, empty logbook, offline with pending changes, sync conflict. A log can hold thousands of dives:
   // the list is virtual, only the rows near the screen are in the document.
   import { onDestroy, tick, untrack } from 'svelte';
-  import { Page, Navbar, NavRight, Link, Subnavbar, Searchbar, List, ListItem, Block, Button, f7, theme } from 'framework7-svelte';
+  import { Page, Navbar, NavRight, Link, Subnavbar, Searchbar, List, ListItem, Block, Button, Popover, f7, theme } from 'framework7-svelte';
   import SyncStatus from '../components/SyncStatus.svelte';
   import DiveRow from '../components/DiveRow.svelte';
   import TripRow from '../components/TripRow.svelte';
@@ -13,7 +13,8 @@
   import MenuButton from '../components/MenuButton.svelte';
   import ActiveFilter from '../components/ActiveFilter.svelte';
   import ConflictSheet from '../components/ConflictSheet.svelte';
-  import { logbook, loadLogbook, importFile, undoLastChange, resolveConflict } from '../lib/logbook.svelte.js';
+  import { logbook, loadLogbook, importFile, undoLastChange, resolveConflict, deleteDives, tripChange } from '../lib/logbook.svelte.js';
+  import { confirmAction } from '../lib/dialogs.js';
   import { filter, loadOptions, applyFilter, isEmpty } from '../lib/filter.svelte.js';
   import { layout } from '../lib/layout.svelte.js';
   import { navigation } from '../lib/navigation.svelte.js';
@@ -125,6 +126,89 @@
     if (!Object.values(checked).some(Boolean)) endSelection();
   }
 
+  const checkedIds = $derived(Object.keys(checked).filter((id) => checked[Number(id)]).map(Number));
+
+  /**
+   * The trips just above and below the checked dives, when these are dives
+   * outside trips that follow one another in the list: "Add to the trip
+   * above / below" (the list goes from the most recent to the oldest).
+   */
+  const neighbourTrips = $derived.by(() => {
+    /** @type {{ above: number|null, below: number|null }} */
+    const none = { above: null, below: null };
+    if (!checkedIds.length) return none;
+    const positions = [];
+    for (let i = 0; i < entries.length; i++) {
+      const e = entries[i];
+      if (e.type === 'trip') {
+        if (e.dives.some((d) => checked[d.id])) return none;
+      } else if (checked[e.dive.id]) positions.push(i);
+    }
+    if (positions.length !== checkedIds.length) return none;
+    const first = positions[0];
+    const last = positions[positions.length - 1];
+    if (last - first + 1 !== positions.length) return none;
+    /** @param {Entry|undefined} e */
+    const tripOf = (e) => (e?.type === 'trip' ? (e.dives[0].trip?.id ?? null) : null);
+    return { above: tripOf(entries[first - 1]), below: tripOf(entries[last + 1]) };
+  });
+
+  /** @param {unknown} e */
+  function changeFailed(e) {
+    const code = String(/** @type {any} */ (e)?.message ?? '');
+    console.error('Logbook selection', code);
+    f7.dialog
+      .create({
+        text: code.startsWith('WRITE_LOCKED') ? t('edit.writeLocked') : t('logbook.selectionFailed'),
+        buttons: [{ text: t('dialog.ok') }],
+      })
+      .open();
+  }
+
+  function deleteChecked() {
+    const ids = checkedIds;
+    const n = ids.length;
+    confirmAction({
+      title: t('logbook.deleteTitle', { n }),
+      text: t('logbook.deleteText', { n }),
+      action: t('logbook.deleteAction'),
+      onConfirm: async () => {
+        try {
+          await deleteDives(ids);
+          endSelection();
+          offerUndo(t('logbook.deleted', { n }));
+        } catch (e) {
+          changeFailed(e);
+        }
+      },
+    });
+  }
+
+  async function createTrip() {
+    try {
+      const result = await tripChange({ action: 'create', diveIds: checkedIds });
+      endSelection();
+      const id = result.trip?.tripId;
+      if (id) expanded[id] = true;
+      offerUndo(t('logbook.tripCreated'));
+    } catch (e) {
+      changeFailed(e);
+    }
+  }
+
+  /** @param {number} tripId */
+  async function addToTrip(tripId) {
+    const n = checkedIds.length;
+    try {
+      await tripChange({ action: 'add', tripId, diveIds: checkedIds });
+      endSelection();
+      expanded[tripId] = true;
+      offerUndo(t('logbook.addedToTrip', { n }));
+    } catch (e) {
+      changeFailed(e);
+    }
+  }
+
   // A new load gives new identifiers: the selection is left.
   $effect(() => {
     logbook.dives;
@@ -169,7 +253,7 @@
      * @param {MouseEvent} e
      */
     function click(e) {
-      if (!el.contains(/** @type {Node} */ (e.target))) return;
+      if (!el?.contains(/** @type {Node} */ (e.target))) return;
       if (pressed) {
         pressed = false;
         e.preventDefault();
@@ -490,8 +574,9 @@
     {#snippet left()}<MenuButton />{/snippet}
     <NavRight>
       {#if logbook.dives.length || logbook.preview}
-        <Link iconOnly href="/filter/" class="{filtered ? 'filter-on' : ''} {logbook.dives.length ? '' : 'disabled'}">
-          <Icon name="filter" /><span class="od-sr-only">{t(filtered ? 'logbook.filterOn' : 'logbook.filter')}</span>
+        <Link iconOnly popoverOpen=".od-logbook-menu" class={logbook.dives.length ? '' : 'disabled'}>
+          {#if theme.ios}<Icon name="moreCircle" />{:else}<Icon name="more" weight={4} />{/if}
+          <span class="od-sr-only">{t('detail.moreOptions')}</span>
         </Link>
       {/if}
       {#if theme.ios}
@@ -514,7 +599,7 @@
     {#if filtered}
       <ActiveFilter prefs={logbook.prefs} dives={logbook.dives} shown={results ? results.length : sorted.length} />
     {:else if sorted.length}
-      <p class="count od-value" role="status">{count}</p>
+      <p class="count od-value" role="status">{count}{#if selecting}<span class="separator" aria-hidden="true">·</span><span class="count-selected">{t('logbook.selected', { n: checkedCount })}</span>{/if}</p>
     {/if}
     {#if filter.failed}<p class="count failed" role="status">{t('logbook.filterFailed')}</p>{/if}
     <!--
@@ -622,6 +707,41 @@
     <Block><p>{t('logbook.noFilterResults')}</p></Block>
   {/if}
 
+  <!--
+    Overflow menu (the dive detail's, components styles "dive-menu"): Filter,
+    and with a selection Delete, Create a trip, Add to the trip above / below.
+  -->
+  <Popover class="dive-menu od-logbook-menu" backdrop={false}>
+    <List noChevron>
+      <ListItem link="/filter/" popoverClose title={t(filtered ? 'logbook.menuFilterOn' : 'logbook.menuFilter')}>
+        {#snippet media()}{#if !theme.ios}<Icon name="filter" weight={2} />{/if}{/snippet}
+        {#snippet after()}{#if theme.ios}<Icon name="filter" />{/if}{/snippet}
+      </ListItem>
+      {#if selecting}
+        <ListItem link="#" popoverClose title={t('logbook.menuDelete')} class="destructive" onClick={deleteChecked}>
+          {#snippet media()}{#if !theme.ios}<Icon name="delete" weight={2} />{/if}{/snippet}
+          {#snippet after()}{#if theme.ios}<Icon name="delete" />{/if}{/snippet}
+        </ListItem>
+        <ListItem link="#" popoverClose title={t('logbook.menuCreateTrip')} onClick={createTrip}>
+          {#snippet media()}{#if !theme.ios}<Icon name="plus" weight={2} />{/if}{/snippet}
+          {#snippet after()}{#if theme.ios}<Icon name="plus" />{/if}{/snippet}
+        </ListItem>
+        {#if neighbourTrips.above}
+          {@const id = neighbourTrips.above}
+          <ListItem link="#" popoverClose title={t('logbook.menuAddAbove', { n: checkedCount })} onClick={() => addToTrip(id)}>
+            {#snippet media()}{#if !theme.ios}<span class="menu-blank"></span>{/if}{/snippet}
+          </ListItem>
+        {/if}
+        {#if neighbourTrips.below}
+          {@const id = neighbourTrips.below}
+          <ListItem link="#" popoverClose title={t('logbook.menuAddBelow', { n: checkedCount })} onClick={() => addToTrip(id)}>
+            {#snippet media()}{#if !theme.ios}<span class="menu-blank"></span>{/if}{/snippet}
+          </ListItem>
+        {/if}
+      {/if}
+    </List>
+  </Popover>
+
   {#if !logbook.loading && !logbook.error && rows.length}
     <div class="list media-list chevron-center dividers virtual-list dives" bind:this={listEl}>
       <ul>
@@ -668,6 +788,10 @@
           <Icon name="close" /><span class="od-sr-only">{t('logbook.selectionClose')}</span>
         </button>
         <span class="selection-count od-value" role="status">{t('logbook.selected', { n: checkedCount })}</span>
+        <a href="#" class="link icon-only popover-open selection-more" data-popover=".od-logbook-menu" role="button">
+          {#if theme.ios}<Icon name="moreCircle" />{:else}<Icon name="more" weight={4} />{/if}
+          <span class="od-sr-only">{t('detail.moreOptions')}</span>
+        </a>
       </div>
     {/if}
     {#if !theme.ios && layout.phone && logbook.dives.length && !selecting}
@@ -733,6 +857,16 @@
       color: var(--od-text-2);
     }
 
+    .count .separator {
+      margin: 0 0.4em;
+    }
+
+    /* Selection mode: the number of dives checked, beside the total. */
+    .count-selected {
+      color: var(--od-text);
+      font-weight: 500;
+    }
+
     .failed {
       color: var(--od-alarm);
     }
@@ -762,6 +896,15 @@
       font-size: 22px;
       line-height: 28px;
       color: var(--od-text);
+    }
+
+    .selection-more {
+      margin-left: auto;
+    }
+
+    :global(.od-logbook-menu .menu-blank) {
+      display: block;
+      width: 24px;
     }
 
     /* The dives follow the count and the sync status closely. */
