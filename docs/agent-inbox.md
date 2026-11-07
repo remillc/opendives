@@ -287,3 +287,7 @@ Done in "App icon: thinner Hublot logo on Android, iOS and the web".
 Follow-up to 2026-11-07-04, changed after it was done. In light mode the logo has no ring any more: the porthole is a white disc (#FFFFFF, circle r 30) on the paper background, with the water (now clipped to r 30) and the two ink bubbles. Dark mode keeps the thin paper ring. Update the Android adaptive icon foreground (remove the ring stroke, add the white disc), the monochrome icon if it uses the ring, the splash mark, iOS and web icons, from the updated `docs/brand/opendives-icon-light-*.svg`. See `docs/ui-specification.md` ("Logo") and `docs/mockups/logo-hublot-moyen.dc.html`.
 
 Done in "App icon: white porthole without a ring in light mode".
+
+## [ ] 2026-11-07-06 App icon: final logo, ring under the water
+
+New and final version of the logo, replacing tasks 04 and 05. A white disc (dark mode #1E2023) with the water at about 40 %, and the ring only under the water: an ink arc (paper in dark mode), 3 units thick with rounded ends, from one end of the waterline to the other through the bottom. Two filled bubbles, slightly larger (radius 3 and 2.1). Regenerate every icon from the updated `docs/brand/opendives-icon-*.svg`: Android adaptive icon (foreground, monochrome), splash mark (light and night), iOS, web. See `docs/ui-specification.md` ("Logo") and `docs/mockups/logo-anneau-sous-eau.dc.html`.
