@@ -432,3 +432,20 @@ Christian finds that several screens, the whole Sites section first, do not look
 - EAD et MOD: the MOD row says "EAN32 à 1,4 bar" (the core's mix name), not "Nx 32".
 - Gas blender (`melangeur-desaturation.png`, left pair): section labels "Mélange voulu" and "Dans la bouteille" are 14/20 weight 500 above the fields, not 18 bold titles; the residual oxygen and helium dropdowns are always shown in Trimix mode (oxygen alone in Nitrox mode), not only after a pressure is typed; the bottle size dropdown shows its value ("12 L").
 - Account (`compte-reglages.png`, left pair): the top app bar is the small one with "Compte" as its title (64 dp), not a large collapsing title; intro paragraph 16/24.
+
+## [ ] 2026-11-07-24 Corrections to the visual audit (task 23): Sites maps, Sites panel on surfaces, Statistics charts
+
+Christian changed some points of task 23. Where this task and task 23 disagree, this task wins.
+
+**Site sheet map (replaces task 23, point 3, first bullet):** no 4:5 map. Keep the map inside the page margins (16 dp), 16 dp corners, 170 dp high, attribution at the bottom right, as in `docs/mockups/sites-fiche-android.dc.html`.
+
+**Sites list map (replaces task 23, point 2, first bullet):** the visible map is in **5:4 landscape ratio**: full width, height = width × 4 / 5 (312 dp on a 390 dp phone), from under the top app bar. The list panel starts right under it. "Centrer sur ma position" stays 16 dp from the right and bottom edges of the visible map.
+
+**Sites list panel on surfaces (new):** the panel has the page background. Under the count line ("3 sites, 9 plongées", 14/20 `#4A4D52`, on the page background), two white surfaces with 20 dp corners, 16 dp side margins, 12 dp apart, 1 dp dividers `#ECECEA` between rows, no divider line between the two surfaces:
+- first surface: the maintenance rows (48 dp, 14/20 ink, 24 dp chevron), only those that apply; no surface at all when none applies;
+- second surface: the site rows (72 dp, name 16/24, supporting 14/20, trailing depth 16/24 weight 500, no chevron).
+Mock-up: `docs/mockups/android-sites.dc.html`.
+
+**Statistics main screen (`/statistics/`):** keep the ready-made charts exactly as they are in the app now. Task 23 does not apply to them.
+
+**Filtered result screen ("Mode : circuit ouvert", `/statistics/result/`):** replace the app's chart with the mock-up's (`docs/mockups/stats-filtre-android.dc.html`): title "Profondeur maximale par plongée", one bar per dive in date order, 120 dp high in the card, bars with 3 dp corners and about 6 dp gaps, each bar coloured with the water gradient by its depth (same scale as the water column: `--od-water-top` to `--od-water-bottom` at 60 m and deeper), the year under each bar in 12 sp `#4A4D52`, no axis lines, an accessible label "Profondeur maximale des N plongées en circuit ouvert".
