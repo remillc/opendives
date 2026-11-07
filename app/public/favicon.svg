@@ -1,12 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="108" height="108" viewBox="0 0 108 108">
-  <!-- The "Hublot" logo in the round mask (docs/brand/opendives-icon-*-round.svg),
+  <!-- The "Hublot" logo in the round mask (docs/brand/opendives-icon-*-round.svg), with the
+       grey arc of the small sizes,
        light or dark following the system. -->
   <style>
     .bg { fill: #F4F4F2 } .disc { fill: #FFFFFF } .ink { fill: #1F2124 }
-    .ring { fill: none; stroke: #1F2124; stroke-width: 3; stroke-linecap: round }
+    .ring { fill: none; stroke: #1F2124; stroke-width: 3; stroke-linecap: round } .grey { stroke: #A3A5A8 }
     .top { stop-color: #FBE3B2 } .bottom { stop-color: #B4530F }
     @media (prefers-color-scheme: dark) {
-      .bg { fill: #121314 } .disc { fill: #1E2023 } .ink { fill: #F4F4F2 } .ring { stroke: #F4F4F2 }
+      .bg { fill: #121314 } .disc { fill: #1E2023 } .ink { fill: #F4F4F2 } .ring { stroke: #F4F4F2 } .grey { stroke: #6B6E72 }
       .top { stop-color: #E5B961 } .bottom { stop-color: #EF7625 }
     }
   </style>
@@ -19,6 +20,7 @@
     <rect width="108" height="108" class="bg"/>
     <circle cx="54" cy="54" r="30" class="disc"/>
     <g clip-path="url(#hc)"><path d="M20 61 Q32 55 44 61 T68 61 T92 61 V100 H20 Z" fill="url(#h)"/></g>
+    <path d="M24.83 61 A30 30 0 1 1 83.17 61" class="ring grey"/>
     <path d="M24.83 61 A30 30 0 0 0 83.17 61" class="ring"/>
     <circle cx="62" cy="44" r="3" class="ink"/>
     <circle cx="56.5" cy="36.5" r="2.1" class="ink"/>

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Themed icon layer of the "Hublot" logo (docs/brand) in one colour: the
-     porthole as a light disc, the water, the ring under it and the bubbles
+     porthole as a light disc, the circle above the water half
+     strong, the water, the ring under it and the bubbles
      in the full colour. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
@@ -12,6 +13,11 @@
         <clip-path android:pathData="M25,54a29,29 0,1 0,58 0a29,29 0,1 0,-58 0Z" />
         <path android:fillColor="#FF000000" android:pathData="M20,61 Q32,55 44,61 T68,61 T92,61 V100 H20 Z" />
     </group>
+    <path
+        android:pathData="M24.83,61 A30,30 0 1,1 83.17,61"
+        android:strokeColor="#80000000"
+        android:strokeWidth="3"
+        android:strokeLineCap="round" />
     <path
         android:pathData="M24.83,61 A30,30 0 0,0 83.17,61"
         android:strokeColor="#FF000000"

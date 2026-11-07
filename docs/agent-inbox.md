@@ -378,6 +378,8 @@ Rename the About row "Signaler un problème" to "Question / signaler un problèm
 
 Done in "About: Question / report a problem".
 
-## [ ] 2026-11-07-21 Logo: grey arc on small sizes only
+## [x] 2026-11-07-21 Logo: grey arc on small sizes only
 
 The logo now has two forms. At 64 px and below (launcher icons on Android, iOS and web, splash and notification marks, the logo beside the name in headers) the top of the circle is completed by a grey arc: regenerate those from the updated `docs/brand/opendives-icon-*.svg`. Above 64 px, when the logo stands alone (About screen, first launch), use the new `docs/brand/opendives-logo-{light,dark}.svg`, without the grey arc. See `docs/ui-specification.md` ("Logo", size rule) and `docs/mockups/logo-anneau-adaptatif.dc.html`.
+
+Done in "Logo: grey arc on small sizes, large logo without it". First launch shows no logo today, so only About uses the large one.

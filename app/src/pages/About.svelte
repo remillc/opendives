@@ -108,7 +108,9 @@
   </Navbar>
 
   <header class="head">
-    <img class="logo" src="favicon.svg" alt="" width="88" height="88" />
+    <!-- The large standalone logo, without the grey arc of the small sizes (spec, "Logo"). -->
+    <img class="logo light" src="logo-light.svg" alt="" width="88" height="88" />
+    <img class="logo dark" src="logo-dark.svg" alt="" width="88" height="88" />
     <h1>OpenDives</h1>
     {#if version}<p class="version od-value">{version}</p>{/if}
     <p class="tagline">{t('about.tagline')}</p>
@@ -172,8 +174,13 @@
       }
     }
 
-    .logo {
-      border-radius: 50%;
+    .logo.dark,
+    :global(html.dark) .logo.light {
+      display: none;
+    }
+
+    :global(html.dark) .logo.dark {
+      display: block;
     }
 
     .author {

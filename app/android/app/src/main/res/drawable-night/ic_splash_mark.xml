@@ -26,6 +26,12 @@
         </path>
     </group>
     <!-- The ring, only under the water: an arc from one end of the waterline to the other. -->
+    <!-- Above the water, the circle completed in grey: small sizes only (spec, "Logo", size rule). -->
+    <path
+        android:pathData="M24.83,61 A30,30 0 1,1 83.17,61"
+        android:strokeColor="#FF6B6E72"
+        android:strokeWidth="3"
+        android:strokeLineCap="round" />
     <path
         android:pathData="M24.83,61 A30,30 0 0,0 83.17,61"
         android:strokeColor="#FFF4F4F2"
