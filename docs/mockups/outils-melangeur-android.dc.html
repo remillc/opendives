@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Mélangeur de gaz, Android</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:#1F2124}a:hover{color:#1F2124}
+@keyframes odlin{0%{left:-40%}100%{left:100%}}
+@keyframes odspin{to{transform:rotate(360deg)}}
+input::placeholder{color:#8E8E93;-webkit-text-fill-color:#8E8E93}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #F4F4F2; font-family: Roboto, 'Google Sans', system-ui, sans-serif; color: #1F2124; position: relative; overflow: hidden">
+  <div style="padding: 40px 8px 0 4px; height: 104px; box-sizing: border-box; display: flex; align-items: center; gap: 4px">
+    <a href="android-outils.dc.html" aria-label="Retour" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #1F2124; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M20 12H5 M11 6l-6 6 6 6"></path></svg></a>
+    <span style="flex: 1; font-size: 22px; line-height: 28px">Mélangeur de gaz</span>
+  </div>
+  <p style="margin: 0 20px 8px 20px; font-size: 14px; font-weight: 500; letter-spacing: 0.1px">Mélange voulu</p>
+  <form onsubmit="return false" style="margin: 0 16px; display: flex; flex-direction: column; gap: 16px">
+    <div style="display: flex; gap: 12px"><div style="flex: 1; min-width: 0"><label style="position: relative; display: flex; align-items: center; height: 56px; background: #E8E8E5; border-bottom: 1px solid #75787C; border-radius: 4px 4px 0 0; padding: 18px 16px 0 16px; gap: 8px; box-sizing: border-box"><span style="position: absolute; left: 16px; top: 8px; font-size: 12px; line-height: 16px; color: #4A4D52">Oxygène</span><input type="text" inputmode="decimal" value="21" aria-label="Oxygène" style="flex: 1; min-width: 0; border: none; background: transparent; font-family: inherit; font-size: 16px; color: #1F2124; font-variant-numeric: tabular-nums; padding: 0; outline: none"><span style="font-size: 16px; color: #4A4D52">%</span></label></div><div style="flex: 1; min-width: 0"><label style="position: relative; display: flex; align-items: center; height: 56px; background: #E8E8E5; border-bottom: 1px solid #75787C; border-radius: 4px 4px 0 0; padding: 18px 16px 0 16px; gap: 8px; box-sizing: border-box"><span style="position: absolute; left: 16px; top: 8px; font-size: 12px; line-height: 16px; color: #4A4D52">Hélium</span><input type="text" inputmode="decimal" value="35" aria-label="Hélium" style="flex: 1; min-width: 0; border: none; background: transparent; font-family: inherit; font-size: 16px; color: #1F2124; font-variant-numeric: tabular-nums; padding: 0; outline: none"><span style="font-size: 16px; color: #4A4D52">%</span></label></div></div>
+    <div style="display: flex; gap: 12px"><div style="flex: 1; min-width: 0"><label style="position: relative; display: flex; align-items: center; height: 56px; background: #E8E8E5; border-bottom: 1px solid #75787C; border-radius: 4px 4px 0 0; padding: 18px 16px 0 16px; gap: 8px; box-sizing: border-box"><span style="position: absolute; left: 16px; top: 8px; font-size: 12px; line-height: 16px; color: #4A4D52">Pression finale</span><input type="text" inputmode="decimal" value="220" aria-label="Pression finale" style="flex: 1; min-width: 0; border: none; background: transparent; font-family: inherit; font-size: 16px; color: #1F2124; font-variant-numeric: tabular-nums; padding: 0; outline: none"><span style="font-size: 16px; color: #4A4D52">bar</span></label></div><div><label style="position: relative; display: flex; align-items: center; height: 56px; background: #E8E8E5; border-bottom: 1px solid #75787C; border-radius: 4px 4px 0 0; padding: 18px 12px 0 16px; gap: 8px; box-sizing: border-box"><span style="position: absolute; left: 16px; top: 8px; font-size: 12px; line-height: 16px; color: #4A4D52">Bouteille</span><span style="flex: 1; font-size: 16px; color: #1F2124">12 L</span><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style="fill: #4A4D52; margin-top: -18px"><path d="M7 10l5 5 5-5z"></path></svg></label></div></div>
+  </form>
+  <div style="height: 16px"></div>
+  <p style="margin: 0 20px 8px 20px; font-size: 14px; font-weight: 500; letter-spacing: 0.1px">Dans la bouteille</p>
+  <form onsubmit="return false" style="margin: 0 16px; display: flex; flex-direction: column; gap: 16px">
+    <div style="display: flex; gap: 12px"><div style="flex: 1; min-width: 0"><label style="position: relative; display: flex; align-items: center; height: 56px; background: #E8E8E5; border-bottom: 1px solid #75787C; border-radius: 4px 4px 0 0; padding: 18px 16px 0 16px; gap: 8px; box-sizing: border-box"><span style="position: absolute; left: 16px; top: 8px; font-size: 12px; line-height: 16px; color: #4A4D52">Pression</span><input type="text" inputmode="decimal" value="50" aria-label="Pression" style="flex: 1; min-width: 0; border: none; background: transparent; font-family: inherit; font-size: 16px; color: #1F2124; font-variant-numeric: tabular-nums; padding: 0; outline: none"><span style="font-size: 16px; color: #4A4D52">bar</span></label></div><div><label style="position: relative; display: flex; align-items: center; height: 56px; background: #E8E8E5; border-bottom: 1px solid #75787C; border-radius: 4px 4px 0 0; padding: 18px 12px 0 16px; gap: 8px; box-sizing: border-box"><span style="position: absolute; left: 16px; top: 8px; font-size: 12px; line-height: 16px; color: #4A4D52">Mélange</span><span style="flex: 1; font-size: 16px; color: #1F2124">21/35</span><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style="fill: #4A4D52; margin-top: -18px"><path d="M7 10l5 5 5-5z"></path></svg></label></div></div>
+    <div><label style="position: relative; display: flex; align-items: center; height: 56px; background: #E8E8E5; border-bottom: 1px solid #75787C; border-radius: 4px 4px 0 0; padding: 18px 12px 0 16px; gap: 8px; box-sizing: border-box"><span style="position: absolute; left: 16px; top: 8px; font-size: 12px; line-height: 16px; color: #4A4D52">Compléter avec</span><span style="flex: 1; font-size: 16px; color: #1F2124">Air</span><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style="fill: #4A4D52; margin-top: -18px"><path d="M7 10l5 5 5-5z"></path></svg></label></div>
+  </form>
+  <h2 style="margin: 20px 20px 8px 20px; font-size: 18px; line-height: 24px; font-weight: 700">Gonflage, dans l’ordre</h2>
+  <ol style="list-style: none; margin: 0 16px; padding: 0; background: #FFFFFF; border-radius: 20px; overflow: hidden">
+      <li style="border-bottom: 1px solid #ECECEA; display: flex; align-items: center; gap: 16px; min-height: 64px; padding: 8px 20px 8px 16px; box-sizing: border-box"><span aria-hidden="true" style="flex: none; width: 28px; height: 28px; border-radius: 14px; background: #E8E8E5; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600">1</span><span style="flex: 1; min-width: 0"><span style="display: block; font-size: 16px; line-height: 24px">Hélium</span><span style="display: block; font-size: 13px; line-height: 18px; color: #4A4D52; font-variant-numeric: tabular-nums">+ 60 bar, 714 L</span></span><span style="font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap">jusqu’à 110 bar</span></li>
+      <li style="border-bottom: 1px solid #ECECEA; display: flex; align-items: center; gap: 16px; min-height: 64px; padding: 8px 20px 8px 16px; box-sizing: border-box"><span aria-hidden="true" style="flex: none; width: 28px; height: 28px; border-radius: 14px; background: #E8E8E5; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600">2</span><span style="flex: 1; min-width: 0"><span style="display: block; font-size: 16px; line-height: 24px">Oxygène</span><span style="display: block; font-size: 13px; line-height: 18px; color: #4A4D52; font-variant-numeric: tabular-nums">+ 16 bar, 190 L</span></span><span style="font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap">jusqu’à 125 bar</span></li>
+      <li style="display: flex; align-items: center; gap: 16px; min-height: 64px; padding: 8px 20px 8px 16px; box-sizing: border-box"><span aria-hidden="true" style="flex: none; width: 28px; height: 28px; border-radius: 14px; background: #E8E8E5; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600">3</span><span style="flex: 1; min-width: 0"><span style="display: block; font-size: 16px; line-height: 24px">Air</span><span style="display: block; font-size: 13px; line-height: 18px; color: #4A4D52; font-variant-numeric: tabular-nums">+ 95 bar</span></span><span style="font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap">jusqu’à 220 bar</span></li>
+  </ol>
+  <p style="margin: 10px 20px 0 20px; font-size: 13px; line-height: 18px; color: #C62828">Pressions à lire bouteille refroidie. Au-delà de 40 % d’oxygène, la bouteille et le robinet doivent être nettoyés pour l’oxygène.</p>
+  <p style="margin: 10px 20px 0 20px; font-size: 13px; line-height: 18px; color: #4A4D52">Analysez le mélange avant de plonger.</p>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

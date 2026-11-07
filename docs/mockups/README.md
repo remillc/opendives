@@ -106,3 +106,6 @@ When a mock-up and `docs/ui-specification.md` disagree, the specification wins. 
 | `outils-desaturation-android.dc.html` | Désaturation · Android |
 | `sites-modifier-android.dc.html` | Modifier le site · Android |
 | `police-source-android.dc.html` | Police du texte courant, Source Sans 3 (retenue) · Android |
+| `outils-ead-mod-android.dc.html` | Outils, EAD et MOD · Android |
+| `outils-meilleur-melange-android.dc.html` | Outils, meilleur mélange · Android |
+| `outils-melangeur-android.dc.html` | Outils, mélangeur de gaz · Android |

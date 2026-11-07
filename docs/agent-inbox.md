@@ -293,3 +293,7 @@ Done in "App icon: white porthole without a ring in light mode".
 New and final version of the logo, replacing tasks 04 and 05. A white disc (dark mode #1E2023) with the water at about 40 %, and the ring only under the water: an ink arc (paper in dark mode), 3 units thick with rounded ends, from one end of the waterline to the other through the bottom. Two filled bubbles, slightly larger (radius 3 and 2.1). Regenerate every icon from the updated `docs/brand/opendives-icon-*.svg`: Android adaptive icon (foreground, monochrome), splash mark (light and night), iOS, web. See `docs/ui-specification.md` ("Logo") and `docs/mockups/logo-anneau-sous-eau.dc.html`.
 
 Done in "App icon: final Hublot logo, the ring only under the water".
+
+## [ ] 2026-11-07-07 Tools: list page and three gas tools
+
+The Tools page becomes a list of links in two groups (Plongée: planner, desaturation; Gaz: EAD et MOD, Meilleur mélange, Mélangeur de gaz). The inline gas calculator is removed and split into "EAD et MOD" and "Meilleur mélange" screens. Add a new "Mélangeur de gaz" screen for partial pressure blending of nitrox and trimix (helium, then oxygen, then top-up gas, with real-gas compressibility), with its warnings. See `docs/ui-specification.md` ("Tools page and gas tools"). Mock-ups: `docs/mockups/android-outils.dc.html`, `outils-ead-mod-android.dc.html`, `outils-meilleur-melange-android.dc.html`, `outils-melangeur-android.dc.html`.
