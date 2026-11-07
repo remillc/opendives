@@ -74,7 +74,8 @@
       style: STYLE,
       center: [0, 20],
       zoom: 1,
-      attributionControl: { compact: true },
+      // The credits are a short line of text at the bottom right (below).
+      attributionControl: false,
       dragRotate: false,
       pitchWithRotate: false,
     });
@@ -85,11 +86,6 @@
     resize.observe(container);
     m.once('remove', () => resize.disconnect());
     m.on('load', () => {
-      // The credits stay one tap away, behind the ⓘ button (OpenStreetMap's
-      // licence asks for them to be reachable), but start collapsed.
-      const credits = container?.querySelector('.maplibregl-ctrl-attrib');
-      credits?.classList.remove('maplibregl-compact-show');
-      credits?.removeAttribute('open');
       showLabelsInLanguage();
       drawSites();
       fit();
@@ -170,6 +166,8 @@
       <circle cx="0" cy="-24" r="5" />
     </svg>
   {/if}
+  <!-- Credits asked by OpenStreetMap's licence and the tile provider. -->
+  <p class="credits">{t('sites.mapCredits')}</p>
 </div>
 
 <style>
@@ -183,6 +181,21 @@
     .canvas {
       position: absolute;
       inset: 0;
+    }
+
+    .credits {
+      position: absolute;
+      right: 8px;
+      bottom: 4px;
+      max-width: calc(100% - 16px);
+      margin: 0;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: color-mix(in srgb, var(--od-surface) 85%, transparent);
+      color: var(--od-text-2);
+      font-size: 11px;
+      line-height: 14px;
+      pointer-events: none;
     }
 
     .center-pin {

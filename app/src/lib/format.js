@@ -224,6 +224,16 @@ export function formatLongDate(iso) {
   return firstOfMonth(longDateFormat.format(toDate(iso)));
 }
 
+/** Long date and time, in the time format chosen in Settings: "24 avril 2022, 10:30". @param {string} iso */
+export function formatLongDateTime(iso) {
+  return `${formatLongDate(iso)}, ${formatTimeChoice(toDate(iso), settings.timeFormat)}`;
+}
+
+/** Duration in whole minutes, as in a site's dive rows: "104 min". @param {number} seconds */
+export function formatMinutes(seconds) {
+  return `${Math.round(seconds / 60)} ${t('units.minutes')}`;
+}
+
 /**
  * Intl writes "1 juillet"; French usage is "1er juillet" (dates follow the
  * device format).

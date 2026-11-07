@@ -83,7 +83,8 @@
 
   {#if located.length}
     <div class="map">
-      <SiteMap bind:this={siteMap} sites={located} onselect={open} height="45vh" />
+      <!-- 5:4 landscape, full width (task 2026-11-07-24). -->
+      <SiteMap bind:this={siteMap} sites={located} onselect={open} height="calc(100vw * 4 / 5)" />
       <button type="button" class="locate" onclick={centreOnDevice}>
         <Icon name="locate" size={20} />
         <span class="od-sr-only">{t('sites.centreOnMe')}</span>
@@ -95,7 +96,7 @@
     <p class="count od-value">{t('sites.siteCount', { n: used.length })}, {t('sites.diveCount', { n: diveCount })}</p>
 
     {#if withoutSite || unplaced || duplicates}
-      <div class="list links">
+      <div class="list links surface">
         <ul>
           {#if withoutSite}
             <li><a href="/sites/without/" class="item-link item-content"><div class="item-inner"><div class="item-title">{t('sites.withoutLink', { n: withoutSite })}</div></div></a></li>
@@ -108,30 +109,32 @@
           {/if}
         </ul>
       </div>
-      <div class="divider" role="separator"></div>
     {/if}
 
-    <div class="list media-list od-sites-list">
-      <ul>
-        {#each used as site (site.uuid)}
-          <li>
-            <a href="/site/{site.uuid}/" class="item-link item-content">
-              <div class="item-inner">
-                <div class="item-title-row">
-                  <div class="item-title od-site-name">{site.name || t('sites.noName')}</div>
-                  {#if site.maxDepthMm}<div class="item-after od-value">{formatDepth(site.maxDepthMm, logbook.prefs)}</div>{/if}
+    {#if used.length}
+      <!-- No chevron on the site rows (android-sites.dc.html). -->
+      <div class="list no-chevron surface od-sites-list">
+        <ul>
+          {#each used as site (site.uuid)}
+            <li>
+              <a href="/site/{site.uuid}/" class="item-link item-content">
+                <div class="item-inner">
+                  <div class="text">
+                    <div class="item-title od-site-name">{site.name || t('sites.noName')}</div>
+                    <div class="item-text">
+                      {site.hasLocation
+                        ? t('sites.rowDives', { n: site.dives, date: formatLongDate(site.lastDate) })
+                        : t('sites.rowNoGps', { n: site.dives })}
+                    </div>
+                  </div>
+                  {#if site.maxDepthMm}<div class="depth od-value">{formatDepth(site.maxDepthMm, logbook.prefs)}</div>{/if}
                 </div>
-                <div class="item-text">
-                  {site.hasLocation
-                    ? t('sites.rowDives', { n: site.dives, date: formatLongDate(site.lastDate) })
-                    : t('sites.rowNoGps', { n: site.dives })}
-                </div>
-              </div>
-            </a>
-          </li>
-        {/each}
-      </ul>
-    </div>
+              </a>
+            </li>
+          {/each}
+        </ul>
+      </div>
+    {/if}
     <div class="list searchbar-not-found"><ul><li class="item-content"><div class="item-inner">{t('sites.noMatch')}</div></li></ul></div>
   </section>
 </Page>
@@ -142,21 +145,22 @@
       position: relative;
     }
 
-    /* Small button (40 dp, in a 48 dp target) at the bottom right of the map. */
+    /* 40 dp, white surface, 12 dp corners, elevation 1, 16 dp from the right
+       of the map, above its credits. */
     .locate {
       position: absolute;
-      right: 12px;
-      bottom: 48px; /* above the credits button */
+      right: 16px;
+      bottom: 32px;
       width: 40px;
       height: 40px;
       border: none;
       border-radius: 12px;
-      background: var(--od-surface-2);
+      background: var(--od-surface);
       color: var(--od-text);
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 1px 3px rgb(0 0 0 / 0.25);
+      box-shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 1px 3px 1px rgb(0 0 0 / 0.15);
     }
 
     .sites-panel {
@@ -173,11 +177,25 @@
       color: var(--od-text-2);
     }
 
-    /* Maintenance rows: compact one-line items, 48 dp, 14 sp, chevron kept
-       (android-sites.dc.html); the site rows below keep their size. */
-    .links {
-      margin: 0;
+    /* White surfaces, 20 dp corners, 16 dp side margins, 12 dp apart, light
+       dividers between the rows (task 2026-11-07-24). */
+    .surface {
+      margin: 0 16px 12px;
+      border-radius: 20px;
+      overflow: hidden;
+      background: var(--od-surface);
 
+      ul {
+        background: none;
+      }
+
+      li + li {
+        border-top: 1px solid var(--od-row-divider);
+      }
+    }
+
+    /* Maintenance rows: 48 dp, 14/20 ink, 24 dp chevron. */
+    .links {
       .item-content,
       .item-inner {
         min-height: 48px;
@@ -192,17 +210,48 @@
         font-size: 14px;
         line-height: 20px;
         letter-spacing: 0.25px;
+        color: var(--od-text);
       }
     }
 
-    .divider {
-      height: 1px;
-      margin: 4px 0;
-      background: var(--od-separator);
-    }
-
+    /* Site rows: 72 dp, name 16/24, supporting 14/20, trailing depth 16/24
+       medium ink, no chevron. */
     .od-sites-list {
-      margin-top: 0;
+      .item-inner {
+        min-height: 72px;
+        padding: 8px 20px 8px 0;
+        gap: 16px;
+      }
+
+      .text {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .item-title {
+        font-size: 16px;
+        line-height: 24px;
+        font-weight: 400;
+        letter-spacing: 0.15px;
+        color: var(--od-text);
+      }
+
+      .item-text {
+        font-size: 14px;
+        line-height: 20px;
+        letter-spacing: 0.25px;
+        color: var(--od-text-2);
+      }
+
+      .depth {
+        flex: none;
+        font-size: 16px;
+        line-height: 24px;
+        font-weight: 500;
+        color: var(--od-text);
+      }
     }
   }
 </style>

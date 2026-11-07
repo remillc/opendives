@@ -6,7 +6,8 @@
   import { Page, Navbar, Link, f7 } from 'framework7-svelte';
   import { OpenDivesCore } from 'opendives-core';
   import { logbook, saveDiveChanges } from '../lib/logbook.svelte.js';
-  import { formatDateTime, formatDuration } from '../lib/format.js';
+  import { formatDateTime } from '../lib/format.js';
+  import { diveLines } from '../lib/sites.svelte.js';
   import { t } from '../lib/i18n.js';
 
   /** @type {{ f7router: any }} */
@@ -21,6 +22,21 @@
     // The latest dive first, as in the logbook.
     dives = (await OpenDivesCore.siteQuery({ kind: 'without' })).sort((/** @type {any} */ a, /** @type {any} */ b) => b.date.localeCompare(a.date));
     sites = await OpenDivesCore.siteQuery({ kind: 'list' });
+    diveLines(dives, (l) => (lines = l), ', ');
+  }
+
+  /** Second line of each dive ("55 min, recycleur"), by dive id. */
+  let lines = $state(/** @type {Record<number, string>} */ ({}));
+
+  /**
+   * How many dives of the same trip are at the suggested site.
+   * @param {number} diveId
+   * @param {number} uuid
+   */
+  function sameTrip(diveId, uuid) {
+    const trip = logbook.dives.find((d) => d.id === diveId)?.trip?.id;
+    const name = siteName(uuid);
+    return trip ? logbook.dives.filter((d) => d.trip?.id === trip && d.site === name).length : 0;
   }
 
   $effect(() => {
@@ -62,73 +78,65 @@
     {/snippet}
   </Navbar>
 
-  <p class="intro">{t('sites.withoutIntro', { n: dives.length })}</p>
+  <p class="od-intro">{t('sites.withoutIntro', { n: dives.length })}</p>
 
-  {#each dives as dive (dive.id)}
-    <div class="dive">
-      <div class="line od-value">{dive.number ? `${t('detail.number', { number: String(dive.number) })} · ` : ''}{formatDateTime(dive.date)}</div>
-      <div class="sub od-value">{formatDuration(dive.durationSeconds)}</div>
-      {#if dive.suggestedSite}
-        <button type="button" class="suggestion" onclick={() => setSite(dive.id, dive.suggestedSite)}>
-          {t('sites.suggestion', { site: siteName(dive.suggestedSite) })}
-        </button>
-      {/if}
-      <div class="actions">
-        <button type="button" class="od-tonal-button" onclick={() => chooseSite(dive.id)}>{t('sites.chooseSite')}</button>
-        <button type="button" class="od-outlined-button" onclick={() => f7router.navigate(`/site/new/?dive=${dive.id}`)}>{t('sites.newSite')}</button>
-      </div>
-    </div>
-  {/each}
+  {#if dives.length}
+    <!-- All the dives in one white surface, with dividers. -->
+    <ul class="surface">
+      {#each dives as dive (dive.id)}
+        <li class="dive">
+          <span class="date od-value">{formatDateTime(dive.date)}</span>
+          <span class="sub od-value">{lines[dive.id] ?? ''}</span>
+          <span class="actions">
+            {#if dive.suggestedSite}
+              <!-- The suggested site first, as a filled tonal chip. -->
+              <button type="button" class="small tonal" onclick={() => setSite(dive.id, dive.suggestedSite)}>
+                {siteName(dive.suggestedSite)}
+              </button>
+            {/if}
+            <button type="button" class="small" onclick={() => chooseSite(dive.id)}>{t('sites.chooseSite')}</button>
+            <button type="button" class="small" onclick={() => f7router.navigate(`/site/new/?dive=${dive.id}`)}>{t('sites.newSite')}</button>
+          </span>
+          {#if dive.suggestedSite}
+            <span class="why">{t('sites.suggestionLine', { n: sameTrip(dive.id, dive.suggestedSite), site: siteName(dive.suggestedSite) })}</span>
+          {/if}
+        </li>
+      {/each}
+    </ul>
+  {/if}
 </Page>
 
 <style>
   @layer od.components {
-    .intro {
-      margin: 12px 20px;
-      font-size: 15px;
-      line-height: 21px;
-      color: var(--od-text-2);
+    .surface {
+      margin: 14px 16px 24px;
+      padding: 0;
+      list-style: none;
+      border-radius: 20px;
+      background: var(--od-surface);
+      overflow: hidden;
     }
 
     .dive {
-      margin: 0 16px 12px;
-      padding: 14px 16px;
-      border-radius: 16px;
-      background: var(--od-surface);
+      padding: 12px 16px;
       display: flex;
       flex-direction: column;
-      gap: 4px;
+
+      & + .dive {
+        border-top: 1px solid var(--od-separator);
+      }
     }
 
-    .line {
-      font-size: 17px;
-      font-weight: 600;
+    .date {
+      font-size: 16px;
+      line-height: 24px;
+      font-weight: 500;
     }
 
     .sub {
       font-size: 14px;
+      line-height: 20px;
       color: var(--od-text-2);
-    }
-
-    .suggestion {
-      align-self: flex-start;
-      margin-top: 6px;
-      position: relative;
-      min-height: 32px;
-      padding: 0 12px;
-      border: 1px dashed var(--od-text-2);
-      /* MD3 suggestion chip: 32 dp, 8 dp corners, 48 dp touch target. */
-      border-radius: 8px;
-      background: none;
-      color: var(--od-text);
-      font: inherit;
-      font-size: 14px;
-
-      &::after {
-        content: '';
-        position: absolute;
-        inset: -8px 0;
-      }
     }
 
     .actions {
@@ -136,6 +144,42 @@
       display: flex;
       gap: 8px;
       flex-wrap: wrap;
+    }
+
+    /* Small outlined buttons: 32 dp, 8 dp corners, 48 dp touch target. */
+    .small {
+      position: relative;
+      width: auto;
+      height: 32px;
+      padding: 0 12px;
+      border: 1px solid var(--od-text-2);
+      border-radius: 8px;
+      background: none;
+      color: var(--od-text);
+      font: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+
+      &::after {
+        content: '';
+        position: absolute;
+        inset: -8px 0;
+      }
+
+      /* The suggested site: a filled tonal chip. */
+      &.tonal {
+        border-color: transparent;
+        background: var(--od-tint);
+        color: var(--od-on-tint);
+      }
+    }
+
+    .why {
+      margin-top: 8px;
+      font-size: 13px;
+      line-height: 18px;
+      color: var(--od-text-2);
     }
   }
 </style>

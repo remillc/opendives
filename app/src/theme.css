@@ -30,6 +30,8 @@
     --od-text: #1F2124;
     --od-text-2: #4A4D52;
     --od-separator: #DADAD6;
+    /* Dividers between the rows of a white surface (Sites). */
+    --od-row-divider: #ECECEA;
     --od-action: #1F2124;
     --od-on-action: #FFFFFF;
     --od-primary-action: var(--od-action);
@@ -66,6 +68,7 @@
     --od-text: var(--f7-md-on-surface);
     --od-text-2: var(--f7-md-on-surface-variant);
     --od-separator: var(--f7-md-outline-variant);
+    --od-row-divider: var(--f7-md-outline-variant);
     --od-action: #F4F4F2;
     --od-on-action: #1F2124;
     --od-cursor: #F4F4F2;
@@ -341,6 +344,62 @@ html.ios {
   .media-list .item-link .item-title-row::before,
   .media-list.chevron-center .item-link .item-inner::before {
     content: var(--f7-list-chevron-icon-right) / '';
+  }
+
+  /*
+   * Android: the chevron of Settings everywhere (24 dp, --od-text-2), not
+   * Framework7's small light one.
+   */
+  .md {
+    --f7-list-chevron-icon-area: 24px;
+
+    .list:not(.media-list) .item-link .item-inner::before,
+    .media-list .item-link .item-title-row::before,
+    .media-list.chevron-center .item-link .item-inner::before {
+      content: '' / '';
+      width: 24px;
+      height: 24px;
+      margin-top: -12px;
+      background: var(--od-chevron-color, var(--od-text-2));
+      mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 5l7 7-7 7'/%3E%3C/svg%3E") center / 24px no-repeat;
+    }
+
+    .media-list .item-link .item-title-row::before {
+      top: 0;
+      margin-top: 0;
+    }
+
+    /* Framework7's no-chevron, on a list or a row, still wins over the above. */
+    .no-chevron .item-link .item-inner::before,
+    .no-chevron .item-link .item-title-row::before,
+    .item-link.no-chevron .item-inner::before,
+    .item-link.no-chevron .item-title-row::before {
+      display: none;
+    }
+  }
+
+  /*
+   * Android section titles on the page background (Settings, Tools, About,
+   * gas results): 18/24, bold, ink, 20 dp from the sides.
+   */
+  .md {
+    --f7-block-title-font-size: 18px;
+    --f7-block-title-line-height: 24px;
+    --f7-block-title-font-weight: 700;
+    --f7-block-title-text-color: var(--od-text);
+
+    .block-title {
+      margin-left: calc(20px + var(--f7-safe-area-left));
+      margin-right: calc(20px + var(--f7-safe-area-right));
+    }
+  }
+
+  /* Intro paragraph at the top of a screen (Account, Dives without a site, Clean up the sites). */
+  .od-intro {
+    margin: 16px 20px 8px;
+    font-size: 16px;
+    line-height: 24px;
+    color: var(--od-text);
   }
 
   .md {

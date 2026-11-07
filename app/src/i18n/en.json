@@ -769,7 +769,7 @@
     "foundAutomatically": "Found automatically from the position",
     "corrected": "Corrected by hand",
     "name": "Name",
-    "movePin": "Move the map under the pin",
+    "movePin": "Move the pin to correct",
     "coordinates": "Coordinates",
     "coordinatesHint": "For example -35.4485, 174.732, or your position",
     "coordinatesInvalid": "Coordinates not recognised. Example: -35.4485, 174.732",
@@ -782,7 +782,10 @@
       "one": "{n} dive has no site. OpenDives suggests the site of the other dives of the same trip.",
       "other": "{n} dives have no site. OpenDives suggests the site of the other dives of the same trip."
     },
-    "suggestion": "Suggestion: {site}, same trip",
+    "suggestionLine": {
+      "one": "Suggestion: same trip as one dive at {site}",
+      "other": "Suggestion: same trip as {n} dives at {site}"
+    },
     "chooseSite": "Choose a site",
     "cleanupTitle": "Clean up the sites",
     "cleanupIntro": "Imports sometimes create the same site several times. Merging keeps a single site, with all its dives. It can be undone.",
@@ -826,6 +829,7 @@
     "searchPlaceholder": "Search",
     "noMatch": "No site matches",
     "centreOnMe": "Centre on my position",
+    "mapCredits": "© OpenFreeMap, OpenMapTiles, OpenStreetMap contributors",
     "listLabel": "List of the sites",
     "unplacedLink": {
       "one": "{n} site without coordinates: place it",

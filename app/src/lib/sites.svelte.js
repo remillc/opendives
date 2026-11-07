@@ -3,8 +3,35 @@
 // synced like a dive edit; coordinates as Subsurface writes them.
 import { OpenDivesCore } from 'opendives-core';
 import { logbook, refreshAfterChange } from './logbook.svelte.js';
-import { language } from './i18n.js';
+import { language, tIfExists } from './i18n.js';
 import { settings } from './settings.svelte.js';
+import { formatMinutes } from './format.js';
+
+/**
+ * Second line of a dive in the Sites screens: "104 min · Buddy Diver ·
+ * recycleur"; the buddies and a mode other than open circuit come from the
+ * dive's detail, read one dive at a time (getDive). Calls `update` with the
+ * lines found so far, so the rows fill in while the rest is read.
+ * @param {{ id: number, durationSeconds: number }[]} dives
+ * @param {(lines: Record<number, string>) => void} update
+ * @param {string} [separator]
+ */
+export async function diveLines(dives, update, separator = ' · ') {
+  /** @type {Record<number, string>} */
+  const lines = {};
+  for (const dive of dives) lines[dive.id] = formatMinutes(dive.durationSeconds);
+  update({ ...lines });
+  for (const dive of dives) {
+    try {
+      const d = await OpenDivesCore.getDive({ id: dive.id });
+      const mode = d.divemode && d.divemode !== 'OC' ? (tIfExists(`detail.computerModes.${d.divemode}`) ?? d.divemode) : '';
+      lines[dive.id] = [formatMinutes(dive.durationSeconds), d.buddies.join(', '), mode].filter(Boolean).join(separator);
+    } catch {
+      // The duration alone.
+    }
+  }
+  update({ ...lines });
+}
 
 /**
  * One site change (create, edit, geocode, merge, delete), one undoable step.

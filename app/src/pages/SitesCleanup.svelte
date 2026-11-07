@@ -43,13 +43,25 @@
         : t('sites.sameName')
       : t('sites.samePlace');
 
+  /**
+   * The two sites of a pair, the one kept by default first: more dives, then
+   * a position.
+   * @param {(typeof pairs)[number]} pair
+   */
+  const ordered = (pair) =>
+    pair.b.dives > pair.a.dives || (pair.b.dives === pair.a.dives && pair.b.hasLocation && !pair.a.hasLocation)
+      ? [pair.b, pair.a]
+      : [pair.a, pair.b];
+
+  /** The site chosen to keep, by pair key; the first of `ordered` otherwise. */
+  /** @type {Record<string, number>} */
+  let kept = $state({});
+
   /** @param {(typeof pairs)[number]} pair */
   function merge(pair) {
-    // The site with more dives (then with a position) keeps them all.
-    const [keep, other] =
-      pair.b.dives > pair.a.dives || (pair.b.dives === pair.a.dives && pair.b.hasLocation && !pair.a.hasLocation)
-        ? [pair.b, pair.a]
-        : [pair.a, pair.b];
+    const [first, second] = ordered(pair);
+    const key = pairKey(pair.a.uuid, pair.b.uuid);
+    const [keep, other] = (kept[key] ?? first.uuid) === first.uuid ? [first, second] : [second, first];
     confirmAction({
       title: t('sites.mergeTitle'),
       text: t('sites.mergeText', { keep: keep.name || t('sites.noName'), other: other.name || t('sites.noName') }),
@@ -103,109 +115,174 @@
     {/snippet}
   </Navbar>
 
-  <p class="intro">{t('sites.cleanupIntro')}</p>
+  <p class="od-intro">{t('sites.cleanupIntro')}</p>
 
+  <!-- One surface per possible duplicate: the site kept is chosen with the radio buttons. -->
   {#each pairs as pair (pairKey(pair.a.uuid, pair.b.uuid))}
-    <div class="pair">
-      <div class="reason">{reason(pair)}</div>
-      {#each [pair.a, pair.b] as s (s.uuid)}
-        <div class="site"><span class="name">{s.name || t('sites.noName')}</span><span class="sub">{describe(s)}</span></div>
+    {@const key = pairKey(pair.a.uuid, pair.b.uuid)}
+    {@const both = ordered(pair)}
+    <fieldset class="surface">
+      <legend class="head">
+        <span class="name">{both[0].name || t('sites.noName')}</span>
+        <span class="sub">{reason(pair)}</span>
+      </legend>
+      {#each both as s (s.uuid)}
+        <label class="row radio-row">
+          <span class="radio">
+            <input type="radio" name="keep-{key}" value={s.uuid} checked={(kept[key] ?? both[0].uuid) === s.uuid} onchange={() => (kept[key] = s.uuid)} />
+            <i class="icon-radio"></i>
+          </span>
+          <span class="text"><span class="label">{s.name || t('sites.noName')}</span><span class="sub">{describe(s)}</span></span>
+        </label>
       {/each}
       <div class="actions">
-        <button type="button" class="od-outlined-button" onclick={() => { dismissPair(pair.a.uuid, pair.b.uuid); load(); }}>{t('sites.notDuplicates')}</button>
-        <button type="button" class="od-tonal-button" onclick={() => merge(pair)}>{t('sites.merge')}</button>
+        <button type="button" class="od-text-button" onclick={() => { dismissPair(pair.a.uuid, pair.b.uuid); load(); }}>{t('sites.notDuplicates')}</button>
+        <button type="button" class="filled" onclick={() => merge(pair)}>{t('sites.merge')}</button>
       </div>
-    </div>
+    </fieldset>
   {/each}
 
   {#if unused.length}
-    <div class="block-title">{t('sites.unusedTitle')}</div>
-    <p class="intro">{t('sites.unusedIntro', { n: unused.length })}</p>
-    <div class="list list-strong inset list-dividers">
-      <ul>
-        <li>
-          <button type="button" class="select-all" onclick={selectAll}>{t('sites.selectAll')}</button>
-        </li>
-        {#each unused as s (s.uuid)}
-          <li>
-            <label class="item-checkbox item-content">
-              <input type="checkbox" bind:checked={selected[s.uuid]} />
-              <i class="icon icon-checkbox"></i>
-              <div class="item-inner"><div class="item-title">{s.name || t('sites.noName')}<div class="item-footer">{t('sites.noDive')}</div></div></div>
-            </label>
-          </li>
-        {/each}
-      </ul>
-    </div>
-    <div class="delete">
-      <button type="button" class="od-outlined-button danger" disabled={!selection.length} onclick={deleteSelection}>
-        {t('sites.deleteSelection', { n: selection.length })}
-      </button>
+    <h2 class="section">{t('sites.unusedTitle')}</h2>
+    <div class="surface">
+      <p class="explain">{t('sites.unusedIntro', { n: unused.length })}</p>
+      <label class="row check-row">
+        <span class="checkbox">
+          <input type="checkbox" checked={selection.length === unused.length} indeterminate={selection.length > 0 && selection.length < unused.length} onchange={selectAll} />
+          <i class="icon-checkbox"></i>
+        </span>
+        <span class="label strong">{t('sites.selectAll')}</span>
+      </label>
+      {#each unused as s (s.uuid)}
+        <label class="row check-row">
+          <span class="checkbox">
+            <input type="checkbox" bind:checked={selected[s.uuid]} />
+            <i class="icon-checkbox"></i>
+          </span>
+          <span class="text"><span class="label">{s.name || t('sites.noName')}</span><span class="sub">{t('sites.noDive')}</span></span>
+        </label>
+      {/each}
+      <div class="actions">
+        <button type="button" class="filled" disabled={!selection.length} onclick={deleteSelection}>
+          {t('sites.deleteSelection', { n: selection.length })}
+        </button>
+      </div>
     </div>
   {/if}
 </Page>
 
 <style>
   @layer od.components {
-    .intro {
-      margin: 12px 20px;
-      font-size: 15px;
-      line-height: 21px;
-      color: var(--od-text-2);
-    }
-
-    .pair {
+    .surface {
       margin: 0 16px 12px;
-      padding: 14px 16px;
-      border-radius: 16px;
+      padding: 0;
+      border: none;
+      border-radius: 20px;
       background: var(--od-surface);
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
+      overflow: hidden;
+      min-width: 0;
     }
 
-    .reason {
-      font-size: 13px;
-      color: var(--od-text-2);
-    }
-
-    .site {
+    /* Header of a duplicate group: the site's name, then the reason. */
+    .head {
+      float: left;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 12px 16px 10px;
       display: flex;
       flex-direction: column;
 
       .name {
         font-size: 16px;
+        line-height: 24px;
         font-weight: 600;
       }
 
-      .sub {
-        font-size: 13px;
-        color: var(--od-text-2);
+      + * {
+        clear: both;
+      }
+    }
+
+    .sub {
+      font-size: 14px;
+      line-height: 20px;
+      color: var(--od-text-2);
+    }
+
+    .row {
+      min-height: 48px;
+      padding: 8px 16px;
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      border-top: 1px solid var(--od-separator);
+      cursor: pointer;
+    }
+
+    .radio-row {
+      min-height: 56px;
+    }
+
+    .text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .label {
+      font-size: 16px;
+      line-height: 24px;
+
+      &.strong {
+        font-weight: 600;
       }
     }
 
     .actions {
+      padding: 10px 16px 12px;
+      border-top: 1px solid var(--od-separator);
       display: flex;
+      justify-content: flex-end;
       gap: 8px;
-      flex-wrap: wrap;
     }
 
-    .select-all {
-      width: 100%;
-      min-height: 48px;
-      padding: 0 16px;
+    /* Filled button in ink: "Fusionner", "Supprimer la sélection". */
+    .filled {
+      width: auto;
+      height: 40px;
+      padding: 0 20px;
       border: none;
-      background: none;
-      color: var(--od-text);
+      border-radius: 20px;
+      background: var(--od-primary-action);
+      color: var(--od-on-primary-action);
       font: inherit;
-      font-weight: 600;
-      text-align: start;
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.1px;
+      cursor: pointer;
+
+      &:disabled {
+        opacity: 0.38;
+      }
     }
 
-    .delete {
-      margin: 12px 16px 32px;
-      display: flex;
-      justify-content: center;
+    /* Title on the page background, as on the site sheet. */
+    .section {
+      margin: 22px 16px 8px;
+      font-size: 14px;
+      line-height: 20px;
+      font-weight: 500;
+      color: var(--od-text-2);
+    }
+
+    .explain {
+      margin: 0;
+      padding: 12px 16px 10px;
+      font-size: 14px;
+      line-height: 20px;
+      color: var(--od-text-2);
     }
   }
 </style>

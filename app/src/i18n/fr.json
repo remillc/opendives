@@ -769,7 +769,7 @@
     "foundAutomatically": "Trouvées automatiquement d’après la position",
     "corrected": "Corrigées à la main",
     "name": "Nom",
-    "movePin": "Déplacez la carte sous l’épingle",
+    "movePin": "Déplacez l’épingle pour corriger",
     "coordinates": "Coordonnées",
     "coordinatesHint": "Par exemple -35.4485, 174.732, ou votre position",
     "coordinatesInvalid": "Coordonnées non reconnues. Exemple : -35.4485, 174.732",
@@ -782,7 +782,10 @@
       "one": "{n} plongée n’a pas de site. OpenDives propose le site des autres plongées du même voyage.",
       "other": "{n} plongées n’ont pas de site. OpenDives propose le site des autres plongées du même voyage."
     },
-    "suggestion": "Suggestion : {site}, même voyage",
+    "suggestionLine": {
+      "one": "Suggestion : même voyage qu’une plongée à {site}",
+      "other": "Suggestion : même voyage que {n} plongées à {site}"
+    },
     "chooseSite": "Choisir un site",
     "cleanupTitle": "Nettoyer les sites",
     "cleanupIntro": "Les imports créent parfois le même site plusieurs fois. Fusionner garde un seul site, avec toutes ses plongées. C’est annulable.",
@@ -826,6 +829,7 @@
     "searchPlaceholder": "Rechercher",
     "noMatch": "Aucun site ne correspond",
     "centreOnMe": "Centrer sur ma position",
+    "mapCredits": "© OpenFreeMap, OpenMapTiles, contributeurs OpenStreetMap",
     "listLabel": "Liste des sites",
     "unplacedLink": {
       "one": "{n} site sans coordonnées : le placer",
