@@ -112,6 +112,7 @@ Gradle does not rebuild the native code: rerun `native/build-android.sh` when th
 
 ## Conventions
 
+- Branch names always start with a prefix that says what the branch is for: `feature/...`, `fix/...`, `release/1.0.0`, and so on.
 - Commit messages in English, imperative mood, short summary line.
 - Author of every commit: Christian Rémillard. No `Co-Authored-By` or `Claude-Session` line in commit messages.
 - Code files taken from or derived from Subsurface: `SPDX-License-Identifier: GPL-2.0` header. OpenDives is GPLv2 because it reuses Subsurface's core.
