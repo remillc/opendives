@@ -113,11 +113,18 @@
     checked = { [id]: true };
     selecting = true;
     if (fabEl) f7.fab.close(fabEl);
+    closeMenu();
   }
 
   function endSelection() {
+    if (selecting) closeMenu();
     selecting = false;
     checked = {};
+  }
+
+  /** The ⋮ menu is placed for its items when it opens: it closes when the selection starts or ends. */
+  function closeMenu() {
+    f7.popover.close('.od-logbook-menu', false);
   }
 
   /** @param {number} id */
@@ -208,6 +215,13 @@
       changeFailed(e);
     }
   }
+
+  // Items of the open menu come and go with the dives checked (Add to the
+  // trip above or below): it is placed again for its new size.
+  $effect(() => {
+    neighbourTrips;
+    tick().then(() => /** @type {any} */ (f7.popover.get('.od-logbook-menu'))?.resize());
+  });
 
   // A new load gives new identifiers: the selection is left.
   $effect(() => {
