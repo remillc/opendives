@@ -329,14 +329,14 @@
       startY = e.clientY;
       const id = Number(row.dataset.dive);
       timer = setTimeout(() => {
+        // A long press lifts the row; what follows decides, as on Android's
+        // home screen: the finger lifted without moving selects the dive
+        // (selection mode, or one more check in it); the finger moving drags
+        // it to a trip or out of its own, and nothing is checked.
         pressed = true;
-        // A long press starts the selection with this dive; in selection
-        // mode it checks the dive. Moving the finger then drags this dive,
-        // the one under the finger (to a trip, or out of its own).
-        if (!selecting) startSelection(id);
-        else checked[id] = true;
         dragIds = [id];
         dragRow = row.closest('li');
+        dragRow?.classList.add('od-drag-lift');
       }, LONG_PRESS_MS);
     }
     /** @param {PointerEvent} e */
@@ -487,7 +487,7 @@
       document.querySelectorAll('.od-drag-chip').forEach((n) => n.remove());
       ghost = null;
       label = null;
-      dragRow?.classList.remove('od-drag-source');
+      dragRow?.classList.remove('od-drag-source', 'od-drag-lift');
       el?.querySelectorAll('.od-drop-target').forEach((n) => n.classList.remove('od-drop-target'));
     }
 
@@ -500,13 +500,11 @@
       try {
         if (what.action === 'add') {
           await tripChange({ action: 'add', tripId: what.tripId, diveIds: ids });
-          endSelection();
           expanded[what.tripId] = true;
           offerUndo(t('logbook.addedToTrip', { n }));
         } else {
           const inTrip = ids.filter((id) => diveById(id)?.trip);
           await tripChange({ action: 'remove', diveIds: inTrip });
-          endSelection();
           offerUndo(t('logbook.removedFromTrip', { n: inTrip.length }));
         }
       } catch (e) {
@@ -535,12 +533,22 @@
       if (dragging) {
         e.stopPropagation();
         drop();
-      } else if (document.querySelector('.od-drag-chip')) endDrag();
+      } else {
+        if (document.querySelector('.od-drag-chip')) endDrag();
+        // A long press let go without moving: the selection.
+        if (dragIds) {
+          dragRow?.classList.remove('od-drag-lift');
+          const id = dragIds[0];
+          if (!selecting) startSelection(id);
+          else checked[id] = true;
+        }
+      }
       dragIds = null;
     }
 
     function touchCancel() {
       if (dragging) endDrag();
+      dragRow?.classList.remove('od-drag-lift');
       dragIds = null;
     }
 
@@ -1225,6 +1233,15 @@
     :global(.od-drag-chip.od-drag-chip-target) {
       background: var(--od-text);
       color: var(--od-surface);
+    }
+
+    /* Held by a long press: the row rises a little, ready to be dragged. */
+    :global(li.od-drag-lift) {
+      position: relative;
+      z-index: 2;
+      background: var(--od-surface);
+      box-shadow: 0 2px 6px 2px rgb(0 0 0 / 0.15), 0 1px 2px rgb(0 0 0 / 0.3);
+      transition: box-shadow 150ms;
     }
 
     :global(.od-drag-source) {
