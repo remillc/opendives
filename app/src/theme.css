@@ -687,4 +687,22 @@ html.ios {
     position: absolute;
     inset: 0;
   }
+
+  /*
+   * A swipe that opens a page (Settings, About): the page is already open,
+   * beside the screen, and both follow --od-push-dx, set on the view.
+   */
+  .view.od-pushing > .page {
+    transform: translate3d(calc(100% + var(--od-push-dx)), 0, 0);
+    transition: none;
+    animation: none;
+  }
+
+  .view.od-pushing > .page.od-push-from {
+    transform: translate3d(var(--od-push-dx), 0, 0);
+  }
+
+  .view.od-push-settle > .page {
+    transition: transform 180ms ease-out;
+  }
 }

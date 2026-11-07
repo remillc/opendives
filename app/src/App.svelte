@@ -50,7 +50,7 @@
   import NavMenu from './components/NavMenu.svelte';
   import Welcome from './components/Welcome.svelte';
   import { layout, ios, listWidth, splitBreakpoint } from './lib/layout.svelte.js';
-  import { trackSection, enableSectionSwipes } from './lib/navigation.svelte.js';
+  import { trackSection, enableSectionSwipes, enableFullSwipeBack } from './lib/navigation.svelte.js';
   import { enableBackButton } from './lib/back-button.js';
   import { enableAccessibility } from './lib/accessibility.js';
   import { t } from './lib/i18n.js';
@@ -81,6 +81,9 @@
       iosSwipeBack: true,
       mdSwipeBackActiveArea: 10000,
       iosSwipeBackActiveArea: 10000,
+      // On Android the pages only slide, like the sections (enableFullSwipeBack).
+      mdSwipeBackAnimateOpacity: false,
+      mdSwipeBackAnimateShadow: false,
     },
     routes: [
       // The Logbook is the master of a master-detail pair on a wide enough tablet:
@@ -149,6 +152,7 @@
     enableAccessibility();
     trackSection();
     enableSectionSwipes();
+    enableFullSwipeBack();
     // The settings are applied and the logbook is loaded from main.js, before
     // the screens are built.
     mark('onMount');
