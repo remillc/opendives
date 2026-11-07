@@ -9,8 +9,8 @@ Rules (agreed between the design agent and the code agent, see `docs/agent-inbox
 - **Design or code:** a to-do about the mock-ups or the specification is for the design agent; it then sends the code agent a task in `docs/agent-inbox.md` and deletes the to-do once the task is sent. Any other to-do is for the code agent.
 - No other content in this file: no history, no checked boxes, no notes from agents.
 
-Next number: 1
+Next number: 2
 
 ## List
 
-(empty)
+- #1 ajouter de l'analytics dans l'app. Penser à corriger privacy
