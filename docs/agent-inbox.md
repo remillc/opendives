@@ -533,3 +533,11 @@ Nothing to change in the app: check this task once you have read the rule.
 
 Done in "Inbox: TODOS.md tags read". Rule read: every item the code agent adds now starts with [design] or [code].
 
+## [ ] 2026-11-08-01 Planner: settings on their own screen
+
+The planner settings move out of the planner screen (to-do #4). See section 4 of the spec, "Planner settings, a screen of their own".
+- Planner screen (`docs/mockups/android-planificateur.dc.html`): keep only the plan data (starting dive, depth, bottom time, gas, SAC, water type) and the computed plan. Remove the "Facteurs de gradient" row (it is in Settings, "Décompression"). Add a 48 dp icon button with a 24 dp "tune" icon, `aria-label` "Réglages du planificateur", in the top bar before "Enregistrer".
+- New screen "Réglages du planificateur" (`docs/mockups/reglages-planificateur-android.dc.html`): back arrow, intro "S’appliquent à chaque plan.", groups Vitesses, Paliers, Gaz, Réserve, with the rows, values, switches and Subsurface defaults of the mock-up. Value rows open the existing number and choice screens; switches change in place. Store the values in the core's planner preferences, as Subsurface-mobile's "Dive planner setup" does.
+- Route: the one you settle under to-do #3 (U3: `/settings/planner`).
+- iOS: same content, in an inset grouped list.
+

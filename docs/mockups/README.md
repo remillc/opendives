@@ -35,6 +35,7 @@ When a mock-up and `docs/ui-specification.md` disagree, the specification wins. 
 | `android-sites.dc.html` | Téléphone Android, Sites (carte hors ligne) |
 | `android-outils.dc.html` | Téléphone Android, Outils et calculateur de gaz |
 | `android-planificateur.dc.html` | Téléphone Android, Planificateur (résultat réel du cœur Subsurface) |
+| `reglages-planificateur-android.dc.html` | Téléphone Android, Réglages du planificateur (vitesses, paliers, gaz, réserve) |
 | `android-edition.dc.html` | Téléphone Android, Modifier une plongée recycleur |
 | `android-reglages.dc.html` | Téléphone Android, Réglages |
 | `android-etat-vide.dc.html` | Téléphone Android, État : carnet vide |
