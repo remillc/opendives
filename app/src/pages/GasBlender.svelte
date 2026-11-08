@@ -22,7 +22,8 @@
   // Everything is computed by the core (toolQuery 'blend', gas_blend in
   // opendives.h) with the real-gas compressibility; this screen only turns the
   // units and writes the fill in order. Nitrox mode hides the helium fields and
-  // the helium step. The last mode is remembered on the device.
+  // the helium step. Nitrox by default; the last mode chosen is remembered on
+  // the device.
   import { Page, Navbar, Link } from 'framework7-svelte';
   import { OpenDivesCore } from 'opendives-core';
   import TextField from '../components/TextField.svelte';
@@ -44,9 +45,9 @@
   /** @returns {'nitrox'|'trimix'} */
   function readMode() {
     try {
-      return localStorage.getItem(MODE_KEY) === 'nitrox' ? 'nitrox' : 'trimix';
+      return localStorage.getItem(MODE_KEY) === 'trimix' ? 'trimix' : 'nitrox';
     } catch {
-      return 'trimix';
+      return 'nitrox';
     }
   }
   let mode = $state(readMode());

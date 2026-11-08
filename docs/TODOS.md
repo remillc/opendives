@@ -22,7 +22,6 @@ Next number: 14
 - #6 [design] /plan/new: refaire le visuel
 - #7 [code] Mettre /plan sous /tools
 - #8 [design] /tools/desaturation: beaucoup trop de texte. Texte pour me protéger.
-- #9 [code] Mélangeur de gas: nitrox par défaut
 - #10 [design] Compte: Compte subsurface vérifié: ?
 - #11 [code] est-ce que c'est un simple protocole git qui transit entre le serveur ss et l'app? Si oui, alors peut on offrir de se connecter aussi, alternativement, a son serveur git préféré, par exemple GitHub?
 - #12 [code] btn synchroniser: montrer une progression

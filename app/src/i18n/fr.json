@@ -1163,7 +1163,8 @@
       "Sites : carte, fiche, plongées sans site, sites sans coordonnées et nettoyage des doublons.",
       "Suppression d'une plongée depuis son menu, avec « Annuler » pendant 10 secondes.",
       "Glisser à gauche ou à droite pour passer d'une section du menu à l'autre.",
-      "Politique de confidentialité et « Question / signaler un problème » dans À propos."
+      "Politique de confidentialité et « Question / signaler un problème » dans À propos.",
+      "Mélangeur de gaz : nitrox par défaut, le dernier mode choisi est retenu."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
