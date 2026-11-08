@@ -643,3 +643,10 @@ Spec: section 4, the "Dive detail" row of the screens table.
 
 Changes task 2026-11-08-11: remove the "N°" field from the editor. Changing a number shifts other dives, so it is done only through "Renuméroter la plongée" in the detail menu (tasks 13 and 14). The editor keeps showing the number in the line under its title ("N° 5 · Lake Coleridge · 2 avril 2014"). The first line of "La plongée" is now Date | Heure. Mock-up: `docs/mockups/android-edition.dc.html`.
 
+## [ ] 2026-11-08-16 Share a dive as a PDF sheet
+
+Changes the "Partager" part of task 2026-11-08-13. "Partager" in the detail menu now opens an MD3 modal bottom sheet titled "Partager" (`docs/mockups/partage-android.dc.html`) with two rows (72 dp, icon, title, one-line description):
+- "Fiche PDF", "Une page : profil, gaz, équipement, personnes et notes": builds a one-page PDF of the dive and opens the system share sheet with it (file name like `OpenDives-plongee-5-2014-04-02.pdf`).
+- "Résumé et image", "Un court texte et l’image du profil": the share described in task 13.
+The PDF follows `docs/mockups/partage-pdf-fiche.dc.html` (US Letter; use A4 outside the US and Canada): header with "Plongée n° 5", date and time, site as the title, location and trip, the three key figures on the right; "Profil" with the depth and time axes and the temperature curve, with a one-line legend; the secondary facts in five columns; "Gaz et équipement" as a table (Bouteille, Taille, Utilisation, Gaz, Début, Fin), then suit, weights and dive computer; "Personnes" and "Conditions" side by side; "Notes" in full (continue on a second page when long); footer "Fiche créée avec OpenDives le …" and "Page 1 sur 1". Rows without a value are left out, as on screen. Build the page as HTML with the app's styles and render it to PDF on the device (Android `PrintDocumentAdapter` or a WebView PDF export, iOS `UIPrintPageRenderer`); no network. Spec: section 4, the "Dive detail" row.
+

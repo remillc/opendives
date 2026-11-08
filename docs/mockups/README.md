@@ -51,6 +51,8 @@ When a mock-up and `docs/ui-specification.md` disagree, the specification wins. 
 | `android-tablette-reglages.dc.html` | Tablette Android, Réglages |
 | `detail2-ios-menu.dc.html` | Détail, menu en haut à droite ouvert, iPhone |
 | `detail2-android-menu.dc.html` | Détail, menu en haut à droite ouvert, Android |
+| `partage-android.dc.html` | Téléphone Android, Partager : choix entre « Fiche PDF » et « Résumé et image » |
+| `partage-pdf-fiche.dc.html` | Fiche PDF d’une plongée, format lettre |
 | `detail3-ios.dc.html` | Détail complet, iPhone |
 | `detail3-android.dc.html` | Détail complet, Android |
 | `detail3-ios-sombre.dc.html` | Détail complet, iPhone, sombre |
