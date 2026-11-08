@@ -11,11 +11,13 @@
   import ChoiceDialog from '../components/ChoiceDialog.svelte';
   import WheelDialog from '../components/WheelDialog.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
-  import { planner, loadSetup, setting, setSetting, ascentRate, setAscentRate, DEFAULT_ASCENT_MM_MIN } from '../lib/planner.svelte.js';
+  import { planner, loadSetup, adoptUnitDefaults, plannerDefaults, setting, setSetting, ascentRate, setAscentRate } from '../lib/planner.svelte.js';
   import { formatNumber, depthUnit } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
 
-  loadSetup().catch((e) => console.error('Planner settings', e));
+  loadSetup()
+    .then(() => adoptUnitDefaults(logbook.prefs))
+    .catch((e) => console.error('Planner settings', e));
 
   const prefs = $derived(logbook.prefs);
   const feet = $derived(prefs.length === 'ft');
@@ -103,14 +105,15 @@
   /** @type {{ id: string, title: string, rows: Row[] }[]} */
   const groups = $derived.by(() => {
     planner.setup; // read again after each change
+    const defaults = plannerDefaults(prefs);
     const lastStopUnit = depthUnit(prefs);
     return [
       {
         id: 'rates',
         title: t('plannerSettings.groups.rates'),
         rows: [
-          rateRow('ascent', t('plannerSettings.ascent'), ascentRate(), DEFAULT_ASCENT_MM_MIN, (mm) => setAscentRate(mm)),
-          rateRow('descent', t('plannerSettings.descent'), Number(setting('descentMmMin')), 18000, (mm) => setSetting('descentMmMin', mm)),
+          rateRow('ascent', t('plannerSettings.ascent'), ascentRate(), defaults.ascentMmMin, (mm) => setAscentRate(mm)),
+          rateRow('descent', t('plannerSettings.descent'), Number(setting('descentMmMin')), defaults.descentMmMin, (mm) => setSetting('descentMmMin', mm)),
         ],
       },
       {
@@ -168,7 +171,7 @@
             id: 'reserve',
             label: t('plannerSettings.reserve'),
             stored: Number(setting('reserveMbar')),
-            def: 40000,
+            def: defaults.reserveMbar,
             wheel: psi ? range(0, 1500, 10) : range(0, 100, 5),
             toUnit: (mbar) => (psi ? mbar / MBAR_PER_PSI : mbar / 1000),
             toStored: (v) => Math.round(psi ? v * MBAR_PER_PSI : v * 1000),
