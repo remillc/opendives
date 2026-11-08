@@ -15,7 +15,7 @@
   // 4. The new dives are one undoable step: back to the logbook with "3
   //    dives downloaded" and "Annuler". A failure opens "Download failed".
   import { onDestroy, onMount } from 'svelte';
-  import { Page, Navbar, Link, theme, f7 } from 'framework7-svelte';
+  import { Page, Navbar, Link, Button, theme, f7 } from 'framework7-svelte';
   import { OpenDivesCore } from 'opendives-core';
   import Icon from '../components/Icon.svelte';
   import ChoiceDialog from '../components/ChoiceDialog.svelte';
@@ -57,6 +57,8 @@
   let connected = $state(false);
   /** Bluetooth Low Energy failed: the second attempt, over Classic. */
   let retrying = $state(false);
+  /** Cancel pressed: the core finishes the dive it is reading first. */
+  let stopping = $state(false);
   let fraction = $state(0);
   /** @type {ReceivedDive[]} */
   let received = $state([]);
@@ -178,6 +180,7 @@
     lastAttempt.computer = c;
     lastAttempt.forceDownload = forceDownload;
     connected = false;
+    stopping = false;
     fraction = 0;
     received = [];
     phase = 'downloading';
@@ -258,7 +261,9 @@
 
   function close() {
     if (phase === 'downloading') {
-      // The core stops at its next step; the screen closes once it has.
+      // The core stops at its next step (up to a dive's read); the screen
+      // closes once it has.
+      stopping = true;
       OpenDivesCore.cancelDownload().catch(() => {});
       return;
     }
@@ -438,6 +443,10 @@
         <div class="fill" style:width={fraction > 0 ? `${percent}%` : undefined}></div>
       </div>
       <p class="hint">{t('download.keepNear')}{forceDownload ? '' : ` ${t('download.notAgain')}`}</p>
+    </div>
+
+    <div class="stop">
+      <Button outline disabled={stopping} onClick={close}>{stopping ? t('download.stopping') : t('download.stop')}</Button>
     </div>
 
     {#if received.length}
@@ -718,6 +727,10 @@
       position: absolute;
       width: 40%;
       animation: od-download-slide 1.4s ease-in-out infinite;
+    }
+
+    .stop {
+      margin: 16px 16px 8px;
     }
 
     .hint {
