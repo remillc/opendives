@@ -18,8 +18,10 @@ function toast(text) {
  * @param {string} text what was done ("Dive saved")
  * @param {(result: import('opendives-core').EditResult) => void|Promise<void>} [after] once undone
  * @param {number} [timeout] ms the message stays (10 s after deleting a dive)
+ * @param {number} [steps] undoable steps the change made (the dive editor can
+ *   also create a site or move the dive to a trip): Undo takes them all back
  */
-export async function offerUndo(text, after, timeout = 6000) {
+export async function offerUndo(text, after, timeout = 6000, steps = 1) {
   const { undoLastChange } = await import('./logbook.svelte.js');
   f7.toast
     .create({
@@ -32,7 +34,8 @@ export async function offerUndo(text, after, timeout = 6000) {
       on: {
         closeButtonClick: async () => {
           try {
-            const result = await undoLastChange();
+            let result = await undoLastChange();
+            for (let i = 1; i < steps; i++) result = await undoLastChange();
             if (after) await after(result);
             toast(t('edit.undone'));
           } catch (e) {

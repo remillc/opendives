@@ -672,9 +672,8 @@
     "title": "Modifier la plongée",
     "save": "Enregistrer",
     "diveGroup": "La plongée",
-    "number": "N°",
     "duration": "Durée",
-    "durationNote": "Calculées par l’ordinateur. Modifiables seulement pour une plongée saisie à la main",
+    "durationNote": "Mesurées par l’ordinateur de plongée",
     "site": "Site",
     "trip": "Voyage",
     "none": "Aucun",
@@ -741,8 +740,6 @@
     "atmPressure": "Pression atm.",
     "invalid": "Plongée invalide",
     "invalidText": "Exclue des statistiques et masquée selon le réglage",
-    "chooseSite": "Site de la plongée",
-    "noSite": "Aucun site",
     "invalidValue": "Valeur hors limites",
     "uses": {
       "OC-gas": "Circuit ouvert",
@@ -750,7 +747,9 @@
       "oxygen": "Oxygène",
       "not used": "Non utilisée",
       "Travel Gas": "Gaz de transit"
-    }
+    },
+    "siteHint": "Un site du carnet ou un nouveau nom",
+    "tripHint": "Un voyage du carnet ou un nouveau nom ; vide : aucun voyage"
   },
   "tripScreen": {
     "kicker": "Voyage · {range}",
@@ -1233,7 +1232,9 @@
       "Planificateur : la consommation (SAC) se choisit dans un menu, par pas de 0,5 L/min ou 0,01 pi³/min.",
       "Modifier la plongée : tous les champs que modifie Subsurface sur ordinateur, dont les bouteilles et le lest ; choisir un emplacement de lest reprend le dernier poids utilisé pour cet emplacement.",
       "La barre de progression du téléchargement depuis l’ordinateur de plongée avance régulièrement pendant le transfert de chaque plongée.",
-      "Profil de plongée : axes gradués (profondeur et temps) et courbe de la température de l’eau, à afficher ou masquer."
+      "Profil de plongée : axes gradués (profondeur et temps) et courbe de la température de l’eau, à afficher ou masquer.",
+      "Modifier la plongée : le numéro ne s’y change plus (il passera par « Renuméroter la plongée ») ; la durée et la profondeur max. sont affichées, mesurées par l’ordinateur.",
+      "Modifier la plongée : le site et le voyage se tapent ou se choisissent dans la liste filtrée ; un nouveau nom crée le site ou le voyage. La combinaison passe avant le mode de plongée."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
