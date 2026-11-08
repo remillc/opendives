@@ -12,7 +12,7 @@ OpenDives is a full dive log app for mobile. It improves on Subsurface-mobile, b
 - **GeoNames and divelogs.de** work as in Subsurface: one-off import or upload, no synchronisation.
 - **Local mode** without an account is supported.
 - **Photos** stay on the device.
-- **Coexistence:** Subsurface-mobile may be installed on the same phone with the same account. The rules are in the architecture document; never do anything that breaks a log read by Subsurface.
+- **Coexistence:** desktop Subsurface reads and writes the same cloud log; never do anything that breaks a log read by Subsurface. Subsurface-mobile is left out of our reasoning (decided on 8 November 2026): it is neither a reference nor a case to handle.
 - **Subsurface maintainers:** no contact for now.
 
 ## Tech stack (decided)
