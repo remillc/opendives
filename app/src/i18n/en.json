@@ -292,7 +292,7 @@
     "deleteFailed": "The dive could not be deleted. No dive was changed."
   },
   "profile": {
-    "hint": "Touch the profile to read time and depth.",
+    "hint": "Touch the profile to read the values",
     "time": "Time",
     "depth": "Depth",
     "gas": "Gas",
@@ -1247,7 +1247,8 @@
       "Dive detail, ⋮ menu: “Share” a one-page PDF sheet or a short summary with the profile image.",
       "Settings, Language and formats: “Paper size” of the PDF sheet (from the region, US Letter or A4).",
       "Tablet: Statistics and Tools show the list and the result or the tool side by side; the planner has its parameters on the left and the plan on the right.",
-      "Tablet: Sites show the list and the map side by side, and the dive editor opens as a sheet (iPad) or a pane (Android) over the logbook."
+      "Tablet: Sites show the list and the map side by side, and the dive editor opens as a sheet (iPad) or a pane (Android) over the logbook.",
+      "Dive profile: shorter hint."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
