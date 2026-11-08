@@ -266,7 +266,7 @@
   async function undoRedo(redo) {
     try {
       await undoLastChange(redo);
-      f7.toast.create({ text: t(redo ? 'edit.redone' : 'edit.undone'), closeTimeout: 2500, position: 'bottom' }).open();
+      f7.toast.create({ text: t(redo ? 'edit.redone' : 'edit.undone'), closeTimeout: 4000, position: 'bottom' }).open();
     } catch (e) {
       changeFailed(e);
     }

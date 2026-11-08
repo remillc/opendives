@@ -99,7 +99,7 @@
   /** Actions whose behaviour in Subsurface is still to be checked. */
   function notAvailable(/** @type {MouseEvent} */ e) {
     e.preventDefault();
-    f7.toast.create({ text: t('account.notAvailable'), closeTimeout: 2500, position: 'center' }).open();
+    f7.toast.create({ text: t('account.notAvailable'), closeTimeout: 4000, position: 'center' }).open();
   }
 </script>
 

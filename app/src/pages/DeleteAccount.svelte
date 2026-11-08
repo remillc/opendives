@@ -21,7 +21,7 @@
 
   /** @param {string} text */
   function toast(text) {
-    f7.toast.create({ text, closeTimeout: 3500, position: 'center' }).open();
+    f7.toast.create({ text, closeTimeout: 4000, position: 'center' }).open();
   }
 
   /** "Export a copy of the logbook" (.ssrf): file export does not exist yet. */

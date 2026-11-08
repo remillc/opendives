@@ -43,7 +43,7 @@ export function validPassword(password) {
 
 /** @param {string} text */
 export function toast(text) {
-  f7.toast.create({ text, closeTimeout: 3500, position: 'center' }).open();
+  f7.toast.create({ text, closeTimeout: 4000, position: 'center' }).open();
 }
 
 /** A failure that is not a field's: the server did not answer, or something else. */
