@@ -9,7 +9,7 @@
   // whose text changed are sent; Save applies one undoable step, saves
   // locally and closes; Undo is offered.
   import { onMount } from 'svelte';
-  import { Page, Navbar, Link, f7 } from 'framework7-svelte';
+  import { Page, Navbar, Link, Popup, View, f7 } from 'framework7-svelte';
   import { OpenDivesCore } from 'opendives-core';
   import Icon from '../components/Icon.svelte';
   import TextField from '../components/TextField.svelte';
@@ -23,6 +23,7 @@
   import { logbook, saveDiveChanges, tripChange } from '../lib/logbook.svelte.js';
   import { siteChange } from '../lib/sites.svelte.js';
   import { settings } from '../lib/settings.svelte.js';
+  import { layout, ios, navWidth } from '../lib/layout.svelte.js';
   import { offerUndo } from '../lib/undo.js';
   import { parseNumber } from '../lib/filter.svelte.js';
   import { WATER_TYPES, waterTypeName, waterTypeOfSalinity } from '../lib/tools.js';
@@ -31,6 +32,16 @@
 
   /** @type {{ f7route: { params: { id: string } }, f7router: any }} */
   let { f7route, f7router } = $props();
+
+  // On a tablet the route opens this screen as a popup (App.svelte): an iPad
+  // sheet of 780 px in two columns, or an Android pane beside the rail. The
+  // fields and the behaviour are the same as full screen on a phone.
+  const sheet = !layout.phone;
+  const leave = () => (sheet ? f7.popup.close() : f7router.back());
+  // iOS: 780 x 740 centred; Android: the content pane, 16 px from the edges.
+  const sheetStyle = ios
+    ? '--f7-popup-tablet-width: min(780px, calc(100vw - 48px)); --f7-popup-tablet-height: min(740px, calc(100vh - 48px));'
+    : `--f7-popup-tablet-width: calc(100vw - ${navWidth}px - 32px); --f7-popup-tablet-height: calc(100vh - 32px); left: calc(50% + ${navWidth / 2}px);`;
 
   /** @type {import('opendives-core').DiveDetail|null} */
   let dive = $state(null);
@@ -440,7 +451,7 @@
           }
         }
       }
-      f7router.back();
+      leave();
       if (steps) offerUndo(t('edit.saved'), undefined, 6000, steps);
     } catch (e) {
       const code = String(/** @type {any} */ (e)?.message ?? '');
@@ -498,22 +509,34 @@
 
 {#snippet unit(/** @type {string} */ text)}<span class="unit">{text}</span>{/snippet}
 
-<Page class="od-edit-dive">
+{#snippet chrome()}
   <Navbar title={t('edit.title')}>
     {#snippet left()}
-      <Link back iconOnly>
-        <i class="icon icon-back"></i>
-        <span class="od-sr-only">{t('detail.back')}</span>
-      </Link>
+      {#if sheet}
+        {#if ios}
+          <Link onClick={leave}>{t('dialog.cancel')}</Link>
+        {:else}
+          <Link iconOnly onClick={leave}><Icon name="close" /><span class="od-sr-only">{t('dialog.cancel')}</span></Link>
+        {/if}
+      {:else}
+        <Link back iconOnly>
+          <i class="icon icon-back"></i>
+          <span class="od-sr-only">{t('detail.back')}</span>
+        </Link>
+      {/if}
     {/snippet}
     {#snippet right()}
       <Link onClick={save} class={saving ? 'disabled' : ''}>{t('edit.save')}</Link>
     {/snippet}
   </Navbar>
+{/snippet}
+
+{#snippet content()}
 
   {#if failed}
     <div class="block"><p>{t('detail.errorText')}</p></div>
   {:else if dive}
+    <div class="cards" class:two-columns={sheet}>
     <p class="subtitle od-value">
       {[dive.number ? t('detail.number', { number: String(dive.number) }) : '', dive.site, formatFullDate(dive.date)].filter(Boolean).join(' · ')}
     </p>
@@ -717,8 +740,25 @@
         </label>
       {/if}
     </section>
+    </div>
   {/if}
-</Page>
+{/snippet}
+
+{#if sheet}
+  <Popup class="od-edit-sheet" push={false} swipeToClose={ios} style={sheetStyle}>
+    <View>
+      <Page class="od-edit-dive">
+        {@render chrome()}
+        {@render content()}
+      </Page>
+    </View>
+  </Popup>
+{:else}
+  <Page class="od-edit-dive">
+    {@render chrome()}
+    {@render content()}
+  </Page>
+{/if}
 
 {#if dialog === 'date'}
   <WheelDialog
@@ -746,6 +786,21 @@
   @layer od.components {
     :global(.od-edit-dive .page-content) {
       padding-bottom: 32px;
+    }
+
+    /* Tablet sheet: the cards in two columns (spec, section 3). */
+    .cards.two-columns {
+      columns: 2;
+      column-gap: 8px;
+      padding: 0 8px;
+
+      .card {
+        break-inside: avoid;
+      }
+
+      .subtitle {
+        column-span: all;
+      }
     }
 
     .subtitle {

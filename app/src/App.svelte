@@ -94,7 +94,12 @@
     { path: '/welcome/code', component: ConfirmCode, options: { props: { welcome: true } } },
     { path: '/welcome/import', component: BringLogbook },
     { path: '/welcome/importing', component: ImportProgress },
-    { path: '/dives/:id/edit', component: EditDive },
+    // Phone: a full screen. Tablet: a sheet (iPad) or a pane (Android) over the
+    // list and the dive, chosen when the screen opens (EditDive.svelte).
+    {
+      path: '/dives/:id/edit',
+      async: (/** @type {{ resolve: Function }} */ { resolve }) => resolve(layout.phone ? { component: EditDive } : { popup: { component: EditDive } }),
+    },
     // A dive opened from another section (site, tools) or from a trip: the
     // same screen, without the master-detail routing of the Logbook, which
     // would put a second Logbook in the history.
