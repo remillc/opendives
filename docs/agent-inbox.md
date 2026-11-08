@@ -553,3 +553,7 @@ Christian wants one ascent rate only. In "Réglages du planificateur", group "Vi
 
 In "Réglages du planificateur", group "Paliers", the first row is no longer a switch. It is a value row "Dernier palier" showing the depth of the last stop (3 m or 6 m, in the depth unit: 10 ft or 20 ft), with a chevron, opening the existing choice screen with the two depths. 3 m by default. It maps to Subsurface's `last_stop` preference (6 m when true). Mock-up: `docs/mockups/reglages-planificateur-android.dc.html`.
 
+## [ ] 2026-11-08-05 Mock-ups: volumes in cubic feet too
+
+Follow-up to task 2026-11-08-02: the mock-ups now also show volumes in cubic feet (Settings, Unités: Volume "Pieds cubes"). Cylinder sizes appear as gas capacity at the working pressure, as Subsurface does in imperial (AL80 = 80 cuft, 12 L at 232 bar = 97 cuft), gas used in cuft ("40 cuft consommés"), SAC in cuft/min with two decimals ("0,36 cuft/min"). Partial pressures (ppO₂, pN₂, pHe, setpoints) stay in bar, as in Subsurface. Nothing to change in the app beyond checking that these conversions come out right when Volume is set to cubic feet.
+

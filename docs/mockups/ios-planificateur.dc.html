@@ -98,7 +98,7 @@ h1,h2,h3,h4,h1 *,h2 *,h3 *,h4 *,[style*='font-size: 2'],[style*='font-size: 3'],
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
 // Résultat réel du planificateur de Subsurface (cœur compilé sans Qt), à partir de la plongée
-// du 2 février 2013 (TestDiveDM5.xml) : 92 ft, 30 min, EAN33 en 12 L à 2 828 psi, SAC 10,3 L/min, GF 30/70.
+// du 2 février 2013 (TestDiveDM5.xml) : 92 ft, 30 min, EAN33 en 12 L à 2 828 psi, SAC 0,36 cuft/min, GF 30/70.
 var PTS = [[0,0],[93,28],[1800,28],[1948,6],[1980,6],[2000,3],[2280,3],[2300,0]];
 function mix(f) {
   var a = [0xFB, 0xE3, 0xB2], b = [0xB4, 0x53, 0x0F];
@@ -118,8 +118,8 @@ class Component extends DCLogic {
       inputs: [
         { label: 'Profondeur', value: '92 ft' },
         { label: 'Temps de fond', value: '30 min' },
-        { label: 'Gaz', value: 'EAN33, 12 L, 2 828 psi' },
-        { label: 'Consommation (SAC)', value: '10,3 L/min' },
+        { label: 'Gaz', value: 'EAN33, 97 cuft, 2 828 psi' },
+        { label: 'Consommation (SAC)', value: '0,36 cuft/min' },
         { label: 'Facteurs de gradient', value: '30/70' }
       ],
       stops: [
