@@ -589,3 +589,8 @@ Done in "Planner: the decompression ceiling on the planned profile". The core's 
 Change to task 2026-11-08-07: the legend under the planner's chart reads only "Plafond de décompression" (no "remonter au-dessus est interdit"). Mock-up: `docs/mockups/android-planificateur.dc.html`.
 
 Done in "Planner: the decompression ceiling on the planned profile": the legend reads "Plafond de décompression" only.
+
+## [ ] 2026-11-08-09 Planner: SAC on a wheel
+
+Change to task 2026-11-08-06: "Consommation (SAC)" is no longer a text field. Under the fields, it is a wheel on a white surface (20 dp corners, 16 dp margins), built like the ppO₂ wheel of "EAD et MOD": label "Consommation (SAC)", helper "Glisser pour changer", three visible values with the selected one in the middle between two ink lines, unit after the wheel. Steps: 0.01 cuft/min in imperial, 0.1 L/min in metric. The third line of fields is now "Pression de départ" | "Type d’eau". Mock-up: `docs/mockups/android-planificateur.dc.html`.
+
