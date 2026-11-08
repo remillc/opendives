@@ -594,3 +594,7 @@ Done in "Planner: the decompression ceiling on the planned profile": the legend 
 
 Change to task 2026-11-08-06: "Consommation (SAC)" is no longer a text field. Under the fields, it is a wheel on a white surface (20 dp corners, 16 dp margins), built like the ppO₂ wheel of "EAD et MOD": label "Consommation (SAC)", helper "Glisser pour changer", three visible values with the selected one in the middle between two ink lines, unit after the wheel. Steps: 0.01 cuft/min in imperial, 0.1 L/min in metric. The third line of fields is now "Pression de départ" | "Type d’eau". Mock-up: `docs/mockups/android-planificateur.dc.html`.
 
+## [ ] 2026-11-08-10 Planner: SAC in a dropdown menu, not a wheel
+
+Cancels task 2026-11-08-09 (if you already built the wheel, remove it). "Consommation (SAC)" is an MD3 exposed dropdown menu in the field grid, beside "Pression de départ"; "Type d’eau" goes back to its own full-width line. The menu lists values around the current one, in steps of 0.01 cuft/min in imperial or 0.5 L/min in metric, the current value selected. Mock-up: `docs/mockups/android-planificateur.dc.html`.
+
