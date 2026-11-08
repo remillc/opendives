@@ -226,8 +226,16 @@
     if (points.length < 2 || !result) return null;
     const tMax = points[points.length - 1][0] || 1;
     const dMax = result.maxDepthMm || 1;
-    const line = 'M' + points.map(([s, mm]) => `${((s / tMax) * W).toFixed(1)} ${(4 + (mm / dMax) * (H - 8)).toFixed(1)}`).join(' L');
-    return { line, water: `${line} L${W} 0 L0 0 Z`, bottom: waterBottomColor(result.maxDepthMm) };
+    /** @param {number} s @param {number} mm */
+    const xy = (s, mm) => `${((s / tMax) * W).toFixed(1)} ${(4 + (mm / dMax) * (H - 8)).toFixed(1)}`;
+    const line = 'M' + points.map(([s, mm]) => xy(s, mm)).join(' L');
+    // The decompression ceiling (task 2026-11-08-07): from the surface down
+    // to the ceiling, on the same scales; none when the plan has no stop.
+    const ceiling = result.stops?.length ? (result.ceiling ?? []).filter(([s]) => s <= tMax) : [];
+    const deepest = Math.max(0, ...ceiling.map(([, mm]) => mm));
+    const ceilingLine = deepest > 0 ? 'M' + ceiling.map(([s, mm]) => xy(s, mm)).join(' L') : '';
+    const ceilingArea = ceilingLine ? `${ceilingLine} L${xy(ceiling[ceiling.length - 1][0], 0)} L${xy(ceiling[0][0], 0)} Z` : '';
+    return { line, water: `${line} L${W} 0 L0 0 Z`, bottom: waterBottomColor(result.maxDepthMm), ceilingLine, ceilingArea, deepest };
   });
 
   const stops = $derived(
@@ -245,7 +253,7 @@
           depth: depthText(planner.depthMm),
           time: minutes(planner.bottomTimeSeconds),
           stops: (result.stops ?? []).map((s) => depthText(s.depthMm)).join(', '),
-        })
+        }) + (shape?.deepest ? `, ${t('plan.ceilingLabel', { depth: depthText(shape.deepest) })}` : '')
       : '',
   );
 
@@ -398,7 +406,14 @@
           </defs>
           <path d={shape.water} fill="url(#plan-water-{uid})" />
           <path d={shape.line} class="line" vector-effect="non-scaling-stroke" />
+          {#if shape.ceilingArea}
+            <path d={shape.ceilingArea} class="ceiling-area" />
+            <path d={shape.ceilingLine} class="ceiling-line" vector-effect="non-scaling-stroke" />
+          {/if}
         </svg>
+        {#if shape.ceilingArea}
+          <p class="legend"><span class="swatch" aria-hidden="true"></span>{t('plan.ceilingLegend')}</p>
+        {/if}
       {/if}
       {#if stops.length}
         <table class="od-value">
@@ -852,5 +867,37 @@
       :global(.field:not(.floated)) & {
         visibility: hidden;
       }
+    }
+    /* The plan's decompression ceiling (task 2026-11-08-07): an exception to
+       the rule that keeps --od-alarm for violations (spec, section 4). */
+    .ceiling-area {
+      fill: var(--od-alarm);
+      fill-opacity: 0.35;
+    }
+
+    .ceiling-line {
+      fill: none;
+      stroke: var(--od-alarm);
+      stroke-width: 1.5;
+    }
+
+    .legend {
+      margin: 8px 0 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      line-height: 16px;
+      color: var(--od-text-2);
+    }
+
+    .swatch {
+      flex: none;
+      width: 16px;
+      height: 12px;
+      border-radius: 2px;
+      background: color-mix(in srgb, var(--od-alarm) 35%, transparent);
+      border: 1.5px solid var(--od-alarm);
+      box-sizing: border-box;
     }  }
 </style>

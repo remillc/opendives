@@ -231,6 +231,8 @@ import { registerPlugin } from '@capacitor/core';
  * @property {number} otu
  * @property {number} surfaceIntervalSeconds
  * @property {[number, number][]} points seconds, mm
+ * @property {[number, number][]} ceiling the plan's decompression ceiling, seconds, mm, as the
+ *   detail's "Plafond" layer computes it (profile.cpp); empty when the plan never has one
  * @property {{timeSeconds: number, depthMm: number, cylinder: number, entered: boolean}[]} segments
  * @property {{depthMm: number, durationSeconds: number, runtimeSeconds: number, cylinder: number, gasChange: boolean}[]} stops
  * @property {PlanCylinder[]} cylinders

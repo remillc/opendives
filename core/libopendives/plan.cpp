@@ -30,6 +30,7 @@
 #include "core/gas.h"
 #include "core/planner.h"
 #include "core/pref.h"
+#include "core/profile.h"
 #include "core/sample.h"
 #include "core/subsurface-time.h"
 #include "core/units.h"
@@ -326,8 +327,31 @@ std::string result_json(const diveplan &plan, struct dive &d, planner_error_t er
 		json += '[' + std::to_string(dc.samples[i].time.seconds) + ',' + std::to_string(dc.samples[i].depth.mm) + ']';
 	}
 
+	json += ']';
+
+	// Decompression ceiling of the plan, computed as the detail's "Plafond"
+	// layer (profile.cpp, with the gradient factors the plan used, in prefs):
+	// [time s, mm] per profile entry; empty when the plan never has one.
+	{
+		struct plot_info pi = create_plot_info_new(&d, &dc, nullptr);
+		bool any = false;
+		for (const auto &e: pi.entry)
+			any = any || e.ceiling.mm > 0;
+		json += ",\"ceiling\":[";
+		bool first_entry = true;
+		for (const auto &e: pi.entry) {
+			if (!any)
+				break;
+			if (!first_entry)
+				json += ',';
+			first_entry = false;
+			json += '[' + std::to_string(e.sec) + ',' + std::to_string(e.ceiling.mm) + ']';
+		}
+		json += ']';
+	}
+
 	// Waypoints of the plan, as plan() leaves them (absolute times).
-	json += "],\"segments\":[";
+	json += ",\"segments\":[";
 	bool first = true;
 	for (const divedatapoint &p: plan.dp) {
 		if (p.time == 0)

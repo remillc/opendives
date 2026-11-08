@@ -574,11 +574,14 @@ The computed plan below updates as soon as a field changes (no "Calculer" button
 
 Done in "Planner: settings on their own screen, plan data edited in place". The plan is computed again at each keystroke of a valid value (checked: 130 ft gives five stops at once). The Gaz list offers the usual mixes (air, EAN28 to EAN40, trimix 21/35 to 12/65) and the plan's own gas; the gases used in the logbook are not listed yet, as the app has no list of them without reading every dive. Bouteille lists the cylinder types of Settings, plus the plan's own size when none matches.
 
-## [ ] 2026-11-08-07 Planner: show the decompression ceiling on the planned profile
+## [x] 2026-11-08-07 Planner: show the decompression ceiling on the planned profile
 
 On the planner's profile chart, draw the decompression ceiling of the plan over the depth profile as a red filled area, from the surface down to the ceiling: fill `--od-alarm` at 35 % opacity, edge line 1.5 dp `--od-alarm`, on the same time and depth scales. Take the ceiling from the core for the planned dive (the same calculation as the detail's "Plafond" layer, with the planner's gradient factors), not a separate computation. Under the chart, a legend line 12/16 `#4A4D52` with a 16×12 dp swatch in the same red: "Plafond de décompression : remonter au-dessus est interdit". When the plan has no stop, do not draw the line or the legend. Add the ceiling to the chart's accessible label. Mock-up: `docs/mockups/android-planificateur.dc.html` (its ceiling values are illustrative).
 
-## [ ] 2026-11-08-08 Planner: shorter ceiling legend
+Done in "Planner: the decompression ceiling on the planned profile". The core's plan result now has the ceiling, computed by profile.cpp on the planned dive as for the detail's "Plafond" layer (facade only, Subsurface unchanged; round-trip tests: 97 passed, 1 known failure). Checked in the emulator: 130 ft, 20 min on air, the red area stays above the profile at every stop; the accessible label ends with "decompression ceiling down to 55 ft".
+
+## [x] 2026-11-08-08 Planner: shorter ceiling legend
 
 Change to task 2026-11-08-07: the legend under the planner's chart reads only "Plafond de décompression" (no "remonter au-dessus est interdit"). Mock-up: `docs/mockups/android-planificateur.dc.html`.
 
+Done in "Planner: the decompression ceiling on the planned profile": the legend reads "Plafond de décompression" only.

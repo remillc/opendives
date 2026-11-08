@@ -1179,7 +1179,8 @@
       "Mélangeur de gaz : nitrox par défaut, le dernier mode choisi est retenu.",
       "Synchronisation : l’étape en cours et une barre de progression dans le menu.",
       "« Synchroniser maintenant » : la liste et le menu restent en place, le bouton montre la progression et un message confirme la fin ou signale l’erreur.",
-      "Planificateur : les données du plan se modifient sur place, ses réglages ont leur propre écran, avec une seule vitesse de remontée."
+      "Planificateur : les données du plan se modifient sur place, ses réglages ont leur propre écran, avec une seule vitesse de remontée.",
+      "Planificateur : le plafond de décompression en rouge sur le profil du plan."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
@@ -1307,6 +1308,8 @@
     "runtime": "Temps écoulé",
     "gasColumn": "Gaz",
     "noStop": "Aucun palier de décompression",
+    "ceilingLegend": "Plafond de décompression",
+    "ceilingLabel": "plafond de décompression jusqu’à {depth}",
     "gasAndOxygen": "Gaz et oxygène",
     "gasUse": "{used} consommés, il resterait {left}",
     "gasUseVolume": "{used} L consommés",
