@@ -598,3 +598,14 @@ Change to task 2026-11-08-06: "Consommation (SAC)" is no longer a text field. Un
 
 Cancels task 2026-11-08-09 (if you already built the wheel, remove it). "Consommation (SAC)" is an MD3 exposed dropdown menu in the field grid, beside "Pression de départ"; "Type d’eau" goes back to its own full-width line. The menu lists values around the current one, in steps of 0.01 cuft/min in imperial or 0.5 L/min in metric, the current value selected. Mock-up: `docs/mockups/android-planificateur.dc.html`.
 
+## [ ] 2026-11-08-11 Dive editor: every field Subsurface desktop edits, friendlier layout
+
+Christian wants the dive editor to edit the same data as Subsurface's desktop app, laid out more comfortably. The mock-up now shows every card open; follow section 4, "Dive editor, same fields as Subsurface desktop". Main changes from the current editor:
+- "La plongée": N°, Date and Heure on one line; Durée and Profondeur max. side by side (read-only unless the dive was entered by hand); the dive rating ("Note", five stars) moves here from Conditions.
+- "Équipement" comes before "Conditions" and now has every cylinder field Subsurface edits (type, use, size, working pressure, start and end pressures, O₂, He, gas switch depth with the MOD as helper), "Ajouter une bouteille", and the weights (location and weight per entry, "Ajouter un lest").
+- "Conditions" now includes the atmospheric pressure (moved from "Avancé"), beside the water type.
+- "Avancé" keeps only the "Plongée invalide" switch.
+- Open cards show no summary under their title.
+- Shorter helpers for people and tags.
+Map each field to the core as Subsurface does (`TabDiveNotes`, `TabDiveInformation`, `TabDiveEquipment` and their models). Mock-up: `docs/mockups/android-edition.dc.html`. The iOS and tablet editors will follow in a later task.
+
