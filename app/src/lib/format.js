@@ -127,13 +127,13 @@ export function formatPressure(mbar, prefs) {
 }
 
 /**
- * Gas consumption (SAC): 1 decimal, per minute.
+ * Gas consumption (SAC), per minute: 1 decimal in litres, 2 in cubic feet (0,36 cuft/min).
  * @param {number} mlPerMin
  * @param {Prefs} prefs
  */
 export function formatSac(mlPerMin, prefs) {
   return prefs.volume === 'cuft'
-    ? `${formatNumber(mlPerMin / 28316.8466, 1)}${NBSP}${t('units.cubicFeetPerMinute')}`
+    ? `${formatNumber(mlPerMin / 28316.8466, 2)}${NBSP}${t('units.cubicFeetPerMinute')}`
     : `${formatNumber(mlPerMin / 1000, 1)}${NBSP}${t('units.litersPerMinute')}`;
 }
 

@@ -543,9 +543,11 @@ The planner settings move out of the planner screen (to-do #4). See section 4 of
 
 Done in "Planner: settings on their own screen, plan data edited in place". The screen is at /settings/planner (to-do #3, U3), opened from a "tune" button in the planner's top bar; the old /plan/setup screen is gone. "Descente instantanée" needed one more planner preference in the facade (dropStone, Subsurface's drop_stone_mode, set through the existing preferences call; Subsurface itself unchanged); it was checked in the emulator: 130 ft, 20 min, the plan goes from 50 to 54 min. Not like the old screen: the safety stop switch is no longer shown (not in the mock-up), and deco gases can no longer be edited (the planner keeps those brought by a starting dive). There is no "Enregistrer" button in the app yet, so the tune button is alone at the end of the bar. iOS: same content, surfaces with 10 pt corners; not checked on an iPhone.
 
-## [ ] 2026-11-08-02 Mock-ups now show imperial example values
+## [x] 2026-11-08-02 Mock-ups now show imperial example values
 
 The mock-ups now show depths in ft, cylinder pressures in psi and weights in lb, with °C and litres (Settings, Unités: "Personnalisé", Profondeur "Pieds", Pression "psi", Poids "Livres"). Partial pressures stay in bar. Nothing changes in the app: it keeps following the user's unit settings. When you compare a screen with its mock-up, compare layout and wording, not the units. Check that every value with a unit converts correctly when the settings are in ft, psi and lb (for example "2 683 → 1 885 psi", "Dernier palier à 20 ft", "30 ft/min").
+
+Done in "Imperial units: SAC in cubic feet with two decimals". Checked in the emulator with ft, psi and lb: cylinder pressures "3,400 → 1,600 psi", "Last stop 10 ft" / "20 ft", "30 ft/min" and "59 ft/min", weights "12 lb" with one line per location, ppO₂ in bar. Nothing needed changing for these. The imperial symbols stay translated in the language of use ("pi", "pi³" in French), as Christian decided on 8 November 2026, although the specification's units table and the French mock-ups write "ft" and "cuft".
 
 ## [x] 2026-11-08-03 Planner settings: a single ascent rate
 
@@ -559,9 +561,11 @@ In "Réglages du planificateur", group "Paliers", the first row is no longer a s
 
 Done in "Planner: settings on their own screen, plan data edited in place". A choice of 3 m or 6 m (10 ft or 20 ft) mapped to lastStop6m (Subsurface's last_stop); checked in the emulator.
 
-## [ ] 2026-11-08-05 Mock-ups: volumes in cubic feet too
+## [x] 2026-11-08-05 Mock-ups: volumes in cubic feet too
 
 Follow-up to task 2026-11-08-02: the mock-ups now also show volumes in cubic feet (Settings, Unités: Volume "Pieds cubes"). Cylinder sizes appear as gas capacity at the working pressure, as Subsurface does in imperial (AL80 = 80 cuft, 12 L at 232 bar = 97 cuft), gas used in cuft ("40 cuft consommés"), SAC in cuft/min with two decimals ("0,36 cuft/min"). Partial pressures (ppO₂, pN₂, pHe, setpoints) stay in bar, as in Subsurface. Nothing to change in the app beyond checking that these conversions come out right when Volume is set to cubic feet.
+
+Done in "Imperial units: SAC in cubic feet with two decimals". Cylinder sizes are the gas capacity at the working pressure (12 L at 200 bar = 83.6 cu ft, LP85 = 85.0 cu ft), gas used in cubic feet ("73 cu ft used"), partial pressures in bar. The SAC had one decimal in cubic feet: it now has two ("0.90 cu ft/min" for 25.5 L/min), litres keep one.
 
 ## [x] 2026-11-08-06 Planner: the plan data are fields edited in place
 

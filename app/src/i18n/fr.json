@@ -1180,7 +1180,8 @@
       "Synchronisation : l’étape en cours et une barre de progression dans le menu.",
       "« Synchroniser maintenant » : la liste et le menu restent en place, le bouton montre la progression et un message confirme la fin ou signale l’erreur.",
       "Planificateur : les données du plan se modifient sur place, ses réglages ont leur propre écran, avec une seule vitesse de remontée.",
-      "Planificateur : le plafond de décompression en rouge sur le profil du plan."
+      "Planificateur : le plafond de décompression en rouge sur le profil du plan.",
+      "En pieds cubes, la consommation (SAC) s’affiche avec deux décimales."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
