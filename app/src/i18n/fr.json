@@ -1230,7 +1230,8 @@
       "Les nouvelles plongées téléchargées sont numérotées à la suite, même quand le téléchargement relit aussi des plongées plus anciennes.",
       "Planificateur : la consommation (SAC) se choisit dans un menu, par pas de 0,5 L/min ou 0,01 pi³/min.",
       "Modifier la plongée : tous les champs que modifie Subsurface sur ordinateur, dont les bouteilles et le lest ; choisir un emplacement de lest reprend le dernier poids utilisé pour cet emplacement.",
-      "La barre de progression du téléchargement depuis l’ordinateur de plongée avance régulièrement pendant le transfert de chaque plongée."
+      "La barre de progression du téléchargement depuis l’ordinateur de plongée avance régulièrement pendant le transfert de chaque plongée.",
+      "Détail d’une plongée, menu ⋮ : « Renuméroter la plongée » ; les plongées concernées sont décalées pour que les numéros restent uniques et sans trou."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
@@ -1830,5 +1831,16 @@
     "add": "Ajouter « {value} »",
     "remove": "Retirer {value}",
     "suitHint": "Choisissez une combinaison du carnet ou tapez-en une nouvelle"
+  },
+  "renumberDive": {
+    "title": "Renuméroter la plongée",
+    "number": "Numéro",
+    "action": "Renuméroter",
+    "actionShift": "Renuméroter et décaler",
+    "shiftMany": "Les plongées n° {from} à {to} seront décalées de {by}",
+    "shiftOne": "La plongée n° {n} sera décalée de {by}",
+    "last": "Elle prendra le dernier numéro, {n}",
+    "invalid": "Un numéro à partir de 1",
+    "done": "Plongée renumérotée n° {n}"
   }
 }

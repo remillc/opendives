@@ -1230,7 +1230,8 @@
       "Newly downloaded dives are numbered in sequence, even when the download also reads older dives again.",
       "Planner: the SAC is chosen from a menu, in steps of 0.5 L/min or 0.01 cu ft/min.",
       "Edit the dive: every field Subsurface desktop edits, cylinders and weights included; choosing a weight location fills in the last weight used for it.",
-      "The progress bar of a download from the dive computer moves steadily while each dive is transferred."
+      "The progress bar of a download from the dive computer moves steadily while each dive is transferred.",
+      "Dive detail, ⋮ menu: “Renumber the dive”; the dives it affects shift so that numbers stay unique and without gaps."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
@@ -1830,5 +1831,16 @@
     "add": "Add “{value}”",
     "remove": "Remove {value}",
     "suitHint": "Choose a suit from the logbook or type a new one"
+  },
+  "renumberDive": {
+    "title": "Renumber the dive",
+    "number": "Number",
+    "action": "Renumber",
+    "actionShift": "Renumber and shift",
+    "shiftMany": "Dives no. {from} to {to} will shift by {by}",
+    "shiftOne": "Dive no. {n} will shift by {by}",
+    "last": "It will take the last number, {n}",
+    "invalid": "A number from 1",
+    "done": "Dive renumbered no. {n}"
   }
 }

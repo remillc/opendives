@@ -691,7 +691,9 @@ class OpenDivesCorePlugin : Plugin() {
             return@onCoreThread
         }
         val ids = call.getArray("ids")?.toList<Int>()?.toIntArray() ?: IntArray(0)
-        call.resolve(JSObject().put("json", NativeCore.renumberDives(ids, start)))
+        // Optional: one number per id (RenumberDives' own pairs) instead of consecutive numbers.
+        val numbers = call.getArray("numbers")?.toList<Int>()?.toIntArray() ?: IntArray(0)
+        call.resolve(JSObject().put("json", NativeCore.renumberDives(ids, start, numbers)))
     }
 
     /**

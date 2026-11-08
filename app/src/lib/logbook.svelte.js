@@ -193,6 +193,58 @@ export async function renumberDives(ids, start) {
 }
 
 /**
+ * "Renuméroter la plongée": dive `id` takes number `target`, and the dives in
+ * between shift by one so that numbers stay unique and without gaps (spec,
+ * section 4, "Dive detail"). Moving dive n to a smaller m: dives m to n−1 go
+ * up by one; to a larger m: dives n+1 to m go down by one; a number beyond
+ * the last dive becomes the last number. An unnumbered dive is inserted: the
+ * dives from m on go up by one.
+ * @param {number} id
+ * @param {number} target
+ * @returns {{ ids: number[], numbers: number[], shifted: { from: number, to: number, by: number }|null, number: number }}
+ */
+export function renumberShiftPlan(id, target) {
+  const dive = logbook.dives.find((d) => d.id === id);
+  const numbered = logbook.dives.filter((d) => d.number > 0);
+  const last = numbered.reduce((max, d) => Math.max(max, d.number), 0);
+  const n = dive?.number ?? 0;
+  const m = Math.max(1, Math.min(Math.round(target), n > 0 ? last : last + 1));
+  /** @type {number[]} */
+  const ids = [id];
+  /** @type {number[]} */
+  const numbers = [m];
+  /** @type {{ from: number, to: number, by: number }|null} */
+  let shifted = null;
+  if (n > 0 && m < n) shifted = { from: m, to: n - 1, by: 1 };
+  else if (n > 0 && m > n) shifted = { from: n + 1, to: m, by: -1 };
+  else if (n === 0 && m <= last) shifted = { from: m, to: last, by: 1 };
+  if (shifted) {
+    const { from, to, by } = shifted;
+    for (const d of numbered)
+      if (d.id !== id && d.number >= from && d.number <= to) {
+        ids.push(d.id);
+        numbers.push(d.number + by);
+      }
+    if (ids.length === 1) shifted = null;
+  }
+  return { ids, numbers, shifted, number: m };
+}
+
+/**
+ * Gives each dive its own number (one undoable step, as Subsurface's
+ * RenumberDives), saved and synced like an edit.
+ * @param {number[]} ids
+ * @param {number[]} numbers
+ */
+export async function renumberDivesTo(ids, numbers) {
+  const result = await OpenDivesCore.renumberDives({ ids, start: 0, numbers });
+  logbook.undoText = result.undo;
+  logbook.redoText = result.redo ?? '';
+  logbook.dives = await OpenDivesCore.listLoadedDives();
+  await persistChanges();
+}
+
+/**
  * The dives that a new dive logged in the middle of the logbook pushes down:
  * that dive and every later one, and the number the first one should take
  * (the previous dive's number plus one, 1 for the first dive of the log).

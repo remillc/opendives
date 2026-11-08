@@ -2916,13 +2916,46 @@ int delete_dives(const std::vector<int> &ids, std::string &result_json, std::str
 	return 0;
 }
 
-int renumber_dives(const std::vector<int> &ids, int start, std::string &result_json, std::string &error)
+int renumber_dives(const std::vector<int> &ids, int start, std::string &result_json, std::string &error,
+		   const std::vector<int> &numbers)
 {
 	if (check_writable_log(error))
 		return -1;
 	if (start < 0) {
 		error = "BAD_REQUEST: start";
 		return -1;
+	}
+	if (!numbers.empty()) {
+		// RenumberDives with the given (dive, number) pairs.
+		if (numbers.size() != ids.size()) {
+			error = "BAD_REQUEST: numbers";
+			return -1;
+		}
+		Step step;
+		step.kind = Step::RENUMBER;
+		std::vector<dive *> list;
+		for (size_t i = 0; i < ids.size(); i++) {
+			dive *d = divelog.dives.get_by_uniq_id(ids[i]);
+			if (!d) {
+				error = "NOT_FOUND";
+				return -1;
+			}
+			if (numbers[i] < 0) {
+				error = "BAD_REQUEST: numbers";
+				return -1;
+			}
+			step.renumbered.push_back({ d, numbers[i] });
+			list.push_back(d);
+		}
+		if (step.renumbered.empty()) {
+			error = "NOTHING_TO_DO";
+			return -1;
+		}
+		step.text = "renumber " + std::to_string(list.size()) + " dive(s) [" + list_of_dives(list) + "]";
+		std::string unused;
+		swap_step(step, result_json, unused);
+		push_step(std::move(step));
+		return 0;
 	}
 	std::set<int> wanted(ids.begin(), ids.end());
 	for (int id: ids) {
