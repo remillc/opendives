@@ -83,14 +83,14 @@
       showSection('logbook');
     } catch (err) {
       console.error('Signing out', err);
-      f7.toast.create({ text: t('signOut.failed'), closeTimeout: 3000, position: 'center' }).open();
+      f7.toast.create({ text: t('signOut.failed'), closeTimeout: 4000, position: 'center' }).open();
     }
   }
 
   async function syncThenSignOut() {
     await syncNow();
     if (logbook.pending > 0) {
-      f7.toast.create({ text: t('signOut.syncFailed'), closeTimeout: 3000, position: 'center' }).open();
+      f7.toast.create({ text: t('signOut.syncFailed'), closeTimeout: 4000, position: 'center' }).open();
       return;
     }
     await runSignOut(false);

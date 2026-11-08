@@ -96,7 +96,7 @@
   }
 
   function useDevicePosition() {
-    const failed = () => f7.toast.create({ text: t('sites.noDevicePosition'), closeTimeout: 3000 }).open();
+    const failed = () => f7.toast.create({ text: t('sites.noDevicePosition'), closeTimeout: 4000 }).open();
     if (!navigator.geolocation) return failed();
     navigator.geolocation.getCurrentPosition(
       (pos) => setPosition({ latUdeg: Math.round(pos.coords.latitude * 1e6), lonUdeg: Math.round(pos.coords.longitude * 1e6) }),
@@ -141,7 +141,7 @@
     } catch (e) {
       const code = String(/** @type {any} */ (e)?.message ?? '');
       console.error('Save site', code);
-      f7.toast.create({ text: code.startsWith('WRITE_LOCKED') ? t('edit.writeLocked') : t('edit.failed'), closeTimeout: 3000 }).open();
+      f7.toast.create({ text: code.startsWith('WRITE_LOCKED') ? t('edit.writeLocked') : t('edit.failed'), closeTimeout: 4000 }).open();
     } finally {
       saving = false;
     }
@@ -165,7 +165,7 @@
         } catch (e) {
           const code = String(/** @type {any} */ (e)?.message ?? '');
           console.error('Delete site', code);
-          f7.toast.create({ text: code.startsWith('WRITE_LOCKED') ? t('edit.writeLocked') : t('edit.failed'), closeTimeout: 3000 }).open();
+          f7.toast.create({ text: code.startsWith('WRITE_LOCKED') ? t('edit.writeLocked') : t('edit.failed'), closeTimeout: 4000 }).open();
         }
       },
     });

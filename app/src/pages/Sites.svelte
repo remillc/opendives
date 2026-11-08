@@ -49,7 +49,7 @@
   const open = (uuid) => f7.views.current?.router.navigate(`/sites/${uuid}`);
 
   function centreOnDevice() {
-    const failed = () => f7.toast.create({ text: t('sites.noDevicePosition'), closeTimeout: 3000 }).open();
+    const failed = () => f7.toast.create({ text: t('sites.noDevicePosition'), closeTimeout: 4000 }).open();
     if (!navigator.geolocation) return failed();
     navigator.geolocation.getCurrentPosition(
       (pos) => siteMap?.centreOn({ latUdeg: Math.round(pos.coords.latitude * 1e6), lonUdeg: Math.round(pos.coords.longitude * 1e6) }),

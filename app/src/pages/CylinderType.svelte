@@ -80,7 +80,7 @@
       error = t('settings.cylinders.nameInUse');
     } else {
       console.error('Saving the cylinder type', e);
-      f7.toast.show({ text: t('settings.error'), closeTimeout: 3000 });
+      f7.toast.show({ text: t('settings.error'), closeTimeout: 4000 });
     }
   }
 

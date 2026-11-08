@@ -62,7 +62,7 @@
   /** @param {unknown} e */
   function failed(e) {
     console.error('Changing a setting', e);
-    f7.toast.show({ text: t('settings.error'), closeTimeout: 3000 });
+    f7.toast.show({ text: t('settings.error'), closeTimeout: 4000 });
   }
 
   /** @param {Partial<CorePrefValues>} changes */

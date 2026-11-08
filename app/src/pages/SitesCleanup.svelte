@@ -72,7 +72,7 @@
           offerSiteUndo();
         } catch (e) {
           console.error('Merge sites', e);
-          f7.toast.create({ text: t('edit.failed'), closeTimeout: 3000 }).open();
+          f7.toast.create({ text: t('edit.failed'), closeTimeout: 4000 }).open();
         }
       },
     });
@@ -92,7 +92,7 @@
           offerSiteUndo();
         } catch (e) {
           console.error('Delete sites', e);
-          f7.toast.create({ text: t('edit.failed'), closeTimeout: 3000 }).open();
+          f7.toast.create({ text: t('edit.failed'), closeTimeout: 4000 }).open();
         }
       },
     });

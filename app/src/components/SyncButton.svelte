@@ -39,7 +39,7 @@
       .create({
         text: t(`sync.outcome.${outcome}`),
         cssClass: 'od-sync-toast',
-        closeTimeout: outcome === 'done' ? 3000 : 6000,
+        closeTimeout: outcome === 'done' ? 4000 : 6000,
         position: 'bottom',
       })
       .open();

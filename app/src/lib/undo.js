@@ -11,7 +11,7 @@ import { t } from './i18n.js';
 
 /** @param {string} text */
 function toast(text) {
-  f7.toast.create({ text, closeTimeout: 3000, position: 'bottom' }).open();
+  f7.toast.create({ text, closeTimeout: 4000, position: 'bottom' }).open();
 }
 
 /**

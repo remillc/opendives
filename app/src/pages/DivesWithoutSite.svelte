@@ -53,7 +53,7 @@
       logbook.sitesVersion++;
     } catch (e) {
       console.error('Set site', e);
-      f7.toast.create({ text: t('edit.failed'), closeTimeout: 3000 }).open();
+      f7.toast.create({ text: t('edit.failed'), closeTimeout: 4000 }).open();
     }
   }
 
