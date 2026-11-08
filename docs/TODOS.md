@@ -10,7 +10,7 @@ Rules (agreed between the design agent and the code agent, see `docs/agent-inbox
 - **Tag:** every item starts with `[design]` or `[code]` right after its number, set by the agent that adds it (`#4 [design] …`). `[design]` = mock-ups, visuals, screen texts, specification; `[code]` = everything else. When unsure, the agent asks Christian. The tag says who handles the item and lets Christian list one kind only.
 - No other content in this file: no history, no checked boxes, no notes from agents.
 
-Next number: 15
+Next number: 16
 
 ## List
 
@@ -23,3 +23,4 @@ Next number: 15
 - #11 [code] Plus tard (après la v1) : synchroniser aussi avec un dépôt git choisi par l’utilisateur (GitHub ou autre), en HTTPS, en plus du cloud Subsurface
 - #13 [design] réglages, après unités, ajouter choix du type d'eau. Les outils doivent utiliser cette valeur par défaut
 - #14 [design] Le bouton synchroniser maintenant dans le menu mobile devrait être centré horizontallement dans le menu
+- #15 [code] supprimer une plongée: afficher un dialogue de confirmation puis un snackbar
