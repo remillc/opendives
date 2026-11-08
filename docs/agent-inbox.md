@@ -545,3 +545,7 @@ The planner settings move out of the planner screen (to-do #4). See section 4 of
 
 The mock-ups now show depths in ft, cylinder pressures in psi and weights in lb, with °C and litres (Settings, Unités: "Personnalisé", Profondeur "Pieds", Pression "psi", Poids "Livres"). Partial pressures stay in bar. Nothing changes in the app: it keeps following the user's unit settings. When you compare a screen with its mock-up, compare layout and wording, not the units. Check that every value with a unit converts correctly when the settings are in ft, psi and lb (for example "2 683 → 1 885 psi", "Dernier palier à 20 ft", "30 ft/min").
 
+## [ ] 2026-11-08-03 Planner settings: a single ascent rate
+
+Christian wants one ascent rate only. In "Réglages du planificateur", group "Vitesses", replace the four ascent rows with one row "Remontée" (default 9 m/min, shown in the depth unit per minute, 30 ft/min in the mock-up), then "Descente". Subsurface's planner reads four rates (`ascrate75`, `ascrate50`, `ascratestops`, `ascratelast6m` in `core/pref.h`): when the user sets "Remontée", write the same value to all four. Do not change the core. Mock-up: `docs/mockups/reglages-planificateur-android.dc.html`. Spec: section 4, "Planner settings, a screen of their own".
+
