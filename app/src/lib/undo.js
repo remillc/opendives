@@ -19,7 +19,7 @@ function toast(text) {
  * @param {(result: import('opendives-core').EditResult) => void|Promise<void>} [after] once undone
  * @param {number} [timeout] ms the message stays (10 s after deleting a dive)
  */
-export async function offerUndo(text, after, timeout = 5000) {
+export async function offerUndo(text, after, timeout = 6000) {
   const { undoLastChange } = await import('./logbook.svelte.js');
   f7.toast
     .create({
