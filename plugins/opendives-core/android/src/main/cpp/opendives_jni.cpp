@@ -809,6 +809,29 @@ Java_org_opendives_core_NativeCore_setRegionsFile(JNIEnv *env, jobject, jstring 
 	opendives::set_regions_file(to_string(env, path));
 }
 
+JNIEXPORT void JNICALL
+Java_org_opendives_core_NativeCore_setXsltDir(JNIEnv *env, jobject, jstring dir)
+{
+	opendives::set_xslt_dir(to_string(env, dir));
+}
+
+// "Exporter au format…": the dives written to `path` (export_dives); read only for the logbook.
+JNIEXPORT void JNICALL
+Java_org_opendives_core_NativeCore_exportDives(JNIEnv *env, jobject, jintArray diveIds, jstring format, jboolean anonymize,
+					      jstring path)
+{
+	std::vector<int> ids;
+	if (diveIds) {
+		jsize n = env->GetArrayLength(diveIds);
+		ids.resize(n);
+		if (n)
+			env->GetIntArrayRegion(diveIds, 0, n, ids.data());
+	}
+	std::string error;
+	if (opendives::export_dives(ids, to_string(env, format), anonymize, to_string(env, path), error))
+		throw_core_error(env, error);
+}
+
 JNIEXPORT jstring JNICALL
 Java_org_opendives_core_NativeCore_undo(JNIEnv *env, jobject, jboolean redo)
 {

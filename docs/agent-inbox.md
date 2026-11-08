@@ -692,7 +692,7 @@ Christian prefers a shorter hint above the profile. Replace `profile.hint` "Pose
 
 Done in "Dive profile: shorter hint". profile.hint is now the shorter text in French and English; size and readout line unchanged.
 
-## [ ] 2026-11-08-22 Logbook selection: "Exporter au format…"
+## [x] 2026-11-08-22 Logbook selection: "Exporter au format…"
 
 Add "Exporter au format…" (24 dp download icon) to the ⋮ menu of the logbook's selection mode, after the "Ajouter les plongées au voyage…" items and before the divider and "Supprimer". It opens an MD3 modal bottom sheet (`docs/mockups/carnet-export-android.dc.html`):
 - title "Exporter N plongées" (plural rules as elsewhere), line "Choisissez un format. Le fichier s’ouvre ensuite dans le partage du téléphone.";
@@ -701,3 +701,4 @@ Add "Exporter au format…" (24 dp download icon) to the ⋮ menu of the logbook
 - "Annuler" (text button) and "Exporter" (filled button).
 Use the core's export functions (`save_dives_logic` with the selection for .ssrf, `export_dives_xslt` with the UDDF and CSV stylesheets, as Subsurface's export dialog does). Remember the last format on the device. "Exporter" closes the sheet, writes the file in the app's cache and opens the system share sheet (file names like `OpenDives-3-plongees-2026-11-08.ssrf`). Errors: a snackbar "L’export n’a pas pu être fait." Keep the selection after an export. Spec: section 4, "Logbook selection and export".
 
+Done in "Logbook selection: Export as..." (Android). Exporter au format... sits after the trip items, then the divider and Supprimer. The sheet follows the mock-up (radio list with descriptions, Anonymiser off by default, Annuler / Exporter) and remembers the last format on the device. The core exports the checked dives as Subsurface does: save_dives_logic for .ssrf, export_dives_xslt with uddf-export.xslt, xml2summarycsv.xslt and xml2detailscsv.xslt (metric, or imperial when depths are in feet), with Subsurface's anonymize option; the app now ships Subsurface's xslt/ stylesheets (copied to its files at start), and the compat stylesheet loader no longer breaks xsl:include. Fiches PDF: one page per dive with a profile drawn from the samples; anonymized, the people and notes are left out. Files go to the cache and the system share sheet (OpenDives-2-plongees-2026-11-08.uddf); the selection is kept. Checked: the four Subsurface formats exported from the sample log on Linux (anonymized names become Xxxxx), and UDDF and a 2-page PDF from the emulator.

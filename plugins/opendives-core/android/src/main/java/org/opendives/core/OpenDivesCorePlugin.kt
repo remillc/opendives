@@ -96,6 +96,21 @@ class OpenDivesCorePlugin : Plugin() {
                     } catch (e: Exception) {
                         Log.e(TAG, "Cannot install the offline regions", e)
                     }
+                    try {
+                        // Subsurface's XSLT stylesheets (exports), copied once per app version.
+                        val dir = File(context.filesDir, XSLT_DIR)
+                        val version = context.packageManager.getPackageInfo(context.packageName, 0).lastUpdateTime
+                        if (!dir.exists() || dir.lastModified() < version) {
+                            dir.mkdirs()
+                            for (name in context.assets.list(XSLT_DIR).orEmpty()) {
+                                context.assets.open("$XSLT_DIR/$name").use { input -> File(dir, name).outputStream().use { input.copyTo(it) } }
+                            }
+                            dir.setLastModified(System.currentTimeMillis())
+                        }
+                        NativeCore.setXsltDir(dir.absolutePath)
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Cannot install the XSLT stylesheets", e)
+                    }
                 } finally {
                     setupDone.countDown()
                     Log.i(TAG, "perf: certificates and regions set up in ${System.currentTimeMillis() - start} ms (file kept: $cached)")
@@ -1144,6 +1159,25 @@ class OpenDivesCorePlugin : Plugin() {
         }
     }
 
+    /**
+     * "Exporter au format…": the dives exported by the core (export_dives)
+     * into the cache, shared from there; read only for the logbook.
+     */
+    @PluginMethod
+    fun exportDives(call: PluginCall) = onCoreThread(call) {
+        val ids = call.getArray("ids")?.toList<Int>()?.toIntArray() ?: IntArray(0)
+        val format = call.getString("format").orEmpty()
+        val name = call.getString("name").orEmpty()
+        if (ids.isEmpty() || format.isEmpty() || name.isEmpty()) {
+            call.reject("Missing ids, format or name", "BAD_ARGUMENT")
+            return@onCoreThread
+        }
+        val dir = File(context.cacheDir, SHARE_DIR).apply { mkdirs() }
+        val file = File(dir, File(name).name)
+        NativeCore.exportDives(ids, format, call.getBoolean("anonymize", false) == true, file.absolutePath)
+        call.resolve(JSObject().put("uri", Uri.fromFile(file).toString()))
+    }
+
     /** The WebView rendering a PDF: kept until the PDF is written. */
     private var pdfView: android.webkit.WebView? = null
 
@@ -1188,6 +1222,7 @@ class OpenDivesCorePlugin : Plugin() {
     private companion object {
         const val TAG = "OpenDives"
         const val SHARE_DIR = "share"
+        const val XSLT_DIR = "xslt"
         const val CERTIFICATES_RECHECK_MS = 20_000L
         const val SAMPLE_ASSET = "SampleDivesV2.ssrf"
         // Offline country and region (core/data/regions.txt, Natural Earth).

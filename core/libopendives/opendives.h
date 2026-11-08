@@ -288,6 +288,20 @@ int site_geocode(uint32_t uuid, const std::string &lang, std::string &json, std:
 int place_at(int lat_udeg, int lon_udeg, const std::string &lang, std::string &json);
 // regions.cpp: the offline file (core/data/regions.txt), read on first use.
 void set_regions_file(const std::string &path);
+
+// Where Subsurface's XSLT stylesheets are on this device (the app copies its
+// xslt/ assets there); the build's Subsurface tree when never set.
+void set_xslt_dir(const std::string &dir);
+
+// Logbook selection, "Exporter au format…" (spec, section 4, "Logbook
+// selection and export"), as Subsurface's export dialog does for the selected
+// dives: "ssrf" (save_dives_logic), "uddf" (uddf-export.xslt), "csv"
+// (xml2summarycsv.xslt), "csvProfiles" (xml2detailscsv.xslt); the CSV and
+// UDDF in the units of the settings (metric, or imperial when depths are in
+// feet), with Subsurface's anonymize option. Writes `path`; the logbook is
+// not changed. Errors: NOT_FOUND, BAD_REQUEST, EXPORT_FAILED: <message>.
+int export_dives(const std::vector<int> &ids, const std::string &format, bool anonymize, const std::string &path,
+		 std::string &error);
 bool offline_region(int lat_udeg, int lon_udeg, const std::string &lang, std::string &country, std::string &region);
 // Possible duplicates: same name ignoring case within same_name_m, or
 // different names within same_place_m: [{"a":…, "b":…, "distanceM":…}].

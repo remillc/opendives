@@ -163,9 +163,13 @@ const stars = (n) => '★'.repeat(n) + '☆'.repeat(Math.max(0, 5 - n));
 /**
  * The dive sheet as HTML (docs/mockups/partage-pdf-fiche.dc.html); rows
  * without a value are left out, as on screen.
- * @param {DiveDetail} dive @param {Prefs} prefs @param {SVGSVGElement|null} svg
+ * The profile: the chart of the screen, or one drawn from the samples (a
+ * string) when the dive is not shown. Anonymized (the logbook's export), the
+ * people and the notes are left out, as Subsurface's anonymize option does.
+ * @param {DiveDetail} dive @param {Prefs} prefs @param {SVGSVGElement|string|null} svg @param {boolean} [anonymize]
  */
-export function sheetHtml(dive, prefs, svg) {
+export function sheetHtml(dive, prefs, svg, anonymize = false) {
+  if (anonymize) dive = { ...dive, guides: [], buddies: [], notes: '' };
   const time = formatTimeOfDay(dive.date);
   const end = new Date(new Date(dive.date).getTime() + dive.durationSeconds * 1000);
   const endText = end.toLocaleTimeString(locale, { timeStyle: 'short' });
@@ -214,7 +218,7 @@ export function sheetHtml(dive, prefs, svg) {
       /** @type {Record<string, number>} */ (dive.conditions ?? {})[k] ? stars(/** @type {Record<string, number>} */ (dive.conditions)[k]) : '',
     ]),
   ].filter(([, v]) => v);
-  const profile = svg ? new XMLSerializer().serializeToString(standaloneSvg(svg)) : '';
+  const profile = typeof svg === 'string' ? svg : svg ? new XMLSerializer().serializeToString(standaloneSvg(svg)) : '';
   const rows = (/** @type {(string|null)[][]} */ list) =>
     list.map(([k, v]) => `<div class="kv"><dt>${esc(k ?? '')}</dt><dd>${esc(v ?? '')}</dd></div>`).join('');
   const created = new Date().toLocaleDateString(locale, { dateStyle: 'long' });
@@ -246,7 +250,7 @@ footer { margin-top: 16px; border-top: 1px solid #DADAD6; padding-top: 6px; colo
 <h1>${esc(dive.site || t('dive.siteNotSet'))}</h1>
 <div class="place">${esc([place, trip].filter(Boolean).join(' · '))}</div>
 </div><div class="figures">${figures.map((f) => `<div class="figure"><b>${esc(/** @type {string[]} */ (f)[0])}</b><span>${esc(/** @type {string[]} */ (f)[1])}</span></div>`).join('')}</div></header>
-${profile ? `<h2>${esc(t('share.profile'))}</h2>${profile}<div class="legend">${esc(t(dive.samples.temperatureMk ? 'share.legendTemperature' : 'share.legend'))}</div>` : ''}
+${profile ? `<h2>${esc(t('share.profile'))}</h2>${profile}<div class="legend">${esc(t(typeof svg !== 'string' && dive.samples.temperatureMk ? 'share.legendTemperature' : 'share.legend'))}</div>` : ''}
 <dl class="facts" style="margin-top:10px">${rows(facts)}</dl>
 ${cylinders.length || equipment.length ? `<h2>${esc(t('detail.gasAndEquipment'))}</h2>` : ''}
 ${cylinders.length ? `<table><thead><tr><th>${esc(t('share.cylinder'))}</th><th>${esc(t('edit.size'))}</th><th>${esc(t('edit.use'))}</th><th>${esc(t('share.gas'))}</th><th>${esc(t('edit.start'))}</th><th>${esc(t('edit.end'))}</th></tr></thead><tbody>${cylinders
@@ -260,6 +264,69 @@ ${people.length || conditions.length ? `<div class="two"><div>${people.length ? 
 ${dive.notes ? `<h2>${esc(t('detail.notes'))}</h2><div class="notes">${esc(dive.notes)}</div>` : ''}
 <footer>${esc(t('share.footer', { date: created }))}</footer>
 </body></html>`;
+}
+
+/**
+ * A dive's depth profile drawn from its samples, for a sheet whose dive is not
+ * on screen: the water column from the surface to the depth line, a depth
+ * scale on the left, minutes at the bottom.
+ * @param {DiveDetail} dive @param {Prefs} prefs
+ */
+export function profileSvgFromSamples(dive, prefs) {
+  const times = dive.samples.timeSeconds;
+  const depths = dive.samples.depthMm;
+  if (times.length < 2) return '';
+  const W = 330, H = 150, L = 30, B = 22;
+  const tMax = times[times.length - 1] || 1;
+  const dMax = Math.max(1, ...depths);
+  const x = (/** @type {number} */ s) => L + (s / tMax) * (W - L - 6);
+  const y = (/** @type {number} */ mm) => 4 + (mm / dMax) * (H - B - 8);
+  let line = '';
+  times.forEach((s, i) => (line += `${i ? 'L' : 'M'}${x(s).toFixed(1)},${y(depths[i]).toFixed(1)}`));
+  const water = `${line}L${x(tMax).toFixed(1)},${y(0).toFixed(1)}L${x(0).toFixed(1)},${y(0).toFixed(1)}Z`;
+  const minutes = Math.round(tMax / 60);
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
+<defs><linearGradient id="w" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FBE3B2"/><stop offset="1" stop-color="#E9B97A"/></linearGradient></defs>
+<path d="${water}" fill="url(#w)"/><path d="${line}" fill="none" stroke="#1F2124" stroke-width="2" stroke-linejoin="round"/>
+<line x1="${L}" x2="${W - 6}" y1="${H - B + 4}" y2="${H - B + 4}" stroke="#4A4D52"/>
+<text x="${L - 4}" y="12" font-size="10" text-anchor="end" fill="#4A4D52">0</text>
+<text x="${L - 4}" y="${(y(dMax) + 4).toFixed(1)}" font-size="10" text-anchor="end" fill="#4A4D52">${esc(formatDepth(dMax, prefs))}</text>
+<text x="${L}" y="${H - 6}" font-size="10" fill="#4A4D52">0</text>
+<text x="${W - 6}" y="${H - 6}" font-size="10" text-anchor="end" fill="#4A4D52">${minutes} min</text>
+</svg>`;
+}
+
+/**
+ * "Exporter au format…" of the logbook's selection (spec, section 4,
+ * "Logbook selection and export"): the checked dives in a file, shared. The
+ * Subsurface formats come from the core; "pdf" is one sheet per dive.
+ * @param {number[]} ids
+ * @param {'ssrf'|'uddf'|'csv'|'csvProfiles'|'pdf'} format
+ * @param {boolean} anonymize
+ * @param {Prefs} prefs
+ */
+export async function exportDives(ids, format, anonymize, prefs) {
+  const day = new Date().toISOString().slice(0, 10);
+  const ext = format === 'csvProfiles' ? 'csv' : format;
+  const name = `${t('share.exportPrefix', { n: String(ids.length) })}-${day}.${ext}`;
+  let uri;
+  if (format === 'pdf') {
+    const pages = [];
+    for (const id of ids) {
+      const dive = await OpenDivesCore.getDive({ id });
+      pages.push(sheetHtml(dive, prefs, profileSvgFromSamples(dive, prefs), anonymize));
+    }
+    // One document: the style of the first sheet, each sheet's body on its own page.
+    const head = pages[0].slice(0, pages[0].indexOf('<body>') + 6);
+    const bodies = pages.map((p) => p.slice(p.indexOf('<body>') + 6, p.lastIndexOf('</body>')));
+    const html = `${head}${bodies.join('<div style="break-after: page"></div>')}</body></html>`;
+    ({ uri } = await OpenDivesCore.htmlToPdf({ html, name, letter: letterPaper() }));
+  } else {
+    ({ uri } = await OpenDivesCore.exportDives({ ids, format, anonymize, name }));
+  }
+  const mime = { ssrf: 'application/xml', uddf: 'application/xml', csv: 'text/csv', csvProfiles: 'text/csv', pdf: 'application/pdf' }[format];
+  await OpenDivesCore.grantShareFile({ uri, mime });
+  await Share.share({ title: name, files: [uri], dialogTitle: t('share.title') });
 }
 
 /** "Fiche PDF". @param {DiveDetail} dive @param {Prefs} prefs @param {SVGSVGElement|null} svg */

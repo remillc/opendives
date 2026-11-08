@@ -189,10 +189,18 @@ void uiNotification(const QString &msg)
 	report_info("%s", msg.toStdString().c_str());
 }
 
-// Stylesheets are read from the Subsurface tree instead of Qt resources.
+// Stylesheets are read from a directory instead of Qt resources: the
+// Subsurface tree of the build, or where the app copied them on the device
+// (opendives::set_xslt_dir).
+namespace opendives_compat {
+std::string xslt_dir = SUBSURFACE_SOURCE "/xslt/";
+}
+
 static xmlDocPtr get_stylesheet_doc(const xmlChar *uri, xmlDictPtr, int, void *, xsltLoadType)
 {
-	std::string filename = std::string(SUBSURFACE_SOURCE "/xslt/") + (const char *)uri;
+	// A stylesheet's xsl:include comes resolved against its own path: absolute.
+	std::string name = (const char *)uri;
+	std::string filename = name.rfind('/', 0) == 0 ? name : opendives_compat::xslt_dir + name;
 	return xmlParseFile(filename.c_str());
 }
 

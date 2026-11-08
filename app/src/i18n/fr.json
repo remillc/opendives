@@ -111,7 +111,8 @@
     "importNothingNew": "Toutes les plongées de ce fichier sont déjà dans le carnet. Aucune plongée n'a été modifiée.",
     "importNoDives": "Ce fichier ne contient aucune plongée. Aucune plongée n'a été modifiée.",
     "importFailed": "Ce fichier n'a pas pu être lu. Les fichiers de Subsurface (.ssrf, .xml), de divelogs.de et d'autres carnets sont acceptés. Aucune plongée n'a été modifiée.",
-    "importing": "Import du fichier en cours"
+    "importing": "Import du fichier en cours",
+    "menuExport": "Exporter au format…"
   },
   "sync": {
     "syncing": "Synchronisation avec le cloud Subsurface…",
@@ -1248,7 +1249,8 @@
       "Réglages, Langue et formats : « Format du papier » de la fiche PDF (selon la région, Lettre US ou A4).",
       "Tablette : Statistiques et Outils montrent la liste et le résultat ou l’outil côte à côte ; le planificateur a ses paramètres à gauche et le plan à droite.",
       "Tablette : les sites affichent la liste et la carte côte à côte, et l’édition d’une plongée s’ouvre en feuille (iPad) ou en panneau (Android) par-dessus le carnet.",
-      "Profil de plongée : texte d’aide plus court."
+      "Profil de plongée : texte d’aide plus court.",
+      "Carnet, sélection, menu ⋮ : « Exporter au format… » (carnet .ssrf, UDDF, CSV, fiches PDF), avec l’option Anonymiser."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
@@ -1875,6 +1877,32 @@
     "legendTemperature": "Noir : profondeur. Bleu : température de l’eau.",
     "cylinder": "Bouteille",
     "gas": "Gaz",
-    "footer": "Fiche créée avec OpenDives le {date}"
+    "footer": "Fiche créée avec OpenDives le {date}",
+    "exportPrefix": "OpenDives-{n}-plongees"
+  },
+  "export": {
+    "title": {
+      "one": "Exporter {n} plongée",
+      "other": "Exporter {n} plongées"
+    },
+    "text": "Choisissez un format. Le fichier s’ouvre ensuite dans le partage du téléphone.",
+    "formats": {
+      "ssrf": "Carnet complet (.ssrf)",
+      "uddf": "UDDF (.uddf)",
+      "csv": "CSV, liste des plongées",
+      "csvProfiles": "CSV, profils",
+      "pdf": "Fiches PDF"
+    },
+    "formatTexts": {
+      "ssrf": "Tout le contenu, à réimporter plus tard",
+      "uddf": "Format d’échange entre logiciels de plongée",
+      "csv": "Une ligne par plongée, pour un tableur",
+      "csvProfiles": "Temps, profondeur et température, point par point",
+      "pdf": "Une page par plongée"
+    },
+    "anonymize": "Anonymiser",
+    "anonymizeText": "Retire les noms des personnes, les notes et les positions GPS",
+    "action": "Exporter",
+    "failed": "L’export n’a pas pu être fait."
   }
 }

@@ -39,6 +39,8 @@ internal object NativeCore {
     external fun statsQuery(kind: String, text: String): String
     external fun siteAction(action: String, uuid: Long, other: Long, uuids: LongArray?, field: String, value: String, lat: Int, lon: Int): String
     external fun setRegionsFile(path: String)
+    external fun setXsltDir(dir: String)
+    external fun exportDives(ids: IntArray, format: String, anonymize: Boolean, path: String)
     external fun toolQuery(kind: String, o2: Int, he: Int, po2: Int, depth: Int, args: IntArray?): String
     external fun tripAction(action: String, tripId: Int, diveId: Int, otherId: Int, diveIds: IntArray?, value: String): String
     external fun sync(): String

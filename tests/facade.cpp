@@ -5,6 +5,8 @@
 //        facade list <path[branch]>
 //        facade dive <log> <number>
 #include "core/libopendives/opendives.h"
+#include "core/dive.h"
+#include "core/divelog.h"
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -91,6 +93,22 @@ int main(int argc, char **argv)
 		check(opendives::cylinder_type_rename("Test 7L", "Test 8L", json, error), "rename");
 		check(opendives::undo(json, error), "undo rename");
 		check(opendives::cylinder_type_action("remove", "Test 7L", 0, 0, json, error), "remove");
+		return 0;
+	}
+	if (argc == 6 && !strcmp(argv[1], "export")) {
+		// export <log> <format> <anonymize 0|1> <file>: the first three dives.
+		if (opendives::list_dives(argv[2], json, error)) {
+			fprintf(stderr, "%s\n", error.c_str());
+			return 1;
+		}
+		std::vector<int> ids;
+		for (size_t i = 0; i < divelog.dives.size() && i < 3; i++)
+			ids.push_back(divelog.dives[i]->id);
+		if (opendives::export_dives(ids, argv[3], argv[4][0] == '1', argv[5], error)) {
+			fprintf(stderr, "%s\n", error.c_str());
+			return 1;
+		}
+		printf("exported %zu dives\n", ids.size());
 		return 0;
 	}
 	if (argc >= 4 && !strcmp(argv[1], "search")) {

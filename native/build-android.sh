@@ -2,6 +2,7 @@
 # Builds libopendives.so for Android and prepares what Gradle bundles:
 #   build/android/jniLibs/<abi>/libopendives.so
 #   build/android/assets/SampleDivesV2.ssrf
+#   build/android/assets/xslt/ (Subsurface's stylesheets)
 # usage: native/build-android.sh [abi...]     (default: arm64-v8a x86_64)
 set -euo pipefail
 source "$(dirname "$0")/env.sh"
@@ -23,4 +24,9 @@ done
 
 mkdir -p "$OUT/assets"
 cp "$SS/dives/SampleDivesV2.ssrf" "$OUT/assets/"
+# Subsurface's XSLT stylesheets (exports, CSV imports), copied to the app's
+# files at start (set_xslt_dir).
+rm -rf "$OUT/assets/xslt"
+mkdir -p "$OUT/assets/xslt"
+cp "$SS"/xslt/*.xsl* "$OUT/assets/xslt/"
 ls -l "$OUT"/jniLibs/*/libopendives.so

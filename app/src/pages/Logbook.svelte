@@ -15,6 +15,8 @@
   import ActiveFilter from '../components/ActiveFilter.svelte';
   import ConflictSheet from '../components/ConflictSheet.svelte';
   import RenumberDialog from '../components/RenumberDialog.svelte';
+  import ExportSheet from '../components/ExportSheet.svelte';
+  import { exportDives } from '../lib/share.js';
   import { logbook, loadLogbook, importFile, undoLastChange, resolveConflict, deleteDives, tripChange } from '../lib/logbook.svelte.js';
   import { confirmAction } from '../lib/dialogs.js';
   import { filter, loadOptions, applyFilter, isEmpty } from '../lib/filter.svelte.js';
@@ -269,6 +271,24 @@
       f7.toast.create({ text: t(redo ? 'edit.redone' : 'edit.undone'), closeTimeout: 4000, position: 'bottom' }).open();
     } catch (e) {
       changeFailed(e);
+    }
+  }
+
+  /** "Exporter au format…" open (selection mode). */
+  let exporting = $state(false);
+
+  /**
+   * The checked dives exported, then the system's share sheet; the selection is kept.
+   * @param {'ssrf'|'uddf'|'csv'|'csvProfiles'|'pdf'} format @param {boolean} anonymize
+   */
+  async function exportChecked(format, anonymize) {
+    try {
+      await exportDives(checkedIds, format, anonymize, logbook.prefs);
+    } catch (e) {
+      // Closing the system's share sheet without choosing is not an error.
+      if (/cancel/i.test(String(/** @type {any} */ (e)?.message ?? ''))) return;
+      console.error('Export dives', e);
+      f7.toast.create({ text: t('export.failed'), closeTimeout: 4000 }).open();
     }
   }
 
@@ -1047,7 +1067,6 @@
         <MenuItem icon="renumber" text={t('logbook.menuRenumberChecked', { n: checkedCount })} onclick={() => (renumbering = true)} />
       {/if}
       {#if selecting}
-        <MenuItem icon="delete" text={t('logbook.menuDelete')} destructive onclick={deleteChecked} />
         <MenuItem icon="plus" text={t('logbook.menuCreateTrip')} onclick={createTrip} />
         {#if checkedInTrip.length}
           <MenuItem icon="remove" text={t('logbook.menuRemoveFromTrip', { n: checkedInTrip.length })} onclick={removeFromTrip} />
@@ -1060,9 +1079,23 @@
           {@const id = neighbourTrips.below}
           <MenuItem icon="arrowDown" text={t('logbook.menuAddBelow', { n: checkedCount })} onclick={() => addToTrip(id)} />
         {/if}
+        <MenuItem
+          icon="download"
+          text={t('logbook.menuExport')}
+          onclick={() => {
+            f7.popover.close('.od-logbook-menu');
+            exporting = true;
+          }}
+        />
+        <li class="od-menu-divider" role="separator"></li>
+        <MenuItem icon="delete" text={t('logbook.menuDelete')} destructive onclick={deleteChecked} />
       {/if}
     </List>
   </Popover>
+
+  {#if exporting}
+    <ExportSheet count={checkedCount} onexport={exportChecked} onclose={() => (exporting = false)} />
+  {/if}
 
   {#if !logbook.loading && !logbook.error && rows.length}
     <div class="list media-list chevron-center dividers virtual-list dives" bind:this={listEl}>

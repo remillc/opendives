@@ -26,6 +26,11 @@
 #include <ctime>
 #include <filesystem>
 
+// core/compat/qthelper_compat.cpp: where the XSLT stylesheets are read from.
+namespace opendives_compat {
+extern std::string xslt_dir;
+}
+
 namespace opendives {
 
 static void append_json_string(std::string &out, const std::string &s)
@@ -906,6 +911,52 @@ int cloud_branch_status(const std::string &url, bool &exists, std::string &head,
 	}
 	git_remote_free(remote);
 	return ret ? -1 : 0;
+}
+
+void set_xslt_dir(const std::string &dir)
+{
+	opendives_compat::xslt_dir = dir.empty() || dir.back() == '/' ? dir : dir + "/";
+}
+
+int export_dives(const std::vector<int> &ids, const std::string &format, bool anonymize, const std::string &path,
+		 std::string &error)
+{
+	const char *stylesheet = format == "uddf" ? "uddf-export.xslt"
+			       : format == "csv" ? "xml2summarycsv.xslt"
+			       : format == "csvProfiles" ? "xml2detailscsv.xslt" : nullptr;
+	if ((format != "ssrf" && !stylesheet) || path.empty() || ids.empty()) {
+		error = "BAD_REQUEST";
+		return -1;
+	}
+	for (int id: ids) {
+		if (!divelog.dives.get_by_uniq_id(id)) {
+			error = "NOT_FOUND";
+			return -1;
+		}
+	}
+	// The export dialog's "Selected dives": the listed dives are the core's
+	// selection for the time of the export, then the selection is put back.
+	std::vector<std::pair<dive *, bool>> saved;
+	for (auto &d: divelog.dives) {
+		saved.push_back({ d.get(), d->selected });
+		d->selected = false;
+	}
+	for (int id: ids)
+		divelog.dives.get_by_uniq_id(id)->selected = true;
+	int ret = 0;
+	if (!stylesheet) {
+		if (save_dives_logic(path.c_str(), true, anonymize))
+			ret = -1, error = "EXPORT_FAILED: ssrf";
+	} else {
+		// DiveLogExportDialog's units: 0 metric, 1 imperial.
+		int units = prefs.units.length == units::FEET ? 1 : 0;
+		auto [rc, message] = export_dives_xslt(path.c_str(), true, units, stylesheet, anonymize);
+		if (rc)
+			ret = -1, error = "EXPORT_FAILED: " + message;
+	}
+	for (auto &[d, selected]: saved)
+		d->selected = selected;
+	return ret;
 }
 
 namespace internal {

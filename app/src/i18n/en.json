@@ -111,7 +111,8 @@
     "importNothingNew": "Every dive of this file is already in the logbook. No dive was changed.",
     "importNoDives": "This file holds no dive. No dive was changed.",
     "importFailed": "This file could not be read. Files from Subsurface (.ssrf, .xml), divelogs.de and other logbooks are accepted. No dive was changed.",
-    "importing": "Importing the file"
+    "importing": "Importing the file",
+    "menuExport": "Export as…"
   },
   "sync": {
     "syncing": "Syncing with the Subsurface cloud…",
@@ -1248,7 +1249,8 @@
       "Settings, Language and formats: “Paper size” of the PDF sheet (from the region, US Letter or A4).",
       "Tablet: Statistics and Tools show the list and the result or the tool side by side; the planner has its parameters on the left and the plan on the right.",
       "Tablet: Sites show the list and the map side by side, and the dive editor opens as a sheet (iPad) or a pane (Android) over the logbook.",
-      "Dive profile: shorter hint."
+      "Dive profile: shorter hint.",
+      "Logbook, selection, ⋮ menu: “Export as…” (.ssrf logbook, UDDF, CSV, PDF sheets), with the Anonymize option."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
@@ -1875,6 +1877,32 @@
     "legendTemperature": "Black: depth. Blue: water temperature.",
     "cylinder": "Cylinder",
     "gas": "Gas",
-    "footer": "Sheet made with OpenDives on {date}"
+    "footer": "Sheet made with OpenDives on {date}",
+    "exportPrefix": "OpenDives-{n}-dives"
+  },
+  "export": {
+    "title": {
+      "one": "Export {n} dive",
+      "other": "Export {n} dives"
+    },
+    "text": "Choose a format. The file then opens in the phone’s share sheet.",
+    "formats": {
+      "ssrf": "Full logbook (.ssrf)",
+      "uddf": "UDDF (.uddf)",
+      "csv": "CSV, list of dives",
+      "csvProfiles": "CSV, profiles",
+      "pdf": "PDF sheets"
+    },
+    "formatTexts": {
+      "ssrf": "All the content, to import again later",
+      "uddf": "Exchange format between dive programs",
+      "csv": "One line per dive, for a spreadsheet",
+      "csvProfiles": "Time, depth and temperature, point by point",
+      "pdf": "One page per dive"
+    },
+    "anonymize": "Anonymize",
+    "anonymizeText": "Removes people’s names, notes and GPS positions",
+    "action": "Export",
+    "failed": "The export could not be done."
   }
 }
