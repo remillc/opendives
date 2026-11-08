@@ -558,8 +558,10 @@ import { registerPlugin } from '@capacitor/core';
  *   The dives received before a download failed or was cancelled: count ({dives}), keep (one
  *   undoable step, a DownloadResult) or discard. Rejects with NO_PARTIAL.
  * @property {() => Promise<void>} cancelDownload
- * @property {(event: 'bluetoothDevice'|'bluetoothScanStopped'|'downloadProgress', listener: (data: any) => void) => Promise<{remove: () => Promise<void>}>} addListener
- *   bluetoothDevice gives a BluetoothDevice, downloadProgress a DownloadProgress.
+ * @property {(event: 'bluetoothDevice'|'bluetoothScanStopped'|'downloadProgress'|'syncProgress', listener: (data: any) => void) => Promise<{remove: () => Promise<void>}>} addListener
+ *   bluetoothDevice gives a BluetoothDevice, downloadProgress a DownloadProgress, syncProgress
+ *   {message}: each message of the core's git work while the cloud log syncs (opendives.h,
+ *   set_sync_progress), in English, e.g. "Transfer from storage (30/80)".
  */
 
 /** @type {any} */

@@ -1849,6 +1849,23 @@ int save_as(const std::string &destination, std::string &error)
 static int sync_and_reload_if_needed(const std::string &log, const std::string &local_before, bool server_in_local,
 			      bool local_in_server, std::string &status_json, std::string &error);
 
+static sync_progress sync_progress_target = nullptr;
+
+// Subsurface's callback: a non-zero return would cancel the transfer; the
+// progress only watches.
+static int forward_git_progress(const char *message)
+{
+	if (sync_progress_target && message)
+		sync_progress_target(message);
+	return 0;
+}
+
+void set_sync_progress(sync_progress progress)
+{
+	sync_progress_target = progress;
+	set_git_update_cb(progress ? &forward_git_progress : nullptr);
+}
+
 int sync(std::string &status_json, std::string &error)
 {
 	const std::string log = internal::current_log();

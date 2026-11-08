@@ -100,7 +100,7 @@
     <div class="spacer"></div>
     {#if !logbook.loading && !logbook.error}
       <div class="status">
-        <SyncStatus sync={logbook.sync} pending={logbook.pending} live={false} />
+        <SyncStatus sync={logbook.sync} pending={logbook.pending} progress={logbook.syncProgress} live={false} />
         {#if logbook.sync === 'manual'}
           <!-- Manual synchronisation: the exchange happens only from here or Account. -->
           <button type="button" class="od-tonal-button" disabled={logbook.loading} onclick={() => syncNow()}>

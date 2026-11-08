@@ -60,7 +60,7 @@
     <span class="label" class:od-sr-only={!ios}>{t('about.title')}</span>
   </a>
   {#if ios && !logbook.loading && !logbook.error}
-    <div class="status"><SyncStatus sync={logbook.sync} pending={logbook.pending} live={false} /></div>
+    <div class="status"><SyncStatus sync={logbook.sync} pending={logbook.pending} progress={logbook.syncProgress} live={false} /></div>
   {/if}
 </nav>
 

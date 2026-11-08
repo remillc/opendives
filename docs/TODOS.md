@@ -24,5 +24,4 @@ Next number: 14
 - #8 [design] /tools/desaturation: beaucoup trop de texte. Texte pour me protéger.
 - #10 [design] Compte: Compte subsurface vérifié: ?
 - #11 [code] est-ce que c'est un simple protocole git qui transit entre le serveur ss et l'app? Si oui, alors peut on offrir de se connecter aussi, alternativement, a son serveur git préféré, par exemple GitHub?
-- #12 [code] btn synchroniser: montrer une progression
 - #13 [design] réglages, après unités, ajouter choix du type d'eau. Les outils doivent utiliser cette valeur par défaut

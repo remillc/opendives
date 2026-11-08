@@ -42,6 +42,8 @@ internal object NativeCore {
     external fun toolQuery(kind: String, o2: Int, he: Int, po2: Int, depth: Int, args: IntArray?): String
     external fun tripAction(action: String, tripId: Int, diveId: Int, otherId: Int, diveIds: IntArray?, value: String): String
     external fun sync(): String
+    /** Receives the messages of the cloud log's git work (opendives.h, set_sync_progress); null stops them. */
+    external fun setSyncListener(listener: DownloadListener?)
     external fun saveLocal()
     external fun listLoadedDives(): String
     external fun setCloudTestEmail(email: String)

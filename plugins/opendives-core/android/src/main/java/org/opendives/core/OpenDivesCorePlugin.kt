@@ -71,6 +71,8 @@ class OpenDivesCorePlugin : Plugin() {
         val caFile = File(context.cacheDir, "cacerts.pem")
         coreThread.execute {
             NativeCore.init(home)
+            // The messages of the cloud log's git work, while it syncs: "syncProgress" events ({message}).
+            NativeCore.setSyncListener { message -> notifyListeners("syncProgress", JSObject().put("message", message)) }
             setupThread.execute {
                 val start = System.currentTimeMillis()
                 // The file of the last start is used at once: reading Android's store
