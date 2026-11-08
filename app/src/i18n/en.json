@@ -1243,7 +1243,8 @@
       "Edit the dive: site and trip are typed or chosen from the filtered list; a new name creates the site or the trip. The suit now comes before the dive mode.",
       "Dive detail, ⋮ menu: “Renumber the dive”; the dives it affects shift so that numbers stay unique and without gaps.",
       "Dive detail, ⋮ menu: “Share” a one-page PDF sheet or a short summary with the profile image.",
-      "Settings, Language and formats: “Paper size” of the PDF sheet (from the region, US Letter or A4)."
+      "Settings, Language and formats: “Paper size” of the PDF sheet (from the region, US Letter or A4).",
+      "Tablet: Sites show the list and the map side by side, and the dive editor opens as a sheet (iPad) or a pane (Android) over the logbook."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",

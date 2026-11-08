@@ -13,6 +13,7 @@
   import { logbook } from '../lib/logbook.svelte.js';
   import { possibleDuplicates } from '../lib/sites.svelte.js';
   import { formatDepth, formatLongDate } from '../lib/format.js';
+  import { layout, ios, listWidth } from '../lib/layout.svelte.js';
   import { t } from '../lib/i18n.js';
 
   /** @type {import('opendives-core').SiteSummary[]} */
@@ -59,39 +60,20 @@
   }
 </script>
 
-<Page onPageReinit={load}>
-  {#snippet fixedContent()}
-    <!-- MD3 FAB, 56 dp, over the list panel: a new site. -->
-    <div class="fab fab-right-bottom od-fab-add">
-      <a href="/sites/new" aria-label={t('sites.newSite')}><i class="icon"><Icon name="plus" /></i></a>
-    </div>
-  {/snippet}
-  <Navbar title={t('sites.title')}>
-    {#snippet left()}<MenuButton />{/snippet}
-    <NavRight>
-      <Link iconOnly searchbarEnable=".od-sites-search"><Icon name="search" /><span class="od-sr-only">{t('sites.search')}</span></Link>
-    </NavRight>
-    <Searchbar
-      class="od-sites-search"
-      expandable
-      searchContainer=".od-sites-list"
-      searchIn=".od-site-name"
-      placeholder={t('sites.searchPlaceholder')}
-      disableButtonText={t('logbook.cancel')}
-    />
-  </Navbar>
-
+{#snippet mapBlock(/** @type {string} */ height)}
   {#if located.length}
     <div class="map">
       <!-- 5:4 landscape, full width (task 2026-11-07-24). -->
-      <SiteMap bind:this={siteMap} sites={located} onselect={open} height="calc(100vw * 4 / 5)" />
+      <SiteMap bind:this={siteMap} sites={located} onselect={open} {height} />
       <button type="button" class="locate" onclick={centreOnDevice}>
         <Icon name="locate" size={20} />
         <span class="od-sr-only">{t('sites.centreOnMe')}</span>
       </button>
     </div>
   {/if}
+{/snippet}
 
+{#snippet panel()}
   <section class="sites-panel" aria-label={t('sites.listLabel')}>
     <p class="count od-value">{t('sites.siteCount', { n: used.length })}, {t('sites.diveCount', { n: diveCount })}</p>
 
@@ -137,10 +119,102 @@
     {/if}
     <div class="list searchbar-not-found"><ul><li class="item-content"><div class="item-inner">{t('sites.noMatch')}</div></li></ul></div>
   </section>
+{/snippet}
+
+{#snippet fab()}
+    <!-- MD3 FAB, 56 dp, over the list panel: a new site. -->
+    <div class="fab fab-right-bottom od-fab-add">
+      <a href="/sites/new" aria-label={t('sites.newSite')}><i class="icon"><Icon name="plus" /></i></a>
+    </div>
+{/snippet}
+
+<Page onPageReinit={load}>
+  {#snippet fixedContent()}
+    {#if layout.phone}
+      {@render fab()}
+    {:else}
+      <!-- Tablet (spec, section 3): the list on the left, the map on the right. -->
+      <div class="split" class:ios>
+        <div class="list-pane" style="width: {listWidth + (ios ? 0 : 20)}px">
+          <div class="scroll">{@render panel()}</div>
+          {@render fab()}
+        </div>
+        <div class="map-pane">{@render mapBlock('100%')}</div>
+      </div>
+    {/if}
+  {/snippet}
+  <Navbar title={t('sites.title')}>
+    {#snippet left()}<MenuButton />{/snippet}
+    <NavRight>
+      <Link iconOnly searchbarEnable=".od-sites-search"><Icon name="search" /><span class="od-sr-only">{t('sites.search')}</span></Link>
+    </NavRight>
+    <Searchbar
+      class="od-sites-search"
+      expandable
+      searchContainer=".od-sites-list"
+      searchIn=".od-site-name"
+      placeholder={t('sites.searchPlaceholder')}
+      disableButtonText={t('logbook.cancel')}
+    />
+  </Navbar>
+
+  {#if layout.phone}
+    {@render mapBlock('calc(100vw * 4 / 5)')}
+    {@render panel()}
+  {/if}
 </Page>
 
 <style>
   @layer od.components {
+    /* Tablet: below the navigation bar, two panes side by side. */
+    .split {
+      position: absolute;
+      inset: calc(var(--f7-navbar-height) + var(--f7-safe-area-top)) 0 0 0;
+      display: flex;
+    }
+
+    .list-pane {
+      position: relative;
+      flex: none;
+      display: flex;
+      flex-direction: column;
+      border-right: 0.5px solid var(--od-separator);
+    }
+
+    .scroll {
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .map-pane {
+      position: relative;
+      flex: 1;
+      min-width: 0;
+    }
+
+    /* Android: the map is a rounded pane, 16 px from the edges. */
+    .split:not(.ios) .map-pane {
+      margin: 16px 16px 16px 0;
+      border-radius: 28px;
+      overflow: hidden;
+    }
+
+    /* iPad: 44 pt button at the top right of the map. */
+    .split.ios .locate {
+      top: 24px;
+      bottom: auto;
+      width: 44px;
+      height: 44px;
+    }
+
+    .split :global(.od-fab-add) {
+      position: absolute;
+    }
+
+    .map-pane .map {
+      height: 100%;
+    }
+
     .map {
       position: relative;
     }
