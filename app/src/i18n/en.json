@@ -1178,7 +1178,8 @@
       "Privacy policy and “Question / report a problem” in About.",
       "Gas blender: nitrox by default, the last mode chosen is remembered.",
       "Syncing: the current stage and a progress bar in the menu.",
-      "“Sync now”: the list and the menu stay in place, the button shows the progress and a message confirms the end or reports the error."
+      "“Sync now”: the list and the menu stay in place, the button shows the progress and a message confirms the end or reports the error.",
+      "In cubic feet, the SAC is shown with two decimals."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
