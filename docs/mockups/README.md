@@ -117,3 +117,6 @@ When a mock-up and `docs/ui-specification.md` disagree, the specification wins. 
 
 Example values (decided on 8 November 2026): the mock-ups show depths in feet, pressures in psi and weights in pounds, volumes in cubic feet (cylinder sizes as gas capacity at the working pressure, SAC in cuft/min), with temperatures in °C, as with personalised units. Partial pressures (ppO₂, pN₂, pHe, setpoints) stay in bar, as in Subsurface. These are only examples: the app always follows the units chosen in Settings.
 | `detail3-android-curseur.dc.html` | Téléphone Android, détail avec le profil touché : curseur et lecture du temps et de la profondeur |
+| `carnet-selection-android.dc.html` | Téléphone Android, carnet en sélection multiple (dessiné d’après l’app) |
+| `carnet-selection-menu-android.dc.html` | Téléphone Android, carnet en sélection multiple, menu ⋮ ouvert |
+| `carnet-export-android.dc.html` | Téléphone Android, exporter les plongées cochées : choix du format |

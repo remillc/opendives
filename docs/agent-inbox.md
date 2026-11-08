@@ -688,7 +688,18 @@ Several layers can be on at once. When two layers need a right-hand scale (Temp�
 
 Done in "Dive profile: ppO2, ceiling and tissue layers". Three chips after Gaz, each offered only when the dive has the data. ppO2: line in --od-oxygen on a 0 to 1.6 bar scale with dashed 1.4 and 1.6 limits; only the last right-hand scale turned on (Temperature or ppO2) is labelled. Plafond: the core's calculated ceiling (plot_info, always computed with the current gradient factors, no preference touched), red area at 35 % with a 1.5 dp edge. Tissus: 16 bars under the chart at the cursor (end of the dive otherwise), same colours as the Desaturation tool (shared lib/tissues.js). The cursor readout adds Eau, ppO2 and Plafond when those layers are on. get_dive gives samples.tissues as one flat array (16 percentages per sample, about 35 KB for 2 hours at 10 s). Not checked in the emulator.
 
-## [ ] 2026-11-08-21 Dive profile: shorter hint
+## [x] 2026-11-08-21 Dive profile: shorter hint
 
 Christian prefers a shorter hint above the profile. Replace `profile.hint` "Posez le doigt sur le profil pour lire temps et profondeur." with "Touchez le profil pour lire les valeurs" (no final period), and in English "Touch the profile to read the values". Keep its size and the readout line as they are. Mock-ups: `docs/mockups/detail3-android.dc.html`, `detail3-android-sombre.dc.html`.
+
+Done in "Dive profile: shorter hint". profile.hint is now the shorter text in French and English; size and readout line unchanged.
+
+## [ ] 2026-11-08-22 Logbook selection: "Exporter au format…"
+
+Add "Exporter au format…" (24 dp download icon) to the ⋮ menu of the logbook's selection mode, after the "Ajouter les plongées au voyage…" items and before the divider and "Supprimer". It opens an MD3 modal bottom sheet (`docs/mockups/carnet-export-android.dc.html`):
+- title "Exporter N plongées" (plural rules as elsewhere), line "Choisissez un format. Le fichier s’ouvre ensuite dans le partage du téléphone.";
+- a radio list, 64 dp rows with a description: "Carnet complet (.ssrf)" (the core's XML export of the checked dives), "UDDF (.uddf)", "CSV, liste des plongées", "CSV, profils", "Fiches PDF" (one page per dive, same layout as task 16);
+- an "Anonymiser" switch, off by default (people's names, notes and GPS positions removed, as Subsurface's anonymize option); it applies to every format;
+- "Annuler" (text button) and "Exporter" (filled button).
+Use the core's export functions (`save_dives_logic` with the selection for .ssrf, `export_dives_xslt` with the UDDF and CSV stylesheets, as Subsurface's export dialog does). Remember the last format on the device. "Exporter" closes the sheet, writes the file in the app's cache and opens the system share sheet (file names like `OpenDives-3-plongees-2026-11-08.ssrf`). Errors: a snackbar "L’export n’a pas pu être fait." Keep the selection after an export. Spec: section 4, "Logbook selection and export".
 
