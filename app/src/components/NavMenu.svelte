@@ -9,7 +9,8 @@
   import { Panel } from 'framework7-svelte';
   import Icon from './Icon.svelte';
   import SyncStatus from './SyncStatus.svelte';
-  import { logbook, syncNow } from '../lib/logbook.svelte.js';
+  import SyncButton from './SyncButton.svelte';
+  import { logbook } from '../lib/logbook.svelte.js';
   import { navigation, sections, showSection, closeMenu, restoreFocus, openSettings, openAbout } from '../lib/navigation.svelte.js';
   import { t } from '../lib/i18n.js';
 
@@ -103,10 +104,8 @@
         <SyncStatus sync={logbook.sync} pending={logbook.pending} progress={logbook.syncProgress} live={false} steady />
         {#if logbook.email && !logbook.autoSync}
           <!-- Manual synchronisation: the exchange happens only from here or Account.
-               The button stays in place while it runs, only disabled (to-do #2). -->
-          <button type="button" class="od-tonal-button" disabled={logbook.loading || logbook.sync === 'syncing'} onclick={() => syncNow()}>
-            {t('account.syncNow')}
-          </button>
+               The button stays in place while it runs and shows its progress (to-do #2). -->
+          <SyncButton />
         {/if}
       </div>
     {/if}

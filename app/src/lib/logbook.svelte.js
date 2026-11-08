@@ -360,10 +360,21 @@ function undoCleared() {
   if (typeof window !== 'undefined') window.dispatchEvent(new Event('od-undo-cleared'));
 }
 
-/** Sends the saved edits (automatic synchronisation). */
+/**
+ * The outcome of a sync, for the message after "Sync now": done; offline
+ * (the server did not answer); failed (it answered, the exchange stopped).
+ * @typedef {'done'|'offline'|'failed'} SyncOutcome
+ */
+
+/**
+ * Sends the saved edits (automatic synchronisation).
+ * @returns {Promise<SyncOutcome>}
+ */
 async function syncEdits() {
   logbook.syncProgress = null;
   logbook.sync = 'syncing';
+  /** @type {SyncOutcome} */
+  let outcome = 'failed';
   try {
     const status = await OpenDivesCore.syncChanges();
     if (status.reloaded) {
@@ -376,12 +387,14 @@ async function syncEdits() {
     // Manual synchronisation: the state says so again once done (spec, section 4).
     logbook.sync = !reached ? 'offline' : logbook.autoSync ? 'cloud' : 'manual';
     if (reached) markSynced();
+    outcome = reached ? 'done' : status.status === 'offline' ? 'offline' : 'failed';
     if (status.status === 'merged') await readConflicts();
   } catch (e) {
     console.error('Syncing the edits', e);
     logbook.sync = 'offline';
   }
   await countPending();
+  return outcome;
 }
 
 /**
@@ -580,11 +593,12 @@ export function setAutoSync(value) {
  */
 export async function syncNow() {
   if (!logbook.email || logbook.loading || logbook.error || logbook.sync === 'syncing') {
-    if (logbook.sync !== 'syncing') await loadLogbook({ force: true });
-    return;
+    if (logbook.sync === 'syncing') return /** @type {SyncOutcome} */ ('failed');
+    await loadLogbook({ force: true });
+    return /** @type {SyncOutcome} */ (logbook.error ? 'failed' : logbook.sync === 'offline' ? 'offline' : 'done');
   }
   clearTimeout(syncTimer);
-  await syncEdits();
+  return syncEdits();
 }
 
 /**

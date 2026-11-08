@@ -122,6 +122,11 @@
       "send": "Sending changes…",
       "read": "Reading the logbook…"
     },
+    "outcome": {
+      "done": "Sync complete",
+      "offline": "Couldn't sync: the server is not answering. Your changes stay on this device.",
+      "failed": "Sync failed. Your changes stay on this device."
+    },
     "cloud": "Synced with Subsurface cloud",
     "offline": "Offline: no changes waiting",
     "local": "Logbook stored on this device only",
@@ -1173,7 +1178,7 @@
       "Privacy policy and “Question / report a problem” in About.",
       "Gas blender: nitrox by default, the last mode chosen is remembered.",
       "Syncing: the current stage and a progress bar in the menu.",
-      "“Sync now”: the list and the menu stay in place, only the status line changes."
+      "“Sync now”: the list and the menu stay in place, the button shows the progress and a message confirms the end or reports the error."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",

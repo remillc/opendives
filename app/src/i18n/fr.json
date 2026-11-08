@@ -122,6 +122,11 @@
       "send": "Envoi des modifications…",
       "read": "Lecture du carnet…"
     },
+    "outcome": {
+      "done": "Synchronisation terminée",
+      "offline": "Synchronisation impossible : le serveur ne répond pas. Les modifications restent sur cet appareil.",
+      "failed": "La synchronisation a échoué. Les modifications restent sur cet appareil."
+    },
     "cloud": "Synchronisé avec le cloud Subsurface",
     "offline": "Hors ligne : aucune modification en attente",
     "local": "Carnet enregistré sur cet appareil seulement",
@@ -1173,7 +1178,7 @@
       "Politique de confidentialité et « Question / signaler un problème » dans À propos.",
       "Mélangeur de gaz : nitrox par défaut, le dernier mode choisi est retenu.",
       "Synchronisation : l’étape en cours et une barre de progression dans le menu.",
-      "« Synchroniser maintenant » : la liste et le menu restent en place, seule la ligne d’état change."
+      "« Synchroniser maintenant » : la liste et le menu restent en place, le bouton montre la progression et un message confirme la fin ou signale l’erreur."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",

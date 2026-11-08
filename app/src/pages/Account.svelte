@@ -7,6 +7,7 @@
   // screens of first launch, whose actions are not built yet.
   import { Page, Navbar, f7 } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
+  import SyncButton from '../components/SyncButton.svelte';
   import MenuButton from '../components/MenuButton.svelte';
   import { logbook, setAutoSync, signOut, syncNow, deviceDiveCount } from '../lib/logbook.svelte.js';
   import { showSection } from '../lib/navigation.svelte.js';
@@ -174,7 +175,7 @@
           </li>
         {/if}
         <li class="sync-now">
-          <button type="button" class="od-tonal-button" disabled={logbook.loading || logbook.sync === 'syncing'} onclick={() => syncNow()}>{t('account.syncNow')}</button>
+          <SyncButton />
         </li>
       </ul>
     </div>
