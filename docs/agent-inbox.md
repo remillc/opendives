@@ -686,3 +686,7 @@ Christian asks for the remaining technical layers on the dive profile, as filter
 - "Tissus": the 16 compartments' saturation at the cursor (or at the end of the dive when no cursor), as in the Désaturation tool: small bars from fast to slow under the chart, coloured with the water gradient by load and `--od-alarm` from 90 %.
 Several layers can be on at once. When two layers need a right-hand scale (Température and ppO₂), show the scale of the last one turned on. The finger cursor keeps its readout; add the value of each layer that is on ("Eau 4,3 °C", "ppO₂ 1,28 bar"). Mock-ups: `docs/mockups/detail3-android.dc.html` (chips), `detail3-android-curseur.dc.html` (cursor).
 
+## [ ] 2026-11-08-21 Dive profile: shorter hint
+
+Christian prefers a shorter hint above the profile. Replace `profile.hint` "Posez le doigt sur le profil pour lire temps et profondeur." with "Touchez le profil pour lire les valeurs" (no final period), and in English "Touch the profile to read the values". Keep its size and the readout line as they are. Mock-ups: `docs/mockups/detail3-android.dc.html`, `detail3-android-sombre.dc.html`.
+
