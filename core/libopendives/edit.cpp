@@ -238,6 +238,15 @@ void exchange(dive *d, dive &other)
 		new_site->add_dive(d);
 	other.dive_site = old_site;
 	d->invalidate_cache(); // so that save-git writes this dive again
+	// The gas used and other cylinder data, as the cylinder commands update them.
+	divelog.dives.update_cylinder_related_info(*d);
+	// Changing times may have unsorted the dive and trip tables.
+	if (d->when != other.when) {
+		divelog.dives.sort();
+		divelog.trips.sort();
+		if (d->divetrip)
+			d->divetrip->sort_dives(); // Keep the trip-table in order
+	}
 }
 
 // Port of moveDiveToTrip() (commands/command_divelist.cpp), without the
@@ -681,6 +690,199 @@ void on_log_loaded()
 
 } // namespace internal
 
+// Local time of a dive, "YYYY-MM-DDTHH:MM[:SS]", as the core stores it
+// (without time zone); false when the text is not a date.
+static bool parse_local_time(const std::string &text, timestamp_t &when)
+{
+	int y, mo, da, h, mi, se = 0;
+	if (sscanf(text.c_str(), "%d-%d-%dT%d:%d:%d", &y, &mo, &da, &h, &mi, &se) < 5)
+		return false;
+	struct tm tm = {};
+	tm.tm_year = y;
+	tm.tm_mon = mo - 1;
+	tm.tm_mday = da;
+	tm.tm_hour = h;
+	tm.tm_min = mi;
+	tm.tm_sec = se;
+	when = utc_mktime(&tm);
+	return when != 0;
+}
+
+// One object of a list of objects, each sent as a JSON string (the façade's
+// JSON reader reads flat objects only).
+static bool read_items(const JsonValue &value, std::vector<std::vector<std::pair<std::string, JsonValue>>> &items)
+{
+	if (value.kind != JsonValue::LIST)
+		return false;
+	for (const std::string &text: value.list) {
+		std::vector<std::pair<std::string, JsonValue>> fields;
+		if (!JsonReader(text).object(fields))
+			return false;
+		items.push_back(std::move(fields));
+	}
+	return true;
+}
+
+// The weights of a dive, as the whole list (TabDiveEquipment: AddWeight,
+// RemoveWeight, EditWeight): each {"description", "grams"}. The description
+// is Subsurface's untranslated name ("belt", "integrated"…) or the diver's own.
+static int set_weights(dive &d, const JsonValue &value, bool &changed, std::string &error)
+{
+	std::vector<std::vector<std::pair<std::string, JsonValue>>> items;
+	if (!read_items(value, items)) {
+		error = "BAD_REQUEST: weights";
+		return -1;
+	}
+	weightsystem_table list;
+	for (const auto &fields: items) {
+		weightsystem_t ws;
+		for (const auto &[key, v]: fields) {
+			if (key == "description" && v.kind == JsonValue::STRING)
+				ws.description = trim(v.text);
+			else if (key == "grams" && v.kind == JsonValue::NUMBER && v.number >= 0 && v.number <= 200000)
+				ws.weight.grams = static_cast<int>(v.number);
+			else {
+				error = "BAD_REQUEST: weight " + key;
+				return -1;
+			}
+		}
+		list.push_back(std::move(ws));
+	}
+	if (list.size() != d.weightsystems.size() ||
+	    !std::equal(list.begin(), list.end(), d.weightsystems.begin())) {
+		d.weightsystems = std::move(list);
+		changed = true;
+	}
+	return 0;
+}
+
+// The fields of a cylinder that the editor sets.
+static bool same_edited_fields(const cylinder_t &a, const cylinder_t &b)
+{
+	return a.type.description == b.type.description && a.type.size.mliter == b.type.size.mliter &&
+	       a.type.workingpressure.mbar == b.type.workingpressure.mbar && a.cylinder_use == b.cylinder_use &&
+	       a.start.mbar == b.start.mbar && a.end.mbar == b.end.mbar && a.gasmix.o2.permille == b.gasmix.o2.permille &&
+	       a.gasmix.he.permille == b.gasmix.he.permille && a.depth.mm == b.depth.mm;
+}
+
+// The cylinders of a dive (TabDiveEquipment: AddCylinder, RemoveCylinder,
+// EditCylinder). Each entry: "index", the cylinder's index in the dive, or -1
+// for a new one (create_new_manual_cylinder(), added at
+// first_hidden_cylinder()); a cylinder of the dive left out of the list is
+// removed, unless it is protected (used by the profile: CYLINDER_IN_USE).
+// Fields, all optional: "description", "sizeMl", "workingPressureMbar"
+// (EditCylinderType::TYPE, with "use": OC-gas, diluent, oxygen, not used),
+// "startMbar", "endMbar" (PRESSURE), "o2Permille", "hePermille", "depthMm"
+// (GASMIX: the gas switch depth). Edited types go to the cylinder types table
+// (set_tank_info_data), as EditCylinder::redo() does.
+static int set_cylinders(dive &d, const JsonValue &value, bool &changed, std::string &error)
+{
+	std::vector<std::vector<std::pair<std::string, JsonValue>>> items;
+	if (!read_items(value, items)) {
+		error = "BAD_REQUEST: cylinders";
+		return -1;
+	}
+	struct Entry {
+		int index = -1;
+		cylinder_t cyl;
+	};
+	std::vector<Entry> entries;
+	std::set<int> kept;
+	for (const auto &fields: items) {
+		Entry e;
+		for (const auto &[key, v]: fields)
+			if (key == "index" && v.kind == JsonValue::NUMBER)
+				e.index = static_cast<int>(v.number);
+		if (e.index >= static_cast<int>(d.cylinders.size()) || (e.index >= 0 && kept.count(e.index))) {
+			error = "BAD_REQUEST: cylinder index";
+			return -1;
+		}
+		if (e.index >= 0)
+			kept.insert(e.index);
+		e.cyl = e.index >= 0 ? d.cylinders[e.index] : create_new_manual_cylinder(&d);
+		cylinder_t &c = e.cyl;
+		bool gas = false;
+		for (const auto &[key, v]: fields) {
+			bool number = v.kind == JsonValue::NUMBER;
+			if (key == "index") {
+				continue;
+			} else if (key == "description" && v.kind == JsonValue::STRING) {
+				c.type.description = trim(v.text);
+			} else if (key == "use" && v.kind == JsonValue::STRING) {
+				int use = -1;
+				for (int u = 0; u < NUM_GAS_USE; u++)
+					if (v.text == cylinderuse_text[u])
+						use = u;
+				if (use < 0) {
+					error = "BAD_REQUEST: cylinder use";
+					return -1;
+				}
+				c.cylinder_use = static_cast<cylinderuse>(use);
+			} else if (key == "sizeMl" && number && v.number >= 0 && v.number <= 100000) {
+				c.type.size.mliter = static_cast<int>(v.number);
+			} else if (key == "workingPressureMbar" && number && v.number >= 0 && v.number <= 500000) {
+				c.type.workingpressure.mbar = static_cast<int>(v.number);
+			} else if (key == "startMbar" && number && v.number >= 0 && v.number <= 500000) {
+				c.start.mbar = static_cast<int>(v.number);
+			} else if (key == "endMbar" && number && v.number >= 0 && v.number <= 500000) {
+				c.end.mbar = static_cast<int>(v.number);
+			} else if ((key == "o2Permille" || key == "hePermille") && number && v.number >= 0 && v.number <= 1000) {
+				(key == "o2Permille" ? c.gasmix.o2 : c.gasmix.he).permille = static_cast<int>(v.number);
+				gas = true;
+			} else if (key == "depthMm" && number && v.number >= 0 && v.number <= 500000) {
+				c.depth.mm = static_cast<int>(v.number);
+			} else {
+				error = "BAD_REQUEST: cylinder " + key;
+				return -1;
+			}
+		}
+		if (gas) {
+			if (c.gasmix.o2.permille + c.gasmix.he.permille > 1000) {
+				error = "BAD_REQUEST: gas mix";
+				return -1;
+			}
+			sanitize_gasmix(c.gasmix);
+		}
+		entries.push_back(std::move(e));
+	}
+
+	// Removed: the cylinders of the dive not in the list, from the last one,
+	// with the renumbering of RemoveCylinder::redo().
+	for (int i = static_cast<int>(d.cylinders.size()) - 1; i >= 0; i--) {
+		if (kept.count(i))
+			continue;
+		if (d.is_cylinder_prot(i)) {
+			error = "CYLINDER_IN_USE";
+			return -1;
+		}
+	}
+	// Edited, at their index.
+	for (const Entry &e: entries) {
+		if (e.index < 0 || same_edited_fields(e.cyl, d.cylinders[e.index]))
+			continue;
+		set_tank_info_data(tank_info_table, e.cyl.type.description, e.cyl.type.size, e.cyl.type.workingpressure);
+		d.cylinders[e.index] = e.cyl;
+		changed = true;
+	}
+	for (int i = static_cast<int>(d.cylinders.size()) - 1; i >= 0; i--) {
+		if (kept.count(i))
+			continue;
+		std::vector<int> mapping = get_cylinder_map_for_remove(static_cast<int>(d.cylinders.size()), i);
+		remove_cylinder(&d, i);
+		cylinder_renumber(d, &mapping[0]);
+		changed = true;
+	}
+	// Added, as AddCylinder::redo().
+	for (const Entry &e: entries) {
+		if (e.index >= 0)
+			continue;
+		set_tank_info_data(tank_info_table, e.cyl.type.description, e.cyl.type.size, e.cyl.type.workingpressure);
+		d.cylinders.add(first_hidden_cylinder(&d), e.cyl);
+		changed = true;
+	}
+	return 0;
+}
+
 int edit_dive(int id, const std::string &changes_json, std::string &result_json, std::string &error)
 {
 	dive *d = divelog.dives.get_by_uniq_id(id);
@@ -700,6 +902,7 @@ int edit_dive(int id, const std::string &changes_json, std::string &result_json,
 
 	auto copy = std::make_unique<dive>(*d);
 	std::vector<std::string> fields; // names as in Subsurface's Edit* commands
+	bool water_temp_changed = false;
 	for (const auto &[key, value]: changes) {
 		if (key == "notes" || key == "suit") {
 			if (value.kind != JsonValue::STRING) {
@@ -766,6 +969,114 @@ int edit_dive(int id, const std::string &changes_json, std::string &result_json,
 				copy->dive_site = ds;
 				fields.push_back("dive site");
 			}
+		} else if (key == "number") {
+			// The dive number, as Subsurface-mobile's EditDive sets it.
+			if (value.kind != JsonValue::NUMBER || value.number < 0 || value.number > 999999) {
+				error = "BAD_REQUEST: number";
+				return -1;
+			}
+			if (copy->number != value.number) {
+				copy->number = static_cast<int>(value.number);
+				fields.push_back("dive");
+			}
+		} else if (key == "date") {
+			// Date and time, local, as EditDive sets dive::when; the dive
+			// computers keep their offset to it (ShiftTime moves them all).
+			timestamp_t when;
+			if (value.kind != JsonValue::STRING || !parse_local_time(value.text, when)) {
+				error = "BAD_REQUEST: date";
+				return -1;
+			}
+			if (copy->when != when) {
+				timestamp_t delta = when - copy->when;
+				copy->when = when;
+				for (divecomputer &dc: copy->dcs)
+					dc.when += delta;
+				fields.push_back("dive");
+			}
+		} else if (key == "durationSeconds" || key == "maxDepthMm") {
+			// EditDuration and EditDepth: only for a dive entered by hand
+			// (TabDiveNotes shows them only then); the profile is made again.
+			bool duration = key == "durationSeconds";
+			if (value.kind != JsonValue::NUMBER || value.number < 0 || value.number > (duration ? 48 * 3600 : 500000)) {
+				error = "BAD_REQUEST: " + key;
+				return -1;
+			}
+			if (!is_dc_manually_added_dive(&copy->dcs[0])) {
+				error = "NOT_MANUAL";
+				return -1;
+			}
+			int &target = duration ? copy->dcs[0].duration.seconds : copy->dcs[0].maxdepth.mm;
+			if (target != value.number) {
+				target = static_cast<int>(value.number);
+				if (duration)
+					copy->duration = copy->dcs[0].duration;
+				else
+					copy->maxdepth = copy->dcs[0].maxdepth;
+				copy->dcs[0].meandepth = 0_m;
+				copy->dcs[0].samples.clear();
+				fake_dc(&copy->dcs[0]);
+				fields.push_back(duration ? "duration" : "depth");
+			}
+		} else if (key == "divemode") {
+			// EditMode on the first dive computer: OC, CCR, PSCR, Freedive.
+			int mode = -1;
+			if (value.kind == JsonValue::STRING)
+				for (int m = 0; m < NUM_DIVEMODE; m++)
+					if (value.text == divemode_text[m])
+						mode = m;
+			if (mode < 0) {
+				error = "BAD_REQUEST: divemode";
+				return -1;
+			}
+			if (copy->dcs[0].divemode != mode) {
+				copy->dcs[0].divemode = static_cast<divemode_t>(mode);
+				update_setpoint_events(copy.get(), &copy->dcs[0]);
+				fields.push_back("dive mode");
+			}
+		} else if (key == "airTempMk" || key == "waterTempMk" || key == "userSalinity" || key == "surfacePressureMbar") {
+			// EditAirTemp, EditWaterTemp, EditWaterTypeUser, EditAtmPress: 0 clears.
+			if (value.kind != JsonValue::NUMBER || value.number < 0 || value.number > 1000000) {
+				error = "BAD_REQUEST: " + key;
+				return -1;
+			}
+			int v = static_cast<int>(value.number);
+			if (key == "airTempMk" && copy->airtemp.mkelvin != static_cast<uint32_t>(v)) {
+				copy->airtemp.mkelvin = v;
+				fields.push_back("air temperature");
+			} else if (key == "waterTempMk" && copy->watertemp.mkelvin != static_cast<uint32_t>(v)) {
+				copy->watertemp.mkelvin = v;
+				fields.push_back("water temperature");
+				water_temp_changed = true;
+			} else if (key == "userSalinity" && copy->user_salinity != v) {
+				copy->user_salinity = v;
+				fields.push_back("salinity");
+			} else if (key == "surfacePressureMbar" && copy->surface_pressure.mbar != v) {
+				copy->surface_pressure.mbar = v;
+				fields.push_back("Atm. pressure");
+			}
+		} else if (key == "invalid") {
+			// EditInvalid.
+			if (value.kind != JsonValue::NUMBER) {
+				error = "BAD_REQUEST: invalid";
+				return -1;
+			}
+			if (copy->invalid != (value.number != 0)) {
+				copy->invalid = value.number != 0;
+				fields.push_back("invalid");
+			}
+		} else if (key == "weights") {
+			bool changed = false;
+			if (set_weights(*copy, value, changed, error))
+				return -1;
+			if (changed)
+				fields.push_back("dive");
+		} else if (key == "cylinders") {
+			bool changed = false;
+			if (set_cylinders(*copy, value, changed, error))
+				return -1;
+			if (changed)
+				fields.push_back("dive");
 		} else {
 			error = "BAD_REQUEST: unknown field " + key;
 			return -1;
@@ -777,6 +1088,11 @@ int edit_dive(int id, const std::string &changes_json, std::string &result_json,
 		// mobile text ("Edit dive [#12]"), as Subsurface-mobile edits a whole dive.
 		std::string what = fields.size() == 1 ? "Edit " + fields[0] : "Edit dive";
 		std::string text = what + " [" + dive_number_or_date(*d) + "]";
+		if (water_temp_changed)
+			divelog.dives.fixup_dive(*copy); // EditWaterTemp::set(): re-populate the temperatures
+		// EditWeight::redo(): the weight types table keeps the last weight of each type.
+		for (const weightsystem_t &ws: copy->weightsystems)
+			add_weightsystem_description(ws);
 		exchange(d, *copy);
 		// A new step drops the steps that were undone, as QUndoStack::push() does.
 		if (applied < steps.size()) {

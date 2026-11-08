@@ -349,6 +349,14 @@ int get_dive(int id, std::string &json, std::string &error)
 			mbar = d->surface_pressure.mbar;
 		json += ",\"surfacePressureMbar\":" + std::to_string(mbar > 0 ? mbar : 0);
 	}
+	// For the editor: the water type chosen by the diver (EditWaterTypeUser,
+	// 0: none), the "invalid" mark, and whether the dive was entered by hand
+	// (duration and depth editable, as TabDiveNotes).
+	json += ",\"userSalinity\":" + std::to_string(d->user_salinity);
+	json += ",\"invalid\":";
+	json += d->invalid ? "true" : "false";
+	json += ",\"manual\":";
+	json += !d->dcs.empty() && is_dc_manually_added_dive(&d->dcs[0]) ? "true" : "false";
 	json += ",\"pictures\":" + std::to_string(d->pictures.size());
 	json += ",\"diveComputers\":[";
 	for (size_t i = 0; i < d->dcs.size(); i++) {
@@ -428,6 +436,11 @@ int get_dive(int id, std::string &json, std::string &error)
 			}
 		}
 		json += ",\"switchDepthMm\":" + std::to_string(switch_mm);
+		// The gas switch depth as stored (cylinder_t::depth), and whether the
+		// profile uses the cylinder (cannot be removed, as RemoveCylinder).
+		json += ",\"depthMm\":" + std::to_string(c.depth.mm);
+		json += ",\"protected\":";
+		json += d->is_cylinder_prot(static_cast<int>(i)) ? "true" : "false";
 		json += '}';
 	}
 	json += ']';

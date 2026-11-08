@@ -789,6 +789,8 @@ Java_org_opendives_core_NativeCore_toolQuery(JNIEnv *env, jobject, jstring kindI
 		}
 	} else if (kind == "cylinders") {
 		opendives::gas_cylinder_types(json);
+	} else if (kind == "weights") {
+		opendives::weight_types(json);
 	} else if (kind == "desaturation") {
 		opendives::desaturation(0, json);
 	} else {
