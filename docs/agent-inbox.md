@@ -628,3 +628,12 @@ Add two items to the ⋮ menu of the dive detail, after "Planifier depuis cette 
 - "Partager" (24 dp share icon): opens the system share sheet (Capacitor Share) with a short French text (site, date, maximum depth, duration, gas, in the user's units) and a PNG image of the profile chart.
 Mock-up: `docs/mockups/detail2-android-menu.dc.html`. Spec: section 4, the "Dive detail" row of the screens table.
 
+## [ ] 2026-11-08-14 Renumbering a dive shifts the dives it affects
+
+Changes the renumbering part of task 2026-11-08-13: a number already taken is no longer refused. The other dives move so that numbers stay unique and without gaps.
+- Moving dive n to a smaller number m: dives m to n−1 each go up by one. Moving it to a larger number m: dives n+1 to m each go down by one. A number beyond the last dive becomes the last number.
+- When other dives are affected, the dialog says so under the field, live as the number is typed: "Les plongées n° 8 à 11 seront décalées de 1". The main button then reads "Renuméroter et décaler"; it is the confirmation (no second dialog). When no other dive is affected, the button stays "Renuméroter".
+- Apply the whole change as one undoable edit through the core (as Subsurface's "Renumber" command does for several dives), synced like any other edit.
+- iOS: same rules; the menu now has "Renuméroter la plongée", "Partager" and, after a wide separator, "Supprimer la plongée" (`docs/mockups/detail2-ios-menu.dc.html`).
+Spec: section 4, the "Dive detail" row of the screens table.
+
