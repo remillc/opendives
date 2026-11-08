@@ -654,3 +654,7 @@ The PDF follows `docs/mockups/partage-pdf-fiche.dc.html` (US Letter; use A4 outs
 
 Changes task 2026-11-08-11: remove "Durée" and "Profondeur max." from the editor, with their helper. They come from the dive computer and are not edited in this screen. A dive entered by hand gets them on the "Nouvelle plongée" screen. "La plongée" now holds Date | Heure, Site, Voyage, Note. Mock-up: `docs/mockups/android-edition.dc.html`.
 
+## [ ] 2026-11-08-18 Dive editor: duration and maximum depth visible, read-only
+
+Changes task 2026-11-08-17: keep "Durée" and "Profondeur max." visible in "La plongée", under Date | Heure, but not editable. Show them as plain text side by side (label 12/16 `#4A4D52`, value 16/24 ink, tabular figures, 16 dp side padding, no field background, not focusable as inputs), with the helper "Mesurées par l’ordinateur de plongée" under them. Mock-up: `docs/mockups/android-edition.dc.html`.
+
