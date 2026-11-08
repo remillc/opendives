@@ -650,3 +650,7 @@ Changes the "Partager" part of task 2026-11-08-13. "Partager" in the detail menu
 - "Résumé et image", "Un court texte et l’image du profil": the share described in task 13.
 The PDF follows `docs/mockups/partage-pdf-fiche.dc.html` (US Letter; use A4 outside the US and Canada): header with "Plongée n° 5", date and time, site as the title, location and trip, the three key figures on the right; "Profil" with the depth and time axes and the temperature curve, with a one-line legend; the secondary facts in five columns; "Gaz et équipement" as a table (Bouteille, Taille, Utilisation, Gaz, Début, Fin), then suit, weights and dive computer; "Personnes" and "Conditions" side by side; "Notes" in full (continue on a second page when long); footer "Fiche créée avec OpenDives le …" and "Page 1 sur 1". Rows without a value are left out, as on screen. Build the page as HTML with the app's styles and render it to PDF on the device (Android `PrintDocumentAdapter` or a WebView PDF export, iOS `UIPrintPageRenderer`); no network. Spec: section 4, the "Dive detail" row.
 
+## [ ] 2026-11-08-17 Dive editor: no duration or maximum depth
+
+Changes task 2026-11-08-11: remove "Durée" and "Profondeur max." from the editor, with their helper. They come from the dive computer and are not edited in this screen. A dive entered by hand gets them on the "Nouvelle plongée" screen. "La plongée" now holds Date | Heure, Site, Voyage, Note. Mock-up: `docs/mockups/android-edition.dc.html`.
+
