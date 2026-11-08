@@ -1172,7 +1172,8 @@
       "Glisser à gauche ou à droite pour passer d'une section du menu à l'autre.",
       "Politique de confidentialité et « Question / signaler un problème » dans À propos.",
       "Mélangeur de gaz : nitrox par défaut, le dernier mode choisi est retenu.",
-      "Synchronisation : l’étape en cours et une barre de progression dans le menu."
+      "Synchronisation : l’étape en cours et une barre de progression dans le menu.",
+      "« Synchroniser maintenant » : la liste et le menu restent en place, seule la ligne d’état change."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",

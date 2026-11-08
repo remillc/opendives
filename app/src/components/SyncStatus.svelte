@@ -11,12 +11,16 @@
    *   live?: boolean,
    *   pending?: number,
    *   progress?: import('../lib/sync-progress.js').SyncProgress|null,
+   *   steady?: boolean,
    * }}
    * `live`: announced when it changes; false for the copy in the side menu.
    * `pending`: changes not sent, for the manual and offline states.
-   * `progress`: while syncing, the stage and a determinate bar (to-do #12).
+   * `progress`: while syncing, the stage and a determinate bar (to-do #12),
+   * in the bottom padding: the line keeps its height (to-do #2).
+   * `steady`: room for two lines of text, whatever the state says, so that
+   * what is under it never moves (narrow side menu).
    */
-  let { sync, live = true, pending = 0, progress = null } = $props();
+  let { sync, live = true, pending = 0, progress = null, steady = false } = $props();
 
   const showProgress = $derived(sync === 'syncing' && !!progress);
   const percent = $derived(progress ? Math.round(progress.fraction * 100) : 0);
@@ -36,7 +40,7 @@
   const state = $derived(states[sync]);
 </script>
 
-<div class="sync-status" class:pending={state.pending} role={live ? 'status' : undefined}>
+<div class="sync-status" class:pending={state.pending} class:steady role={live ? 'status' : undefined}>
   <div class="line">
     <Icon name={state.icon} size={18} />
     <!-- The stage is announced, not each percent: the bar carries the value. -->
@@ -54,6 +58,7 @@
 <style>
   @layer od.components {
     .sync-status {
+      position: relative;
       padding: 8px 16px;
       font-size: 14px;
       line-height: 20px;
@@ -75,12 +80,21 @@
       gap: 8px;
     }
 
+    /* Two lines of text in any state: nothing under it moves. */
+    .steady .line {
+      min-height: 40px;
+    }
+
     .percent {
       margin-left: auto;
     }
 
+    /* In the bottom padding, under the text: the line keeps its height. */
     .bar {
-      margin-top: 6px;
+      position: absolute;
+      left: 16px;
+      right: 16px;
+      bottom: 2px;
       height: 4px;
       border-radius: 2px;
       background: var(--od-surface-2);

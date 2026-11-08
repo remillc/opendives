@@ -174,7 +174,7 @@
           </li>
         {/if}
         <li class="sync-now">
-          <button type="button" class="od-tonal-button" disabled={logbook.loading} onclick={() => syncNow()}>{t('account.syncNow')}</button>
+          <button type="button" class="od-tonal-button" disabled={logbook.loading || logbook.sync === 'syncing'} onclick={() => syncNow()}>{t('account.syncNow')}</button>
         </li>
       </ul>
     </div>

@@ -921,9 +921,12 @@
     {#if filter.failed}<p class="count failed" role="status">{t('logbook.filterFailed')}</p>{/if}
     <!--
       Only offline or in manual synchronisation, when the logbook may be out of
-      date; the side menu shows every state.
+      date, and while a "Sync now" runs: the line stays, only its text and
+      bar change (to-do #2). The side menu shows every state.
     -->
-    {#if logbook.sync === 'offline' || logbook.sync === 'manual'}<SyncStatus sync={logbook.sync} pending={logbook.pending} />{/if}
+    {#if logbook.sync === 'offline' || logbook.sync === 'manual' || (logbook.sync === 'syncing' && !logbook.autoSync && !!logbook.email)}
+      <SyncStatus sync={logbook.sync} pending={logbook.pending} progress={logbook.syncProgress} />
+    {/if}
   {/if}
 
   {#if logbook.loading && logbook.preview}

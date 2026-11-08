@@ -100,10 +100,11 @@
     <div class="spacer"></div>
     {#if !logbook.loading && !logbook.error}
       <div class="status">
-        <SyncStatus sync={logbook.sync} pending={logbook.pending} progress={logbook.syncProgress} live={false} />
-        {#if logbook.sync === 'manual'}
-          <!-- Manual synchronisation: the exchange happens only from here or Account. -->
-          <button type="button" class="od-tonal-button" disabled={logbook.loading} onclick={() => syncNow()}>
+        <SyncStatus sync={logbook.sync} pending={logbook.pending} progress={logbook.syncProgress} live={false} steady />
+        {#if logbook.email && !logbook.autoSync}
+          <!-- Manual synchronisation: the exchange happens only from here or Account.
+               The button stays in place while it runs, only disabled (to-do #2). -->
+          <button type="button" class="od-tonal-button" disabled={logbook.loading || logbook.sync === 'syncing'} onclick={() => syncNow()}>
             {t('account.syncNow')}
           </button>
         {/if}

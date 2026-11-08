@@ -372,8 +372,10 @@ async function syncEdits() {
       logbook.dives = await OpenDivesCore.listLoadedDives();
       undoCleared();
     }
-    logbook.sync = status.status === 'offline' || status.status === 'stopped' ? 'offline' : 'cloud';
-    if (logbook.sync === 'cloud') markSynced();
+    const reached = status.status !== 'offline' && status.status !== 'stopped';
+    // Manual synchronisation: the state says so again once done (spec, section 4).
+    logbook.sync = !reached ? 'offline' : logbook.autoSync ? 'cloud' : 'manual';
+    if (reached) markSynced();
     if (status.status === 'merged') await readConflicts();
   } catch (e) {
     console.error('Syncing the edits', e);
@@ -570,9 +572,19 @@ export function setAutoSync(value) {
   }
 }
 
-/** "Sync now": the full exchange with the server, in either mode. */
-export function syncNow() {
-  return loadLogbook({ force: true });
+/**
+ * "Sync now", in either mode. A logbook already shown: the exchange of the
+ * automatic synchronisation (send, fetch, merge; read again only when the
+ * cloud brought changes), so that only the status line moves, not the list
+ * nor the menu (to-do #2). Otherwise (no copy yet, an error): the full load.
+ */
+export async function syncNow() {
+  if (!logbook.email || logbook.loading || logbook.error || logbook.sync === 'syncing') {
+    if (logbook.sync !== 'syncing') await loadLogbook({ force: true });
+    return;
+  }
+  clearTimeout(syncTimer);
+  await syncEdits();
 }
 
 /**
