@@ -16,11 +16,10 @@ Next number: 14
 
 - #1 [code] ajouter de l'analytics dans l'app. Penser à corriger privacy
 - #2 [code] la chorégraphie presser btn synchroniser maintenant -> indicateur de progression -> retour, fait des flickers. Il faudrait que les éléments qui restent en place ne bougent pas. revoir la chorégraphie
-- #3 [code] urls U1 à U7 (non pour U8, U9 et U10) : U1 /plan/42 → /dives/42/plan ; U2 /plan/new → /plan ; U3 /plan/setup → /settings/planner ; U4 /statistics/year/2014 → /statistics/years/2014 ; U5 /filter/depth → /filter/criteria/depth ; U6 /download/failed → /download-failed ; U7 /add/download (iPhone) → /download
+- #3 [code] urls U1 à U7 (non pour U8, U9 et U10) : U1 /plan/42 → /dives/42/plan ; U2 /plan/new → /plan ; U3 /plan/setup → /settings/planner ; U4 /statistics/year/2014 → /statistics/years/2014 ; U5 /filter/depth → /filter/criteria/depth ; U6 /download/failed → /download-failed ; U7 /add/download (iPhone) → /download ; et (ex-#7) Mettre /plan sous /tools
 - #4 [design] Refaire le visuel des réglages du planificateur de plongées
 - #5 [design] Dans les mêmes réglages, pointer vers la vue déco dans les préférences
 - #6 [design] /plan/new: refaire le visuel
-- #7 [code] Mettre /plan sous /tools
 - #8 [design] /tools/desaturation: beaucoup trop de texte. Texte pour me protéger.
 - #10 [design] Compte: Compte subsurface vérifié: ?
 - #11 [code] est-ce que c'est un simple protocole git qui transit entre le serveur ss et l'app? Si oui, alors peut on offrir de se connecter aussi, alternativement, a son serveur git préféré, par exemple GitHub?
