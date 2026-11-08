@@ -10,10 +10,20 @@ Rules (agreed between the design agent and the code agent, see `docs/agent-inbox
 - **Tag:** every item starts with `[design]` or `[code]` right after its number, set by the agent that adds it (`#4 [design] …`). `[design]` = mock-ups, visuals, screen texts, specification; `[code]` = everything else. When unsure, the agent asks Christian. The tag says who handles the item and lets Christian list one kind only.
 - No other content in this file: no history, no checked boxes, no notes from agents.
 
-Next number: 4
+Next number: 14
 
 ## List
 
 - #1 [code] ajouter de l'analytics dans l'app. Penser à corriger privacy
 - #2 [code] la chorégraphie presser btn synchroniser maintenant -> indicateur de progression -> retour, fait des flickers. Il faudrait que les éléments qui restent en place ne bougent pas. revoir la chorégraphie
 - #3 [code] urls U1 à U7 (non pour U8, U9 et U10) : U1 /plan/42 → /dives/42/plan ; U2 /plan/new → /plan ; U3 /plan/setup → /settings/planner ; U4 /statistics/year/2014 → /statistics/years/2014 ; U5 /filter/depth → /filter/criteria/depth ; U6 /download/failed → /download-failed ; U7 /add/download (iPhone) → /download
+- #4 [design] Refaire le visuel des réglages du planificateur de plongées
+- #5 [design] Dans les mêmes réglages, pointer vers la vue déco dans les préférences
+- #6 [design] /plan/new: refaire le visuel
+- #7 [code] Mettre /plan sous /tools
+- #8 [design] /tools/desaturation: beaucoup trop de texte. Texte pour me protéger.
+- #9 [code] Mélangeur de gas: nitrox par défaut
+- #10 [design] Compte: Compte subsurface vérifié: ?
+- #11 [code] est-ce que c'est un simple protocole git qui transit entre le serveur ss et l'app? Si oui, alors peut on offrir de se connecter aussi, alternativement, a son serveur git préféré, par exemple GitHub?
+- #12 [code] btn synchroniser: montrer une progression
+- #13 [design] réglages, après unités, ajouter choix du type d'eau. Les outils doivent utiliser cette valeur par défaut
