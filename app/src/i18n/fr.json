@@ -1235,7 +1235,8 @@
       "Profil de plongée : axes gradués (profondeur et temps) et courbe de la température de l’eau, à afficher ou masquer.",
       "Modifier la plongée : le numéro ne s’y change plus (il passera par « Renuméroter la plongée ») ; la durée et la profondeur max. sont affichées, mesurées par l’ordinateur.",
       "Modifier la plongée : le site et le voyage se tapent ou se choisissent dans la liste filtrée ; un nouveau nom crée le site ou le voyage. La combinaison passe avant le mode de plongée.",
-      "Détail d’une plongée, menu ⋮ : « Renuméroter la plongée » ; les plongées concernées sont décalées pour que les numéros restent uniques et sans trou."
+      "Détail d’une plongée, menu ⋮ : « Renuméroter la plongée » ; les plongées concernées sont décalées pour que les numéros restent uniques et sans trou.",
+      "Détail d’une plongée, menu ⋮ : « Partager » une fiche PDF d’une page ou un court résumé avec l’image du profil."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
@@ -1846,5 +1847,22 @@
     "last": "Elle prendra le dernier numéro, {n}",
     "invalid": "Un numéro à partir de 1",
     "done": "Plongée renumérotée n° {n}"
+  },
+  "share": {
+    "title": "Partager",
+    "pdf": "Fiche PDF",
+    "pdfText": "Une page : profil, gaz, équipement, personnes et notes",
+    "summary": "Résumé et image",
+    "summaryText": "Un court texte et l’image du profil",
+    "failed": "La plongée n’a pas pu être partagée.",
+    "filePrefix": "OpenDives-plongee",
+    "sheetNumber": "Plongée n° {number}",
+    "sheetDive": "Plongée",
+    "profile": "Profil",
+    "legend": "Noir : profondeur.",
+    "legendTemperature": "Noir : profondeur. Bleu : température de l’eau.",
+    "cylinder": "Bouteille",
+    "gas": "Gaz",
+    "footer": "Fiche créée avec OpenDives le {date}"
   }
 }

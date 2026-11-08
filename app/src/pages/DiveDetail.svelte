@@ -14,6 +14,8 @@
   import Icon from '../components/Icon.svelte';
   import MenuItem from '../components/MenuItem.svelte';
   import RenumberDiveDialog from '../components/RenumberDiveDialog.svelte';
+  import ShareSheet from '../components/ShareSheet.svelte';
+  import { sharePdf, shareSummary } from '../lib/share.js';
   import { filter } from '../lib/filter.svelte.js';
   import { horizontalSwipe, swipeGoesThrough } from '../lib/swipe.js';
   import Stars from '../components/Stars.svelte';
@@ -171,6 +173,26 @@
 
   /** "Renuméroter la plongée" open. */
   let renumbering = $state(false);
+
+  /** "Partager" open: the sheet, then the system's share sheet. */
+  let sharing = $state(false);
+  /** @param {'pdf'|'summary'} kind */
+  async function share(kind) {
+    sharing = false;
+    if (!dive) return;
+    // The profile chart of this page (the current one in its view).
+    const svg = /** @type {SVGSVGElement|null} */ (document.querySelector('.page-current .profile .frame svg'));
+    try {
+      if (kind === 'pdf') await sharePdf(dive, prefs, svg);
+      else await shareSummary(dive, prefs, svg);
+    } catch (e) {
+      // Closing the system's share sheet without choosing is not an error.
+      const message = String(/** @type {any} */ (e)?.message ?? '');
+      if (/cancel/i.test(message)) return;
+      console.error('Share a dive', e);
+      f7.toast.create({ text: t('share.failed'), closeTimeout: 4000 }).open();
+    }
+  }
 
   /** Key figures under the title; a figure without a value is left out. */
   const figures = $derived.by(() => {
@@ -357,6 +379,14 @@
           renumbering = true;
         }}
       />
+      <MenuItem
+        icon="share"
+        text={t('share.title')}
+        onclick={() => {
+          f7.popover.close(`#${menuId}`);
+          sharing = true;
+        }}
+      />
       <li class="od-menu-divider" role="separator"></li>
       <!-- In ink, not in the alarm colour: that one is for errors only. -->
       <MenuItem icon="delete" text={t('detail.delete')} onclick={deleteNow} />
@@ -536,6 +566,10 @@
     <div class="end" aria-hidden="true"></div>
   {/if}
 </Page>
+
+{#if sharing}
+  <ShareSheet onpdf={() => share('pdf')} onsummary={() => share('summary')} onclose={() => (sharing = false)} />
+{/if}
 
 {#if renumbering && dive}
   <RenumberDiveDialog

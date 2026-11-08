@@ -1094,8 +1094,72 @@ class OpenDivesCorePlugin : Plugin() {
         }
     }
 
+    // --- Sharing a dive (spec, section 4, "Dive detail", "Partager") ---------
+
+    /** A file to share (the profile image): written in the cache, shared through the FileProvider. */
+    @PluginMethod
+    fun writeShareFile(call: PluginCall) {
+        val name = call.getString("name")
+        val data = call.getString("base64")
+        if (name.isNullOrEmpty() || data == null) {
+            call.reject("Missing name or data", "BAD_ARGUMENT")
+            return
+        }
+        try {
+            val dir = File(context.cacheDir, SHARE_DIR).apply { mkdirs() }
+            val file = File(dir, File(name).name)
+            file.writeBytes(Base64.decode(data, Base64.DEFAULT))
+            call.resolve(JSObject().put("uri", Uri.fromFile(file).toString()))
+        } catch (e: Exception) {
+            Log.e(TAG, "writeShareFile", e)
+            call.reject("Cannot write the file", "FAILED")
+        }
+    }
+
+    /** The WebView rendering a PDF: kept until the PDF is written. */
+    private var pdfView: android.webkit.WebView? = null
+
+    /**
+     * A page of HTML (the dive sheet) rendered to a PDF in the cache by the
+     * system's print engine, without network or dialog; US Letter or A4.
+     */
+    @PluginMethod
+    fun htmlToPdf(call: PluginCall) {
+        val html = call.getString("html")
+        val name = call.getString("name")
+        if (html == null || name.isNullOrEmpty()) {
+            call.reject("Missing html or name", "BAD_ARGUMENT")
+            return
+        }
+        val letter = call.getBoolean("letter", false) == true
+        activity.runOnUiThread {
+            val view = android.webkit.WebView(context)
+            pdfView = view
+            view.settings.javaScriptEnabled = false
+            view.webViewClient = object : android.webkit.WebViewClient() {
+                override fun onPageFinished(page: android.webkit.WebView, url: String?) {
+                    val attributes = android.print.PrintAttributes.Builder()
+                        .setMediaSize(if (letter) android.print.PrintAttributes.MediaSize.NA_LETTER else android.print.PrintAttributes.MediaSize.ISO_A4)
+                        .setResolution(android.print.PrintAttributes.Resolution("pdf", "pdf", 600, 600))
+                        .setMinMargins(android.print.PrintAttributes.Margins.NO_MARGINS)
+                        .build()
+                    val dir = File(context.cacheDir, SHARE_DIR).apply { mkdirs() }
+                    val file = File(dir, File(name).name)
+                    android.print.PdfPrint(attributes).print(page.createPrintDocumentAdapter(name), file) { ok ->
+                        page.destroy()
+                        pdfView = null
+                        if (ok) call.resolve(JSObject().put("uri", Uri.fromFile(file).toString()))
+                        else call.reject("Cannot render the PDF", "FAILED")
+                    }
+                }
+            }
+            view.loadDataWithBaseURL(null, html, "text/html", "utf-8", null)
+        }
+    }
+
     private companion object {
         const val TAG = "OpenDives"
+        const val SHARE_DIR = "share"
         const val CERTIFICATES_RECHECK_MS = 20_000L
         const val SAMPLE_ASSET = "SampleDivesV2.ssrf"
         // Offline country and region (core/data/regions.txt, Natural Earth).

@@ -1235,7 +1235,8 @@
       "Dive profile: graduated depth and time axes, and a water temperature curve that can be shown or hidden.",
       "Edit the dive: the number is no longer changed there (it will go through “Renumber the dive”); duration and max. depth are shown, measured by the dive computer.",
       "Edit the dive: site and trip are typed or chosen from the filtered list; a new name creates the site or the trip. The suit now comes before the dive mode.",
-      "Dive detail, ⋮ menu: “Renumber the dive”; the dives it affects shift so that numbers stay unique and without gaps."
+      "Dive detail, ⋮ menu: “Renumber the dive”; the dives it affects shift so that numbers stay unique and without gaps.",
+      "Dive detail, ⋮ menu: “Share” a one-page PDF sheet or a short summary with the profile image."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
@@ -1846,5 +1847,22 @@
     "last": "It will take the last number, {n}",
     "invalid": "A number from 1",
     "done": "Dive renumbered no. {n}"
+  },
+  "share": {
+    "title": "Share",
+    "pdf": "PDF sheet",
+    "pdfText": "One page: profile, gas, equipment, people and notes",
+    "summary": "Summary and image",
+    "summaryText": "A short text and the profile image",
+    "failed": "The dive could not be shared.",
+    "filePrefix": "OpenDives-dive",
+    "sheetNumber": "Dive no. {number}",
+    "sheetDive": "Dive",
+    "profile": "Profile",
+    "legend": "Black: depth.",
+    "legendTemperature": "Black: depth. Blue: water temperature.",
+    "cylinder": "Cylinder",
+    "gas": "Gas",
+    "footer": "Sheet made with OpenDives on {date}"
   }
 }

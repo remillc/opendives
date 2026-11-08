@@ -625,12 +625,14 @@ Mock-ups: `docs/mockups/detail3-android.dc.html`, `detail3-android-sombre.dc.htm
 
 Done in "Dive profile: graduated axes and a water temperature curve". The core now sends the profile's water temperature (plot_info's temperature, filled between samples as Subsurface draws it) with the dive. Depth axis: grid line and label every 40 ft (10 m), "0 ft" first, 5 dp ticks every 10 ft (2 m), 30 dp left margin; time axis: axis line, labelled ticks every 20 min (10 or 5 for dives under 40 or 15 min), minor ticks between, the last label with the unit. "Température" filter chip, on by default when the dive has temperature samples: 2 dp line on its own scale labelled on the right (top with the unit). New tokens --od-chart-grid and --od-temperature, light and dark as specified. Checked in the emulator, light and dark, on a Petrel dive. Partial: the chip row has "Température" and the existing "Gaz" only; the ppO₂, Plafond and Tissus layers do not exist in the app yet (the old profile spec left them for later), so they have no chip.
 
-## [ ] 2026-11-08-13 Dive detail menu: "Renuméroter la plongée" and "Partager"
+## [x] 2026-11-08-13 Dive detail menu: "Renuméroter la plongée" and "Partager"
 
 Add two items to the ⋮ menu of the dive detail, after "Planifier depuis cette plongée" and before the divider and "Supprimer la plongée" (Android MD3 menu, iOS pull-down menu):
 - "Renuméroter la plongée" (24 dp "#" icon): opens an MD3 dialog titled "Renuméroter la plongée" with a number field prefilled with the current number, buttons "Annuler" and "Renuméroter". A number used by another dive is refused with a message under the field ("Ce numéro est déjà pris par la plongée du …"). Change the number through the core, as Subsurface's "Renumber" does for one dive, so it syncs like any other edit.
 - "Partager" (24 dp share icon): opens the system share sheet (Capacitor Share) with a short French text (site, date, maximum depth, duration, gas, in the user's units) and a PNG image of the profile chart.
 Mock-up: `docs/mockups/detail2-android-menu.dc.html`. Spec: section 4, the "Dive detail" row of the screens table.
+
+Done: the renumbering part in task 14's commit, Partager in "Dive detail: Share, as a PDF sheet or a summary with the profile image" (as changed by task 16). Android; the iOS pull-down menu uses the same items.
 
 ## [x] 2026-11-08-14 Renumbering a dive shifts the dives it affects
 
@@ -649,12 +651,14 @@ Changes task 2026-11-08-11: remove the "N°" field from the editor. Changing a n
 
 Done in "Dive editor: no number field; duration and maximum depth read-only". The N field is gone; the number stays in the line under the title; the first line of La plongee is Date | Heure. The core keeps accepting a number (used by Renumber, tasks 13 and 14).
 
-## [ ] 2026-11-08-16 Share a dive as a PDF sheet
+## [x] 2026-11-08-16 Share a dive as a PDF sheet
 
 Changes the "Partager" part of task 2026-11-08-13. "Partager" in the detail menu now opens an MD3 modal bottom sheet titled "Partager" (`docs/mockups/partage-android.dc.html`) with two rows (72 dp, icon, title, one-line description):
 - "Fiche PDF", "Une page : profil, gaz, équipement, personnes et notes": builds a one-page PDF of the dive and opens the system share sheet with it (file name like `OpenDives-plongee-5-2014-04-02.pdf`).
 - "Résumé et image", "Un court texte et l’image du profil": the share described in task 13.
 The PDF follows `docs/mockups/partage-pdf-fiche.dc.html` (US Letter; use A4 outside the US and Canada): header with "Plongée n° 5", date and time, site as the title, location and trip, the three key figures on the right; "Profil" with the depth and time axes and the temperature curve, with a one-line legend; the secondary facts in five columns; "Gaz et équipement" as a table (Bouteille, Taille, Utilisation, Gaz, Début, Fin), then suit, weights and dive computer; "Personnes" and "Conditions" side by side; "Notes" in full (continue on a second page when long); footer "Fiche créée avec OpenDives le …" and "Page 1 sur 1". Rows without a value are left out, as on screen. Build the page as HTML with the app's styles and render it to PDF on the device (Android `PrintDocumentAdapter` or a WebView PDF export, iOS `UIPrintPageRenderer`); no network. Spec: section 4, the "Dive detail" row.
+
+Done in "Dive detail: Share, as a PDF sheet or a summary with the profile image" (Android). The sheet is HTML built on the device (lib/share.js) and rendered to PDF by the system's print engine (a WebView's print adapter written to a file, no dialog, no network), US Letter in the US and Canada, A4 elsewhere, then the system share sheet. File name OpenDives-plongee-5-2014-04-02.pdf (OpenDives-dive-... in English). Resumes et image: the text (number, site, date, depth, duration, gases in the user's units) and a PNG of the profile chart drawn on a canvas. Checked in the emulator: a 1-page PDF of a Petrel dive and the PNG, both offered to the share sheet. New dependency @capacitor/share 7 (about 15 KB in the APK; agreed by Christian). Partial: no Page 1 sur 1 in the footer (the print engine gives no page counter to the HTML); the sheet uses the system sans-serif font, not Source Sans 3; iOS rendering (UIPrintPageRenderer) not done yet.
 
 ## [x] 2026-11-08-17 Dive editor: no duration or maximum depth
 
@@ -668,7 +672,8 @@ Changes task 2026-11-08-17: keep "Durée" and "Profondeur max." visible in "La p
 
 Done in "Dive editor: no number field; duration and maximum depth read-only". Duration and maximum depth are plain text side by side under Date | Heure (label 12/16 text-2, value 16/24 ink, tabular figures, 16 dp padding), with the helper Mesurees par l'ordinateur de plongee. Checked in the emulator.
 
-## [ ] 2026-11-08-19 Share sheet: icons in coloured circles
+## [x] 2026-11-08-19 Share sheet: icons in coloured circles
 
 In the "Partager" bottom sheet (task 2026-11-08-16), each row's icon sits in a 40 dp circle filled with `--od-water-top` (#FBE3B2), the icon 22 dp in #8A3E09 (dark mode: circle #4A3410, icon #E5B961). The sheet still opens over the dive detail with the usual scrim. Mock-up: `docs/mockups/partage-android.dc.html`.
 
+Done in "Dive detail: Share, as a PDF sheet or a summary with the profile image": 40 dp circles in --od-share-circle (water top, dark #4A3410) with 22 dp icons in --od-share-icon (#8A3E09, dark #E5B961); the sheet opens over the detail with the scrim.

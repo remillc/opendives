@@ -45,6 +45,9 @@
     /* Profile chart: grid lines of the depth axis, water temperature curve and its scale. */
     --od-chart-grid: #E8E8E5;
     --od-temperature: #2F6DB5;
+    /* Share sheet: each row's icon in a circle of the water's top colour. */
+    --od-share-circle: var(--od-water-top);
+    --od-share-icon: #8A3E09;
     --od-block: var(--od-surface);
     --od-on-block: var(--od-text);
     --od-trace-block: var(--od-trace);
@@ -83,6 +86,8 @@
     --od-trace-outline: #121314;
     --od-chart-grid: #3A3C40;
     --od-temperature: #8AB4F8;
+    --od-share-circle: #4A3410;
+    --od-share-icon: #E5B961;
     --od-block: var(--od-surface);
     --od-tint: var(--f7-md-surface-variant);
     --od-on-tint: var(--f7-md-on-surface);

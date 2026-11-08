@@ -525,6 +525,10 @@ import { registerPlugin } from '@capacitor/core';
  *   "off") sets the log's trip grouping, as Subsurface's View > Autogroup.
  * @property {() => Promise<Dive[]>} listLoadedDives
  *   The dives of the log in memory, without loading anything.
+ * @property {(options: {name: string, base64: string}) => Promise<{uri: string}>} writeShareFile
+ *   A file to share (the profile image), written in the app's cache; its file URI.
+ * @property {(options: {html: string, name: string, letter?: boolean}) => Promise<{uri: string}>} htmlToPdf
+ *   A page of HTML rendered to a PDF in the cache by the system's print engine (US Letter or A4); its file URI.
  * @property {() => Promise<void>} saveLocal
  *   Local save only, without network (manual synchronisation).
  * @property {() => Promise<{status: string, pending: number, reloaded: boolean}>} syncChanges
@@ -672,6 +676,8 @@ export const OpenDivesCore = {
     return JSON.parse((await native.undo(options)).json);
   },
   saveLocal: () => native.saveLocal(),
+  writeShareFile: (options) => native.writeShareFile(options),
+  htmlToPdf: (options) => native.htmlToPdf(options),
   async listLoadedDives() {
     return JSON.parse((await native.listLoadedDives()).json);
   },
