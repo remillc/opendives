@@ -1182,7 +1182,8 @@
       "Planificateur : les données du plan se modifient sur place, ses réglages ont leur propre écran, avec une seule vitesse de remontée.",
       "Planificateur : le plafond de décompression en rouge sur le profil du plan.",
       "En pieds cubes, la consommation (SAC) s’affiche avec deux décimales.",
-      "Planificateur : valeurs par défaut rondes dans les unités choisies (45 pi, 3 000 psi, 60 pi/min…), et gaz consommé dans l’unité de volume choisie."
+      "Planificateur : valeurs par défaut rondes dans les unités choisies (45 pi, 3 000 psi, 60 pi/min…), et gaz consommé dans l’unité de volume choisie.",
+      "Un bouton « Arrêter le téléchargement » sous la progression du téléchargement depuis l’ordinateur de plongée."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
@@ -1550,6 +1551,8 @@
   "download": {
     "title": "Téléchargement",
     "cancel": "Annuler",
+    "stop": "Arrêter le téléchargement",
+    "stopping": "Arrêt après la plongée en cours…",
     "close": "Fermer",
     "intro": "Allumez l'ordinateur de plongée, mettez-le en mode transfert Bluetooth et gardez-le près du téléphone.",
     "pairingNote": "La première fois, le téléphone peut demander le code affiché par l'ordinateur.",

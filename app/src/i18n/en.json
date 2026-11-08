@@ -1182,7 +1182,8 @@
       "Planner: the plan data are edited in place, its settings have their own screen, with a single ascent rate.",
       "Planner: the decompression ceiling in red on the planned profile.",
       "In cubic feet, the SAC is shown with two decimals.",
-      "Planner: round defaults in the chosen units (45 ft, 3,000 psi, 60 ft/min…), and gas used in the chosen volume unit."
+      "Planner: round defaults in the chosen units (45 ft, 3,000 psi, 60 ft/min…), and gas used in the chosen volume unit.",
+      "A “Stop download” button under the progress of a download from the dive computer."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
@@ -1550,6 +1551,8 @@
   "download": {
     "title": "Download",
     "cancel": "Cancel",
+    "stop": "Stop download",
+    "stopping": "Stopping after the current dive…",
     "close": "Close",
     "intro": "Turn the dive computer on, put it in Bluetooth transfer mode and keep it near the phone.",
     "pairingNote": "The first time, the phone may ask for the code shown by the dive computer.",
