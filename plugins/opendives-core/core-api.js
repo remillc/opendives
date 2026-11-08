@@ -501,8 +501,9 @@ import { registerPlugin } from '@capacitor/core';
  * @property {(options: {id?: number, ids?: number[]}) => Promise<EditResult>} deleteDive
  *   One dive (id) or several (ids), one undoable step.
  *   Deletes a dive, one undoable step (delete_dive).
- * @property {(options: {ids: number[], start: number}) => Promise<EditResult>} renumberDives
- *   Renumbers the dives (all if ids is empty) in date order from start, one undoable step (renumber_dives).
+ * @property {(options: {ids: number[], start: number, numbers?: number[]}) => Promise<EditResult>} renumberDives
+ *   Renumbers the dives (all if ids is empty) in date order from start, one undoable step (renumber_dives);
+ *   with numbers (one per id), each dive gets its own number instead.
  * @property {(options: {name: string, data: string}) => Promise<EditResult>} importDives
  *   Imports a file (base64 contents, original name), one undoable step (import_dives).
  * @property {(options: {action: 'list'} | {action: 'save', name: string, fulltext?: string, mode?: string, rules: FilterRule[]} | {action: 'delete', index: number}) => Promise<any>} filterPresets

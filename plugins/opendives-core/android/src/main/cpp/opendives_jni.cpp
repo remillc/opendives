@@ -628,17 +628,21 @@ Java_org_opendives_core_NativeCore_deleteDive(JNIEnv *env, jobject, jintArray di
 
 // Renumbers dives (all of them if ids is empty): one undoable step (renumber_dives).
 JNIEXPORT jstring JNICALL
-Java_org_opendives_core_NativeCore_renumberDives(JNIEnv *env, jobject, jintArray diveIds, jint start)
+Java_org_opendives_core_NativeCore_renumberDives(JNIEnv *env, jobject, jintArray diveIds, jint start, jintArray diveNumbers)
 {
-	std::vector<int> ids;
-	if (diveIds) {
-		jsize n = env->GetArrayLength(diveIds);
-		ids.resize(n);
-		if (n)
-			env->GetIntArrayRegion(diveIds, 0, n, ids.data());
-	}
+	auto read = [env](jintArray array) {
+		std::vector<int> out;
+		if (array) {
+			jsize n = env->GetArrayLength(array);
+			out.resize(n);
+			if (n)
+				env->GetIntArrayRegion(array, 0, n, out.data());
+		}
+		return out;
+	};
+	std::vector<int> ids = read(diveIds), numbers = read(diveNumbers);
 	std::string json, error;
-	if (opendives::renumber_dives(ids, start, json, error)) {
+	if (opendives::renumber_dives(ids, start, json, error, numbers)) {
 		throw_core_error(env, error);
 		return nullptr;
 	}

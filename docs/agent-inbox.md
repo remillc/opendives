@@ -632,7 +632,7 @@ Add two items to the ⋮ menu of the dive detail, after "Planifier depuis cette 
 - "Partager" (24 dp share icon): opens the system share sheet (Capacitor Share) with a short French text (site, date, maximum depth, duration, gas, in the user's units) and a PNG image of the profile chart.
 Mock-up: `docs/mockups/detail2-android-menu.dc.html`. Spec: section 4, the "Dive detail" row of the screens table.
 
-## [ ] 2026-11-08-14 Renumbering a dive shifts the dives it affects
+## [x] 2026-11-08-14 Renumbering a dive shifts the dives it affects
 
 Changes the renumbering part of task 2026-11-08-13: a number already taken is no longer refused. The other dives move so that numbers stay unique and without gaps.
 - Moving dive n to a smaller number m: dives m to n−1 each go up by one. Moving it to a larger number m: dives n+1 to m each go down by one. A number beyond the last dive becomes the last number.
@@ -640,6 +640,8 @@ Changes the renumbering part of task 2026-11-08-13: a number already taken is no
 - Apply the whole change as one undoable edit through the core (as Subsurface's "Renumber" command does for several dives), synced like any other edit.
 - iOS: same rules; the menu now has "Renuméroter la plongée", "Partager" and, after a wide separator, "Supprimer la plongée" (`docs/mockups/detail2-ios-menu.dc.html`).
 Spec: section 4, the "Dive detail" row of the screens table.
+
+Done in "Dive detail: Renumber the dive, shifting the dives it affects" (the renumbering part of task 2026-11-08-13 with it; Partager follows in tasks 13 and 16). The menu item uses the existing renumber icon; the dialog computes the shift live (dives m to n-1 up by one, or n+1 to m down by one, a number beyond the last becomes the last, an unnumbered dive is inserted), says it under the field and switches the button to Renumeroter et decaler. Applied through the core as one step of Subsurface's RenumberDives with the (dive, number) pairs (renumber_dives now takes them), saved and synced like any edit. Checked in the emulator on the test account: dive 1385 to 1383 moved 1383 and 1384 up by one; Undo put them back.
 
 ## [x] 2026-11-08-15 Dive editor: no number field
 

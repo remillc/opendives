@@ -13,6 +13,7 @@
   import DiveProfile from '../components/DiveProfile.svelte';
   import Icon from '../components/Icon.svelte';
   import MenuItem from '../components/MenuItem.svelte';
+  import RenumberDiveDialog from '../components/RenumberDiveDialog.svelte';
   import { filter } from '../lib/filter.svelte.js';
   import { horizontalSwipe, swipeGoesThrough } from '../lib/swipe.js';
   import Stars from '../components/Stars.svelte';
@@ -148,8 +149,7 @@
     };
   });
 
-  /** @type {import('opendives-core').DiveDetail|null} */
-  let dive = $state(null);
+  let dive = $state(/** @type {import('opendives-core').DiveDetail|null} */ (null));
   let failed = $state(false);
   const prefs = $derived(logbook.prefs);
 
@@ -159,14 +159,18 @@
     if (edited && dive && edited.id === dive.id) dive = edited.dive;
   });
 
-  onMount(async () => {
+  async function loadDive() {
     try {
       dive = await OpenDivesCore.getDive({ id: Number(diveId) });
     } catch (e) {
       console.error('Dive detail', e);
       failed = true;
     }
-  });
+  }
+  onMount(loadDive);
+
+  /** "Renuméroter la plongée" open. */
+  let renumbering = $state(false);
 
   /** Key figures under the title; a figure without a value is left out. */
   const figures = $derived.by(() => {
@@ -214,6 +218,7 @@
    */
   const conditions = $derived.by(() => {
     if (!dive) return [];
+    /** @type {Record<string, number>} */
     const values = { visibility: dive.visibility, ...(dive.conditions ?? {}) };
     return ['visibility', 'wavesize', 'current', 'surge', 'chill']
       .map((key) => ({ key, name: t(`detail.conditionNames.${key}`), value: values[key] ?? 0 }))
@@ -344,6 +349,14 @@
   <Popover id={menuId} class="od-menu" backdrop={false}>
     <List noChevron>
       <MenuItem icon="plan" text={t('detail.plan')} link="/plan/{diveId}" />
+      <MenuItem
+        icon="renumber"
+        text={t('renumberDive.title')}
+        onclick={() => {
+          f7.popover.close(`#${menuId}`);
+          renumbering = true;
+        }}
+      />
       <li class="od-menu-divider" role="separator"></li>
       <!-- In ink, not in the alarm colour: that one is for errors only. -->
       <MenuItem icon="delete" text={t('detail.delete')} onclick={deleteNow} />
@@ -523,6 +536,18 @@
     <div class="end" aria-hidden="true"></div>
   {/if}
 </Page>
+
+{#if renumbering && dive}
+  <RenumberDiveDialog
+    id={dive.id}
+    number={dive.number}
+    oncancel={() => (renumbering = false)}
+    ondone={() => {
+      renumbering = false;
+      loadDive();
+    }}
+  />
+{/if}
 
 <style>
   @layer od.components {

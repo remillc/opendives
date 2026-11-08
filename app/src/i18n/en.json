@@ -1234,7 +1234,8 @@
       "The progress bar of a download from the dive computer moves steadily while each dive is transferred.",
       "Dive profile: graduated depth and time axes, and a water temperature curve that can be shown or hidden.",
       "Edit the dive: the number is no longer changed there (it will go through “Renumber the dive”); duration and max. depth are shown, measured by the dive computer.",
-      "Edit the dive: site and trip are typed or chosen from the filtered list; a new name creates the site or the trip. The suit now comes before the dive mode."
+      "Edit the dive: site and trip are typed or chosen from the filtered list; a new name creates the site or the trip. The suit now comes before the dive mode.",
+      "Dive detail, ⋮ menu: “Renumber the dive”; the dives it affects shift so that numbers stay unique and without gaps."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
@@ -1834,5 +1835,16 @@
     "add": "Add “{value}”",
     "remove": "Remove {value}",
     "suitHint": "Choose a suit from the logbook or type a new one"
+  },
+  "renumberDive": {
+    "title": "Renumber the dive",
+    "number": "Number",
+    "action": "Renumber",
+    "actionShift": "Renumber and shift",
+    "shiftMany": "Dives no. {from} to {to} will shift by {by}",
+    "shiftOne": "Dive no. {n} will shift by {by}",
+    "last": "It will take the last number, {n}",
+    "invalid": "A number from 1",
+    "done": "Dive renumbered no. {n}"
   }
 }

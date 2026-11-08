@@ -1234,7 +1234,8 @@
       "La barre de progression du téléchargement depuis l’ordinateur de plongée avance régulièrement pendant le transfert de chaque plongée.",
       "Profil de plongée : axes gradués (profondeur et temps) et courbe de la température de l’eau, à afficher ou masquer.",
       "Modifier la plongée : le numéro ne s’y change plus (il passera par « Renuméroter la plongée ») ; la durée et la profondeur max. sont affichées, mesurées par l’ordinateur.",
-      "Modifier la plongée : le site et le voyage se tapent ou se choisissent dans la liste filtrée ; un nouveau nom crée le site ou le voyage. La combinaison passe avant le mode de plongée."
+      "Modifier la plongée : le site et le voyage se tapent ou se choisissent dans la liste filtrée ; un nouveau nom crée le site ou le voyage. La combinaison passe avant le mode de plongée.",
+      "Détail d’une plongée, menu ⋮ : « Renuméroter la plongée » ; les plongées concernées sont décalées pour que les numéros restent uniques et sans trou."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
@@ -1834,5 +1835,16 @@
     "add": "Ajouter « {value} »",
     "remove": "Retirer {value}",
     "suitHint": "Choisissez une combinaison du carnet ou tapez-en une nouvelle"
+  },
+  "renumberDive": {
+    "title": "Renuméroter la plongée",
+    "number": "Numéro",
+    "action": "Renuméroter",
+    "actionShift": "Renuméroter et décaler",
+    "shiftMany": "Les plongées n° {from} à {to} seront décalées de {by}",
+    "shiftOne": "La plongée n° {n} sera décalée de {by}",
+    "last": "Elle prendra le dernier numéro, {n}",
+    "invalid": "Un numéro à partir de 1",
+    "done": "Plongée renumérotée n° {n}"
   }
 }
