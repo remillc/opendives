@@ -19,9 +19,9 @@
   import ComboField from '../components/ComboField.svelte';
   import StarsInput from '../components/StarsInput.svelte';
   import WheelDialog from '../components/WheelDialog.svelte';
-  import ChoiceDialog from '../components/ChoiceDialog.svelte';
   import { logbookValues } from '../lib/people.js';
-  import { logbook, saveDiveChanges } from '../lib/logbook.svelte.js';
+  import { logbook, saveDiveChanges, tripChange } from '../lib/logbook.svelte.js';
+  import { siteChange } from '../lib/sites.svelte.js';
   import { settings } from '../lib/settings.svelte.js';
   import { offerUndo } from '../lib/undo.js';
   import { parseNumber } from '../lib/filter.svelte.js';
@@ -101,8 +101,9 @@
   let buddies = $state([]);
   /** @type {string[]} */
   let tags = $state([]);
-  let site = $state(0);
-  let initialSite = 0;
+  /** Site and trip, as typed or chosen; a new name creates a site or a trip on Save. */
+  let siteName = $state('');
+  let tripName = $state('');
   /** @type {Record<string, number>} */
   let stars = $state({ rating: 0, visibility: 0, current: 0, wavesize: 0, surge: 0, chill: 0 });
   let invalid = $state(false);
@@ -128,7 +129,7 @@
 
   /** Open cards. */
   let open = $state({ dive: true, people: true, equipment: true, conditions: true, computers: false, advanced: true });
-  /** @type {'date'|'time'|'site'|null} */
+  /** @type {'date'|'time'|null} */
   let dialog = $state(null);
 
   /** @param {import('opendives-core').Cylinder} c */
@@ -163,6 +164,8 @@
         atm: d.surfacePressureMbar ? String(d.surfacePressureMbar) : '',
       };
       f = { ...initial };
+      siteName = d.site;
+      tripName = d.trip?.location ?? '';
       guides = [...d.guides];
       buddies = [...d.buddies];
       tags = [...d.tags];
@@ -190,7 +193,6 @@
     OpenDivesCore.siteQuery({ kind: 'list' })
       .then((/** @type {import('opendives-core').SiteSummary[]} */ list) => {
         sites = list;
-        site = initialSite = list.find((s) => s.name === /** @type {import('opendives-core').DiveDetail|null} */ (dive)?.site)?.uuid ?? 0;
       })
       .catch((/** @type {unknown} */ e) => console.error('Sites', e));
     OpenDivesCore.toolQuery({ kind: 'cylinders' })
@@ -241,13 +243,18 @@
     if (!list.some((o) => o.value === own)) list.unshift({ value: own, label: placeName(own) });
     return list;
   };
-  const siteOptions = $derived([
-    { value: '0', label: t('edit.noSite') },
-    ...[...sites].filter((s) => s.name).sort((a, b) => a.name.localeCompare(b.name, locale)).map((s) => ({ value: String(s.uuid), label: s.name })),
-  ]);
-  const siteText = $derived(
-    site ? (sites.find((s) => s.uuid === site)?.name ?? /** @type {import('opendives-core').DiveDetail|null} */ (dive)?.site ?? '') : t('edit.noSite'),
+  /** Site names, the most recently dived first. */
+  const siteNames = $derived(
+    [...sites].filter((s) => s.name).sort((a, b) => (b.lastDate || '').localeCompare(a.lastDate || '')).map((s) => s.name),
   );
+  /** The logbook's trips, by location (the first one of each name). */
+  const trips = $derived.by(() => {
+    /** @type {Map<string, number>} */
+    const byName = new Map();
+    for (const d of logbook.dives) if (d.trip?.location && !byName.has(d.trip.location)) byName.set(d.trip.location, d.trip.id);
+    return byName;
+  });
+  const tripNames = $derived([...trips.keys()]);
 
   /**
    * A weight location chosen: the weight last used for it fills the weight,
@@ -335,7 +342,6 @@
     /** @type {Record<string, string|number|string[]>} */
     const out = {};
     if (isoDate !== initialDate) out.date = isoDate;
-    if (site !== initialSite) out.site = site;
     if (!sameList(guides, dive.guides)) out.diveguide = [...guides];
     if (!sameList(buddies, dive.buddies)) out.buddies = [...buddies];
     if (!sameList(tags, dive.tags)) out.tags = [...tags];
@@ -391,15 +397,51 @@
       return;
     }
     const all = changes();
-    if (!Object.keys(all).length) {
-      f7router.back();
-      return;
-    }
+    const siteText = siteName.trim();
+    const tripText = tripName.trim();
+    const oldTrip = dive.trip?.location ?? '';
     saving = true;
+    // Each change is one undoable step, as in Subsurface (a new site:
+    // AddDiveSite; the trip: DivesToTrip or CreateTrip, then the location);
+    // Undo in the message takes them all back.
+    let steps = 0;
     try {
-      await saveDiveChanges(dive.id, all);
+      if (siteText !== dive.site) {
+        const same = sites.find((s) => s.name.toLocaleLowerCase() === siteText.toLocaleLowerCase());
+        if (!siteText) all.site = 0;
+        else if (same) all.site = same.uuid;
+        else {
+          const created = await siteChange({ action: 'create', value: siteText });
+          steps++;
+          all.site = created.site?.uuid ?? 0;
+        }
+      }
+      if (Object.keys(all).length) {
+        await saveDiveChanges(dive.id, all);
+        steps++;
+      }
+      if (tripText !== oldTrip) {
+        const existing = trips.get(tripText);
+        if (!tripText) {
+          if (dive.trip) {
+            await tripChange({ action: 'remove', diveIds: [dive.id] });
+            steps++;
+          }
+        } else if (existing !== undefined) {
+          await tripChange({ action: 'add', tripId: existing, diveIds: [dive.id] });
+          steps++;
+        } else {
+          const created = await tripChange({ action: 'create', diveIds: [dive.id] });
+          steps++;
+          const tripId = created.trip?.tripId;
+          if (tripId) {
+            await tripChange({ action: 'location', tripId, value: tripText });
+            steps++;
+          }
+        }
+      }
       f7router.back();
-      offerUndo(t('edit.saved'));
+      if (steps) offerUndo(t('edit.saved'), undefined, 6000, steps);
     } catch (e) {
       const code = String(/** @type {any} */ (e)?.message ?? '');
       console.error('Save dive', code);
@@ -423,7 +465,7 @@
     const join = (/** @type {(string|false|undefined)[]} */ parts) => parts.filter(Boolean).join(' · ');
     const totalWeight = weights.reduce((sum, w) => sum + gramsOf(w), 0);
     return {
-      dive: join([dateText, siteText]),
+      dive: join([dateText, siteName, tripName]),
       people: join([...guides, ...buddies]),
       equipment: join([
         tIfExists(`detail.modes.${f.divemode}`) ?? f.divemode,
@@ -490,8 +532,8 @@
           <div><dt>{t('edit.maxDepth')}</dt><dd class="od-value">{formatDepth(dive.maxDepthMm, prefs)}</dd></div>
         </dl>
         <p class="helper">{t('edit.durationNote')}</p>
-        <ButtonField label={t('edit.site')} value={siteText} onclick={() => (dialog = 'site')} />
-        <ButtonField label={t('edit.trip')} value={dive.trip?.location || t('edit.none')} />
+        <ComboField label={t('edit.site')} bind:value={siteName} options={siteNames} supporting={t('edit.siteHint')} />
+        <ComboField label={t('edit.trip')} bind:value={tripName} options={tripNames} supporting={t('edit.tripHint')} />
         <div class="stars-row">
           <span>{t('edit.rating')}</span>
           <StarsInput value={stars.rating} label={t('edit.rating')} onchange={(v) => (stars.rating = v)} />
@@ -515,8 +557,8 @@
     <section class="card">
       {@render header('equipment', t('edit.equipmentGroup'))}
       {#if open.equipment}
-        <SelectField label={t('edit.divemode')} bind:value={f.divemode} options={modeOptions} />
         <ComboField label={t('edit.suit')} bind:value={f.suit} options={known.suit} />
+        <SelectField label={t('edit.divemode')} bind:value={f.divemode} options={modeOptions} />
 
         {#each cylinders as c, i (i)}
           {@const cb = cylinderBad(c)}
@@ -695,17 +737,6 @@
     oncancel={() => (dialog = null)}
     onconfirm={([h, m]) => {
       date = { ...date, hour: h, minute: m };
-      dialog = null;
-    }}
-  />
-{:else if dialog === 'site'}
-  <ChoiceDialog
-    title={t('edit.chooseSite')}
-    options={siteOptions}
-    value={String(site)}
-    oncancel={() => (dialog = null)}
-    onselect={(v) => {
-      site = Number(v);
       dialog = null;
     }}
   />
