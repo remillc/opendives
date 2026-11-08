@@ -27,6 +27,8 @@
   } from '../lib/statistics.svelte.js';
   import { formatHours, formatLongDuration } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
+  import { layout } from '../lib/layout.svelte.js';
+  import { keepInSvelteRange } from '../lib/master-detail.js';
 
   let result = $state(/** @type {import('../lib/statistics.svelte.js').StatsResult|null} */ (null));
   /** Figures of each saved statistic, by its id. */
@@ -59,9 +61,19 @@
           max: formatLongDuration(Math.max(...durations)),
         })
       : '',
-  );
+  );
   /** The "By …" groups that are open (all closed at first). */
-  let open = $state(/** @type {Record<string, boolean>} */ ({}));
+  let open = $state(
+    /** @type {Record<string, boolean>} */ (layout.split ? { year: true, mode: true, suit: true, buddy: true } : {}),
+  );
+  /** Tablet: the address of the row whose result is shown beside the list. */
+  let selected = $state('');
+  /** @param {MouseEvent} e */
+  function select(e) {
+    if (!layout.split) return;
+    const link = /** @type {HTMLElement} */ (e.target).closest('a[data-reload-detail]');
+    if (link) selected = link.getAttribute('href') ?? '';
+  }
 
   const yearBars = $derived(
     [...(result?.yearly ?? [])].sort((a, b) => a.year - b.year).map((y) => ({ value: y.dives, label: String(y.year) })),
@@ -71,7 +83,7 @@
   const resultHref = (field, value) => `/statistics/result?c=${encodeCriteria([{ field, values: [value] }])}`;
 </script>
 
-<Page>
+<Page onPageInit={keepInSvelteRange}>
   <Navbar large={theme.ios} title={t('stats.title')}>
     {#snippet left()}<MenuButton />{/snippet}
     <NavRight>
@@ -113,8 +125,8 @@
       <div class="list list-strong inset list-dividers media-list chevron-center">
         <ul>
           {#each myStatistics.list as s (s.id)}
-            <li>
-              <a href="/statistics/result?c={encodeCriteria(s.criteria)}&saved={s.id}" class="item-link item-content">
+            <li class:selected={selected === `/statistics/result?c=${encodeCriteria(s.criteria)}&saved=${s.id}`}>
+              <a href="/statistics/result?c={encodeCriteria(s.criteria)}&saved={s.id}" data-reload-detail="true" class="item-link item-content" onclick={select}>
                 <div class="item-inner">
                   <div class="item-title-row"><div class="item-title">{s.name}</div></div>
                   <div class="item-text od-value">{summaryLine(saved[s.id], logbook.prefs)}</div>
@@ -149,8 +161,8 @@
     <div class="list list-strong inset list-dividers media-list chevron-center">
       <ul>
         {#each yearly as y (y.year)}
-          <li>
-            <a href="/statistics/year/{y.year}" class="item-link item-content">
+          <li class:selected={selected === `/statistics/year/${y.year}`}>
+            <a href="/statistics/year/{y.year}" data-reload-detail="true" class="item-link item-content" onclick={select}>
               <div class="item-inner">
                 <div class="item-title-row"><div class="item-title od-value">{y.year}</div></div>
                 <div class="item-text od-value">{summaryLine(y, logbook.prefs)}</div>
@@ -169,8 +181,8 @@
         <div class="list list-strong inset list-dividers media-list chevron-center">
           <ul>
             {#each rows as row (row.key)}
-              <li>
-                <a href={resultHref(field, row.key)} class="item-link item-content">
+              <li class:selected={selected === resultHref(field, row.key)}>
+                <a href={resultHref(field, row.key)} data-reload-detail="true" class="item-link item-content" onclick={select}>
                   <div class="item-inner">
                     <div class="item-title-row">
                       <div class="item-title">{row.label}</div>
@@ -233,6 +245,12 @@
           transform: rotate(180deg);
         }
       }
+    }
+
+    /* Tablet: the row whose result is shown beside the list. */
+    li.selected {
+      background: var(--od-tint);
+      color: var(--od-on-tint);
     }
 
     .empty {

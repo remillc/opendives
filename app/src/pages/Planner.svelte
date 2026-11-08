@@ -390,6 +390,9 @@
     {/snippet}
   </Navbar>
 
+  <!-- Tablet (wide pane): the parameters on the left, the computed plan on the right. -->
+  <div class="planner">
+  <div class="params">
   {#if theme.ios}<h2 class="ios-header">{t('plan.fromLogbook')}</h2>{/if}
   <div class="inputs" class:ios={theme.ios}>
     <button type="button" class="source" onclick={() => (choosing = true)}>
@@ -435,7 +438,9 @@
     </div>
     <SelectField label={t('plan.waterType')} bind:value={water} options={waterOptions} />
   </div>
+  </div>
 
+  <div class="outcome">
   {#if failed}
     <p class="note">{t('plan.failed')}</p>
   {:else if result}
@@ -500,6 +505,8 @@
   {:else}
     <div class="skeleton-block loading" aria-busy="true" aria-label={t('plan.computing')}></div>
   {/if}
+  </div>
+  </div>
   <div class="end" aria-hidden="true"></div>
 
   <Popup opened={choosing} onPopupClosed={() => (choosing = false)}>
@@ -530,6 +537,31 @@
 
 <style>
   @layer od.components {
+    /* Phone and narrow panes: one column, the groups add no box of their own. */
+    .planner {
+      container-type: inline-size;
+    }
+
+    .params,
+    .outcome {
+      display: contents;
+    }
+
+    /* Wide pane (tablet): parameters on the left, computed plan on the right. */
+    @container (min-width: 680px) {
+      .planner {
+        display: grid;
+        grid-template-columns: minmax(280px, 340px) minmax(0, 1fr);
+        align-items: start;
+        column-gap: 8px;
+      }
+
+      .params,
+      .outcome {
+        display: block;
+      }
+    }
+
     /* Android: list items on the page background (MD3); iOS: an inset grouped list. */
     .inputs {
       display: flex;

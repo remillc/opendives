@@ -570,7 +570,9 @@
     "trimix": "Trimix {o2}/{he}"
   },
   "tablet": {
-    "noDive": "Choose a dive to see it here"
+    "noDive": "Choose a dive to see it here",
+    "noStatistic": "Choose a statistic to see it here",
+    "noTool": "Choose a tool to use it here"
   },
   "menu": {
     "open": "Menu",
@@ -1243,7 +1245,8 @@
       "Edit the dive: site and trip are typed or chosen from the filtered list; a new name creates the site or the trip. The suit now comes before the dive mode.",
       "Dive detail, ⋮ menu: “Renumber the dive”; the dives it affects shift so that numbers stay unique and without gaps.",
       "Dive detail, ⋮ menu: “Share” a one-page PDF sheet or a short summary with the profile image.",
-      "Settings, Language and formats: “Paper size” of the PDF sheet (from the region, US Letter or A4)."
+      "Settings, Language and formats: “Paper size” of the PDF sheet (from the region, US Letter or A4).",
+      "Tablet: Statistics and Tools show the list and the result or the tool side by side; the planner has its parameters on the left and the plan on the right."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",

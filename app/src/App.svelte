@@ -136,6 +136,44 @@
     ...appRoutes,
   ];
 
+  /**
+   * The Statistics view's routes (tablet): the list of statistics is the
+   * master, a result or a year opens beside it (as the Logbook, above).
+   */
+  const statisticsRoutes = [
+    {
+      path: '/statistics/',
+      component: Statistics,
+      master: true,
+      detailRoutes: [
+        { path: '/statistics/year/:year', component: StatisticsYear },
+        { path: '/statistics/result', component: StatisticsResult },
+      ],
+    },
+    ...appRoutes,
+  ];
+
+  /** The Tools view's routes (tablet): the list of tools is the master, the tool opens beside it. */
+  const toolsRoutes = [
+    {
+      path: '/tools/',
+      component: Tools,
+      master: true,
+      detailRoutes: [
+        { path: '/plan/:id', component: Planner },
+        { path: '/tools/desaturation', component: Desaturation },
+        { path: '/tools/ead-mod', component: GasEadMod },
+        { path: '/tools/best-mix', component: GasBestMix },
+        { path: '/tools/blender', component: GasBlender },
+      ],
+    },
+    ...appRoutes,
+  ];
+
+  /** Widths of the lists beside a result (Statistics) and beside a tool (Tools), from the tablet mock-ups. */
+  const statisticsListWidth = ios ? 420 : 400;
+  const toolsListWidth = 360;
+
   const f7params = {
     name: 'OpenDives',
     theme: ios ? 'ios' : 'md',
@@ -181,8 +219,22 @@
   <Views tabs class="safe-areas {layout.phone ? '' : 'od-tablet'}" style="--f7-page-master-width: {listWidth}px; --od-no-dive: '{t('tablet.noDive')}'">
     <View id="view-logbook" main tab tabActive url="/" routes={logbookRoutes} masterDetailBreakpoint={splitBreakpoint} />
     <View id="view-sites" tab url="/sites/" />
-    <View id="view-statistics" tab url="/statistics/" />
-    <View id="view-tools" tab url="/tools/" />
+    <View
+      id="view-statistics"
+      tab
+      url="/statistics/"
+      routes={statisticsRoutes}
+      masterDetailBreakpoint={splitBreakpoint}
+      style="--f7-page-master-width: {statisticsListWidth}px; --od-no-dive: '{t('tablet.noStatistic')}'"
+    />
+    <View
+      id="view-tools"
+      tab
+      url="/tools/"
+      routes={toolsRoutes}
+      masterDetailBreakpoint={splitBreakpoint}
+      style="--f7-page-master-width: {toolsListWidth}px; --od-no-dive: '{t('tablet.noTool')}'"
+    />
     <View id="view-account" tab url="/account" />
   </Views>
 </App>
