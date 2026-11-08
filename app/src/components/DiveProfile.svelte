@@ -147,8 +147,8 @@
     return d;
   });
   const ppo2Labels = $derived([
-    { y: MARGIN_TOP + 4, text: '1,6' },
-    { y: yPpo2(1.4) + 4, text: '1,4' },
+    { y: MARGIN_TOP + 4, text: formatNumber(1.6, 1) },
+    { y: yPpo2(1.4) + 4, text: formatNumber(1.4, 1) },
     { y: MARGIN_TOP + plotHeight + 2, text: '0' },
   ]);
 
