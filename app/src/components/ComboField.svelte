@@ -30,15 +30,15 @@
   /**
    * The values matching what is typed: those holding every typed word, in any
    * order, case and accents aside (a list of hundreds of sites is not read,
-   * it is narrowed down); all of them while it is the chosen value.
+   * it is narrowed down); all of them when the field opens, until something
+   * is typed (a typed name that is also a value still narrows the list).
    */
+  let typed = $state(false);
   const proposals = $derived.by(() => {
     if (!open) return [];
-    const q = fold(value.trim());
-    const exact = options.some((o) => fold(o) === q);
-    const words = q.split(/\s+/).filter(Boolean);
+    const words = typed ? fold(value.trim()).split(/\s+/).filter(Boolean) : [];
     // Each name once: several sites can share a name.
-    return [...new Set(options)].filter((o) => o && (exact || words.every((w) => fold(o).includes(w)))).slice(0, 50);
+    return [...new Set(options)].filter((o) => o && words.every((w) => fold(o).includes(w))).slice(0, 50);
   });
   const isNew = $derived(open && value.trim() !== '' && !options.some((o) => fold(o) === fold(value.trim())));
 
@@ -86,10 +86,14 @@
         onfocus={() => {
           focused = true;
           open = true;
+          typed = false;
           // The chosen value is selected: typing replaces it and filters the list.
           input?.select();
         }}
-        oninput={() => (open = true)}
+        oninput={() => {
+          open = true;
+          typed = true;
+        }}
         {onblur}
         {onkeydown}
         autocomplete="off"
