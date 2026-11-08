@@ -112,3 +112,5 @@ When a mock-up and `docs/ui-specification.md` disagree, the specification wins. 
 | `outils-melangeur-nitrox-android.dc.html` | Outils, mélangeur de gaz, nitrox · Android |
 | `outils-melangeur-android.dc.html` | Outils, mélangeur de gaz, trimix · Android |
 | `apropos-android.dc.html` | À propos · Android |
+
+Example values (decided on 8 November 2026): the mock-ups show depths in feet, pressures in psi and weights in pounds, with temperatures in °C and volumes in litres, as with personalised units. Partial pressures (ppO₂, pN₂, pHe, setpoints) stay in bar, as in Subsurface. These are only examples: the app always follows the units chosen in Settings.

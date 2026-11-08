@@ -541,3 +541,7 @@ The planner settings move out of the planner screen (to-do #4). See section 4 of
 - Route: the one you settle under to-do #3 (U3: `/settings/planner`).
 - iOS: same content, in an inset grouped list.
 
+## [ ] 2026-11-08-02 Mock-ups now show imperial example values
+
+The mock-ups now show depths in ft, cylinder pressures in psi and weights in lb, with °C and litres (Settings, Unités: "Personnalisé", Profondeur "Pieds", Pression "psi", Poids "Livres"). Partial pressures stay in bar. Nothing changes in the app: it keeps following the user's unit settings. When you compare a screen with its mock-up, compare layout and wording, not the units. Check that every value with a unit converts correctly when the settings are in ft, psi and lb (for example "2 683 → 1 885 psi", "Dernier palier à 20 ft", "30 ft/min").
+
