@@ -603,6 +603,15 @@ int save_as(const std::string &destination, std::string &error);
 // list_loaded_dives(); the undo stack is cleared.
 int sync(std::string &status_json, std::string &error);
 
+// Progress of the cloud log's git work (Subsurface's set_git_update_cb):
+// `progress` receives each message of the core, on the thread doing the
+// work, e.g. "Sync with cloud storage", "Transfer from storage (30/80)",
+// "Checkout from storage (12/40)", "Transfer to storage (3/5)", "Done
+// syncing with cloud storage". Read-only: it never changes what is synced.
+// nullptr stops it.
+using sync_progress = void (*)(const char *message);
+void set_sync_progress(sync_progress progress);
+
 // Local commits of the cloud log not yet on the server, newest first:
 // [{"id":…, "summary":…, "message":…}]. Empty for a log without account.
 int pending_changes(std::string &json);

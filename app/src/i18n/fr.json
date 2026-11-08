@@ -115,6 +115,13 @@
   },
   "sync": {
     "syncing": "Synchronisation avec le cloud Subsurface…",
+    "stages": {
+      "connect": "Connexion au cloud…",
+      "receive": "Réception des modifications…",
+      "merge": "Fusion des modifications…",
+      "send": "Envoi des modifications…",
+      "read": "Lecture du carnet…"
+    },
     "cloud": "Synchronisé avec le cloud Subsurface",
     "offline": "Hors ligne : aucune modification en attente",
     "local": "Carnet enregistré sur cet appareil seulement",
@@ -1163,7 +1170,8 @@
       "Sites : carte, fiche, plongées sans site, sites sans coordonnées et nettoyage des doublons.",
       "Suppression d'une plongée depuis son menu, avec « Annuler » pendant 10 secondes.",
       "Glisser à gauche ou à droite pour passer d'une section du menu à l'autre.",
-      "Politique de confidentialité et « Question / signaler un problème » dans À propos."
+      "Politique de confidentialité et « Question / signaler un problème » dans À propos.",
+      "Synchronisation : l’étape en cours et une barre de progression dans le menu."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",

@@ -115,6 +115,13 @@
   },
   "sync": {
     "syncing": "Syncing with the Subsurface cloud…",
+    "stages": {
+      "connect": "Connecting to the cloud…",
+      "receive": "Receiving changes…",
+      "merge": "Merging changes…",
+      "send": "Sending changes…",
+      "read": "Reading the logbook…"
+    },
     "cloud": "Synced with Subsurface cloud",
     "offline": "Offline: no changes waiting",
     "local": "Logbook stored on this device only",
@@ -1163,7 +1170,8 @@
       "Sites: map, site page, dives without a site, sites without coordinates and duplicate clean-up.",
       "Delete a dive from its menu, with “Undo” for 10 seconds.",
       "Swipe left or right to go from one section of the menu to the next.",
-      "Privacy policy and “Question / report a problem” in About."
+      "Privacy policy and “Question / report a problem” in About.",
+      "Syncing: the current stage and a progress bar in the menu."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",

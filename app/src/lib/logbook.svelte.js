@@ -4,6 +4,7 @@ import { OpenDivesCore } from 'opendives-core';
 import { defaultPrefs } from './format.js';
 import { mark } from './perf.js';
 import { readSnapshot, saveSnapshot } from './snapshot.js';
+import { nextProgress } from './sync-progress.js';
 import { applyDeviceSettings, keepCylinderLibrary, keepDiveComputers } from './settings.svelte.js';
 
 /** @typedef {import('opendives-core').Dive} Dive */
@@ -32,6 +33,8 @@ export const logbook = $state({
   prefs: /** @type {Prefs} */ ({ ...defaultPrefs }),
   /** @type {SyncState} */
   sync: 'local',
+  /** Where the running sync is (lib/sync-progress.js); shown while sync is "syncing". */
+  syncProgress: /** @type {import('./sync-progress.js').SyncProgress|null} */ (null),
   loading: true,
   /**
    * The top of the list as it was at the last load (lib/snapshot.js): drawn
@@ -359,6 +362,7 @@ function undoCleared() {
 
 /** Sends the saved edits (automatic synchronisation). */
 async function syncEdits() {
+  logbook.syncProgress = null;
   logbook.sync = 'syncing';
   try {
     const status = await OpenDivesCore.syncChanges();
@@ -608,6 +612,10 @@ if (typeof window !== 'undefined') {
   window.addEventListener('online', () => {
     if (logbook.email && logbook.autoSync && logbook.sync === 'offline' && logbook.pending) syncEdits();
   });
+  // Where the sync is: only while one is shown as running.
+  OpenDivesCore.addListener('syncProgress', (/** @type {{ message: string }} */ { message }) => {
+    if (logbook.sync === 'syncing') logbook.syncProgress = nextProgress(message, logbook.syncProgress);
+  }).catch((/** @type {unknown} */ e) => console.error('Sync progress', e));
 }
 
 function readLastSync() {
@@ -683,6 +691,7 @@ async function loadCloud(force, pre = null) {
     if (cached.dives) {
       logbook.dives = cached.dives;
       logbook.prefs = await OpenDivesCore.getPrefs();
+      logbook.syncProgress = null;
       logbook.sync = 'syncing';
       logbook.loading = false;
       shownHead = cached.head ?? '';

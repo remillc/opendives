@@ -254,9 +254,49 @@ void send_progress(const std::string &json, void *userdata)
 	}
 }
 
+// The listener of the cloud log's progress (NativeCore.setSyncListener):
+// called on the core's thread, a Java thread, whose JNIEnv the VM gives.
+JavaVM *sync_vm = nullptr;
+jobject sync_listener = nullptr;
+jmethodID sync_on_progress = nullptr;
+
+void send_sync_progress(const char *message)
+{
+	JNIEnv *env = nullptr;
+	if (!sync_vm || !sync_listener || sync_vm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6) != JNI_OK)
+		return;
+	jstring s = env->NewStringUTF(message);
+	env->CallVoidMethod(sync_listener, sync_on_progress, s);
+	env->DeleteLocalRef(s);
+	if (env->ExceptionCheck()) {
+		env->ExceptionDescribe();
+		env->ExceptionClear();
+	}
+}
+
 } // namespace
 
 extern "C" {
+
+// `listener` (onProgress(String)) receives the messages of the cloud log's
+// git work; null stops them.
+JNIEXPORT void JNICALL
+Java_org_opendives_core_NativeCore_setSyncListener(JNIEnv *env, jobject, jobject listener)
+{
+	opendives::set_sync_progress(nullptr);
+	if (sync_listener) {
+		env->DeleteGlobalRef(sync_listener);
+		sync_listener = nullptr;
+	}
+	if (!listener)
+		return;
+	env->GetJavaVM(&sync_vm);
+	sync_listener = env->NewGlobalRef(listener);
+	jclass cls = env->GetObjectClass(listener);
+	sync_on_progress = env->GetMethodID(cls, "onProgress", "(Ljava/lang/String;)V");
+	env->DeleteLocalRef(cls);
+	opendives::set_sync_progress(send_sync_progress);
+}
 
 JNIEXPORT void JNICALL
 Java_org_opendives_core_NativeCore_init(JNIEnv *env, jobject, jstring home)
