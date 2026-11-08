@@ -13,6 +13,8 @@
 
 #include "core/bluetoothaddress.h"
 #include "core/device.h"
+#include "core/dive.h"
+#include "core/divecomputer.h"
 #include "core/divelog.h"
 #include "core/file.h"
 #include "core/libdivecomputer.h"
@@ -538,6 +540,56 @@ static void test_import_step(const char *file)
 	opendives::undo(json, error);
 }
 
+// A downloaded dive after the last one of the log is numbered after it, even
+// when the download also reads an older dive that is not in the log (edit.cpp,
+// number_new_last_dives); the older one stays unnumbered, as in Subsurface.
+static void test_numbering()
+{
+	std::string json, error;
+	if (divelog.dives.empty()) {
+		check("numbering: a log with dives", false);
+		return;
+	}
+	dive &last = *divelog.dives.back();
+	int saved_number = last.number;
+	if (last.number <= 0)
+		last.number = 100;
+	int last_number = last.number;
+	timestamp_t older_when = last.when - 3 * 24 * 3600, newer_when = last.when + 3 * 24 * 3600;
+	struct divelog log;
+	int k = 0;
+	for (timestamp_t when: { older_when, newer_when, newer_when + 3600 * 5 }) {
+		auto d = std::make_unique<dive>();
+		d->when = when;
+		divecomputer &dc = d->dcs[0];
+		dc.when = when;
+		dc.model = "Shearwater Petrel 3";
+		dc.deviceid = 0x1234;
+		dc.diveid = 0x100 + k++;
+		dc.duration.seconds = 1800;
+		dc.maxdepth.mm = 12000;
+		log.dives.put(std::move(d));
+	}
+	fingerprint_table before;
+	int rc = opendives::internal::import_downloaded(log, "LE:C8:5C:A2:11:22:33", before, json, error);
+	check("numbering: imported", rc == 0, error);
+	int older = -1, newer = -1, newest = -1;
+	for (auto &d: divelog.dives) {
+		if (d->when == older_when)
+			older = d->number;
+		else if (d->when == newer_when)
+			newer = d->number;
+		else if (d->when == newer_when + 3600 * 5)
+			newest = d->number;
+	}
+	check("numbering: the new dives follow the last number",
+	      newer == last_number + 1 && newest == last_number + 2,
+	      std::to_string(newer) + " " + std::to_string(newest) + " after " + std::to_string(last_number));
+	check("numbering: the older dive stays unnumbered", older == 0, std::to_string(older));
+	opendives::undo(json, error);
+	divelog.dives.back()->number = saved_number;
+}
+
 // A download cut after some dives (a stream lost, or cancelled): the dives
 // received are offered, as Subsurface-mobile does (download_partial).
 static void test_partial(const char *file)
@@ -627,6 +679,7 @@ int main(int argc, char **argv)
 	test_download_failures();
 	test_fallback();
 	test_import_step(argv[2]);
+	test_numbering();
 	test_partial(argv[2]);
 	printf("%s\n", failed ? "FAILED" : "all passed");
 	return failed ? 1 : 0;

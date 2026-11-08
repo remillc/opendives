@@ -1183,7 +1183,8 @@
       "Planner: the decompression ceiling in red on the planned profile.",
       "In cubic feet, the SAC is shown with two decimals.",
       "Planner: round defaults in the chosen units (45 ft, 3,000 psi, 60 ft/min…), and gas used in the chosen volume unit.",
-      "A “Stop download” button under the progress of a download from the dive computer."
+      "A “Stop download” button under the progress of a download from the dive computer.",
+      "Newly downloaded dives are numbered in sequence, even when the download also reads older dives again."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",

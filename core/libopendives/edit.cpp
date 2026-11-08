@@ -2639,6 +2639,34 @@ int renumber_dives(const std::vector<int> &ids, int start, std::string &result_j
 	return 0;
 }
 
+// An OpenDives addition to the numbering of downloaded dives. Subsurface
+// (divelog::process_imported_dives) numbers the new dives only when none of
+// them falls before the last dive of the log: one older dive read again (a
+// dive deleted from the log, a full download) leaves every new dive at 0.
+// Here the new dives after the last dive of the log still follow its number
+// when it has one, as Subsurface would number them alone; the older ones
+// stay unnumbered, as in Subsurface.
+static void number_new_last_dives(dive_table &dives_to_add, bool new_dive_has_number)
+{
+	if (new_dive_has_number || divelog.dives.empty())
+		return;
+	const dive &last = *divelog.dives.back();
+	if (last.number <= 0)
+		return;
+	std::vector<dive *> after;
+	for (auto &d: dives_to_add) {
+		if (d->when > last.when) {
+			if (d->number > 0)
+				return; // Subsurface numbered them already
+			after.push_back(d.get());
+		}
+	}
+	std::sort(after.begin(), after.end(), [](const dive *a, const dive *b) { return a->when < b->when; });
+	int nr = last.number;
+	for (dive *d: after)
+		d->number = ++nr;
+}
+
 // ImportDives::ImportDives(log, flags, source) as one undoable step; the
 // tables of `log` are consumed. With `fingerprints_before`, the step swaps the
 // core's fingerprint table with it on each undo and redo.
@@ -2651,8 +2679,12 @@ static int import_log(struct divelog &log, int flags, const std::string &source,
 	step.text = (n == 1 ? "import 1 dive from " : "import " + std::to_string(n) + " dives from ") + source;
 	for (auto &dv: log.dives)
 		normalize_imported_cylinder_depths(dv.get());
+	bool new_dive_has_number = std::any_of(log.dives.begin(), log.dives.end(),
+					       [](auto &d) { return d->number > 0; });
 	auto [dives_to_add, dives_to_remove, trips_to_add, sites_to_add, devices_to_add] =
 		divelog.process_imported_dives(log, flags);
+	if (flags & import_flags::is_downloaded)
+		number_new_last_dives(dives_to_add, new_dive_has_number);
 	step.devices = std::move(devices_to_add);
 	for (auto &trip: trips_to_add)
 		step.list.trips.push_back(std::move(trip));
