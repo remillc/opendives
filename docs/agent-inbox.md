@@ -609,3 +609,11 @@ Christian wants the dive editor to edit the same data as Subsurface's desktop ap
 - Shorter helpers for people and tags.
 Map each field to the core as Subsurface does (`TabDiveNotes`, `TabDiveInformation`, `TabDiveEquipment` and their models). Mock-up: `docs/mockups/android-edition.dc.html`. The iOS and tablet editors will follow in a later task.
 
+## [ ] 2026-11-08-12 Dive profile: axes with graduations and a temperature curve
+
+On the dive detail's profile chart (see section 4, the profile items "Axes" and "Temperature curve"):
+- Depth axis on the left: major graduations every 40 ft (10 m) with labels and a light grid line (`#E8E8E5`, dark `#3A3C40`), the first label with the unit ("0 ft"); minor ticks every 10 ft (2 m), 5 dp long, no label. Leave a 30 dp left margin for the labels.
+- Time axis at the bottom: an axis line, major ticks every 20 minutes with labels, the last one with the unit ("80 min"), minor ticks every 10 minutes.
+- Under the chart, a row of MD3 filter chips that scrolls sideways: "Température" (new), then the existing technical layers (ppO₂, Plafond, Tissus) when the dive has the data. "Température" draws the water temperature samples as a 2 dp line in `#2F6DB5` (dark `#8AB4F8`) with its own scale labelled on the right in the same colour ("10°C", "7°", "4°"); on by default when the dive has temperature samples.
+Mock-ups: `docs/mockups/detail3-android.dc.html`, `detail3-android-sombre.dc.html` (the temperature values there are illustrative).
+
