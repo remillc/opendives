@@ -300,6 +300,11 @@
     "rebreather": "Rebreather",
     "description": "Dive profile: {depth} max. depth, {duration}",
     "temperature": "Temperature",
+    "water": "Water",
+    "ppo2": "ppO₂",
+    "ceiling": "Ceiling",
+    "tissues": "Tissues",
+    "tissuesLabel": "Tissue loading, from fast to slow compartments",
     "layers": "Curves shown"
   },
   "units": {
@@ -1250,7 +1255,9 @@
       "Tablet: Statistics and Tools show the list and the result or the tool side by side; the planner has its parameters on the left and the plan on the right.",
       "Tablet: Sites show the list and the map side by side, and the dive editor opens as a sheet (iPad) or a pane (Android) over the logbook.",
       "Dive profile: shorter hint.",
-      "Logbook, selection, ⋮ menu: “Export as…” (.ssrf logbook, UDDF, CSV, PDF sheets), with the Anonymize option."
+      "Logbook, selection, ⋮ menu: “Export as…” (.ssrf logbook, UDDF, CSV, PDF sheets), with the Anonymize option.",
+      "Dive profile: ppO₂, ceiling and tissue layers.",
+      "Dive profile: shorter hint."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",

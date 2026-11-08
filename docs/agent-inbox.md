@@ -678,13 +678,15 @@ In the "Partager" bottom sheet (task 2026-11-08-16), each row's icon sits in a 4
 
 Done in "Dive detail: Share, as a PDF sheet or a summary with the profile image": 40 dp circles in --od-share-circle (water top, dark #4A3410) with 22 dp icons in --od-share-icon (#8A3E09, dark #E5B961); the sheet opens over the detail with the scrim.
 
-## [ ] 2026-11-08-20 Dive profile: ppO₂, Plafond and Tissus layers
+## [x] 2026-11-08-20 Dive profile: ppO₂, Plafond and Tissus layers
 
 Christian asks for the remaining technical layers on the dive profile, as filter chips after "Température" and "Gaz" (spec section 4, "Technical layers"), each offered only when the dive has the data:
 - "ppO₂": the oxygen partial pressure from the core's samples (`pressures.o2`), a line in `--od-oxygen` on its own scale on the right (0 to 1.6 bar, with the 1.4 and 1.6 limits as light dashed lines).
 - "Plafond": the decompression ceiling computed by the core (the same calculation as Subsurface's calculated ceiling, with the planner's gradient factors), drawn as on the planner: a red area from the surface down to the ceiling, `--od-alarm` at 35 % opacity, with a 1.5 dp edge line.
 - "Tissus": the 16 compartments' saturation at the cursor (or at the end of the dive when no cursor), as in the Désaturation tool: small bars from fast to slow under the chart, coloured with the water gradient by load and `--od-alarm` from 90 %.
 Several layers can be on at once. When two layers need a right-hand scale (Température and ppO₂), show the scale of the last one turned on. The finger cursor keeps its readout; add the value of each layer that is on ("Eau 4,3 °C", "ppO₂ 1,28 bar"). Mock-ups: `docs/mockups/detail3-android.dc.html` (chips), `detail3-android-curseur.dc.html` (cursor).
+
+Done in "Dive profile: ppO2, ceiling and tissue layers". Three chips after Gaz, each offered only when the dive has the data. ppO2: line in --od-oxygen on a 0 to 1.6 bar scale with dashed 1.4 and 1.6 limits; only the last right-hand scale turned on (Temperature or ppO2) is labelled. Plafond: the core's calculated ceiling (plot_info, always computed with the current gradient factors, no preference touched), red area at 35 % with a 1.5 dp edge. Tissus: 16 bars under the chart at the cursor (end of the dive otherwise), same colours as the Desaturation tool (shared lib/tissues.js). The cursor readout adds Eau, ppO2 and Plafond when those layers are on. get_dive gives samples.tissues as one flat array (16 percentages per sample, about 35 KB for 2 hours at 10 s). Not checked in the emulator.
 
 ## [x] 2026-11-08-21 Dive profile: shorter hint
 

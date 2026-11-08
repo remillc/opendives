@@ -470,6 +470,8 @@ int get_dive(int id, std::string &json, std::string &error)
 	// Profile computed by the core (profile.cpp), as Subsurface draws it.
 	std::vector<int> t, depth, ceiling, ppo2, cylinder, temperature;
 	bool has_ceiling = false, has_temperature = false;
+	// Tissue loading, 16 compartments per entry, flattened (see "tissues" below).
+	std::vector<int> tissues;
 	if (dc) {
 		struct plot_info pi = create_plot_info_new(d, dc, nullptr);
 		for (const auto &e: pi.entry) {
@@ -481,6 +483,8 @@ int get_dive(int id, std::string &json, std::string &error)
 			// Water temperature as the profile carries it (populate_plot_entries
 			// fills the gaps with the last value), in mK; 0 when unknown.
 			temperature.push_back(e.temperature);
+			for (int p: e.percentages)
+				tissues.push_back(p);
 			has_ceiling = has_ceiling || e.ceiling.mm > 0;
 			has_temperature = has_temperature || e.temperature > 0;
 		}
@@ -503,6 +507,16 @@ int get_dive(int id, std::string &json, std::string &error)
 		append_json_array(json, temperature);
 	else
 		json += "null";
+	// Per-compartment loading in percent (profile.cpp: 50 at ambient pressure,
+	// 100 at the M-value limit with the gradient factors), as one flat array,
+	// 16 values per sample, in the order of the other arrays: the value of
+	// compartment c at sample i is tissues[16 * i + c]. One flat array keeps
+	// the JSON small (about 3 bytes per value, so ~35 KB for 2 hours at 10 s).
+	json += ",\"tissues\":";
+	if (tissues.empty())
+		json += "null";
+	else
+		append_json_array(json, tissues);
 	json += "}}";
 	return 0;
 }
