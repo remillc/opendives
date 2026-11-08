@@ -658,3 +658,7 @@ Changes task 2026-11-08-11: remove "Durée" and "Profondeur max." from the edito
 
 Changes task 2026-11-08-17: keep "Durée" and "Profondeur max." visible in "La plongée", under Date | Heure, but not editable. Show them as plain text side by side (label 12/16 `#4A4D52`, value 16/24 ink, tabular figures, 16 dp side padding, no field background, not focusable as inputs), with the helper "Mesurées par l’ordinateur de plongée" under them. Mock-up: `docs/mockups/android-edition.dc.html`.
 
+## [ ] 2026-11-08-19 Share sheet: icons in coloured circles
+
+In the "Partager" bottom sheet (task 2026-11-08-16), each row's icon sits in a 40 dp circle filled with `--od-water-top` (#FBE3B2), the icon 22 dp in #8A3E09 (dark mode: circle #4A3410, icon #E5B961). The sheet still opens over the dive detail with the usual scrim. Mock-up: `docs/mockups/partage-android.dc.html`.
+
