@@ -11,20 +11,23 @@
 const DEFAULT_DIVE_SECONDS = 10;
 
 export class ProgressSmoother {
-  constructor() {
-    this.reset();
-  }
+  /** The real fraction last reported. */
+  raw = 0;
+  /** The fraction shown. */
+  shown = 0;
+  /** The last real jump, an estimate of one dive's share; 0 until there is one. */
+  lastJump = 0;
+  /** @type {number[]} times the dives arrived, in ms */
+  diveTimes = [];
+  /** Time of the first real progress, in ms; 0 before. */
+  startedAt = 0;
+  tickAt = 0;
 
   reset() {
-    /** The real fraction last reported. */
     this.raw = 0;
-    /** The fraction shown. */
     this.shown = 0;
-    /** The last real jump, an estimate of one dive's share; 0 until there is one. */
     this.lastJump = 0;
-    /** @type {number[]} times the dives arrived, in ms */
     this.diveTimes = [];
-    /** Time of the first real progress, in ms; 0 before. */
     this.startedAt = 0;
     this.tickAt = 0;
   }
