@@ -271,6 +271,12 @@
       display: none;
     }
 
+    /* Without a button before it, the title keeps the side margin of the pane. */
+    :global(.views.od-tablet .navbar .left:not(:has(a, button)) + .title),
+    :global(.view-master-detail .page-master-detail .navbar .left + .title) {
+      margin-left: 16px;
+    }
+
     /* Nothing chosen yet. */
     :global(.view-master-detail:not(:has(.page-master-detail))::after) {
       content: var(--od-no-dive);
