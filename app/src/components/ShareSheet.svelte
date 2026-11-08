@@ -18,11 +18,11 @@
     <div class="handle" aria-hidden="true"></div>
     <h2 id="od-share-title" class="title">{t('share.title')}</h2>
     <button type="button" class="row" onclick={onpdf}>
-      <span class="circle" aria-hidden="true"><Icon name="file" size={22} /></span>
+      <span class="circle" aria-hidden="true"><Icon name="document" size={22} weight={2} /></span>
       <span class="texts"><span class="headline">{t('share.pdf')}</span><span class="supporting">{t('share.pdfText')}</span></span>
     </button>
     <button type="button" class="row" onclick={onsummary}>
-      <span class="circle" aria-hidden="true"><Icon name="image" size={22} /></span>
+      <span class="circle" aria-hidden="true"><Icon name="image" size={22} weight={2} /></span>
       <span class="texts"><span class="headline">{t('share.summary')}</span><span class="supporting">{t('share.summaryText')}</span></span>
     </button>
   </div>
