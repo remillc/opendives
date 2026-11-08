@@ -25,6 +25,7 @@
   import { offerUndo } from '../lib/undo.js';
   import { errorCode } from '../lib/account.js';
   import { addressFor, keepReceived, lastAttempt, macOf } from '../lib/download.js';
+  import { ProgressSmoother } from '../lib/progress-smoothing.js';
   import { formatDateTime, formatDepth, formatDuration } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
 
@@ -59,7 +60,9 @@
   let retrying = $state(false);
   /** Cancel pressed: the core finishes the dive it is reading first. */
   let stopping = $state(false);
+  /** The fraction shown, smoothed. */
   let fraction = $state(0);
+  const smoother = new ProgressSmoother();
   /** @type {ReceivedDive[]} */
   let received = $state([]);
   let leaving = false;
@@ -182,6 +185,7 @@
     connected = false;
     stopping = false;
     fraction = 0;
+    smoother.reset();
     received = [];
     phase = 'downloading';
     scanning = false;
@@ -285,10 +289,14 @@
           retrying = true;
           received = [];
           fraction = 0;
+          smoother.reset();
           return;
         }
         connected = p.state === 'connected';
-        if (p.fraction > 0) fraction = Math.min(1, p.fraction);
+        const now = Date.now();
+        smoother.report(p.fraction, now);
+        for (let i = 0; i < p.newDives.length; i++) smoother.diveReceived(now);
+        fraction = smoother.tick(now);
         if (p.newDives.length) received = [...p.newDives.slice().reverse(), ...received];
       }),
     );
@@ -300,6 +308,13 @@
       console.error('Bluetooth models', e);
     }
     check();
+  });
+
+  // The bar moves on between the core's reports (lib/progress-smoothing.js).
+  $effect(() => {
+    if (phase !== 'downloading') return;
+    const timer = setInterval(() => (fraction = smoother.tick(Date.now())), 250);
+    return () => clearInterval(timer);
   });
 
   onDestroy(() => {
