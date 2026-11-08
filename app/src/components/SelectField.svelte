@@ -11,9 +11,10 @@
    *   value: string,
    *   options: { value: string, label: string }[],
    *   supporting?: string,
+   *   onchange?: (value: string) => void,
    * }}
    */
-  let { label, value = $bindable(), options, supporting = '' } = $props();
+  let { label, value = $bindable(), options, supporting = '', onchange } = $props();
 
   const id = `od-select-${Math.random().toString(36).slice(2, 9)}`;
 </script>
@@ -21,7 +22,7 @@
 <div class="field">
   <div class="box">
     <label class="label" for={id}>{label}</label>
-    <select {id} bind:value>
+    <select {id} bind:value onchange={() => onchange?.(value)}>
       {#each options as option (option.value)}<option value={option.value}>{option.label}</option>{/each}
     </select>
     <span class="arrow"><Icon name="expand" /></span>

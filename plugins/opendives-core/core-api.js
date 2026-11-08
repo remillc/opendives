@@ -39,6 +39,8 @@ import { registerPlugin } from '@capacitor/core';
  * @property {boolean} used the cylinder is breathed during the dive
  * @property {number} gasUsedMl gas used, computed by the core (compressibility included); 0 when unknown
  * @property {number} switchDepthMm depth of the first switch to this cylinder after the start (core's get_depth_at_time); 0 when none
+ * @property {number} depthMm gas switch depth as stored (editor's "Changement de gaz à"); 0 when not set
+ * @property {boolean} protected used by the profile: cannot be removed
  */
 
 /**
@@ -71,6 +73,9 @@ import { registerPlugin } from '@capacitor/core';
  * @property {{wavesize: number, current: number, surge: number, chill: number}} conditions 0 to 5 stars each
  * @property {''|'fresh'|'brackish'|'en13319'|'salt'} waterType from the salinity, Subsurface's thresholds; empty when unknown
  * @property {number} surfacePressureMbar as stored; 0 when not stored
+ * @property {number} userSalinity water type chosen by the diver (kg per 10000 L); 0 when none
+ * @property {boolean} invalid marked invalid
+ * @property {boolean} manual entered by hand: duration and depth can be edited
  * @property {number} pictures number of pictures and videos referenced
  * @property {{model: string, divemode: string}[]} diveComputers the first is the main one
  * @property {string} divemode OC, CCR, PSCR, Freedive
@@ -479,12 +484,13 @@ import { registerPlugin } from '@capacitor/core';
  *   within a metres of lat/lon (or null), possible duplicates (a: same name within a m,
  *   b: other names within b m), dives without a site, and place: {country, region, city,
  *   offline} at lat/lon in the language text (Nominatim, else offline Natural Earth), or null.
- * @property {(options: {kind: 'gas'|'blend'|'cylinders'|'desaturation', o2?: number, he?: number, po2?: number, depth?: number, args?: number[]}) => Promise<any>} toolQuery
+ * @property {(options: {kind: 'gas'|'blend'|'cylinders'|'weights'|'desaturation', o2?: number, he?: number, po2?: number, depth?: number, args?: number[]}) => Promise<any>} toolQuery
  *   Read-only tools (opendives.h): gas, a GasResult (o2, he per mille, po2 in mbar,
  *   planned depth in mm; args [best-mix END in mm or -1, water salinity in kg per 10000 l,
  *   10300 sea water]; rejects with BAD_REQUEST); blend, a GasBlend (o2, he: wanted mix per mille;
  *   args [final mbar, cylinder ml, start mbar, start o2, start he, top-up o2, optional 1 for oxygen first]); cylinders, the GasCylinderTypes;
- *   desaturation, the Desaturation now.
+ *   weights, {types: [{name, grams}]}: Subsurface's weight types (untranslated built-in names),
+ *   each with the weight last used for it (0 when none); desaturation, the Desaturation now.
  * @property {(options: {kind: 'options'} | {kind: 'search', fulltext: string} | {kind: 'dives', fulltext?: string, mode?: string, rules: FilterRule[]}) => Promise<any>} filterQuery
  *   "search": the Logbook's search box (search_dives), the matching dive ids.
  *   Read-only free filter (opendives.h): FilterOptions, or the identifiers of the

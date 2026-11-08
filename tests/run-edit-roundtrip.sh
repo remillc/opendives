@@ -32,7 +32,7 @@
 
 ED=$1; RT=$2; W=$3; shift 3
 IMPORT=${IMPORT:-$(cd "$(dirname "$1")" && pwd)/TestDiveDivelogsDE.xml}
-FIELDS="notes suit rating visibility wavesize current surge chill buddies diveguide tags"
+FIELDS="notes suit rating visibility wavesize current surge chill buddies diveguide tags airtemp watertemp salinity atmpress divemode invalid weights cylinders"
 
 tree() { git -C "$1" rev-parse 'main^{tree}'; }
 tip() { git -C "$1" rev-parse main; }
@@ -77,7 +77,8 @@ run_one() {
     if [ $rc = 2 ]; then why="no dive"; break; fi
     [ $rc != 0 ] && { why="$f: $(value error "$E.out")"; break; }
     changed=$(git -C "$E" diff --name-only "$T0" 'main^{tree}')
-    if [ "$(echo "$changed" | grep -c .)" != 1 ] || ! basename "$changed" | grep -qE '^Dive(-[0-9]+)?$'; then
+    # The dive mode belongs to the dive computer: its "Divecomputer" file.
+    if [ "$(echo "$changed" | grep -c .)" != 1 ] || ! basename "$changed" | grep -qE '^Dive(computer)?(-[0-9]+)?$'; then
       why="$f: files changed: $(echo $changed)"; break
     fi
     [ "$(count "$E")" = $((C0+1)) ] || { why="$f: $(($(count "$E")-C0)) commits added"; break; }

@@ -336,6 +336,13 @@ int gas_blend(int o2_permille, int he_permille, int final_mbar, int cylinder_ml,
 // {"default": prefs.default_cylinder, "types": [{"name", "ml", "workingPressureMbar"}]}.
 int gas_cylinder_types(std::string &json);
 
+// Dive editor, weights: the weight types of Subsurface's list (ws_info_table),
+// each with the weight last used for it in the log (fixup_dive() records it
+// dive after dive, EditWeight on each edit; 0 when none):
+// {"types": [{"name", "grams"}]}. The built-in names are untranslated
+// ("integrated", "belt", "ankle", "backplate", "clip-on"). Read only.
+int weight_types(std::string &json);
+
 // Tissues at `now` (local wall-clock seconds, as the core's dive times; 0 for
 // the current time), loaded by the core's init_decompression() with the
 // logbook dives before now, as the planner does for a new dive, with the

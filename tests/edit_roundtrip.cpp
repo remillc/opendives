@@ -26,6 +26,7 @@
 #include "core/trip.h"
 #include "core/divesite.h"
 #include "core/divecomputer.h"
+#include "core/equipment.h"
 #include "core/filterpreset.h"
 #include "core/filterpresettable.h"
 
@@ -120,6 +121,31 @@ static std::string field_value(const dive &d, const std::string &field)
 		return json_list(split(d.buddy));
 	if (field == "diveguide")
 		return json_list(split(d.diveguide));
+	if (field == "airtemp")
+		return std::to_string(d.airtemp.mkelvin);
+	if (field == "watertemp")
+		return std::to_string(d.watertemp.mkelvin);
+	if (field == "salinity")
+		return std::to_string(d.user_salinity);
+	if (field == "atmpress")
+		return std::to_string(d.surface_pressure.mbar);
+	if (field == "divemode")
+		return divemode_text[d.dcs[0].divemode];
+	if (field == "invalid")
+		return d.invalid ? "1" : "0";
+	if (field == "weights") {
+		std::string out;
+		for (const weightsystem_t &ws: d.weightsystems)
+			out += ws.description + "=" + std::to_string(ws.weight.grams) + ";";
+		return out;
+	}
+	if (field == "cylinders") {
+		std::string out;
+		for (const cylinder_t &c: d.cylinders)
+			out += c.type.description + "/" + std::to_string(c.type.size.mliter) + "/" + std::to_string(c.start.mbar) + "/" +
+			       std::to_string(c.gasmix.o2.permille) + ";";
+		return out;
+	}
 	std::vector<std::string> tags = tags_of(d);
 	std::sort(tags.begin(), tags.end());
 	return json_list(tags);
@@ -146,6 +172,58 @@ static bool make_change(const dive &d, const std::string &field, std::string &re
 		int value = (old + 1) % 6;
 		request = "{" + json_string(field) + ":" + std::to_string(value) + "}";
 		expected = std::to_string(value);
+		return true;
+	}
+	if (field == "airtemp" || field == "watertemp" || field == "salinity" || field == "atmpress") {
+		int old = std::stoi(field_value(d, field));
+		int value = field == "salinity" ? (old == 10300 ? 10000 : 10300)
+			  : field == "atmpress" ? (old ? old + 10 : 1013)
+			  : (old ? old + 1000 : 293150);
+		const char *key = field == "airtemp" ? "airTempMk" : field == "watertemp" ? "waterTempMk"
+				: field == "salinity" ? "userSalinity" : "surfacePressureMbar";
+		request = "{" + json_string(key) + ":" + std::to_string(value) + "}";
+		expected = std::to_string(value);
+		return true;
+	}
+	if (field == "divemode") {
+		expected = d.dcs[0].divemode == OC ? "CCR" : "OC";
+		request = "{\"divemode\":" + json_string(expected) + "}";
+		return true;
+	}
+	if (field == "invalid") {
+		expected = d.invalid ? "0" : "1";
+		request = std::string("{\"invalid\":") + (d.invalid ? "false" : "true") + "}";
+		return true;
+	}
+	if (field == "weights") {
+		// The weights of the dive, plus a belt of 2 kg.
+		std::vector<std::string> items;
+		for (const weightsystem_t &ws: d.weightsystems)
+			items.push_back("{\"description\":" + json_string(ws.description) + ",\"grams\":" + std::to_string(ws.weight.grams) + "}");
+		items.push_back("{\"description\":\"belt\",\"grams\":2000}");
+		request = "{\"weights\":" + json_list(items) + "}";
+		expected = field_value(d, field) + "belt=2000;";
+		return true;
+	}
+	if (field == "cylinders") {
+		// The cylinders of the dive unchanged, plus a new AL80 of EAN32, which
+		// AddCylinder puts at first_hidden_cylinder().
+		std::vector<std::string> items;
+		for (size_t i = 0; i < d.cylinders.size(); i++)
+			items.push_back("{\"index\":" + std::to_string(i) + "}");
+		items.push_back("{\"index\":-1,\"description\":\"AL80\",\"sizeMl\":11100,\"workingPressureMbar\":206843,\"o2Permille\":320}");
+		request = "{\"cylinders\":" + json_list(items) + "}";
+		int at = first_hidden_cylinder(&d);
+		expected.clear();
+		for (int i = 0; i <= static_cast<int>(d.cylinders.size()); i++) {
+			if (i == at)
+				expected += "AL80/11100/0/320;";
+			if (i < static_cast<int>(d.cylinders.size())) {
+				const cylinder_t &c = d.cylinders[i];
+				expected += c.type.description + "/" + std::to_string(c.type.size.mliter) + "/" + std::to_string(c.start.mbar) +
+					    "/" + std::to_string(c.gasmix.o2.permille) + ";";
+			}
+		}
 		return true;
 	}
 	if (field == "buddies" || field == "diveguide" || field == "tags") {

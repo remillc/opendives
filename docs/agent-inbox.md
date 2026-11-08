@@ -602,7 +602,7 @@ Cancels task 2026-11-08-09 (if you already built the wheel, remove it). "Consomm
 
 Done in "Planner: SAC in a dropdown menu". "Consommation (SAC)" is a dropdown (the app's SelectField, the system's choice list) beside "Pression de départ", with 20 values on each side of the current one in steps of 0.01 cuft/min or 0.5 L/min, within the planner's former limits (0.04 to 3.5 cuft/min, 1 to 99 L/min). A SAC off the steps (measured on a dive, e.g. 17.3 L/min) is listed as its own entry and selected. "Type d’eau" was already on its own line.
 
-## [ ] 2026-11-08-11 Dive editor: every field Subsurface desktop edits, friendlier layout
+## [x] 2026-11-08-11 Dive editor: every field Subsurface desktop edits, friendlier layout
 
 Christian wants the dive editor to edit the same data as Subsurface's desktop app, laid out more comfortably. The mock-up now shows every card open; follow section 4, "Dive editor, same fields as Subsurface desktop". Main changes from the current editor:
 - "La plongée": N°, Date and Heure on one line; Durée and Profondeur max. side by side (read-only unless the dive was entered by hand); the dive rating ("Note", five stars) moves here from Conditions.
@@ -612,6 +612,8 @@ Christian wants the dive editor to edit the same data as Subsurface's desktop ap
 - Open cards show no summary under their title.
 - Shorter helpers for people and tags.
 Map each field to the core as Subsurface does (`TabDiveNotes`, `TabDiveInformation`, `TabDiveEquipment` and their models). Mock-up: `docs/mockups/android-edition.dc.html`. The iOS and tablet editors will follow in a later task.
+
+Done in "Core: edit every dive field Subsurface desktop edits, weights and cylinders included" and "Dive editor: every field Subsurface desktop edits, in cards". Android phone layout; each field maps to the core as Subsurface does (EditDive's whole-dive exchange, with the table re-sorted when the time changes; EditDuration and EditDepth only for a dive entered by hand; EditMode on the first dive computer; EditAirTemp, EditWaterTemp, EditWaterTypeUser, EditAtmPress, EditInvalid; AddWeight, RemoveWeight, EditWeight; AddCylinder at first_hidden_cylinder(), RemoveCylinder with cylinder_renumber(), refused for a cylinder the profile uses, EditCylinder with the cylinder types table). Only the fields whose text changed are sent, so unchanged values are never rounded. At Christian's request (8 November 2026), choosing a weight location fills in the weight last used for it, from Subsurface's own ws_info table (WSInfoDelegate). Choices made: "Voyage" stays read-only (Subsurface edits a trip's location from the trip, not from a dive); the site is chosen in a list dialog of the logbook's sites; the MOD helper uses ppO₂ 1.6 bar and the dive's water. The edit round-trip test covers the new fields (edit, save, reload; undo gives the original tree). Checked in the emulator on the test account: a weight location changed, the air temperature set, saved, then undone.
 
 ## [ ] 2026-11-08-12 Dive profile: axes with graduations and a temperature curve
 

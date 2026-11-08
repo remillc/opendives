@@ -348,6 +348,21 @@ int gas_cylinder_types(std::string &json)
 	return 0;
 }
 
+int weight_types(std::string &json)
+{
+	// WSInfoModel (qt-models/weightsysteminfomodel.cpp): ws_info_table in order.
+	json = "{\"types\":[";
+	for (size_t i = 0; i < ws_info_table.size(); i++) {
+		if (i)
+			json += ',';
+		json += "{\"name\":";
+		tools_json_string(json, ws_info_table[i].name);
+		json += ",\"grams\":" + std::to_string(ws_info_table[i].weight.grams) + '}';
+	}
+	json += "]}";
+	return 0;
+}
+
 int desaturation(int64_t now, std::string &json)
 {
 	// Local wall-clock time, as Subsurface's planner dates a new dive.
