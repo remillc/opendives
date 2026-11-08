@@ -109,6 +109,53 @@ export async function setSetting(key, value) {
   planner.version++;
 }
 
+/**
+ * The planner's defaults in the user's units, round in each system as
+ * Subsurface's M_OR_FT: 15 m or 45 ft, 200 bar or 3000 psi, 9 m/min or
+ * 30 ft/min, 18 m/min or 60 ft/min, a 40 bar or 500 psi reserve.
+ * @param {{ length: string, pressure: string }} prefs
+ */
+export function plannerDefaults(prefs) {
+  const ft = prefs.length === 'ft';
+  const psi = prefs.pressure === 'psi';
+  return {
+    depthMm: ft ? 45 * 304.8 : 15000,
+    startMbar: psi ? Math.round(3000 * 68.947572932) : 200000,
+    ascentMmMin: ft ? 30 * 304.8 : 9000,
+    descentMmMin: ft ? 60 * 304.8 : 18000,
+    reserveMbar: psi ? Math.round(500 * 68.947572932) : 40000,
+  };
+}
+
+/** Same rate, as the core keeps it: whole mm/s. @param {number} a @param {number} b */
+const sameRate = (a, b) => Math.floor(a / 60) === Math.floor(b / 60);
+
+/**
+ * A setting never changed by the user still holds a default: when it is the
+ * other unit system's, it takes this system's, so that 18 m/min shows as
+ * 60 ft/min and not 59. Read the setup first.
+ * @param {{ length: string, pressure: string }} prefs
+ */
+export async function adoptUnitDefaults(prefs) {
+  const s = planner.setup;
+  if (!s) return;
+  const mine = plannerDefaults(prefs);
+  const other = plannerDefaults({ length: prefs.length === 'ft' ? 'm' : 'ft', pressure: prefs.pressure === 'psi' ? 'bar' : 'psi' });
+  /** @type {Record<string, number>} */
+  const changes = {};
+  if (ASCENT_KEYS.every((k) => sameRate(Number(s[k]), other.ascentMmMin)) && !sameRate(other.ascentMmMin, mine.ascentMmMin)) {
+    for (const k of ASCENT_KEYS) changes[k] = Math.round(mine.ascentMmMin);
+  }
+  if (sameRate(s.descentMmMin, other.descentMmMin) && !sameRate(other.descentMmMin, mine.descentMmMin)) {
+    changes.descentMmMin = Math.round(mine.descentMmMin);
+  }
+  if (s.reserveMbar === other.reserveMbar && other.reserveMbar !== mine.reserveMbar) changes.reserveMbar = mine.reserveMbar;
+  if (Object.keys(changes).length) {
+    await setCorePrefs(changes);
+    await loadSetup();
+  }
+}
+
 /** Subsurface reads four ascent rates, by depth band: OpenDives sets them all at once. */
 export const ASCENT_KEYS = /** @type {const} */ (['ascent75MmMin', 'ascent50MmMin', 'ascentStopsMmMin', 'ascentLast6mMmMin']);
 
@@ -130,10 +177,19 @@ export async function setAscentRate(mmMin) {
   planner.version++;
 }
 
-/** Back to Subsurface's values for the planner-only settings, with the single ascent rate. */
-export async function resetSettings() {
+/**
+ * Back to Subsurface's values for the planner-only settings, with the single
+ * ascent rate and the round defaults of the user's units.
+ * @param {{ length: string, pressure: string }} prefs
+ */
+export async function resetSettings(prefs) {
+  const d = plannerDefaults(prefs);
   await resetCorePrefs([...SETTING_KEYS]);
-  await setCorePrefs(Object.fromEntries(ASCENT_KEYS.map((k) => [k, DEFAULT_ASCENT_MM_MIN])));
+  await setCorePrefs({
+    ...Object.fromEntries(ASCENT_KEYS.map((k) => [k, Math.round(d.ascentMmMin)])),
+    descentMmMin: Math.round(d.descentMmMin),
+    reserveMbar: d.reserveMbar,
+  });
   await loadSetup();
   planner.version++;
 }
@@ -177,16 +233,22 @@ export function startFromDive(dive, source, feet) {
   planner.version++;
 }
 
-/** A new dive, with Subsurface's planner defaults. */
-export function startNewDive() {
+/**
+ * A new dive, with Subsurface's planner defaults in the user's units, and
+ * the default cylinder of Settings when there is one.
+ * @param {{ length: string, pressure: string }} prefs
+ * @param {number} [cylinderMl] water volume of the default cylinder
+ */
+export function startNewDive(prefs, cylinderMl = 0) {
+  const d = plannerDefaults(prefs);
   planner.source = null;
-  planner.depthMm = 15000;
+  planner.depthMm = d.depthMm;
   planner.bottomTimeSeconds = 20 * 60;
   planner.o2Permille = 209;
   planner.hePermille = 0;
   planner.salinity = SEA_WATER_SALINITY;
-  planner.sizeMl = 12000;
-  planner.startMbar = 200000;
+  planner.sizeMl = cylinderMl > 0 ? cylinderMl : 12000;
+  planner.startMbar = d.startMbar;
   planner.bottomSacMlMin = planner.setup?.bottomSacMlMin ?? 20000;
   planner.decoGases = [];
   planner.version++;

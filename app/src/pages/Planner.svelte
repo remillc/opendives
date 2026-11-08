@@ -13,12 +13,13 @@
   import TextField from '../components/TextField.svelte';
   import SelectField from '../components/SelectField.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
-  import { planner, loadSetup, planRequest, startFromDive, startNewDive } from '../lib/planner.svelte.js';
+  import { planner, loadSetup, adoptUnitDefaults, planRequest, startFromDive, startNewDive } from '../lib/planner.svelte.js';
   import { waterBottomColor } from '../lib/water-column.js';
   import {
     formatCylinderSize,
     formatDateTime,
     formatGas,
+    formatGasVolume,
     formatNumber,
     formatPressure,
     depthUnit,
@@ -43,6 +44,7 @@
   async function refresh() {
     try {
       await loadSetup();
+      await adoptUnitDefaults(prefs);
       ready = true;
       planner.version++;
     } catch (e) {
@@ -73,11 +75,25 @@
     }
   }
 
+  /** A new dive in the user's units, with the default cylinder of Settings. */
+  async function newDive() {
+    /** @type {number} */
+    let ml = 0;
+    try {
+      /** @type {import('opendives-core').GasCylinderTypes} */
+      const list = await OpenDivesCore.toolQuery({ kind: 'cylinders' });
+      ml = list.types.find((c) => c.name === list.default)?.ml ?? 0;
+    } catch (e) {
+      console.error('Default cylinder', e);
+    }
+    startNewDive(prefs, ml);
+  }
+
   async function open() {
     const id = f7route.params.id;
     await refresh();
     if (id === 'new') {
-      if (planner.source) startNewDive();
+      await newDive();
     } else if (planner.source?.id !== Number(id)) {
       await startFrom(Number(id));
     }
@@ -268,14 +284,14 @@
       const hasPressure = c.sizeMl > 0 && c.startMbar > 0;
       let hint = hasPressure
         ? t('plan.gasUse', { used: formatPressure(c.startMbar - c.endMbar, prefs), left: formatPressure(Math.max(0, c.endMbar), prefs) })
-        : t('plan.gasUseVolume', { used: formatNumber(c.gasUsedMl / 1000, 0) });
+        : t('plan.gasUseVolume', { used: formatGasVolume(c.gasUsedMl, prefs) });
       if (c.warning === 'MORE_THAN_AVAILABLE') hint = t('plan.warnings.MORE_THAN_AVAILABLE');
       if (c.warning === 'NO_RESERVE_FOR_SHARING') hint = t('plan.warnings.NO_RESERVE_FOR_SHARING');
       rows.push({
         key: `gas-${i}`,
         label: name,
         hint,
-        value: hasPressure ? formatPressure(Math.max(0, c.endMbar), prefs) : `${formatNumber(c.gasUsedMl / 1000, 0)} ${t('units.liters')}`,
+        value: hasPressure ? formatPressure(Math.max(0, c.endMbar), prefs) : formatGasVolume(c.gasUsedMl, prefs),
         alarm: c.warning === 'MORE_THAN_AVAILABLE' || c.warning === 'NO_RESERVE_FOR_SHARING',
       });
     });
@@ -319,7 +335,7 @@
   /** @param {number|null} id */
   async function choose(id) {
     choosing = false;
-    if (id === null) startNewDive();
+    if (id === null) await newDive();
     else await startFrom(id);
   }
 

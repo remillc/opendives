@@ -1181,7 +1181,8 @@
       "« Synchroniser maintenant » : la liste et le menu restent en place, le bouton montre la progression et un message confirme la fin ou signale l’erreur.",
       "Planificateur : les données du plan se modifient sur place, ses réglages ont leur propre écran, avec une seule vitesse de remontée.",
       "Planificateur : le plafond de décompression en rouge sur le profil du plan.",
-      "En pieds cubes, la consommation (SAC) s’affiche avec deux décimales."
+      "En pieds cubes, la consommation (SAC) s’affiche avec deux décimales.",
+      "Planificateur : valeurs par défaut rondes dans les unités choisies (45 pi, 3 000 psi, 60 pi/min…), et gaz consommé dans l’unité de volume choisie."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
@@ -1313,7 +1314,7 @@
     "ceilingLabel": "plafond de décompression jusqu’à {depth}",
     "gasAndOxygen": "Gaz et oxygène",
     "gasUse": "{used} consommés, il resterait {left}",
-    "gasUseVolume": "{used} L consommés",
+    "gasUseVolume": "{used} consommés",
     "minimumGas": "Réserve minimale",
     "reserveShort": "Il manque {gap} pour remonter à deux",
     "reserveMargin": "{gap} de marge pour remonter à deux",

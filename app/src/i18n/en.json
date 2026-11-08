@@ -1181,7 +1181,8 @@
       "“Sync now”: the list and the menu stay in place, the button shows the progress and a message confirms the end or reports the error.",
       "Planner: the plan data are edited in place, its settings have their own screen, with a single ascent rate.",
       "Planner: the decompression ceiling in red on the planned profile.",
-      "In cubic feet, the SAC is shown with two decimals."
+      "In cubic feet, the SAC is shown with two decimals.",
+      "Planner: round defaults in the chosen units (45 ft, 3,000 psi, 60 ft/min…), and gas used in the chosen volume unit."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
@@ -1313,7 +1314,7 @@
     "ceilingLabel": "decompression ceiling down to {depth}",
     "gasAndOxygen": "Gas and oxygen",
     "gasUse": "{used} used, {left} would be left",
-    "gasUseVolume": "{used} L used",
+    "gasUseVolume": "{used} used",
     "minimumGas": "Minimum gas",
     "reserveShort": "{gap} short to surface two divers",
     "reserveMargin": "{gap} to spare to surface two divers",
