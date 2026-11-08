@@ -119,3 +119,4 @@ Example values (decided on 8 November 2026): the mock-ups show depths in feet, p
 | `detail3-android-curseur.dc.html` | Téléphone Android, détail avec le profil touché : curseur et lecture du temps et de la profondeur |
 | `carnet-selection-android.dc.html` | Téléphone Android, carnet en sélection multiple (dessiné d’après l’app) |
 | `carnet-selection-menu-android.dc.html` | Téléphone Android, carnet en sélection multiple, menu ⋮ ouvert |
+| `carnet-export-android.dc.html` | Téléphone Android, exporter les plongées cochées : choix du format |
