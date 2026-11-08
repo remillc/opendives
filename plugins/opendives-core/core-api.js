@@ -52,6 +52,7 @@ import { registerPlugin } from '@capacitor/core';
  * @property {number[]|null} ceilingMm computed ceiling; null when zero for the whole dive
  * @property {number[]} ppo2Mbar
  * @property {number[]|null} temperatureMk water temperature in mK (0 where unknown); null when the dive has none
+ * @property {number[]|null} tissues loading of the 16 compartments in percent (100 = M-value limit with the gradient factors), flat: compartment c at sample i is tissues[16 * i + c]; null without profile
  */
 
 /**

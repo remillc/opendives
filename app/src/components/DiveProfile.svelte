@@ -3,11 +3,12 @@
   // <DiveProfile> (spec, section 4, "Profil", "Axes" and "Temperature curve"):
   // depth over time, surface at the top; water column; graduated depth and
   // time axes; finger cursor; filter chips for the layers: water temperature
-  // (on by default when the dive has temperature samples) and gas. The other
-  // layers (ceiling, ppO2, tissues) will come later.
+  // (on by default when the dive has temperature samples), gas, ppO2, ceiling
+  // and tissues, each offered only when the dive has the data.
   import Icon from './Icon.svelte';
   import { waterBottomColor } from '../lib/water-column.js';
-  import { depthUnit, formatDepth, formatDuration, formatMinSec } from '../lib/format.js';
+  import { depthUnit, formatDepth, formatDuration, formatMinSec, formatNumber, formatTemperature } from '../lib/format.js';
+  import { tissueColor } from '../lib/tissues.js';
   import { t } from '../lib/i18n.js';
 
   /**
@@ -86,7 +87,25 @@
   let temperatureLayer = $state(true);
   const showTemperature = $derived(temperatureAvailable && temperatureLayer);
 
-  const MARGIN_RIGHT = $derived(showTemperature ? 34 : 8);
+  // ppO2: the samples in bar, on their own 0 to 1.6 bar scale on the right,
+  // with the 1.4 and 1.6 bar limits as light dashed lines.
+  const PPO2_MAX = 1.6;
+  const ppo2Available = $derived(samples.ppo2Mbar.some((v) => v > 0));
+  let ppo2Layer = $state(false);
+  const showPpo2 = $derived(ppo2Available && ppo2Layer);
+
+  // Only one right-hand scale is drawn: the last one turned on.
+  /** @type {('temperature'|'ppo2')[]} */
+  let scaleOrder = $state(['temperature']);
+  /** @param {'temperature'|'ppo2'} layer @param {boolean} on */
+  function trackScale(layer, on) {
+    scaleOrder = on ? [...scaleOrder.filter((l) => l !== layer), layer] : scaleOrder.filter((l) => l !== layer);
+  }
+  const rightScale = $derived(
+    [...scaleOrder].reverse().find((l) => (l === 'temperature' ? showTemperature : showPpo2)) ?? null,
+  );
+
+  const MARGIN_RIGHT = $derived(rightScale ? 34 : 8);
   const plotWidth = $derived(Math.max(10, width - MARGIN_LEFT - MARGIN_RIGHT));
   const plotHeight = $derived(HEIGHT - MARGIN_TOP - MARGIN_BOTTOM);
   /** @param {number} s */
@@ -119,6 +138,51 @@
     }
     return d;
   });
+  /** @param {number} bar */
+  const yPpo2 = (bar) => MARGIN_TOP + (1 - Math.min(bar, PPO2_MAX) / PPO2_MAX) * plotHeight;
+  const ppo2Path = $derived.by(() => {
+    if (!ppo2Available) return '';
+    let d = '';
+    for (let i = 0; i < times.length; i++) d += `${i ? 'L' : 'M'}${x(times[i]).toFixed(1)},${yPpo2(samples.ppo2Mbar[i] / 1000).toFixed(1)}`;
+    return d;
+  });
+  const ppo2Labels = $derived([
+    { y: MARGIN_TOP + 4, text: '1,6' },
+    { y: yPpo2(1.4) + 4, text: '1,4' },
+    { y: MARGIN_TOP + plotHeight + 2, text: '0' },
+  ]);
+
+  // Ceiling: the core's calculated ceiling (gradient factors of the settings),
+  // an area from the surface down to it, as on the planner.
+  const ceilingMm = $derived(samples.ceilingMm);
+  const ceilingAvailable = $derived(!!ceilingMm && ceilingMm.some((v) => v > 0));
+  let ceilingLayer = $state(false);
+  const ceilingShape = $derived.by(() => {
+    if (!ceilingAvailable || !ceilingMm || !times.length) return null;
+    let edge = '';
+    for (let i = 0; i < times.length; i++) edge += `${i ? 'L' : 'M'}${x(times[i]).toFixed(1)},${y(ceilingMm[i]).toFixed(1)}`;
+    const last = times.length - 1;
+    return { edge, area: `${edge}L${x(times[last]).toFixed(1)},${y(0).toFixed(1)}L${x(times[0]).toFixed(1)},${y(0).toFixed(1)}Z` };
+  });
+
+  // Tissues: 16 compartments, flat in the samples; bars at the cursor, or at
+  // the end of the dive.
+  const tissueData = $derived(samples.tissues);
+  const tissuesAvailable = $derived(!!tissueData && tissueData.length >= 16 && tissueData.length === times.length * 16);
+  let tissuesLayer = $state(false);
+  const T_HEIGHT = 56;
+  const T_TOP = 4;
+  const T_BOTTOM = 40;
+  const T_GAP = 4;
+  const tissueBar = $derived((width - 15 * T_GAP) / 16);
+  const tissueValues = $derived.by(() => {
+    if (!tissuesAvailable || !tissueData) return [];
+    const i = cursor ?? times.length - 1;
+    return Array.from({ length: 16 }, (_, c) => tissueData[16 * i + c]);
+  });
+  /** @param {number} percent */
+  const tissueHeight = (percent) => (Math.max(0, Math.min(percent, 110)) / 100) * (T_BOTTOM - T_TOP);
+
   const temperatureLabels = $derived.by(() => {
     if (!temperature) return [];
     const { lo, hi, symbol } = temperature;
@@ -184,6 +248,15 @@
     {#if cursor !== null}
       <span>{t('profile.time')} <strong>{formatMinSec(times[cursor])}</strong></span>
       <span>{t('profile.depth')} <strong>{formatDepth(depths[cursor], prefs)}</strong></span>
+      {#if showTemperature && temperature && temperature.mk[cursor] > 0}
+        <span>{t('profile.water')} <strong>{formatTemperature(temperature.mk[cursor], prefs)}</strong></span>
+      {/if}
+      {#if showPpo2}
+        <span>{t('profile.ppo2')} <strong>{formatNumber(samples.ppo2Mbar[cursor] / 1000, 2)} bar</strong></span>
+      {/if}
+      {#if ceilingLayer && ceilingMm}
+        <span>{t('profile.ceiling')} <strong>{formatDepth(ceilingMm[cursor], prefs)}</strong></span>
+      {/if}
     {:else}
       <span class="hint">{t('profile.hint')}</span>
     {/if}
@@ -218,6 +291,10 @@
 
       {#if paths}
         <path d={paths.water} fill="url(#water-{uid})" />
+        {#if ceilingLayer && ceilingShape}
+          <path d={ceilingShape.area} class="ceiling-area" />
+          <path d={ceilingShape.edge} class="ceiling-line" />
+        {/if}
         <path d={paths.line} class="trace-outline" />
         <path d={paths.line} class="trace" />
       {/if}
@@ -233,10 +310,22 @@
         {/if}
       {/each}
 
+      {#if showPpo2}
+        {#each [1.4, 1.6] as limit (limit)}
+          <line class="ppo2-limit" x1={MARGIN_LEFT} x2={MARGIN_LEFT + plotWidth} y1={yPpo2(limit)} y2={yPpo2(limit)} />
+        {/each}
+        <path d={ppo2Path} class="ppo2" />
+      {/if}
       {#if showTemperature}
         <path d={temperaturePath} class="temperature" />
+      {/if}
+      {#if rightScale === 'temperature'}
         {#each temperatureLabels as label (label.y)}
           <text class="temperature-label od-value" x={MARGIN_LEFT + plotWidth + 4} y={label.y}>{label.text}</text>
+        {/each}
+      {:else if rightScale === 'ppo2'}
+        {#each ppo2Labels as label (label.y)}
+          <text class="ppo2-label od-value" x={MARGIN_LEFT + plotWidth + 4} y={label.y}>{label.text}</text>
         {/each}
       {/if}
 
@@ -261,11 +350,38 @@
     </svg>
   </div>
 
-  {#if temperatureAvailable || gasAvailable}
+  {#if tissuesLayer && tissuesAvailable}
+    <!-- Tissues: a separate drawing under the chart, so that the PDF sheet keeps the chart alone. -->
+    <svg
+      class="tissues"
+      {width}
+      height={T_HEIGHT}
+      role="img"
+      aria-label={t('profile.tissuesLabel')}
+    >
+      <path class="tissue-limit" d="M0 {T_TOP} H{width}" />
+      {#each tissueValues as percent, c (c)}
+        {@const h = tissueHeight(percent)}
+        <rect x={c * (tissueBar + T_GAP)} y={T_BOTTOM - h} width={tissueBar} height={h} rx="2" style:fill={tissueColor(percent)} />
+      {/each}
+      <text class="tick od-value" x="0" y={T_HEIGHT - 4}>{t('desaturation.fast')}</text>
+      <text class="tick od-value" x={width} y={T_HEIGHT - 4} text-anchor="end">{t('desaturation.slow')}</text>
+    </svg>
+  {/if}
+
+  {#if temperatureAvailable || gasAvailable || ppo2Available || ceilingAvailable || tissuesAvailable}
     <div class="layers" role="group" aria-label={t('profile.layers')}>
       <!-- MD3 filter chips, 48 px targets around 32 px chips (spec, section 3); the row scrolls sideways. -->
       {#if temperatureAvailable}
-        <button type="button" class="filter" aria-pressed={temperatureLayer} onclick={() => (temperatureLayer = !temperatureLayer)}>
+        <button
+          type="button"
+          class="filter"
+          aria-pressed={temperatureLayer}
+          onclick={() => {
+            temperatureLayer = !temperatureLayer;
+            trackScale('temperature', temperatureLayer);
+          }}
+        >
           <span class="chip" class:chip-outline={!temperatureLayer}>
             {#if temperatureLayer}<Icon name="check" size={18} weight={2.4} />{/if}<span class="chip-label">{t('profile.temperature')}</span>
           </span>
@@ -275,6 +391,35 @@
         <button type="button" class="filter" aria-pressed={gasLayer} onclick={() => (gasLayer = !gasLayer)}>
           <span class="chip" class:chip-outline={!gasLayer}>
             {#if gasLayer}<Icon name="check" size={18} weight={2.4} />{/if}<span class="chip-label">{t('profile.gas')}</span>
+          </span>
+        </button>
+      {/if}
+      {#if ppo2Available}
+        <button
+          type="button"
+          class="filter"
+          aria-pressed={ppo2Layer}
+          onclick={() => {
+            ppo2Layer = !ppo2Layer;
+            trackScale('ppo2', ppo2Layer);
+          }}
+        >
+          <span class="chip" class:chip-outline={!ppo2Layer}>
+            {#if ppo2Layer}<Icon name="check" size={18} weight={2.4} />{/if}<span class="chip-label">{t('profile.ppo2')}</span>
+          </span>
+        </button>
+      {/if}
+      {#if ceilingAvailable}
+        <button type="button" class="filter" aria-pressed={ceilingLayer} onclick={() => (ceilingLayer = !ceilingLayer)}>
+          <span class="chip" class:chip-outline={!ceilingLayer}>
+            {#if ceilingLayer}<Icon name="check" size={18} weight={2.4} />{/if}<span class="chip-label">{t('profile.ceiling')}</span>
+          </span>
+        </button>
+      {/if}
+      {#if tissuesAvailable}
+        <button type="button" class="filter" aria-pressed={tissuesLayer} onclick={() => (tissuesLayer = !tissuesLayer)}>
+          <span class="chip" class:chip-outline={!tissuesLayer}>
+            {#if tissuesLayer}<Icon name="check" size={18} weight={2.4} />{/if}<span class="chip-label">{t('profile.tissues')}</span>
           </span>
         </button>
       {/if}
@@ -298,7 +443,8 @@
 
     .readout {
       display: flex;
-      gap: 24px;
+      flex-wrap: wrap;
+      gap: 0 24px;
       min-height: 24px;
       align-items: baseline;
       font-size: 14px;
@@ -334,6 +480,50 @@
       stroke: var(--od-temperature);
       stroke-width: 2;
       stroke-linejoin: round;
+    }
+
+    .ppo2 {
+      fill: none;
+      stroke: var(--od-oxygen);
+      stroke-width: 2;
+      stroke-linejoin: round;
+    }
+
+    .ppo2-limit {
+      stroke: var(--od-oxygen);
+      stroke-opacity: 0.4;
+      stroke-width: 1;
+      stroke-dasharray: 4 4;
+    }
+
+    .ppo2-label {
+      font-size: 10px;
+      fill: var(--od-oxygen);
+    }
+
+    /* The ceiling (as on the planner): an exception to the rule that keeps
+       --od-alarm for violations (spec, section 4). */
+    .ceiling-area {
+      fill: var(--od-alarm);
+      fill-opacity: 0.35;
+    }
+
+    .ceiling-line {
+      fill: none;
+      stroke: var(--od-alarm);
+      stroke-width: 1.5;
+    }
+
+    .tissue-limit {
+      stroke: var(--od-text-2);
+      stroke-width: 1;
+      stroke-dasharray: 3 3;
+    }
+
+    .tissues {
+      display: block;
+      margin-top: 6px;
+      touch-action: pan-y;
     }
 
     .temperature-label {

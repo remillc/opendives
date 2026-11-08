@@ -299,6 +299,11 @@
     "rebreather": "Rebreather",
     "description": "Dive profile: {depth} max. depth, {duration}",
     "temperature": "Temperature",
+    "water": "Water",
+    "ppo2": "ppO₂",
+    "ceiling": "Ceiling",
+    "tissues": "Tissues",
+    "tissuesLabel": "Tissue loading, from fast to slow compartments",
     "layers": "Curves shown"
   },
   "units": {
@@ -1247,7 +1252,8 @@
       "Dive detail, ⋮ menu: “Share” a one-page PDF sheet or a short summary with the profile image.",
       "Settings, Language and formats: “Paper size” of the PDF sheet (from the region, US Letter or A4).",
       "Tablet: Statistics and Tools show the list and the result or the tool side by side; the planner has its parameters on the left and the plan on the right.",
-      "Tablet: Sites show the list and the map side by side, and the dive editor opens as a sheet (iPad) or a pane (Android) over the logbook."
+      "Tablet: Sites show the list and the map side by side, and the dive editor opens as a sheet (iPad) or a pane (Android) over the logbook.",
+      "Dive profile: ppO₂, ceiling and tissue layers."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",

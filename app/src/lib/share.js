@@ -26,7 +26,7 @@ import { settings } from './settings.svelte.js';
 /** @typedef {import('opendives-core').Prefs} Prefs */
 
 /** Properties copied from the page's styles into a standalone SVG. */
-const SVG_STYLES = ['fill', 'stroke', 'stroke-width', 'stroke-linejoin', 'font-size', 'font-family', 'font-weight', 'opacity', 'stop-color'];
+const SVG_STYLES = ['fill', 'stroke', 'stroke-width', 'stroke-linejoin', 'font-size', 'font-family', 'font-weight', 'opacity', 'stop-color', 'fill-opacity', 'stroke-opacity', 'stroke-dasharray'];
 
 /**
  * The profile chart as a standalone SVG: the classes and CSS variables of

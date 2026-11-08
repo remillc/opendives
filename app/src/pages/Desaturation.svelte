@@ -12,6 +12,7 @@
   import { formatDateTime, formatDepth, formatDuration, formatFullDate } from '../lib/format.js';
   import { flightWait, formatHoursMinutes } from '../lib/tools.js';
   import { t } from '../lib/i18n.js';
+  import { ALARM_PERCENT, tissueColor as barColor } from '../lib/tissues.js';
 
   let desat = $state(/** @type {import('opendives-core').Desaturation|null} */ (null));
   let failed = $state(false);
@@ -41,17 +42,9 @@
   const BOTTOM = 116;
   const GAP = 4;
   const BAR = (WIDTH - 15 * GAP) / 16;
-  const ALARM_PERCENT = 90;
 
   /** @param {number} percent */
   const barHeight = (percent) => (Math.max(0, Math.min(percent, 110)) / 100) * (BOTTOM - TOP);
-
-  /** Water gradient by load (spec): --od-water-top at 0 %, --od-water-bottom at 100 %; alarm from 90 %. @param {number} percent */
-  function barColor(percent) {
-    if (percent >= ALARM_PERCENT) return 'var(--od-alarm)';
-    const mix = Math.max(0, Math.min(100, percent));
-    return `color-mix(in srgb, var(--od-water-bottom) ${mix}%, var(--od-water-top))`;
-  }
 
   const chartLabel = $derived.by(() => {
     if (!desat) return '';
