@@ -30,6 +30,7 @@ const SVG_STYLES = ['fill', 'stroke', 'stroke-width', 'stroke-linejoin', 'font-s
 /**
  * The profile chart as a standalone SVG: the classes and CSS variables of
  * the page resolved into attributes, so that it draws the same alone.
+ * The gas band and the finger cursor of the screen are left out.
  * @param {SVGSVGElement} svg
  */
 export function standaloneSvg(svg) {
@@ -43,11 +44,15 @@ export function standaloneSvg(svg) {
       const v = style.getPropertyValue(p);
       if (v) target.style.setProperty(p, v);
     }
-    target.removeAttribute('class');
   });
-  copy.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+  // The chart only: its height without the gas band below it.
+  const band = copy.querySelector('.gas rect');
   const w = svg.getAttribute('width') ?? String(svg.clientWidth);
-  const h = svg.getAttribute('height') ?? String(svg.clientHeight);
+  const h = band ? String(Number(band.getAttribute('y')) - 2) : (svg.getAttribute('height') ?? String(svg.clientHeight));
+  for (const el of copy.querySelectorAll('.gas, .cursor, .cursor-halo')) el.remove();
+  for (const el of [copy, ...copy.querySelectorAll('*')]) el.removeAttribute('class');
+  copy.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+  copy.setAttribute('height', h);
   copy.setAttribute('viewBox', `0 0 ${w} ${h}`);
   return copy;
 }
@@ -113,9 +118,15 @@ export async function shareSummary(dive, prefs, svg) {
   const files = [];
   if (svg) {
     const { uri } = await OpenDivesCore.writeShareFile({ name: fileName(dive, 'png'), base64: await profilePng(svg) });
+    await OpenDivesCore.grantShareFile({ uri, mime: 'image/png' });
     files.push(uri);
   }
-  await Share.share({ title: dive.site || t('share.title'), text, files, dialogTitle: t('share.title') });
+  await Share.share({ title: shareTitle(dive), text, files, dialogTitle: t('share.title') });
+}
+
+/** The subject of a mail: the site, else "Plongée n° 5". @param {DiveDetail} dive */
+function shareTitle(dive) {
+  return dive.site || (dive.number ? t('share.sheetNumber', { number: String(dive.number) }) : t('share.sheetDive'));
 }
 
 /** Letter paper in the United States and Canada, A4 elsewhere. */
@@ -222,7 +233,7 @@ ${cylinders.length || equipment.length ? `<h2>${esc(t('detail.gasAndEquipment'))
 ${cylinders.length ? `<table><thead><tr><th>${esc(t('share.cylinder'))}</th><th>${esc(t('edit.size'))}</th><th>${esc(t('edit.use'))}</th><th>${esc(t('share.gas'))}</th><th>${esc(t('edit.start'))}</th><th>${esc(t('edit.end'))}</th></tr></thead><tbody>${cylinders
     .map(
       (c) =>
-        `<tr><td>${esc(c.description || '–')}</td><td class="n">${esc(formatCylinderSize(c.sizeMl, c.workingPressureMbar, prefs) ?? '')}</td><td>${esc(tIfExists(`edit.uses.${c.use}`) ?? c.use)}</td><td>${esc(formatGas(c.o2Permille, c.hePermille))}</td><td class="n">${c.startMbar ? esc(formatPressure(c.startMbar, prefs)) : ''}</td><td class="n">${c.endMbar ? esc(formatPressure(c.endMbar, prefs)) : ''}</td></tr>`,
+        `<tr><td>${esc(c.description && c.description !== 'unknown' ? c.description : '–')}</td><td class="n">${esc(formatCylinderSize(c.sizeMl, c.workingPressureMbar, prefs) ?? '')}</td><td>${esc(tIfExists(`edit.uses.${c.use}`) ?? c.use)}</td><td>${esc(formatGas(c.o2Permille, c.hePermille))}</td><td class="n">${c.startMbar ? esc(formatPressure(c.startMbar, prefs)) : ''}</td><td class="n">${c.endMbar ? esc(formatPressure(c.endMbar, prefs)) : ''}</td></tr>`,
     )
     .join('')}</tbody></table>` : ''}
 ${equipment.length ? `<dl class="list">${rows(equipment)}</dl>` : ''}
@@ -235,5 +246,6 @@ ${dive.notes ? `<h2>${esc(t('detail.notes'))}</h2><div class="notes">${esc(dive.
 /** "Fiche PDF". @param {DiveDetail} dive @param {Prefs} prefs @param {SVGSVGElement|null} svg */
 export async function sharePdf(dive, prefs, svg) {
   const { uri } = await OpenDivesCore.htmlToPdf({ html: sheetHtml(dive, prefs, svg), name: fileName(dive, 'pdf'), letter: letterPaper() });
-  await Share.share({ title: dive.site || t('share.title'), files: [uri], dialogTitle: t('share.title') });
+  await OpenDivesCore.grantShareFile({ uri, mime: 'application/pdf' });
+  await Share.share({ title: shareTitle(dive), files: [uri], dialogTitle: t('share.title') });
 }

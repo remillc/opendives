@@ -1116,6 +1116,34 @@ class OpenDivesCorePlugin : Plugin() {
         }
     }
 
+    /**
+     * Read access to a shared file for every app that can receive it, granted
+     * before the share sheet opens. The share sheet's own grant lasts only
+     * while the receiving screen is open; Gmail sends its attachments later,
+     * in the background, and lost the file (the mail arrived with a broken
+     * attachment). The grant lasts until the device restarts; the files are
+     * the app's cache copies of what the diver chose to share.
+     */
+    @PluginMethod
+    fun grantShareFile(call: PluginCall) {
+        val path = call.getString("uri")?.let { Uri.parse(it).path }
+        val mime = call.getString("mime") ?: "*/*"
+        if (path == null) {
+            call.reject("Missing uri", "BAD_ARGUMENT")
+            return
+        }
+        try {
+            val uri = androidx.core.content.FileProvider.getUriForFile(context, context.packageName + ".fileprovider", File(path))
+            val send = Intent(Intent.ACTION_SEND).setType(mime)
+            val targets = context.packageManager.queryIntentActivities(send, 0).map { it.activityInfo.packageName }.toSet()
+            for (target in targets) context.grantUriPermission(target, uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            call.resolve(JSObject().put("apps", targets.size))
+        } catch (e: Exception) {
+            Log.e(TAG, "grantShareFile", e)
+            call.reject("Cannot grant access to the file", "FAILED")
+        }
+    }
+
     /** The WebView rendering a PDF: kept until the PDF is written. */
     private var pdfView: android.webkit.WebView? = null
 
