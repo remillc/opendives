@@ -45,9 +45,10 @@ h1,h2,h3,h4,h1 *,h2 *,h3 *,h4 *,[style*='font-size: 2'],[style*='font-size: 3'],
         <defs><linearGradient id="apl-w" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color: #FBE3B2"></stop><stop offset="1" style="stop-color: {{bottom}}"></stop></linearGradient></defs>
         <path d="{{area}}" style="fill: url(#apl-w); stroke: none"></path>
         <path d="{{line}}" style="fill: none; stroke: #1F2124; stroke-width: 1.5; vector-effect: non-scaling-stroke"></path>
-        <path d="{{ceil}}" style="fill: none; stroke: #1F2124; stroke-width: 1.5; stroke-dasharray: 4 3; vector-effect: non-scaling-stroke"></path>
+        <path d="{{ceilArea}}" style="fill: #C62828; fill-opacity: 0.35; stroke: none"></path>
+        <path d="{{ceil}}" style="fill: none; stroke: #C62828; stroke-width: 1.5; vector-effect: non-scaling-stroke"></path>
       </svg>
-      <p style="margin: 0; padding: 6px 16px 2px 16px; display: flex; align-items: center; gap: 8px; font-size: 12px; line-height: 16px; color: #4A4D52"><svg width="20" height="4" viewBox="0 0 20 4" aria-hidden="true"><path d="M0 2h20" style="stroke: #1F2124; stroke-width: 1.5; stroke-dasharray: 4 3"></path></svg>Plafond de décompression : remonter au-dessus est interdit</p>
+      <p style="margin: 0; padding: 6px 16px 2px 16px; display: flex; align-items: center; gap: 8px; font-size: 12px; line-height: 16px; color: #4A4D52"><svg width="16" height="12" viewBox="0 0 16 12" aria-hidden="true"><rect x="0" y="0" width="16" height="12" rx="2" style="fill: #C62828; fill-opacity: 0.35; stroke: #C62828; stroke-width: 1.5"></rect></svg>Plafond de décompression</p>
       <table style="width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums">
         <thead><tr style="color: #4A4D52; font-size: 12px"><th scope="col" style="text-align: left; font-weight: 500; padding: 8px 16px 4px 16px">Palier</th><th scope="col" style="text-align: right; font-weight: 500; padding: 8px 8px 4px 8px">Durée</th><th scope="col" style="text-align: right; font-weight: 500; padding: 8px 8px 4px 8px">Temps écoulé</th><th scope="col" style="text-align: left; font-weight: 500; padding: 8px 16px 4px 8px">Gaz</th></tr></thead>
         <tbody>
@@ -87,7 +88,7 @@ class Component extends DCLogic {
   renderVals() {
     var line = 'M' + PTS.map(function (p) { return (p[0] / 2300 * 358).toFixed(1) + ' ' + (4 + p[1] / 28 * 80).toFixed(1); }).join(' L');
     var ceil = 'M' + CEIL.map(function (p) { return (p[0] / 2300 * 358).toFixed(1) + ' ' + (4 + p[1] / 28 * 80).toFixed(1); }).join(' L');
- return Object.assign({ line: line, area: line + ' L358 0 L0 0 Z', bottom: mix(28 / 60), ceil: ceil }, srcProf());
+ return Object.assign({ line: line, area: line + ' L358 0 L0 0 Z', bottom: mix(28 / 60), ceil: ceil, ceilArea: ceil + ' L358 4 L0 4 Z' }, srcProf());
   }
 }
 </script>
