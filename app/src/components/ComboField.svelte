@@ -24,14 +24,23 @@
   const id = `od-combo-${Math.random().toString(36).slice(2, 9)}`;
   const floated = $derived(focused || value !== '');
 
-  /** The values matching what is typed; all of them while it is the chosen value. */
+  /** Lower case without accents, for matching ("Carrière" ~ "carriere"). @param {string} s */
+  const fold = (s) => s.normalize('NFD').replace(/\p{M}/gu, '').toLocaleLowerCase();
+
+  /**
+   * The values matching what is typed: those holding every typed word, in any
+   * order, case and accents aside (a list of hundreds of sites is not read,
+   * it is narrowed down); all of them while it is the chosen value.
+   */
   const proposals = $derived.by(() => {
     if (!open) return [];
-    const q = value.trim().toLocaleLowerCase();
-    const exact = options.some((o) => o.toLocaleLowerCase() === q);
-    return options.filter((o) => o && (exact || !q || o.toLocaleLowerCase().includes(q))).slice(0, 8);
+    const q = fold(value.trim());
+    const exact = options.some((o) => fold(o) === q);
+    const words = q.split(/\s+/).filter(Boolean);
+    // Each name once: several sites can share a name.
+    return [...new Set(options)].filter((o) => o && (exact || words.every((w) => fold(o).includes(w)))).slice(0, 50);
   });
-  const isNew = $derived(open && value.trim() !== '' && !options.some((o) => o.toLocaleLowerCase() === value.trim().toLocaleLowerCase()));
+  const isNew = $derived(open && value.trim() !== '' && !options.some((o) => fold(o) === fold(value.trim())));
 
   /** @param {string} choice */
   function choose(choice) {
@@ -77,6 +86,8 @@
         onfocus={() => {
           focused = true;
           open = true;
+          // The chosen value is selected: typing replaces it and filters the list.
+          input?.select();
         }}
         oninput={() => (open = true)}
         {onblur}
@@ -216,6 +227,9 @@
       margin: 0;
       padding: 8px 0;
       list-style: none;
+      /* About five and a half rows, the rest scrolls. */
+      max-height: 280px;
+      overflow-y: auto;
       border-radius: 4px;
       background: var(--od-surface);
       box-shadow: 0 2px 6px rgb(0 0 0 / 0.2);

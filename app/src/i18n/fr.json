@@ -1257,7 +1257,8 @@
       "Profil de plongée : texte d’aide plus court.",
       "Carnet, sélection, menu ⋮ : « Exporter au format… » (carnet .ssrf, UDDF, CSV, fiches PDF), avec l’option Anonymiser.",
       "Profil de plongée : couches ppO₂, plafond et tissus.",
-      "Profil de plongée : texte d’aide plus court."
+      "Profil de plongée : texte d’aide plus court.",
+      "Modifier la plongée : les listes Site, Voyage et Combinaison se filtrent avec les mots tapés, dans n’importe quel ordre et sans tenir compte des accents ; toucher le champ sélectionne son texte pour le remplacer."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",

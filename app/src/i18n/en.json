@@ -1257,7 +1257,8 @@
       "Dive profile: shorter hint.",
       "Logbook, selection, ⋮ menu: “Export as…” (.ssrf logbook, UDDF, CSV, PDF sheets), with the Anonymize option.",
       "Dive profile: ppO₂, ceiling and tissue layers.",
-      "Dive profile: shorter hint."
+      "Dive profile: shorter hint.",
+      "Edit the dive: the Site, Trip and Suit lists narrow down with the words typed, in any order and ignoring accents; touching the field selects its text to replace it."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
