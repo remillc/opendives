@@ -297,7 +297,9 @@
     "depth": "Profondeur",
     "gas": "Gaz",
     "rebreather": "Recycleur",
-    "description": "Profil de plongée : {depth} au plus profond, {duration}"
+    "description": "Profil de plongée : {depth} au plus profond, {duration}",
+    "temperature": "Température",
+    "layers": "Courbes affichées"
   },
   "units": {
     "meters": "m",
@@ -1230,7 +1232,8 @@
       "Les nouvelles plongées téléchargées sont numérotées à la suite, même quand le téléchargement relit aussi des plongées plus anciennes.",
       "Planificateur : la consommation (SAC) se choisit dans un menu, par pas de 0,5 L/min ou 0,01 pi³/min.",
       "Modifier la plongée : tous les champs que modifie Subsurface sur ordinateur, dont les bouteilles et le lest ; choisir un emplacement de lest reprend le dernier poids utilisé pour cet emplacement.",
-      "La barre de progression du téléchargement depuis l’ordinateur de plongée avance régulièrement pendant le transfert de chaque plongée."
+      "La barre de progression du téléchargement depuis l’ordinateur de plongée avance régulièrement pendant le transfert de chaque plongée.",
+      "Profil de plongée : axes gradués (profondeur et temps) et courbe de la température de l’eau, à afficher ou masquer."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",

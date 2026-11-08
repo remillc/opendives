@@ -51,6 +51,7 @@ import { registerPlugin } from '@capacitor/core';
  * @property {number[]} cylinder open-circuit cylinder being breathed; -1 when unknown or rebreather
  * @property {number[]|null} ceilingMm computed ceiling; null when zero for the whole dive
  * @property {number[]} ppo2Mbar
+ * @property {number[]|null} temperatureMk water temperature in mK (0 where unknown); null when the dive has none
  */
 
 /**

@@ -297,7 +297,9 @@
     "depth": "Depth",
     "gas": "Gas",
     "rebreather": "Rebreather",
-    "description": "Dive profile: {depth} max. depth, {duration}"
+    "description": "Dive profile: {depth} max. depth, {duration}",
+    "temperature": "Temperature",
+    "layers": "Curves shown"
   },
   "units": {
     "meters": "m",
@@ -1230,7 +1232,8 @@
       "Newly downloaded dives are numbered in sequence, even when the download also reads older dives again.",
       "Planner: the SAC is chosen from a menu, in steps of 0.5 L/min or 0.01 cu ft/min.",
       "Edit the dive: every field Subsurface desktop edits, cylinders and weights included; choosing a weight location fills in the last weight used for it.",
-      "The progress bar of a download from the dive computer moves steadily while each dive is transferred."
+      "The progress bar of a download from the dive computer moves steadily while each dive is transferred.",
+      "Dive profile: graduated depth and time axes, and a water temperature curve that can be shown or hidden."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",

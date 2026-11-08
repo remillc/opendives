@@ -42,6 +42,9 @@
     --od-trace: #1F2124;
     /* Outline drawn under the profile line; only used in dark mode. */
     --od-trace-outline: transparent;
+    /* Profile chart: grid lines of the depth axis, water temperature curve and its scale. */
+    --od-chart-grid: #E8E8E5;
+    --od-temperature: #2F6DB5;
     --od-block: var(--od-surface);
     --od-on-block: var(--od-text);
     --od-trace-block: var(--od-trace);
@@ -78,6 +81,8 @@
     --od-water-bottom: #EF7625;
     --od-trace: #F4F4F2;
     --od-trace-outline: #121314;
+    --od-chart-grid: #3A3C40;
+    --od-temperature: #8AB4F8;
     --od-block: var(--od-surface);
     --od-tint: var(--f7-md-surface-variant);
     --od-on-tint: var(--f7-md-on-surface);

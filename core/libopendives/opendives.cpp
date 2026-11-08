@@ -463,8 +463,8 @@ int get_dive(int id, std::string &json, std::string &error)
 	json += ']';
 
 	// Profile computed by the core (profile.cpp), as Subsurface draws it.
-	std::vector<int> t, depth, ceiling, ppo2, cylinder;
-	bool has_ceiling = false;
+	std::vector<int> t, depth, ceiling, ppo2, cylinder, temperature;
+	bool has_ceiling = false, has_temperature = false;
 	if (dc) {
 		struct plot_info pi = create_plot_info_new(d, dc, nullptr);
 		for (const auto &e: pi.entry) {
@@ -473,7 +473,11 @@ int get_dive(int id, std::string &json, std::string &error)
 			ceiling.push_back(e.ceiling.mm);
 			ppo2.push_back(static_cast<int>(e.pressures.o2 * 1000.0 + 0.5));
 			cylinder.push_back(e.ruler_cylinder);
+			// Water temperature as the profile carries it (populate_plot_entries
+			// fills the gaps with the last value), in mK; 0 when unknown.
+			temperature.push_back(e.temperature);
 			has_ceiling = has_ceiling || e.ceiling.mm > 0;
+			has_temperature = has_temperature || e.temperature > 0;
 		}
 	}
 	json += ",\"samples\":{\"timeSeconds\":";
@@ -489,6 +493,11 @@ int get_dive(int id, std::string &json, std::string &error)
 		json += "null";
 	json += ",\"ppo2Mbar\":";
 	append_json_array(json, ppo2);
+	json += ",\"temperatureMk\":";
+	if (has_temperature)
+		append_json_array(json, temperature);
+	else
+		json += "null";
 	json += "}}";
 	return 0;
 }

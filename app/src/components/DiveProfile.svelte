@@ -1,8 +1,11 @@
 <script>
   // @ts-check
-  // <DiveProfile> (spec, section 4, "Profil"): depth over time, surface at the
-  // top; water column; finger cursor; Gas layer when the dive has gas data.
-  // The other layers (ceiling, ppO2, tissues) will come later.
+  // <DiveProfile> (spec, section 4, "Profil", "Axes" and "Temperature curve"):
+  // depth over time, surface at the top; water column; graduated depth and
+  // time axes; finger cursor; filter chips for the layers: water temperature
+  // (on by default when the dive has temperature samples) and gas. The other
+  // layers (ceiling, ppO2, tissues) will come later.
+  import Icon from './Icon.svelte';
   import { waterBottomColor } from '../lib/water-column.js';
   import { depthUnit, formatDepth, formatDuration, formatMinSec } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
@@ -22,10 +25,9 @@
   const uid = $props.id();
   let width = $state(320);
   const HEIGHT = 180;
-  const MARGIN_LEFT = 40;
-  const MARGIN_RIGHT = 8;
+  const MARGIN_LEFT = 30;
   const MARGIN_TOP = 8;
-  const MARGIN_BOTTOM = 22;
+  const MARGIN_BOTTOM = 26;
   const BAND = 22;
 
   const times = $derived(samples.timeSeconds);
@@ -33,17 +35,58 @@
   const tMax = $derived(Math.max(1, times.length ? times[times.length - 1] : durationSeconds));
   const dMax = $derived(Math.max(1, ...depths, maxDepthMm));
 
-  // Depth ticks in the display unit, at "round" steps.
+  // Depth axis: a labelled graduation with a grid line every 40 ft (10 m),
+  // the first label with the unit; a 5 px tick every 10 ft (2 m).
   const ticks = $derived.by(() => {
-    const mmPerUnit = prefs.length === 'ft' ? 304.8 : 1000;
-    const max = dMax / mmPerUnit;
-    const step = [1, 2, 5, 10, 20, 25, 50, 100, 200].find((s) => max / s <= 5) ?? 500;
-    const end = Math.ceil(max / step) * step;
+    const feet = prefs.length === 'ft';
+    const mmPerUnit = feet ? 304.8 : 1000;
+    const major = feet ? 40 : 10;
+    const minor = feet ? 10 : 2;
+    const end = Math.max(minor, Math.ceil(dMax / mmPerUnit / minor) * minor);
+    /** @type {{ value: number, mm: number, major: boolean }[]} */
     const list = [];
-    for (let v = 0; v <= end + 1e-9; v += step) list.push({ value: v, mm: v * mmPerUnit });
+    for (let v = 0; v <= end + 1e-9; v += minor) list.push({ value: v, mm: v * mmPerUnit, major: v % major === 0 });
     return { list, endMm: end * mmPerUnit };
   });
 
+  // Time axis: labelled ticks every 20 min (10 or 5 for short dives), the
+  // last label with the unit; minor ticks in between.
+  const timeTicks = $derived.by(() => {
+    const minutes = tMax / 60;
+    const major = minutes >= 40 ? 20 : minutes >= 15 ? 10 : 5;
+    const minor = major / 2;
+    /** @type {{ m: number, major: boolean }[]} */
+    const list = [];
+    for (let m = 0; m * 60 <= tMax + 1e-9; m += minor) list.push({ m, major: m % major === 0 });
+    const lastMajor = [...list].reverse().find((tick) => tick.major)?.m ?? 0;
+    return { list, lastMajor };
+  });
+
+  // Water temperature: the samples (0 where unknown) in the display unit,
+  // on their own scale, labelled on the right.
+  const temperature = $derived.by(() => {
+    const mk = samples.temperatureMk;
+    if (!mk || !mk.some((v) => v > 0)) return null;
+    const fahrenheit = prefs.temperature === 'F';
+    /** @param {number} v */
+    const unit = (v) => {
+      const c = v / 1000 - 273.15;
+      return fahrenheit ? (c * 9) / 5 + 32 : c;
+    };
+    const values = mk.filter((v) => v > 0).map(unit);
+    let lo = Math.floor(Math.min(...values));
+    let hi = Math.ceil(Math.max(...values));
+    if (hi - lo < 2) {
+      lo -= 1;
+      hi = lo + 2;
+    }
+    return { mk, unit, lo, hi, symbol: fahrenheit ? '°F' : '°C' };
+  });
+  const temperatureAvailable = $derived(temperature !== null);
+  let temperatureLayer = $state(true);
+  const showTemperature = $derived(temperatureAvailable && temperatureLayer);
+
+  const MARGIN_RIGHT = $derived(showTemperature ? 34 : 8);
   const plotWidth = $derived(Math.max(10, width - MARGIN_LEFT - MARGIN_RIGHT));
   const plotHeight = $derived(HEIGHT - MARGIN_TOP - MARGIN_BOTTOM);
   /** @param {number} s */
@@ -60,12 +103,31 @@
     return { line, water };
   });
 
-  const timeTicks = $derived.by(() => {
-    const minutes = tMax / 60;
-    const step = [5, 10, 15, 20, 30, 60, 120].find((s) => minutes / s <= 5) ?? 240;
-    const list = [];
-    for (let m = 0; m * 60 <= tMax; m += step) list.push(m);
-    return list;
+  const temperaturePath = $derived.by(() => {
+    if (!temperature) return '';
+    const { mk, unit, lo, hi } = temperature;
+    let d = '';
+    let pen = false;
+    for (let i = 0; i < times.length; i++) {
+      if (!(mk[i] > 0)) {
+        pen = false;
+        continue;
+      }
+      const yy = MARGIN_TOP + ((hi - unit(mk[i])) / (hi - lo)) * plotHeight;
+      d += `${pen ? 'L' : 'M'}${x(times[i]).toFixed(1)},${yy.toFixed(1)}`;
+      pen = true;
+    }
+    return d;
+  });
+  const temperatureLabels = $derived.by(() => {
+    if (!temperature) return [];
+    const { lo, hi, symbol } = temperature;
+    const mid = (lo + hi) / 2;
+    return [
+      { y: MARGIN_TOP + 4, text: `${hi}${symbol}` },
+      { y: MARGIN_TOP + plotHeight / 2 + 4, text: `${Number.isInteger(mid) ? mid : mid.toFixed(1)}°` },
+      { y: MARGIN_TOP + plotHeight + 2, text: `${lo}°` },
+    ];
   });
 
   // Gas layer: one band per mix, from the cylinder being breathed.
@@ -144,19 +206,38 @@
       </defs>
 
       {#each ticks.list as tick (tick.value)}
-        <line class="grid" x1={MARGIN_LEFT} x2={MARGIN_LEFT + plotWidth} y1={y(tick.mm)} y2={y(tick.mm)} />
-        <text class="tick od-value" x={MARGIN_LEFT - 6} y={y(tick.mm) + 4} text-anchor="end">{tick.value}</text>
+        {#if tick.major}
+          <line class="grid" x1={MARGIN_LEFT} x2={MARGIN_LEFT + plotWidth} y1={y(tick.mm)} y2={y(tick.mm)} />
+          <text class="tick od-value" x={MARGIN_LEFT - 4} y={y(tick.mm) + 4} text-anchor="end"
+            >{tick.value === 0 ? `0 ${depthUnit(prefs)}` : tick.value}</text
+          >
+        {:else}
+          <line class="axis" x1={MARGIN_LEFT} x2={MARGIN_LEFT + 5} y1={y(tick.mm)} y2={y(tick.mm)} />
+        {/if}
       {/each}
-      <text class="tick" x={4} y={MARGIN_TOP + 4}>{depthUnit(prefs)}</text>
-      {#each timeTicks as m (m)}
-        <text class="tick od-value" x={x(m * 60)} y={HEIGHT - 6} text-anchor="middle">{m}</text>
-      {/each}
-      <text class="tick" x={MARGIN_LEFT + plotWidth} y={HEIGHT - 6} text-anchor="end">{t('units.minutes')}</text>
 
       {#if paths}
         <path d={paths.water} fill="url(#water-{uid})" />
         <path d={paths.line} class="trace-outline" />
         <path d={paths.line} class="trace" />
+      {/if}
+
+      <line class="axis" x1={MARGIN_LEFT} x2={MARGIN_LEFT + plotWidth} y1={MARGIN_TOP + plotHeight} y2={MARGIN_TOP + plotHeight} />
+      {#each timeTicks.list as tick (tick.m)}
+        {@const tx = x(tick.m * 60)}
+        <line class="axis" x1={tx} x2={tx} y1={MARGIN_TOP + plotHeight} y2={MARGIN_TOP + plotHeight + (tick.major ? 6 : 4)} />
+        {#if tick.major}
+          <text class="tick od-value" x={tx} y={MARGIN_TOP + plotHeight + 17} text-anchor="middle"
+            >{tick.m === timeTicks.lastMajor && tick.m > 0 ? `${tick.m} ${t('units.minutes')}` : tick.m}</text
+          >
+        {/if}
+      {/each}
+
+      {#if showTemperature}
+        <path d={temperaturePath} class="temperature" />
+        {#each temperatureLabels as label (label.y)}
+          <text class="temperature-label od-value" x={MARGIN_LEFT + plotWidth + 4} y={label.y}>{label.text}</text>
+        {/each}
       {/if}
 
       {#if gasLayer}
@@ -180,12 +261,23 @@
     </svg>
   </div>
 
-  {#if gasAvailable}
-    <div class="layers">
-      <!-- 48 px target around a 32 px chip (spec, section 3). -->
-      <button type="button" class="filter" aria-pressed={gasLayer} onclick={() => (gasLayer = !gasLayer)}>
-        <span class="chip" class:chip-outline={!gasLayer}><span class="chip-label">{t('profile.gas')}</span></span>
-      </button>
+  {#if temperatureAvailable || gasAvailable}
+    <div class="layers" role="group" aria-label={t('profile.layers')}>
+      <!-- MD3 filter chips, 48 px targets around 32 px chips (spec, section 3); the row scrolls sideways. -->
+      {#if temperatureAvailable}
+        <button type="button" class="filter" aria-pressed={temperatureLayer} onclick={() => (temperatureLayer = !temperatureLayer)}>
+          <span class="chip" class:chip-outline={!temperatureLayer}>
+            {#if temperatureLayer}<Icon name="check" size={18} weight={2.4} />{/if}<span class="chip-label">{t('profile.temperature')}</span>
+          </span>
+        </button>
+      {/if}
+      {#if gasAvailable}
+        <button type="button" class="filter" aria-pressed={gasLayer} onclick={() => (gasLayer = !gasLayer)}>
+          <span class="chip" class:chip-outline={!gasLayer}>
+            {#if gasLayer}<Icon name="check" size={18} weight={2.4} />{/if}<span class="chip-label">{t('profile.gas')}</span>
+          </span>
+        </button>
+      {/if}
     </div>
   {/if}
 </div>
@@ -228,8 +320,25 @@
     }
 
     .grid {
-      stroke: var(--f7-list-item-border-color);
+      stroke: var(--od-chart-grid);
       stroke-width: 1;
+    }
+
+    .axis {
+      stroke: var(--od-text-2);
+      stroke-width: 1;
+    }
+
+    .temperature {
+      fill: none;
+      stroke: var(--od-temperature);
+      stroke-width: 2;
+      stroke-linejoin: round;
+    }
+
+    .temperature-label {
+      font-size: 10px;
+      fill: var(--od-temperature);
     }
 
     .tick {
@@ -280,11 +389,19 @@
 
     .layers {
       display: flex;
+      flex-wrap: nowrap;
       gap: 8px;
-      padding: 8px 0;
+      padding: 0 0 4px;
+      overflow-x: auto;
+    }
+
+    .chip {
+      gap: 4px;
     }
 
     .filter {
+      flex: none;
+      width: auto;
       min-height: 48px;
       min-width: 48px;
       display: flex;
