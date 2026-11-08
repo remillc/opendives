@@ -621,10 +621,10 @@ On the dive detail's profile chart (see section 4, the profile items "Axes" and 
 - Under the chart, a row of MD3 filter chips that scrolls sideways: "Température" (new), then the existing technical layers (ppO₂, Plafond, Tissus) when the dive has the data. "Température" draws the water temperature samples as a 2 dp line in `#2F6DB5` (dark `#8AB4F8`) with its own scale labelled on the right in the same colour ("10°C", "7°", "4°"); on by default when the dive has temperature samples.
 Mock-ups: `docs/mockups/detail3-android.dc.html`, `detail3-android-sombre.dc.html` (the temperature values there are illustrative).
 
-## [ ] 2026-11-08-13 Dive detail menu: "Renuméroter la plongée" and "Partager la plongée"
+## [ ] 2026-11-08-13 Dive detail menu: "Renuméroter la plongée" and "Partager"
 
 Add two items to the ⋮ menu of the dive detail, after "Planifier depuis cette plongée" and before the divider and "Supprimer la plongée" (Android MD3 menu, iOS pull-down menu):
 - "Renuméroter la plongée" (24 dp "#" icon): opens an MD3 dialog titled "Renuméroter la plongée" with a number field prefilled with the current number, buttons "Annuler" and "Renuméroter". A number used by another dive is refused with a message under the field ("Ce numéro est déjà pris par la plongée du …"). Change the number through the core, as Subsurface's "Renumber" does for one dive, so it syncs like any other edit.
-- "Partager la plongée" (24 dp share icon): opens the system share sheet (Capacitor Share) with a short French text (site, date, maximum depth, duration, gas, in the user's units) and a PNG image of the profile chart.
+- "Partager" (24 dp share icon): opens the system share sheet (Capacitor Share) with a short French text (site, date, maximum depth, duration, gas, in the user's units) and a PNG image of the profile chart.
 Mock-up: `docs/mockups/detail2-android-menu.dc.html`. Spec: section 4, the "Dive detail" row of the screens table.
 
