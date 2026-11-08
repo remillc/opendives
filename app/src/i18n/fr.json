@@ -549,6 +549,12 @@
       "volumeInvalid": "Indiquez un volume plus grand que 0",
       "pressureInvalid": "Indiquez une pression valide",
       "renamed": "Type renommé"
+    },
+    "paperSize": {
+      "label": "Format du papier",
+      "text": "Selon la région de l’appareil : {name}",
+      "letter": "Lettre US",
+      "a4": "A4"
     }
   },
   "gas": {
@@ -1236,7 +1242,8 @@
       "Modifier la plongée : le numéro ne s’y change plus (il passera par « Renuméroter la plongée ») ; la durée et la profondeur max. sont affichées, mesurées par l’ordinateur.",
       "Modifier la plongée : le site et le voyage se tapent ou se choisissent dans la liste filtrée ; un nouveau nom crée le site ou le voyage. La combinaison passe avant le mode de plongée.",
       "Détail d’une plongée, menu ⋮ : « Renuméroter la plongée » ; les plongées concernées sont décalées pour que les numéros restent uniques et sans trou.",
-      "Détail d’une plongée, menu ⋮ : « Partager » une fiche PDF d’une page ou un court résumé avec l’image du profil."
+      "Détail d’une plongée, menu ⋮ : « Partager » une fiche PDF d’une page ou un court résumé avec l’image du profil.",
+      "Réglages, Langue et formats : « Format du papier » de la fiche PDF (selon la région, Lettre US ou A4)."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",

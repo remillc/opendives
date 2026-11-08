@@ -549,6 +549,12 @@
       "volumeInvalid": "Enter a volume greater than 0",
       "pressureInvalid": "Enter a valid pressure",
       "renamed": "Type renamed"
+    },
+    "paperSize": {
+      "label": "Paper size",
+      "text": "From the device’s region: {name}",
+      "letter": "US Letter",
+      "a4": "A4"
     }
   },
   "gas": {
@@ -1236,7 +1242,8 @@
       "Edit the dive: the number is no longer changed there (it will go through “Renumber the dive”); duration and max. depth are shown, measured by the dive computer.",
       "Edit the dive: site and trip are typed or chosen from the filtered list; a new name creates the site or the trip. The suit now comes before the dive mode.",
       "Dive detail, ⋮ menu: “Renumber the dive”; the dives it affects shift so that numbers stay unique and without gaps.",
-      "Dive detail, ⋮ menu: “Share” a one-page PDF sheet or a short summary with the profile image."
+      "Dive detail, ⋮ menu: “Share” a one-page PDF sheet or a short summary with the profile image.",
+      "Settings, Language and formats: “Paper size” of the PDF sheet (from the region, US Letter or A4)."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",

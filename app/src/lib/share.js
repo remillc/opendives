@@ -20,6 +20,7 @@ import {
   locale,
 } from './format.js';
 import { t, tIfExists } from './i18n.js';
+import { settings } from './settings.svelte.js';
 
 /** @typedef {import('opendives-core').DiveDetail} DiveDetail */
 /** @typedef {import('opendives-core').Prefs} Prefs */
@@ -135,8 +136,8 @@ function shareTitle(dive) {
  */
 const LETTER_REGIONS = new Set(['US', 'CA', 'MX', 'BZ', 'CL', 'CO', 'CR', 'GT', 'NI', 'PA', 'PH', 'PR', 'SV', 'VE']);
 
-/** The paper of the device's region (from its language, e.g. fr-CA). */
-function letterPaper() {
+/** Whether the device's region uses US Letter (from its language, e.g. fr-CA). */
+export function regionUsesLetter() {
   let region = (navigator.language.split('-')[1] ?? '').toUpperCase();
   if (!region) {
     try {
@@ -146,6 +147,11 @@ function letterPaper() {
     }
   }
   return LETTER_REGIONS.has(region);
+}
+
+/** The paper of the PDF sheet: the setting (Settings, "Format du papier"), else the region's. */
+function letterPaper() {
+  return settings.paperSize === 'system' ? regionUsesLetter() : settings.paperSize === 'letter';
 }
 
 /** @param {string} s */

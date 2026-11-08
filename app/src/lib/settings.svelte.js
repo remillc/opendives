@@ -27,6 +27,8 @@ const COMPUTERS_KEY = 'od.diveComputers';
  * @property {'decimal'|'minutes'|'seconds'} coordinatesFormat GPS coordinates, formatted by
  *   OpenDives itself (the core only knows seconds and decimal): -35.4485, 35° 26.9′ S, 35° 26′ 54.6″ S
  * @property {boolean} showAllBluetooth the Bluetooth scan shows every device, not only dive computers
+ * @property {'system'|'letter'|'a4'} paperSize the PDF sheet of a dive: "system" follows the
+ *   device's region (US Letter where it is used, A4 elsewhere)
  */
 
 /** @type {AppSettings} */
@@ -37,6 +39,7 @@ const APP_DEFAULTS = {
   timeFormat: 'system',
   coordinatesFormat: 'decimal',
   showAllBluetooth: false,
+  paperSize: 'system',
 };
 
 /**

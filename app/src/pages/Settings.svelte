@@ -27,6 +27,7 @@
   } from '../lib/settings.svelte.js';
   import { confirmAction } from '../lib/dialogs.js';
   import { formatNumber, formatDuration, formatDateChoice, formatTimeChoice, formatDepth } from '../lib/format.js';
+  import { regionUsesLetter } from '../lib/share.js';
 
   /** @typedef {import('opendives-core').CorePrefValues} CorePrefValues */
   /** @typedef {{ value: string, label: string, example?: string }} Option */
@@ -230,6 +231,22 @@
             setAppSetting('timeFormat', choice);
             return setCore(choice === 'system' ? { timeFormatOverride: false } : { timeFormat: TIME_PATTERNS[choice], timeFormatOverride: true });
           },
+        },
+        {
+          kind: 'choice',
+          id: 'paperSize',
+          label: t('settings.paperSize.label'),
+          text: settings.paperSize === 'system'
+            ? t('settings.paperSize.text', { name: t(regionUsesLetter() ? 'settings.paperSize.letter' : 'settings.paperSize.a4') })
+            : undefined,
+          value: settings.paperSize === 'system' ? t('settings.system') : t(`settings.paperSize.${settings.paperSize}`),
+          current: settings.paperSize,
+          options: () => [
+            { value: 'system', label: t('settings.system'), example: t(regionUsesLetter() ? 'settings.paperSize.letter' : 'settings.paperSize.a4') },
+            { value: 'letter', label: t('settings.paperSize.letter') },
+            { value: 'a4', label: t('settings.paperSize.a4') },
+          ],
+          set: (v) => setAppSetting('paperSize', /** @type {'system'|'letter'|'a4'} */ (v)),
         },
       ],
     },
