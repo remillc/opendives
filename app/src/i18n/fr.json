@@ -570,7 +570,9 @@
     "trimix": "Trimix {o2}/{he}"
   },
   "tablet": {
-    "noDive": "Choisissez une plongée pour la voir ici"
+    "noDive": "Choisissez une plongée pour la voir ici",
+    "noStatistic": "Choisissez une statistique pour la voir ici",
+    "noTool": "Choisissez un outil pour l’utiliser ici"
   },
   "menu": {
     "open": "Menu",
@@ -1243,7 +1245,9 @@
       "Modifier la plongée : le site et le voyage se tapent ou se choisissent dans la liste filtrée ; un nouveau nom crée le site ou le voyage. La combinaison passe avant le mode de plongée.",
       "Détail d’une plongée, menu ⋮ : « Renuméroter la plongée » ; les plongées concernées sont décalées pour que les numéros restent uniques et sans trou.",
       "Détail d’une plongée, menu ⋮ : « Partager » une fiche PDF d’une page ou un court résumé avec l’image du profil.",
-      "Réglages, Langue et formats : « Format du papier » de la fiche PDF (selon la région, Lettre US ou A4)."
+      "Réglages, Langue et formats : « Format du papier » de la fiche PDF (selon la région, Lettre US ou A4).",
+      "Tablette : Statistiques et Outils montrent la liste et le résultat ou l’outil côte à côte ; le planificateur a ses paramètres à gauche et le plan à droite.",
+      "Tablette : les sites affichent la liste et la carte côte à côte, et l’édition d’une plongée s’ouvre en feuille (iPad) ou en panneau (Android) par-dessus le carnet."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",

@@ -94,7 +94,12 @@
     { path: '/welcome/code', component: ConfirmCode, options: { props: { welcome: true } } },
     { path: '/welcome/import', component: BringLogbook },
     { path: '/welcome/importing', component: ImportProgress },
-    { path: '/dives/:id/edit', component: EditDive },
+    // Phone: a full screen. Tablet: a sheet (iPad) or a pane (Android) over the
+    // list and the dive, chosen when the screen opens (EditDive.svelte).
+    {
+      path: '/dives/:id/edit',
+      async: (/** @type {{ resolve: Function }} */ { resolve }) => resolve(layout.phone ? { component: EditDive } : { popup: { component: EditDive } }),
+    },
     // A dive opened from another section (site, tools) or from a trip: the
     // same screen, without the master-detail routing of the Logbook, which
     // would put a second Logbook in the history.
@@ -135,6 +140,44 @@
     { path: '/', component: Logbook, master: true, detailRoutes: [{ path: '/dives/:id', component: DiveDetail }] },
     ...appRoutes,
   ];
+
+  /**
+   * The Statistics view's routes (tablet): the list of statistics is the
+   * master, a result or a year opens beside it (as the Logbook, above).
+   */
+  const statisticsRoutes = [
+    {
+      path: '/statistics/',
+      component: Statistics,
+      master: true,
+      detailRoutes: [
+        { path: '/statistics/year/:year', component: StatisticsYear },
+        { path: '/statistics/result', component: StatisticsResult },
+      ],
+    },
+    ...appRoutes,
+  ];
+
+  /** The Tools view's routes (tablet): the list of tools is the master, the tool opens beside it. */
+  const toolsRoutes = [
+    {
+      path: '/tools/',
+      component: Tools,
+      master: true,
+      detailRoutes: [
+        { path: '/plan/:id', component: Planner },
+        { path: '/tools/desaturation', component: Desaturation },
+        { path: '/tools/ead-mod', component: GasEadMod },
+        { path: '/tools/best-mix', component: GasBestMix },
+        { path: '/tools/blender', component: GasBlender },
+      ],
+    },
+    ...appRoutes,
+  ];
+
+  /** Widths of the lists beside a result (Statistics) and beside a tool (Tools), from the tablet mock-ups. */
+  const statisticsListWidth = ios ? 420 : 400;
+  const toolsListWidth = 360;
 
   const f7params = {
     name: 'OpenDives',
@@ -181,8 +224,22 @@
   <Views tabs class="safe-areas {layout.phone ? '' : 'od-tablet'}" style="--f7-page-master-width: {listWidth}px; --od-no-dive: '{t('tablet.noDive')}'">
     <View id="view-logbook" main tab tabActive url="/" routes={logbookRoutes} masterDetailBreakpoint={splitBreakpoint} />
     <View id="view-sites" tab url="/sites/" />
-    <View id="view-statistics" tab url="/statistics/" />
-    <View id="view-tools" tab url="/tools/" />
+    <View
+      id="view-statistics"
+      tab
+      url="/statistics/"
+      routes={statisticsRoutes}
+      masterDetailBreakpoint={splitBreakpoint}
+      style="--f7-page-master-width: {statisticsListWidth}px; --od-no-dive: '{t('tablet.noStatistic')}'"
+    />
+    <View
+      id="view-tools"
+      tab
+      url="/tools/"
+      routes={toolsRoutes}
+      masterDetailBreakpoint={splitBreakpoint}
+      style="--f7-page-master-width: {toolsListWidth}px; --od-no-dive: '{t('tablet.noTool')}'"
+    />
     <View id="view-account" tab url="/account" />
   </Views>
 </App>
@@ -212,6 +269,12 @@
     :global(.views.od-tablet .navbar .left:not(:has(a, button))),
     :global(.view-master-detail .page-master-detail .navbar .left) {
       display: none;
+    }
+
+    /* Without a button before it, the title keeps the side margin of the pane. */
+    :global(.views.od-tablet .navbar .left:not(:has(a, button)) + .title),
+    :global(.view-master-detail .page-master-detail .navbar .left + .title) {
+      margin-left: 16px;
     }
 
     /* Nothing chosen yet. */

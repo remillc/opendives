@@ -94,7 +94,7 @@
     <ul>
       {#each months as m (m.month)}
         <li>
-          <a href={monthHref(m.month)} class="item-link item-content">
+          <a href={monthHref(m.month)} data-reload-detail="true" class="item-link item-content">
             <div class="item-inner">
               <div class="item-title-row"><div class="item-title">{monthName(m.month)}</div></div>
               <div class="item-text od-value">{summaryLine(m, logbook.prefs)}</div>
