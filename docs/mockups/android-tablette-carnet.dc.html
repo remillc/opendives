@@ -92,7 +92,7 @@ h1,h2,h3,h4,h1 *,h2 *,h3 *,h4 *,[style*='font-size: 2'],[style*='font-size: 3'],
       <button aria-pressed="false" style="height: 32px; padding: 0 16px; border: 1px solid #75787C; border-radius: 8px; background: transparent; color: #4A4D52; font-family: inherit; font-size: 14px; font-weight: 500">ppO2 des cellules</button>
       <button aria-pressed="false" style="height: 32px; padding: 0 16px; border: 1px solid #75787C; border-radius: 8px; background: transparent; color: #4A4D52; font-family: inherit; font-size: 14px; font-weight: 500">Tissus</button>
     </div>
-    <svg width="560" height="300" viewBox="0 0 560 300" role="img" aria-label="Profil de la plongée 7 : 60,2 m au plus profond, 104 minutes">
+    <svg width="560" height="300" viewBox="0 0 560 300" role="img" aria-label="Profil de la plongée 7 : 198 ft au plus profond, 104 minutes">
       <defs><linearGradient id="awater-d7" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color: #FBE3B2"></stop><stop offset="1" style="stop-color: {{bottom}}"></stop></linearGradient></defs>
       <sc-for list="{{yTicks}}" as="tk" hint-placeholder-count="5">
         <line x1="40" x2="560" y1="{{tk.y}}" y2="{{tk.y}}" style="stroke: #E8E8E5; stroke-width: 1"></line>
@@ -135,11 +135,11 @@ var P = {
   d5: [[2,2.3],[166,14.8],[330,29.1],[494,30.4],[658,25.5],[822,20.9],[986,12.9],[1150,17.6],[1314,22.0],[1478,20.8],[1642,27.9],[1806,31.0],[1970,38.7],[2134,26.7],[2298,25.8],[2462,24.1],[2626,24.1],[2790,20.1],[2954,18.4],[3118,13.7],[3282,8.5],[3446,7.0],[3610,6.8],[3774,6.9],[3938,6.7],[4102,7.1],[4266,6.6],[4430,4.7],[4594,2.4],[4758,0.4],[4922,0.2],[4970,0.2]]
 };
 var ROWS = [
-  { k: 'd9', site: 'Site à préciser', missing: true, date: '7 févr. 2026, 09:09', max: '27,6 m', dur: '55 min' },
-  { k: 'd8', site: 'Site à préciser', missing: true, date: '27 sept. 2025, 11:55', max: '101,5 m', dur: '102 min' },
-  { k: 'd7', site: 'Northern Arch', date: '24 avr. 2022, 10:30', max: '60,2 m', dur: '104 min', sel: true },
-  { k: 'd6', site: 'Hälvälä', date: '23 mai 2015, 13:23', max: '79,6 m', dur: '100 min' },
-  { k: 'd5', site: 'Lake Coleridge', date: '2 avr. 2014, 10:00', max: '39,0 m', dur: '78 min' }
+  { k: 'd9', site: 'Site à préciser', missing: true, date: '7 févr. 2026, 09:09', max: '91 ft', dur: '55 min' },
+  { k: 'd8', site: 'Site à préciser', missing: true, date: '27 sept. 2025, 11:55', max: '333 ft', dur: '102 min' },
+  { k: 'd7', site: 'Northern Arch', date: '24 avr. 2022, 10:30', max: '198 ft', dur: '104 min', sel: true },
+  { k: 'd6', site: 'Hälvälä', date: '23 mai 2015, 13:23', max: '261 ft', dur: '100 min' },
+  { k: 'd5', site: 'Lake Coleridge', date: '2 avr. 2014, 10:00', max: '128 ft', dur: '78 min' }
 ];
 var X0 = 40, W = 520, H = 270, TMAX = 6240, DMAX = 65;
 function xs(t) { return X0 + t / TMAX * W; }
@@ -154,10 +154,10 @@ class Component extends DCLogic {
     return {
       dives: dives,
       line: line, area: line + ' L' + (X0 + W) + ' 0 L' + X0 + ' 0 Z', bottom: mix(60.2 / 60),
-      yTicks: [0, 15, 30, 45, 60].map(function (d) { return { y: ys(d), ty: Math.max(ys(d) + 4, 11), label: d + ' m' }; }),
+      yTicks: [0, 50, 100, 150, 200].map(function (f) { var d = f / 3.28084; return { y: ys(d), ty: Math.max(ys(d) + 4, 11), label: f + ' ft' }; }),
       xTicks: [0, 20, 40, 60, 80, 100].map(function (m) { return { x: Math.min(xs(m * 60), 540), label: m + ' min' }; }),
       facts: [
-        { label: 'Profondeur maximale', value: '60,2 m' },
+        { label: 'Profondeur maximale', value: '198 ft' },
         { label: 'Durée', value: '104 min' },
         { label: 'Eau', value: '16,9 °C' },
         { label: 'Mode', value: 'Recycleur (circuit fermé)' },

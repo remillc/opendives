@@ -27,18 +27,18 @@ h1,h2,h3,h4,h1 *,h2 *,h3 *,h4 *,[style*='font-size: 2'],[style*='font-size: 3'],
     <span style="flex: 1"></span>
     <button aria-label="Rechercher" style="width: 48px; height: 48px; border: none; background: none; padding: 0; display: flex; align-items: center; justify-content: center"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style="flex: none; fill: none; stroke: #1F2124; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><circle cx="10.5" cy="10.5" r="6.5"></circle><path d="M15.5 15.5L20 20"></path></svg></button>
   </div>
-  <div style="padding: 0 16px 0 16px"><p style="margin: 0; font-size: 15px; line-height: 21px; color: #4A4D52; font-variant-numeric: tabular-nums">9 plongées, la plus profonde à 101,5 m</p></div>
+  <div style="padding: 0 16px 0 16px"><p style="margin: 0; font-size: 15px; line-height: 21px; color: #4A4D52; font-variant-numeric: tabular-nums">9 plongées, la plus profonde à 333 ft</p></div>
 
   <a href="detail3-android.dc.html" style="margin: 12px 16px 0 16px; display: block; border-radius: 18px; overflow: hidden; background: #FFFFFF; color: #1F2124; text-decoration: none">
     <div style="padding: 12px 14px 0 14px"><span style="padding: 4px 10px; border-radius: 12px; background: #1F2124; color: #FFFFFF; font-size: 13px; font-weight: 700">Dernière plongée</span></div>
-    <svg width="358" height="130" viewBox="0 0 358 130" preserveAspectRatio="none" role="img" aria-label="Profil, 27,6 m au plus profond" style="display: block; margin-top: 10px">
+    <svg width="358" height="130" viewBox="0 0 358 130" preserveAspectRatio="none" role="img" aria-label="Profil, 91 ft au plus profond" style="display: block; margin-top: 10px">
       <defs><linearGradient id="mono-3-h" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color: #FBE3B2"></stop><stop offset="1" style="stop-color: {{hb}}"></stop></linearGradient></defs>
       <path d="{{ha}}" style="fill: url(#mono-3-h); stroke: none"></path>
       <path d="{{hl}}" style="fill: none; stroke: #1F2124; stroke-width: 2; vector-effect: non-scaling-stroke"></path>
     </svg>
     <div style="padding: 10px 14px 14px 14px; display: flex; justify-content: space-between; align-items: baseline; gap: 12px">
       <span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 20px; font-weight: 700">Site à préciser</span><span style="font-size: 14px; color: #4A4D52">7 févr. 2026, 09:09, recycleur</span></span>
-      <span style="font-size: 26px; font-weight: 800; font-variant-numeric: tabular-nums">27,6 m</span>
+      <span style="font-size: 26px; font-weight: 800; font-variant-numeric: tabular-nums">91 ft</span>
     </div>
   </a>
 
@@ -87,7 +87,7 @@ var P = { d9: [[10,0.0],[110,7.3],[210,14.4],[310,20.9],[410,25.0],[510,25.9],[6
 class Component extends DCLogic {
   renderVals() {
     var h = prof(P.d9, 358, 130, 6);
-    var rows = [['d8', 'Site à préciser', '27 sept. 2025', '101,5 m'], ['d7', 'Northern Arch', '24 avr. 2022', '60,2 m'], ['d6', 'Hälvälä, Finlande', '23 mai 2015', '79,6 m']].map(function (r) {
+    var rows = [['d8', 'Site à préciser', '27 sept. 2025', '333 ft'], ['d7', 'Northern Arch', '24 avr. 2022', '198 ft'], ['d6', 'Hälvälä, Finlande', '23 mai 2015', '261 ft']].map(function (r) {
       var q = prof(P[r[0]], 56, 36);
       return { site: r[1], date: r[2], max: r[3], line: q.line, area: q.area, bottom: q.bottom, gid: 'mono-3-' + r[0], alt: 'Profil, ' + r[3] + ' au plus profond' };
     });
