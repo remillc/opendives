@@ -1181,7 +1181,8 @@
       "« Synchroniser maintenant » : la liste et le menu restent en place, le bouton montre la progression et un message confirme la fin ou signale l’erreur.",
       "Planificateur : les données du plan se modifient sur place, ses réglages ont leur propre écran, avec une seule vitesse de remontée.",
       "Planificateur : le plafond de décompression en rouge sur le profil du plan.",
-      "En pieds cubes, la consommation (SAC) s’affiche avec deux décimales."
+      "En pieds cubes, la consommation (SAC) s’affiche avec deux décimales.",
+      "Les nouvelles plongées téléchargées sont numérotées à la suite, même quand le téléchargement relit aussi des plongées plus anciennes."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
