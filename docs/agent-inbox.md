@@ -566,3 +566,7 @@ On the planner screen, the plan data are no longer list rows. Under the starting
 - Type d’eau (exposed dropdown, full width)
 The computed plan below updates as soon as a field changes (no "Calculer" button). "Changer" on the starting dive card replaces the dive; the values it brought stay editable. Mock-up: `docs/mockups/android-planificateur.dc.html`. Spec: section 4, "Planner settings, a screen of their own".
 
+## [ ] 2026-11-08-07 Planner: show the decompression ceiling on the planned profile
+
+On the planner's profile chart, draw the decompression ceiling of the plan over the depth profile: a dashed line (1.5 dp, ink, dash 4/3), on the same time and depth scales. Take the ceiling from the core for the planned dive (the same calculation as the detail's "Plafond" layer, with the planner's gradient factors), not a separate computation. Under the chart, a legend line 12/16 `#4A4D52` with a short dashed sample: "Plafond de décompression : remonter au-dessus est interdit". When the plan has no stop, do not draw the line or the legend. Add the ceiling to the chart's accessible label. Mock-up: `docs/mockups/android-planificateur.dc.html` (its ceiling values are illustrative).
+
