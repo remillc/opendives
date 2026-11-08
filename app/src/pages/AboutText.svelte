@@ -55,7 +55,8 @@
 
   {#if which === 'notes'}
     <div class="text">
-      <h2>{t('about.notesHeading')}</h2>
+      <!-- The version of app/package.json, the one source of the version. -->
+      <h2>{t('about.version', { version: __APP_VERSION__ })}</h2>
       <ul>
         {#each notes as note, i (i)}<li>{note}</li>{/each}
       </ul>
