@@ -549,3 +549,7 @@ The mock-ups now show depths in ft, cylinder pressures in psi and weights in lb,
 
 Christian wants one ascent rate only. In "Réglages du planificateur", group "Vitesses", replace the four ascent rows with one row "Remontée" (default 9 m/min, shown in the depth unit per minute, 30 ft/min in the mock-up), then "Descente". Subsurface's planner reads four rates (`ascrate75`, `ascrate50`, `ascratestops`, `ascratelast6m` in `core/pref.h`): when the user sets "Remontée", write the same value to all four. Do not change the core. Mock-up: `docs/mockups/reglages-planificateur-android.dc.html`. Spec: section 4, "Planner settings, a screen of their own".
 
+## [ ] 2026-11-08-04 Planner settings: "Dernier palier" is a choice, not a switch
+
+In "Réglages du planificateur", group "Paliers", the first row is no longer a switch. It is a value row "Dernier palier" showing the depth of the last stop (3 m or 6 m, in the depth unit: 10 ft or 20 ft), with a chevron, opening the existing choice screen with the two depths. 3 m by default. It maps to Subsurface's `last_stop` preference (6 m when true). Mock-up: `docs/mockups/reglages-planificateur-android.dc.html`.
+
