@@ -1178,7 +1178,8 @@
       "Politique de confidentialité et « Question / signaler un problème » dans À propos.",
       "Mélangeur de gaz : nitrox par défaut, le dernier mode choisi est retenu.",
       "Synchronisation : l’étape en cours et une barre de progression dans le menu.",
-      "« Synchroniser maintenant » : la liste et le menu restent en place, le bouton montre la progression et un message confirme la fin ou signale l’erreur."
+      "« Synchroniser maintenant » : la liste et le menu restent en place, le bouton montre la progression et un message confirme la fin ou signale l’erreur.",
+      "Planificateur : les données du plan se modifient sur place, ses réglages ont leur propre écran, avec une seule vitesse de remontée."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
@@ -1248,6 +1249,34 @@
     "file": "L'import d'un fichier n'est pas encore construit.",
     "createLocked": "Pendant le développement, créer un compte et écrire dans le cloud sont réservés au compte de test. Rien n'a été envoyé."
   },
+  "plannerSettings": {
+    "title": "Réglages du planificateur",
+    "intro": "S’appliquent à chaque plan.",
+    "open": "Réglages du planificateur",
+    "groups": {
+      "rates": "Vitesses",
+      "stops": "Paliers",
+      "gas": "Gaz",
+      "reserve": "Réserve"
+    },
+    "ascent": "Remontée",
+    "descent": "Descente",
+    "lastStop": "Dernier palier",
+    "dropStone": "Descente instantanée",
+    "dropStoneText": "Sans compter le temps de descente",
+    "o2Breaks": "Pauses sur le gaz de fond",
+    "o2BreaksText": "Pendant les longs paliers à l’oxygène",
+    "switchAtStop": "Changer de gaz seulement aux paliers",
+    "minSwitch": "Durée minimale à un changement de gaz",
+    "bottomSac": "Consommation au fond",
+    "bottomSacText": "Un plan fait depuis une plongée reprend la sienne",
+    "decoSac": "Consommation pendant la déco",
+    "bottomPo2": "ppO₂ au fond",
+    "decoPo2": "ppO₂ pendant la déco",
+    "reserve": "Réserve minimale",
+    "problemSolving": "Temps pour régler un problème",
+    "sacFactor": "Facteur de consommation sous stress"
+  },
   "plan": {
     "title": "Planificateur",
     "back": "Retour",
@@ -1261,6 +1290,7 @@
     "chooseClose": "Fermer",
     "depth": "Profondeur",
     "bottomTime": "Temps de fond",
+    "cylinder": "Bouteille",
     "gas": "Gaz",
     "sac": "Consommation (SAC)",
     "gradientFactors": "Facteurs de gradient",

@@ -77,6 +77,8 @@ static const BoolPref bool_prefs[] = {
 	{ "safetyStop", &preferences::safetystop },
 	{ "switchAtRequiredStop", &preferences::switch_at_req_stop },
 	{ "o2Breaks", &preferences::doo2breaks },
+	// Instant descent (spec, "Planner settings"): Subsurface's drop stone mode.
+	{ "dropStone", &preferences::drop_stone_mode },
 };
 
 // The planner's own numbers, by key: one int of `preferences`, its range in

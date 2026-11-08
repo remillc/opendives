@@ -36,7 +36,7 @@
   import GasBestMix from './pages/GasBestMix.svelte';
   import GasBlender from './pages/GasBlender.svelte';
   import Planner from './pages/Planner.svelte';
-  import PlannerSetup from './pages/PlannerSetup.svelte';
+  import PlannerSettings from './pages/PlannerSettings.svelte';
   import Filter from './pages/Filter.svelte';
   import NewDive from './pages/NewDive.svelte';
   import FilterCriterion from './pages/FilterCriterion.svelte';
@@ -102,7 +102,8 @@
     { path: '/trips/:id', component: Trip },
     { path: '/trips/:trip/dives/:id', component: DiveDetail },
     // The planner: /plan/new/ for a new dive, /plan/<dive id>/ from a logbook dive.
-    { path: '/plan/setup', component: PlannerSetup },
+    // The planner's settings, a screen of their own (task 2026-11-08-01, to-do #3 U3).
+    { path: '/settings/planner', component: PlannerSettings },
     { path: '/plan/:id', component: Planner },
     { path: '/sites/', component: Sites },
     { path: '/sites/without/', component: DivesWithoutSite },

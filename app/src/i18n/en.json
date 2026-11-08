@@ -1178,7 +1178,8 @@
       "Privacy policy and “Question / report a problem” in About.",
       "Gas blender: nitrox by default, the last mode chosen is remembered.",
       "Syncing: the current stage and a progress bar in the menu.",
-      "“Sync now”: the list and the menu stay in place, the button shows the progress and a message confirms the end or reports the error."
+      "“Sync now”: the list and the menu stay in place, the button shows the progress and a message confirms the end or reports the error.",
+      "Planner: the plan data are edited in place, its settings have their own screen, with a single ascent rate."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
@@ -1248,6 +1249,34 @@
     "file": "Importing a file is not built yet.",
     "createLocked": "During development, creating an account and writing to the cloud are limited to the test account. Nothing was sent."
   },
+  "plannerSettings": {
+    "title": "Planner settings",
+    "intro": "They apply to every plan.",
+    "open": "Planner settings",
+    "groups": {
+      "rates": "Rates",
+      "stops": "Stops",
+      "gas": "Gas",
+      "reserve": "Reserve"
+    },
+    "ascent": "Ascent",
+    "descent": "Descent",
+    "lastStop": "Last stop",
+    "dropStone": "Instant descent",
+    "dropStoneText": "Without counting the descent time",
+    "o2Breaks": "Back-gas breaks",
+    "o2BreaksText": "During long oxygen stops",
+    "switchAtStop": "Switch gas only at stops",
+    "minSwitch": "Minimum time at a gas switch",
+    "bottomSac": "Bottom SAC",
+    "bottomSacText": "A plan made from a dive takes the dive’s own",
+    "decoSac": "Deco SAC",
+    "bottomPo2": "Bottom ppO₂",
+    "decoPo2": "Deco ppO₂",
+    "reserve": "Minimum reserve",
+    "problemSolving": "Problem-solving time",
+    "sacFactor": "SAC factor under stress"
+  },
   "plan": {
     "title": "Planner",
     "back": "Back",
@@ -1261,6 +1290,7 @@
     "chooseClose": "Close",
     "depth": "Depth",
     "bottomTime": "Bottom time",
+    "cylinder": "Cylinder",
     "gas": "Gas",
     "sac": "Consumption (SAC)",
     "gradientFactors": "Gradient factors",

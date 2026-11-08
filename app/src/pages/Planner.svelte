@@ -10,6 +10,8 @@
   import { OpenDivesCore } from 'opendives-core';
   import Icon from '../components/Icon.svelte';
   import ProfileThumbnail from '../components/ProfileThumbnail.svelte';
+  import TextField from '../components/TextField.svelte';
+  import SelectField from '../components/SelectField.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
   import { planner, loadSetup, planRequest, startFromDive, startNewDive } from '../lib/planner.svelte.js';
   import { waterBottomColor } from '../lib/water-column.js';
@@ -19,11 +21,11 @@
     formatGas,
     formatNumber,
     formatPressure,
-    formatSac,
     depthUnit,
+    locale,
   } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
-  import { waterTypeName, waterTypeOfSalinity } from '../lib/tools.js';
+  import { WATER_TYPES, waterTypeName, waterTypeOfSalinity } from '../lib/tools.js';
 
   /** @type {{ f7route: { params: { id: string } }, f7router: { navigate: (url: string) => void } }} */
   let { f7route, f7router } = $props();
@@ -111,47 +113,108 @@
     return `${formatNumber(Math.floor((seconds + 30) / 60), 0)} ${t('units.minutes')}`;
   }
 
-  const gasName = $derived(formatGas(planner.o2Permille, planner.hePermille));
+  // --- The data of the plan, MD3 filled fields edited in place (task
+  // 2026-11-08-06): the plan is computed again as soon as one changes.
+  const MM_PER_FT = 304.8;
+  const MBAR_PER_PSI = 68.947572932;
+  const ML_PER_CUFT = 28316.8466;
+  const psi = $derived(prefs.pressure === 'psi');
+  const cuft = $derived(prefs.volume === 'cuft');
 
-  /** The rows of the dive to plan; each opens the planner's settings. */
-  const inputs = $derived([
-    { key: 'depth', label: t('plan.depth'), value: depthText(planner.depthMm) },
-    { key: 'time', label: t('plan.bottomTime'), value: minutes(planner.bottomTimeSeconds) },
-    {
-      key: 'gas',
-      label: t('plan.gas'),
-      value: [gasName, formatCylinderSize(planner.sizeMl, planner.startMbar, prefs), formatPressure(planner.startMbar, prefs)]
-        .filter(Boolean)
-        .join(', '),
-    },
-    {
-      key: 'deco',
-      label: t('plan.decoGases'),
-      // Each gas and its switch depth, as the core set it (the MOD at the ppO2 for deco by default).
-      value: planner.decoGases.length
-        ? planner.decoGases
-            .map((g, i) => {
-              const depth = g.switchDepthMm || result?.cylinders[i + 1]?.switchDepthMm || 0;
-              const name = formatGas(g.o2Permille, g.hePermille);
-              return depth ? t('plan.decoGasAt', { gas: name, depth: depthText(depth) }) : name;
-            })
-            .join(', ')
-        : t('plan.decoGasesNone'),
-    },
-    { key: 'sac', label: t('plan.sac'), value: formatSac(planner.bottomSacMlMin, prefs) },
-    { key: 'water', label: t('plan.waterType'), value: waterTypeName(waterTypeOfSalinity(planner.salinity)) },
-  ]);
+  /** A number as typed back: no thousands separator. @param {number} value @param {number} decimals */
+  const show = (value, decimals = 0) =>
+    new Intl.NumberFormat(locale, { useGrouping: false, maximumFractionDigits: decimals }).format(value);
+  /** "12,5" or "12.5" → 12.5; NaN when empty or not a number. @param {string} text */
+  const parse = (text) => (text.trim() === '' ? NaN : Number(text.trim().replace(',', '.')));
 
-  /** The shared deco settings, read from the core's preferences; set in Settings. */
-  const deco = $derived.by(() => {
-    const s = result?.setup ?? planner.setup;
-    if (!s) return null;
-    if (s.model === 'vpmb') return { label: t('plan.vpmb'), value: t('plan.vpmbValue', { n: s.vpmbConservatism }) };
-    return {
-      label: s.model === 'recreational' ? t('plan.recreational') : t('plan.gradientFactors'),
-      value: `${s.gfLow}/${s.gfHigh}`,
-    };
+  let depthField = $state('');
+  let timeField = $state('');
+  let pressureField = $state('');
+  let sacField = $state('');
+  /** @type {Record<string, boolean>} */
+  let invalid = $state({});
+
+  /** The fields from the plan: on opening, and when "Changer" brings another dive. */
+  function fillFields() {
+    depthField = show(feet ? planner.depthMm / MM_PER_FT : planner.depthMm / 1000);
+    timeField = show(planner.bottomTimeSeconds / 60);
+    pressureField = show(psi ? planner.startMbar / MBAR_PER_PSI : planner.startMbar / 1000);
+    sacField = show(cuft ? planner.bottomSacMlMin / ML_PER_CUFT : planner.bottomSacMlMin / 1000, cuft ? 2 : 1);
+    invalid = {};
+  }
+  $effect(() => {
+    planner.source;
+    ready;
+    fillFields();
   });
+
+  /**
+   * A typed number into the plan, when it is within its range.
+   * @param {string} key @param {string} text @param {number} min @param {number} max @param {(v: number) => void} set
+   */
+  function typed(key, text, min, max, set) {
+    const v = parse(text);
+    invalid[key] = !(v >= min && v <= max);
+    if (invalid[key]) return;
+    set(v);
+    planner.version++;
+  }
+
+  /** The usual bottom gases, and the plan's own when it is another one. */
+  const gasOptions = $derived.by(() => {
+    const usual = [[209, 0], [280, 0], [320, 0], [360, 0], [400, 0], [210, 350], [180, 450], [150, 550], [120, 650]];
+    const mine = [planner.o2Permille, planner.hePermille];
+    const list = usual.some(([o, h]) => o === mine[0] && h === mine[1]) ? usual : [mine, ...usual];
+    return list.map(([o, h]) => ({ value: `${o}/${h}`, label: formatGas(o, h) }));
+  });
+  let gasChoice = $state('');
+  $effect(() => {
+    gasChoice = `${planner.o2Permille}/${planner.hePermille}`;
+  });
+  $effect(() => {
+    const [o2, he] = gasChoice.split('/').map(Number);
+    if (!o2 || (o2 === planner.o2Permille && he === planner.hePermille)) return;
+    planner.o2Permille = o2;
+    planner.hePermille = he;
+    planner.version++;
+  });
+
+  /** The cylinder types (Settings, Bouteilles), and the plan's own size when none matches. */
+  let cylinderTypes = $state(/** @type {{ name: string, ml: number, workingPressureMbar: number }[]} */ ([]));
+  OpenDivesCore.toolQuery({ kind: 'cylinders' })
+    .then((/** @type {import('opendives-core').GasCylinderTypes} */ list) => (cylinderTypes = list.types.filter((c) => c.ml > 0)))
+    .catch((/** @type {unknown} */ e) => console.error('Cylinder types', e));
+  const cylinderOptions = $derived.by(() => {
+    const own = { value: '', label: formatCylinderSize(planner.sizeMl, planner.startMbar, prefs) ?? '' };
+    const types = cylinderTypes.map((c) => ({
+      value: c.name,
+      label: [c.name, formatCylinderSize(c.ml, c.workingPressureMbar, prefs)].filter(Boolean).join(', '),
+    }));
+    return types.some((c) => cylinderTypes.find((x) => x.name === c.value)?.ml === planner.sizeMl) ? types : [own, ...types];
+  });
+  let cylinderChoice = $state('');
+  $effect(() => {
+    cylinderChoice = cylinderTypes.find((c) => c.ml === planner.sizeMl)?.name ?? '';
+  });
+  $effect(() => {
+    const type = cylinderTypes.find((c) => c.name === cylinderChoice);
+    if (!type || type.ml === planner.sizeMl) return;
+    planner.sizeMl = type.ml;
+    planner.version++;
+  });
+
+  /** The water type: every depth to pressure conversion of the plan uses it. */
+  let water = $state('');
+  $effect(() => {
+    water = waterTypeOfSalinity(planner.salinity);
+  });
+  $effect(() => {
+    const salinity = WATER_TYPES.find((w) => w.id === water)?.salinity;
+    if (!salinity || salinity === planner.salinity) return;
+    planner.salinity = salinity;
+    planner.version++;
+  });
+  const waterOptions = WATER_TYPES.map((w) => ({ value: w.id, label: waterTypeName(w.id) }));
 
   const errorText = $derived(result?.error ? t(`plan.errors.${result.error}`) : '');
 
@@ -252,9 +315,6 @@
     else await startFrom(id);
   }
 
-  function openSetup() {
-    f7router.navigate('/plan/setup');
-  }
 </script>
 
 <Page onPageReinit={refresh}>
@@ -263,6 +323,12 @@
       <Link back iconOnly={!theme.ios}>
         <i class="icon icon-back"></i>
         {#if theme.ios}<span>{t('plan.back')}</span>{:else}<span class="od-sr-only">{t('plan.back')}</span>{/if}
+      </Link>
+    {/snippet}
+    {#snippet right()}
+      <!-- The planner's settings, a screen of their own (task 2026-11-08-01). -->
+      <Link iconOnly href="/settings/planner">
+        <Icon name="tune" /><span class="od-sr-only">{t('plannerSettings.open')}</span>
       </Link>
     {/snippet}
   </Navbar>
@@ -285,23 +351,35 @@
       <span class="change">{t('plan.change')}</span>
     </button>
 
-    {#each inputs as input (input.key)}
-      <button type="button" class="row" onclick={openSetup}>
-        <span class="label">{input.label}</span>
-        <span class="value od-value">{input.value}</span>
-      </button>
-    {/each}
-    {#if deco}
-      <!-- Shared with the profile, the desaturation and the gas calculator: set in Settings. -->
-      <a class="row" href="/settings/">
-        <span class="label">{deco.label}</span>
-        <span class="value od-value">{deco.value}</span>
-      </a>
-    {/if}
-    <button type="button" class="row" onclick={openSetup}>
-      <span class="label">{t('plan.settings')}</span>
-      <span class="chevron"><Icon name="expand" size={20} /></span>
-    </button>
+  </div>
+
+  <!-- The data of the plan: two fields per line, 16 dp apart. -->
+  <div class="fields">
+    <div class="pair">
+      <TextField label={t('plan.depth')} bind:value={depthField} inputmode="decimal" invalid={invalid.depth}
+        oninput={() => typed('depth', depthField, 1, feet ? 980 : 300, (v) => (planner.depthMm = feet ? v * MM_PER_FT : v * 1000))}>
+        {#snippet trailing()}<span class="unit">{depthUnit(prefs)}</span>{/snippet}
+      </TextField>
+      <TextField label={t('plan.bottomTime')} bind:value={timeField} inputmode="numeric" invalid={invalid.time}
+        oninput={() => typed('time', timeField, 1, 360, (v) => (planner.bottomTimeSeconds = Math.round(v * 60)))}>
+        {#snippet trailing()}<span class="unit">{t('units.minutes')}</span>{/snippet}
+      </TextField>
+    </div>
+    <div class="pair">
+      <SelectField label={t('plan.gas')} bind:value={gasChoice} options={gasOptions} />
+      <SelectField label={t('plan.cylinder')} bind:value={cylinderChoice} options={cylinderOptions} />
+    </div>
+    <div class="pair">
+      <TextField label={t('plan.startPressure')} bind:value={pressureField} inputmode="decimal" invalid={invalid.pressure}
+        oninput={() => typed('pressure', pressureField, psi ? 150 : 10, psi ? 5000 : 350, (v) => (planner.startMbar = psi ? v * MBAR_PER_PSI : v * 1000))}>
+        {#snippet trailing()}<span class="unit">{t(psi ? 'units.psi' : 'units.bar')}</span>{/snippet}
+      </TextField>
+      <TextField label={t('plan.sac')} bind:value={sacField} inputmode="decimal" invalid={invalid.sac}
+        oninput={() => typed('sac', sacField, cuft ? 0.04 : 1, cuft ? 3.5 : 99, (v) => (planner.bottomSacMlMin = Math.round(cuft ? v * ML_PER_CUFT : v * 1000)))}>
+        {#snippet trailing()}<span class="unit">{t(cuft ? 'units.cubicFeetPerMinute' : 'units.litersPerMinute')}</span>{/snippet}
+      </TextField>
+    </div>
+    <SelectField label={t('plan.waterType')} bind:value={water} options={waterOptions} />
   </div>
 
   {#if failed}
@@ -742,5 +820,37 @@
     .end {
       height: 32px;
     }
-  }
+
+    /* The data of the plan: MD3 filled fields, two per line, 16 dp apart. */
+    .fields {
+      margin-top: 8px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .pair {
+      display: flex;
+      gap: 16px;
+      margin: 0 16px;
+      align-items: flex-start;
+
+      :global(.field) {
+        flex: 1;
+        min-width: 0;
+        margin-left: 0;
+        margin-right: 0;
+      }
+    }
+
+    .unit {
+      display: block;
+      padding: 24px 8px 0 0;
+      font-size: 16px;
+      line-height: 24px;
+      color: var(--od-text-2);
+
+      :global(.field:not(.floated)) & {
+        visibility: hidden;
+      }
+    }  }
 </style>

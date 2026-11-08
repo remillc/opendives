@@ -35,10 +35,12 @@ export const SETTING_KEYS = /** @type {const} */ ([
   'switchAtRequiredStop',
   'minSwitchSeconds',
   'o2Breaks',
+  'dropStone',
   'reserveMbar',
   'problemSolvingMinutes',
   'sacFactor',
   'decoSacMlMin',
+  'bottomSacMlMin',
 ]);
 
 /**
@@ -107,9 +109,31 @@ export async function setSetting(key, value) {
   planner.version++;
 }
 
-/** Back to Subsurface's values for the planner-only settings. */
+/** Subsurface reads four ascent rates, by depth band: OpenDives sets them all at once. */
+export const ASCENT_KEYS = /** @type {const} */ (['ascent75MmMin', 'ascent50MmMin', 'ascentStopsMmMin', 'ascentLast6mMmMin']);
+
+/** The single ascent rate (spec, "Planner settings"), 9 m/min by default. */
+export const DEFAULT_ASCENT_MM_MIN = 9000;
+
+/** The ascent rate shown: the first band's, which "Remontée" writes to all four. */
+export function ascentRate() {
+  return Number(setting('ascent75MmMin')) || DEFAULT_ASCENT_MM_MIN;
+}
+
+/**
+ * "Remontée": one rate for Subsurface's four depth bands (task 2026-11-08-03).
+ * @param {number} mmMin
+ */
+export async function setAscentRate(mmMin) {
+  await setCorePrefs(Object.fromEntries(ASCENT_KEYS.map((k) => [k, mmMin])));
+  await loadSetup();
+  planner.version++;
+}
+
+/** Back to Subsurface's values for the planner-only settings, with the single ascent rate. */
 export async function resetSettings() {
   await resetCorePrefs([...SETTING_KEYS]);
+  await setCorePrefs(Object.fromEntries(ASCENT_KEYS.map((k) => [k, DEFAULT_ASCENT_MM_MIN])));
   await loadSetup();
   planner.version++;
 }

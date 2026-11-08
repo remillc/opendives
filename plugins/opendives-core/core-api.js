@@ -121,7 +121,7 @@ import { registerPlugin } from '@capacitor/core';
  *   bottomPo2Mbar: number, decoPo2Mbar: number, bottomSacMlMin: number, decoSacMlMin: number,
  *   descentMmMin: number, ascent75MmMin: number, ascent50MmMin: number, ascentStopsMmMin: number,
  *   ascentLast6mMmMin: number, lastStop6m: boolean, safetyStop: boolean, switchAtRequiredStop: boolean,
- *   minSwitchSeconds: number, o2Breaks: boolean, reserveMbar: number, problemSolvingMinutes: number,
+ *   minSwitchSeconds: number, o2Breaks: boolean, dropStone: boolean, reserveMbar: number, problemSolvingMinutes: number,
  *   sacFactor: number,
  * }} CorePrefValues
  * The planner's own values (rates in mm per minute, sacFactor x100) are set from the planner screen.
@@ -180,6 +180,7 @@ import { registerPlugin } from '@capacitor/core';
  * @property {boolean} switchAtRequiredStop
  * @property {number} minSwitchSeconds
  * @property {boolean} o2Breaks
+ * @property {boolean} dropStone instant descent (Subsurface's drop_stone_mode)
  * @property {number} reserveMbar
  * @property {number} problemSolvingMinutes
  * @property {number} sacFactor x100

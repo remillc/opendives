@@ -254,6 +254,7 @@ std::string setup_json()
 	add_bool(json, "switchAtRequiredStop", prefs.switch_at_req_stop);
 	add(json, "minSwitchSeconds", prefs.min_switch_duration);
 	add_bool(json, "o2Breaks", prefs.doo2breaks);
+	add_bool(json, "dropStone", prefs.drop_stone_mode);
 	add(json, "reserveMbar", prefs.reserve_gas);
 	add(json, "problemSolvingMinutes", prefs.problemsolvingtime);
 	add(json, "sacFactor", prefs.sacfactor);
@@ -278,6 +279,7 @@ void apply_settings(const Flat &v)
 	prefs.switch_at_req_stop = get(v, "switchAtRequiredStop", prefs.switch_at_req_stop);
 	prefs.min_switch_duration = get(v, "minSwitchSeconds", prefs.min_switch_duration);
 	prefs.doo2breaks = get(v, "o2Breaks", prefs.doo2breaks);
+	prefs.drop_stone_mode = get(v, "dropStone", prefs.drop_stone_mode);
 	prefs.reserve_gas = get(v, "reserveMbar", prefs.reserve_gas);
 	prefs.problemsolvingtime = get(v, "problemSolvingMinutes", prefs.problemsolvingtime);
 	prefs.sacfactor = get(v, "sacFactor", prefs.sacfactor);
@@ -492,9 +494,11 @@ int plan_dive(const std::string &request, std::string &json, std::string &error)
 		if (d.cylinders[i].depth.mm && d.cylinders[i].cylinder_use == OC_GAS)
 			plan_add_segment(dp, 0, d.cylinders[i].depth, static_cast<int>(i), 0, false, OC);
 	depth_t bottom { .mm = static_cast<int32_t>(depth) };
-	// As in drop-stone mode: the descent at the descent rate, counted in the
-	// bottom time (Subsurface's runtime of the last entered waypoint).
-	int descent = bottom.mm / prefs.descrate;
+	// The descent at the descent rate, counted in the bottom time (Subsurface's
+	// runtime of the last entered waypoint); with the instant descent setting
+	// (drop_stone_mode), the whole bottom time is spent at depth: one second,
+	// as a segment of no duration would make the next one the descent.
+	int descent = prefs.drop_stone_mode ? 1 : bottom.mm / prefs.descrate;
 	dp_add(dp, descent, bottom);
 	if (bottom_time > descent)
 		dp_add(dp, static_cast<int>(bottom_time) - descent, bottom);

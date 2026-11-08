@@ -533,7 +533,7 @@ Nothing to change in the app: check this task once you have read the rule.
 
 Done in "Inbox: TODOS.md tags read". Rule read: every item the code agent adds now starts with [design] or [code].
 
-## [ ] 2026-11-08-01 Planner: settings on their own screen
+## [x] 2026-11-08-01 Planner: settings on their own screen
 
 The planner settings move out of the planner screen (to-do #4). See section 4 of the spec, "Planner settings, a screen of their own".
 - Planner screen (`docs/mockups/android-planificateur.dc.html`): keep only the plan data (starting dive, depth, bottom time, gas, SAC, water type) and the computed plan. Remove the "Facteurs de gradient" row (it is in Settings, "Décompression"). Add a 48 dp icon button with a 24 dp "tune" icon, `aria-label` "Réglages du planificateur", in the top bar before "Enregistrer".
@@ -541,23 +541,29 @@ The planner settings move out of the planner screen (to-do #4). See section 4 of
 - Route: the one you settle under to-do #3 (U3: `/settings/planner`).
 - iOS: same content, in an inset grouped list.
 
+Done in "Planner: settings on their own screen, plan data edited in place". The screen is at /settings/planner (to-do #3, U3), opened from a "tune" button in the planner's top bar; the old /plan/setup screen is gone. "Descente instantanée" needed one more planner preference in the facade (dropStone, Subsurface's drop_stone_mode, set through the existing preferences call; Subsurface itself unchanged); it was checked in the emulator: 130 ft, 20 min, the plan goes from 50 to 54 min. Not like the old screen: the safety stop switch is no longer shown (not in the mock-up), and deco gases can no longer be edited (the planner keeps those brought by a starting dive). There is no "Enregistrer" button in the app yet, so the tune button is alone at the end of the bar. iOS: same content, surfaces with 10 pt corners; not checked on an iPhone.
+
 ## [ ] 2026-11-08-02 Mock-ups now show imperial example values
 
 The mock-ups now show depths in ft, cylinder pressures in psi and weights in lb, with °C and litres (Settings, Unités: "Personnalisé", Profondeur "Pieds", Pression "psi", Poids "Livres"). Partial pressures stay in bar. Nothing changes in the app: it keeps following the user's unit settings. When you compare a screen with its mock-up, compare layout and wording, not the units. Check that every value with a unit converts correctly when the settings are in ft, psi and lb (for example "2 683 → 1 885 psi", "Dernier palier à 20 ft", "30 ft/min").
 
-## [ ] 2026-11-08-03 Planner settings: a single ascent rate
+## [x] 2026-11-08-03 Planner settings: a single ascent rate
 
 Christian wants one ascent rate only. In "Réglages du planificateur", group "Vitesses", replace the four ascent rows with one row "Remontée" (default 9 m/min, shown in the depth unit per minute, 30 ft/min in the mock-up), then "Descente". Subsurface's planner reads four rates (`ascrate75`, `ascrate50`, `ascratestops`, `ascratelast6m` in `core/pref.h`): when the user sets "Remontée", write the same value to all four. Do not change the core. Mock-up: `docs/mockups/reglages-planificateur-android.dc.html`. Spec: section 4, "Planner settings, a screen of their own".
 
-## [ ] 2026-11-08-04 Planner settings: "Dernier palier" is a choice, not a switch
+Done in "Planner: settings on their own screen, plan data edited in place". "Remontée" writes the same value to the four ascent rates (checked: 30 ft/min gives 9120 mm/min in all four, the core keeping mm/s). "Reset" puts 9 m/min in all four.
+
+## [x] 2026-11-08-04 Planner settings: "Dernier palier" is a choice, not a switch
 
 In "Réglages du planificateur", group "Paliers", the first row is no longer a switch. It is a value row "Dernier palier" showing the depth of the last stop (3 m or 6 m, in the depth unit: 10 ft or 20 ft), with a chevron, opening the existing choice screen with the two depths. 3 m by default. It maps to Subsurface's `last_stop` preference (6 m when true). Mock-up: `docs/mockups/reglages-planificateur-android.dc.html`.
+
+Done in "Planner: settings on their own screen, plan data edited in place". A choice of 3 m or 6 m (10 ft or 20 ft) mapped to lastStop6m (Subsurface's last_stop); checked in the emulator.
 
 ## [ ] 2026-11-08-05 Mock-ups: volumes in cubic feet too
 
 Follow-up to task 2026-11-08-02: the mock-ups now also show volumes in cubic feet (Settings, Unités: Volume "Pieds cubes"). Cylinder sizes appear as gas capacity at the working pressure, as Subsurface does in imperial (AL80 = 80 cuft, 12 L at 232 bar = 97 cuft), gas used in cuft ("40 cuft consommés"), SAC in cuft/min with two decimals ("0,36 cuft/min"). Partial pressures (ppO₂, pN₂, pHe, setpoints) stay in bar, as in Subsurface. Nothing to change in the app beyond checking that these conversions come out right when Volume is set to cubic feet.
 
-## [ ] 2026-11-08-06 Planner: the plan data are fields edited in place
+## [x] 2026-11-08-06 Planner: the plan data are fields edited in place
 
 On the planner screen, the plan data are no longer list rows. Under the starting dive card, a form of MD3 filled text fields (the same as in the gas tools), 16 dp apart, two per line:
 - Profondeur (number, unit suffix) | Temps de fond (number, "min")
@@ -565,6 +571,8 @@ On the planner screen, the plan data are no longer list rows. Under the starting
 - Pression de départ (number, pressure unit) | Consommation (SAC) (number, volume unit per minute)
 - Type d’eau (exposed dropdown, full width)
 The computed plan below updates as soon as a field changes (no "Calculer" button). "Changer" on the starting dive card replaces the dive; the values it brought stay editable. Mock-up: `docs/mockups/android-planificateur.dc.html`. Spec: section 4, "Planner settings, a screen of their own".
+
+Done in "Planner: settings on their own screen, plan data edited in place". The plan is computed again at each keystroke of a valid value (checked: 130 ft gives five stops at once). The Gaz list offers the usual mixes (air, EAN28 to EAN40, trimix 21/35 to 12/65) and the plan's own gas; the gases used in the logbook are not listed yet, as the app has no list of them without reading every dive. Bouteille lists the cylinder types of Settings, plus the plan's own size when none matches.
 
 ## [ ] 2026-11-08-07 Planner: show the decompression ceiling on the planned profile
 
