@@ -129,10 +129,23 @@ function shareTitle(dive) {
   return dive.site || (dive.number ? t('share.sheetNumber', { number: String(dive.number) }) : t('share.sheetDive'));
 }
 
-/** Letter paper in the United States and Canada, A4 elsewhere. */
+/**
+ * The regions whose paper is US Letter (Unicode CLDR, paperSize "US-Letter");
+ * A4 everywhere else.
+ */
+const LETTER_REGIONS = new Set(['US', 'CA', 'MX', 'BZ', 'CL', 'CO', 'CR', 'GT', 'NI', 'PA', 'PH', 'PR', 'SV', 'VE']);
+
+/** The paper of the device's region (from its language, e.g. fr-CA). */
 function letterPaper() {
-  const region = (navigator.language.split('-')[1] ?? '').toUpperCase();
-  return region === 'US' || region === 'CA';
+  let region = (navigator.language.split('-')[1] ?? '').toUpperCase();
+  if (!region) {
+    try {
+      region = new Intl.Locale(navigator.language).maximize().region ?? '';
+    } catch {
+      region = '';
+    }
+  }
+  return LETTER_REGIONS.has(region);
 }
 
 /** @param {string} s */
