@@ -22,6 +22,7 @@
     formatGasVolume,
     formatNumber,
     formatPressure,
+    formatSac,
     depthUnit,
     locale,
   } from '../lib/format.js';
@@ -146,7 +147,6 @@
   let depthField = $state('');
   let timeField = $state('');
   let pressureField = $state('');
-  let sacField = $state('');
   /** @type {Record<string, boolean>} */
   let invalid = $state({});
 
@@ -155,7 +155,6 @@
     depthField = show(feet ? planner.depthMm / MM_PER_FT : planner.depthMm / 1000);
     timeField = show(planner.bottomTimeSeconds / 60);
     pressureField = show(psi ? planner.startMbar / MBAR_PER_PSI : planner.startMbar / 1000);
-    sacField = show(cuft ? planner.bottomSacMlMin / ML_PER_CUFT : planner.bottomSacMlMin / 1000, cuft ? 2 : 1);
     invalid = {};
   }
   $effect(() => {
@@ -216,6 +215,40 @@
     const type = cylinderTypes.find((c) => c.name === cylinderChoice);
     if (!type || type.ml === planner.sizeMl) return;
     planner.sizeMl = type.ml;
+    planner.version++;
+  });
+
+  /**
+   * The SAC, an exposed dropdown menu: the values around the current one, in
+   * steps of 0.01 cuft/min or 0.5 L/min (20 each side), the current one
+   * selected even off the steps (a SAC measured on a dive). Values in mL/min.
+   */
+  const sacOptions = $derived.by(() => {
+    const step = cuft ? 0.01 * ML_PER_CUFT : 500;
+    const min = cuft ? 0.04 * ML_PER_CUFT : 1000;
+    const max = cuft ? 3.5 * ML_PER_CUFT : 99000;
+    const current = planner.bottomSacMlMin;
+    const base = Math.round(current / step);
+    /** @type {number[]} */
+    const values = [];
+    for (let k = base - 20; k <= base + 20; k++) {
+      const ml = Math.round(k * step);
+      if (ml >= min && ml <= max) values.push(ml);
+    }
+    // The current value: the step that shows the same, or its own entry.
+    const same = values.find((ml) => formatSac(ml, prefs) === formatSac(current, prefs));
+    if (same === undefined) values.push(current);
+    values.sort((a, b) => a - b);
+    return { selected: same ?? current, list: values.map((ml) => ({ value: String(ml), label: formatSac(ml, prefs) })) };
+  });
+  let sacChoice = $state('');
+  $effect(() => {
+    sacChoice = String(sacOptions.selected);
+  });
+  $effect(() => {
+    const ml = Number(sacChoice);
+    if (!ml || ml === sacOptions.selected) return;
+    planner.bottomSacMlMin = ml;
     planner.version++;
   });
 
@@ -398,10 +431,7 @@
         oninput={() => typed('pressure', pressureField, psi ? 150 : 10, psi ? 5000 : 350, (v) => (planner.startMbar = psi ? v * MBAR_PER_PSI : v * 1000))}>
         {#snippet trailing()}<span class="unit">{t(psi ? 'units.psi' : 'units.bar')}</span>{/snippet}
       </TextField>
-      <TextField label={t('plan.sac')} bind:value={sacField} inputmode="decimal" invalid={invalid.sac}
-        oninput={() => typed('sac', sacField, cuft ? 0.04 : 1, cuft ? 3.5 : 99, (v) => (planner.bottomSacMlMin = Math.round(cuft ? v * ML_PER_CUFT : v * 1000)))}>
-        {#snippet trailing()}<span class="unit">{t(cuft ? 'units.cubicFeetPerMinute' : 'units.litersPerMinute')}</span>{/snippet}
-      </TextField>
+      <SelectField label={t('plan.sac')} bind:value={sacChoice} options={sacOptions.list} />
     </div>
     <SelectField label={t('plan.waterType')} bind:value={water} options={waterOptions} />
   </div>
