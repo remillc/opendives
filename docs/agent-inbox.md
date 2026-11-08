@@ -637,3 +637,7 @@ Changes the renumbering part of task 2026-11-08-13: a number already taken is no
 - iOS: same rules; the menu now has "Renuméroter la plongée", "Partager" and, after a wide separator, "Supprimer la plongée" (`docs/mockups/detail2-ios-menu.dc.html`).
 Spec: section 4, the "Dive detail" row of the screens table.
 
+## [ ] 2026-11-08-15 Dive editor: no number field
+
+Changes task 2026-11-08-11: remove the "N°" field from the editor. Changing a number shifts other dives, so it is done only through "Renuméroter la plongée" in the detail menu (tasks 13 and 14). The editor keeps showing the number in the line under its title ("N° 5 · Lake Coleridge · 2 avril 2014"). The first line of "La plongée" is now Date | Heure. Mock-up: `docs/mockups/android-edition.dc.html`.
+
