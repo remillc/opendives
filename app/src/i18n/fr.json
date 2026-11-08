@@ -1184,7 +1184,8 @@
       "En pieds cubes, la consommation (SAC) s’affiche avec deux décimales.",
       "Planificateur : valeurs par défaut rondes dans les unités choisies (45 pi, 3 000 psi, 60 pi/min…), et gaz consommé dans l’unité de volume choisie.",
       "Un bouton « Arrêter le téléchargement » sous la progression du téléchargement depuis l’ordinateur de plongée.",
-      "Les nouvelles plongées téléchargées sont numérotées à la suite, même quand le téléchargement relit aussi des plongées plus anciennes."
+      "Les nouvelles plongées téléchargées sont numérotées à la suite, même quand le téléchargement relit aussi des plongées plus anciennes.",
+      "Planificateur : la consommation (SAC) se choisit dans un menu, par pas de 0,5 L/min ou 0,01 pi³/min."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",

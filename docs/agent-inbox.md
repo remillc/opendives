@@ -590,13 +590,17 @@ Change to task 2026-11-08-07: the legend under the planner's chart reads only "P
 
 Done in "Planner: the decompression ceiling on the planned profile": the legend reads "Plafond de décompression" only.
 
-## [ ] 2026-11-08-09 Planner: SAC on a wheel
+## [x] 2026-11-08-09 Planner: SAC on a wheel
 
 Change to task 2026-11-08-06: "Consommation (SAC)" is no longer a text field. Under the fields, it is a wheel on a white surface (20 dp corners, 16 dp margins), built like the ppO₂ wheel of "EAD et MOD": label "Consommation (SAC)", helper "Glisser pour changer", three visible values with the selected one in the middle between two ink lines, unit after the wheel. Steps: 0.01 cuft/min in imperial, 0.1 L/min in metric. The third line of fields is now "Pression de départ" | "Type d’eau". Mock-up: `docs/mockups/android-planificateur.dc.html`.
 
-## [ ] 2026-11-08-10 Planner: SAC in a dropdown menu, not a wheel
+Cancelled by task 2026-11-08-10 before it was built: no wheel was made.
+
+## [x] 2026-11-08-10 Planner: SAC in a dropdown menu, not a wheel
 
 Cancels task 2026-11-08-09 (if you already built the wheel, remove it). "Consommation (SAC)" is an MD3 exposed dropdown menu in the field grid, beside "Pression de départ"; "Type d’eau" goes back to its own full-width line. The menu lists values around the current one, in steps of 0.01 cuft/min in imperial or 0.5 L/min in metric, the current value selected. Mock-up: `docs/mockups/android-planificateur.dc.html`.
+
+Done in "Planner: SAC in a dropdown menu". "Consommation (SAC)" is a dropdown (the app's SelectField, the system's choice list) beside "Pression de départ", with 20 values on each side of the current one in steps of 0.01 cuft/min or 0.5 L/min, within the planner's former limits (0.04 to 3.5 cuft/min, 1 to 99 L/min). A SAC off the steps (measured on a dive, e.g. 17.3 L/min) is listed as its own entry and selected. "Type d’eau" was already on its own line.
 
 ## [ ] 2026-11-08-11 Dive editor: every field Subsurface desktop edits, friendlier layout
 
