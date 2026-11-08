@@ -639,9 +639,11 @@ Changes the renumbering part of task 2026-11-08-13: a number already taken is no
 - iOS: same rules; the menu now has "Renuméroter la plongée", "Partager" and, after a wide separator, "Supprimer la plongée" (`docs/mockups/detail2-ios-menu.dc.html`).
 Spec: section 4, the "Dive detail" row of the screens table.
 
-## [ ] 2026-11-08-15 Dive editor: no number field
+## [x] 2026-11-08-15 Dive editor: no number field
 
 Changes task 2026-11-08-11: remove the "N°" field from the editor. Changing a number shifts other dives, so it is done only through "Renuméroter la plongée" in the detail menu (tasks 13 and 14). The editor keeps showing the number in the line under its title ("N° 5 · Lake Coleridge · 2 avril 2014"). The first line of "La plongée" is now Date | Heure. Mock-up: `docs/mockups/android-edition.dc.html`.
+
+Done in "Dive editor: no number field; duration and maximum depth read-only". The N field is gone; the number stays in the line under the title; the first line of La plongee is Date | Heure. The core keeps accepting a number (used by Renumber, tasks 13 and 14).
 
 ## [ ] 2026-11-08-16 Share a dive as a PDF sheet
 
@@ -650,13 +652,17 @@ Changes the "Partager" part of task 2026-11-08-13. "Partager" in the detail menu
 - "Résumé et image", "Un court texte et l’image du profil": the share described in task 13.
 The PDF follows `docs/mockups/partage-pdf-fiche.dc.html` (US Letter; use A4 outside the US and Canada): header with "Plongée n° 5", date and time, site as the title, location and trip, the three key figures on the right; "Profil" with the depth and time axes and the temperature curve, with a one-line legend; the secondary facts in five columns; "Gaz et équipement" as a table (Bouteille, Taille, Utilisation, Gaz, Début, Fin), then suit, weights and dive computer; "Personnes" and "Conditions" side by side; "Notes" in full (continue on a second page when long); footer "Fiche créée avec OpenDives le …" and "Page 1 sur 1". Rows without a value are left out, as on screen. Build the page as HTML with the app's styles and render it to PDF on the device (Android `PrintDocumentAdapter` or a WebView PDF export, iOS `UIPrintPageRenderer`); no network. Spec: section 4, the "Dive detail" row.
 
-## [ ] 2026-11-08-17 Dive editor: no duration or maximum depth
+## [x] 2026-11-08-17 Dive editor: no duration or maximum depth
 
 Changes task 2026-11-08-11: remove "Durée" and "Profondeur max." from the editor, with their helper. They come from the dive computer and are not edited in this screen. A dive entered by hand gets them on the "Nouvelle plongée" screen. "La plongée" now holds Date | Heure, Site, Voyage, Note. Mock-up: `docs/mockups/android-edition.dc.html`.
 
-## [ ] 2026-11-08-18 Dive editor: duration and maximum depth visible, read-only
+Done in "Dive editor: no number field; duration and maximum depth read-only", as changed by task 2026-11-08-18: duration and maximum depth are no longer fields.
+
+## [x] 2026-11-08-18 Dive editor: duration and maximum depth visible, read-only
 
 Changes task 2026-11-08-17: keep "Durée" and "Profondeur max." visible in "La plongée", under Date | Heure, but not editable. Show them as plain text side by side (label 12/16 `#4A4D52`, value 16/24 ink, tabular figures, 16 dp side padding, no field background, not focusable as inputs), with the helper "Mesurées par l’ordinateur de plongée" under them. Mock-up: `docs/mockups/android-edition.dc.html`.
+
+Done in "Dive editor: no number field; duration and maximum depth read-only". Duration and maximum depth are plain text side by side under Date | Heure (label 12/16 text-2, value 16/24 ink, tabular figures, 16 dp padding), with the helper Mesurees par l'ordinateur de plongee. Checked in the emulator.
 
 ## [ ] 2026-11-08-19 Share sheet: icons in coloured circles
 

@@ -670,9 +670,8 @@
     "title": "Modifier la plongée",
     "save": "Enregistrer",
     "diveGroup": "La plongée",
-    "number": "N°",
     "duration": "Durée",
-    "durationNote": "Calculées par l’ordinateur. Modifiables seulement pour une plongée saisie à la main",
+    "durationNote": "Mesurées par l’ordinateur de plongée",
     "site": "Site",
     "trip": "Voyage",
     "none": "Aucun",
@@ -1230,7 +1229,8 @@
       "Les nouvelles plongées téléchargées sont numérotées à la suite, même quand le téléchargement relit aussi des plongées plus anciennes.",
       "Planificateur : la consommation (SAC) se choisit dans un menu, par pas de 0,5 L/min ou 0,01 pi³/min.",
       "Modifier la plongée : tous les champs que modifie Subsurface sur ordinateur, dont les bouteilles et le lest ; choisir un emplacement de lest reprend le dernier poids utilisé pour cet emplacement.",
-      "La barre de progression du téléchargement depuis l’ordinateur de plongée avance régulièrement pendant le transfert de chaque plongée."
+      "La barre de progression du téléchargement depuis l’ordinateur de plongée avance régulièrement pendant le transfert de chaque plongée.",
+      "Modifier la plongée : le numéro ne s’y change plus (il passera par « Renuméroter la plongée ») ; la durée et la profondeur max. sont affichées, mesurées par l’ordinateur."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",

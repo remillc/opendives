@@ -3,8 +3,9 @@
   // Edit a dive (docs/mockups/android-edition.dc.html; spec, section 4, "Dive
   // editor, same fields as Subsurface desktop"): every field Subsurface's
   // desktop app edits for one dive (tabs Notes, Information and Equipment,
-  // and "Mark invalid"), in collapsible white cards. Duration and maximum
-  // depth only for a dive entered by hand, as in Subsurface. Only the fields
+  // and "Mark invalid"), in collapsible white cards. The number changes only
+  // through "Renuméroter la plongée" (it shifts other dives); duration and
+  // maximum depth are shown, measured by the dive computer. Only the fields
   // whose text changed are sent; Save applies one undoable step, saves
   // locally and closes; Undo is offered.
   import { onMount } from 'svelte';
@@ -25,7 +26,7 @@
   import { offerUndo } from '../lib/undo.js';
   import { parseNumber } from '../lib/filter.svelte.js';
   import { WATER_TYPES, waterTypeName, waterTypeOfSalinity } from '../lib/tools.js';
-  import { formatFullDate, formatGas, formatMinSec, formatNumber, formatWeight, locale } from '../lib/format.js';
+  import { formatDepth, formatFullDate, formatGas, formatMinSec, formatNumber, formatWeight, locale } from '../lib/format.js';
   import { t, tIfExists } from '../lib/i18n.js';
 
   /** @type {{ f7route: { params: { id: string } }, f7router: any }} */
@@ -153,9 +154,6 @@
       date = { year: y, month: mo - 1, day: da, hour: h, minute: mi, second: se || 0 };
       initialDate = d.date.slice(0, 19);
       initial = {
-        number: d.number ? String(d.number) : '',
-        duration: formatMinSec(d.durationSeconds),
-        maxDepth: depthText(d.maxDepthMm),
         notes: d.notes,
         suit: d.suit,
         divemode: d.divemode,
@@ -300,19 +298,9 @@
   // --- Checks and changes ------------------------------------------------------
   /** An optional number: empty, or within [min, max]. @param {string} text @param {number} min @param {number} max */
   const optionalOk = (text, min, max) => !text?.trim() || (parseNumber(text) >= min && parseNumber(text) <= max);
-  /** @param {string} text */
-  const parseMinSec = (text) => {
-    const m = text.trim().match(/^(\d+)(?:[:h](\d{1,2}))?$/);
-    return m ? Number(m[1]) * 60 + Number(m[2] ?? 0) : NaN;
-  };
   const bad = $derived.by(() => {
     /** @type {Record<string, boolean>} */
     const b = {};
-    b.number = !optionalOk(f.number, 0, 999999);
-    if (dive?.manual) {
-      b.duration = !(parseMinSec(f.duration ?? '') > 0);
-      b.maxDepth = !optionalOk(f.maxDepth, 0, feet ? 1640 : 500);
-    }
     b.air = !optionalOk(f.air, fahrenheit ? -40 : -40, fahrenheit ? 140 : 60);
     b.water = !optionalOk(f.water, fahrenheit ? 28 : -2, fahrenheit ? 110 : 45);
     b.atm = !optionalOk(f.atm, 500, 1100);
@@ -346,10 +334,7 @@
     if (!dive) return {};
     /** @type {Record<string, string|number|string[]>} */
     const out = {};
-    if (changed('number')) out.number = Math.round(parseNumber(f.number) || 0);
     if (isoDate !== initialDate) out.date = isoDate;
-    if (dive.manual && changed('duration')) out.durationSeconds = parseMinSec(f.duration);
-    if (dive.manual && changed('maxDepth')) out.maxDepthMm = f.maxDepth.trim() ? depthMm(parseNumber(f.maxDepth)) : 0;
     if (site !== initialSite) out.site = site;
     if (!sameList(guides, dive.guides)) out.diveguide = [...guides];
     if (!sameList(buddies, dive.buddies)) out.buddies = [...buddies];
@@ -438,7 +423,7 @@
     const join = (/** @type {(string|false|undefined)[]} */ parts) => parts.filter(Boolean).join(' · ');
     const totalWeight = weights.reduce((sum, w) => sum + gramsOf(w), 0);
     return {
-      dive: join([f.number && `N° ${f.number}`, dateText, siteText]),
+      dive: join([dateText, siteText]),
       people: join([...guides, ...buddies]),
       equipment: join([
         tIfExists(`detail.modes.${f.divemode}`) ?? f.divemode,
@@ -496,24 +481,15 @@
       {@render header('dive', t('edit.diveGroup'))}
       {#if open.dive}
         <div class="row">
-          <div class="narrow"><TextField label={t('edit.number')} bind:value={f.number} inputmode="numeric" invalid={bad.number} /></div>
           <div class="grow"><ButtonField label={t('edit.date')} value={dateText} onclick={() => (dialog = 'date')} /></div>
           <div class="time"><ButtonField label={t('edit.time')} value={timeText} onclick={() => (dialog = 'time')} /></div>
         </div>
-        <div class="row">
-          {#if dive.manual}
-            <div class="grow"><TextField label={t('edit.duration')} bind:value={f.duration} invalid={bad.duration} /></div>
-            <div class="grow">
-              <TextField label={t('edit.maxDepth')} bind:value={f.maxDepth} inputmode="decimal" invalid={bad.maxDepth}>
-                {#snippet trailing()}{@render unit(depthUnitText)}{/snippet}
-              </TextField>
-            </div>
-          {:else}
-            <div class="grow"><ButtonField label={t('edit.duration')} value={f.duration} /></div>
-            <div class="grow"><ButtonField label={t('edit.maxDepth')} value={`${f.maxDepth} ${depthUnitText}`} /></div>
-          {/if}
-        </div>
-        {#if !dive.manual}<p class="helper">{t('edit.durationNote')}</p>{/if}
+        <!-- Measured by the dive computer: plain text, not a field. -->
+        <dl class="measured">
+          <div><dt>{t('edit.duration')}</dt><dd class="od-value">{formatMinSec(dive.durationSeconds)}</dd></div>
+          <div><dt>{t('edit.maxDepth')}</dt><dd class="od-value">{formatDepth(dive.maxDepthMm, prefs)}</dd></div>
+        </dl>
+        <p class="helper">{t('edit.durationNote')}</p>
         <ButtonField label={t('edit.site')} value={siteText} onclick={() => (dialog = 'site')} />
         <ButtonField label={t('edit.trip')} value={dive.trip?.location || t('edit.none')} />
         <div class="stars-row">
@@ -813,10 +789,6 @@
         min-width: 0;
       }
 
-      .narrow {
-        flex: 0 0 64px;
-        min-width: 0;
-      }
 
       .time {
         flex: 0 0 auto;
@@ -837,10 +809,37 @@
     }
 
     .helper {
-      margin: 4px 32px 0;
+      margin: 4px 16px 0;
       font-size: 12px;
       line-height: 16px;
       color: var(--od-text-2);
+    }
+
+    /* Duration and maximum depth: plain text side by side, not fields. */
+    .measured {
+      display: flex;
+      gap: 12px;
+      margin: 14px 0 0;
+      padding: 0 16px;
+
+      div {
+        flex: 1;
+        min-width: 0;
+      }
+
+      dt {
+        font-size: 12px;
+        line-height: 16px;
+        color: var(--od-text-2);
+      }
+
+      dd {
+        margin: 0;
+        font-size: 16px;
+        line-height: 24px;
+        color: var(--od-text);
+        font-variant-numeric: tabular-nums;
+      }
     }
 
     .stars-row {

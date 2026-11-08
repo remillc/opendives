@@ -670,9 +670,8 @@
     "title": "Edit the dive",
     "save": "Save",
     "diveGroup": "The dive",
-    "number": "No.",
     "duration": "Duration",
-    "durationNote": "Computed by the dive computer. Editable only for a dive logged by hand",
+    "durationNote": "Measured by the dive computer",
     "site": "Site",
     "trip": "Trip",
     "none": "None",
@@ -1230,7 +1229,8 @@
       "Newly downloaded dives are numbered in sequence, even when the download also reads older dives again.",
       "Planner: the SAC is chosen from a menu, in steps of 0.5 L/min or 0.01 cu ft/min.",
       "Edit the dive: every field Subsurface desktop edits, cylinders and weights included; choosing a weight location fills in the last weight used for it.",
-      "The progress bar of a download from the dive computer moves steadily while each dive is transferred."
+      "The progress bar of a download from the dive computer moves steadily while each dive is transferred.",
+      "Edit the dive: the number is no longer changed there (it will go through “Renumber the dive”); duration and max. depth are shown, measured by the dive computer."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
