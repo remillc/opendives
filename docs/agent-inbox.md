@@ -557,3 +557,12 @@ In "Réglages du planificateur", group "Paliers", the first row is no longer a s
 
 Follow-up to task 2026-11-08-02: the mock-ups now also show volumes in cubic feet (Settings, Unités: Volume "Pieds cubes"). Cylinder sizes appear as gas capacity at the working pressure, as Subsurface does in imperial (AL80 = 80 cuft, 12 L at 232 bar = 97 cuft), gas used in cuft ("40 cuft consommés"), SAC in cuft/min with two decimals ("0,36 cuft/min"). Partial pressures (ppO₂, pN₂, pHe, setpoints) stay in bar, as in Subsurface. Nothing to change in the app beyond checking that these conversions come out right when Volume is set to cubic feet.
 
+## [ ] 2026-11-08-06 Planner: the plan data are fields edited in place
+
+On the planner screen, the plan data are no longer list rows. Under the starting dive card, a form of MD3 filled text fields (the same as in the gas tools), 16 dp apart, two per line:
+- Profondeur (number, unit suffix) | Temps de fond (number, "min")
+- Gaz (exposed dropdown: the logbook gases and the usual mixes) | Bouteille (exposed dropdown: the cylinder types)
+- Pression de départ (number, pressure unit) | Consommation (SAC) (number, volume unit per minute)
+- Type d’eau (exposed dropdown, full width)
+The computed plan below updates as soon as a field changes (no "Calculer" button). "Changer" on the starting dive card replaces the dive; the values it brought stay editable. Mock-up: `docs/mockups/android-planificateur.dc.html`. Spec: section 4, "Planner settings, a screen of their own".
+
