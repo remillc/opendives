@@ -16,7 +16,6 @@ Next number: 29
 
 - #1 [code] ajouter de l'analytics dans l'app. Penser à corriger privacy (en pause : voir docs/analytics-decision.md)
 - #3 [code] urls U1 à U7 (non pour U8, U9 et U10) : U1 /plan/42 → /dives/42/plan ; U2 /plan/new → /plan ; U3 /plan/setup → /settings/planner ; U4 /statistics/year/2014 → /statistics/years/2014 ; U5 /filter/depth → /filter/criteria/depth ; U6 /download/failed → /download-failed ; U7 /add/download (iPhone) → /download ; et (ex-#7) Mettre /plan sous /tools
-- #8 [design] /tools/desaturation: beaucoup trop de texte. Texte pour me protéger.
 - #10 [design] Compte: Compte subsurface vérifié: ?
 - #15 [code] supprimer une plongée: afficher un dialogue de confirmation puis un snackbar
 - #17 [design] ajouter la possibilité d'une switch globale "plongée récréative" qui masque les paramètres avancés et ceux concernant le mode de plongée cc. Ce que SS nomme le mode loisir.

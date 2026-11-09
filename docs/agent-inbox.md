@@ -1029,3 +1029,10 @@ Native dependencies to add:
 - The simplified world map asset (Natural Earth, public domain) bundled with the app; add its credit to "Bibliothèques libres".
 
 Every visible text is a translation key (fr, en, and fr-CA where "nuage" applies). Snackbars at least 4 s, 6 s with "Annuler".
+
+## [ ] 2026-11-09-34 Desaturation: shorter chart text (to-do #8)
+
+Christian wrote the text. Mock-up: `docs/mockups/outils-desaturation-android.dc.html`.
+- `desaturation.chartText` becomes, in fr: "Les 16 compartiments du modèle Bühlmann, des plus rapides aux plus lents, en pourcentage de la limite permise." In en: "The 16 compartments of the Bühlmann model, fastest to slowest, as a percentage of the allowed limit."
+- `modelGf` ("Facteurs de gradient 30 / 75, ceux du planificateur.") and `modelVpmb` stay, right after it, in the same paragraph.
+- Keep the note "Ce calcul ne connaît que les plongées du carnet…" and the flight recommendation unchanged.
