@@ -23,6 +23,25 @@
   :root {
     /* Meaning colors. */
     --od-alarm: #C62828;
+    /* MD3 colour roles (spec, section 1, "Colour roles"), light. */
+    --od-primary-container: #E8E8E5;
+    --od-on-primary-container: #1F2124;
+    --od-secondary: #B4530F;
+    --od-on-secondary: #FFFFFF;
+    --od-secondary-container: #FBE3B2;
+    --od-on-secondary-container: #3D2200;
+    --od-tertiary: #2F6DB5;
+    --od-on-tertiary: #FFFFFF;
+    --od-tertiary-container: #DCE8F7;
+    --od-on-tertiary-container: #0F2F55;
+    --od-error: var(--od-alarm);
+    --od-on-error: #FFFFFF;
+    --od-error-container: #FDE2E0;
+    --od-on-error-container: #5F1010;
+    /* Selection and tonal buttons: the secondary role. */
+    --od-selected: var(--od-secondary);
+    --od-selected-container: var(--od-secondary-container);
+    --od-tonal: var(--od-secondary-container);
     --od-oxygen: #2E7D32;
     --od-pending: #8A4B00;
 
@@ -54,7 +73,7 @@
     /* Pin on the aerial view of a site. */
     --od-pin: #1F2124;
     --od-on-pin: #FFFFFF;
-    --od-temperature: #2F6DB5;
+    --od-temperature: var(--od-tertiary);
     /* Share sheet: each row's icon in a circle of the water's top colour. */
     --od-share-circle: var(--od-water-top);
     --od-share-icon: #8A3E09;
@@ -79,6 +98,19 @@
   html.dark {
     /* Meaning colours, lighter to keep their contrast on the dark background (spec, section 1). */
     --od-alarm: #FF8A80;
+    --od-primary-container: #2E3033;
+    --od-on-primary-container: #F4F4F2;
+    --od-secondary: #F0A66B;
+    --od-on-secondary: #3D2200;
+    --od-secondary-container: #4A3216;
+    --od-on-secondary-container: #FBE3B2;
+    --od-tertiary: #8AB4F8;
+    --od-on-tertiary: #0F2F55;
+    --od-tertiary-container: #1E3A5F;
+    --od-on-tertiary-container: #DCE8F7;
+    --od-on-error: #3A0A08;
+    --od-error-container: #5C1A16;
+    --od-on-error-container: #FDE2E0;
     --od-pending: #F2B84B;
     --od-background: #121314;
     --od-surface: #1C1D1F;
@@ -98,7 +130,7 @@
     --od-chip-outline: #8E9196;
     --od-pin: #E5B961;
     --od-on-pin: #121314;
-    --od-temperature: #8AB4F8;
+    --od-temperature: var(--od-tertiary);
     --od-share-circle: #4A3410;
     --od-share-icon: #E5B961;
     --od-block: var(--od-surface);
@@ -121,12 +153,33 @@
  * --od-* tokens.
  */
 html.md {
-  /* Dark mode: the screen and the selected chips follow the spec's values. */
+  /* The colour roles, for what uses them; other screens are not recoloured
+     yet: the components Framework7 fills with the secondary container stay on
+     the neutral primary container. */
+  --f7-md-secondary: var(--od-secondary);
+  --f7-md-on-secondary: var(--od-on-secondary);
+  --f7-md-tertiary: var(--od-tertiary);
+  --f7-md-on-tertiary: var(--od-on-tertiary);
+  --f7-md-tertiary-container: var(--od-tertiary-container);
+  --f7-md-on-tertiary-container: var(--od-on-tertiary-container);
+  --f7-md-error: var(--od-error);
+  --f7-md-on-error: var(--od-on-error);
+  --f7-md-error-container: var(--od-error-container);
+  --f7-md-on-error-container: var(--od-on-error-container);
+  --f7-button-tonal-bg-color: var(--od-primary-container);
+  --f7-chip-bg-color: var(--od-primary-container);
+  --f7-searchbar-input-bg-color: var(--od-primary-container);
+  --f7-progressbar-bg-color: var(--od-primary-container);
+  --f7-range-bar-bg-color: var(--od-primary-container);
+  --f7-menu-list-item-selected-bg-color: var(--od-primary-container);
+  --f7-tabbar-link-active-icon-bg-color: var(--od-primary-container);
+
+  /* Dark mode: the screen follows the spec's values. */
   &.dark {
     --f7-page-bg-color: var(--od-background);
     --f7-md-surface: var(--od-background);
-    --f7-md-secondary-container: var(--od-surface-2);
-    --f7-md-on-secondary-container: var(--od-text);
+    --f7-md-secondary-container: var(--od-secondary-container);
+    --f7-md-on-secondary-container: var(--od-on-secondary-container);
   }
 
   &:not(.dark) {
@@ -141,8 +194,8 @@ html.md {
     --f7-md-on-surface: var(--od-text);
     --f7-md-on-surface-variant: var(--od-text-2);
     --f7-md-outline: var(--od-text-2);
-    --f7-md-secondary-container: var(--od-surface-2);
-    --f7-md-on-secondary-container: var(--od-text);
+    --f7-md-secondary-container: var(--od-secondary-container);
+    --f7-md-on-secondary-container: var(--od-on-secondary-container);
     --f7-list-item-border-color: var(--od-separator);
   }
 
@@ -336,7 +389,7 @@ html.ios {
 
   /* "+" button on Android: floating action button in secondary-container. */
   .md .od-fab-add {
-    --f7-fab-bg-color: var(--f7-md-secondary-container);
+    --f7-fab-bg-color: var(--od-primary-container);
     --f7-fab-text-color: var(--f7-md-on-secondary-container);
     --f7-fab-label-bg-color: var(--od-surface);
     --f7-fab-label-text-color: var(--od-text);
