@@ -790,7 +790,6 @@
     },
     "summaryWeight": "weights {value}",
     "computersGroup": "Dive computers",
-    "mainSuffix": ", main",
     "advancedGroup": "Advanced",
     "saved": "Change saved",
     "undo": "Undo",
@@ -843,7 +842,12 @@
       "Travel Gas": "Travel gas"
     },
     "siteHint": "A site from the logbook or a new name",
-    "tripHint": "A trip from the logbook or a new name; empty: no trip"
+    "tripNone": "None",
+    "tripNew": "New trip",
+    "tripClear": "Remove from trip",
+    "tripNewName": "Trip name",
+    "mainComputer": "Main: its profile is the dive’s",
+    "mainComputerHelp": "With several computers, choose the main one."
   },
   "tripScreen": {
     "kicker": "Trip · {range}",
@@ -1333,7 +1337,8 @@
       "Dive detail: a dive on its own no longer shows a trip.",
       "Dive detail: the rating stars stand alone.",
       "Dive detail: “Remove from trip” in the ⋮ menu.",
-      "About: the map credit also names OpenFreeMap and OpenMapTiles."
+      "About: the map credit also names OpenFreeMap and OpenMapTiles.",
+      "Edit a dive: sections always open, the trip chosen from a list, with a button to remove it."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",

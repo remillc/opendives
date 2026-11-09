@@ -1,6 +1,7 @@
 <script>
   // @ts-check
   import Icon from './Icon.svelte';
+  import { ios } from '../lib/layout.svelte.js';
   // A value chosen in a dialog (date, time, site): drawn as the MD3 filled
   // field of SelectField, the label small above the value, a button that
   // opens the dialog. Without `onclick`, a read-only field (no arrow).
@@ -21,7 +22,7 @@
     <button type="button" class="box" {onclick}>
       <span class="label">{label}</span>
       <span class="value">{value}</span>
-      <span class="arrow"><Icon name="expand" /></span>
+      <span class="arrow"><Icon name={ios ? 'expand' : 'chevron'} /></span>
     </button>
   {:else}
     <div class="box readonly">

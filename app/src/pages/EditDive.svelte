@@ -3,7 +3,7 @@
   // Edit a dive (docs/mockups/android-edition.dc.html; spec, section 4, "Dive
   // editor, same fields as Subsurface desktop"): every field Subsurface's
   // desktop app edits for one dive (tabs Notes, Information and Equipment,
-  // and "Mark invalid"), in collapsible white cards. The number changes only
+  // and "Mark invalid"), in white cards, always open. The number changes only
   // through "Renuméroter la plongée" (it shifts other dives); duration and
   // maximum depth are shown, measured by the dive computer. Only the fields
   // whose text changed are sent; Save applies one undoable step, saves
@@ -138,8 +138,6 @@
   /** Weight types, each with the weight last used for it (Subsurface's ws_info table). */
   let weightTypes = $state(/** @type {{ name: string, grams: number }[]} */ ([]));
 
-  /** Open cards. */
-  let open = $state({ dive: true, people: true, equipment: true, conditions: true, computers: false, advanced: true });
   /** @type {'date'|'time'|null} */
   let dialog = $state(null);
 
@@ -265,7 +263,14 @@
     for (const d of logbook.dives) if (d.trip?.location && !byName.has(d.trip.location)) byName.set(d.trip.location, d.trip.id);
     return byName;
   });
-  const tripNames = $derived([...trips.keys()]);
+  /** "Nouveau voyage" in the list of trips: its name is asked below. */
+  const NEW_TRIP = '\u0000new';
+  let newTripName = $state('');
+  const tripOptions = $derived([
+    { value: '', label: t('edit.tripNone') },
+    ...[...trips.keys()].map((name) => ({ value: name, label: name })),
+    { value: NEW_TRIP, label: t('edit.tripNew') },
+  ]);
 
   /**
    * A weight location chosen: the weight last used for it fills the weight,
@@ -419,8 +424,9 @@
     }
     const all = changes();
     const siteText = siteName.trim();
-    const tripText = tripName.trim();
     const oldTrip = dive.trip?.location ?? '';
+    // A new trip without a name changes nothing.
+    const tripText = tripName === NEW_TRIP ? newTripName.trim() || oldTrip : tripName.trim();
     saving = true;
     // Each change is one undoable step, as in Subsurface (a new site:
     // AddDiveSite; the trip: DivesToTrip or CreateTrip, then the location);
@@ -474,47 +480,16 @@
     }
   }
 
-  // --- Summaries of closed cards ------------------------------------------------
   const starFields = $derived(
     ['visibility', 'current', ...(settings.extraConditions ? ['wavesize', 'surge', 'chill'] : [])].map((key) => ({
       key,
       name: t(`detail.conditionNames.${key}`),
     })),
   );
-  const summaries = $derived.by(() => {
-    if (!dive) return /** @type {Record<string, string>} */ ({});
-    const join = (/** @type {(string|false|undefined)[]} */ parts) => parts.filter(Boolean).join(' · ');
-    const totalWeight = weights.reduce((sum, w) => sum + gramsOf(w), 0);
-    return {
-      dive: join([dateText, siteName, tripName]),
-      people: join([...guides, ...buddies]),
-      equipment: join([
-        tIfExists(`detail.modes.${f.divemode}`) ?? f.divemode,
-        f.suit,
-        cylinders.length > 0 && t('edit.cylinders', { n: cylinders.length }),
-        totalWeight > 0 && t('edit.summaryWeight', { value: formatWeight(totalWeight, prefs) }),
-      ]),
-      conditions: join([
-        ...['visibility', 'current', 'wavesize', 'surge', 'chill']
-          .filter((key) => stars[key] > 0)
-          .map((key) => t('edit.summaryCondition', { name: t(`detail.conditionNames.${key}`).toLocaleLowerCase(), n: stars[key] })),
-        f.air && t('edit.summaryAir', { value: `${f.air} ${temperatureUnitText}` }),
-        f.water && t('edit.summaryWater', { value: `${f.water} ${temperatureUnitText}` }),
-      ]),
-      computers: join(dive.diveComputers.map((c) => c.model)),
-      advanced: invalid ? t('edit.invalid') : '',
-    };
-  });
 </script>
 
-{#snippet header(/** @type {keyof typeof open} */ key, /** @type {string} */ title)}
-  <button type="button" class="disclosure" aria-expanded={open[key]} onclick={() => (open[key] = !open[key])}>
-    <span class="text">
-      <span class="title">{title}</span>
-      {#if !open[key] && summaries[key]}<span class="summary">{summaries[key]}</span>{/if}
-    </span>
-    <span class="arrow" class:open={open[key]}><Icon name="expand" /></span>
-  </button>
+{#snippet header(/** @type {string} */ title)}
+  <span class="heading" role="heading" aria-level="2">{title}</span>
 {/snippet}
 
 {#snippet unit(/** @type {string} */ text)}<span class="unit">{text}</span>{/snippet}
@@ -553,193 +528,192 @@
 
     <!-- La plongée -->
     <section class="card">
-      {@render header('dive', t('edit.diveGroup'))}
-      {#if open.dive}
-        <div class="row">
-          <div class="grow"><ButtonField label={t('edit.date')} value={dateText} onclick={() => (dialog = 'date')} /></div>
-          <div class="time"><ButtonField label={t('edit.time')} value={timeText} onclick={() => (dialog = 'time')} /></div>
-        </div>
-        <!-- Measured by the dive computer: plain text, not a field. -->
-        <dl class="measured">
-          <div><dt>{t('edit.duration')}</dt><dd class="od-value">{formatMinSec(dive.durationSeconds)}</dd></div>
-          <div><dt>{t('edit.maxDepth')}</dt><dd class="od-value">{formatDepth(dive.maxDepthMm, prefs)}</dd></div>
-        </dl>
-        <ComboField label={t('edit.site')} bind:value={siteName} options={siteNames} supporting={t('edit.siteHint')} />
-        <ComboField label={t('edit.trip')} bind:value={tripName} options={tripNames} supporting={t('edit.tripHint')} />
-        <div class="stars-row">
-          <span>{t('edit.rating')}</span>
-          <StarsInput value={stars.rating} label={t('edit.rating')} onchange={(v) => (stars.rating = v)} />
-        </div>
+      {@render header(t('edit.diveGroup'))}
+      <div class="row">
+        <div class="grow"><ButtonField label={t('edit.date')} value={dateText} onclick={() => (dialog = 'date')} /></div>
+        <div class="time"><ButtonField label={t('edit.time')} value={timeText} onclick={() => (dialog = 'time')} /></div>
+      </div>
+      <!-- Measured by the dive computer: plain text, not a field. -->
+      <dl class="measured">
+        <div><dt>{t('edit.duration')}</dt><dd class="od-value">{formatMinSec(dive.durationSeconds)}</dd></div>
+        <div><dt>{t('edit.maxDepth')}</dt><dd class="od-value">{formatDepth(dive.maxDepthMm, prefs)}</dd></div>
+      </dl>
+      <ComboField label={t('edit.site')} bind:value={siteName} options={siteNames} supporting={t('edit.siteHint')} />
+      <SelectField label={t('edit.trip')} bind:value={tripName} options={tripOptions} clearLabel={t('edit.tripClear')} />
+      {#if tripName === NEW_TRIP}
+        <TextField label={t('edit.tripNewName')} bind:value={newTripName} />
       {/if}
+      <div class="stars-row">
+        <span>{t('edit.rating')}</span>
+        <StarsInput value={stars.rating} label={t('edit.rating')} onchange={(v) => (stars.rating = v)} />
+      </div>
     </section>
 
     <!-- Personnes et notes -->
     <section class="card">
-      {@render header('people', t('edit.peopleGroup'))}
-      {#if open.people}
-        <ChipsField label={t('edit.guides')} bind:values={guides} suggestions={known.guide} supporting={t('edit.guidesHint')} />
-        <ChipsField label={t('edit.buddies')} bind:values={buddies} suggestions={known.buddy} supporting={t('edit.buddiesHint')} />
-        <ChipsField label={t('edit.tags')} bind:values={tags} suggestions={known.tag} supporting={t('edit.tagsHint')} />
-        <TextField label={t('edit.notes')} bind:value={f.notes} multiline />
-        <div class="end"></div>
-      {/if}
+      {@render header(t('edit.peopleGroup'))}
+      <ChipsField label={t('edit.guides')} bind:values={guides} suggestions={known.guide} supporting={t('edit.guidesHint')} />
+      <ChipsField label={t('edit.buddies')} bind:values={buddies} suggestions={known.buddy} supporting={t('edit.buddiesHint')} />
+      <ChipsField label={t('edit.tags')} bind:values={tags} suggestions={known.tag} supporting={t('edit.tagsHint')} />
+      <TextField label={t('edit.notes')} bind:value={f.notes} multiline />
+      <div class="end"></div>
     </section>
 
     <!-- Équipement -->
     <section class="card">
-      {@render header('equipment', t('edit.equipmentGroup'))}
-      {#if open.equipment}
-        <ComboField label={t('edit.suit')} bind:value={f.suit} options={known.suit} />
-        <SelectField label={t('edit.divemode')} bind:value={f.divemode} options={modeOptions} onchange={modeChanged} />
+      {@render header(t('edit.equipmentGroup'))}
+      <ComboField label={t('edit.suit')} bind:value={f.suit} options={known.suit} />
+      <SelectField label={t('edit.divemode')} bind:value={f.divemode} options={modeOptions} onchange={modeChanged} />
 
-        {#each cylinders as c, i (i)}
-          {@const cb = cylinderBad(c)}
-          <div class="cyl-head">
-            <h4 class="cyl-title">{t('edit.cylinderTitle', { n: i + 1 })}{c.f.description ? ` · ${c.f.description}` : ''}</h4>
-            {#if !c.protected}
-              <button type="button" class="remove" onclick={() => cylinders.splice(i, 1)}>
-                <Icon name="close" /><span class="od-sr-only">{t('edit.removeCylinder')}</span>
-              </button>
-            {/if}
+      {#each cylinders as c, i (i)}
+        {@const cb = cylinderBad(c)}
+        <div class="cyl-head">
+          <h4 class="cyl-title">{t('edit.cylinderTitle', { n: i + 1 })}{c.f.description ? ` · ${c.f.description}` : ''}</h4>
+          {#if !c.protected}
+            <button type="button" class="remove" onclick={() => cylinders.splice(i, 1)}>
+              <Icon name="close" /><span class="od-sr-only">{t('edit.removeCylinder')}</span>
+            </button>
+          {/if}
+        </div>
+        <div class="row">
+            <div class="grow">
+              <SelectField
+                label={t('edit.cylinderType')}
+                value={c.f.description}
+                options={cylinderTypeOptions(c.initial.description)}
+                onchange={(v) => chooseCylinderType(c, v)}
+              />
+            </div>
+            <div class="grow"><SelectField label={t('edit.use')} bind:value={c.f.use} options={useOptions} /></div>
           </div>
           <div class="row">
-              <div class="grow">
-                <SelectField
-                  label={t('edit.cylinderType')}
-                  value={c.f.description}
-                  options={cylinderTypeOptions(c.initial.description)}
-                  onchange={(v) => chooseCylinderType(c, v)}
-                />
-              </div>
-              <div class="grow"><SelectField label={t('edit.use')} bind:value={c.f.use} options={useOptions} /></div>
-            </div>
-            <div class="row">
-              <div class="grow">
-                <TextField label={t('edit.size')} bind:value={c.f.size} inputmode="decimal" invalid={cb.size}>
-                  {#snippet trailing()}{@render unit(volumeUnitText)}{/snippet}
-                </TextField>
-              </div>
-              <div class="grow">
-                <TextField label={t('edit.workingPressure')} bind:value={c.f.workingPressure} inputmode="decimal" invalid={cb.workingPressure}>
-                  {#snippet trailing()}{@render unit(pressureUnitText)}{/snippet}
-                </TextField>
-              </div>
-            </div>
-            <div class="row">
-              <div class="grow">
-                <TextField label={t('edit.start')} bind:value={c.f.start} inputmode="decimal" invalid={cb.start}>
-                  {#snippet trailing()}{@render unit(pressureUnitText)}{/snippet}
-                </TextField>
-              </div>
-              <div class="grow">
-                <TextField label={t('edit.end')} bind:value={c.f.end} inputmode="decimal" invalid={cb.end}>
-                  {#snippet trailing()}{@render unit(pressureUnitText)}{/snippet}
-                </TextField>
-              </div>
-            </div>
-            <div class="row">
-              <div class="grow">
-                <TextField label={t('edit.o2')} bind:value={c.f.o2} inputmode="decimal" invalid={cb.gas}>
-                  {#snippet trailing()}{@render unit(t('units.percent'))}{/snippet}
-                </TextField>
-              </div>
-              <div class="grow">
-                <TextField label={t('edit.he')} bind:value={c.f.he} inputmode="decimal" invalid={cb.gas}>
-                  {#snippet trailing()}{@render unit(t('units.percent'))}{/snippet}
-                </TextField>
-              </div>
-            </div>
-            <TextField label={t('edit.switchDepth')} bind:value={c.f.depth} inputmode="decimal" invalid={cb.depth} supporting={modText(c)}>
-              {#snippet trailing()}{@render unit(depthUnitText)}{/snippet}
-            </TextField>
-        {/each}
-        <button type="button" class="add" onclick={addCylinder}><Icon name="plus" />{t('edit.addCylinder')}</button>
-
-        <h3 class="sub">{t('edit.weightsTitle')}</h3>
-        {#each weights as w, i (i)}
-          <div class="row weight">
             <div class="grow">
-              <SelectField label={t('edit.weightPlace')} value={w.description} options={placeOptions(w.description)} onchange={(v) => choosePlace(i, v)} />
-            </div>
-            <div class="weight-value">
-              <TextField label={t('edit.weight')} bind:value={w.weight} inputmode="decimal" invalid={!optionalOk(w.weight, 0, pounds ? 400 : 200)}>
-                {#snippet trailing()}{@render unit(weightUnitText)}{/snippet}
+              <TextField label={t('edit.size')} bind:value={c.f.size} inputmode="decimal" invalid={cb.size}>
+                {#snippet trailing()}{@render unit(volumeUnitText)}{/snippet}
               </TextField>
             </div>
-            <button type="button" class="remove inline" onclick={() => weights.splice(i, 1)}>
-              <Icon name="close" /><span class="od-sr-only">{t('edit.removeWeight')}</span>
-            </button>
+            <div class="grow">
+              <TextField label={t('edit.workingPressure')} bind:value={c.f.workingPressure} inputmode="decimal" invalid={cb.workingPressure}>
+                {#snippet trailing()}{@render unit(pressureUnitText)}{/snippet}
+              </TextField>
+            </div>
           </div>
-        {/each}
-        <button type="button" class="add" onclick={() => weights.push({ description: weightTypes[0]?.name ?? 'integrated', weight: weightText(weightTypes[0]?.grams ?? 0), grams0: -1, text0: '' })}>
-          <Icon name="plus" />{t('edit.addWeight')}
-        </button>
-      {/if}
+          <div class="row">
+            <div class="grow">
+              <TextField label={t('edit.start')} bind:value={c.f.start} inputmode="decimal" invalid={cb.start}>
+                {#snippet trailing()}{@render unit(pressureUnitText)}{/snippet}
+              </TextField>
+            </div>
+            <div class="grow">
+              <TextField label={t('edit.end')} bind:value={c.f.end} inputmode="decimal" invalid={cb.end}>
+                {#snippet trailing()}{@render unit(pressureUnitText)}{/snippet}
+              </TextField>
+            </div>
+          </div>
+          <div class="row">
+            <div class="grow">
+              <TextField label={t('edit.o2')} bind:value={c.f.o2} inputmode="decimal" invalid={cb.gas}>
+                {#snippet trailing()}{@render unit(t('units.percent'))}{/snippet}
+              </TextField>
+            </div>
+            <div class="grow">
+              <TextField label={t('edit.he')} bind:value={c.f.he} inputmode="decimal" invalid={cb.gas}>
+                {#snippet trailing()}{@render unit(t('units.percent'))}{/snippet}
+              </TextField>
+            </div>
+          </div>
+          <TextField label={t('edit.switchDepth')} bind:value={c.f.depth} inputmode="decimal" invalid={cb.depth} supporting={modText(c)}>
+            {#snippet trailing()}{@render unit(depthUnitText)}{/snippet}
+          </TextField>
+      {/each}
+      <button type="button" class="add" onclick={addCylinder}><Icon name="plus" />{t('edit.addCylinder')}</button>
+
+      <h3 class="sub">{t('edit.weightsTitle')}</h3>
+      {#each weights as w, i (i)}
+        <div class="row weight">
+          <div class="grow">
+            <SelectField label={t('edit.weightPlace')} value={w.description} options={placeOptions(w.description)} onchange={(v) => choosePlace(i, v)} />
+          </div>
+          <div class="weight-value">
+            <TextField label={t('edit.weight')} bind:value={w.weight} inputmode="decimal" invalid={!optionalOk(w.weight, 0, pounds ? 400 : 200)}>
+              {#snippet trailing()}{@render unit(weightUnitText)}{/snippet}
+            </TextField>
+          </div>
+          <button type="button" class="remove inline" onclick={() => weights.splice(i, 1)}>
+            <Icon name="close" /><span class="od-sr-only">{t('edit.removeWeight')}</span>
+          </button>
+        </div>
+      {/each}
+      <button type="button" class="add" onclick={() => weights.push({ description: weightTypes[0]?.name ?? 'integrated', weight: weightText(weightTypes[0]?.grams ?? 0), grams0: -1, text0: '' })}>
+        <Icon name="plus" />{t('edit.addWeight')}
+      </button>
     </section>
 
     <!-- Conditions -->
     <section class="card">
-      {@render header('conditions', t('edit.conditionsGroup'))}
-      {#if open.conditions}
-        {#each starFields as field (field.key)}
-          <div class="stars-row">
-            <span>{field.name}</span>
-            <StarsInput value={stars[field.key]} label={field.name} onchange={(v) => (stars[field.key] = v)} />
-          </div>
-        {/each}
-        <div class="row">
-          <div class="grow">
-            <TextField label={t('edit.air')} bind:value={f.air} inputmode="decimal" invalid={bad.air}>
-              {#snippet trailing()}{@render unit(temperatureUnitText)}{/snippet}
-            </TextField>
-          </div>
-          <div class="grow">
-            <TextField label={t('edit.water')} bind:value={f.water} inputmode="decimal" invalid={bad.water}>
-              {#snippet trailing()}{@render unit(temperatureUnitText)}{/snippet}
-            </TextField>
-          </div>
+      {@render header(t('edit.conditionsGroup'))}
+      {#each starFields as field (field.key)}
+        <div class="stars-row">
+          <span>{field.name}</span>
+          <StarsInput value={stars[field.key]} label={field.name} onchange={(v) => (stars[field.key] = v)} />
         </div>
-        <div class="row">
-          <div class="grow"><SelectField label={t('edit.waterType')} bind:value={f.waterType} options={waterOptions} /></div>
-          <div class="grow">
-            <TextField label={t('edit.atmPressure')} bind:value={f.atm} inputmode="numeric" invalid={bad.atm}>
-              {#snippet trailing()}{@render unit('mbar')}{/snippet}
-            </TextField>
-          </div>
+      {/each}
+      <div class="row">
+        <div class="grow">
+          <TextField label={t('edit.air')} bind:value={f.air} inputmode="decimal" invalid={bad.air}>
+            {#snippet trailing()}{@render unit(temperatureUnitText)}{/snippet}
+          </TextField>
         </div>
-        <div class="end"></div>
-      {/if}
+        <div class="grow">
+          <TextField label={t('edit.water')} bind:value={f.water} inputmode="decimal" invalid={bad.water}>
+            {#snippet trailing()}{@render unit(temperatureUnitText)}{/snippet}
+          </TextField>
+        </div>
+      </div>
+      <div class="row">
+        <div class="grow"><SelectField label={t('edit.waterType')} bind:value={f.waterType} options={waterOptions} /></div>
+        <div class="grow">
+          <TextField label={t('edit.atmPressure')} bind:value={f.atm} inputmode="numeric" invalid={bad.atm}>
+            {#snippet trailing()}{@render unit('mbar')}{/snippet}
+          </TextField>
+        </div>
+      </div>
+      <div class="end"></div>
     </section>
 
     <!-- Ordinateurs -->
     {#if dive.diveComputers.length}
       <section class="card">
-        {@render header('computers', t('edit.computersGroup'))}
-        {#if open.computers}
-          <ul class="computers">
-            {#each dive.diveComputers as computer, i (i)}
-              <li>{computer.model}{i === 0 ? t('edit.mainSuffix') : ''}</li>
-            {/each}
-          </ul>
-        {/if}
+        {@render header(t('edit.computersGroup'))}
+        <!-- Showing the main computer only: changing it needs a core command. -->
+        <div class="computers" role="radiogroup" aria-label={t('edit.computersGroup')}>
+          {#each dive.diveComputers as computer, i (i)}
+            <label class="computer">
+              <input type="radio" name="od-main-computer" checked={i === 0} disabled />
+              <span class="texts">
+                <span>{computer.model}</span>
+                {#if i === 0}<span class="sub">{t('edit.mainComputer')}</span>{/if}
+              </span>
+            </label>
+          {/each}
+          <p class="helper">{t('edit.mainComputerHelp')}</p>
+        </div>
       </section>
     {/if}
 
     <!-- Avancé -->
     <section class="card last">
-      {@render header('advanced', t('edit.advancedGroup'))}
-      {#if open.advanced}
-        <label class="switch-row">
-          <span class="texts">
-            <span class="label">{t('edit.invalid')}</span>
-            <span class="helper-text">{t('edit.invalidText')}</span>
-          </span>
-          <span class="toggle">
-            <input type="checkbox" bind:checked={invalid} />
-            <span class="toggle-icon"></span>
-          </span>
-        </label>
-      {/if}
+      {@render header(t('edit.advancedGroup'))}
+      <label class="switch-row">
+        <span class="texts">
+          <span class="label">{t('edit.invalid')}</span>
+          <span class="helper-text">{t('edit.invalidText')}</span>
+        </span>
+        <span class="toggle">
+          <input type="checkbox" bind:checked={invalid} />
+          <span class="toggle-icon"></span>
+        </span>
+      </label>
     </section>
     </div>
   {/if}
@@ -822,46 +796,15 @@
       }
     }
 
-    .disclosure {
-      width: 100%;
+    /* Plain section headings: the sections are always open. */
+    .heading {
       min-height: 56px;
-      padding: 10px 16px;
-      border: none;
-      background: none;
-      color: var(--od-text);
-      font: inherit;
-      text-align: start;
+      padding: 0 16px;
       display: flex;
       align-items: center;
-      gap: 12px;
-
-      .text {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
-        min-width: 0;
-      }
-
-      .title {
-        font-size: 16px;
-        font-weight: 600;
-      }
-
-      .summary {
-        font-size: 13px;
-        line-height: 18px;
-        color: var(--od-text-2);
-      }
-    }
-
-    .arrow {
-      display: flex;
-      color: var(--od-text-2);
-
-      &.open {
-        transform: rotate(180deg);
-      }
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--od-text);
     }
 
     /* Two or three fields on one line. */
@@ -995,16 +938,61 @@
     }
 
     .computers {
-      margin: 0;
       padding: 0 16px 8px;
-      list-style: none;
+    }
 
-      li {
-        min-height: 40px;
+    .computer {
+      min-height: 64px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+
+      input {
+        flex: none;
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        margin: 0;
+        border-radius: 10px;
+        border: 2px solid var(--od-text-2);
         display: flex;
         align-items: center;
+        justify-content: center;
+
+        &:checked {
+          border-color: var(--od-text);
+
+          &::after {
+            content: '';
+            width: 10px;
+            height: 10px;
+            border-radius: 5px;
+            background: var(--od-text);
+          }
+        }
+      }
+
+      .texts {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        font-size: 16px;
+        color: var(--od-text);
+      }
+
+      .sub {
+        font-size: 14px;
+        line-height: 20px;
         color: var(--od-text-2);
       }
+    }
+
+    .helper {
+      margin: 0 0 8px 36px;
+      font-size: 12px;
+      line-height: 16px;
+      color: var(--od-text-2);
     }
 
     .switch-row {

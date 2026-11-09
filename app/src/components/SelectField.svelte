@@ -1,5 +1,6 @@
 <script>
   // @ts-check
+  import DropdownArrow from './DropdownArrow.svelte';
   import Icon from './Icon.svelte';
   // One value chosen in a short list: the MD3 filled field with a ▾ at the end
   // (spec, section 1, "Text fields"), on the system's own choice list. The
@@ -13,9 +14,16 @@
    *   supporting?: string,
    *   disabled?: boolean,
    *   onchange?: (value: string) => void,
+   *   clearLabel?: string,
    * }}
    */
-  let { label, value = $bindable(), options, supporting = '', disabled = false, onchange } = $props();
+  let { label, value = $bindable(), options, supporting = '', disabled = false, onchange, clearLabel = '' } = $props();
+
+  /** With `clearLabel` and a value: a ✕ sets the field back to the empty choice. */
+  function clear() {
+    value = '';
+    onchange?.(value);
+  }
 
   const id = `od-select-${Math.random().toString(36).slice(2, 9)}`;
 </script>
@@ -23,10 +31,13 @@
 <div class="field" class:disabled>
   <div class="box">
     <label class="label" for={id}>{label}</label>
-    <select {id} {disabled} bind:value onchange={() => onchange?.(value)}>
+    <select {id} {disabled} class:clearable={clearLabel && value} bind:value onchange={() => onchange?.(value)}>
       {#each options as option (option.value)}<option value={option.value}>{option.label}</option>{/each}
     </select>
-    <span class="arrow"><Icon name="expand" /></span>
+    {#if clearLabel && value}
+      <button type="button" class="clear" aria-label={clearLabel} onclick={clear}><Icon name="close" size={20} /></button>
+    {/if}
+    <span class="arrow"><DropdownArrow /></span>
   </div>
   {#if supporting}<p class="supporting">{supporting}</p>{/if}
 </div>
@@ -96,6 +107,27 @@
       font: inherit;
       font-size: 16px;
       line-height: 24px;
+
+      &.clearable {
+        padding-right: 92px;
+      }
+    }
+
+    /* 48 dp target, 20 dp icon, before the arrow. */
+    .clear {
+      position: absolute;
+      right: 40px;
+      top: 4px;
+      width: 48px;
+      height: 48px;
+      padding: 0;
+      border: none;
+      border-radius: 24px;
+      background: none;
+      color: var(--od-text-2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .arrow {

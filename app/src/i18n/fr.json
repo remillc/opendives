@@ -790,7 +790,6 @@
     },
     "summaryWeight": "lest {value}",
     "computersGroup": "Ordinateurs",
-    "mainSuffix": ", principal",
     "advancedGroup": "Avancé",
     "saved": "Modification enregistrée",
     "undo": "Annuler",
@@ -843,7 +842,12 @@
       "Travel Gas": "Gaz de transit"
     },
     "siteHint": "Un site du carnet ou un nouveau nom",
-    "tripHint": "Un voyage du carnet ou un nouveau nom ; vide : aucun voyage"
+    "tripNone": "Aucun",
+    "tripNew": "Nouveau voyage",
+    "tripClear": "Retirer du voyage",
+    "tripNewName": "Nom du voyage",
+    "mainComputer": "Principal : son profil est celui de la plongée",
+    "mainComputerHelp": "Avec plusieurs ordinateurs, choisissez le principal."
   },
   "tripScreen": {
     "kicker": "Voyage · {range}",
@@ -1333,7 +1337,8 @@
       "Détail d’une plongée : une plongée seule n’affiche plus de voyage.",
       "Détail d’une plongée : les étoiles de la note s’affichent seules.",
       "Détail d’une plongée : « Retirer du voyage » dans le menu ⋮.",
-      "À propos : le crédit des cartes nomme aussi OpenFreeMap et OpenMapTiles."
+      "À propos : le crédit des cartes nomme aussi OpenFreeMap et OpenMapTiles.",
+      "Modifier une plongée : sections toujours ouvertes, voyage choisi dans une liste, avec un bouton pour le retirer."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",

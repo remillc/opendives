@@ -5,6 +5,7 @@
   // a ▾ at the end; on focus, the values already in the logbook (the most
   // used first), filtered by what is typed, and "Add …" for a new one.
   import Icon from './Icon.svelte';
+  import DropdownArrow from './DropdownArrow.svelte';
   import { t } from '../lib/i18n.js';
 
   /**
@@ -100,7 +101,7 @@
         enterkeyhint="done"
       />
     </div>
-    <span class="arrow" class:up={open}><Icon name="expand" /></span>
+    <span class="arrow" class:up={open}><DropdownArrow /></span>
   </div>
   {#if proposals.length || isNew}
     <ul class="menu" role="listbox" aria-label={label}>

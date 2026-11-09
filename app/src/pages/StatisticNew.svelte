@@ -9,6 +9,7 @@
   // statistics, on this device. No chart builder.
   import { Popup, View, Page, Navbar, Link, f7, theme } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
+  import DropdownArrow from '../components/DropdownArrow.svelte';
   import KeyFigures from '../components/KeyFigures.svelte';
   import TextField from '../components/TextField.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
@@ -151,7 +152,7 @@
             <div class="filled-box filled">
               <span class="filled-label">{t('stats.criterion')}</span>
               <span class="dropdown-value">{t(`stats.criteria.${c.field}`)}</span>
-              <span class="dropdown-arrow"><Icon name="expand" /></span>
+              <span class="dropdown-arrow"><DropdownArrow /></span>
               <select aria-label={t('stats.criterion')} value={c.field} onchange={(e) => setField(index, e.currentTarget.value)}>
                 {#each CRITERIA as f (f)}<option value={f}>{t(`stats.criteria.${f}`)}</option>{/each}
               </select>
