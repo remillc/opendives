@@ -227,6 +227,12 @@
 
   const rebreather = $derived(dive ? dive.divemode === 'CCR' || dive.divemode === 'PSCR' : false);
 
+  /** The dive's trip; a trip of one dive is no trip, as in the logbook list. */
+  const trip = $derived.by(() => {
+    const own = dive?.trip;
+    return own?.location && logbook.dives.filter((d) => d.trip?.id === own.id).length > 1 ? own : null;
+  });
+
   /** Location line under the title, from the site's taxonomy; empty when unknown. */
   const location = $derived(
     dive?.siteLocation
@@ -412,9 +418,9 @@
         {#if dive.number}<strong>{t('detail.number', { number: String(dive.number) })}</strong>&emsp;{/if}{formatDiveDay(dive.date)}
       </p>
       <h1 class="site" class:not-set={!dive.site}>{dive.site || t('dive.siteNotSet')}</h1>
-      {#if location || dive.trip?.location}
+      {#if location || trip}
         <p class="location">
-          {location}{#if location && dive.trip?.location}{' · '}{/if}{#if dive.trip?.location}<a href="/trips/{dive.trip.id}">{t('detail.tripLine', { name: dive.trip.location })}</a>{/if}
+          {location}{#if location && trip}{' · '}{/if}{#if trip}<a href="/trips/{trip.id}">{t('detail.tripLine', { name: trip.location })}</a>{/if}
         </p>
       {/if}
       {#if dive.rating > 0}
