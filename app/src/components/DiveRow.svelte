@@ -81,11 +81,8 @@
         <div class="item-title">
           {#if dive.site}{dive.site}{:else}<span class="not-set">{t('dive.siteNotSet')}</span>{/if}
         </div>
-        {#if pendingText}
-          <div class="item-text pending">{pendingText}</div>
-        {:else}
-          <div class="item-text">{#if number}{number}<span class="separator" aria-hidden="true">·</span>{/if}{formatDateTime(dive.date)}</div>
-        {/if}
+        <div class="item-text">{#if number}{number}<span class="separator" aria-hidden="true">·</span>{/if}{formatDateTime(dive.date)}</div>
+        {#if pendingText}<div class="item-text pending">{pendingText}</div>{/if}
       </div>
       <div class="values od-value">
         {#if dive.maxDepthMm}<strong>{formatDepth(dive.maxDepthMm, prefs)}</strong>{/if}

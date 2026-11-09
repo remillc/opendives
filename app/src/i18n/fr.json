@@ -1387,6 +1387,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Carnet : l’état de la synchronisation (hors ligne avec des changements en attente, échec, conflit) s’affiche dans une pastille de l’en-tête ; une plongée en attente garde son numéro et sa date.",
       "Synchronisation : quand elle échoue alors que le réseau fonctionne, le Carnet dit pourquoi (mot de passe refusé, cloud qui ne répond pas, dépôt git refusé) et propose quoi faire.",
       "Planificateur : la plongée de départ montre son numéro et sa durée, dans le planificateur et dans la liste pour la choisir.",
       "Réglages du planificateur : sans ligne d’introduction, les groupes suivent directement le titre.",

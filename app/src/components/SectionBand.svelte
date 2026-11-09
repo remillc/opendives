@@ -6,13 +6,13 @@
   // search bar follows the summary. `flat`, on Sites, whose map runs under
   // the band: rounded bottom corners and a shadow instead of the wave.
 
-  /** @type {{ summary?: string, tall?: boolean, flat?: boolean, children?: import('svelte').Snippet }} */
-  let { summary = '', tall = false, flat = false, children } = $props();
+  /** @type {{ summary?: string, tall?: boolean, flat?: boolean, pill?: boolean, children?: import('svelte').Snippet }} */
+  let { summary = '', tall = false, flat = false, pill = false, children } = $props();
 
   const PROFILE = 'M0 30 L20 38 L45 70 L70 92 L95 96 L120 88 L140 94 L165 80 L185 62 L210 58 L235 50 L255 46 L275 40 L300 36';
 </script>
 
-<div class="band" class:tall class:flat>
+<div class="band" class:tall class:flat class:pill>
   <!-- Flat, the band is one line high: no room for the profile. -->
   {#if !flat}
     <svg class="profile" viewBox="0 0 300 140" preserveAspectRatio="none" aria-hidden="true">
@@ -40,6 +40,10 @@
 
       &.tall {
         --od-band-h: calc(var(--f7-safe-area-top) + 190px);
+      }
+
+      &.pill {
+        --od-band-h: calc(var(--f7-safe-area-top) + 242px);
       }
 
       &.flat {
