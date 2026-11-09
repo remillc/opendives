@@ -1390,7 +1390,8 @@
       "About: the map credit also names OpenFreeMap and OpenMapTiles.",
       "Edit a dive: sections always open, the trip chosen from a list, with a button to remove it.",
       "Edit a dive: choose the main computer when the dive has several.",
-      "Settings: Logbook dive computers, to rename, remove or merge duplicates, found by serial number, then by comparing the profiles."
+      "Settings: Logbook dive computers, to rename, remove or merge duplicates, found by serial number, then by comparing the profiles.",
+      "Logbook: “Logbook dive computers” in the ⋮ menu."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",

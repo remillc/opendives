@@ -1390,7 +1390,8 @@
       "À propos : le crédit des cartes nomme aussi OpenFreeMap et OpenMapTiles.",
       "Modifier une plongée : sections toujours ouvertes, voyage choisi dans une liste, avec un bouton pour le retirer.",
       "Modifier une plongée : choix de l’ordinateur principal quand la plongée en a plusieurs.",
-      "Réglages : Ordinateurs du carnet, pour renommer, retirer ou fusionner les doublons, détectés par le numéro de série, puis en comparant les profils."
+      "Réglages : Ordinateurs du carnet, pour renommer, retirer ou fusionner les doublons, détectés par le numéro de série, puis en comparant les profils.",
+      "Carnet : « Ordinateurs du carnet » dans le menu ⋮."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",

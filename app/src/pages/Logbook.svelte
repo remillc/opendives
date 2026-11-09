@@ -1196,6 +1196,7 @@
       <MenuItem icon="filter" text={t(filtered ? 'logbook.menuFilterOn' : 'logbook.menuFilter')} link="/filter" />
       {#if !selecting}
         <MenuItem icon="renumber" text={t('logbook.menuRenumber')} onclick={() => (renumbering = true)} />
+        <MenuItem icon="computer" text={t('settings.logbookComputers.title')} link="/settings/computers/" />
       {:else}
         <MenuItem icon="renumber" text={t('logbook.menuRenumberChecked', { n: checkedCount })} onclick={() => (renumbering = true)} />
       {/if}
