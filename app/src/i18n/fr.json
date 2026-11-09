@@ -257,6 +257,10 @@
     },
     "figureWaterMin": "eau, minimum",
     "tripLine": "Voyage : {name}",
+    "removeFromTrip": "Retirer du voyage",
+    "removedFromTrip": "Plongée retirée du voyage",
+    "removedFromTripEmpty": "Plongée retirée. Le voyage, maintenant vide, a été supprimé.",
+    "removeFromTripFailed": "La plongée n’a pas pu être retirée du voyage.",
     "ratingLabel": "Note globale : {n} sur 5",
     "water": "Eau",
     "waterTypes": {
@@ -1327,7 +1331,8 @@
       "Détail d’une plongée : l’écran suit la maquette (barre du haut, voyage en lien, tailles et marges, personnes et étiquettes en puces, point sur la courbe de température au toucher).",
       "Détail d’une plongée : carte du site derrière l’en-tête, préparée à l’avance en Wi-Fi, quand le site a des coordonnées GPS.",
       "Détail d’une plongée : une plongée seule n’affiche plus de voyage.",
-      "Détail d’une plongée : les étoiles de la note s’affichent seules."
+      "Détail d’une plongée : les étoiles de la note s’affichent seules.",
+      "Détail d’une plongée : « Retirer du voyage » dans le menu ⋮."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",

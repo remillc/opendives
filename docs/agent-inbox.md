@@ -828,7 +828,9 @@ Christian approved this on the canvas. Spec: "Dive detail, site map behind the h
 - Choose a satellite imagery provider whose terms allow this use in a free, open-source app, show its attribution as required, and cache the image per site. Before adding a paid service or an API key, stop and propose the options to Christian.
 - Do this together with task 2026-11-09-12 (whole screen as the mock-up), which left the map out until now.
 
-## [ ] 2026-11-09-14 Dive detail menu: "Retirer du voyage" (to-do #22)
+## [x] 2026-11-09-14 Dive detail menu: "Retirer du voyage" (to-do #22)
+
+Done in Dive detail: Remove from trip in the menu
 
 Christian approved this. Spec: "Dive detail menu, Retirer du voyage". Mock-up: `docs/mockups/detail2-android-menu.dc.html`.
 - Show "Retirer du voyage" in the ⋮ menu of `/dives/:id` only when the dive belongs to a trip, right after "Renuméroter la plongée", with the suitcase-minus icon of the mock-up.

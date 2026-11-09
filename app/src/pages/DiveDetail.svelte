@@ -20,7 +20,7 @@
   import { filter } from '../lib/filter.svelte.js';
   import { horizontalSwipe, swipeGoesThrough } from '../lib/swipe.js';
   import Stars from '../components/Stars.svelte';
-  import { logbook, deleteDive } from '../lib/logbook.svelte.js';
+  import { logbook, deleteDive, tripChange } from '../lib/logbook.svelte.js';
   import { layout } from '../lib/layout.svelte.js';
   import { offerUndo } from '../lib/undo.js';
   import {
@@ -241,6 +241,28 @@
 
   const rebreather = $derived(dive ? dive.divemode === 'CCR' || dive.divemode === 'PSCR' : false);
 
+  /** The dive can leave its trip; a trip of one dive made by the automatic grouping is no trip. */
+  const removableFromTrip = $derived(
+    !!dive?.trip && (!dive.trip.autogen || logbook.dives.filter((d) => d.trip?.id === dive?.trip?.id).length > 1),
+  );
+
+  // "Retirer du voyage": at once, as Subsurface's "Remove dive(s) from trip".
+  // A trip left empty is deleted by the core; "Annuler" brings both back.
+  async function removeFromTrip() {
+    f7.popover.close(`#${menuId}`);
+    const tripId = dive?.trip?.id;
+    const last = logbook.dives.filter((d) => d.trip?.id === tripId).length <= 1;
+    try {
+      await tripChange({ action: 'remove', diveIds: [Number(diveId)] });
+      await loadDive();
+      offerUndo(t(last ? 'detail.removedFromTripEmpty' : 'detail.removedFromTrip'), loadDive);
+    } catch (e) {
+      const code = String(/** @type {any} */ (e)?.message ?? '');
+      console.error('Remove from trip', code);
+      f7.toast.show({ text: code.startsWith('WRITE_LOCKED') ? t('edit.writeLocked') : t('detail.removeFromTripFailed'), closeTimeout: 4000 });
+    }
+  }
+
   /** The dive's trip; a trip of one dive is no trip, as in the logbook list. */
   const trip = $derived.by(() => {
     const own = dive?.trip;
@@ -399,6 +421,9 @@
           renumbering = true;
         }}
       />
+      {#if removableFromTrip}
+        <MenuItem icon="tripRemove" text={t('detail.removeFromTrip')} onclick={removeFromTrip} />
+      {/if}
       <MenuItem
         icon="share"
         text={t('share.title')}

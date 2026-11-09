@@ -257,6 +257,10 @@
     },
     "figureWaterMin": "water, minimum",
     "tripLine": "Trip: {name}",
+    "removeFromTrip": "Remove from trip",
+    "removedFromTrip": "Dive removed from trip",
+    "removedFromTripEmpty": "Dive removed. The trip, now empty, was deleted.",
+    "removeFromTripFailed": "The dive could not be removed from the trip.",
     "ratingLabel": "Overall rating: {n} of 5",
     "water": "Water",
     "waterTypes": {
@@ -1327,7 +1331,8 @@
       "Dive detail: the screen follows the mock-up (top bar, trip as a link, sizes and margins, people and tags as chips, a dot on the temperature curve at the cursor).",
       "Dive detail: map of the site behind the header, prepared ahead on Wi-Fi, when the site has GPS coordinates.",
       "Dive detail: a dive on its own no longer shows a trip.",
-      "Dive detail: the rating stars stand alone."
+      "Dive detail: the rating stars stand alone.",
+      "Dive detail: “Remove from trip” in the ⋮ menu."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
