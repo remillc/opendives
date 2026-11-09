@@ -867,7 +867,9 @@ Christian approved these on the canvas. Spec: "Edit dive form, sections and trip
 - When the dive is in a trip, show a clear button ✕ before the arrow (accessible label "Retirer du voyage", 48 dp touch target, 20 dp icon). It sets the field to "Aucun". The dive leaves the trip on Enregistrer, and an empty trip is deleted as with the ⋮ menu action of task 2026-11-09-14.
 - Check the other Android screens: a filled down arrow only on dropdown menus, a right chevron only on fields or rows that open another page or a dialog.
 
-## [ ] 2026-11-09-18 Settings: logbook dive computers, rename, remove, merge duplicates
+## [x] 2026-11-09-18 Settings: logbook dive computers, rename, remove, merge duplicates
+
+Done in Settings: logbook dive computers, rename, remove, merge duplicates by profile. Christian chose not to open the logbook in desktop Subsurface: the merged test logbook was read back with Subsurface's core instead.
 
 Christian approved this. Spec: "Settings, logbook dive computers (rename, remove, merge duplicates)". Mock-ups: `docs/mockups/reglages-ordinateurs-android.dc.html`, `reglages-ordinateur-modifier-android.dc.html`, `reglages-ordinateur-fusion-android.dc.html`, and the new first row of the "Ordinateurs de plongée" group in `android-reglages.dc.html` (the ⋮ menu in `reglages-menu-android.dc.html` moved down with it).
 - New row "Ordinateurs du carnet" → page listing every computer the dives come from (device list of the core, plus model and device id found in the dives), with name, model, serial, dive count, and the "Doublon possible" chip (same model as another entry, no serial).
