@@ -854,3 +854,12 @@ Christian approved this on the canvas at 11:24. It replaces the aerial view of t
 - Show "© OpenStreetMap" at the right, 10 sp, above the rating line (required by the licence). The map stays decorative: not interactive, hidden from screen readers.
 - Tiles: follow the OpenStreetMap tile usage policy (a real User-Agent for the app, no bulk download, cache the rendered image per site). If the policy does not fit an app, propose another OSM-based tile provider to Christian before adding an API key or a paid service. Remove the satellite provider added for task 13 if nothing else uses it.
 
+## [ ] 2026-11-09-17 Edit dive form: sections always open, Voyage dropdown with a clear button
+
+Christian approved these on the canvas. Spec: "Edit dive form, sections and trip field". Mock-up: `docs/mockups/android-edition.dc.html`.
+- Remove the expand/collapse chevrons of all the sections of `/dives/:id/edit` and make every section always open. Section titles become plain headings, not buttons.
+- Ordinateurs, previously collapsed, now shows each computer of the dive with a radio button for the main one ("Principal : son profil est celui de la plongée") and the helper "Avec plusieurs ordinateurs, choisissez le principal.". Use the core's notion of the dive's first (main) computer.
+- Voyage is a dropdown menu (Aucun, the existing trips, Nouveau voyage) with the filled down arrow used by the other dropdowns, not a right chevron.
+- When the dive is in a trip, show a clear button ✕ before the arrow (accessible label "Retirer du voyage", 48 dp touch target, 20 dp icon). It sets the field to "Aucun". The dive leaves the trip on Enregistrer, and an empty trip is deleted as with the ⋮ menu action of task 2026-11-09-14.
+- Check the other Android screens: a filled down arrow only on dropdown menus, a right chevron only on fields or rows that open another page or a dialog.
+
