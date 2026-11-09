@@ -52,7 +52,7 @@ if [ "${1:-}" = --verify ]; then
     if (!r.steps.length) bad.push("no steps");
     if (bad.length) { console.log("RED: " + bad.join("; ")); process.exit(1); }
     console.log("GREEN: " + r.steps.length + " checks, commit " + r.commit.slice(0, 10) + ", Subsurface " + r.subsurface.slice(0, 10) + ", " + r.date);
-  ' "$r" "$c" "$(git ls-tree "$c" third_party/subsurface | awk '{ print $3 }')"
+  ' "$(case "$NODE" in *.exe) wslpath -w "$r" ;; *) echo "$r" ;; esac)" "$c" "$(git ls-tree "$c" third_party/subsurface | awk '{ print $3 }')"
   exit $?
 fi
 
