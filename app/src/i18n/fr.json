@@ -1235,7 +1235,8 @@
       "Réglages : nouveau groupe « Conditions par défaut » (type d’eau et altitude), repris par le planificateur et le calculateur de gaz.",
       "Planificateur refait : plongées planifiées enregistrées dans le carnet, plusieurs niveaux et plusieurs gaz, volumes par gaz, modèle de décompression propre à chaque plan, partage du plan.",
       "Modifier la plongée : chaque bouteille montre tous ses champs, sans ligne repliée.",
-      "Partager : icône PDF pour la fiche. Exporter : le premier format se nomme « Fichier de carnet (.ssrf) »."
+      "Partager : icône PDF pour la fiche. Exporter : le premier format se nomme « Fichier de carnet (.ssrf) ».",
+      "À propos : chaque bibliothèque libre ouvre son site dans le navigateur."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
@@ -1273,7 +1274,9 @@
       "lastError": "Dernière erreur"
     },
     "opensElsewhere": "s'ouvre dans le navigateur",
-    "credit": "Le cœur de calcul vient de Subsurface, créé par Linus Torvalds et Dirk Hohndel, et de ses contributeurs."
+    "credit": "Le cœur de calcul vient de Subsurface, créé par Linus Torvalds et Dirk Hohndel, et de ses contributeurs.",
+    "librariesIntro": "Toucher une bibliothèque ouvre son site dans le navigateur.",
+    "libraryLink": "{name}, {licence} (s’ouvre dans le navigateur)"
   },
   "bringLogbook": {
     "device": {

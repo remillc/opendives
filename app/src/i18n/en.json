@@ -1235,7 +1235,8 @@
       "Settings: new group “Default conditions” (water type and altitude), used by the planner and the gas calculator.",
       "Planner redone: planned dives saved in the logbook, several levels and gases, volumes per gas, a decompression model for each plan, sharing a plan.",
       "Edit dive: every cylinder shows all its fields, no collapsed lines.",
-      "Share: a PDF icon for the sheet. Export: the first format is named “Logbook file (.ssrf)”."
+      "Share: a PDF icon for the sheet. Export: the first format is named “Logbook file (.ssrf)”.",
+      "About: each open source library opens its website in the browser."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
@@ -1273,7 +1274,9 @@
       "lastError": "Last error"
     },
     "opensElsewhere": "opens in the browser",
-    "credit": "The dive core comes from Subsurface, created by Linus Torvalds and Dirk Hohndel, and its contributors."
+    "credit": "The dive core comes from Subsurface, created by Linus Torvalds and Dirk Hohndel, and its contributors.",
+    "librariesIntro": "Tapping a library opens its website in the browser.",
+    "libraryLink": "{name}, {licence} (opens in the browser)"
   },
   "bringLogbook": {
     "device": {

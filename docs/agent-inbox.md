@@ -752,7 +752,9 @@ Christian approved these by resolving their comment threads. Do them after 2026-
 - Share sheet (`docs/mockups/partage-android.dc.html`): the "Fiche PDF" choice uses the Material Symbols `picture_as_pdf` icon in its coloured circle.
 - Export sheet of the logbook selection (`docs/mockups/carnet-export-android.dc.html`): the first format reads "Fichier de carnet (.ssrf)" with the description "Format Subsurface, lisible aussi par OpenDives" (it exports the checked dives only, as before).
 
-## [ ] 2026-11-09-06 About › Bibliothèques libres: each library opens its website
+## [x] 2026-11-09-06 About › Bibliothèques libres: each library opens its website
+
+Done in the branch `fix/about-library-links`.
 
 Christian wants the "Bibliothèques libres" screen (`app/src/pages/AboutLibraries.svelte`) as drawn in `docs/mockups/apropos-bibliotheques-android.dc.html`. Spec: "About".
 - Under the top bar, the line "Toucher une bibliothèque ouvre son site dans le navigateur."
