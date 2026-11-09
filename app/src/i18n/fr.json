@@ -137,6 +137,33 @@
     }
   },
   "sync": {
+    "failure": {
+      "later": "Plus tard",
+      "close": "Fermer",
+      "stays": { "one": "Votre modification reste sur ce téléphone.", "other": "Vos {n} modifications restent sur ce téléphone." },
+      "staysAuth": { "one": "Votre modification reste sur ce téléphone et partira dès que le mot de passe sera corrigé.", "other": "Vos {n} modifications restent sur ce téléphone et partiront dès que le mot de passe sera corrigé." },
+      "staysNone": "Vos plongées restent sur ce téléphone.",
+      "auth": {
+        "row": "Synchronisation impossible : mot de passe refusé",
+        "title": "Le cloud refuse votre mot de passe",
+        "intro": "Il a peut-être été changé sur un autre appareil.",
+        "action": "Corriger le mot de passe"
+      },
+      "server": {
+        "row": "Le cloud ne répond pas : nouvel essai dans {n} min",
+        "rowManual": "Le cloud ne répond pas",
+        "title": "Le cloud ne répond pas",
+        "intro": "Le réseau fonctionne, mais le serveur du cloud est peut-être en maintenance.",
+        "retry": "Nouvel essai automatique dans {n} minutes.",
+        "action": "Réessayer maintenant"
+      },
+      "repository": {
+        "row": "Synchro impossible : dépôt git refusé",
+        "title": "Le dépôt git refuse l’accès",
+        "intro": "Le jeton d’accès a peut-être expiré ou a été retiré, ou l’adresse du dépôt a changé.",
+        "action": "Modifier le dépôt"
+      }
+    },
     "syncing": "Synchronisation avec le cloud Subsurface…",
     "stages": {
       "connect": "Connexion au cloud…",
@@ -1360,6 +1387,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Synchronisation : quand elle échoue alors que le réseau fonctionne, le Carnet dit pourquoi (mot de passe refusé, cloud qui ne répond pas, dépôt git refusé) et propose quoi faire.",
       "Planificateur : la plongée de départ montre son numéro et sa durée, dans le planificateur et dans la liste pour la choisir.",
       "Réglages du planificateur : sans ligne d’introduction, les groupes suivent directement le titre.",
       "Planificateur : « Nouvelle plongée » sans la ligne « Valeurs par défaut du planificateur de Subsurface ».",

@@ -137,6 +137,33 @@
     }
   },
   "sync": {
+    "failure": {
+      "later": "Later",
+      "close": "Close",
+      "stays": { "one": "Your change stays on this phone.", "other": "Your {n} changes stay on this phone." },
+      "staysAuth": { "one": "Your change stays on this phone and will be sent once the password is fixed.", "other": "Your {n} changes stay on this phone and will be sent once the password is fixed." },
+      "staysNone": "Your dives stay on this phone.",
+      "auth": {
+        "row": "Can’t sync: password refused",
+        "title": "The cloud refuses your password",
+        "intro": "It may have been changed on another device.",
+        "action": "Fix the password"
+      },
+      "server": {
+        "row": "The cloud isn’t answering: trying again in {n} min",
+        "rowManual": "The cloud isn’t answering",
+        "title": "The cloud isn’t answering",
+        "intro": "The network works, but the cloud server may be under maintenance.",
+        "retry": "Next automatic try in {n} minutes.",
+        "action": "Try again now"
+      },
+      "repository": {
+        "row": "Can’t sync: git repository refused",
+        "title": "The git repository refuses access",
+        "intro": "The access token may have expired or been removed, or the repository’s address has changed.",
+        "action": "Edit the repository"
+      }
+    },
     "syncing": "Syncing with the Subsurface cloud…",
     "stages": {
       "connect": "Connecting to the cloud…",
@@ -1360,6 +1387,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Sync: when it fails while the network works, the Logbook says why (password refused, cloud not answering, git repository refused) and offers what to do.",
       "Planner: the starting dive shows its number and duration, in the planner and in the list to choose it.",
       "Planner settings: no introduction line, the groups follow the title directly.",
       "Planner: “New dive” without the line “Defaults of the Subsurface planner”.",

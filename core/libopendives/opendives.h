@@ -711,7 +711,8 @@ int save_as(const std::string &destination, std::string &error);
 // with its settings (as Subsurface-mobile). Writes {"status":…, "pending":n,
 // "reloaded":true|false} with status "local" (log without account),
 // "up_to_date", "pushed", "pulled", "merged", "offline" (saved locally,
-// server unreachable) or "stopped" (sync failed; the local commits wait).
+// server unreachable; "cause" is "auth" when it answered and refused the
+// credentials, otherwise "server") or "stopped" (sync failed; the local commits wait).
 // After a reload the dives are new: list them again with
 // list_loaded_dives(); the undo stack is cleared.
 int sync(std::string &status_json, std::string &error);

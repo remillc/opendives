@@ -597,7 +597,7 @@ import { registerPlugin } from '@capacitor/core';
  *   A page of HTML rendered to a PDF in the cache by the system's print engine (US Letter or A4); its file URI.
  * @property {() => Promise<void>} saveLocal
  *   Local save only, without network (manual synchronisation).
- * @property {() => Promise<{status: string, pending: number, reloaded: boolean}>} syncChanges
+ * @property {() => Promise<{status: string, pending: number, reloaded: boolean, cause?: 'auth'|'server'}>} syncChanges
  *   Local save, then the cloud sync (refused with WRITE_LOCKED except on the test account).
  * @property {(options: {id: number}) => Promise<DiveDetail>} getDive
  *   Detail of one dive of the last loaded log.

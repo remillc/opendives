@@ -664,9 +664,11 @@ int pending_count()
 	return internal::current_log_is_cloud() ? static_cast<int>(list_pending(internal::current_log()).size()) : 0;
 }
 
-std::string sync_json(const std::string &status, bool reloaded)
+std::string sync_json(const std::string &status, bool reloaded, const std::string &cause = std::string())
 {
 	std::string json = "{\"status\":\"" + status + "\",\"pending\":" + std::to_string(pending_count());
+	if (!cause.empty())
+		json += ",\"cause\":\"" + cause + "\"";
 	json += ",\"reloaded\":";
 	json += reloaded ? "true" : "false";
 	json += '}';
@@ -2562,7 +2564,7 @@ int sync(std::string &status_json, std::string &error)
 	if (save_local(error))
 		return -1;
 	if (!reachable) {
-		status_json = sync_json("offline", false);
+		status_json = sync_json("offline", false, probe_error.rfind("AUTH", 0) == 0 ? "auth" : "server");
 		return 0;
 	}
 	Heads before = read_heads(log);

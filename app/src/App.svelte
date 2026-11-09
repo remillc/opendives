@@ -50,6 +50,7 @@
   const showRoute = /** @type {any} */ (import.meta).env?.VITE_SHOW_ROUTE === '1';
   import Download from './pages/Download.svelte';
   import NavMenu from './components/NavMenu.svelte';
+  import SyncFailureSheet from './components/SyncFailureSheet.svelte';
   import Welcome from './components/Welcome.svelte';
   import { layout, ios, listWidth, splitBreakpoint } from './lib/layout.svelte.js';
   import { trackSection, enableSectionSwipes, enableFullSwipeBack } from './lib/navigation.svelte.js';
@@ -249,6 +250,7 @@
 
 <App {...f7params}>
   {#if layout.phone}<NavMenu />{:else}<NavRail />{/if}
+  <SyncFailureSheet />
   {#if showRoute}<RouteBadge />{/if}
   <Welcome />
   <Views tabs class="safe-areas {layout.phone ? '' : 'od-tablet'}" style="--f7-page-master-width: {listWidth}px; --od-no-dive: '{t('tablet.noDive')}'">

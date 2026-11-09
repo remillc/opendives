@@ -1031,8 +1031,12 @@ int cloud_branch_status(const std::string &url, bool &exists, std::string &head,
 		git_remote_disconnect(remote);
 	}
 	if (ret) {
-		error = attempts > 1 ? "Credentials rejected by the server"
-				     : (git_error_last() ? git_error_last()->message : "Cannot connect");
+		// "AUTH" tells the app the server answered and refused (spec, "Sync failures").
+		const char *message = git_error_last() ? git_error_last()->message : "";
+		if (attempts > 1 || strstr(message, "401") || strstr(message, "403") || strstr(message, "authentication"))
+			error = "AUTH: Credentials rejected by the server";
+		else
+			error = *message ? message : "Cannot connect";
 	}
 	git_remote_free(remote);
 	return ret ? -1 : 0;
