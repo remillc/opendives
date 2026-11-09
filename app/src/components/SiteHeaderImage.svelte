@@ -3,10 +3,9 @@
   // Map of the site behind the top bar and the header of a dive (detail3-android
   // mock-ups; spec, "Dive detail, site map behind the header"). Decorative: not
   // interactive, hidden from screen readers. Until the picture is there
-  // (offline and never seen), nothing is shown.
+  // (offline and never seen), nothing is shown. The map's credits are in About.
   import { onDestroy } from 'svelte';
   import { DRAW_WIDTH, HALF_HEIGHT, loadSiteMap } from '../lib/site-image.js';
-  import { t } from '../lib/i18n.js';
 
   /** @type {{ latUdeg: number, lonUdeg: number, onshown: (shown: boolean) => void }} */
   let { latUdeg, lonUdeg, onshown } = $props();
@@ -49,8 +48,6 @@
       <circle class="eye" cy="-11" r="3" />
     </svg>
     <div class="fade"></div>
-    <!-- Credits asked by OpenStreetMap's licence and the tile provider. -->
-    <p class="credits">{t('sites.mapCredits')}</p>
   {/if}
 </div>
 
@@ -111,17 +108,6 @@
         color-mix(in srgb, var(--od-background) 45%, transparent) 60%,
         var(--od-background) 100%
       );
-    }
-
-    /* In the gap between the top bar and the date. */
-    .credits {
-      position: absolute;
-      right: 8px;
-      top: calc(var(--f7-safe-area-top) + var(--f7-navbar-height) + 2px);
-      margin: 0;
-      color: var(--od-text-2);
-      font-size: 10px;
-      line-height: 12px;
     }
   }
 </style>
