@@ -56,6 +56,7 @@
   import { enableBackButton } from './lib/back-button.js';
   import { enableAccessibility } from './lib/accessibility.js';
   import { enableDetailPageCleanup } from './lib/detail-pages.js';
+  import { enableModalCleanup } from './lib/modal-cleanup.js';
   import { t } from './lib/i18n.js';
   import { mark } from './lib/perf.js';
   import { settings } from './lib/settings.svelte.js';
@@ -225,6 +226,7 @@
     enableBackButton();
     enableAccessibility();
     enableDetailPageCleanup();
+    enableModalCleanup();
     trackSection();
     enableSectionSwipes();
     enableFullSwipeBack();

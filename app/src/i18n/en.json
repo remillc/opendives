@@ -1320,7 +1320,8 @@
       "Privacy policy: links and the contact address can be tapped.",
       "Secure connections: the OpenSSL library is replaced by Mbed TLS, compatible with the app’s licence.",
       "Git repository: the logbook can live in your own git repository (GitHub, GitLab, Codeberg or your server) instead of the Subsurface cloud. On the first page, “Use my own git repository”; the access token stays encrypted on the device.",
-      "Tablet: the logbook opens the first dive when none is shown."
+      "Tablet: the logbook opens the first dive when none is shown.",
+      "Sharing: the app no longer stays stuck under a grey veil after sharing a dive or a plan."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
