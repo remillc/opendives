@@ -988,7 +988,9 @@ Christian chose corrected bars over dial gauges. Spec: "Dive detail, cylinder pr
 - `role="img"` with an aria-label giving remaining, working and used pressures.
 - When a pressure is missing (no start, no end or no working pressure), hide the bar and keep the text.
 
-## [ ] 2026-11-09-31 Mark dives invalid from the Carnet selection menu and the detail menu (to-do #26)
+## [x] 2026-11-09-31 Mark dives invalid from the Carnet selection menu and the detail menu (to-do #26)
+
+**Cancelled by Christian on 9 November 2026, before it was built: do not add these menu items.** To-do #27 will instead remove the invalid-dive workflow; a separate task will follow.
 
 Christian approved. Spec: "Marking dives invalid". Mock-ups: `docs/mockups/carnet-selection-menu-android.dc.html`, `docs/mockups/detail2-android-menu.dc.html`.
 - Carnet selection ⋮ menu: "Marquer comme invalides" after "Exporter au format…". Detail ⋮ menu: "Marquer comme invalide" after "Partager". Circle-slash icon, above the separator.
