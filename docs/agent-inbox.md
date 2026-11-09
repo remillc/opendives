@@ -846,3 +846,11 @@ Christian approved this on the canvas. Mock-ups: `docs/mockups/detail3-android.d
 - Remove the text "note globale" after the rating stars in the header of `/dives/:id`. The stars stay alone. Keep the accessible label of the rating ("Note : 4 sur 5").
 - Remove the string from the translations if nothing else uses it. Include this in task 2026-11-09-12 if it is still open.
 
+## [ ] 2026-11-09-16 Dive detail: site map from OpenStreetMap instead of an aerial view, stronger veil
+
+Christian approved this on the canvas at 11:24. It replaces the aerial view of task 2026-11-09-13. Spec: "Dive detail, site map behind the header" (rewritten). Mock-ups: `docs/mockups/detail3-android.dc.html`, `detail3-android-sombre.dc.html`, `detail3-android-curseur.dc.html`.
+- Use an OpenStreetMap map (standard style, zoom about 12) centred on the site's coordinates instead of the satellite image. Same size and place as now, pin in the middle of the top bar.
+- Stronger veil of the page background over the map: about 45 % at the top, 70 % at 60 % of the height, 100 % at the bottom, before the three big figures. Draw the pin above the veil, at full strength. Dark mode: map at about 60 % brightness, dark veil.
+- Show "© OpenStreetMap" at the right, 10 sp, above the rating line (required by the licence). The map stays decorative: not interactive, hidden from screen readers.
+- Tiles: follow the OpenStreetMap tile usage policy (a real User-Agent for the app, no bulk download, cache the rendered image per site). If the policy does not fit an app, propose another OSM-based tile provider to Christian before adding an API key or a paid service. Remove the satellite provider added for task 13 if nothing else uses it.
+
