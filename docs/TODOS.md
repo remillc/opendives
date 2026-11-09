@@ -20,7 +20,6 @@ Next number: 20
 - #8 [design] /tools/desaturation: beaucoup trop de texte. Texte pour me protéger.
 - #10 [design] Compte: Compte subsurface vérifié: ?
 - #11 [code] Plus tard (après la v1) : synchroniser aussi avec un dépôt git choisi par l’utilisateur (GitHub ou autre), en HTTPS, en plus du cloud Subsurface
-- #14 [design] Le bouton synchroniser maintenant dans le menu mobile devrait être centré horizontallement dans le menu
 - #15 [code] supprimer une plongée: afficher un dialogue de confirmation puis un snackbar
 - #16 [code] Il nous faut un outil pour s'assurer que les calculs du planificateur de plongée sont exactes. Ceci passe par une série de tests qu'on doit effectuer avant de faire un release
 - #17 [design] ajouter la possibilité d'une switch globale "plongée récréative" qui masque les paramètres avancés et ceux concernant le mode de plongée cc. Ce que SS nomme le mode loisir.
