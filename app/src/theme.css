@@ -57,7 +57,7 @@
     --od-trace-block: var(--od-trace);
     --od-tint: var(--od-surface-2);
     --od-on-tint: var(--od-text);
-    --od-thumbnail-background: var(--od-surface);
+    --od-thumbnail-background: var(--od-surface-2);
     /* Android side menu (MD3 surface-container-low); iOS uses --od-surface. */
     --od-drawer: #F0F0EE;
     /* Dialogs (MD3 surface-container-high) and the scrim under them. */
@@ -467,6 +467,12 @@ html.ios {
    * a white surface, 64 dp each.
    */
   .md .list.dives {
+    /* A dive has no chevron; only a trip has its arrow. */
+    .item-link .item-inner::before,
+    .item-link .item-title-row::before {
+      display: none;
+    }
+
     .item-content:has(> .od-row) {
       box-sizing: border-box;
       min-height: 72px;
