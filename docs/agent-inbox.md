@@ -997,7 +997,9 @@ Christian approved. Spec: "Marking dives invalid". Mock-ups: `docs/mockups/carne
 - Use the core's invalid flag through an undoable command (Subsurface "Mark dive invalid"). No confirmation dialog. Snackbar with "Annuler": "Plongée marquée invalide" or "N plongées marquées invalides".
 - With "Afficher les plongées invalides" off (default), invalid dives leave the Carnet and the statistics; from the detail, go back to the Carnet. With it on, show them dimmed with an outlined "Invalide" label, and offer "Marquer comme valide(s)" instead. A mixed selection gets "Marquer comme invalides".
 
-## [ ] 2026-11-09-32 fr-CA language: wire the catalog (to-do #19)
+## [x] 2026-11-09-32 fr-CA language: wire the catalog (to-do #19)
+
+Done in Add the fr-CA language
 
 Christian asked for a fr-CA catalog that holds only what differs from fr. The file is written: `app/src/i18n/fr-CA.json` (39 texts: "cloud" → "nuage", "e-mail" → "courriel"). Same nested keys as `fr.json`, only the changed leaves.
 - In `app/src/lib/i18n.js`, add fr-CA: look up a key in fr-CA, then fr, then en. Plural objects (`one`/`other`) count as one leaf.

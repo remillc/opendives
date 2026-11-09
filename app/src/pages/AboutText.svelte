@@ -27,7 +27,7 @@
     if (which !== 'privacy') return;
     /** @param {string} lang */
     const read = (lang) => fetch(`privacy/${lang}.html`).then((r) => (r.ok ? r.text() : Promise.reject(r.status)));
-    read(language === 'fr' ? 'fr' : 'en')
+    read(language.startsWith('fr') ? 'fr' : 'en')
       .catch(() => read('en'))
       .then((html) => (policy = html))
       .catch((e) => console.error('Privacy policy', e));

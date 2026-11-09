@@ -1387,6 +1387,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Settings: the app language can be Français (Canada), which says \"nuage\" and \"courriel\"; a phone set to French (Canada) picks it by itself.",
       "Dive detail: the cylinder pressure bars run from 0 to the working pressure, with what is left and what was used.",
       "Planner: a plan made from a rebreather dive starts on the diluent, never the oxygen.",
       "Planner: a bar shows the consumed part and the reserve of each gas, another the CNS exposure.",

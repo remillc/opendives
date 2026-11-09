@@ -1387,6 +1387,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Réglages : la langue de l’app peut être Français (Canada), qui dit « nuage » et « courriel » ; un téléphone réglé en français (Canada) la choisit tout seul.",
       "Détail d’une plongée : les barres de pression des bouteilles vont de 0 à la pression de service, avec le restant et l’utilisé.",
       "Planificateur : un plan fait à partir d’une plongée au recycleur part du diluant, jamais de l’oxygène.",
       "Planificateur : une barre montre la part consommée et la réserve de chaque gaz, une autre l’exposition CNS.",
