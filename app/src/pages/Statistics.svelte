@@ -12,6 +12,7 @@
   import { Page, Navbar, NavRight, Link, theme } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
   import MenuButton from '../components/MenuButton.svelte';
+  import SectionBand from '../components/SectionBand.svelte';
   import KeyFigures from '../components/KeyFigures.svelte';
   import BarChart from '../components/BarChart.svelte';
   import ActiveFilter from '../components/ActiveFilter.svelte';
@@ -81,10 +82,17 @@
 
   /** @param {string} field @param {string} value */
   const resultHref = (field, value) => `/statistics/result?c=${encodeCriteria([{ field, values: [value] }])}`;
+
+  /** "9 plongées sur 6 années, de 2013 à 2026" (the band). */
+  const bandSummary = $derived.by(() => {
+    if (!logbook.dives.length) return '';
+    const years = [...new Set(logbook.dives.map((d) => d.date.slice(0, 4)))].sort();
+    return `${t('band.dives', { n: logbook.dives.length })} ${t('band.overYears', { n: years.length, from: years[0], to: years[years.length - 1] })}`;
+  });
 </script>
 
 <Page onPageInit={keepInSvelteRange}>
-  <Navbar large={theme.ios} title={t('stats.title')}>
+  <Navbar large={theme.ios} class="od-band-bar" title={t('stats.title')}>
     {#snippet left()}<MenuButton />{/snippet}
     <NavRight>
       {#if theme.ios}
@@ -94,6 +102,8 @@
       {/if}
     </NavRight>
   </Navbar>
+
+  <SectionBand summary={bandSummary} />
 
   {#if !logbook.loading && !logbook.dives.length}
     <div class="empty">

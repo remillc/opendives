@@ -12,6 +12,9 @@
   import { Page, Navbar, Link, f7 } from 'framework7-svelte';
   import { OpenDivesCore } from 'opendives-core';
   import ChoiceDialog from '../components/ChoiceDialog.svelte';
+  import MenuButton from '../components/MenuButton.svelte';
+  import { layout } from '../lib/layout.svelte.js';
+  import { navigation } from '../lib/navigation.svelte.js';
   import WheelDialog from '../components/WheelDialog.svelte';
   import RenumberDialog from '../components/RenumberDialog.svelte';
   import { t, deviceLanguage } from '../lib/i18n.js';
@@ -813,13 +816,17 @@
   {/if}
 {/snippet}
 
-<Page class="od-settings">
+<Page class="od-settings" onPageBeforeIn={() => (navigation.page = 'settings')} onPageBeforeOut={() => (navigation.page = '')}>
   <Navbar title={t('settings.title')}>
     {#snippet left()}
-      <Link back iconOnly>
-        <i class="icon icon-back"></i>
-        <span class="od-sr-only">{t('detail.back')}</span>
-      </Link>
+      {#if layout.phone}
+        <MenuButton />
+      {:else}
+        <Link back iconOnly>
+          <i class="icon icon-back"></i>
+          <span class="od-sr-only">{t('detail.back')}</span>
+        </Link>
+      {/if}
     {/snippet}
   </Navbar>
 

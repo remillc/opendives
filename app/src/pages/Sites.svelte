@@ -9,6 +9,7 @@
   import { OpenDivesCore } from 'opendives-core';
   import Icon from '../components/Icon.svelte';
   import MenuButton from '../components/MenuButton.svelte';
+  import SectionBand from '../components/SectionBand.svelte';
   import SiteMap from '../components/SiteMap.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
   import { possibleDuplicates } from '../lib/sites.svelte.js';
@@ -143,7 +144,7 @@
       </div>
     {/if}
   {/snippet}
-  <Navbar title={t('sites.title')}>
+  <Navbar class="od-band-bar" title={t('sites.title')}>
     {#snippet left()}<MenuButton />{/snippet}
     <NavRight>
       <Link iconOnly searchbarEnable=".od-sites-search"><Icon name="search" /><span class="od-sr-only">{t('sites.search')}</span></Link>
@@ -159,6 +160,7 @@
   </Navbar>
 
   {#if layout.phone}
+    <SectionBand flat summary={sites.length ? [t('band.sites', { n: sites.length }), t('band.dives', { n: logbook.dives.length })].join(' · ') : ''} />
     {@render mapBlock('calc(100vw * 4 / 5)')}
     {@render panel()}
   {/if}

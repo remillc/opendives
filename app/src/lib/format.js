@@ -345,6 +345,20 @@ export function formatMixName(o2Permille, hePermille) {
 }
 
 /**
+ * Time since a local date, in days, weeks, months or years: "il y a 9 mois".
+ * @param {string} iso
+ */
+export function formatTimeAgo(iso) {
+  // Dive times are local wall-clock times: "now" is taken the same way.
+  const days = Math.floor((Date.now() - new Date().getTimezoneOffset() * 60000 - toDate(iso).getTime()) / 86400000);
+  const rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' });
+  if (days < 7) return rtf.format(-Math.max(0, days), 'day');
+  if (days < 60) return rtf.format(-Math.floor(days / 7), 'week');
+  if (days < 365) return rtf.format(-Math.floor(days / 30.44), 'month');
+  return rtf.format(-Math.floor(days / 365.25), 'year');
+}
+
+/**
  * A range of days, e.g. "2–4 février 2013" (device format, Intl.formatRange);
  * a single day when both are the same.
  * @param {string} isoStart

@@ -38,6 +38,10 @@
     --od-on-primary-action: var(--od-on-action);
     --od-cursor: var(--od-action);
     --od-water-top: #FBE3B2;
+    /* Header band of the sections and of the side menu, the same in dark mode. */
+    --od-band-gradient: linear-gradient(165deg, #FBE3B2 0%, #EFB677 55%, #C97A35 100%);
+    --od-on-band: #1F2124;
+    --od-on-band-2: #3D3A33;
     --od-water-bottom: #B4530F;
     --od-trace: #1F2124;
     /* Outline drawn under the profile line; only used in dark mode. */
@@ -777,4 +781,43 @@ html.ios {
   .view.od-push-settle > .page {
     transition: transform 180ms ease-out;
   }
+}
+
+/* The top bar of a section continues into its band (SectionBand.svelte). Out of
+   the layers: these override Framework7's variables and its navbar. */
+.navbar.od-band-bar {
+  --f7-navbar-text-color: var(--od-on-band);
+  --f7-navbar-link-color: var(--od-on-band);
+  --f7-navbar-title-font-size: 22px;
+  --f7-navbar-title-font-weight: 500;
+  --od-band-h: calc(var(--f7-safe-area-top) + 120px);
+}
+
+.navbar.od-band-bar.od-band-tall {
+  --od-band-h: calc(var(--f7-safe-area-top) + 190px);
+}
+
+.navbar.od-band-bar .navbar-bg {
+  background-image: var(--od-band-gradient);
+  background-size: 100% var(--od-band-h);
+  background-repeat: no-repeat;
+  background-color: transparent;
+}
+
+.navbar.od-band-bar .navbar-bg::after {
+  display: none;
+}
+
+/* The Logbook's search bar in its band: MD3, 56 dp, translucent white. */
+.searchbar.od-band-search {
+  --f7-searchbar-height: 56px;
+  --f7-searchbar-input-height: 56px;
+  --f7-searchbar-input-border-radius: 28px;
+  --f7-searchbar-input-bg-color: rgb(255 255 255 / 0.78);
+  --f7-searchbar-inner-padding-left: 0px;
+  --f7-searchbar-inner-padding-right: 0px;
+  position: relative;
+  margin-top: 16px;
+  background: none;
+  box-shadow: none;
 }

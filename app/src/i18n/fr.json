@@ -14,7 +14,7 @@
   },
   "logbook": {
     "title": "Carnet",
-    "search": "Rechercher",
+    "search": "Rechercher dans le carnet",
     "cancel": "Annuler",
     "add": "Ajouter des plongées",
     "addDownload": "Télécharger depuis l'ordinateur de plongée",
@@ -605,7 +605,17 @@
   "menu": {
     "open": "Menu",
     "title": "OpenDives",
-    "sections": "Sections"
+    "sections": "Sections",
+    "noAccount": "Sans compte",
+    "cloudDives": {
+      "one": "Cloud · {n} plongée",
+      "other": "Cloud · {n} plongées"
+    },
+    "localDives": {
+      "one": "Sur cet appareil · {n} plongée",
+      "other": "Sur cet appareil · {n} plongées"
+    },
+    "accountLabel": "Compte : {name}"
   },
   "account": {
     "addDeviceDives": "Ajouter les plongées de cet appareil",
@@ -1254,7 +1264,8 @@
       "Partager : icône PDF pour la fiche. Exporter : le premier format se nomme « Fichier de carnet (.ssrf) ».",
       "À propos : chaque bibliothèque libre ouvre son site dans le navigateur.",
       "Planificateur : le facteur de consommation sous stress vaut 2,0 par défaut.",
-      "Réglages : bouteilles par défaut pour le circuit ouvert et le recycleur (diluant, oxygène, secours), ajoutées quand une plongée passe en recycleur. Types de bouteilles : nombre de plongées et nouvelle fiche. Profil : plafonds réorganisés, grille de profondeur retirée."
+      "Réglages : bouteilles par défaut pour le circuit ouvert et le recycleur (diluant, oxygène, secours), ajoutées quand une plongée passe en recycleur. Types de bouteilles : nombre de plongées et nouvelle fiche. Profil : plafonds réorganisés, grille de profondeur retirée.",
+      "Menu latéral et en-têtes refaits : bandeau, compte en haut du menu, synchronisation centrée, résumé de chaque section, barre de recherche du carnet. Réglages et À propos s’ouvrent avec le menu ☰."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
@@ -1896,5 +1907,21 @@
     "deleted": "Plan supprimé",
     "deleteFailed": "Le plan n’a pas pu être supprimé.",
     "failed": "Les plongées planifiées n’ont pas pu être lues."
+  },
+  "band": {
+    "dives": {
+      "one": "{n} plongée",
+      "other": "{n} plongées"
+    },
+    "sites": {
+      "one": "{n} site",
+      "other": "{n} sites"
+    },
+    "lastDive": "dernière plongée {ago}",
+    "overYears": {
+      "one": "en {from}",
+      "other": "sur {n} années, de {from} à {to}"
+    },
+    "tools": "Planifier, vérifier la désaturation, préparer les gaz"
   }
 }

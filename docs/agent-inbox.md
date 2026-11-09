@@ -771,7 +771,9 @@ Christian asked to send these Settings changes. Mock-ups: `android-reglages.dc.h
 - Profil de plongée: remove "Grille de profondeur" (keep the core default 1, 2, 5, 10). Order and helpers: "Plafond donné par l’ordinateur" ("Affiche le plafond donné par l’ordinateur de plongée"), "Plafond en rouge" right after it ("Le plafond de l’ordinateur en rouge plutôt qu’en découpe", dimmed and inactive when the computer ceiling is off), "Plafond calculé" ("Affiche le plafond calculé selon le modèle de décompression ci-dessous").
 - Types de bouteilles: in "Vos types", supporting text with the number of dives using the type, and an outlined "Inutilisé" label for a type no dive uses. Tapping a type opens "Modifier le type" (full-screen form, Nom, Volume, Pression de service, notes, "Retirer ce type"). "Ajouter un type" opens the same form empty, titled "Nouveau type".
 
-## [ ] 2026-11-09-08 Side menu and section headers: identity band, account at the top, Carnet search bar and menu
+## [x] 2026-11-09-08 Side menu and section headers: identity band, account at the top, Carnet search bar and menu
+
+Done in the branch `feature/side-menu-headers`.
 
 Christian asked to send these changes. Spec: "Side menu" and "Side menu and section headers, identity" (both list the mock-ups).
 - Side menu: header band (gradient, faint profile, wave), logo and "OpenDives" in Title Large, the account card (icon, address, "Cloud · N plongées", chevron to Compte), "Compte" removed from the list; active row in #FBE3B2 with a filled icon; at the bottom, a white card with "Synchroniser maintenant" centred and the sync state centred under it (manual mode: "N modifications non envoyées"). This covers to-do #14, removed from the list.

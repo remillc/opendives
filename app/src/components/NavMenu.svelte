@@ -1,10 +1,11 @@
 <script>
   // @ts-check
-  // Side menu of the phone layout (spec, section 3): the four sections, then
-  // Settings, then the sync status. A modal navigation drawer on Android
-  // (MD3); on iOS a panel drawn for the project, as iOS has none.
-  // Opens only with the ☰ button: the panel follows a swipe to close, never
-  // an edge swipe to open, which stays iOS's swipe back.
+  // Side menu of the phone layout (spec, section 3, "Side menu" and "Side menu
+  // and section headers, identity"): the identity band with the account card,
+  // the four sections, Settings and About, then the sync card. A modal
+  // navigation drawer on Android (MD3); on iOS a panel drawn for the project,
+  // as iOS has none. Opens only with the ☰ button: the panel follows a swipe
+  // to close, never an edge swipe to open, which stays iOS's swipe back.
   import { onDestroy } from 'svelte';
   import { Panel } from 'framework7-svelte';
   import Icon from './Icon.svelte';
@@ -16,6 +17,8 @@
 
   /** @type {Record<string, 'logbook'|'sites'|'statistics'|'tools'>} */
   const icons = { logbook: 'logbook', sites: 'sites', statistics: 'statistics', tools: 'tools' };
+
+  const PROFILE = 'M0 30 L20 38 L45 70 L70 92 L95 96 L120 88 L140 94 L165 80 L185 62 L210 58 L235 50 L255 46 L275 40 L300 36';
 
   /** @type {HTMLElement|undefined} */
   let menu = $state();
@@ -50,6 +53,11 @@
   }
 
   onDestroy(() => setBackgroundInert(false));
+
+  /** The row of the screen shown: Settings or About over a section, else the section. */
+  const current = $derived(navigation.page || navigation.section);
+  const accountName = $derived(logbook.email || t('menu.noAccount'));
+  const accountLine = $derived(t(logbook.email ? 'menu.cloudDives' : 'menu.localDives', { n: logbook.dives.length }));
 </script>
 
 <Panel
@@ -68,45 +76,47 @@
   onPanelClosed={restoreFocus}
 >
   <nav class="menu" aria-label={t('menu.sections')} bind:this={menu}>
-    <p class="title">{t('menu.title')}</p>
+    <div class="band">
+      <svg class="profile" viewBox="0 0 300 140" preserveAspectRatio="none" aria-hidden="true">
+        <path d="{PROFILE} V140 H0 Z" class="area" />
+        <path d={PROFILE} class="line" />
+      </svg>
+      <div class="brand">
+        <img src="logo-light.svg" alt="" width="44" height="44" />
+        <span class="name">{t('menu.title')}</span>
+      </div>
+      <a href="#account" class="account" aria-label={t('menu.accountLabel', { name: accountName })} onclick={(e) => choose(e, () => showSection('account'))}>
+        <Icon name="account" />
+        <span class="texts">
+          <span class="address">{accountName}</span>
+          <span class="line-2">{accountLine}</span>
+        </span>
+        <Icon name="chevron" size={20} />
+      </a>
+      <svg class="wave" viewBox="0 0 300 18" preserveAspectRatio="none" aria-hidden="true"><path d="M0 11 Q37.5 2 75 11 T150 11 T225 11 T300 11 V18 H0 Z" /></svg>
+    </div>
+
     {#each sections as section (section)}
-      <a
-        href="#{section}"
-        class="item"
-        aria-current={navigation.section === section ? 'page' : undefined}
-        onclick={(e) => choose(e, () => showSection(section))}
-      >
+      <a href="#{section}" class="item" aria-current={current === section ? 'page' : undefined} onclick={(e) => choose(e, () => showSection(section))}>
         <Icon name={icons[section]} />
         <span>{t(`tabs.${section}`)}</span>
       </a>
     {/each}
     <div class="separator" role="separator"></div>
-    <a
-      href="#account"
-      class="item"
-      aria-current={navigation.section === 'account' ? 'page' : undefined}
-      onclick={(e) => choose(e, () => showSection('account'))}
-    >
-      <Icon name="account" />
-      <span>{t('account.title')}</span>
-    </a>
-    <a href="#settings" class="item" onclick={(e) => choose(e, openSettings)}>
+    <a href="#settings" class="item" aria-current={current === 'settings' ? 'page' : undefined} onclick={(e) => choose(e, openSettings)}>
       <Icon name="settings" />
       <span>{t('settings.title')}</span>
     </a>
-    <a href="#about" class="item" onclick={(e) => choose(e, openAbout)}>
+    <a href="#about" class="item" aria-current={current === 'about' ? 'page' : undefined} onclick={(e) => choose(e, openAbout)}>
       <Icon name="info" />
       <span>{t('about.title')}</span>
     </a>
     <div class="spacer"></div>
     {#if !logbook.loading && !logbook.error}
       <div class="status">
+        <!-- The button stays in place while it runs and shows its progress (to-do #2). -->
+        {#if logbook.email}<SyncButton />{/if}
         <SyncStatus sync={logbook.sync} pending={logbook.pending} progress={logbook.syncProgress} live={false} steady />
-        {#if logbook.email && !logbook.autoSync}
-          <!-- Manual synchronisation: the exchange happens only from here or Account.
-               The button stays in place while it runs and shows its progress (to-do #2). -->
-          <SyncButton />
-        {/if}
       </div>
     {/if}
   </nav>
@@ -131,17 +141,102 @@
       display: flex;
       flex-direction: column;
       gap: 2px;
-      padding-top: var(--f7-safe-area-top);
-      padding-bottom: calc(var(--f7-safe-area-bottom) + 24px);
+      padding-bottom: calc(var(--f7-safe-area-bottom) + 16px);
       color: var(--od-text);
     }
 
-    .title {
-      margin: 0;
-      padding: 20px 28px 18px;
-      font-size: 16px;
-      font-weight: 500;
-      letter-spacing: 0.1px;
+    .band {
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 12px;
+      padding: calc(var(--f7-safe-area-top) + 16px) 20px 40px;
+      border-radius: 0 16px 0 0;
+      background-image: var(--od-band-gradient);
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      color: var(--od-on-band);
+    }
+
+    .profile {
+      position: absolute;
+      left: 0;
+      bottom: 6px;
+      width: 100%;
+      height: 56px;
+
+      .area {
+        fill: rgb(255 255 255 / 0.1);
+      }
+
+      .line {
+        fill: none;
+        stroke: rgb(31 33 36 / 0.22);
+        stroke-width: 1.5;
+        stroke-linejoin: round;
+      }
+    }
+
+    .wave {
+      position: absolute;
+      left: 0;
+      bottom: -1px;
+      width: 100%;
+      height: 18px;
+      display: block;
+
+      path {
+        fill: var(--f7-panel-bg-color);
+      }
+    }
+
+    .brand {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      .name {
+        font-size: 22px;
+        line-height: 28px;
+        font-weight: 500;
+      }
+    }
+
+    .account {
+      position: relative;
+      padding: 10px 10px 10px 12px;
+      border-radius: 16px;
+      background: rgb(255 255 255 / 0.72);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--od-on-band);
+      text-decoration: none;
+
+      .texts {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .address {
+        font-size: 14px;
+        line-height: 20px;
+        font-weight: 500;
+        letter-spacing: 0.1px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .line-2 {
+        font-size: 12px;
+        line-height: 16px;
+        letter-spacing: 0.4px;
+        color: var(--od-on-band-2);
+      }
     }
 
     /* Android: MD3 drawer item, 56 dp pill. */
@@ -160,9 +255,13 @@
       text-decoration: none;
 
       &[aria-current='page'] {
-        background: var(--od-tint);
-        color: var(--od-on-tint);
+        background: var(--od-water-top);
+        color: var(--od-on-band);
         font-weight: 700;
+
+        :global(svg) {
+          fill: currentColor;
+        }
       }
     }
 
@@ -174,30 +273,29 @@
 
     .spacer {
       flex: 1;
+      min-height: 12px;
     }
 
+    /* The sync card: the button and the state, centred. */
     .status {
-      padding: 0 12px;
+      margin: 0 12px;
+      padding: 12px;
+      border-radius: 16px;
+      background: var(--od-surface);
       display: flex;
       flex-direction: column;
-      align-items: flex-start;
+      align-items: center;
       gap: 6px;
 
-      /* Lined up with the status text. */
-      .od-tonal-button {
-        margin-left: 16px;
+      :global(.sync-status),
+      :global(.sync-status .line) {
+        justify-content: center;
+        text-align: center;
       }
     }
 
-    /* iOS: large bold title, 48 pt rows with a rounded highlight. */
+    /* iOS: 48 pt rows with a rounded highlight. */
     :global(.ios) {
-      .title {
-        padding: 22px 22px 14px;
-        font-size: 22px;
-        font-weight: 800;
-        letter-spacing: -0.3px;
-      }
-
       .item {
         margin: 0 10px;
         min-height: 48px;
@@ -215,10 +313,6 @@
 
       .separator {
         margin: 8px 16px;
-      }
-
-      .status {
-        padding: 0 6px;
       }
     }
   }

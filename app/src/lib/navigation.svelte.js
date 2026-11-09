@@ -17,6 +17,8 @@ export const navigation = $state({
   /** @type {Section} */
   section: 'logbook',
   menuOpen: false,
+  /** Settings or About when shown over a section, else empty: the row lit in the menu. */
+  page: /** @type {''|'settings'|'about'} */ (''),
   /** Counts the presses of the rail's "+" button; the Logbook offers its choices on each. */
   addRequests: 0,
   /** Identifier of the dive shown beside the list (tablet), or null. */

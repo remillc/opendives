@@ -5,6 +5,7 @@
   // groups, on white surfaces like Settings. Each tool has its own screen.
   import { Page, Navbar } from 'framework7-svelte';
   import MenuButton from '../components/MenuButton.svelte';
+  import SectionBand from '../components/SectionBand.svelte';
   import Icon from '../components/Icon.svelte';
   import { t } from '../lib/i18n.js';
   import { layout } from '../lib/layout.svelte.js';
@@ -55,9 +56,11 @@
 </script>
 
 <Page class="od-tools" onPageInit={keepInSvelteRange}>
-  <Navbar title={t('tools.title')}>
+  <Navbar class="od-band-bar" title={t('tools.title')}>
     {#snippet left()}<MenuButton />{/snippet}
   </Navbar>
+
+  <SectionBand summary={t('band.tools')} />
 
   {#each groups as group (group.title)}
     <h2 class="title">{group.title}</h2>

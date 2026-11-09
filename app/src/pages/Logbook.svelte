@@ -5,13 +5,14 @@
   // error, empty logbook, offline with pending changes, sync conflict. A log can hold thousands of dives:
   // the list is virtual, only the rows near the screen are in the document.
   import { onDestroy, tick, untrack } from 'svelte';
-  import { Page, Navbar, NavRight, Link, Subnavbar, Searchbar, List, ListItem, Block, Button, Popover, f7, theme } from 'framework7-svelte';
+  import { Page, Navbar, NavRight, Link, Searchbar, List, ListItem, Block, Button, Popover, f7, theme } from 'framework7-svelte';
   import SyncStatus from '../components/SyncStatus.svelte';
   import DiveRow from '../components/DiveRow.svelte';
   import TripRow from '../components/TripRow.svelte';
   import Icon from '../components/Icon.svelte';
   import MenuItem from '../components/MenuItem.svelte';
   import MenuButton from '../components/MenuButton.svelte';
+  import SectionBand from '../components/SectionBand.svelte';
   import ActiveFilter from '../components/ActiveFilter.svelte';
   import ConflictSheet from '../components/ConflictSheet.svelte';
   import RenumberDialog from '../components/RenumberDialog.svelte';
@@ -22,7 +23,7 @@
   import { filter, loadOptions, applyFilter, isEmpty } from '../lib/filter.svelte.js';
   import { layout } from '../lib/layout.svelte.js';
   import { navigation } from '../lib/navigation.svelte.js';
-  import { formatDateTime, formatLongDate } from '../lib/format.js';
+  import { formatDateTime, formatLongDate, formatTimeAgo } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
   import { mark } from '../lib/perf.js';
   import { buildSnapshot, saveSnapshot } from '../lib/snapshot.js';
@@ -704,6 +705,14 @@
     return list;
   });
 
+  /** "9 plongées · 4 sites · dernière plongée il y a 9 mois" (the band). */
+  const bandSummary = $derived.by(() => {
+    if (!logbook.dives.length) return '';
+    const sites = new Set(logbook.dives.map((d) => d.site).filter(Boolean)).size;
+    const latest = logbook.dives.reduce((a, d) => (d.date > a ? d.date : a), logbook.dives[0].date);
+    return [t('band.dives', { n: logbook.dives.length }), t('band.sites', { n: sites }), t('band.lastDive', { ago: formatTimeAgo(latest) })].join(' · ');
+  });
+
   /** Number of dives shown: follows the search (the filter row counts the filter). */
   const count = $derived(
     results
@@ -907,7 +916,7 @@
 </script>
 
 <Page class="od-logbook" onPageInit={keepInSvelteRange}>
-  <Navbar large title={t('logbook.title')}>
+  <Navbar large={theme.ios} class="od-band-bar od-band-tall" title={t('logbook.title')}>
     {#snippet left()}<MenuButton />{/snippet}
     <NavRight>
       {#if logbook.dives.length || logbook.preview}
@@ -920,22 +929,26 @@
         <Link iconOnly onClick={add}><Icon name="plus" /><span class="od-sr-only">{t('logbook.add')}</span></Link>
       {/if}
     </NavRight>
-    <Subnavbar inner={false}>
+  </Navbar>
+
+  <SectionBand tall summary={bandSummary}>
+    {#if logbook.dives.length || logbook.loading}
       <Searchbar
+        inline
         customSearch
-        disableButtonText={t('logbook.cancel')}
+        class="od-band-search"
         placeholder={t('logbook.search')}
         onSearchbarSearch={(/** @type {any} */ _sb, /** @type {string} */ q) => (query = q)}
         onSearchbarClear={() => (query = '')}
       />
-    </Subnavbar>
-  </Navbar>
+    {/if}
+  </SectionBand>
 
   <!-- While loading, the count and the status are not known yet: nothing is shown. -->
   {#if !logbook.loading && !logbook.error}
     {#if filtered}
       <ActiveFilter prefs={logbook.prefs} dives={logbook.dives} shown={results ? results.length : sorted.length} />
-    {:else if sorted.length}
+    {:else if sorted.length && (results || selecting)}
       <p class="count od-value" role="status">{count}{#if selecting}<span class="separator" aria-hidden="true">·</span><span class="count-selected">{t('logbook.selected', { n: checkedCount })}</span>{/if}</p>
     {/if}
     {#if filter.failed}<p class="count failed" role="status">{t('logbook.filterFailed')}</p>{/if}

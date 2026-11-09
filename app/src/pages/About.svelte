@@ -7,6 +7,9 @@
   // licence requires. Links that leave the app say so and show the
   // external-link icon.
   import { Page, Navbar, Link } from 'framework7-svelte';
+  import MenuButton from '../components/MenuButton.svelte';
+  import { layout } from '../lib/layout.svelte.js';
+  import { navigation } from '../lib/navigation.svelte.js';
   import { App } from '@capacitor/app';
   import { Capacitor } from '@capacitor/core';
   import { logbook } from '../lib/logbook.svelte.js';
@@ -95,13 +98,17 @@
   ];
 </script>
 
-<Page class="od-about">
+<Page class="od-about" onPageBeforeIn={() => (navigation.page = 'about')} onPageBeforeOut={() => (navigation.page = '')}>
   <Navbar title={t('about.title')}>
     {#snippet left()}
-      <Link back iconOnly>
-        <i class="icon icon-back"></i>
-        <span class="od-sr-only">{t('detail.back')}</span>
-      </Link>
+      {#if layout.phone}
+        <MenuButton />
+      {:else}
+        <Link back iconOnly>
+          <i class="icon icon-back"></i>
+          <span class="od-sr-only">{t('detail.back')}</span>
+        </Link>
+      {/if}
     {/snippet}
   </Navbar>
 
