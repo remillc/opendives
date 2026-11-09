@@ -1268,7 +1268,8 @@
       "Planificateur : le facteur de consommation sous stress vaut 2,0 par défaut.",
       "Réglages : bouteilles par défaut pour le circuit ouvert et le recycleur (diluant, oxygène, secours), ajoutées quand une plongée passe en recycleur. Types de bouteilles : nombre de plongées et nouvelle fiche. Profil : plafonds réorganisés, grille de profondeur retirée.",
       "Menu latéral et en-têtes refaits : bandeau, compte en haut du menu, synchronisation centrée, résumé de chaque section, barre de recherche du carnet. Réglages et À propos s’ouvrent avec le menu ☰.",
-      "Carnet : lignes alignées sur la maquette (sans séparateurs), plongées d’un voyage déplié dans un cadre blanc. Compte : même en-tête que les sections."
+      "Carnet : lignes alignées sur la maquette (sans séparateurs), plongées d’un voyage déplié dans un cadre blanc. Compte : même en-tête que les sections.",
+      "Carnet : un voyage d’une seule plongée s’affiche comme une plongée, sans flèche."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",

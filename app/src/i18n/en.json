@@ -1268,7 +1268,8 @@
       "Planner: the SAC factor under stress is 2.0 by default.",
       "Settings: default cylinders for open circuit and rebreather (diluent, oxygen, bailout), added when a dive becomes a rebreather dive. Cylinder types: number of dives and a new form. Profile: ceilings reordered, depth grid removed.",
       "Side menu and headers redone: band, account at the top of the menu, centred sync, a summary for each section, logbook search bar. Settings and About use the ☰ menu.",
-      "Logbook: rows aligned with the design (no dividers), the dives of an expanded trip in a white surface. Account: same header as the sections."
+      "Logbook: rows aligned with the design (no dividers), the dives of an expanded trip in a white surface. Account: same header as the sections.",
+      "Logbook: a trip of one dive is shown as a dive, without an arrow."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",

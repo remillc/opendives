@@ -641,7 +641,8 @@
       }
       trip.dives.push(dive);
     }
-    return list;
+    // A trip of one dive (automatic grouping makes many) is drawn as that dive.
+    return list.map((e) => (e.type === 'trip' && e.dives.length === 1 ? { type: /** @type {const} */ ('dive'), key: `d${e.dives[0].id}`, dive: e.dives[0] } : e));
   });
 
   /**
