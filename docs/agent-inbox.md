@@ -937,3 +937,10 @@ Christian approved this. Spec: "Carnet sync status pill". It completes tasks 202
 - Dive rows keep "N° X · date"; a waiting change adds a third line in `--od-pending`.
 Mock-ups: `docs/mockups/android-etat-horsligne.dc.html`, `android-etat-synchro-motdepasse.dc.html`, `android-etat-synchro-serveur.dc.html`, `android-etat-synchro-depot.dc.html`, `android-etat-conflit.dc.html`, `android-etat-conflit-ordinateurs.dc.html`.
 
+## [ ] 2026-11-09-26 Sites header: same wave and profile as the other sections
+
+Christian approved this on the canvas. Mock-up: `docs/mockups/android-sites.dc.html`. Spec: section headers paragraph.
+- Remove the 24 dp bottom corners and the shadow of the Sites header band. Give it the same 52 dp bottom padding, the same faint profile (10 dp from the bottom) and the same wave as Carnet, Statistiques and Outils.
+- The map runs under the band, so the wave must cut the band (CSS mask or clip-path on its bottom edge, 18 dp high) rather than be painted in the page colour: the map shows under the curve.
+- Make sure the first map pins and their labels are not hidden under the taller band (initial map view, or padding of the map camera).
+
