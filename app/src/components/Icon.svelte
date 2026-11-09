@@ -7,7 +7,7 @@
 
   /**
    * @type {{
-   *   name: 'logbook'|'sites'|'statistics'|'tools'|'plus'|'check'|'offline'|'device'|'expand'|'settings'|'edit'|'more'|'moreCircle'|'plan'|'menu'|'sync'|'close'|'download'|'file'|'account'|'cloud'|'warning'|'locate'|'fullscreen'|'exitFullscreen'|'place'|'search'|'openInNew'|'filter'|'info'|'error'|'visibility'|'visibilityOff'|'refresh'|'delete'|'chevron'|'bluetooth'|'merge'|'split'|'ungroup'|'remove'|'arrowRight'|'arrowUp'|'arrowDown'|'undo'|'redo'|'renumber'|'mail'|'desaturation'|'depthGauge'|'bestMix'|'blender'|'tune'|'share'|'image'|'document',
+   *   name: 'logbook'|'sites'|'statistics'|'tools'|'plus'|'copy'|'check'|'offline'|'device'|'expand'|'settings'|'edit'|'more'|'moreCircle'|'plan'|'menu'|'sync'|'close'|'download'|'file'|'account'|'cloud'|'warning'|'locate'|'fullscreen'|'exitFullscreen'|'place'|'search'|'openInNew'|'filter'|'info'|'error'|'visibility'|'visibilityOff'|'refresh'|'delete'|'chevron'|'bluetooth'|'merge'|'split'|'ungroup'|'remove'|'arrowRight'|'arrowUp'|'arrowDown'|'undo'|'redo'|'renumber'|'mail'|'desaturation'|'depthGauge'|'bestMix'|'blender'|'tune'|'share'|'image'|'document',
    *   size?: number,
    *   weight?: number,
    * }}
@@ -21,6 +21,7 @@
     statistics: 'M4 20h16M6.5 20v-6M11 20V8M15.5 20v-9M20 20V4',
     tools: 'M14.5 6.5a4 4 0 0 0 5 5L12 19a2.1 2.1 0 0 1-3-3l7.5-7.5a4 4 0 0 0-5-5l2.5 2.5-1 2-2 1z',
     plus: 'M12 5v14M5 12h14',
+    copy: 'M9 9h11v11H9zM5 15H4V4h11v1',
     filter: 'M4 6h16M7 12h10M10 18h4',
     delete: 'M4.5 7h15M10 11v6M14 11v6M6.5 7l1 13h9l1-13M9.5 7V4.5h5V7',
     chevron: 'M9 5l7 7-7 7',

@@ -14,11 +14,14 @@
 //    to 3 m / 10 ft); in the planner the cylinder's working pressure is its
 //    start pressure, as in Subsurface's planner cylinder table;
 //  - the rates from mobile-widgets (qPrefDivePlanner): per minute, divided by 60;
+//  - the waypoints of a logged dive from DivePlannerPointsModel::loadFromDive();
 //  - the minimum gas and the gas warnings as core/plannernotes.cpp computes
 //    them (add_plan_to_notes(), called by plan(), sets minimum_gas).
-// The deco model, gradient factors and VPM-B conservatism are read from the
-// core's preferences (Settings, "Décompression"), never from the request.
+// The deco model, gradient factors and VPM-B conservatism come from the core's
+// preferences (Settings, "Décompression") unless the request sets them for
+// this plan; the preferences are put back afterwards.
 #include "opendives.h"
+#include "internal.h"
 
 #include "core/deco.h"
 #include "core/dive.h"
@@ -42,10 +45,44 @@
 #include <cstring>
 #include <ctime>
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
 namespace opendives {
+
+namespace internal {
+
+bool is_plan_only(const struct dive &d)
+{
+	return d.is_planned() && !d.is_logged();
+}
+
+struct HiddenPlans::Held {
+	std::unique_ptr<struct dive> d;
+	bool hidden_by_filter;
+};
+
+HiddenPlans::HiddenPlans(const struct dive *also)
+{
+	for (int i = static_cast<int>(divelog.dives.size()) - 1; i >= 0; i--) {
+		const struct dive *d = divelog.dives[i].get();
+		if (d != also && !is_plan_only(*d))
+			continue;
+		bool hidden = d->hidden_by_filter;
+		held.push_back({ divelog.dives.unregister_dive(i), hidden });
+	}
+}
+
+HiddenPlans::~HiddenPlans()
+{
+	for (Held &h: held) {
+		struct dive *d = divelog.dives.register_dive(std::move(h.d));
+		d->hidden_by_filter = h.hidden_by_filter;
+	}
+}
+
+} // namespace internal
 
 namespace {
 
@@ -57,7 +94,7 @@ class Reader {
 public:
 	explicit Reader(const std::string &s) : s(s) {}
 
-	bool request(Flat &values, std::vector<Flat> &cylinders)
+	bool request(Flat &values, std::vector<Flat> &cylinders, std::vector<Flat> &levels)
 	{
 		if (!open())
 			return false;
@@ -68,7 +105,8 @@ public:
 			if (!string(key) || !colon())
 				return false;
 			space();
-			if (key == "cylinders") {
+			if (key == "cylinders" || key == "levels") {
+				std::vector<Flat> &list = key == "levels" ? levels : cylinders;
 				if (!eat('['))
 					return false;
 				space();
@@ -77,7 +115,7 @@ public:
 						Flat c;
 						if (!flat(c))
 							return false;
-						cylinders.push_back(std::move(c));
+						list.push_back(std::move(c));
 						space();
 						if (eat(','))
 							continue;
@@ -284,6 +322,12 @@ void apply_settings(const Flat &v)
 	prefs.reserve_gas = get(v, "reserveMbar", prefs.reserve_gas);
 	prefs.problemsolvingtime = get(v, "problemSolvingMinutes", prefs.problemsolvingtime);
 	prefs.sacfactor = get(v, "sacFactor", prefs.sacfactor);
+	// The plan's own model, also for the ceiling computed for it.
+	if (v.count("decoModel"))
+		prefs.planner_deco_mode = prefs.display_deco_mode = get(v, "decoModel", 0) == 1 ? VPMB : BUEHLMANN;
+	prefs.gflow = get(v, "gfLow", prefs.gflow);
+	prefs.gfhigh = get(v, "gfHigh", prefs.gfhigh);
+	prefs.vpmb_conservatism = get(v, "vpmbConservatism", prefs.vpmb_conservatism);
 	// A plan is always calculated, never "display only" options.
 	prefs.surface_segment = 0;
 }
@@ -300,6 +344,12 @@ timestamp_t start_time()
 	}
 	return when;
 }
+
+// A gas without a cylinder: the core computes the minimum gas as a pressure in
+// a cylinder, so it gets a very large one, nearly ideal at the pressures
+// reached, and the result is turned back into a volume. Never saved.
+constexpr int nominal_size_ml = 400000;
+constexpr int nominal_mbar = 232000;
 
 std::string result_json(const diveplan &plan, struct dive &d, planner_error_t error)
 {
@@ -436,6 +486,16 @@ std::string result_json(const diveplan &plan, struct dive &d, planner_error_t er
 		add(json, "endMbar", cyl.end.mbar);
 		add(json, "gasUsedMl", cyl.gas_used.mliter);
 		add(json, "decoGasUsedMl", cyl.deco_gas_used.mliter);
+		// The reserve of this gas: the minimum gas for the last bottom gas, the
+		// gas of the ascent for the others (shared with a buddy).
+		{
+			long reserve = cyl.deco_gas_used.mliter;
+			if (mindp && static_cast<int>(i) == mindp->cylinderid && cyl.type.size.mliter) {
+				double bar = mindp->minimum_gas.mbar / 1000.0;
+				reserve = lrint(bar * cyl.type.size.mliter / gas_compressibility_factor(cyl.gasmix, bar));
+			}
+			add(json, "reserveMl", reserve);
+		}
 		add(json, "decoPressureMbar", lrint(deco_pressure_mbar));
 		add(json, "switchDepthMm", cyl.depth.mm);
 		// Deepest use of this gas at the ppO2 for the bottom (rounded down to 1 m).
@@ -456,50 +516,189 @@ int planner_setup(std::string &json)
 	return 0;
 }
 
-int plan_dive(const std::string &request, std::string &json, std::string &error)
-{
+namespace {
+
+constexpr int max_levels = 20;
+
+// A request read and checked; `source` the logged dive it starts from.
+struct PlanRun {
 	Flat v;
-	std::vector<Flat> cylinders;
-	if (!Reader(request).request(v, cylinders)) {
+	std::vector<Flat> cylinders, levels;
+	struct dive *source = nullptr;
+};
+
+bool parse(const std::string &request, PlanRun &run, std::string &error)
+{
+	if (!Reader(request).request(run.v, run.cylinders, run.levels)) {
 		error = "BAD_REQUEST: not a plan request";
-		return -1;
+		return false;
 	}
+	const Flat &v = run.v;
 	long depth = get(v, "depthMm", 0), bottom_time = get(v, "bottomTimeSeconds", 0);
-	if (depth <= 0 || depth > 300000 || bottom_time <= 0 || bottom_time > 6 * 3600 || cylinders.empty() || cylinders.size() > 20) {
-		error = "BAD_REQUEST: depth, bottom time and at least one cylinder are needed";
-		return -1;
+	long source_id = get(v, "sourceDiveId", 0);
+	if (source_id) {
+		run.source = divelog.dives.get_by_uniq_id(static_cast<int>(source_id));
+		if (!run.source) {
+			error = "NOT_FOUND: the dive to start from";
+			return false;
+		}
 	}
-	for (const Flat &c: cylinders) {
+	long total = 0;
+	for (const Flat &l: run.levels) {
+		long mm = get(l, "depthMm", 0), seconds = get(l, "durationSeconds", 0);
+		if (mm <= 0 || mm > 300000 || seconds <= 0) {
+			error = "BAD_REQUEST: invalid level";
+			return false;
+		}
+		total += seconds;
+	}
+	bool have_profile = run.source || (!run.levels.empty() && run.levels.size() <= max_levels && total <= 6 * 3600) ||
+			    (run.levels.empty() && depth > 0 && depth <= 300000 && bottom_time > 0 && bottom_time <= 6 * 3600);
+	if (!have_profile || run.cylinders.empty() || run.cylinders.size() > 20) {
+		error = "BAD_REQUEST: depth, bottom time and at least one cylinder are needed";
+		return false;
+	}
+	for (const Flat &c: run.cylinders) {
 		long o2 = get(c, "o2Permille", 0), he = get(c, "hePermille", 0);
 		if (o2 <= 0 || o2 > 1000 || he < 0 || o2 + he > 1000 || get(c, "sizeMl", 0) < 0 || get(c, "startMbar", 0) < 0) {
 			error = "BAD_REQUEST: invalid cylinder";
-			return -1;
+			return false;
 		}
 	}
+	// utc_mktime() (core/time.cpp) only reads dates up to 2029: a later one would
+	// come back from the log as 0.
+	if (get(v, "when", 0) < 0 || get(v, "when", 0) >= 1893456000) {
+		error = "BAD_REQUEST: date";
+		return false;
+	}
+	long gf_low = get(v, "gfLow", 30), gf_high = get(v, "gfHigh", 75), conservatism = get(v, "vpmbConservatism", 0);
+	if (gf_low < 10 || gf_low > 150 || gf_high < 40 || gf_high > 150 || conservatism < 0 || conservatism > 4) {
+		error = "BAD_REQUEST: invalid decompression settings";
+		return false;
+	}
+	return true;
+}
 
-	// Planner-only settings for this plan only: prefs are restored afterwards.
-	struct preferences saved = prefs;
+// The time the plan runs in: the preferences are the plan's, the other plans
+// and the dive it starts from are out of the tissue loading.
+class PlanScope {
+public:
+	explicit PlanScope(const struct dive *source) : saved(prefs), hidden(source) {}
+	~PlanScope()
+	{
+		prefs = saved;
+		set_gf(prefs.gflow, prefs.gfhigh);
+		set_vpmb_conservatism(prefs.vpmb_conservatism);
+	}
+
+private:
+	struct preferences saved;
+	internal::HiddenPlans hidden;
+};
+
+// DivePlannerPointsModel::loadFromDive(): at most 100 averaged waypoints of
+// the logged dive, each on the gas breathed then. `gas_of` turns a cylinder
+// of that dive into one of the plan.
+void add_source_waypoints(diveplan &dp, struct dive *source, const std::map<int, int> &gas_of)
+{
+	struct divecomputer dc = source->dcs[0];
+	bool marked = false;
+	if (!dc.samples.empty())
+		marked = dc.samples[0].manually_entered;
+	else
+		fake_dc(&dc);
+	auto gas = [&](duration_t t) {
+		auto it = gas_of.find(get_cylinderid_at_time(source, &dc, t));
+		return it == gas_of.end() ? 0 : it->second;
+	};
+	int plansamples = std::min(static_cast<int>(dc.samples.size()), 100);
+	int j = 0, previous = 0, samplecount = 0, cylinder = 0;
+	depth_t depthsum;
+	duration_t lasttime, lastrecorded, newtime;
+	for (int i = 0; i < plansamples - 1; i++) {
+		if (dc.last_manual_time.seconds && dc.last_manual_time.seconds > 120 && lasttime.seconds >= dc.last_manual_time.seconds)
+			break;
+		while (j * plansamples <= i * static_cast<int>(dc.samples.size())) {
+			const sample &s = dc.samples[j];
+			if (s.time.seconds != 0 && (!marked || s.manually_entered)) {
+				depthsum += s.depth;
+				++samplecount;
+				newtime = s.time;
+			}
+			j++;
+		}
+		if (!samplecount)
+			continue;
+		cylinder = gas(lasttime);
+		duration_t nexttime = newtime;
+		++nexttime.seconds;
+		if (newtime.seconds - lastrecorded.seconds > 10 || cylinder == gas(nexttime)) {
+			if (newtime.seconds == lastrecorded.seconds)
+				newtime.seconds += 10;
+			if (newtime.seconds > previous) {
+				plan_add_segment(dp, newtime.seconds - previous, depthsum / samplecount, cylinder, 0, true, OC);
+				previous = newtime.seconds;
+			}
+			lastrecorded = newtime;
+		}
+		lasttime = newtime;
+		depthsum = 0_m;
+		samplecount = 0;
+	}
+	// The last point, so that the duration is right.
+	if (!marked && !dc.last_manual_time.seconds && dc.duration.seconds > previous)
+		plan_add_segment(dp, dc.duration.seconds - previous, 0_m, cylinder, 0, true, OC);
+}
+
+// The waypoints of the levels: each level's time is at depth, the transit to
+// it is added at the descent or ascent rate. All on the bottom gas.
+void add_levels(diveplan &dp, const std::vector<Flat> &levels)
+{
+	long previous = 0;
+	for (const Flat &level: levels) {
+		long mm = get(level, "depthMm", 0);
+		depth_t depth { .mm = static_cast<int32_t>(mm) };
+		if (mm != previous) {
+			int transit = mm > previous ? (prefs.drop_stone_mode ? 1 : static_cast<int>((mm - previous) / prefs.descrate))
+						    : static_cast<int>((previous - mm) / prefs.ascrate50);
+			dp_add(dp, std::max(transit, 1), depth);
+		}
+		dp_add(dp, static_cast<int>(get(level, "durationSeconds", 0)), depth);
+		previous = mm;
+	}
+}
+
+// Sets up and runs plan(), inside a PlanScope.
+planner_error_t run_plan(const PlanRun &run, struct dive &d, diveplan &dp, bool saving)
+{
+	const Flat &v = run.v;
+	const std::vector<Flat> &cylinders = run.cylinders;
+	// Planner-only settings for this plan only.
 	apply_settings(v);
 
-	struct dive d;
-	d.when = get(v, "when", 0) > 0 ? get(v, "when", 0) : start_time();
+	d.when = get(v, "when", 0) > 0 ? get(v, "when", 0) : run.source ? run.source->when : start_time();
 	make_planner_dc(&d.dcs[0]);
 	d.dcs[0].divemode = OC;
 	// Create every cylinder first: pointers are not stable while the table grows.
 	d.get_or_create_cylinder(static_cast<int>(cylinders.size()) - 1);
+	std::map<int, int> gas_of;
 	for (size_t i = 0; i < cylinders.size(); i++) {
 		cylinder_t &cyl = d.cylinders[i];
+		long size = get(cylinders[i], "sizeMl", 0), start = get(cylinders[i], "startMbar", 0);
+		bool nominal = !saving && !size && !start;
 		cyl.gasmix.o2.permille = get(cylinders[i], "o2Permille", 209);
 		cyl.gasmix.he.permille = get(cylinders[i], "hePermille", 0);
-		cyl.type.size.mliter = get(cylinders[i], "sizeMl", 0);
-		cyl.type.workingpressure.mbar = get(cylinders[i], "startMbar", 0);
+		cyl.type.size.mliter = nominal ? nominal_size_ml : size;
+		cyl.type.workingpressure.mbar = nominal ? nominal_mbar : start;
 		cyl.cylinder_use = OC_GAS;
 		cyl.manually_added = true;
 		// 0: the MOD at the ppO2 for deco, set by reset_cylinders() below.
 		cyl.depth.mm = static_cast<int32_t>(std::max(0L, get(cylinders[i], "switchDepthMm", 0)));
+		long source_cylinder = get(cylinders[i], "sourceCylinder", -1);
+		if (source_cylinder >= 0)
+			gas_of[static_cast<int>(source_cylinder)] = static_cast<int>(i);
 	}
 
-	diveplan dp;
 	dp.when = d.when;
 	dp.salinity = get(v, "salinity", 10300);
 	dp.surface_pressure.mbar = get(v, "surfacePressureMbar", 1013);
@@ -517,24 +716,67 @@ int plan_dive(const std::string &request, std::string &json, std::string &error)
 	for (size_t i = 0; i < d.cylinders.size(); i++)
 		if (d.cylinders[i].depth.mm && d.cylinders[i].cylinder_use == OC_GAS)
 			plan_add_segment(dp, 0, d.cylinders[i].depth, static_cast<int>(i), 0, false, OC);
-	depth_t bottom { .mm = static_cast<int32_t>(depth) };
-	// The descent at the descent rate, counted in the bottom time (Subsurface's
-	// runtime of the last entered waypoint); with the instant descent setting
-	// (drop_stone_mode), the whole bottom time is spent at depth: one second,
-	// as a segment of no duration would make the next one the descent.
-	int descent = prefs.drop_stone_mode ? 1 : bottom.mm / prefs.descrate;
-	dp_add(dp, descent, bottom);
-	if (bottom_time > descent)
-		dp_add(dp, static_cast<int>(bottom_time) - descent, bottom);
+	if (run.source) {
+		add_source_waypoints(dp, run.source, gas_of);
+	} else if (!run.levels.empty()) {
+		add_levels(dp, run.levels);
+	} else {
+		depth_t bottom { .mm = static_cast<int32_t>(get(v, "depthMm", 0)) };
+		long bottom_time = get(v, "bottomTimeSeconds", 0);
+		// The descent at the descent rate, counted in the bottom time (Subsurface's
+		// runtime of the last entered waypoint); with the instant descent setting
+		// (drop_stone_mode), the whole bottom time is spent at depth: one second,
+		// as a segment of no duration would make the next one the descent.
+		int descent = prefs.drop_stone_mode ? 1 : bottom.mm / prefs.descrate;
+		dp_add(dp, descent, bottom);
+		if (bottom_time > descent)
+			dp_add(dp, static_cast<int>(bottom_time) - descent, bottom);
+	}
 
 	deco_state_cache cache;
 	struct deco_state ds;
-	planner_error_t result = plan(&ds, dp, &d, 0, 60, cache, true, false, nullptr);
+	return plan(&ds, dp, &d, 0, 60, cache, true, saving, nullptr);
+}
+
+} // namespace
+
+int plan_dive(const std::string &request, std::string &json, std::string &error)
+{
+	PlanRun run;
+	if (!parse(request, run, error))
+		return -1;
+	PlanScope scope(run.source);
+	struct dive d;
+	diveplan dp;
+	planner_error_t result = run_plan(run, d, dp, false);
 	json = result_json(dp, d, result);
-	prefs = saved;
-	set_gf(prefs.gflow, prefs.gfhigh);
-	set_vpmb_conservatism(prefs.vpmb_conservatism);
 	return 0;
 }
+
+namespace internal {
+
+int build_plan(const std::string &request, struct dive &d, struct dive_site *&site, std::string &error)
+{
+	PlanRun run;
+	if (!parse(request, run, error))
+		return -1;
+	site = run.source ? run.source->dive_site : nullptr;
+	{
+		PlanScope scope(run.source);
+		diveplan dp;
+		if (run_plan(run, d, dp, true) != PLAN_OK) {
+			error = "INVALID_PLAN";
+			return -1;
+		}
+	}
+	// The request, to reopen the plan as it was typed. Single quotes: Subsurface
+	// writes the value as it is, and the request holds no other quoted text.
+	std::string kept = request;
+	std::replace(kept.begin(), kept.end(), '"', '\'');
+	add_extra_data(&d.dcs[0], "OpenDives plan", kept);
+	return 0;
+}
+
+} // namespace internal
 
 } // namespace opendives

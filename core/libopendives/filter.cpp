@@ -170,6 +170,8 @@ int filter_options(std::string &json)
 	bool rating = false, visibility = false, current = false, wavesize = false, surge = false, chill = false;
 	for (const auto &dp: divelog.dives) {
 		const dive &d = *dp;
+		if (internal::is_plan_only(d))
+			continue;
 		if (!d.dcs.empty())
 			modes |= 1ULL << static_cast<int>(d.dcs[0].divemode);
 		int year = utc_year(d.when);
@@ -433,6 +435,8 @@ int search_dives(const std::string &text, std::string &json, std::string &)
 	bool first = true;
 	for (const auto &dp: divelog.dives) {
 		const dive *d = dp.get();
+		if (internal::is_plan_only(*d))
+			continue;
 		bool match = do_fulltext && fulltext_dive_matches(d, query, StringFilterMode::STARTSWITH);
 		if (!match && !needle.empty() && d->dive_site) {
 			for (taxonomy_category cat: { TC_ADMIN_L1, TC_ADMIN_L2, TC_LOCALNAME }) {
@@ -470,6 +474,8 @@ int filter_dives(const std::string &fulltext, const std::string &fulltext_mode, 
 	bool first = true;
 	for (const auto &dp: divelog.dives) {
 		const dive *d = dp.get();
+		if (internal::is_plan_only(*d))
+			continue;
 		if (do_fulltext && !fulltext_dive_matches(d, query, mode))
 			continue;
 		if (!std::all_of(constraints.begin(), constraints.end(),

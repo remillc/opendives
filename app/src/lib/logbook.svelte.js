@@ -273,6 +273,20 @@ export async function addDive(fields) {
 }
 
 /**
+ * Saves a plan as a planned dive, or replaces one (one undoable step), saved
+ * and synced like an edit. The dive list does not show planned dives.
+ * @param {import('opendives-core').PlanRequest} request
+ * @param {number} [replaceId]
+ */
+export async function savePlan(request, replaceId = 0) {
+  const result = await OpenDivesCore.savePlan({ request, replaceId });
+  logbook.undoText = result.undo;
+  logbook.redoText = result.redo ?? '';
+  await persistChanges();
+  return result.list?.id ?? 0;
+}
+
+/**
  * Imports a file chosen by the diver (one undoable step), saved and synced
  * like an edit. Errors keep the core's code (IMPORT_FAILED, NO_DIVES,
  * NO_NEW_DIVES) for the message.

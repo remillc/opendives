@@ -12,6 +12,7 @@
 struct FilterData;
 struct divelog;
 struct dive;
+struct dive_site;
 struct fingerprint_record;
 using fingerprint_table = std::vector<fingerprint_record>; // core/device.h
 
@@ -42,6 +43,32 @@ int finish_download(struct divelog &log, const DownloadedComputer &computer, con
 		    fingerprint_table &fingerprints_before, std::string &json, std::string &error);
 // Drops the dives kept aside after a failure (a new load, a new download).
 void download_forget_partial();
+
+// A dive that is only a plan: Subsurface's "planned dive" computer and no
+// logged one. OpenDives lists these in the planner only (plan.cpp).
+bool is_plan_only(const struct dive &d);
+
+// While it lives, the plans (and `also`, a dive being planned from) are out
+// of the dive table: the core's tissue loading of the dives around a time
+// (init_decompression) reads the whole table, and a plan is not a dive done.
+// Nothing is saved meanwhile; the dives go back in the destructor.
+class HiddenPlans {
+public:
+	explicit HiddenPlans(const struct dive *also = nullptr);
+	~HiddenPlans();
+	HiddenPlans(const HiddenPlans &) = delete;
+	HiddenPlans &operator=(const HiddenPlans &) = delete;
+
+private:
+	struct Held;
+	std::vector<Held> held;
+};
+
+// Runs the plan of `request` for saving: `d` is the planned dive, with its
+// notes and the request kept as extra data ("OpenDives plan"); `site` the
+// site of the dive it starts from (nullptr if none). INVALID_PLAN when the
+// core refuses the plan. Nothing is added to the log.
+int build_plan(const std::string &request, struct dive &d, struct dive_site *&site, std::string &error);
 
 // The thumbnail of list_dives() ("profile"), as a JSON array (opendives.cpp).
 std::string profile_json(const struct dive &d);

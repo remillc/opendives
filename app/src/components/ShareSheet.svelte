@@ -9,8 +9,11 @@
   import Icon from './Icon.svelte';
   import { t } from '../lib/i18n.js';
 
-  /** @type {{ onpdf: () => void, onsummary: () => void, onclose: () => void }} */
-  let { onpdf, onsummary, onclose } = $props();
+  /**
+   * The texts of the rows default to those of a dive.
+   * @type {{ onpdf: () => void, onsummary: () => void, onclose: () => void, pdfText?: string, summaryLabel?: string, summaryText?: string }}
+   */
+  let { onpdf, onsummary, onclose, pdfText = t('share.pdfText'), summaryLabel = t('share.summary'), summaryText = t('share.summaryText') } = $props();
 </script>
 
 <Sheet opened swipeToClose backdrop class="od-share-sheet" style="height: auto" onSheetClosed={onclose}>
@@ -19,11 +22,11 @@
     <h2 id="od-share-title" class="title">{t('share.title')}</h2>
     <button type="button" class="row" onclick={onpdf}>
       <span class="circle" aria-hidden="true"><Icon name="document" size={22} weight={2} /></span>
-      <span class="texts"><span class="headline">{t('share.pdf')}</span><span class="supporting">{t('share.pdfText')}</span></span>
+      <span class="texts"><span class="headline">{t('share.pdf')}</span><span class="supporting">{pdfText}</span></span>
     </button>
     <button type="button" class="row" onclick={onsummary}>
       <span class="circle" aria-hidden="true"><Icon name="image" size={22} weight={2} /></span>
-      <span class="texts"><span class="headline">{t('share.summary')}</span><span class="supporting">{t('share.summaryText')}</span></span>
+      <span class="texts"><span class="headline">{summaryLabel}</span><span class="supporting">{summaryText}</span></span>
     </button>
   </div>
 </Sheet>

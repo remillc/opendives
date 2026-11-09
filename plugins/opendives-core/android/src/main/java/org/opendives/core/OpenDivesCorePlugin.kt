@@ -685,6 +685,23 @@ class OpenDivesCorePlugin : Plugin() {
         call.resolve(JSObject().put("json", NativeCore.createDive(fields.toString())))
     }
 
+    /** The planned dives, listed by the planner only (list_plans). */
+    @PluginMethod
+    fun listPlans(call: PluginCall) = onCoreThread(call) {
+        call.resolve(JSObject().put("json", NativeCore.listPlans()))
+    }
+
+    /** Saves a plan as a planned dive, or replaces one (save_plan): one undoable step. */
+    @PluginMethod
+    fun savePlan(call: PluginCall) = onCoreThread(call) {
+        val request = call.getObject("request")
+        if (request == null) {
+            call.reject("Missing request", "BAD_ARGUMENT")
+            return@onCoreThread
+        }
+        call.resolve(JSObject().put("json", NativeCore.savePlan(request.toString(), call.getInt("replaceId") ?: 0)))
+    }
+
     /** Deletes a dive (delete_dive): one undoable step. */
     @PluginMethod
     fun deleteDive(call: PluginCall) = onCoreThread(call) {

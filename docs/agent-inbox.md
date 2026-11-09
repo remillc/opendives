@@ -729,7 +729,9 @@ Christian undoes task 2026-11-09-02. Spec: "Settings, modelled on Subsurface".
 - Remove the page `/settings/decompression` and the planner settings row "Modèle de décompression". Put the five decompression rows back in the Settings group "Décompression", with the warning note and the footnote, as before 2026-11-09-02 (`docs/mockups/android-reglages.dc.html`).
 - Add a group "Conditions par défaut" after "Unités": "Type d’eau" (choice: Eau douce, Eau de mer, EN 13319; Eau de mer by default) and "Altitude" (number, in the depth unit; 0 by default), then the note "Le planificateur part de ces valeurs. On peut les changer pour chaque plan." Device settings, like the others. This also covers to-do #13.
 
-## [ ] 2026-11-09-04 Planner: planned dives list, two planner screens, several gases
+## [x] 2026-11-09-04 Planner: planned dives list, two planner screens, several gases
+
+Done in the branch `feature/planner-redesign`. Christian approved the facade extension and the write function (`save_plan`), and added the optional "Volume transporté" per gas, which keeps the alarm of an insufficient reserve. The request of a saved plan is kept as the extra data "OpenDives plan" of its dive computer, so that it reopens as typed. Android only for now; iOS comes with its project.
 
 Christian approved the planner redesign. Spec: "Planner, redesigned" (it lists the mock-ups). Do it after 2026-11-09-03.
 - Plongées planifiées (`/plans/`): the list, the per-plan menu (Dupliquer, Partager, Supprimer), the empty state, the "Nouveau plan" FAB. Outils › Planificateur opens it. Planned dives are stored in the logbook as Subsurface does (planned dive computer) and are hidden from the logbook, statistics, desaturation and numbering.

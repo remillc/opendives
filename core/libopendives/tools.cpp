@@ -4,6 +4,7 @@
 // from the core's own functions, or from code ported as is from Subsurface
 // (each port names its source).
 #include "opendives.h"
+#include "internal.h"
 
 #include "core/deco.h"
 #include "core/dive.h"
@@ -368,6 +369,8 @@ int desaturation(int64_t now, std::string &json)
 	// Local wall-clock time, as Subsurface's planner dates a new dive.
 	if (!now)
 		now = static_cast<int64_t>(time(nullptr)) + gettimezoneoffset();
+
+	internal::HiddenPlans hidden_plans; // a plan is not a dive done
 
 	// A dive starting now, in no trip: the core's init_decompression() then
 	// loads the tissues with the logbook dives before it and the surface

@@ -12,6 +12,9 @@ import {
   formatDuration,
   formatFullDate,
   formatGas,
+  formatGasLong,
+  formatGasVolume,
+  formatMixName,
   formatNumber,
   formatPressure,
   formatTemperature,
@@ -334,4 +337,119 @@ export async function sharePdf(dive, prefs, svg) {
   const { uri } = await OpenDivesCore.htmlToPdf({ html: sheetHtml(dive, prefs, svg), name: fileName(dive, 'pdf'), letter: letterPaper() });
   await OpenDivesCore.grantShareFile({ uri, mime: 'application/pdf' });
   await Share.share({ title: shareTitle(dive), files: [uri], dialogTitle: t('share.title') });
+}
+
+// --- A plan (spec, "Planner, redesigned", "Partager le plan") -----------------
+
+/** @typedef {import('opendives-core').PlanResult} PlanResult */
+/** @typedef {import('opendives-core').PlanRequest} PlanRequest */
+
+/** @param {number} o2 @param {number} he */
+const planGas = (o2, he) => (he === 0 && o2 >= 1000 ? formatGasLong(o2, he) : formatMixName(o2, he));
+
+/** @param {number} seconds */
+const planMinutes = (seconds) => `${formatNumber(Math.floor((seconds + 30) / 60), 0)} ${t('units.minutes')}`;
+
+/**
+ * What a shared plan says, in the diver's units.
+ * @param {PlanResult} result @param {PlanRequest} request @param {Prefs} prefs
+ */
+function planFacts(result, request, prefs) {
+  const bottomIndex = result.minimumGas?.cylinder ?? 0;
+  return {
+    levels: (request.levels ?? []).map((l) => `${formatDepth(l.depthMm, prefs)} · ${planMinutes(l.durationSeconds)}`),
+    stops: result.stops.map((s) => ({
+      depth: formatDepth(s.depthMm, prefs),
+      duration: planMinutes(s.durationSeconds),
+      runtime: planMinutes(s.runtimeSeconds),
+      gas: planGas(result.cylinders[s.cylinder].o2Permille, result.cylinders[s.cylinder].hePermille),
+    })),
+    gases: result.cylinders.map((c, i) => ({
+      name: planGas(c.o2Permille, c.hePermille),
+      total: formatGasVolume(c.gasUsedMl + c.reserveMl, prefs),
+      detail: t(i === bottomIndex ? 'plan.volumeBottom' : 'plan.volumeDeco', {
+        used: formatGasVolume(c.gasUsedMl, prefs),
+        reserve: formatGasVolume(c.reserveMl, prefs),
+      }),
+    })),
+    total: planMinutes(result.runtimeSeconds),
+    deepest: formatDepth(result.maxDepthMm, prefs),
+    oxygen: t('plan.oxygenValue', { cns: result.cns, otu: result.otu }),
+  };
+}
+
+/** @param {PlanResult} result */
+function planFileName(result) {
+  const day = new Date(result.when * 1000).toISOString().slice(0, 10);
+  return `${t('plan.filePrefix')}-${day}`;
+}
+
+/** The profile of a plan as an SVG text, for the sheet. @param {PlanResult} result */
+function planSvg(result) {
+  const points = result.points;
+  if (points.length < 2) return '';
+  const W = 720;
+  const H = 180;
+  const tMax = points[points.length - 1][0] || 1;
+  const dMax = result.maxDepthMm || 1;
+  const xy = (/** @type {number} */ s, /** @type {number} */ mm) => `${((s / tMax) * W).toFixed(1)} ${(4 + (mm / dMax) * (H - 8)).toFixed(1)}`;
+  const line = 'M' + points.map(([s, mm]) => xy(s, mm)).join(' L');
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}"><path d="${line} L${W} 0 L0 0 Z" fill="#FBE3B2"/><path d="${line}" fill="none" stroke="#1F2124" stroke-width="1.5"/></svg>`;
+}
+
+/**
+ * The plan as a text: levels, stops, gases, volumes.
+ * @param {PlanResult} result @param {PlanRequest} request @param {Prefs} prefs @param {string} title
+ */
+export function planSummaryText(result, request, prefs, title) {
+  const f = planFacts(result, request, prefs);
+  return [
+    title,
+    t('plan.shareHeadline', { depth: f.deepest, time: f.total }),
+    ...(f.levels.length ? [`${t('plan.levels')} : ${f.levels.join(', ')}`] : []),
+    f.stops.length ? `${t('plan.stop')} : ${f.stops.map((s) => `${s.depth} ${s.duration} (${s.gas})`).join(', ')}` : t('plan.noStop'),
+    ...f.gases.map((g) => `${g.name} : ${g.total}, ${g.detail}`),
+    `${t('plan.oxygen')} : ${f.oxygen}`,
+    t('plan.note'),
+  ].join('\n');
+}
+
+/** @param {PlanResult} result @param {PlanRequest} request @param {Prefs} prefs @param {string} title */
+export async function sharePlanSummary(result, request, prefs, title) {
+  await Share.share({ title, text: planSummaryText(result, request, prefs, title), dialogTitle: t('share.title') });
+}
+
+/**
+ * The plan as a one-page sheet.
+ * @param {PlanResult} result @param {PlanRequest} request @param {Prefs} prefs @param {string} title
+ */
+export function planSheetHtml(result, request, prefs, title) {
+  const f = planFacts(result, request, prefs);
+  const created = new Date().toLocaleDateString(locale, { dateStyle: 'long' });
+  return `<!DOCTYPE html><html lang="${esc(locale)}"><head><meta charset="utf-8"><style>
+@page { size: ${letterPaper() ? 'letter' : 'A4'}; margin: 14mm; }
+body { margin: 0; font-family: sans-serif; color: #1F2124; font-size: 10pt; line-height: 1.35; }
+h1 { margin: 0 0 2px; font-size: 20pt; } h2 { font-size: 11pt; margin: 14px 0 6px; }
+.sub { color: #4A4D52; } svg { width: 100%; height: auto; display: block; }
+table { width: 100%; border-collapse: collapse; } th { text-align: left; color: #4A4D52; font-weight: normal; font-size: 8.5pt; border-bottom: 1px solid #DADAD6; padding: 3px 4px; }
+td { padding: 3px 4px; border-bottom: 1px solid #ECECEA; }
+footer { margin-top: 16px; border-top: 1px solid #DADAD6; padding-top: 6px; color: #4A4D52; font-size: 8.5pt; }
+</style></head><body>
+<h1>${esc(title)}</h1><div class="sub">${esc(t('plan.shareHeadline', { depth: f.deepest, time: f.total }))}</div>
+<h2>${esc(t('share.profile'))}</h2>${planSvg(result)}
+${f.levels.length ? `<h2>${esc(t('plan.levels'))}</h2><div>${esc(f.levels.join(', '))}</div>` : ''}
+<h2>${esc(t('plan.stop'))}</h2>
+${f.stops.length ? `<table><thead><tr><th>${esc(t('plan.stop'))}</th><th>${esc(t('plan.duration'))}</th><th>${esc(t('plan.runtime'))}</th><th>${esc(t('plan.gasColumn'))}</th></tr></thead><tbody>${f.stops.map((s) => `<tr><td>${esc(s.depth)}</td><td>${esc(s.duration)}</td><td>${esc(s.runtime)}</td><td>${esc(s.gas)}</td></tr>`).join('')}</tbody></table>` : `<div>${esc(t('plan.noStop'))}</div>`}
+<h2>${esc(t('plan.volumes'))}</h2>
+<table><tbody>${f.gases.map((g) => `<tr><td>${esc(g.name)}</td><td>${esc(g.detail)}</td><td><b>${esc(g.total)}</b></td></tr>`).join('')}</tbody></table>
+<h2>${esc(t('plan.oxygen'))}</h2><div>${esc(f.oxygen)}</div>
+<footer>${esc(t('plan.note'))} ${esc(t('share.footer', { date: created }))}</footer>
+</body></html>`;
+}
+
+/** @param {PlanResult} result @param {PlanRequest} request @param {Prefs} prefs @param {string} title */
+export async function sharePlanPdf(result, request, prefs, title) {
+  const { uri } = await OpenDivesCore.htmlToPdf({ html: planSheetHtml(result, request, prefs, title), name: `${planFileName(result)}.pdf`, letter: letterPaper() });
+  await OpenDivesCore.grantShareFile({ uri, mime: 'application/pdf' });
+  await Share.share({ title, files: [uri], dialogTitle: t('share.title') });
 }

@@ -23,8 +23,8 @@
   $effect(() => {
     if (!layout.split || navigation.section !== 'tools' || opened) return;
     opened = true;
-    selected = '/plan/new';
-    f7router.navigate('/plan/new', { reloadDetail: true });
+    selected = '/plans/';
+    f7router.navigate('/plans/', { reloadDetail: true });
   });
 
   /** @param {MouseEvent} e */
@@ -39,7 +39,7 @@
     {
       title: t('tools.groupDive'),
       rows: [
-        { href: '/plan/new', icon: 'plan', name: t('tools.planner'), text: t('tools.plannerText') },
+        { href: '/plans/', icon: 'plan', name: t('tools.planner'), text: t('tools.plannerText') },
         { href: '/tools/desaturation', icon: 'desaturation', name: t('tools.desaturation'), text: t('tools.desaturationText') },
       ],
     },
