@@ -454,6 +454,28 @@
       ghost.style.top = `${touchY - 72}px`;
     }
 
+    /**
+     * A horizontal bar on the edge of the row under the finger, the nearest
+     * one, while a drop there would do something.
+     * @param {HTMLElement|null} row
+     */
+    function placeDropLine(row) {
+      let line = /** @type {HTMLElement|null} */ (document.querySelector('.od-drop-line'));
+      if (!row) {
+        line?.remove();
+        return;
+      }
+      if (!line) {
+        line = document.createElement('div');
+        line.className = 'od-drop-line';
+        document.body.append(line);
+      }
+      const rect = (row.querySelector('.item-content') ?? row).getBoundingClientRect();
+      line.style.left = `${rect.left + 8}px`;
+      line.style.width = `${rect.width - 16}px`;
+      line.style.top = `${touchY < rect.top + rect.height / 2 ? rect.top : rect.bottom}px`;
+    }
+
     function updateTarget() {
       el?.querySelectorAll('.od-drop-target').forEach((n) => n.classList.remove('od-drop-target'));
       target = null;
@@ -469,6 +491,7 @@
           target = { action: 'remove' };
         }
       }
+      placeDropLine(target ? li : null);
       if (!label) return;
       if (!target) {
         label.textContent = dragged.length > 1 ? t('logbook.dragCount', { n: dragged.length }) : dragged[0]?.site || t('dive.siteNotSet');
@@ -507,7 +530,7 @@
       dragging = false;
       cancelAnimationFrame(scrolling);
       // Every chip, also one left by a drag the list reload cut short.
-      document.querySelectorAll('.od-drag-chip').forEach((n) => n.remove());
+      document.querySelectorAll('.od-drag-chip, .od-drop-line').forEach((n) => n.remove());
       ghost = null;
       label = null;
       dragRow?.classList.remove('od-drag-source', 'od-drag-lift');
@@ -1325,6 +1348,28 @@
     }
 
     /* Over a place where the dives can go: the chip in ink. */
+    /* Where the drop would go: a 3 dp bar with a dot at its start. */
+    :global(.od-drop-line) {
+      position: fixed;
+      z-index: 9999;
+      height: 3px;
+      margin-top: -1.5px;
+      border-radius: 2px;
+      background: var(--od-text);
+      pointer-events: none;
+    }
+
+    :global(.od-drop-line::before) {
+      content: '';
+      position: absolute;
+      left: -5px;
+      top: -3.5px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--od-text);
+    }
+
     :global(.od-drag-chip.od-drag-chip-target) {
       background: var(--od-text);
       color: var(--od-surface);
