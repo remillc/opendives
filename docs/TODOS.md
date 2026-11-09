@@ -10,7 +10,7 @@ Rules (agreed between the design agent and the code agent, see `docs/agent-inbox
 - **Tag:** every item starts with `[design]` or `[code]` right after its number, set by the agent that adds it (`#4 [design] …`). `[design]` = mock-ups, visuals, screen texts, specification; `[code]` = everything else. When unsure, the agent asks Christian. The tag says who handles the item and lets Christian list one kind only.
 - No other content in this file: no history, no checked boxes, no notes from agents.
 
-Next number: 22
+Next number: 23
 
 ## List
 
@@ -26,3 +26,4 @@ Next number: 22
 - #19 [code] ajouter une langue fr-CA : un petit fichier qui ne contient que les mots qui diffèrent du fr (par exemple nuage plutôt que cloud), le reste retombe sur fr
 - #20 [design] ajouter la possibilité pour l'usager de noter l'app dans le store
 - #21 [design] ajouter une vue carte des plongées
+- #22 [design] /dives/:id : ajouter « Retirer du voyage » dans le menu 3 points quand la plongée fait partie d'un voyage
