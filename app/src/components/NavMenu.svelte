@@ -15,6 +15,7 @@
   import { logbook } from '../lib/logbook.svelte.js';
   import { navigation, sections, showSection, closeMenu, restoreFocus, openSettings, openAbout } from '../lib/navigation.svelte.js';
   import { t } from '../lib/i18n.js';
+  import { updatesCount } from '../lib/offline-maps.svelte.js';
 
   /** @type {Record<string, 'logbook'|'sites'|'statistics'|'tools'>} */
   const icons = { logbook: 'logbook', sites: 'sites', statistics: 'statistics', tools: 'tools' };
@@ -57,6 +58,8 @@
 
   /** The row of the screen shown: Settings or About over a section, else the section. */
   const current = $derived(navigation.page || navigation.section);
+  /** Map updates waiting: the badge on Settings (appbar-tiroir-android-maj-cartes.dc.html). */
+  const mapUpdates = $derived(updatesCount());
   const accountName = $derived(logbook.email || t('menu.noAccount'));
   const accountLine = $derived(t(logbook.email ? (logbook.mode === 'git' ? 'menu.gitDives' : 'menu.cloudDives') : 'menu.localDives',{ n: logbook.dives.length }));
 </script>
@@ -106,7 +109,10 @@
     <div class="separator" role="separator"></div>
     <a href="#settings" class="item" aria-current={current === 'settings' ? 'page' : undefined} onclick={(e) => choose(e, openSettings)}>
       <Icon name="settings" />
-      <span>{t('settings.title')}</span>
+      <span class="label">{t('settings.title')}</span>
+      {#if mapUpdates > 0}
+        <span class="badge" aria-label={t('settings.maps.updates', { n: mapUpdates })}>{mapUpdates}</span>
+      {/if}
     </a>
     <a href="#about" class="item" aria-current={current === 'about' ? 'page' : undefined} onclick={(e) => choose(e, openAbout)}>
       <Icon name="info" />
@@ -268,6 +274,25 @@
           fill: currentColor;
         }
       }
+    }
+
+    .item .label {
+      flex: 1;
+    }
+
+    /* Count of waiting map updates: white on the secondary role, a number and a name, not the colour alone. */
+    .badge {
+      min-width: 24px;
+      height: 24px;
+      padding: 0 7px;
+      box-sizing: border-box;
+      border-radius: 12px;
+      background: var(--od-secondary);
+      color: var(--od-on-secondary);
+      font-size: 12px;
+      line-height: 24px;
+      font-weight: 700;
+      text-align: center;
     }
 
     .separator {

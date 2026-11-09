@@ -72,6 +72,13 @@
   import AboutLibraries from './pages/AboutLibraries.svelte';
   import GitRepository from './pages/GitRepository.svelte';
   import TokenHelp from './pages/TokenHelp.svelte';
+  import SettingsMaps from './pages/SettingsMaps.svelte';
+  import SettingsMapsNew from './pages/SettingsMapsNew.svelte';
+  import SettingsMapsCountries from './pages/SettingsMapsCountries.svelte';
+  import SettingsMapsCountry from './pages/SettingsMapsCountry.svelte';
+  import SettingsMapsArea from './pages/SettingsMapsArea.svelte';
+  import MapsDialogs from './components/MapsDialogs.svelte';
+  import { startOfflineMaps } from './lib/offline-maps.svelte.js';
 
   // Addresses: a resource has no trailing slash, a collection has one (AGENTS.md).
   const appRoutes = [
@@ -93,6 +100,12 @@
     { path: '/settings/cylinders/', component: CylinderTypes },
     { path: '/settings/cylinders/new', component: CylinderType },
     { path: '/settings/cylinders/type', component: CylinderType },
+    // Offline maps: the list, adding a region (by search, country, or a rectangle on the map).
+    { path: '/settings/maps/', component: SettingsMaps },
+    { path: '/settings/maps/new', component: SettingsMapsNew },
+    { path: '/settings/maps/countries/', component: SettingsMapsCountries },
+    { path: '/settings/maps/countries/:code', component: SettingsMapsCountry },
+    { path: '/settings/maps/area', component: SettingsMapsArea },
     { path: '/account', component: Account },
     { path: '/account/delete', component: DeleteAccount },
     // Signing in and creating an account, from the Account screen without an account.
@@ -245,12 +258,15 @@
     // The settings are applied and the logbook is loaded from main.js, before
     // the screens are built.
     mark('onMount');
+    // Offline maps: follows the downloads and checks for updates (at most once a day).
+    startOfflineMaps();
   });
 </script>
 
 <App {...f7params}>
   {#if layout.phone}<NavMenu />{:else}<NavRail />{/if}
   <SyncFailureSheet />
+  <MapsDialogs />
   {#if showRoute}<RouteBadge />{/if}
   <Welcome />
   <Views tabs class="safe-areas {layout.phone ? '' : 'od-tablet'}" style="--f7-page-master-width: {listWidth}px; --od-no-dive: '{t('tablet.noDive')}'">
