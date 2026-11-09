@@ -378,3 +378,10 @@ When the dive's site has GPS coordinates, the top of `/dives/:id` shows an OpenS
 When the dive belongs to a trip, the ⋮ menu of `/dives/:id` shows "Retirer du voyage" right after "Renuméroter la plongée" (icon: a suitcase with a minus sign). Dives outside a trip don't show it. There is no confirmation dialog: the dive leaves the trip at once and a snackbar says "Plongée retirée du voyage" with "Annuler". If it was the trip's last dive, the empty trip is deleted, as in Subsurface, and the snackbar says "Plongée retirée. Le voyage, maintenant vide, a été supprimé." "Annuler" puts the dive back in its trip, and recreates the trip if needed. Mock-up: `detail2-android-menu.dc.html`.
 
 Dive detail header: the rating shows the stars alone, with no "note globale" label after them (the accessible label stays "Note : N sur 5").
+
+### Edit dive form, sections and trip field
+
+The sections of the edit form (La plongée, Personnes et notes, Équipement, Conditions, Ordinateurs, Avancé) are always open: no chevron, no collapsing. Their titles are plain section headings. Ordinateurs lists the dive's computers, each with a radio button for the main one ("Principal : son profil est celui de la plongée") and the helper "Avec plusieurs ordinateurs, choisissez le principal.".
+
+The Voyage field is a dropdown menu (Aucun, the existing trips, Nouveau voyage) with the filled down arrow, like the other dropdowns of the form. When the dive is in a trip, a clear button ✕ (accessible label "Retirer du voyage", 48 dp touch target, 20 dp icon) sits before the arrow and sets the field to "Aucun". The change applies on Enregistrer, like every field of the form. Rule for every Android mock-up: a filled down arrow marks a dropdown menu, a right chevron marks a field or row that opens another page or a dialog. Mock-up: `android-edition.dc.html`.
+
