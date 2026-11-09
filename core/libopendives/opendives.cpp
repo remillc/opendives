@@ -9,6 +9,7 @@
 #include "core/divesite.h"
 #include "core/event.h"
 #include "core/profile.h"
+#include "core/extradata.h"
 #include "core/sample.h"
 #include "core/statistics.h"
 #include "core/taxonomy.h"
@@ -239,6 +240,83 @@ static void append_trip(std::string &json, const struct dive &d)
 	json += '}';
 }
 
+// The levels of a plan: the holds at one depth up to the last entered time.
+// Subsurface saves that time, not which samples were entered.
+static std::string plan_levels_json(const struct dive &d)
+{
+	const struct divecomputer &dc = d.dcs[0];
+	std::string json = "[";
+	bool first = true;
+	int depth = 0, held = 0;
+	auto flush = [&] {
+		if (held > 0) {
+			if (!first)
+				json += ',';
+			first = false;
+			json += "{\"depthMm\":" + std::to_string(depth) + ",\"durationSeconds\":" + std::to_string(held) + '}';
+		}
+		held = 0;
+	};
+	const sample *previous = nullptr;
+	for (const sample &s: dc.samples) {
+		if (dc.last_manual_time.seconds && s.time.seconds > dc.last_manual_time.seconds)
+			break;
+		if (previous && s.depth.mm > 0 && s.depth.mm == previous->depth.mm) {
+			if (s.depth.mm != depth)
+				flush();
+			depth = s.depth.mm;
+			held += s.time.seconds - previous->time.seconds;
+		} else {
+			flush();
+		}
+		previous = &s;
+	}
+	flush();
+	return json + ']';
+}
+
+int list_plans(std::string &json)
+{
+	json = "[";
+	bool first = true;
+	for (auto it = divelog.dives.rbegin(); it != divelog.dives.rend(); ++it) {
+		const struct dive &d = **it;
+		if (!internal::is_plan_only(d))
+			continue;
+		if (!first)
+			json += ',';
+		first = false;
+		json += "{\"id\":" + std::to_string(d.id) + ",\"date\":";
+		append_json_string(json, iso_date(d.when));
+		json += ",\"when\":" + std::to_string(d.when) + ",\"site\":";
+		append_json_string(json, site_name(d));
+		json += ",\"maxDepthMm\":" + std::to_string(d.maxdepth.mm);
+		json += ",\"durationSeconds\":" + std::to_string(d.duration.seconds);
+		json += ",\"salinity\":" + std::to_string(d.salinity);
+		json += ",\"surfacePressureMbar\":" + std::to_string(d.surface_pressure.mbar);
+		json += ",\"profile\":";
+		append_json_array(json, profile_summary(d));
+		json += ",\"levels\":" + plan_levels_json(d);
+		json += ",\"gases\":[";
+		for (size_t i = 0; i < d.cylinders.size(); i++) {
+			if (i)
+				json += ',';
+			json += "{\"o2Permille\":" + std::to_string(get_o2(d.cylinders[i].gasmix)) +
+				",\"hePermille\":" + std::to_string(get_he(d.cylinders[i].gasmix)) + '}';
+		}
+		json += "],\"request\":";
+		std::string request;
+		for (const extra_data &e: d.dcs[0].extra_data)
+			if (e.key == "OpenDives plan")
+				request = e.value;
+		std::replace(request.begin(), request.end(), '\'', '"');
+		append_json_string(json, request);
+		json += '}';
+	}
+	json += ']';
+	return 0;
+}
+
 static std::string dives_json()
 {
 	std::string json = "[";
@@ -246,6 +324,9 @@ static std::string dives_json()
 	for (const auto &d: divelog.dives) {
 		// Invalid dives are hidden unless "Show invalid dives" (DiveFilter::showDive).
 		if (d->invalid && !prefs.display_invalid_dives)
+			continue;
+		// Plans are listed by the planner only (list_plans).
+		if (internal::is_plan_only(*d))
 			continue;
 		if (!first)
 			json += ',';
@@ -473,6 +554,8 @@ int get_dive(int id, std::string &json, std::string &error)
 	// Tissue loading, 16 compartments per entry, flattened (see "tissues" below).
 	std::vector<int> tissues;
 	if (dc) {
+		// A plan is not a dive done: it does not load the tissues of this one.
+		internal::HiddenPlans hidden_plans;
 		struct plot_info pi = create_plot_info_new(d, dc, nullptr);
 		for (const auto &e: pi.entry) {
 			t.push_back(e.sec);

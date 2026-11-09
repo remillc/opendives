@@ -170,6 +170,47 @@ int main()
 	check(sea_gas > 0 && sea_gas == num(sea_explicit, "gasUsedMl", item(sea_explicit, "cylinders", 0)), "water: sea water is the default");
 	check(fresh_gas > 0 && fresh_gas < sea_gas, "water: fresh water uses less gas than sea water");
 
+	// Levels: the time of a level is at depth, the descent is added. One level
+	// of 10 min at 30 m is the square profile of 100 s of descent + 10 min.
+	prefs = default_prefs;
+	prefs.gflow = 30;
+	prefs.gfhigh = 75;
+	std::string gases = "\"cylinders\":[{\"o2Permille\":209,\"hePermille\":0,\"sizeMl\":12000,\"startMbar\":200000}]}";
+	std::string square = run("{\"depthMm\":30000,\"bottomTimeSeconds\":700,\"descentMmMin\":18000,\"when\":1000000000," + gases);
+	std::string level = run("{\"levels\":[{\"depthMm\":30000,\"durationSeconds\":600}],\"descentMmMin\":18000,\"when\":1000000000," + gases);
+	check(num(square, "runtimeSeconds") == num(level, "runtimeSeconds") && num(square, "cns") == num(level, "cns"), "levels: one level is the square profile");
+
+	// Two levels: deeper first, then shallower; the plan is longer than the first level alone.
+	std::string first_only = run("{\"levels\":[{\"depthMm\":30000,\"durationSeconds\":900}],\"when\":1000000000," + gases);
+	std::string two = run("{\"levels\":[{\"depthMm\":30000,\"durationSeconds\":900},{\"depthMm\":18000,\"durationSeconds\":1200}],\"when\":1000000000," + gases);
+	printf("     two levels: runtime %ld s, one level %ld s\n", num(two, "runtimeSeconds"), num(first_only, "runtimeSeconds"));
+	check(num(two, "maxDepthMm") >= 30000 && num(two, "runtimeSeconds") > num(first_only, "runtimeSeconds") + 1200, "levels: the second level is held");
+	bool at18 = false;
+	for (int i = 0; item(two, "segments", i) != std::string::npos && item(two, "segments", i) < two.find("\"stops\""); i++)
+		at18 |= num(two, "depthMm", item(two, "segments", i)) == 18000;
+	check(at18, "levels: a waypoint at 18 m");
+	std::string bad_level, level_error;
+	check(opendives::plan_dive("{\"levels\":[{\"depthMm\":0,\"durationSeconds\":60}]," + gases, bad_level, level_error) == -1, "levels: an empty level is refused");
+
+	// The plan's own gradient factors: for this plan only.
+	std::string conservative = run("{\"levels\":[{\"depthMm\":40000,\"durationSeconds\":1500}],\"gfLow\":20,\"gfHigh\":60,\"when\":1000000000," + gases);
+	std::string liberal = run("{\"levels\":[{\"depthMm\":40000,\"durationSeconds\":1500}],\"gfLow\":90,\"gfHigh\":95,\"when\":1000000000," + gases);
+	printf("     GF 20/60 %ld s, GF 90/95 %ld s\n", num(conservative, "runtimeSeconds"), num(liberal, "runtimeSeconds"));
+	check(num(conservative, "runtimeSeconds") > num(liberal, "runtimeSeconds"), "own GF: lower factors, longer plan");
+	check(prefs.gflow == 30 && prefs.gfhigh == 75 && prefs.planner_deco_mode == default_prefs.planner_deco_mode, "own GF: preferences put back");
+	std::string vpmb = run("{\"levels\":[{\"depthMm\":40000,\"durationSeconds\":1500}],\"decoModel\":1,\"vpmbConservatism\":2,\"when\":1000000000," + gases);
+	check(vpmb.find("\"model\":\"vpmb\"") != std::string::npos && prefs.planner_deco_mode != VPMB, "own model: VPM-B for this plan only");
+
+	// Without a cylinder: the reserve as a volume, as with a real cylinder.
+	std::string real = run("{\"levels\":[{\"depthMm\":30000,\"durationSeconds\":1500}],\"when\":1000000000,"
+			       "\"cylinders\":[{\"o2Permille\":209,\"hePermille\":0,\"sizeMl\":24000,\"startMbar\":232000}]}");
+	std::string volumes = run("{\"levels\":[{\"depthMm\":30000,\"durationSeconds\":1500}],\"when\":1000000000,"
+				  "\"cylinders\":[{\"o2Permille\":209,\"hePermille\":0}]}");
+	long real_reserve = num(real, "reserveMl", item(real, "cylinders", 0)), reserve = num(volumes, "reserveMl", item(volumes, "cylinders", 0));
+	printf("     reserve: %ld ml with a cylinder, %ld ml without\n", real_reserve, reserve);
+	check(reserve > 0 && std::labs(reserve - real_reserve) * 100 <= real_reserve, "volumes: reserve within 1 % of a real cylinder");
+	check(num(volumes, "gasUsedMl", item(volumes, "cylinders", 0)) == num(real, "gasUsedMl", item(real, "cylinders", 0)), "volumes: same gas used");
+
 	std::string bad, error;
 	check(opendives::plan_dive("{\"depthMm\":0}", bad, error) == -1 && error.rfind("BAD_REQUEST", 0) == 0, "bad request refused");
 

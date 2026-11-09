@@ -10,6 +10,7 @@
 // constraints cannot say, and the values offered (stats_values) and the
 // values matched must be the same keys. Both use keys_of() below.
 #include "opendives.h"
+#include "internal.h"
 #include "json.h"
 
 #include "core/dive.h"
@@ -224,7 +225,7 @@ std::string groups_json(const std::string &field)
 	std::map<std::string, std::vector<dive *>> groups;
 	for (auto &dp: divelog.dives) {
 		saved.emplace_back(dp.get(), dp->selected);
-		if (!dp->selected || dp->invalid)
+		if (!dp->selected || dp->invalid || internal::is_plan_only(*dp))
 			continue;
 		std::set<std::string> keys = keys_of(field, *dp);
 		if (keys.empty())
@@ -289,7 +290,7 @@ int stats(const std::string &criteria_json, std::string &json, std::string &erro
 	for (auto &dp: divelog.dives) {
 		saved.emplace_back(dp.get(), dp->selected);
 		dp->selected = matches(criteria, *dp);
-		if (!dp->invalid)
+		if (!dp->invalid && !internal::is_plan_only(*dp))
 			log_dives++;
 	}
 
@@ -313,7 +314,7 @@ int stats(const std::string &criteria_json, std::string &json, std::string &erro
 	std::vector<const dive_trip *> trips;
 	const dive_trip *trip = nullptr;
 	for (auto &dp: divelog.dives) {
-		if (!dp->selected || dp->invalid)
+		if (!dp->selected || dp->invalid || internal::is_plan_only(*dp))
 			continue;
 		struct tm tm;
 		utc_mkdate(dp->when, &tm);
@@ -367,7 +368,7 @@ int stats(const std::string &criteria_json, std::string &json, std::string &erro
 	json += ",\"diveIds\":[";
 	first = true;
 	for (auto &dp: divelog.dives) {
-		if (!dp->selected || dp->invalid)
+		if (!dp->selected || dp->invalid || internal::is_plan_only(*dp))
 			continue;
 		if (!first)
 			json += ',';
@@ -390,7 +391,7 @@ int stats_values(const std::string &field, std::string &json, std::string &error
 	std::map<std::string, int> counts;
 	std::map<std::string, std::string> locations;
 	for (auto &dp: divelog.dives) {
-		if (dp->invalid)
+		if (dp->invalid || internal::is_plan_only(*dp))
 			continue;
 		std::set<std::string> keys = keys_of(field, *dp);
 		if (keys.empty())

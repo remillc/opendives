@@ -973,6 +973,26 @@ Java_org_opendives_core_NativeCore_planDive(JNIEnv *env, jobject, jstring reques
 	return env->NewStringUTF(json.c_str());
 }
 
+// Planned dives (save_plan: one undoable step).
+JNIEXPORT jstring JNICALL
+Java_org_opendives_core_NativeCore_listPlans(JNIEnv *env, jobject)
+{
+	std::string json;
+	opendives::list_plans(json);
+	return env->NewStringUTF(json.c_str());
+}
+
+JNIEXPORT jstring JNICALL
+Java_org_opendives_core_NativeCore_savePlan(JNIEnv *env, jobject, jstring request, jint replaceId)
+{
+	std::string json, error;
+	if (opendives::save_plan(to_string(env, request), replaceId, json, error)) {
+		throw_core_error(env, error);
+		return nullptr;
+	}
+	return edit_result(env, json);
+}
+
 JNIEXPORT jstring JNICALL
 Java_org_opendives_core_NativeCore_listDives(JNIEnv *env, jobject, jstring repo)
 {

@@ -50,7 +50,7 @@ OpenDives is a full dive log app for mobile. It improves on Subsurface-mobile, b
 - **Statistics tab:** opens on precompiled statistics with a "Free filter" button. Examples: number of dives per buddy, dive hours per suit.
 - **First launch:** three choices (existing account, create an account, no account), each with its consequence written out; "no account" means the log stays on the device, with an upload possible later.
 - **Units:** each measure is set separately (depth, temperature, pressure, volume, weight), like Subsurface's "personalised" mode.
-- **Planner:** can start from a dive in the log (gas, cylinder, start pressure, measured SAC); an insufficient reserve is shown in the alarm colour.
+- **Planner:** can start from a dive in the log (gases, measured SAC). Results are volumes per gas; when the diver gives the volume carried for a gas and it is too little, the total is shown in the alarm colour. Saved plans are planned dives of the logbook, listed by the planner only.
 - **States to build:** empty log, failed download, offline with pending changes, sync conflict (version choice: to be confirmed, an OpenDives addition).
 - **Log screen:** no permanent Download button; a "+" button opens download, import or manual entry.
 - **Navigation (decided on 6 November 2026):** no bottom bar on phones, on iOS or Android. A top bar with a ☰ button opens a side menu (Logbook, Sites, Statistics, Tools, then Account and Settings); see docs/ui-specification.md, section 3. Tablets keep the iPad sidebar and the Android navigation rail.

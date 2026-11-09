@@ -13,6 +13,7 @@
   import Account from './pages/Account.svelte';
   import DeleteAccount from './pages/DeleteAccount.svelte';
   import WelcomeStart from './pages/WelcomeStart.svelte';
+  import Plans from './pages/Plans.svelte';
   import SignIn from './pages/SignIn.svelte';
   import CreateAccount from './pages/CreateAccount.svelte';
   import BringLogbook from './pages/BringLogbook.svelte';
@@ -106,7 +107,10 @@
     { path: '/dives/:id', component: DiveDetail },
     { path: '/trips/:id', component: Trip },
     { path: '/trips/:trip/dives/:id', component: DiveDetail },
-    // The planner: /plan/new/ for a new dive, /plan/<dive id>/ from a logbook dive.
+    // Planned dives, and a saved plan reopened.
+    { path: '/plans/', component: Plans },
+    { path: '/plans/:id', component: Planner, options: { props: { reopen: true } } },
+    // The planner: /plan/new for a new dive, /plan/<dive id> from a logbook dive.
     // The planner's settings, a screen of their own (task 2026-11-08-01, to-do #3 U3).
     { path: '/settings/planner', component: PlannerSettings },
     { path: '/plan/:id', component: Planner },
@@ -165,6 +169,8 @@
       component: Tools,
       master: true,
       detailRoutes: [
+        { path: '/plans/', component: Plans },
+        { path: '/plans/:id', component: Planner, options: { props: { reopen: true } } },
         { path: '/plan/:id', component: Planner },
         { path: '/tools/desaturation', component: Desaturation },
         { path: '/tools/ead-mod', component: GasEadMod },

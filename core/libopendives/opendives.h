@@ -405,6 +405,20 @@ int planner_setup(std::string &json);
 // "problemSolvingMinutes"}}, as plannernotes.cpp computes them.
 // -1 with BAD_REQUEST.
 int plan_dive(const std::string &request, std::string &json, std::string &error);
+
+// Planned dives (spec, "Planner, redesigned"): dives whose only computer is
+// Subsurface's "planned dive", kept in the logbook, listed here and nowhere
+// else: left out of the dive list, statistics, desaturation and numbering.
+// [{"id", "date", "when", "site", "maxDepthMm", "durationSeconds", "salinity",
+//   "surfacePressureMbar", "profile", "levels": [{"depthMm", "durationSeconds"}],
+//   "gases": [{"o2Permille", "hePermille"}], "request": the plan as saved by
+//   OpenDives, a JSON text, or ""}], newest first.
+int list_plans(std::string &json);
+// Saves the plan of `request` (as plan_dive; cylinders without size or
+// pressure) as a planned dive, not numbered and in no trip, in one undoable
+// step; replace_id, when not 0, is the plan it replaces (Subsurface's
+// replan). INVALID_PLAN when the core refuses the plan.
+int save_plan(const std::string &request, int replace_id, std::string &result_json, std::string &error);
 // --- Free filter (filter.cpp), read-only -----------------------------------
 //
 // One constraint in the text form of Subsurface's filter presets (the

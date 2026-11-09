@@ -198,16 +198,38 @@ import { registerPlugin } from '@capacitor/core';
  * @property {number} o2Permille
  * @property {number} hePermille
  * @property {number} sizeMl
- * @property {number} startMbar
+ * @property {number} [sizeMl] with startMbar; both absent: volumes only (reserveMl)
+ * @property {number} [startMbar]
  * @property {number} [switchDepthMm] deco gases: 0 or absent for the MOD at the ppO2 for deco
+ * @property {number} [sourceCylinder] the cylinder of the dive this gas stands for (sourceDiveId)
+ * @property {number} [carriedMl] kept with a saved plan, not used by the core
  */
 
 /**
- * A square profile and the planner-only settings for this plan.
- * @typedef {Partial<Omit<PlannerSetup, 'model'|'gfLow'|'gfHigh'|'vpmbConservatism'>> & {
- *   depthMm: number, bottomTimeSeconds: number, cylinders: PlanCylinderRequest[],
- *   surfacePressureMbar?: number, salinity?: number, when?: number
+ * The profile (levels, the waypoints of a logged dive, or a square one) and the
+ * settings for this plan. Each level's time is at depth; the transit is added.
+ * @typedef {Partial<Omit<PlannerSetup, 'model'>> & {
+ *   levels?: {depthMm: number, durationSeconds: number}[], sourceDiveId?: number,
+ *   depthMm?: number, bottomTimeSeconds?: number, cylinders: PlanCylinderRequest[],
+ *   surfacePressureMbar?: number, salinity?: number, when?: number, decoModel?: 0|1
  * }} PlanRequest
+ */
+
+/**
+ * A planned dive of the logbook (list_plans).
+ * @typedef {Object} PlannedDive
+ * @property {number} id
+ * @property {string} date
+ * @property {number} when
+ * @property {string} site
+ * @property {number} maxDepthMm
+ * @property {number} durationSeconds
+ * @property {number} salinity
+ * @property {number} surfacePressureMbar
+ * @property {number[]} profile
+ * @property {{depthMm: number, durationSeconds: number}[]} levels
+ * @property {{o2Permille: number, hePermille: number}[]} gases
+ * @property {string} request the plan as saved by OpenDives (JSON), or "" for one made elsewhere
  */
 
 /**
@@ -219,6 +241,7 @@ import { registerPlugin } from '@capacitor/core';
  * @property {number} endMbar
  * @property {number} gasUsedMl
  * @property {number} decoGasUsedMl
+ * @property {number} reserveMl the minimum gas for the last bottom gas, the gas of the ascent for the others
  * @property {number} decoPressureMbar
  * @property {number} switchDepthMm
  * @property {number} bottomModMm
@@ -236,6 +259,7 @@ import { registerPlugin } from '@capacitor/core';
  * @property {number} maxDepthMm
  * @property {number} cns
  * @property {number} otu
+ * @property {number} when local time of the plan, seconds
  * @property {number} surfaceIntervalSeconds
  * @property {[number, number][]} points seconds, mm
  * @property {[number, number][]} ceiling the plan's decompression ceiling, seconds, mm, as the
@@ -551,6 +575,9 @@ import { registerPlugin } from '@capacitor/core';
  *   The planner's settings as the core's preferences hold them.
  * @property {(request: PlanRequest) => Promise<PlanResult>} planDive
  *   Runs Subsurface's planner; read only, nothing is added to the logbook.
+ * @property {() => Promise<PlannedDive[]>} listPlans
+ * @property {(options: {request: PlanRequest, replaceId?: number}) => Promise<EditResult>} savePlan
+ *   Saves the plan as a planned dive, or replaces one: one undoable step.
  * @property {() => Promise<BluetoothStatus>} bluetoothStatus
  * @property {() => Promise<BluetoothStatus>} requestBluetoothPermission
  *   Asks for the Bluetooth permissions (Android 12+: nearby devices; before: location).
@@ -705,6 +732,12 @@ export const OpenDivesCore = {
   },
   async planDive(request) {
     return JSON.parse((await native.planDive({ request })).json);
+  },
+  async listPlans() {
+    return JSON.parse((await native.listPlans()).json);
+  },
+  async savePlan(options) {
+    return JSON.parse((await native.savePlan(options)).json);
   },
   bluetoothStatus: () => native.bluetoothStatus(),
   requestBluetoothPermission: () => native.requestBluetoothPermission(),

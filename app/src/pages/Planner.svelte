@@ -1,46 +1,51 @@
 <script>
   // @ts-check
-  // Dive planner (spec, section 4, "Planner"; mock-ups android-planificateur
-  // and ios-planificateur). From a logbook dive (gas, cylinder, start pressure
-  // and measured SAC taken from it) or a new dive. The plan, gas use, minimum
-  // gas, CNS and OTU all come from the core (Subsurface's planner); nothing is
-  // written to the logbook. An insufficient reserve is an ordinary row whose
-  // value is in --od-alarm, with the gap spelled out.
-  import { Page, Navbar, Link, List, ListItem, Popup, theme } from 'framework7-svelte';
+  // Dive planner (spec, section 4, "Planner, redesigned"; mock-ups
+  // android-planificateur, -menu and -nouveau): the same sections from a logbook
+  // dive and for a new dive. The plan, gas volumes, reserve, CNS and OTU all
+  // come from the core (Subsurface's planner). Saved, a plan is a planned dive
+  // of the logbook, listed by "Plongées planifiées" only.
+  import { Page, Navbar, Link, List, ListItem, Popup, Popover, f7, theme } from 'framework7-svelte';
   import { OpenDivesCore } from 'opendives-core';
   import Icon from '../components/Icon.svelte';
+  import MenuItem from '../components/MenuItem.svelte';
   import ProfileThumbnail from '../components/ProfileThumbnail.svelte';
   import TextField from '../components/TextField.svelte';
   import SelectField from '../components/SelectField.svelte';
-  import { logbook } from '../lib/logbook.svelte.js';
-  import { planner, loadSetup, adoptUnitDefaults, planRequest, startFromDive, startNewDive } from '../lib/planner.svelte.js';
+  import ButtonField from '../components/ButtonField.svelte';
+  import WheelDialog from '../components/WheelDialog.svelte';
+  import ShareSheet from '../components/ShareSheet.svelte';
+  import { logbook, savePlan } from '../lib/logbook.svelte.js';
+  import { planner, loadSetup, adoptUnitDefaults, planRequest, startFromDive, startNewDive, requestOfPlan, applyRequest, nextGas } from '../lib/planner.svelte.js';
   import { waterBottomColor } from '../lib/water-column.js';
-  import {
-    formatCylinderSize,
-    formatDateTime,
-    formatDuration,
-    formatGas,
-    formatGasVolume,
-    formatNumber,
-    formatPressure,
-    formatSac,
-    depthUnit,
-    locale,
-  } from '../lib/format.js';
+  import { formatDateTime, formatDuration, formatGasVolume, formatMixName, formatGasLong, formatNumber, formatSac, formatTimeOfDay, decoSummary, depthUnit, locale } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
-  import { WATER_TYPES, waterTypeName, waterTypeOfSalinity } from '../lib/tools.js';
+  import { WATER_TYPES, altitudeToPressureMbar, formatHoursMinutes, pressureToAltitudeMm, waterTypeName, waterTypeOfSalinity } from '../lib/tools.js';
+  import { sharePlanPdf, sharePlanSummary } from '../lib/share.js';
 
-  /** @type {{ f7route: { params: { id: string } }, f7router: { navigate: (url: string) => void } }} */
-  let { f7route, f7router } = $props();
+  /**
+   * `reopen`: the route /plans/<id>, a saved plan; otherwise /plan/new or /plan/<dive id>.
+   * @type {{ f7route: { params: { id: string } }, f7router: any, reopen?: boolean }}
+   */
+  let { f7route, f7router, reopen = false } = $props();
 
   const uid = $props.id();
+  const menuId = `od-plan-menu-${uid}`;
   const prefs = $derived(logbook.prefs);
   const feet = $derived(prefs.length === 'ft');
+  const cuft = $derived(prefs.volume === 'cuft');
+  const MM_PER_FT = 304.8;
+  const ML_PER_CUFT = 28316.8466;
 
   let result = $state(/** @type {import('opendives-core').PlanResult|null} */ (null));
   let failed = $state(false);
   let ready = $state(false);
+  let started = $state(false);
   let choosing = $state(false);
+  let sharing = $state(false);
+  let saving = $state(false);
+  let decoOpen = $state(false);
+  let dialog = $state(/** @type {null|'date'|'time'} */ (null));
 
   /** Reads the shared settings again (they may have changed in Settings), then plans. */
   async function refresh() {
@@ -55,60 +60,72 @@
     }
   }
 
+  /** The card of the dive a plan starts from. @param {number} id */
+  async function sourceOf(id) {
+    const summary = logbook.dives.find((d) => d.id === id);
+    const dive = await OpenDivesCore.getDive({ id });
+    return {
+      dive,
+      source: {
+        id,
+        number: dive.number,
+        durationSeconds: dive.durationSeconds,
+        date: dive.date,
+        site: dive.site,
+        maxDepthMm: dive.maxDepthMm,
+        profile: summary?.profile ?? [],
+      },
+    };
+  }
+
   /** @param {number} id */
   async function startFrom(id) {
-    const summary = logbook.dives.find((d) => d.id === id);
     try {
-      const dive = await OpenDivesCore.getDive({ id });
-      startFromDive(
-        dive,
-        {
-          id,
-          number: dive.number,
-          durationSeconds: dive.durationSeconds,
-          date: dive.date,
-          site: dive.site,
-          maxDepthMm: dive.maxDepthMm,
-          profile: summary?.profile ?? [],
-        },
-        feet,
-      );
+      const { dive, source } = await sourceOf(id);
+      startFromDive(dive, source, prefs);
     } catch (e) {
       console.error('Planner source', e);
       failed = true;
     }
   }
 
-  /** A new dive in the user's units, with the default cylinder of Settings. */
-  async function newDive() {
-    /** @type {number} */
-    let ml = 0;
+  async function reopenPlan(/** @type {number} */ id) {
     try {
-      /** @type {import('opendives-core').GasCylinderTypes} */
-      const list = await OpenDivesCore.toolQuery({ kind: 'cylinders' });
-      ml = list.types.find((c) => c.name === list.default)?.ml ?? 0;
+      const plans = await OpenDivesCore.listPlans();
+      const plan = plans.find((p) => p.id === id);
+      if (!plan) throw new Error('No such plan');
+      const request = requestOfPlan(plan, prefs);
+      const stillThere = request.sourceDiveId && logbook.dives.some((d) => d.id === request.sourceDiveId);
+      if (request.sourceDiveId && !stillThere) {
+        // The dive it started from is gone: the plan is what was saved.
+        delete request.sourceDiveId;
+        request.levels = plan.levels;
+      }
+      const source = stillThere ? (await sourceOf(/** @type {number} */ (request.sourceDiveId))).source : null;
+      applyRequest(request, id, source);
     } catch (e) {
-      console.error('Default cylinder', e);
+      console.error('Reopening a plan', e);
+      failed = true;
     }
-    startNewDive(prefs, ml);
   }
 
   async function open() {
     const id = f7route.params.id;
     await refresh();
-    if (id === 'new') {
-      await newDive();
-    } else if (planner.source?.id !== Number(id)) {
-      await startFrom(Number(id));
-    }
+    planner.planId = 0;
+    if (reopen) await reopenPlan(Number(id));
+    else if (id === 'new') startNewDive(prefs);
+    else await startFrom(Number(id));
+    started = true;
   }
   open();
 
-  // The plan is computed again at each change of the dive or the settings.
+  // The plan is computed again at each change of the dive or the settings,
+  // once the plan to show is loaded.
   let run = 0;
   $effect(() => {
     planner.version;
-    if (!ready) return;
+    if (!ready || !started) return;
     const request = planRequest();
     const mine = ++run;
     OpenDivesCore.planDive(request)
@@ -116,6 +133,8 @@
         if (mine !== run) return;
         result = r;
         failed = false;
+        // The time the core chose for a new dive, shown from now on.
+        if (!planner.when && !planner.source) planner.when = r.when;
       })
       .catch((e) => {
         console.error('Plan', e);
@@ -123,9 +142,9 @@
       });
   });
 
-  /** Whole metres or feet, as typed. @param {number} mm */
+  /** Whole metres or feet. @param {number} mm */
   function depthText(mm) {
-    return `${formatNumber(feet ? mm / 304.8 : mm / 1000, 0)} ${depthUnit(prefs)}`;
+    return `${formatNumber(feet ? mm / MM_PER_FT : mm / 1000, 0)} ${depthUnit(prefs)}`;
   }
 
   /** Minutes rounded as Subsurface's plan table. @param {number} seconds */
@@ -133,35 +152,49 @@
     return `${formatNumber(Math.floor((seconds + 30) / 60), 0)} ${t('units.minutes')}`;
   }
 
-  // --- The data of the plan, MD3 filled fields edited in place (task
-  // 2026-11-08-06): the plan is computed again as soon as one changes.
-  const MM_PER_FT = 304.8;
-  const MBAR_PER_PSI = 68.947572932;
-  const ML_PER_CUFT = 28316.8466;
-  const psi = $derived(prefs.pressure === 'psi');
-  const cuft = $derived(prefs.volume === 'cuft');
+  /** The name of a gas: EAN32, Oxygène, (18/45). @param {number} o2 @param {number} he */
+  const gasName = (o2, he) => (he === 0 && o2 >= 1000 ? formatGasLong(o2, he) : formatMixName(o2, he));
+
+  // --- The fields, MD3 filled fields edited in place: the plan is computed
+  // again as soon as one changes.
 
   /** A number as typed back: no thousands separator. @param {number} value @param {number} decimals */
-  const show = (value, decimals = 0) =>
-    new Intl.NumberFormat(locale, { useGrouping: false, maximumFractionDigits: decimals }).format(value);
+  const show = (value, decimals = 0) => new Intl.NumberFormat(locale, { useGrouping: false, maximumFractionDigits: decimals }).format(value);
   /** "12,5" or "12.5" → 12.5; NaN when empty or not a number. @param {string} text */
   const parse = (text) => (text.trim() === '' ? NaN : Number(text.trim().replace(',', '.')));
 
-  let depthField = $state('');
-  let timeField = $state('');
-  let pressureField = $state('');
+  let levelFields = $state(/** @type {{ key: number, depth: string, time: string }[]} */ ([]));
+  let gasFields = $state(/** @type {{ key: number, o2: string, he: string, carried: string }[]} */ ([]));
+  let altitudeField = $state('');
+  let gfLowField = $state('');
+  let gfHighField = $state('');
   /** @type {Record<string, boolean>} */
   let invalid = $state({});
+  let nextKey = 0;
+
+  const volumeValue = (/** @type {number} */ ml) => (ml > 0 ? show(cuft ? ml / ML_PER_CUFT : ml / 1000, 1) : '');
 
   /** The fields from the plan: on opening, and when "Changer" brings another dive. */
   function fillFields() {
-    depthField = show(feet ? planner.depthMm / MM_PER_FT : planner.depthMm / 1000);
-    timeField = show(planner.bottomTimeSeconds / 60);
-    pressureField = show(psi ? planner.startMbar / MBAR_PER_PSI : planner.startMbar / 1000);
+    levelFields = planner.levels.map((l) => ({
+      key: nextKey++,
+      depth: show(feet ? l.depthMm / MM_PER_FT : l.depthMm / 1000),
+      time: show(l.durationSeconds / 60),
+    }));
+    gasFields = planner.gases.map((g) => ({
+      key: nextKey++,
+      o2: show(g.o2Permille / 10),
+      he: show(g.hePermille / 10),
+      carried: volumeValue(g.carriedMl),
+    }));
+    const altitude = pressureToAltitudeMm(planner.surfacePressureMbar);
+    altitudeField = show(Math.max(0, feet ? altitude / MM_PER_FT : altitude / 1000));
+    gfLowField = show(planner.deco.gfLow);
+    gfHighField = show(planner.deco.gfHigh);
     invalid = {};
   }
   $effect(() => {
-    planner.source;
+    planner.loaded;
     ready;
     fillFields();
   });
@@ -178,48 +211,90 @@
     planner.version++;
   }
 
-  /** The usual bottom gases, and the plan's own when it is another one. */
-  const gasOptions = $derived.by(() => {
-    const usual = [[209, 0], [280, 0], [320, 0], [360, 0], [400, 0], [210, 350], [180, 450], [150, 550], [120, 650]];
-    const mine = [planner.o2Permille, planner.hePermille];
-    const list = usual.some(([o, h]) => o === mine[0] && h === mine[1]) ? usual : [mine, ...usual];
-    return list.map(([o, h]) => ({ value: `${o}/${h}`, label: formatGas(o, h) }));
-  });
-  let gasChoice = $state('');
-  $effect(() => {
-    gasChoice = `${planner.o2Permille}/${planner.hePermille}`;
-  });
-  $effect(() => {
-    const [o2, he] = gasChoice.split('/').map(Number);
-    if (!o2 || (o2 === planner.o2Permille && he === planner.hePermille)) return;
-    planner.o2Permille = o2;
-    planner.hePermille = he;
-    planner.version++;
-  });
+  // --- Levels ---------------------------------------------------------------
 
-  /** The cylinder types (Settings, Bouteilles), and the plan's own size when none matches. */
-  let cylinderTypes = $state(/** @type {{ name: string, ml: number, workingPressureMbar: number }[]} */ ([]));
-  OpenDivesCore.toolQuery({ kind: 'cylinders' })
-    .then((/** @type {import('opendives-core').GasCylinderTypes} */ list) => (cylinderTypes = list.types.filter((c) => c.ml > 0)))
-    .catch((/** @type {unknown} */ e) => console.error('Cylinder types', e));
-  const cylinderOptions = $derived.by(() => {
-    const own = { value: '', label: formatCylinderSize(planner.sizeMl, planner.startMbar, prefs) ?? '' };
-    const types = cylinderTypes.map((c) => ({
-      value: c.name,
-      label: [c.name, formatCylinderSize(c.ml, c.workingPressureMbar, prefs)].filter(Boolean).join(', '),
-    }));
-    return types.some((c) => cylinderTypes.find((x) => x.name === c.value)?.ml === planner.sizeMl) ? types : [own, ...types];
-  });
-  let cylinderChoice = $state('');
-  $effect(() => {
-    cylinderChoice = cylinderTypes.find((c) => c.ml === planner.sizeMl)?.name ?? '';
-  });
-  $effect(() => {
-    const type = cylinderTypes.find((c) => c.name === cylinderChoice);
-    if (!type || type.ml === planner.sizeMl) return;
-    planner.sizeMl = type.ml;
+  /** @param {number} i */
+  function levelDepth(i) {
+    typed(`depth-${levelFields[i].key}`, levelFields[i].depth, 1, feet ? 980 : 300, (v) => (planner.levels[i].depthMm = Math.round(feet ? v * MM_PER_FT : v * 1000)));
+  }
+
+  /** @param {number} i */
+  function levelTime(i) {
+    typed(`time-${levelFields[i].key}`, levelFields[i].time, 1, 360, (v) => (planner.levels[i].durationSeconds = Math.round(v * 60)));
+  }
+
+  /** A new level, shallower than the last one. */
+  function addLevel() {
+    const last = planner.levels[planner.levels.length - 1];
+    const step = feet ? MM_PER_FT : 1000;
+    const depthMm = Math.max(step, Math.round((last.depthMm * 0.6) / step) * step);
+    planner.levels.push({ depthMm, durationSeconds: 10 * 60 });
+    levelFields.push({ key: nextKey++, depth: show(depthMm / step), time: show(10) });
     planner.version++;
-  });
+  }
+
+  /** @param {number} i */
+  function removeLevel(i) {
+    planner.levels.splice(i, 1);
+    delete invalid[`depth-${levelFields[i].key}`];
+    delete invalid[`time-${levelFields[i].key}`];
+    levelFields.splice(i, 1);
+    planner.version++;
+  }
+
+  // --- Gases ----------------------------------------------------------------
+
+  /** Oxygen and helium: valid each, and 100 % at most together. @param {number} i */
+  function gasChanged(i) {
+    const f = gasFields[i];
+    const o2 = parse(f.o2);
+    const he = parse(f.he);
+    const good = o2 >= 1 && o2 <= 100 && he >= 0 && he <= 99 && o2 + he <= 100;
+    invalid[`gas-${f.key}`] = !good;
+    if (!good) return;
+    planner.gases[i].o2Permille = Math.round(o2 * 10);
+    planner.gases[i].hePermille = Math.round(he * 10);
+    planner.version++;
+  }
+
+  /** The volume carried, optional: empty means not given. @param {number} i */
+  function carriedChanged(i) {
+    const f = gasFields[i];
+    if (f.carried.trim() === '') {
+      invalid[`carried-${f.key}`] = false;
+      planner.gases[i].carriedMl = 0;
+      planner.version++;
+      return;
+    }
+    typed(`carried-${f.key}`, f.carried, cuft ? 1 : 10, cuft ? 1000 : 30000, (v) => (planner.gases[i].carriedMl = Math.round(cuft ? v * ML_PER_CUFT : v * 1000)));
+  }
+
+  function addGas() {
+    const gas = nextGas();
+    planner.gases.push(gas);
+    gasFields.push({ key: nextKey++, o2: show(gas.o2Permille / 10), he: show(0), carried: '' });
+    planner.version++;
+  }
+
+  /** @param {number} i */
+  function removeGas(i) {
+    planner.gases.splice(i, 1);
+    delete invalid[`gas-${gasFields[i].key}`];
+    delete invalid[`carried-${gasFields[i].key}`];
+    gasFields.splice(i, 1);
+    planner.version++;
+  }
+
+  /** What a gas does: its name and its role. @param {number} i */
+  function gasHelper(i) {
+    const gas = planner.gases[i];
+    if (!gas) return ''; // another plan was just loaded: the fields follow
+    const name = gasName(gas.o2Permille, gas.hePermille);
+    if (planner.source && gas.sourceCylinder !== undefined) return t('plan.gasFromDive', { name });
+    if (i === 0) return t('plan.gasBottom', { name });
+    const switchMm = result?.cylinders[i]?.switchDepthMm;
+    return switchMm ? t('plan.gasSwitch', { name, depth: depthText(switchMm) }) : name;
+  }
 
   /**
    * The SAC, an exposed dropdown menu: the values around the current one, in
@@ -255,7 +330,45 @@
     planner.version++;
   });
 
-  /** The water type: every depth to pressure conversion of the plan uses it. */
+  // --- Date, for a new dive --------------------------------------------------
+
+  const whenDate = $derived(new Date((planner.when || 0) * 1000));
+  const dateText = $derived(planner.when ? whenDate.toLocaleDateString(locale, { dateStyle: 'medium', timeZone: 'UTC' }) : '');
+  const timeText = $derived(planner.when ? formatTimeOfDay(whenDate.toISOString().slice(0, 19)) : '');
+  const two = (/** @type {number} */ n) => String(n).padStart(2, '0');
+  const thisYear = new Date().getFullYear();
+  // The core reads dates up to 2029 only (utc_mktime).
+  const years = Array.from({ length: Math.max(1, 2030 - thisYear) }, (_, i) => thisYear + i);
+  const monthNames = Array.from({ length: 12 }, (_, m) => new Date(2000, m, 1).toLocaleDateString(locale, { month: 'short' }));
+  const dateWheels = $derived([
+    { label: t('newDive.day'), values: Array.from({ length: 31 }, (_, i) => String(i + 1)), index: whenDate.getUTCDate() - 1, defaultIndex: whenDate.getUTCDate() - 1 },
+    { label: t('newDive.month'), values: monthNames, index: whenDate.getUTCMonth(), defaultIndex: whenDate.getUTCMonth() },
+    { label: t('newDive.year'), values: years.map(String), index: Math.max(0, years.indexOf(whenDate.getUTCFullYear())), defaultIndex: 0 },
+  ]);
+  const timeWheels = $derived([
+    { label: t('newDive.hour'), values: Array.from({ length: 24 }, (_, i) => two(i)), index: whenDate.getUTCHours(), defaultIndex: whenDate.getUTCHours() },
+    { label: t('newDive.minute'), values: Array.from({ length: 60 }, (_, i) => two(i)), index: whenDate.getUTCMinutes(), defaultIndex: whenDate.getUTCMinutes() },
+  ]);
+
+  /** @param {number} year @param {number} month @param {number} day @param {number} hour @param {number} minute */
+  function setWhen(year, month, day, hour, minute) {
+    const last = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
+    planner.when = Date.UTC(year, month, Math.min(day, last), hour, minute) / 1000;
+    planner.version++;
+  }
+
+  /** "3 h 20 après la plongée de 11:10, dont les tissus tiennent compte". */
+  const intervalHelper = $derived.by(() => {
+    if (!result || !planner.when) return '';
+    const interval = result.surfaceIntervalSeconds;
+    if (interval < 0) return t('plan.intervalOverlap');
+    if (interval >= 48 * 3600) return t('plan.intervalNone');
+    const end = new Date((planner.when - interval) * 1000).toISOString().slice(0, 19);
+    return t('plan.interval', { interval: formatHoursMinutes(interval), time: formatTimeOfDay(end) });
+  });
+
+  // --- Conditions and decompression ------------------------------------------
+
   let water = $state('');
   $effect(() => {
     water = waterTypeOfSalinity(planner.salinity);
@@ -268,11 +381,43 @@
   });
   const waterOptions = WATER_TYPES.map((w) => ({ value: w.id, label: waterTypeName(w.id) }));
 
+  function altitudeChanged() {
+    typed('altitude', altitudeField, 0, feet ? 16000 : 5000, (v) => (planner.surfacePressureMbar = altitudeToPressureMbar(Math.round(feet ? v * MM_PER_FT : v * 1000))));
+  }
+
+  let modelChoice = $state('');
+  $effect(() => {
+    modelChoice = planner.deco.decoModel;
+  });
+  $effect(() => {
+    const model = /** @type {'buehlmann'|'vpmb'} */ (modelChoice);
+    if (!model || model === planner.deco.decoModel) return;
+    planner.deco.decoModel = model;
+    planner.version++;
+  });
+  const modelOptions = $derived([
+    { value: 'buehlmann', label: t('settings.deco.buehlmann') },
+    { value: 'vpmb', label: t('settings.deco.vpmb') },
+  ]);
+  let conservatismChoice = $state('');
+  $effect(() => {
+    conservatismChoice = String(planner.deco.vpmbConservatism);
+  });
+  $effect(() => {
+    const value = Number(conservatismChoice);
+    if (conservatismChoice === '' || value === planner.deco.vpmbConservatism) return;
+    planner.deco.vpmbConservatism = value;
+    planner.version++;
+  });
+  const conservatismOptions = [0, 1, 2, 3, 4].map((n) => ({ value: String(n), label: `+${n}` }));
+
+  // --- The result -------------------------------------------------------------
+
   const errorText = $derived(result?.error ? t(`plan.errors.${result.error}`) : '');
 
   /** Profile of the plan, on the same water scale as the logbook. */
   const W = 358;
-  const H = 88;
+  const H = 120;
   const shape = $derived.by(() => {
     const points = result?.points ?? [];
     if (points.length < 2 || !result) return null;
@@ -281,13 +426,29 @@
     /** @param {number} s @param {number} mm */
     const xy = (s, mm) => `${((s / tMax) * W).toFixed(1)} ${(4 + (mm / dMax) * (H - 8)).toFixed(1)}`;
     const line = 'M' + points.map(([s, mm]) => xy(s, mm)).join(' L');
-    // The decompression ceiling (task 2026-11-08-07): from the surface down
-    // to the ceiling, on the same scales; none when the plan has no stop.
+    // The decompression ceiling: from the surface down to the ceiling, on the
+    // same scales; none when the plan has no stop.
     const ceiling = result.stops?.length ? (result.ceiling ?? []).filter(([s]) => s <= tMax) : [];
     const deepest = Math.max(0, ...ceiling.map(([, mm]) => mm));
     const ceilingLine = deepest > 0 ? 'M' + ceiling.map(([s, mm]) => xy(s, mm)).join(' L') : '';
     const ceilingArea = ceilingLine ? `${ceilingLine} L${xy(ceiling[ceiling.length - 1][0], 0)} L${xy(ceiling[0][0], 0)} Z` : '';
-    return { line, water: `${line} L${W} 0 L0 0 Z`, bottom: waterBottomColor(result.maxDepthMm), ceilingLine, ceilingArea, deepest };
+    // A label on each held level ("100 ft · 15 min"), a new dive only.
+    /** @type {{ left: number, top: number, text: string }[]} */
+    const labels = [];
+    if (!planner.source) {
+      const entered = (result.segments ?? []).filter((s) => s.entered);
+      for (let i = 1; i < entered.length; i++) {
+        const a = entered[i - 1];
+        const b = entered[i];
+        if (a.depthMm <= 0 || a.depthMm !== b.depthMm) continue;
+        labels.push({
+          left: (((a.timeSeconds + b.timeSeconds) / 2 / tMax) * 100),
+          top: ((4 + (a.depthMm / dMax) * (H - 8)) / H) * 100,
+          text: `${depthText(a.depthMm)} · ${minutes(b.timeSeconds - a.timeSeconds)}`,
+        });
+      }
+    }
+    return { line, water: `${line} L${W} 0 L0 0 Z`, bottom: waterBottomColor(result.maxDepthMm), ceilingLine, ceilingArea, deepest, labels };
   });
 
   const stops = $derived(
@@ -295,74 +456,48 @@
       depth: depthText(s.depthMm),
       duration: minutes(s.durationSeconds),
       runtime: minutes(s.runtimeSeconds),
-      gas: s.gasChange && result ? formatGas(result.cylinders[s.cylinder].o2Permille, result.cylinders[s.cylinder].hePermille) : '',
+      gas: result ? gasName(result.cylinders[s.cylinder].o2Permille, result.cylinders[s.cylinder].hePermille) : '',
     })),
   );
 
   const profileLabel = $derived(
     result
       ? t(stops.length ? 'plan.profileLabelStops' : 'plan.profileLabel', {
-          depth: depthText(planner.depthMm),
-          time: minutes(planner.bottomTimeSeconds),
+          depth: depthText(result.maxDepthMm),
+          time: minutes(result.runtimeSeconds),
           stops: (result.stops ?? []).map((s) => depthText(s.depthMm)).join(', '),
         }) + (shape?.deepest ? `, ${t('plan.ceilingLabel', { depth: depthText(shape.deepest) })}` : '')
       : '',
   );
 
-  /** Gas, reserve and oxygen rows. */
-  const gasRows = $derived.by(() => {
+  /**
+   * "Volume nécessaire par gaz": what is breathed plus the reserve. The volume
+   * carried, when given, turns an insufficient total into an alarm.
+   */
+  const volumeRows = $derived.by(() => {
     if (!result) return [];
-    /** @type {{ key: string, label: string, hint: string, value: string, alarm: boolean }[]} */
-    const rows = [];
-    result.cylinders.forEach((c, i) => {
-      if (c.gasUsedMl <= 0) return;
-      const name = formatGas(c.o2Permille, c.hePermille);
-      const hasPressure = c.sizeMl > 0 && c.startMbar > 0;
-      let hint = hasPressure
-        ? t('plan.gasUse', { used: formatPressure(c.startMbar - c.endMbar, prefs), left: formatPressure(Math.max(0, c.endMbar), prefs) })
-        : t('plan.gasUseVolume', { used: formatGasVolume(c.gasUsedMl, prefs) });
-      if (c.warning === 'MORE_THAN_AVAILABLE') hint = t('plan.warnings.MORE_THAN_AVAILABLE');
-      if (c.warning === 'NO_RESERVE_FOR_SHARING') hint = t('plan.warnings.NO_RESERVE_FOR_SHARING');
-      rows.push({
-        key: `gas-${i}`,
-        label: name,
-        hint,
-        value: hasPressure ? formatPressure(Math.max(0, c.endMbar), prefs) : formatGasVolume(c.gasUsedMl, prefs),
-        alarm: c.warning === 'MORE_THAN_AVAILABLE' || c.warning === 'NO_RESERVE_FOR_SHARING',
-      });
+    const bottomIndex = result.minimumGas?.cylinder ?? 0;
+    return result.cylinders.map((c, i) => {
+      const used = formatGasVolume(c.gasUsedMl, prefs);
+      const reserve = formatGasVolume(c.reserveMl, prefs);
+      const total = c.gasUsedMl + c.reserveMl;
+      const carried = planner.gases[i]?.carriedMl ?? 0;
+      const short = carried > 0 && carried < total;
+      const parts = [t(i === bottomIndex ? 'plan.volumeBottom' : 'plan.volumeDeco', { used, reserve })];
+      if (short) parts.push(t('plan.volumeShort', { missing: formatGasVolume(total - carried, prefs) }));
+      return { key: i, label: gasName(c.o2Permille, c.hePermille), hint: parts.join(' '), value: formatGasVolume(total, prefs), alarm: short };
     });
-    const m = result.minimumGas;
-    if (m) {
-      const short = m.deltaMbar < 0 || result.cylinders[m.cylinder]?.warning === 'NO_GAS_FOR_PROBLEM_SOLVING';
-      rows.push({
-        key: 'reserve',
-        label: t('plan.minimumGas'),
-        hint: t(short ? 'plan.reserveShort' : 'plan.reserveMargin', { gap: formatPressure(Math.abs(m.deltaMbar), prefs) }),
-        value: formatPressure(m.pressureMbar, prefs),
-        alarm: short,
-      });
-    }
-    const bottom = result.cylinders[0];
-    if (bottom && bottom.bottomModMm > 0 && planner.depthMm > bottom.bottomModMm) {
-      rows.push({
-        key: 'mod',
-        label: t('plan.modTitle'),
-        hint: t('plan.modText', {
-          po2: formatNumber((result.setup.bottomPo2Mbar ?? 1400) / 1000, 1),
-          depth: depthText(bottom.bottomModMm),
-        }),
-        value: depthText(bottom.bottomModMm),
-        alarm: true,
-      });
-    }
-    rows.push({
-      key: 'oxygen',
-      label: t('plan.oxygen'),
-      hint: t('plan.oxygenHint'),
-      value: t('plan.oxygenValue', { cns: result.cns, otu: result.otu }),
-      alarm: false,
-    });
-    return rows;
+  });
+
+  /** The bottom gas too rich for the deepest point at the ppO2 for the bottom. */
+  const modRow = $derived.by(() => {
+    const bottom = result?.cylinders[0];
+    if (!result || !bottom || bottom.bottomModMm <= 0 || result.maxDepthMm <= bottom.bottomModMm) return null;
+    return {
+      label: t('plan.modTitle'),
+      hint: t('plan.modText', { po2: formatNumber((result.setup.bottomPo2Mbar ?? 1400) / 1000, 1), depth: depthText(bottom.bottomModMm) }),
+      value: depthText(bottom.bottomModMm),
+    };
   });
 
   /** Logbook dives to start from, newest first. */
@@ -371,152 +506,295 @@
   /** @param {number|null} id */
   async function choose(id) {
     choosing = false;
-    if (id === null) await newDive();
+    if (id === null) startNewDive(prefs);
     else await startFrom(id);
   }
 
+  const canSave = $derived(!!result && !result.error && !failed && !saving && !Object.values(invalid).some(Boolean));
+
+  /** Back to the list of planned dives, however the planner was opened. */
+  function toList() {
+    const history = f7router.history ?? [];
+    if (history[history.length - 2]?.startsWith('/plans/')) f7router.back();
+    else f7router.navigate('/plans/', { reloadCurrent: true });
+  }
+
+  async function save() {
+    if (!canSave || !result) return;
+    saving = true;
+    try {
+      await savePlan({ ...planRequest(), when: result.when }, planner.planId);
+      toList();
+    } catch (e) {
+      console.error('Saving the plan', e);
+      f7.toast.show({ text: t('plan.saveFailed'), closeTimeout: 4000 });
+    } finally {
+      saving = false;
+    }
+  }
+
+  /** @param {'pdf'|'summary'} kind */
+  async function share(kind) {
+    sharing = false;
+    if (!result) return;
+    const title = planner.source ? planner.source.site || t('dive.siteNotSet') : t('plan.noStartDive');
+    try {
+      if (kind === 'pdf') await sharePlanPdf(result, planRequest(), prefs, title);
+      else await sharePlanSummary(result, planRequest(), prefs, title);
+    } catch (e) {
+      console.error('Sharing the plan', e);
+      f7.toast.show({ text: t('plan.shareFailed'), closeTimeout: 4000 });
+    }
+  }
 </script>
 
 <Page onPageReinit={refresh}>
   <Navbar title={t('plan.title')}>
     {#snippet left()}
-      <Link back iconOnly={!theme.ios}>
+      <Link iconOnly={!theme.ios} onClick={toList}>
         <i class="icon icon-back"></i>
         {#if theme.ios}<span>{t('plan.back')}</span>{:else}<span class="od-sr-only">{t('plan.back')}</span>{/if}
       </Link>
     {/snippet}
     {#snippet right()}
-      <!-- The planner's settings, a screen of their own (task 2026-11-08-01). -->
-      <Link iconOnly href="/settings/planner">
-        <Icon name="tune" /><span class="od-sr-only">{t('plannerSettings.open')}</span>
+      <Link class={canSave ? '' : 'disabled'} onClick={save}>{t('plan.save')}</Link>
+      <Link iconOnly popoverOpen="#{menuId}">
+        <Icon name="more" weight={4} /><span class="od-sr-only">{t('detail.moreOptions')}</span>
       </Link>
     {/snippet}
   </Navbar>
 
-  <!-- Tablet (wide pane): the parameters on the left, the computed plan on the right. -->
+  <Popover id={menuId} class="od-menu" backdrop={false}>
+    <List noChevron>
+      <MenuItem
+        icon="share"
+        text={t('plan.share')}
+        onclick={() => {
+          f7.popover.close(`#${menuId}`);
+          sharing = true;
+        }}
+      />
+      <MenuItem icon="tune" text={t('plannerSettings.open')} link="/settings/planner" />
+    </List>
+  </Popover>
+
+  <!-- Tablet (wide pane): the data on the left, the profile and the result on the right. -->
   <div class="planner">
-  <div class="params">
-  {#if theme.ios}<h2 class="ios-header">{t('plan.fromLogbook')}</h2>{/if}
-  <div class="inputs" class:ios={theme.ios}>
-    <button type="button" class="source" onclick={() => (choosing = true)}>
-      {#if planner.source}
-        <ProfileThumbnail profile={planner.source.profile} maxDepthMm={planner.source.maxDepthMm} {prefs} />
-        <span class="text">
-          <span class="title"
-            >{[
-              planner.source.number
-                ? t('plan.sourceTitleNumber', { number: String(planner.source.number), date: formatDateTime(planner.source.date) })
-                : t('plan.sourceTitle', { date: formatDateTime(planner.source.date) }),
-              planner.source.durationSeconds ? formatDuration(planner.source.durationSeconds) : '',
-            ]
-              .filter(Boolean)
-              .join(' · ')}</span
-          >
-          <span class="sub">{t('plan.sourceText')}</span>
-        </span>
-      {:else}
-        <span class="text">
-          <span class="title">{t('plan.newDive')}</span>
-        </span>
-      {/if}
-      <span class="change">{t('plan.change')}</span>
-    </button>
-
-  </div>
-
-  <!-- The data of the plan: two fields per line, 16 dp apart. -->
-  <div class="fields">
-    <div class="pair">
-      <TextField label={t('plan.depth')} bind:value={depthField} inputmode="decimal" invalid={invalid.depth}
-        oninput={() => typed('depth', depthField, 1, feet ? 980 : 300, (v) => (planner.depthMm = feet ? v * MM_PER_FT : v * 1000))}>
-        {#snippet trailing()}<span class="unit">{depthUnit(prefs)}</span>{/snippet}
-      </TextField>
-      <TextField label={t('plan.bottomTime')} bind:value={timeField} inputmode="numeric" invalid={invalid.time}
-        oninput={() => typed('time', timeField, 1, 360, (v) => (planner.bottomTimeSeconds = Math.round(v * 60)))}>
-        {#snippet trailing()}<span class="unit">{t('units.minutes')}</span>{/snippet}
-      </TextField>
+    <div class="start">
+      <button type="button" class="source" onclick={() => (choosing = true)}>
+        {#if planner.source}
+          <ProfileThumbnail profile={planner.source.profile} maxDepthMm={planner.source.maxDepthMm} {prefs} />
+          <span class="text">
+            <span class="title">{planner.source.site || t('dive.siteNotSet')}</span>
+            <span class="sub"
+              >{[
+                planner.source.number ? t('detail.number', { number: String(planner.source.number) }) : '',
+                formatDateTime(planner.source.date),
+                planner.source.durationSeconds ? formatDuration(planner.source.durationSeconds) : '',
+              ]
+                .filter(Boolean)
+                .join(' · ')}</span
+            >
+          </span>
+        {:else}
+          <span class="plus" aria-hidden="true"><Icon name="plus" /></span>
+          <span class="text">
+            <span class="title">{t('plan.newDive')}</span>
+            <span class="sub">{t('plan.noStartDive')}</span>
+          </span>
+        {/if}
+        <span class="change">{t('plan.change')}</span>
+      </button>
     </div>
-    <div class="pair">
-      <SelectField label={t('plan.gas')} bind:value={gasChoice} options={gasOptions} />
-      <SelectField label={t('plan.cylinder')} bind:value={cylinderChoice} options={cylinderOptions} />
-    </div>
-    <div class="pair">
-      <TextField label={t('plan.startPressure')} bind:value={pressureField} inputmode="decimal" invalid={invalid.pressure}
-        oninput={() => typed('pressure', pressureField, psi ? 150 : 10, psi ? 5000 : 350, (v) => (planner.startMbar = psi ? v * MBAR_PER_PSI : v * 1000))}>
-        {#snippet trailing()}<span class="unit">{t(psi ? 'units.psi' : 'units.bar')}</span>{/snippet}
-      </TextField>
-      <SelectField label={t('plan.sac')} bind:value={sacChoice} options={sacOptions.list} />
-    </div>
-    <SelectField label={t('plan.waterType')} bind:value={water} options={waterOptions} />
-  </div>
-  </div>
 
-  <div class="outcome">
-  {#if failed}
-    <p class="note">{t('plan.failed')}</p>
-  {:else if result}
-    <h2 class="section-title">{t('plan.result', { time: minutes(result.runtimeSeconds) })}</h2>
-    <div class="plan">
-      {#if errorText}<p class="error" role="alert">{errorText}</p>{/if}
+    <div class="chart">
+      <h2 class="section-title">{t(planner.source ? 'plan.profileOfDive' : 'plan.profilePlanned')}</h2>
       {#if shape}
-        <svg class="profile" viewBox="0 0 {W} {H}" preserveAspectRatio="none" role="img" aria-label={profileLabel}>
-          <defs>
-            <linearGradient id="plan-water-{uid}" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" style="stop-color: var(--od-water-top)" />
-              <stop offset="1" style="stop-color: {shape.bottom}" />
-            </linearGradient>
-          </defs>
-          <path d={shape.water} fill="url(#plan-water-{uid})" />
-          <path d={shape.line} class="line" vector-effect="non-scaling-stroke" />
-          {#if shape.ceilingArea}
-            <path d={shape.ceilingArea} class="ceiling-area" />
-            <path d={shape.ceilingLine} class="ceiling-line" vector-effect="non-scaling-stroke" />
-          {/if}
-        </svg>
+        <div class="profile-box">
+          <svg class="profile" viewBox="0 0 {W} {H}" preserveAspectRatio="none" role="img" aria-label={profileLabel}>
+            <defs>
+              <linearGradient id="plan-water-{uid}" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" style="stop-color: var(--od-water-top)" />
+                <stop offset="1" style="stop-color: {shape.bottom}" />
+              </linearGradient>
+            </defs>
+            <path d={shape.water} fill="url(#plan-water-{uid})" />
+            <path d={shape.line} class="line" vector-effect="non-scaling-stroke" />
+            {#if shape.ceilingArea}
+              <path d={shape.ceilingArea} class="ceiling-area" />
+              <path d={shape.ceilingLine} class="ceiling-line" vector-effect="non-scaling-stroke" />
+            {/if}
+          </svg>
+          {#each shape.labels as label, i (i)}
+            <span class="level-label" class:above={label.top > 70} style="left: {label.left}%; top: {label.top}%" aria-hidden="true">{label.text}</span>
+          {/each}
+        </div>
         {#if shape.ceilingArea}
           <p class="legend"><span class="swatch" aria-hidden="true"></span>{t('plan.ceilingLegend')}</p>
         {/if}
+      {:else if !failed}
+        <div class="skeleton-block loading" aria-busy="true" aria-label={t('plan.computing')}></div>
       {/if}
-      {#if stops.length}
-        <table class="od-value">
-          <thead>
-            <tr>
-              <th scope="col">{t('plan.stop')}</th>
-              <th scope="col" class="num">{t('plan.duration')}</th>
-              <th scope="col" class="num">{t('plan.runtime')}</th>
-              <th scope="col">{t('plan.gasColumn')}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {#each stops as stop, i (i)}
-              <tr>
-                <td class="depth">{stop.depth}</td>
-                <td class="num">{stop.duration}</td>
-                <td class="num">{stop.runtime}</td>
-                <td>{stop.gas}</td>
-              </tr>
-            {/each}
-          </tbody>
-        </table>
-      {:else}
-        <p class="no-stop">{t('plan.noStop')}</p>
+      {#if planner.source}<p class="helper">{t('plan.fromDiveHelper')}</p>{/if}
+    </div>
+
+    <div class="data">
+      {#if !planner.source}
+        <h2 class="section-title">{t('plan.date')}</h2>
+        <div class="fields">
+          <div class="pair">
+            <div class="grow"><ButtonField label={t('edit.date')} value={dateText} onclick={() => (dialog = 'date')} /></div>
+            <div class="grow"><ButtonField label={t('edit.time')} value={timeText} onclick={() => (dialog = 'time')} /></div>
+          </div>
+          {#if intervalHelper}<p class="helper inner">{intervalHelper}</p>{/if}
+        </div>
+
+        <h2 class="section-title">{t('plan.levels')}</h2>
+        <div class="fields">
+          {#each levelFields as level, i (level.key)}
+            <div class="pair with-remove">
+              <TextField label={t('plan.depth')} bind:value={level.depth} inputmode="decimal" invalid={invalid[`depth-${level.key}`]} oninput={() => levelDepth(i)}>
+                {#snippet trailing()}<span class="unit">{depthUnit(prefs)}</span>{/snippet}
+              </TextField>
+              <TextField label={t('plan.duration')} bind:value={level.time} inputmode="numeric" invalid={invalid[`time-${level.key}`]} oninput={() => levelTime(i)}>
+                {#snippet trailing()}<span class="unit">{t('units.minutes')}</span>{/snippet}
+              </TextField>
+              {#if i > 0}
+                <button type="button" class="remove" aria-label={t('plan.removeLevel')} onclick={() => removeLevel(i)}><Icon name="close" /></button>
+              {:else}
+                <span class="remove" aria-hidden="true"></span>
+              {/if}
+            </div>
+          {/each}
+          {#if levelFields.length < 20}
+            <button type="button" class="add" onclick={addLevel}><Icon name="plus" size={18} />{t('plan.addLevel')}</button>
+          {/if}
+          <p class="helper inner">{t('plan.levelsHelper')}</p>
+        </div>
+      {/if}
+
+      <h2 class="section-title">{t('plan.gas')}</h2>
+      <div class="fields">
+        {#each gasFields as gas, i (gas.key)}
+          <div class="gas">
+            <div class="pair with-remove">
+              <TextField label={t('plan.oxygenPercent')} bind:value={gas.o2} inputmode="numeric" invalid={invalid[`gas-${gas.key}`]} oninput={() => gasChanged(i)}>
+                {#snippet trailing()}<span class="unit">%</span>{/snippet}
+              </TextField>
+              <TextField label={t('plan.heliumPercent')} bind:value={gas.he} inputmode="numeric" invalid={invalid[`gas-${gas.key}`]} oninput={() => gasChanged(i)}>
+                {#snippet trailing()}<span class="unit">%</span>{/snippet}
+              </TextField>
+              {#if i > 0}
+                <button type="button" class="remove" aria-label={t('plan.removeGas')} onclick={() => removeGas(i)}><Icon name="close" /></button>
+              {:else}
+                <span class="remove" aria-hidden="true"></span>
+              {/if}
+            </div>
+            <p class="helper inner">{gasHelper(i)}</p>
+            <div class="pair with-remove">
+              <TextField label={t('plan.carried')} bind:value={gas.carried} inputmode="decimal" invalid={invalid[`carried-${gas.key}`]} oninput={() => carriedChanged(i)}>
+                {#snippet trailing()}<span class="unit">{t(cuft ? 'units.cubicFeet' : 'units.liters')}</span>{/snippet}
+              </TextField>
+              <span class="remove" aria-hidden="true"></span>
+            </div>
+          </div>
+        {/each}
+        <button type="button" class="add" onclick={addGas}><Icon name="plus" size={18} />{t('plan.addGas')}</button>
+        <SelectField label={t('plan.sac')} bind:value={sacChoice} options={sacOptions.list} supporting={planner.source ? t('plan.sacMeasured') : ''} />
+      </div>
+
+      <h2 class="section-title">{t('plan.conditions')}</h2>
+      <div class="fields">
+        <div class="pair">
+          <SelectField label={t('plan.waterType')} bind:value={water} options={waterOptions} />
+          <TextField label={t('plan.altitude')} bind:value={altitudeField} inputmode="numeric" invalid={invalid.altitude} oninput={altitudeChanged}>
+            {#snippet trailing()}<span class="unit">{depthUnit(prefs)}</span>{/snippet}
+          </TextField>
+        </div>
+        <p class="helper inner">{t(planner.source ? 'plan.conditionsFromDive' : 'plan.conditionsDefault')}</p>
+      </div>
+
+      <button type="button" class="accordion" aria-expanded={decoOpen} onclick={() => (decoOpen = !decoOpen)}>
+        <span class="text">
+          <span class="title">{t('plan.deco')}</span>
+          <span class="sub">{decoSummary(planner.deco)}</span>
+        </span>
+        <span class="arrow" class:open={decoOpen}><Icon name="expand" /></span>
+      </button>
+      {#if decoOpen}
+        <div class="fields">
+          <SelectField label={t('plan.decoModel')} bind:value={modelChoice} options={modelOptions} />
+          {#if planner.deco.decoModel === 'vpmb'}
+            <SelectField label={t('settings.deco.vpmbConservatism')} bind:value={conservatismChoice} options={conservatismOptions} />
+          {:else}
+            <div class="pair">
+              <TextField label={t('settings.deco.gfLow')} bind:value={gfLowField} inputmode="numeric" invalid={invalid.gfLow}
+                oninput={() => typed('gfLow', gfLowField, 10, 150, (v) => (planner.deco.gfLow = Math.round(v)))} />
+              <TextField label={t('settings.deco.gfHigh')} bind:value={gfHighField} inputmode="numeric" invalid={invalid.gfHigh}
+                oninput={() => typed('gfHigh', gfHighField, 40, 150, (v) => (planner.deco.gfHigh = Math.round(v)))} />
+            </div>
+          {/if}
+        </div>
       {/if}
     </div>
 
-    {#if theme.ios}<h2 class="ios-header">{t('plan.gasAndOxygen')}</h2>{/if}
-    <div class="results" class:ios={theme.ios}>
-      {#each gasRows as row (row.key)}
-        <div class="result">
-          <span class="text"><span class="label">{row.label}</span><span class="hint">{row.hint}</span></span>
-          <span class="value od-value" class:alarm={row.alarm}>{row.value}</span>
+    <div class="outcome">
+      {#if failed}
+        <p class="note">{t('plan.failed')}</p>
+      {:else if result}
+        <h2 class="section-title">{t('plan.result', { time: minutes(result.runtimeSeconds) })}</h2>
+        <div class="plan">
+          {#if errorText}<p class="error" role="alert">{errorText}</p>{/if}
+          {#if stops.length}
+            <table class="od-value">
+              <thead>
+                <tr>
+                  <th scope="col">{t('plan.stop')}</th>
+                  <th scope="col" class="num">{t('plan.duration')}</th>
+                  <th scope="col" class="num">{t('plan.runtime')}</th>
+                  <th scope="col">{t('plan.gasColumn')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {#each stops as stop, i (i)}
+                  <tr>
+                    <td class="depth">{stop.depth}</td>
+                    <td class="num">{stop.duration}</td>
+                    <td class="num">{stop.runtime}</td>
+                    <td>{stop.gas}</td>
+                  </tr>
+                {/each}
+              </tbody>
+            </table>
+          {:else}
+            <p class="no-stop">{t('plan.noStop')}</p>
+          {/if}
         </div>
-      {/each}
+
+        <h2 class="section-title">{t('plan.volumes')}</h2>
+        <div class="results" class:ios={theme.ios}>
+          {#each volumeRows as row (row.key)}
+            <div class="result">
+              <span class="text"><span class="label">{row.label}</span><span class="hint">{row.hint}</span></span>
+              <span class="value od-value" class:alarm={row.alarm}>{row.value}</span>
+            </div>
+          {/each}
+          {#if modRow}
+            <div class="result">
+              <span class="text"><span class="label">{modRow.label}</span><span class="hint">{modRow.hint}</span></span>
+              <span class="value od-value alarm">{modRow.value}</span>
+            </div>
+          {/if}
+          <div class="result oxygen">
+            <span class="text"><span class="label">{t('plan.oxygen')}</span></span>
+            <span class="value od-value">{t('plan.oxygenValue', { cns: result.cns, otu: result.otu })}</span>
+          </div>
+        </div>
+        <p class="note">{t(planner.source ? 'plan.noteFromDive' : 'plan.note')}</p>
+      {:else}
+        <div class="skeleton-block loading" aria-busy="true" aria-label={t('plan.computing')}></div>
+      {/if}
     </div>
-    <p class="note">{t(planner.source ? 'plan.noteFromDive' : 'plan.note')}</p>
-  {:else}
-    <div class="skeleton-block loading" aria-busy="true" aria-label={t('plan.computing')}></div>
-  {/if}
-  </div>
   </div>
   <div class="end" aria-hidden="true"></div>
 
@@ -535,11 +813,7 @@
           <ListItem
             link="#"
             title={dive.site || t('dive.siteNotSet')}
-            footer={[
-              dive.number ? t('detail.number', { number: String(dive.number) }) : '',
-              formatDateTime(dive.date),
-              dive.durationSeconds ? formatDuration(dive.durationSeconds) : '',
-            ]
+            footer={[dive.number ? t('detail.number', { number: String(dive.number) }) : '', formatDateTime(dive.date), dive.durationSeconds ? formatDuration(dive.durationSeconds) : '']
               .filter(Boolean)
               .join(' · ')}
             onClick={() => choose(dive.id)}
@@ -552,59 +826,89 @@
   </Popup>
 </Page>
 
+{#if sharing}
+  <ShareSheet pdfText={t('plan.sharePdfText')} summaryLabel={t('plan.shareSummary')} summaryText={t('plan.shareSummaryText')} onpdf={() => share('pdf')} onsummary={() => share('summary')} onclose={() => (sharing = false)} />
+{/if}
+
+{#if dialog === 'date'}
+  <WheelDialog
+    title={t('edit.date')}
+    wheels={dateWheels}
+    oncancel={() => (dialog = null)}
+    onconfirm={([d, m, y]) => {
+      setWhen(years[y], m, d + 1, whenDate.getUTCHours(), whenDate.getUTCMinutes());
+      dialog = null;
+    }}
+  />
+{:else if dialog === 'time'}
+  <WheelDialog
+    title={t('edit.time')}
+    wheels={timeWheels}
+    oncancel={() => (dialog = null)}
+    onconfirm={([h, m]) => {
+      setWhen(whenDate.getUTCFullYear(), whenDate.getUTCMonth(), whenDate.getUTCDate(), h, m);
+      dialog = null;
+    }}
+  />
+{/if}
+
 <style>
   @layer od.components {
-    /* Phone and narrow panes: one column, the groups add no box of their own. */
+    /* One column in the order of the spec; a wide pane puts the data on the
+       left, the profile and the result on the right. */
     .planner {
       container-type: inline-size;
     }
 
-    .params,
-    .outcome {
-      display: contents;
-    }
-
-    /* Wide pane (tablet): parameters on the left, computed plan on the right. */
     @container (min-width: 680px) {
-      .planner {
-        display: grid;
-        grid-template-columns: minmax(280px, 340px) minmax(0, 1fr);
-        align-items: start;
-        column-gap: 8px;
+      .start,
+      .data {
+        grid-column: 1;
       }
 
-      .params,
+      .chart,
       .outcome {
-        display: block;
+        grid-column: 2;
+      }
+
+      .planner > .start {
+        grid-row: 1;
+      }
+
+      .planner > .chart {
+        grid-row: 1 / span 2;
+      }
+
+      .planner > .data {
+        grid-row: 2 / span 2;
+      }
+
+      .planner > .outcome {
+        grid-row: 3;
       }
     }
 
-    /* Android: list items on the page background (MD3); iOS: an inset grouped list. */
-    .inputs {
-      display: flex;
-      flex-direction: column;
+    .planner:has(> .start) {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      align-items: start;
+    }
 
-      &.ios {
-        margin: 0 16px;
-        border-radius: 10px;
-        background: var(--od-surface);
-        overflow: hidden;
+    @media (min-width: 768px) {
+      .planner:has(> .start) {
+        grid-template-columns: minmax(280px, 380px) minmax(0, 1fr);
+        column-gap: 8px;
       }
     }
 
     .source {
-      width: auto;
+      width: calc(100% - 32px);
       margin: 0 16px;
       min-height: 72px;
       padding: 8px 16px;
       box-sizing: border-box;
       border: none;
       border-radius: 12px;
-
-      /* "Nouvelle plongée" alone: a one-line item (MD3, 56 dp). */
-      &:not(:has(.sub)) {
-        min-height: 56px;
-      }
       background: var(--od-surface-2);
       color: var(--od-text);
       font: inherit;
@@ -612,6 +916,15 @@
       display: flex;
       align-items: center;
       gap: 16px;
+
+      .plus {
+        flex: none;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
 
       .text {
         flex: 1;
@@ -636,86 +949,6 @@
         font-size: 14px;
         font-weight: 500;
       }
-
-      .ios & {
-        margin: 0;
-        min-height: 60px;
-        border-radius: 0;
-        background: none;
-        gap: 12px;
-        border-bottom: 0.5px solid var(--od-separator);
-
-        .title {
-          font-size: 15px;
-          line-height: 20px;
-          font-weight: 600;
-        }
-
-        .sub {
-          font-size: 13px;
-          line-height: 18px;
-          letter-spacing: 0;
-        }
-
-        .change {
-          font-size: 15px;
-          font-weight: 400;
-        }
-      }
-    }
-
-    .row {
-      min-height: 56px;
-      padding: 8px 24px 8px 16px;
-      box-sizing: border-box;
-      border: none;
-      background: none;
-      color: var(--od-text);
-      font: inherit;
-      text-align: start;
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-
-      .label {
-        flex: 1;
-        min-width: 0;
-        font-size: 16px;
-        line-height: 24px;
-        letter-spacing: 0.15px;
-      }
-
-      .value {
-        font-size: 14px;
-        color: var(--od-text-2);
-        text-align: right;
-      }
-
-      .chevron {
-        color: var(--od-text-2);
-        transform: rotate(-90deg);
-      }
-
-      .ios & {
-        min-height: 44px;
-        padding: 0 16px;
-        border-bottom: 0.5px solid var(--od-separator);
-
-        &:last-child {
-          border-bottom: none;
-        }
-
-        .label,
-        .value {
-          font-size: 17px;
-          letter-spacing: 0;
-        }
-
-        .value {
-          color: var(--od-text);
-        }
-      }
     }
 
     .section-title {
@@ -737,11 +970,191 @@
       }
     }
 
-    .ios-header {
-      margin: 14px 16px 6px 32px;
-      font-size: 13px;
-      font-weight: 400;
+    .profile-box {
+      position: relative;
+      margin: 0 16px;
+      border-radius: 12px;
+      background: var(--od-surface);
+      overflow: hidden;
+    }
+
+    .profile {
+      display: block;
+      width: 100%;
+      height: 120px;
+
+      .line {
+        fill: none;
+        stroke: var(--od-trace);
+        stroke-width: 1.5;
+        stroke-linejoin: round;
+      }
+
+      .ceiling-area {
+        fill: var(--od-alarm);
+        opacity: 0.25;
+      }
+
+      .ceiling-line {
+        fill: none;
+        stroke: var(--od-alarm);
+        stroke-width: 1;
+      }
+    }
+
+    .level-label {
+      position: absolute;
+      transform: translate(-50%, 4px);
+      font-size: 11px;
+      line-height: 14px;
+      white-space: nowrap;
+      color: var(--od-text);
+
+      /* Near the bottom of the chart: over the line, in the water. */
+      &.above {
+        transform: translate(-50%, calc(-100% - 4px));
+      }
+    }
+
+    .legend {
+      margin: 8px 16px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
       color: var(--od-text-2);
+
+      .swatch {
+        width: 16px;
+        height: 10px;
+        background: color-mix(in srgb, var(--od-alarm) 35%, transparent);
+        border: 1.5px solid var(--od-alarm);
+        box-sizing: border-box;
+      }
+    }
+
+    .helper {
+      margin: 8px 16px 0;
+      font-size: 12px;
+      line-height: 16px;
+      color: var(--od-text-2);
+
+      &.inner {
+        margin: -4px 16px 0;
+      }
+    }
+
+    .fields {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .gas {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .pair {
+      display: flex;
+      gap: 16px;
+
+      & > :global(*) {
+        flex: 1;
+        min-width: 0;
+      }
+
+      &.with-remove {
+        margin-right: 8px;
+        gap: 8px;
+
+        & > .remove {
+          flex: none;
+          width: 40px;
+          height: 56px;
+          padding: 0;
+          border: none;
+          background: none;
+          color: var(--od-text-2);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+        }
+      }
+    }
+
+    .grow {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .unit {
+      padding-inline-end: 12px;
+      font-size: 14px;
+      color: var(--od-text-2);
+    }
+
+    .add {
+      align-self: flex-start;
+      margin: 0 16px;
+      height: 40px;
+      padding: 0 12px 0 8px;
+      border: none;
+      background: none;
+      color: var(--od-text);
+      font: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+
+    .accordion {
+      width: 100%;
+      margin-top: 8px;
+      min-height: 72px;
+      padding: 8px 24px 8px 16px;
+      box-sizing: border-box;
+      border: none;
+      background: none;
+      color: var(--od-text);
+      font: inherit;
+      text-align: start;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      cursor: pointer;
+
+      .text {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .title {
+        font-size: 16px;
+        line-height: 24px;
+      }
+
+      .sub {
+        font-size: 14px;
+        line-height: 20px;
+        color: var(--od-text-2);
+      }
+
+      .arrow {
+        display: flex;
+        transition: transform 0.2s;
+
+        &.open {
+          transform: rotate(180deg);
+        }
+      }
     }
 
     .plan {
@@ -752,19 +1165,6 @@
 
       :global(.ios) & {
         border-radius: 10px;
-      }
-    }
-
-    .profile {
-      display: block;
-      width: 100%;
-      height: 88px;
-
-      .line {
-        fill: none;
-        stroke: var(--od-trace);
-        stroke-width: 1.5;
-        stroke-linejoin: round;
       }
     }
 
@@ -805,23 +1205,6 @@
       .depth {
         font-weight: 500;
       }
-
-      :global(.ios) & {
-        font-size: 15px;
-
-        th {
-          font-size: 13px;
-          font-weight: 400;
-        }
-
-        td {
-          border-top-width: 0.5px;
-        }
-
-        .depth {
-          font-weight: 600;
-        }
-      }
     }
 
     .no-stop,
@@ -837,7 +1220,6 @@
     }
 
     .results {
-      margin-top: 8px;
       display: flex;
       flex-direction: column;
 
@@ -856,6 +1238,11 @@
       display: flex;
       align-items: center;
       gap: 16px;
+
+      &.oxygen {
+        min-height: 56px;
+        border-top: 1px solid var(--od-separator);
+      }
 
       .text {
         flex: 1;
@@ -879,7 +1266,7 @@
 
       .value {
         font-size: 16px;
-        font-weight: 500;
+        font-weight: 600;
         text-align: right;
         color: var(--od-text);
 
@@ -887,117 +1274,23 @@
           color: var(--od-alarm);
         }
       }
-
-      .ios & {
-        min-height: 52px;
-        padding: 6px 16px;
-        border-bottom: 0.5px solid var(--od-separator);
-
-        &:last-child {
-          border-bottom: none;
-        }
-
-        .label,
-        .value {
-          font-size: 17px;
-          letter-spacing: 0;
-        }
-
-        .value {
-          font-weight: 600;
-        }
-
-        .hint {
-          font-size: 13px;
-          line-height: 18px;
-          letter-spacing: 0;
-        }
-      }
     }
 
     .note {
       margin: 8px 16px 0;
-      font-size: 13px;
-      line-height: 18px;
+      font-size: 12px;
+      line-height: 16px;
       color: var(--od-text-2);
-
-      :global(.ios) & {
-        margin: 8px 32px 0;
-      }
     }
 
-    .loading {
-      height: 200px;
-      margin: 16px;
+    .skeleton-block {
+      margin: 8px 16px;
+      height: 120px;
       border-radius: 12px;
     }
 
     .end {
       height: 32px;
     }
-
-    /* The data of the plan: MD3 filled fields, two per line, 16 dp apart. */
-    .fields {
-      margin-top: 8px;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .pair {
-      display: flex;
-      gap: 16px;
-      margin: 0 16px;
-      align-items: flex-start;
-
-      :global(.field) {
-        flex: 1;
-        min-width: 0;
-        margin-left: 0;
-        margin-right: 0;
-      }
-    }
-
-    .unit {
-      display: block;
-      padding: 24px 8px 0 0;
-      font-size: 16px;
-      line-height: 24px;
-      color: var(--od-text-2);
-
-      :global(.field:not(.floated)) & {
-        visibility: hidden;
-      }
-    }
-    /* The plan's decompression ceiling (task 2026-11-08-07): an exception to
-       the rule that keeps --od-alarm for violations (spec, section 4). */
-    .ceiling-area {
-      fill: var(--od-alarm);
-      fill-opacity: 0.35;
-    }
-
-    .ceiling-line {
-      fill: none;
-      stroke: var(--od-alarm);
-      stroke-width: 1.5;
-    }
-
-    .legend {
-      margin: 8px 0 0;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 12px;
-      line-height: 16px;
-      color: var(--od-text-2);
-    }
-
-    .swatch {
-      flex: none;
-      width: 16px;
-      height: 12px;
-      border-radius: 2px;
-      background: color-mix(in srgb, var(--od-alarm) 35%, transparent);
-      border: 1.5px solid var(--od-alarm);
-      box-sizing: border-box;
-    }  }
+  }
 </style>

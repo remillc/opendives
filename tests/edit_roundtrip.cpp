@@ -308,6 +308,138 @@ int main(int argc, char **argv)
 		return 0;
 	}
 
+	if (mode == "plans") {
+		// Planned dives: saved, reopened, replaced, left out of everything else.
+		std::string log = arg + "[main]", error, json, result;
+		int count = import_file(repo, log, error);
+		if (count <= 0 || open_log(log))
+			return 1;
+		auto fail = [](const char *what) {
+			printf("error=%s\n", what);
+			return 1;
+		};
+		auto plans = [] {
+			std::string list;
+			list_plans(list);
+			return list;
+		};
+		auto listed = [] {
+			std::string list;
+			list_loaded_dives(list);
+			return list;
+		};
+		const std::string before = listed();
+		int last_number = divelog.dives.back()->number;
+		// In the future, so that it is the last of the table.
+		const std::string request = "{\"levels\":[{\"depthMm\":30000,\"durationSeconds\":1200},{\"depthMm\":18000,\"durationSeconds\":600}],"
+					    "\"when\":1800000000,\"bottomSacMlMin\":17000,\"gfLow\":35,\"gfHigh\":70,"
+					    "\"cylinders\":[{\"o2Permille\":320,\"hePermille\":0,\"carriedMl\":2400000},{\"o2Permille\":500,\"hePermille\":0}]}";
+		if (save_plan(request, 0, result, error)) {
+			printf("error=%s\n", error.c_str());
+			return 1;
+		}
+		dive *plan = divelog.dives.back().get();
+		int plan_id = plan->id;
+		if (!plan->is_planned() || plan->number != 0 || plan->divetrip)
+			return fail("a plan has no number and no trip");
+		if (plan->notes.find("Subsurface") == std::string::npos)
+			return fail("the plan has no notes");
+		if (plan->cylinders[0].type.size.mliter != 0)
+			return fail("a cylinder of the calculation was saved");
+		if (listed() != before)
+			return fail("the plan is in the dive list");
+		std::string list = plans();
+		if (list.find("\"id\":" + std::to_string(plan_id)) == std::string::npos || list.find("carriedMl") == std::string::npos)
+			return fail("the plan is not listed with its request");
+
+		// A dive logged by hand follows the last real dive, not the plan.
+		if (create_dive("{\"date\":\"2026-12-01T10:00:00\",\"durationSeconds\":1800,\"maxDepthMm\":12000}", result, error)) {
+			printf("error=%s\n", error.c_str());
+			return 1;
+		}
+		dive *manual = nullptr;
+		for (auto &d: divelog.dives)
+			if (!d->is_planned() && (!manual || d->when > manual->when))
+				manual = d.get();
+		if (last_number > 0 && manual->number != last_number + 1)
+			return fail("a new dive did not follow the last real dive");
+		const std::string with_manual = listed();
+		const std::vector<int> all_numbers;
+		if (renumber_dives({}, 1, result, error, all_numbers)) {
+			printf("error=%s\n", error.c_str());
+			return 1;
+		}
+		if (divelog.dives.get_by_uniq_id(plan_id)->number != 0)
+			return fail("renumbering numbered the plan");
+
+		// The plan survives a save and a reload as it was.
+		if (save_local(error)) {
+			printf("error=%s\n", error.c_str());
+			return 1;
+		}
+		if (open_log(log))
+			return 1;
+		list = plans();
+		if (list.find("carriedMl") == std::string::npos || list.find("\\\"levels\\\"") == std::string::npos) {
+			printf("list=%s\n", list.c_str());
+			return fail("the request did not survive a reload");
+		}
+		// The levels read back from the dive itself, for a plan made elsewhere.
+		if (list.find("\"levels\":[{\"depthMm\":30000,\"durationSeconds\":1200},{\"depthMm\":18000,\"durationSeconds\":600}]") == std::string::npos) {
+			printf("list=%s\n", list.substr(0, 400).c_str());
+			return fail("the levels did not come back from the dive");
+		}
+		dive *reloaded = nullptr;
+		for (auto &d: divelog.dives)
+			if (d->is_planned())
+				reloaded = d.get();
+		if (!reloaded)
+			return fail("the plan was not reloaded");
+
+		// Replaced, then undone.
+		const int old_id = reloaded->id;
+		const timestamp_t old_when = reloaded->when;
+		if (save_plan(request, old_id, result, error)) {
+			printf("error=%s\n", error.c_str());
+			return 1;
+		}
+		int plans_now = 0;
+		for (auto &d: divelog.dives)
+			plans_now += d->is_planned();
+		printf("replan: plans=%d last=%lld was=%lld\n", plans_now, static_cast<long long>(divelog.dives.back()->when), static_cast<long long>(old_when));
+		if (plans_now != 1 || divelog.dives.back()->when != old_when)
+			return fail("replanning did not replace the plan");
+		if (undo(result, error) || !divelog.dives.get_by_uniq_id(old_id))
+			return fail("undo did not bring the plan back");
+
+		// A second plan at the same time starts a minute later.
+		const int first_duration = divelog.dives.get_by_uniq_id(old_id)->duration.seconds;
+		if (save_plan(request, 0, result, error) || divelog.dives.back()->when != old_when + 60)
+			return fail("two plans at the same second");
+		printf("duplicate: %d s, first %d s\n", divelog.dives.back()->duration.seconds, first_duration);
+		if (divelog.dives.back()->duration.seconds != first_duration)
+			return fail("a duplicate has another duration");
+
+		// From a logged dive: its profile, the site kept, the dive still there.
+		dive *logged = first_dive();
+		const std::string from = "{\"sourceDiveId\":" + std::to_string(logged->id) +
+					 ",\"cylinders\":[{\"o2Permille\":209,\"hePermille\":0,\"sourceCylinder\":0}]}";
+		if (plan_dive(from, json, error)) {
+			printf("error=%s\n", error.c_str());
+			return 1;
+		}
+		printf("source=%.200s\n", json.c_str());
+		if (json.find("\"runtimeSeconds\":" + std::to_string(logged->dcs[0].duration.seconds)) == std::string::npos)
+			printf("note=runtime differs from the dive\n");
+		if (!divelog.dives.get_by_uniq_id(logged->id))
+			return fail("the dive left the log");
+
+		if (delete_dive(divelog.dives.back()->id, result, error))
+			return fail("deleting a plan");
+		printf("plans=ok\n");
+		return 0;
+	}
+
 	if (int ret = open_log(repo))
 		return ret;
 
@@ -528,19 +660,30 @@ int main(int argc, char **argv)
 				return 1;
 		}
 		// Renumber: all the dives from 100, then the last half only from 7; the
-		// numbers are consecutive in date order; each saved and undone.
+		// numbers are consecutive in date order, planned dives left out; each
+		// saved and undone.
+		auto plan_only = [](const dive &d) { return d.is_planned() && !d.is_logged(); };
 		for (int pass = 0; pass < 2; pass++) {
 			std::vector<int> ids;
 			int start = pass ? 7 : 100;
-			if (pass)
-				for (size_t i = divelog.dives.size() / 2; i < divelog.dives.size(); i++)
+			size_t real = 0;
+			for (size_t i = pass ? divelog.dives.size() / 2 : 0; i < divelog.dives.size(); i++) {
+				if (plan_only(*divelog.dives[i]))
+					continue;
+				real++;
+				if (pass)
 					ids.push_back(divelog.dives[i]->id);
+			}
+			if (!real)
+				continue;
 			if (renumber_dives(ids, start, json, error) || undo_text().rfind("renumber ", 0) != 0) {
 				printf("error=renumber: %s\n", error.c_str());
 				return 1;
 			}
 			int expected = start;
 			for (size_t i = pass ? divelog.dives.size() / 2 : 0; i < divelog.dives.size(); i++) {
+				if (plan_only(*divelog.dives[i]))
+					continue;
 				if (divelog.dives[i]->number != expected++) {
 					printf("error=renumber: dive %zu has number %d, expected %d\n", i, divelog.dives[i]->number,
 					       expected - 1);

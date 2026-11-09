@@ -76,6 +76,14 @@ export function altitudeToPressureMbar(altitudeMm) {
 }
 
 /**
+ * Altitude of a surface pressure, mm (Subsurface's pressure_to_altitude, core/units.cpp).
+ * @param {number} mbar
+ */
+export function pressureToAltitudeMm(mbar) {
+  return Math.trunc(Math.log(1013 / mbar) * 7800000);
+}
+
+/**
  * A number typed by the user ("12,5" or "12.5"), NaN when it is not one.
  * @param {string} text
  */

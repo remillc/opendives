@@ -1,26 +1,25 @@
 // @ts-check
-// Dive planner state (spec, section 4, "Planner"), shared by the planner
-// screen and its settings screen. The plan itself always comes from the core
-// (planDive, Subsurface's planner); nothing here is ever written to the
-// logbook.
+// Dive planner state (spec, section 4, "Planner, redesigned"), shared by the
+// planner screen and its settings screen. The plan itself always comes from
+// the core (planDive, Subsurface's planner); it reaches the logbook only when
+// the diver saves it (savePlan, as a planned dive).
 //
-// - The dive to plan: depth, bottom time, the bottom gas and its cylinder,
-//   SAC at the bottom, deco gases. From a logbook dive they are taken from
-//   that dive (gas, cylinder, start pressure, measured SAC, richer gases as
-//   deco gases); otherwise Subsurface's planner defaults.
+// - The dive to plan: levels (a new dive) or the profile of a logbook dive,
+//   the gases, the SAC at the bottom, the water and the altitude.
+// - The decompression model and gradient factors start from Settings and are
+//   the plan's own: changing them never changes Settings.
 // - The planner-only settings (rates, reserve, ppO2, last stop, gas switches,
 //   SAC during the ascent) are the core's preferences, as Subsurface-mobile's
 //   "Dive planner setup": set through setPrefs and kept as this device's
 //   settings (settings.svelte.js), read back with plannerSetup.
-// - The deco model, gradient factors and VPM-B conservatism are the shared
-//   preferences of Settings, "Décompression": shown, never set here.
 import { OpenDivesCore } from 'opendives-core';
-import { setCorePrefs, resetCorePrefs } from './settings.svelte.js';
+import { settings, setCorePrefs, resetCorePrefs } from './settings.svelte.js';
 import { altitudeToPressureMbar, salinityOfWaterType } from './tools.js';
-import { settings } from './settings.svelte.js';
 
 /** @typedef {import('opendives-core').PlannerSetup} PlannerSetup */
 /** @typedef {import('opendives-core').DiveDetail} DiveDetail */
+/** @typedef {import('opendives-core').PlanRequest} PlanRequest */
+/** @typedef {import('opendives-core').PlannedDive} PlannedDive */
 
 /** Planner-only settings: core preferences, set from the planner screen. */
 export const SETTING_KEYS = /** @type {const} */ ([
@@ -55,37 +54,38 @@ export const SETTING_KEYS = /** @type {const} */ ([
  * @property {number[]} profile
  */
 
+/** @typedef {{ depthMm: number, durationSeconds: number }} Level */
+
 /**
- * A deco gas; switchDepthMm 0: the MOD at the ppO2 for deco, as Subsurface sets it.
- * @typedef {{ o2Permille: number, hePermille: number, sizeMl: number, startMbar: number, switchDepthMm: number }} DecoGas
+ * A gas of the plan. `sourceCylinder`: the cylinder of the logbook dive it
+ * stands for. `carriedMl`: the volume the diver carries, optional (0: not given).
+ * @typedef {{ o2Permille: number, hePermille: number, carriedMl: number, sourceCylinder?: number }} PlanGas
  */
 
-/** Subsurface's deco gas when one is added: EAN50 in a 7 L cylinder at 200 bar. */
-export const NEW_DECO_GAS = { o2Permille: 500, hePermille: 0, sizeMl: 7000, startMbar: 200000, switchDepthMm: 0 };
+/** @typedef {{ decoModel: 'buehlmann'|'vpmb', gfLow: number, gfHigh: number, vpmbConservatism: number }} PlanDeco */
 
 export const planner = $state({
   /** The logbook dive the plan starts from, or null for a new dive. */
   source: /** @type {PlanSource|null} */ (null),
-  /** Depth of the bottom, mm. */
-  depthMm: 15000,
-  /** Bottom time, descent included, s (Subsurface's simple dive: 15 m, 20 min). */
-  bottomTimeSeconds: 20 * 60,
-  o2Permille: 209,
-  hePermille: 0,
-  /** Water type as a salinity in kg per 10000 l (the dive's when it has one, else sea water). */
+  /** The planned dive reopened (saving replaces it), or 0. */
+  planId: 0,
+  /** Local time of the plan, seconds; 0 until the core has chosen one. */
+  when: 0,
+  levels: /** @type {Level[]} */ ([{ depthMm: 15000, durationSeconds: 20 * 60 }]),
+  /** The first one is the bottom gas. */
+  gases: /** @type {PlanGas[]} */ ([{ o2Permille: 209, hePermille: 0, carriedMl: 0 }]),
+  /** Water type as a salinity in kg per 10000 l. */
   salinity: 10300,
-  /** Surface pressure, mbar (a new dive's comes from the default altitude of Settings). */
   surfacePressureMbar: 1013,
-  sizeMl: 12000,
-  startMbar: 200000,
   /** SAC at the bottom, ml/min (the measured one from a dive). */
   bottomSacMlMin: 20000,
-  /** Deco gases, switched to on the ascent. */
-  decoGases: /** @type {DecoGas[]} */ ([]),
+  deco: /** @type {PlanDeco} */ ({ decoModel: 'buehlmann', gfLow: 30, gfHigh: 75, vpmbConservatism: 3 }),
   /** The planner settings as the core's preferences hold them, once read. */
   setup: /** @type {PlannerSetup|null} */ (null),
   /** Increases at each change, so that the plan is computed again. */
   version: 0,
+  /** Increases when another plan is loaded, so that the fields are filled again. */
+  loaded: 0,
 });
 
 /** Reads the core's planner settings (also after a change in Settings). */
@@ -116,8 +116,8 @@ export async function setSetting(key, value) {
 
 /**
  * The planner's defaults in the user's units, round in each system as
- * Subsurface's M_OR_FT: 15 m or 45 ft, 200 bar or 3000 psi, 9 m/min or
- * 30 ft/min, 18 m/min or 60 ft/min, a 40 bar or 500 psi reserve.
+ * Subsurface's M_OR_FT: 15 m or 45 ft, 9 m/min or 30 ft/min, 18 m/min or
+ * 60 ft/min, a 40 bar or 500 psi reserve.
  * @param {{ length: string, pressure: string }} prefs
  */
 export function plannerDefaults(prefs) {
@@ -125,7 +125,6 @@ export function plannerDefaults(prefs) {
   const psi = prefs.pressure === 'psi';
   return {
     depthMm: ft ? 45 * 304.8 : 15000,
-    startMbar: psi ? Math.round(3000 * 68.947572932) : 200000,
     ascentMmMin: ft ? 30 * 304.8 : 9000,
     descentMmMin: ft ? 60 * 304.8 : 18000,
     reserveMbar: psi ? Math.round(500 * 68.947572932) : 40000,
@@ -200,105 +199,164 @@ export async function resetSettings(prefs) {
 }
 
 /**
- * Starts a plan from a logbook dive: its first breathed open-circuit gas and
- * cylinder, its start pressure and its measured SAC; its richer gases as deco
- * gases. The depth is the dive's maximum depth, rounded down to the metre (or
- * foot); the bottom time stays Subsurface's 20 min.
+ * The decompression settings of Settings, as a plan starts from them.
+ * @param {{ decoModel?: string, gfLow?: number, gfHigh?: number, vpmbConservatism?: number }} prefs
+ * @returns {PlanDeco}
+ */
+function decoOfSettings(prefs) {
+  return {
+    decoModel: prefs.decoModel === 'vpmb' ? 'vpmb' : 'buehlmann',
+    gfLow: prefs.gfLow ?? 30,
+    gfHigh: prefs.gfHigh ?? 75,
+    vpmbConservatism: prefs.vpmbConservatism ?? 3,
+  };
+}
+
+/** The core stores air as 0 per mille. @param {{ o2Permille: number }} c */
+const o2Of = (c) => c.o2Permille || 209;
+
+/**
+ * Starts a plan from a logbook dive: its profile, its first breathed
+ * open-circuit gas and the richer ones after it, its measured SAC, its water
+ * and surface pressure. Times and depths stay the dive's.
  * @param {DiveDetail} dive
  * @param {PlanSource} source
- * @param {boolean} feet
+ * @param {Parameters<typeof decoOfSettings>[0]} prefs
  */
-export function startFromDive(dive, source, feet) {
+export function startFromDive(dive, source, prefs) {
   planner.source = source;
-  const step = feet ? 304.8 : 1000;
-  if (dive.maxDepthMm > 0) planner.depthMm = Math.max(step, Math.floor(dive.maxDepthMm / step) * step);
+  planner.when = 0;
   const breathed = dive.cylinders.filter((c) => c.used && c.use === 'OC-gas');
   const bottom = breathed[0] ?? dive.cylinders.find((c) => c.used) ?? dive.cylinders[0];
-  // The core stores air as 0 per mille.
-  const o2 = (/** @type {{ o2Permille: number }} */ c) => c.o2Permille || 209;
-  if (bottom) {
-    planner.o2Permille = o2(bottom);
-    planner.hePermille = bottom.hePermille;
-    if (bottom.sizeMl > 0) planner.sizeMl = bottom.sizeMl;
-    const start = bottom.startMbar || bottom.workingPressureMbar;
-    if (start > 0) planner.startMbar = start;
-  }
-  planner.decoGases = breathed
-    .filter((c) => c !== bottom && bottom && o2(c) > o2(bottom))
-    .map((c) => ({
-      o2Permille: o2(c),
-      hePermille: c.hePermille,
-      sizeMl: c.sizeMl || NEW_DECO_GAS.sizeMl,
-      startMbar: c.startMbar || c.workingPressureMbar || NEW_DECO_GAS.startMbar,
-      switchDepthMm: 0,
-    }));
+  planner.gases = bottom
+    ? [bottom, ...breathed.filter((c) => c !== bottom && o2Of(c) > o2Of(bottom))].map((c) => ({
+        o2Permille: o2Of(c),
+        hePermille: c.hePermille,
+        carriedMl: 0,
+        sourceCylinder: dive.cylinders.indexOf(c),
+      }))
+    : [{ o2Permille: 209, hePermille: 0, carriedMl: 0 }];
   if (dive.sacMlMin > 0) planner.bottomSacMlMin = dive.sacMlMin;
+  else planner.bottomSacMlMin = planner.setup?.bottomSacMlMin ?? 20000;
   // The dive's water type when it has one, else sea water.
   planner.salinity = salinityOfWaterType(dive.waterType);
-  planner.surfacePressureMbar = 1013;
+  planner.surfacePressureMbar = dive.surfacePressureMbar || 1013;
+  planner.deco = decoOfSettings(prefs);
+  planner.loaded++;
   planner.version++;
 }
 
 /**
- * A new dive, with Subsurface's planner defaults in the user's units, and
- * the default cylinder of Settings when there is one.
- * @param {{ length: string, pressure: string }} prefs
- * @param {number} [cylinderMl] water volume of the default cylinder
+ * A new dive: one level at Subsurface's default depth, air, the conditions and
+ * the decompression settings of Settings.
+ * @param {{ length: string, pressure: string } & Parameters<typeof decoOfSettings>[0]} prefs
  */
-export function startNewDive(prefs, cylinderMl = 0) {
-  const d = plannerDefaults(prefs);
+export function startNewDive(prefs) {
   planner.source = null;
-  planner.depthMm = d.depthMm;
-  planner.bottomTimeSeconds = 20 * 60;
-  planner.o2Permille = 209;
-  planner.hePermille = 0;
+  planner.when = 0;
+  planner.levels = [{ depthMm: plannerDefaults(prefs).depthMm, durationSeconds: 20 * 60 }];
+  planner.gases = [{ o2Permille: 209, hePermille: 0, carriedMl: 0 }];
   planner.salinity = salinityOfWaterType(settings.defaultWater);
   planner.surfacePressureMbar = altitudeToPressureMbar(settings.defaultAltitudeMm);
-  planner.sizeMl = cylinderMl > 0 ? cylinderMl : 12000;
-  planner.startMbar = d.startMbar;
   planner.bottomSacMlMin = planner.setup?.bottomSacMlMin ?? 20000;
-  planner.decoGases = [];
+  planner.deco = decoOfSettings(prefs);
+  planner.loaded++;
   planner.version++;
 }
 
-/** Adds a deco gas (EAN50 by default). */
-export function addDecoGas() {
-  planner.decoGases = [...planner.decoGases, { ...NEW_DECO_GAS }];
+/**
+ * The request of a saved plan: as OpenDives saved it, or rebuilt from the
+ * planned dive when it was made elsewhere or changed since.
+ * @param {PlannedDive} plan
+ * @param {Parameters<typeof decoOfSettings>[0]} prefs
+ * @returns {PlanRequest}
+ */
+export function requestOfPlan(plan, prefs) {
+  /** @type {PlanRequest|null} */
+  let stored = null;
+  try {
+    stored = plan.request ? JSON.parse(plan.request) : null;
+  } catch {
+    stored = null;
+  }
+  const same = (/** @type {Level[]} */ a, /** @type {Level[]} */ b) =>
+    a.length === b.length && a.every((l, i) => l.depthMm === b[i].depthMm && Math.abs(l.durationSeconds - b[i].durationSeconds) <= 60);
+  if (stored && (stored.sourceDiveId || same(stored.levels ?? [], plan.levels))) return stored;
+  const deco = decoOfSettings(prefs);
+  return {
+    when: plan.when,
+    levels: plan.levels.length ? plan.levels : [{ depthMm: plan.maxDepthMm, durationSeconds: 20 * 60 }],
+    salinity: plan.salinity || 10300,
+    surfacePressureMbar: plan.surfacePressureMbar || 1013,
+    bottomSacMlMin: planner.setup?.bottomSacMlMin ?? 20000,
+    decoModel: deco.decoModel === 'vpmb' ? 1 : 0,
+    gfLow: deco.gfLow,
+    gfHigh: deco.gfHigh,
+    vpmbConservatism: deco.vpmbConservatism,
+    cylinders: plan.gases.map((g) => ({ o2Permille: g.o2Permille || 209, hePermille: g.hePermille })),
+  };
+}
+
+/**
+ * Reopens a saved plan.
+ * @param {PlanRequest} request
+ * @param {number} planId
+ * @param {PlanSource|null} source
+ */
+export function applyRequest(request, planId, source) {
+  planner.planId = planId;
+  planner.source = source;
+  planner.when = request.when ?? 0;
+  planner.levels = request.levels?.length ? request.levels.map((l) => ({ ...l })) : planner.levels;
+  planner.gases = request.cylinders.map((c) => ({
+    o2Permille: c.o2Permille,
+    hePermille: c.hePermille,
+    carriedMl: c.carriedMl ?? 0,
+    ...(c.sourceCylinder !== undefined ? { sourceCylinder: c.sourceCylinder } : {}),
+  }));
+  planner.salinity = request.salinity ?? 10300;
+  planner.surfacePressureMbar = request.surfacePressureMbar ?? 1013;
+  planner.bottomSacMlMin = request.bottomSacMlMin ?? planner.setup?.bottomSacMlMin ?? 20000;
+  planner.deco = {
+    decoModel: request.decoModel === 1 ? 'vpmb' : 'buehlmann',
+    gfLow: request.gfLow ?? 30,
+    gfHigh: request.gfHigh ?? 75,
+    vpmbConservatism: request.vpmbConservatism ?? 3,
+  };
+  planner.loaded++;
   planner.version++;
 }
 
-/** @param {number} index */
-export function removeDecoGas(index) {
-  planner.decoGases = planner.decoGases.filter((_, i) => i !== index);
-  planner.version++;
+/** The next gas added: EAN50, then oxygen. @returns {PlanGas} */
+export function nextGas() {
+  const has50 = planner.gases.some((g) => g.o2Permille === 500);
+  return { o2Permille: has50 ? 1000 : 500, hePermille: 0, carriedMl: 0 };
 }
 
 /**
  * The request for the core's planner. The planner-only settings are not
  * sent: the core reads them from its preferences.
- * @returns {import('opendives-core').PlanRequest}
+ * @returns {PlanRequest}
  */
 export function planRequest() {
+  const deco = planner.deco;
   return {
-    depthMm: Math.round(planner.depthMm),
-    bottomTimeSeconds: Math.round(planner.bottomTimeSeconds),
+    ...(planner.source
+      ? { sourceDiveId: planner.source.id }
+      : { levels: planner.levels.map((l) => ({ depthMm: Math.round(l.depthMm), durationSeconds: Math.round(l.durationSeconds) })) }),
+    ...(planner.when ? { when: planner.when } : {}),
     bottomSacMlMin: Math.round(planner.bottomSacMlMin),
     salinity: planner.salinity,
     surfacePressureMbar: planner.surfacePressureMbar,
-    cylinders: [
-      {
-        o2Permille: planner.o2Permille,
-        hePermille: planner.hePermille,
-        sizeMl: Math.round(planner.sizeMl),
-        startMbar: Math.round(planner.startMbar),
-      },
-      ...planner.decoGases.map((g) => ({
-        o2Permille: g.o2Permille,
-        hePermille: g.hePermille,
-        sizeMl: Math.round(g.sizeMl),
-        startMbar: Math.round(g.startMbar),
-        switchDepthMm: Math.round(g.switchDepthMm),
-      })),
-    ],
+    decoModel: deco.decoModel === 'vpmb' ? 1 : 0,
+    gfLow: deco.gfLow,
+    gfHigh: deco.gfHigh,
+    vpmbConservatism: deco.vpmbConservatism,
+    cylinders: planner.gases.map((g) => ({
+      o2Permille: g.o2Permille,
+      hePermille: g.hePermille,
+      ...(g.carriedMl > 0 ? { carriedMl: Math.round(g.carriedMl) } : {}),
+      ...(g.sourceCylinder !== undefined ? { sourceCylinder: g.sourceCylinder } : {}),
+    })),
   };
 }

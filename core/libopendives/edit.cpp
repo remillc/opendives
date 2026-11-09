@@ -1141,6 +1141,8 @@ int trip_json(int trip_id, std::string &json, std::string &error)
 	json += ",\"dives\":[";
 	bool first = true;
 	for (const dive *d: trip->dives) {
+		if (internal::is_plan_only(*d))
+			continue;
 		if (!first)
 			json += ',';
 		first = false;
@@ -1465,7 +1467,7 @@ static void append_site_summary(std::string &json, const dive_site &ds)
 	json += ",\"lonUdeg\":" + std::to_string(ds.location.lon.udeg);
 	json += ",\"country\":";
 	append_json_string(json, taxonomy_get_country(ds.taxonomy));
-	json += ",\"dives\":" + std::to_string(ds.dives.size());
+	json += ",\"dives\":" + std::to_string(std::count_if(ds.dives.begin(), ds.dives.end(), [](const dive *d) { return !internal::is_plan_only(*d); }));
 	// The latest dive and the deepest, for the list of sites.
 	timestamp_t last = 0;
 	int deepest = 0;
@@ -1530,6 +1532,8 @@ int site_json(uint32_t uuid, std::string &json, std::string &error)
 	json += ",\"diveList\":[";
 	bool first = true;
 	for (const dive *d: ds->dives) {
+		if (internal::is_plan_only(*d))
+			continue;
 		if (!first)
 			json += ',';
 		first = false;
@@ -1886,7 +1890,7 @@ int dives_without_site(std::string &json)
 	json = "[";
 	bool first = true;
 	for (const auto &d: divelog.dives) {
-		if (d->dive_site)
+		if (d->dive_site || internal::is_plan_only(*d))
 			continue;
 		if (!first)
 			json += ',';
@@ -2023,6 +2027,29 @@ static void apply_filter_preset(Step &step)
 		divelog.filter_presets.remove(step.preset_index);
 	}
 	step.preset_applied = !step.preset_applied;
+}
+
+// The latest dive of the log that is not a plan; the plans do not count in
+// the numbering (OpenDives lists them apart). `usable`: leaves invalid dives out.
+static const dive *last_real_dive(bool usable)
+{
+	for (auto it = divelog.dives.rbegin(); it != divelog.dives.rend(); ++it)
+		if (!internal::is_plan_only(**it) && !(usable && (*it)->invalid))
+			return it->get();
+	return nullptr;
+}
+
+// dive_table::get_dive_nr_at_idx(), the plans left out: a new last dive follows
+// the number of the last one, any other has none.
+static int next_dive_number(const dive &d)
+{
+	const dive *after = last_real_dive(false);
+	if (after && after->when > d.when)
+		return 0;
+	const dive *last = last_real_dive(true);
+	if (!last)
+		return 1;
+	return last->number ? last->number + 1 : 0;
 }
 
 // Result of a dive list step: {"listChange":true, "dives":<dives in the log>,
@@ -2872,9 +2899,52 @@ int create_dive(const std::string &fields_json, std::string &result_json, std::s
 		if (allocated)
 			step.list.trips.push_back(std::move(allocated));
 	}
-	size_t idx = divelog.dives.get_insertion_index(d.get());
-	d->number = divelog.dives.get_dive_nr_at_idx(static_cast<int>(idx));
+	d->number = next_dive_number(*d);
 	step.list.dives.push_back({ std::move(d), trip, site });
+	apply_dive_list(step);
+	result_json = dive_list_json(step);
+	push_step(std::move(step));
+	return 0;
+}
+
+int save_plan(const std::string &request, int replace_id, std::string &result_json, std::string &error)
+{
+	if (check_writable_log(error))
+		return -1;
+	dive *replaced = nullptr;
+	if (replace_id) {
+		replaced = divelog.dives.get_by_uniq_id(replace_id);
+		if (!replaced || !internal::is_plan_only(*replaced)) {
+			error = "NOT_FOUND";
+			return -1;
+		}
+	}
+	auto d = std::make_unique<dive>();
+	dive_site *site = nullptr;
+	if (internal::build_plan(request, *d, site, error))
+		return -1;
+	// DivePlannerPointsModel::createPlan(), without a number or a trip. Two
+	// dives of the log never start at the same second: the plan of a logged
+	// dive, or its duplicate, starts a minute later.
+	auto taken = [&](timestamp_t when) {
+		return std::any_of(divelog.dives.begin(), divelog.dives.end(),
+				   [&](auto &o) { return o.get() != replaced && o->when == when; });
+	};
+	while (taken(d->when))
+		d->when += 60;
+	d->dcs[0].when = d->when;
+	divelog.dives.fixup_dive(*d);
+	d->selected = false;
+	d->divetrip = nullptr;
+	d->dive_site = nullptr;
+	d->number = 0;
+
+	Step step;
+	step.kind = Step::DIVE_LIST;
+	step.text = replaced ? "replan dive" : "add dive";
+	if (replaced)
+		step.list.remove_dives.push_back(replaced);
+	step.list.dives.push_back({ std::move(d), nullptr, site });
 	apply_dive_list(step);
 	result_json = dive_list_json(step);
 	push_step(std::move(step));
@@ -2970,6 +3040,8 @@ int renumber_dives(const std::vector<int> &ids, int start, std::string &result_j
 	step.kind = Step::RENUMBER;
 	int number = start;
 	for (auto &d: divelog.dives) {
+		if (internal::is_plan_only(*d))
+			continue;
 		if (wanted.empty() || wanted.count(d->id))
 			step.renumbered.push_back({ d.get(), number++ });
 	}
@@ -2997,11 +3069,12 @@ int renumber_dives(const std::vector<int> &ids, int start, std::string &result_j
 // stay unnumbered, as in Subsurface.
 static void number_new_last_dives(dive_table &dives_to_add, bool new_dive_has_number)
 {
-	if (new_dive_has_number || divelog.dives.empty())
+	if (new_dive_has_number)
 		return;
-	const dive &last = *divelog.dives.back();
-	if (last.number <= 0)
+	const dive *newest = last_real_dive(false);
+	if (!newest || newest->number <= 0)
 		return;
+	const dive &last = *newest;
 	std::vector<dive *> after;
 	for (auto &d: dives_to_add) {
 		if (d->when > last.when) {
