@@ -314,6 +314,16 @@
     for (const name of settings.defaultBailout) addConfiguredCylinder('OC-gas', name, 21);
   }
 
+  /** The starting mix of a use; the diver can still change it. @param {EditedCylinder} c @param {string} use */
+  function useChanged(c, use) {
+    if (use !== 'oxygen' && use !== 'diluent') return;
+    c.f.o2 = show(use === 'oxygen' ? 100 : 21);
+    c.f.he = show(0);
+  }
+
+  /** The switch depth only applies to open-circuit and bailout cylinders. @param {EditedCylinder} c */
+  const hasSwitchDepth = (c) => !(f.divemode === 'CCR' && (c.f.use === 'diluent' || c.f.use === 'oxygen'));
+
   function addCylinder() {
     const texts = { description: '', use: 'OC-gas', size: '', workingPressure: '', start: '', end: '', o2: show(21), he: show(0), depth: '' };
     cylinders.push({ index: -1, protected: false, f: { ...texts }, initial: texts });
@@ -351,7 +361,7 @@
       start: !optionalOk(c.f.start, 0, max),
       end: !optionalOk(c.f.end, 0, max),
       gas: !optionalOk(c.f.o2, 1, 100) || !optionalOk(c.f.he, 0, 99) || (parseNumber(c.f.o2) || 21) + (parseNumber(c.f.he) || 0) > 100,
-      depth: !optionalOk(c.f.depth, 0, feet ? 1640 : 500),
+      depth: hasSwitchDepth(c) && !optionalOk(c.f.depth, 0, feet ? 1640 : 500),
     };
   };
   const anyBad = $derived(
@@ -407,7 +417,7 @@
         item.o2Permille = Math.round((parseNumber(c.f.o2) || 21) * 10);
         item.hePermille = Math.round((parseNumber(c.f.he) || 0) * 10);
       }
-      if (ch('depth')) item.depthMm = c.f.depth.trim() ? depthMm(parseNumber(c.f.depth)) : 0;
+      if (ch('depth') && hasSwitchDepth(c)) item.depthMm = c.f.depth.trim() ? depthMm(parseNumber(c.f.depth)) : 0;
       return item;
     });
     if (removed || cylinderItems.some((item) => Object.keys(item).length > 1)) out.cylinders = cylinderItems.map((item) => JSON.stringify(item));
@@ -592,7 +602,7 @@
                 onchange={(v) => chooseCylinderType(c, v)}
               />
             </div>
-            <div class="grow"><SelectField label={t('edit.use')} bind:value={c.f.use} options={useOptions} /></div>
+            <div class="grow"><SelectField label={t('edit.use')} bind:value={c.f.use} options={useOptions} onchange={(v) => useChanged(c, v)} /></div>
           </div>
           <div class="row">
             <div class="grow">
@@ -630,9 +640,11 @@
               </TextField>
             </div>
           </div>
-          <TextField label={t('edit.switchDepth')} bind:value={c.f.depth} inputmode="decimal" invalid={cb.depth} supporting={modText(c)}>
-            {#snippet trailing()}{@render unit(depthUnitText)}{/snippet}
-          </TextField>
+          {#if hasSwitchDepth(c)}
+            <TextField label={t('edit.switchDepth')} bind:value={c.f.depth} inputmode="decimal" invalid={cb.depth} supporting={modText(c)}>
+              {#snippet trailing()}{@render unit(depthUnitText)}{/snippet}
+            </TextField>
+          {/if}
       {/each}
       <button type="button" class="add" onclick={addCylinder}><Icon name="plus" />{t('edit.addCylinder')}</button>
 
