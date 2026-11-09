@@ -11,7 +11,7 @@ This document turns the mock-ups into rules the code applies as they are: colour
 
 ## 1. Colours
 
-The theme is **black and white**: a neutral light background, actions without a bright colour (#1F2124), strong contrast and sans-serif titles. In dive data, the water column of the profile and of the thumbnails goes from sand to rust with depth. The code declares each colour once, as a CSS variable `--od-*`, and never hard-codes a value in a component.
+The theme is **black and white**: a neutral light background, actions without a bright colour (#1F2124), strong contrast and sans-serif titles. In dive data, the water column of the profile and of the thumbnails goes from sand to rust with depth. Colour may also appear elsewhere in the interface, and we can play with it, but sparingly and always within the accessibility rules (WCAG 2.2 AA): text at least 4.5:1 against its background (3:1 for large text, 18 sp, or 14 sp bold), and 3:1 for icons, borders, selection marks and other meaningful graphics. Colour never carries meaning alone: a selection, a state or an alert also has a shape, an icon or a word. The code declares each colour once, as a CSS variable `--od-*`, and never hard-codes a value in a component.
 
 | Token | Light | Dark | Use, and only this one |
 | --- | --- | --- | --- |
