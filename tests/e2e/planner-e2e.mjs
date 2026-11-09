@@ -41,6 +41,8 @@ const p = await connect();
 const q = (s) => JSON.stringify(s);
 
 // --- the account: abort unless it is the test account -----------------------------
+// The account screen fills a few seconds after the start.
+await p.waitFor(`!!document.querySelector('#view-account')?.textContent.trim()`, 'the account screen', 90000).catch(() => {});
 const accountText = await p.eval(`document.querySelector('#view-account')?.textContent ?? ''`);
 if (!accountText.includes('roger.bourdieu')) {
   console.error('ABORT: the emulator is not on the test account; nothing was run.');
@@ -68,14 +70,21 @@ async function inject() {
         return l ? document.getElementById(l.htmlFor) : null;
       },
       visible(sel, text) {
-        return [...document.querySelectorAll(sel)].filter((e) => e.offsetParent !== null && (text === undefined || e.textContent.replace(/\\s+/g, ' ').trim() === text));
+        // Only what is on the page being shown (earlier pages stay in the stack), or outside any page (menus, dialogs).
+        const top = document.elementFromPoint(innerWidth / 2, innerHeight / 2)?.closest('.page');
+        return [...document.querySelectorAll(sel)].filter(
+          (e) => e.offsetParent !== null && (!e.closest('.page') || (top && top.contains(e))) && (text === undefined || e.textContent.replace(/\\s+/g, ' ').trim() === text),
+        );
       },
     };
   })()`);
 }
 await inject();
 
-const core = async (method, options = {}) => JSON.parse(await p.eval(`Capacitor.Plugins.OpenDivesCore.${method}(${q(options)}).then((r) => r.json)`));
+const core = async (method, options = {}) => {
+  const json = await p.eval(`Capacitor.Plugins.OpenDivesCore.${method}(${q(options)}).then((r) => (r && r.json) || null)`);
+  return json ? JSON.parse(json) : null;
+};
 const planCore = (request) => core('planDive', { request });
 const planCalls = () => p.eval(`window.__odCalls.filter((c) => c.method === 'planDive').length`);
 const lastRequest = () => p.eval(`(() => { const c = window.__odCalls.filter((c) => c.method === 'planDive'); return c.length ? c[c.length - 1].options.request : null; })()`);
@@ -84,13 +93,18 @@ const go = async (path) => {
   await sleep(400);
 };
 const click = async (sel, text) => {
-  const ok = await p.eval(`(() => { const e = __od.visible(${q(sel)}, ${text === undefined ? 'undefined' : q(text)})[0]; if (!e) return false; e.click(); return true; })()`);
+  const tap = `(() => { const list = __od.visible(${q(sel)}, ${text === undefined ? 'undefined' : q(text)}); const e = list.find((x) => x.closest('.page')) || list[list.length - 1]; if (!e) return false; e.click(); return true; })()`;
+  let ok = false;
+  for (let i = 0; i < 25 && !ok; i++) {
+    ok = await p.eval(tap);
+    if (!ok) await sleep(200);
+  }
   if (!ok) throw new Error(`nothing to tap: ${sel} ${text ?? ''}`);
   await sleep(250);
 };
 
 /** Types into the field with this label (the nth one): real key input, replacing what is there. */
-async function type(label, n, text) {
+async function type(label, n, text, rounding = 0) {
   const ok = await p.eval(`(() => { const e = __od.field(${q(label)}, ${n}); if (!e) return false; e.scrollIntoView({ block: 'center' }); e.focus(); if (e.select) e.select(); return true; })()`);
   if (!ok) throw new Error(`no field ${label} #${n}`);
   if (text === '') {
@@ -99,7 +113,9 @@ async function type(label, n, text) {
     await p.send('Input.insertText', { text });
   }
   const shown = await p.eval(`__od.field(${q(label)}, ${n}).value`);
-  if (shown !== text) throw new Error(`typed ${text} in ${label}, the field shows ${shown}`);
+  // The altitude is kept as a pressure in whole mbar and written back: it may read a few units off.
+  if (shown !== text && !(rounding && Math.abs(Number(shown) - Number(text)) <= rounding)) throw new Error(`typed ${text} in ${label}, the field shows ${shown}`);
+  if (shown !== text) console.log(`note: ${text} typed in ${label}, the field reads ${shown}`);
   await sleep(120);
 }
 /** Chooses an option of a select. */
@@ -199,8 +215,19 @@ async function useUnits(sys) {
 }
 
 async function openNew() {
-  await go('/plan/new');
-  await p.waitFor(`!!__od.root()?.querySelector('.outcome')`, 'the planner');
+  // The router ignores a navigation to the page it is on, and one made during a transition: leave
+  // first, and try again if the planner does not show.
+  for (let attempt = 1; ; attempt++) {
+    await go('/tools/');
+    await sleep(700);
+    await go('/plan/new');
+    try {
+      await p.waitFor(`!!__od.root()?.querySelector('.outcome')`, 'the planner', 8000);
+      break;
+    } catch (e) {
+      if (attempt >= 3) throw e;
+    }
+  }
   await settle();
 }
 
@@ -288,7 +315,7 @@ async function run() {
   await type(T('plan.depth'), 0, '35');
   await type(T('plan.duration'), 0, '25');
   await choose(T('plan.waterType'), 0, 'fresh');
-  await type(T('plan.altitude'), 0, '1500');
+  await type(T('plan.altitude'), 0, '1500', 5);
   await check('6 fresh water, 1500 m', 'metric', {
     ...base,
     salinity: 10000,
@@ -309,7 +336,7 @@ async function run() {
     cylinders: [air(), { o2Permille: 500, hePermille: 0 }],
   });
   yes('7 imperial: depths in feet on the screen', imp.ui.helpers.some((h) => / ft/.test(h)), JSON.stringify(imp.ui.helpers));
-  await type(T('plan.altitude'), 0, '5000');
+  await type(T('plan.altitude'), 0, '5000', 10);
   await check('7 imperial: 5000 ft altitude', 'imperial', {
     ...base,
     surfacePressureMbar: Math.round(1013 * Math.exp(-(5000 * MM_PER_FT) / 7800000)),
@@ -453,6 +480,9 @@ async function run() {
   await inject();
   await p.waitFor(`!!document.querySelector('.view-main')?.f7View`, 'the app view', 60000);
   await p.waitFor(`document.querySelector('#view-account')?.textContent.includes('roger.bourdieu')`, 'the account after the reload', 90000);
+  const afterReload = await core('getPrefs');
+  if (afterReload.length !== 'm') console.log(`note: after the reload the units are ${afterReload.unitSystem} ${afterReload.length}/${afterReload.pressure}/${afterReload.volume}, not the metric chosen before`);
+  await useUnits('metric');
   await go('/plans/');
   await p.waitFor(`__od.visible('.list .row').length >= 1`, 'the plans after the reload');
   await click('.list .row a.open');
@@ -496,6 +526,23 @@ async function run() {
   created = [];
 }
 
+/** Deletes, through the plans screen, every plan that was not there at the start. */
+async function deleteLeftovers() {
+  for (let guard = 0; guard < 6; guard++) {
+    const left = (await core('listPlans')).map((x) => x.id).filter((id) => !startPlans.includes(id));
+    if (!left.length) return 0;
+    await go('/tools/');
+    await sleep(600);
+    await go('/plans/');
+    await p.waitFor(`__od.visible('.list .row').length >= 1`, 'the plans to delete');
+    await click('.list .row .more');
+    await click('.popover .item-link', T('plans.delete'));
+    await click('.dialog-button', T('plans.delete'));
+    await sleep(2500);
+  }
+  return (await core('listPlans')).filter((x) => !startPlans.includes(x.id)).length;
+}
+
 try {
   await run();
 } catch (e) {
@@ -503,16 +550,18 @@ try {
 } finally {
   // Every plan created is deleted; the settings are put back.
   try {
-    const now = (await core('listPlans')).map((x) => x.id).filter((id) => !startPlans.includes(id));
-    if (now.length) {
-      await core('deleteDives', { ids: now });
-      console.log(`cleanup: deleted ${now.length} plan(s) left by the scenarios`);
-    }
-    const restore = {};
-    for (const k of ['length', 'temperature', 'pressure', 'volume', 'weight', 'unitSystem']) restore[k] = startPrefs[k];
-    await core('setPrefs', { changes: restore });
-    await core('setPrefs', { changes: { lastStop6m: startSetup.lastStop6m, ascent75MmMin: startSetup.ascent75MmMin, ascent50MmMin: startSetup.ascent50MmMin, ascentStopsMmMin: startSetup.ascentStopsMmMin, ascentLast6mMmMin: startSetup.ascentLast6mMmMin, sacFactor: startSetup.sacFactor } });
-    if (startLocal !== null) await p.eval(`localStorage.setItem('od.corePrefs', ${q(startLocal)})`);
+    const left = await deleteLeftovers();
+    record('cleanup: no plan left behind', left === 0, `${left} left`);
+    await core('setPrefs', {
+      changes: { lastStop6m: startSetup.lastStop6m, ascent75MmMin: startSetup.ascent75MmMin, ascent50MmMin: startSetup.ascent50MmMin, ascentStopsMmMin: startSetup.ascentStopsMmMin, ascentLast6mMmMin: startSetup.ascentLast6mMmMin, sacFactor: startSetup.sacFactor, descentMmMin: startSetup.descentMmMin, reserveMbar: startSetup.reserveMbar },
+    });
+    // Units back as they were: in the core, and in the record the app keeps of the changes (the Settings
+    // screen writes both; it has no way to choose back a personalised set in one tap).
+    const units = Object.fromEntries(['length', 'pressure', 'volume', 'weight', 'temperature', 'unitSystem'].map((k) => [k, startPrefs[k]]));
+    await core('setPrefs', { changes: units });
+    await p.eval(`(() => { const k = 'od.corePrefs'; const r = JSON.parse(localStorage.getItem(k) || '{}'); Object.assign(r, ${q(units)}); localStorage.setItem(k, JSON.stringify(r)); })()`);
+    const end = await core('getPrefs');
+    record('cleanup: the units are back', ['length', 'pressure', 'volume', 'weight', 'temperature'].every((k) => end[k] === startPrefs[k]), JSON.stringify(end));
     await go('/');
   } catch (e) {
     console.log('cleanup problem:', e.message);
