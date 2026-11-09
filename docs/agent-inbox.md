@@ -741,3 +741,10 @@ Christian approved the planner redesign. Spec: "Planner, redesigned" (it lists t
 - Partager le plan: share sheet with a PDF sheet of the plan or a text summary.
 If the core does not offer something needed here (for example multi-level plans or altitude in the planner wrapper), stop and tell Christian before working around it.
 
+## [ ] 2026-11-09-05 Editor, share sheet and export: changes approved on the canvas
+
+Christian approved these by resolving their comment threads. Do them after 2026-11-09-04 or before it, as you prefer (they are independent).
+- Dive editor (`docs/mockups/android-edition.dc.html`, spec "Dive editor, same fields as Subsurface desktop"): remove the helper "Mesurées par l’ordinateur de plongée" under Durée and Profondeur max. Every cylinder block is open with all its fields (Type, Utilisation, Taille, Service, Début, Fin, O₂, He, Changement de gaz à with the MOD helper), no more one-line rows for the second and later cylinders.
+- Share sheet (`docs/mockups/partage-android.dc.html`): the "Fiche PDF" choice uses the Material Symbols `picture_as_pdf` icon in its coloured circle.
+- Export sheet of the logbook selection (`docs/mockups/carnet-export-android.dc.html`): the first format reads "Fichier de carnet (.ssrf)" with the description "Format Subsurface, lisible aussi par OpenDives" (it exports the checked dives only, as before).
+
