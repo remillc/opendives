@@ -1290,7 +1290,8 @@
       "Carnet : pendant le glisser-déposer d’une plongée, une barre horizontale montre où elle serait déposée.",
       "Carnet : le numéro de la plongée revient devant la date ; un voyage ouvert est décalé, et ses plongées se cochent en mode sélection.",
       "Carnet : un voyage se sélectionne ; « Supprimer ce voyage » retire le voyage et garde ses plongées.",
-      "Politique de confidentialité : les liens et l’adresse de contact sont cliquables."
+      "Politique de confidentialité : les liens et l’adresse de contact sont cliquables.",
+      "Connexions sécurisées : la bibliothèque OpenSSL est remplacée par Mbed TLS, compatible avec la licence de l’app."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",

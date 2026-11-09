@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
-// OpenDives — opendives_https_get() with OpenSSL (Linux and Android).
+// OpenDives — opendives_https_get() with OpenSSL, for the desktop tests only
+// (poc/build.sh): the app itself uses https_mbedtls.cpp, never this file.
 // Full validation: trusted authorities, chain and host name.
 #include "platform_https.h"
 

@@ -1290,7 +1290,8 @@
       "Logbook: while dragging a dive, a horizontal bar shows where it would be dropped.",
       "Logbook: the dive number is back before the date; an open trip is indented, and its dives can be checked in selection mode.",
       "Logbook: a trip can be selected; “Delete this trip” removes the trip and keeps its dives.",
-      "Privacy policy: links and the contact address can be tapped."
+      "Privacy policy: links and the contact address can be tapped.",
+      "Secure connections: the OpenSSL library is replaced by Mbed TLS, compatible with the app’s licence."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
