@@ -2,7 +2,7 @@
 # The planner's release check: its success is required for any release.
 #
 #   tests/release-check.sh            everything, on this machine and on the emulator (about 25 min)
-#   tests/release-check.sh --ci       what needs no device (GitHub Actions; the report is not "complete")
+#   tests/release-check.sh --ci       what needs no device (the report is not "complete")
 #   tests/release-check.sh --verify [commit]
 #                                     checks that a complete, green report exists for the commit (default
 #                                     HEAD) and for the Subsurface commit pinned in it: the release lock
