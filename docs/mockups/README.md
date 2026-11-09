@@ -102,6 +102,10 @@ When a mock-up and `docs/ui-specification.md` disagree, the specification wins. 
 | `reglages-nombre-android.dc.html` | Réglages, choix d’un nombre · Android |
 | `reglages-menu-android.dc.html` | Réglages, menu d’un ordinateur · Android |
 | `reglages-bouteilles-android.dc.html` | Types de bouteilles · Android |
+| `reglages-bouteille-choix-android.dc.html` | Téléphone Android, Réglages, choix de la bouteille par défaut |
+| `reglages-secours-android.dc.html` | Téléphone Android, Réglages, bouteilles de secours (bailout) du recycleur |
+| `reglages-bouteille-type-android.dc.html` | Téléphone Android, Nouveau type de bouteille |
+| `reglages-bouteille-modifier-android.dc.html` | Téléphone Android, Modifier un type de bouteille |
 | `reglages-vitesse-android.dc.html` | Réglages, vitesses · Android |
 | `reglages-duree-android.dc.html` | Réglages, durée · Android |
 | `reglages-coordonnees-android.dc.html` | Réglages, coordonnées GPS · Android |
