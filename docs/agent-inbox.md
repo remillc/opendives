@@ -818,7 +818,9 @@ Christian, on the canvas (mock-up `docs/mockups/detail3-android.dc.html`): in th
 - Then compare the whole profile card with the mock-up (hint line, axes and labels, temperature curve and scale, cursor, sizes and margins) and fix every difference.
 - Update (Christian, 10:28): the task covers the whole `/dives/:id` screen, not only the profile. Go through `detail3-android.dc.html` from top to bottom (top bar and its menu, header with number, date, site, country, trip link and rating, the three big figures, profile card and its chips, every section and field below, down to the end of the page) and make the app identical: texts, order, sizes, weights, colours, spacing, corners. Check dark mode against `detail3-android-sombre.dc.html` and the cursor against `detail3-android-curseur.dc.html`. The aerial map behind the header is now approved: see task 2026-11-09-13. List in your report every difference you found and fixed.
 
-## [ ] 2026-11-09-13 Dive detail: aerial map of the site behind the header
+## [x] 2026-11-09-13 Dive detail: aerial map of the site behind the header
+
+Done in Dive detail: site maps prepared ahead on Wi-Fi
 
 Christian approved this on the canvas. Spec: "Dive detail, site map behind the header". Mock-ups: `docs/mockups/detail3-android.dc.html`, `detail3-android-sombre.dc.html`, `detail3-android-curseur.dc.html` (the aerial picture in them is a generated example).
 - When the site has GPS coordinates, show an aerial view centred on them behind the top bar and the header, full width, about 270 dp high, with the pin in the middle of the top bar and a fade into the page background before the three big figures. Dark mode: image darkened, fade into the dark background.

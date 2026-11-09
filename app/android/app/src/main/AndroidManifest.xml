@@ -40,6 +40,7 @@
     <!-- Permissions -->
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <!-- "Use my position" on the site edit screen. Asked only when the diver
          taps it (Capacitor's WebChromeClient requests it at that moment). -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />

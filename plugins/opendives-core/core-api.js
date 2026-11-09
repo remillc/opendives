@@ -600,6 +600,7 @@ import { registerPlugin } from '@capacitor/core';
  *   The planner's settings as the core's preferences hold them.
  * @property {(request: PlanRequest) => Promise<PlanResult>} planDive
  *   Runs Subsurface's planner; read only, nothing is added to the logbook.
+ * @property {() => Promise<{wifi: boolean}>} networkStatus whether the device is on Wi-Fi or Ethernet
  * @property {() => Promise<PlannedDive[]>} listPlans
  * @property {(options: {request: PlanRequest, replaceId?: number}) => Promise<EditResult>} savePlan
  *   Saves the plan as a planned dive, or replaces one: one undoable step.
@@ -769,6 +770,7 @@ export const OpenDivesCore = {
   async savePlan(options) {
     return JSON.parse((await native.savePlan(options)).json);
   },
+  networkStatus: () => native.networkStatus(),
   bluetoothStatus: () => native.bluetoothStatus(),
   requestBluetoothPermission: () => native.requestBluetoothPermission(),
   enableBluetooth: () => native.enableBluetooth(),

@@ -133,30 +133,33 @@ export async function loadSiteMap(latUdeg, lonUdeg) {
 }
 
 /** Never on mobile data, nor with the app in the background. */
-function canPrepare() {
-  const type = /** @type {any} */ (navigator).connection?.type;
-  return !document.hidden && navigator.onLine && (type === 'wifi' || type === 'ethernet');
+async function canPrepare() {
+  if (document.hidden || !navigator.onLine) return false;
+  return OpenDivesCore.networkStatus().then(
+    (status) => status.wifi,
+    () => false,
+  );
 }
 
 let running = false;
 
 /** Prepares the pictures still missing, the sites of the latest dives first. */
 async function prepareSiteMaps() {
-  if (running || !canPrepare()) return;
-  const cache = await openCache();
-  if (!cache) return;
+  if (running) return;
   running = true;
   /** @type {Awaited<ReturnType<typeof createDrawer>>|undefined} */
   let drawer;
   let tiles = 0;
   try {
+    const cache = await openCache();
+    if (!cache || !(await canPrepare())) return;
     /** @type {{ hasLocation: boolean, latUdeg: number, lonUdeg: number, dives: number, lastDate: string }[]} */
     const sites = await OpenDivesCore.siteQuery({ kind: 'list' });
     const wanted = sites.filter((s) => s.hasLocation && s.dives > 0).sort((a, b) => (b.lastDate ?? '').localeCompare(a.lastDate ?? ''));
     for (const site of wanted) {
       const key = keyOf(site.latUdeg, site.lonUdeg);
       if (await cache.match(key)) continue;
-      if (!canPrepare() || tiles >= MAX_TILES_PER_RUN) break;
+      if (tiles >= MAX_TILES_PER_RUN || !(await canPrepare())) break;
       drawer ??= await createDrawer(() => tiles++);
       await keep(cache, key, await drawer.draw(site.latUdeg, site.lonUdeg));
       await new Promise((resolve) => setTimeout(resolve, PAUSE_MS));

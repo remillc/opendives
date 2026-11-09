@@ -6,6 +6,8 @@ import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
 import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
@@ -812,6 +814,16 @@ class OpenDivesCorePlugin : Plugin() {
             return@onCoreThread
         }
         call.resolve(JSObject().put("json", NativeCore.createDive(fields.toString())))
+    }
+
+    /** Whether the device is on Wi-Fi or Ethernet (the WebView does not say). */
+    @PluginMethod
+    fun networkStatus(call: PluginCall) {
+        val manager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val capabilities = manager.getNetworkCapabilities(manager.activeNetwork)
+        val wifi = capabilities != null &&
+            (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) || capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET))
+        call.resolve(JSObject().put("wifi", wifi))
     }
 
     /** The planned dives, listed by the planner only (list_plans). */
