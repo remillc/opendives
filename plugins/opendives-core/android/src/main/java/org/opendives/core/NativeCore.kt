@@ -55,6 +55,11 @@ internal object NativeCore {
     external fun cloudCreateAccount(email: String, password: String): String
     external fun cloudVerifyPin(email: String, password: String, pin: String): String
     external fun cloudCreateLog(importPath: String): String
+
+    /** Own git repository: the references of the repository (opendives.h, git_check); any thread. */
+    external fun gitCheck(url: String, username: String, token: String): String
+    external fun gitConfigure(url: String, username: String, token: String, branch: String)
+    external fun gitCreateLog(): String
     external fun importCount(path: String): String
     external fun divelogsCheck(user: String, password: String): String
     external fun divelogsDownload(user: String, password: String, outPath: String): String

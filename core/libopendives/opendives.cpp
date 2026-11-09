@@ -24,8 +24,10 @@
 #include <git2.h>
 #include <chrono>
 #include <cstdio>
+#include <cstring>
 #include <ctime>
 #include <filesystem>
+#include <vector>
 
 // core/compat/qthelper_compat.cpp: where the XSLT stylesheets are read from.
 namespace opendives_compat {
@@ -621,8 +623,16 @@ int set_ca_file(const std::string &path)
 	return git_libgit2_opts(GIT_OPT_SET_SSL_CERT_LOCATIONS, path.c_str(), nullptr) < 0 ? -1 : 0;
 }
 
+// Own git repository (git_configure): the log address, without credentials,
+// and the host it is on.
+static bool git_mode_on = false;
+static bool git_any_scheme = false;
+static std::string git_host;
+
 static std::string cloud_host()
 {
+	if (git_mode_on)
+		return git_host;
 	size_t host_start = prefs.cloud_base_url.find("://");
 	host_start = host_start == std::string::npos ? 0 : host_start + 3;
 	std::string host = prefs.cloud_base_url.substr(host_start);
@@ -686,7 +696,14 @@ int cloud_list_dives(const std::string &email, const std::string &password, std:
 {
 	std::string url, head;
 	bool exists = false;
-	if (cloud_configure(email, password, url)) {
+	if (git_mode_on) {
+		// Own git repository: configured by git_configure(), nothing to set.
+		url = configured_url;
+		if (url.empty()) {
+			error = "Repository not configured";
+			return -1;
+		}
+	} else if (cloud_configure(email, password, url)) {
 		error = "Incomplete cloud credentials";
 		return -1;
 	}
@@ -728,6 +745,7 @@ int cloud_list_dives(const std::string &email, const std::string &password, std:
 
 int cloud_configure(const std::string &email, const std::string &password, std::string &url)
 {
+	git_mode_on = false;
 	prefs.cloud_storage_email = email;
 	prefs.cloud_storage_password = password;
 	configured_url.clear();
@@ -764,6 +782,8 @@ int cloud_sign_out(bool delete_copy, std::string &error)
 	current_log_path.clear();
 	loaded_cloud_url.clear();
 	configured_url.clear();
+	git_mode_on = false;
+	git_host.clear();
 	internal::on_log_loaded();
 	prefs.cloud_storage_email.clear();
 	prefs.cloud_storage_email_encoded.clear();
@@ -1008,6 +1028,278 @@ int cloud_branch_status(const std::string &url, bool &exists, std::string &head,
 	}
 	git_remote_free(remote);
 	return ret ? -1 : 0;
+}
+
+// --- Own git repository instead of the cloud --------------------------------
+
+bool git_mode()
+{
+	return git_mode_on;
+}
+
+void set_git_any_scheme_for_tests(bool allowed)
+{
+	git_any_scheme = allowed;
+}
+
+// "https://host/path" (a trailing slash is dropped) and its host. Nothing that
+// could carry credentials or confuse Subsurface's "url[branch]" syntax.
+static bool normalise_git_url(const std::string &in, std::string &out, std::string &host)
+{
+	size_t first = in.find_first_not_of(" \t\r\n");
+	size_t last = in.find_last_not_of(" \t\r\n");
+	if (first == std::string::npos)
+		return false;
+	std::string url = in.substr(first, last - first + 1);
+	size_t scheme_len = 0;
+	if (url.compare(0, 8, "https://") == 0) {
+		scheme_len = 8;
+	} else if (git_any_scheme) {
+		size_t pos = url.find("://");
+		if (pos == std::string::npos || pos == 0)
+			return false;
+		scheme_len = pos + 3;
+	} else {
+		return false;
+	}
+	for (unsigned char c: url) {
+		if (c <= 0x20 || c == 0x7f || c == '@' || c == '[' || c == ']' || c == '?' || c == '#' || c == '\\')
+			return false;
+	}
+	while (!url.empty() && url.back() == '/')
+		url.pop_back();
+	size_t slash = url.find('/', scheme_len);
+	if (slash == std::string::npos || slash == scheme_len || slash + 1 >= url.size())
+		return false;
+	host = url.substr(scheme_len, slash - scheme_len);
+	for (unsigned char c: host) {
+		if (!isalnum(c) && c != '.' && c != '-' && c != ':')
+			return false;
+	}
+	out = url;
+	return true;
+}
+
+static bool valid_git_username(const std::string &name)
+{
+	if (name.empty() || name.size() > 100)
+		return false;
+	for (unsigned char c: name) {
+		if (!isalnum(c) && c != '.' && c != '_' && c != '-')
+			return false;
+	}
+	return true;
+}
+
+static bool valid_git_token(const std::string &token)
+{
+	if (token.empty() || token.size() > 1000)
+		return false;
+	for (unsigned char c: token) {
+		if (c <= 0x20 || c >= 0x7f)
+			return false;
+	}
+	return true;
+}
+
+static bool valid_git_branch(const std::string &branch)
+{
+	if (branch.empty() || branch.size() > 200 || branch[0] == '-' || branch[0] == '/' || branch.back() == '/' ||
+	    branch.back() == '.' || branch.find("..") != std::string::npos || branch.find("//") != std::string::npos)
+		return false;
+	for (unsigned char c: branch) {
+		if (c <= 0x20 || c == 0x7f || c == '[' || c == ']' || c == '~' || c == '^' || c == ':' || c == '?' ||
+		    c == '*' || c == '\\')
+			return false;
+	}
+	return true;
+}
+
+namespace {
+
+// What libgit2's credential callback needs for one question to a server. The
+// token only lives here for the time of the question.
+struct CheckAuth {
+	std::string user, token;
+	int calls = 0;
+};
+
+// One attempt: a refused token must not be retried.
+int check_credentials(git_credential **out, const char *, const char *, unsigned int allowed, void *payload)
+{
+	CheckAuth *auth = static_cast<CheckAuth *>(payload);
+	if (auth->calls++ > 0 || auth->token.empty() || !(allowed & GIT_CREDENTIAL_USERPASS_PLAINTEXT))
+		return GIT_EUSER;
+	return git_credential_userpass_plaintext_new(out, auth->user.c_str(), auth->token.c_str());
+}
+
+struct CheckResult {
+	std::string status; // see git_check()
+	std::vector<std::string> branches;
+	bool empty = false;
+};
+
+// The git_check() question. Anonymous: the fetch advertisement (`git
+// ls-remote`). With a token: the push advertisement (receive-pack), which
+// asks for credentials even on a public repository and refuses a token that
+// may not write; nothing is sent.
+void check_remote(const std::string &url, const std::string &username, const std::string &token, CheckResult &result)
+{
+	result = CheckResult();
+	CheckAuth auth{ username, token };
+	git_remote *remote = nullptr;
+	if (git_remote_create_detached(&remote, url.c_str())) {
+		result.status = "none";
+		return;
+	}
+	git_remote_callbacks callbacks = GIT_REMOTE_CALLBACKS_INIT;
+	callbacks.credentials = check_credentials;
+	callbacks.payload = &auth;
+	// No certificate_check: libgit2 applies its normal validation.
+	int ret = git_remote_connect(remote, token.empty() ? GIT_DIRECTION_FETCH : GIT_DIRECTION_PUSH, &callbacks, nullptr,
+				     nullptr);
+	if (ret == 0) {
+		const git_remote_head **heads = nullptr;
+		size_t count = 0;
+		ret = git_remote_ls(&heads, &count, remote);
+		bool any_ref = false;
+		for (size_t i = 0; ret == 0 && i < count; i++) {
+			const std::string name = heads[i]->name;
+			if (name.compare(0, 5, "refs/") != 0)
+				continue;
+			any_ref = true;
+			if (name.compare(0, 11, "refs/heads/") == 0)
+				result.branches.push_back(name.substr(11));
+		}
+		result.empty = ret == 0 && !any_ref;
+		git_remote_disconnect(remote);
+	}
+	if (ret == 0) {
+		result.status = token.empty() ? "public" : "ok";
+	} else if (auth.calls > 0) {
+		// The server asked for credentials (and refused them, with a token).
+		result.status = token.empty() ? "auth" : "denied";
+	} else {
+		const char *message = git_error_last() ? git_error_last()->message : "";
+		result.status = !token.empty() && (strstr(message, "401") || strstr(message, "403")) ? "denied" : "none";
+	}
+	git_remote_free(remote);
+}
+
+} // namespace
+
+int git_check(const std::string &url, const std::string &username, const std::string &token, std::string &json,
+	      std::string &error)
+{
+	std::string clean, host;
+	if (!normalise_git_url(url, clean, host)) {
+		error = "BAD_ADDRESS";
+		return -1;
+	}
+	if (!token.empty() && (!valid_git_token(token) || !valid_git_username(username))) {
+		error = "BAD_CREDENTIALS";
+		return -1;
+	}
+	CheckResult result;
+	check_remote(clean, username, token, result);
+	json = "{\"status\":";
+	append_json_string(json, result.status);
+	json += ",\"empty\":";
+	json += result.empty ? "true" : "false";
+	json += ",\"branches\":[";
+	for (size_t i = 0; i < result.branches.size(); i++) {
+		if (i)
+			json += ',';
+		append_json_string(json, result.branches[i]);
+	}
+	json += "]}";
+	return 0;
+}
+
+int git_configure(const std::string &url, const std::string &username, const std::string &token,
+		  const std::string &branch, std::string &address, std::string &error)
+{
+	std::string clean, host;
+	if (!normalise_git_url(url, clean, host)) {
+		error = "BAD_ADDRESS";
+		return -1;
+	}
+	if (!valid_git_username(username) || !valid_git_token(token)) {
+		error = "BAD_CREDENTIALS";
+		return -1;
+	}
+	if (!valid_git_branch(branch)) {
+		error = "BAD_BRANCH";
+		return -1;
+	}
+	// Another repository or another account: nothing of the previous one stays.
+	prefs.cloud_storage_email.clear();
+	prefs.cloud_storage_email_encoded = username;
+	prefs.cloud_storage_password = token;
+	git_mode_on = true;
+	git_host = host;
+	address = configured_url = clean + "[" + branch + "]";
+	return 0;
+}
+
+int git_create_log(std::string &json, std::string &error)
+{
+	const std::string url = configured_url;
+	if (!git_mode_on || url.empty()) {
+		error = "NO_REPOSITORY";
+		return -1;
+	}
+	struct git_info info;
+	if (!is_git_repository(url.c_str(), &info)) {
+		error = "BAD_ADDRESS";
+		return -1;
+	}
+	std::error_code ec;
+	if (std::filesystem::exists(info.localdir, ec)) {
+		error = "LOCAL_COPY_EXISTS";
+		return -1;
+	}
+	// Never create anything unless the server says, now, that it holds no
+	// reference at all (a push of the first branch cannot overwrite anything).
+	CheckResult state;
+	check_remote(url.substr(0, url.rfind('[')), prefs.cloud_storage_email_encoded, prefs.cloud_storage_password, state);
+	if (state.status != "ok") {
+		error = state.status == "denied" ? "DENIED" : "NETWORK";
+		return -1;
+	}
+	if (!state.empty) {
+		const std::string branch = url.substr(url.rfind('[') + 1, url.size() - url.rfind('[') - 2);
+		bool has_branch = false;
+		for (const std::string &b: state.branches)
+			has_branch = has_branch || b == branch;
+		error = has_branch ? "LOG_EXISTS" : "NOT_EMPTY";
+		return -1;
+	}
+	// No local copy: the core clones, finds no branch and creates it with an
+	// empty commit pushed to the server (create_and_push_remote).
+	bool was_local_only = git_local_only;
+	git_local_only = false;
+	int ret = load(url, error);
+	git_local_only = was_local_only;
+	bool created = false;
+	std::string head, probe_error;
+	if (!ret && cloud_branch_status(url, created, head, probe_error) == 0 && created) {
+		loaded_cloud_url = url;
+		apply_log_prefs();
+		divelog.process_loaded_dives();
+		json = cloud_json(loaded_git_commit, git_remote_sync_successful, std::string(), true);
+		return 0;
+	}
+	// Nothing reached the server: the copy made here is of no use.
+	loaded_cloud_url.clear();
+	if (!ret) {
+		divelog.clear();
+		current_log_path.clear();
+		internal::on_log_loaded();
+	}
+	std::filesystem::remove_all(info.localdir, ec);
+	error = "CREATE_FAILED: " + (ret ? error : probe_error);
+	return -1;
 }
 
 void set_xslt_dir(const std::string &dir)

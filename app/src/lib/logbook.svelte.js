@@ -44,8 +44,12 @@ export const logbook = $state({
   preview: readWelcome() ? null : readSnapshot(),
   /** @type {string|null} */
   error: null,
-  /** Cloud account email; empty without an account. */
+  /** Cloud account email, or the user name for a git repository; empty without an account. */
   email: '',
+  /** Where the logbook is synced: the Subsurface cloud, or the user's own git repository. */
+  mode: /** @type {'cloud'|'git'} */ ('cloud'),
+  /** The git repository, "host/owner/name"; empty for the cloud. */
+  repository: '',
   /** Cloud server host in use, e.g. ssrf-cloud-eu.subsurface-divelog.org. */
   server: '',
   /** Local time of the last successful sync (ISO, no time zone), or null. */
@@ -590,6 +594,8 @@ function forgetAccount(showWelcome) {
   saveSnapshot(null);
   logbook.dives = [];
   logbook.email = '';
+  logbook.mode = 'cloud';
+  logbook.repository = '';
   logbook.server = '';
   logbook.sync = 'local';
   logbook.pending = 0;
@@ -620,6 +626,26 @@ export function accountReady() {
   writeWelcomeState('done');
   logbook.lastSync = null;
   return loadLogbook();
+}
+
+/**
+ * The logbook now lives in another git repository (Account, "Modifier le
+ * dépôt"): what was shown belongs to the previous one, the new one is loaded.
+ */
+export function repositoryChanged() {
+  logbook.preview = null;
+  saveSnapshot(null);
+  logbook.dives = [];
+  logbook.pending = 0;
+  logbook.pendingByDive = {};
+  logbook.conflict = null;
+  logbook.lastSync = null;
+  try {
+    localStorage.removeItem('od.lastSync');
+  } catch {
+    // Not fatal.
+  }
+  return loadLogbook({ force: true });
 }
 
 function readAutoSync() {
@@ -747,10 +773,14 @@ async function loadCloud(force, pre = null) {
   mark('configured');
   if (!account.available) {
     logbook.email = '';
+    logbook.mode = 'cloud';
+    logbook.repository = '';
     logbook.server = '';
     return false;
   }
   logbook.email = account.email;
+  logbook.mode = account.mode === 'git' ? 'git' : 'cloud';
+  logbook.repository = account.repository ?? '';
 
   if (!logbook.autoSync && !force) {
     try {

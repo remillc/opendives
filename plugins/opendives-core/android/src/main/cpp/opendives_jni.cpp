@@ -885,6 +885,34 @@ Java_org_opendives_core_NativeCore_pendingChanges(JNIEnv *env, jobject)
 	return env->NewStringUTF(json.c_str());
 }
 
+// Own git repository (opendives.h, git_check and following). The token is
+// only passed through: never kept, logged or put in an error text here.
+JNIEXPORT jstring JNICALL
+Java_org_opendives_core_NativeCore_gitCheck(JNIEnv *env, jobject, jstring url, jstring username, jstring token)
+{
+	std::string json, error;
+	int ret = opendives::git_check(to_string(env, url), to_string(env, username), to_string(env, token), json, error);
+	return json_or_throw(env, ret, json, error);
+}
+
+JNIEXPORT void JNICALL
+Java_org_opendives_core_NativeCore_gitConfigure(JNIEnv *env, jobject, jstring url, jstring username, jstring token,
+						jstring branch)
+{
+	std::string address, error;
+	if (opendives::git_configure(to_string(env, url), to_string(env, username), to_string(env, token),
+				     to_string(env, branch), address, error))
+		throw_core_error(env, error);
+}
+
+JNIEXPORT jstring JNICALL
+Java_org_opendives_core_NativeCore_gitCreateLog(JNIEnv *env, jobject)
+{
+	std::string json, error;
+	int ret = opendives::git_create_log(json, error);
+	return json_or_throw(env, ret, json, error);
+}
+
 JNIEXPORT jstring JNICALL
 Java_org_opendives_core_NativeCore_cloudProbe(JNIEnv *env, jobject)
 {

@@ -3,6 +3,7 @@
   // <SyncStatus> (spec, section 4, "EtatSynchro"): one line under the Logbook
   // title, never a window. An icon always goes with the color.
   import Icon from './Icon.svelte';
+  import { logbook } from '../lib/logbook.svelte.js';
   import { t } from '../lib/i18n.js';
 
   /**
@@ -28,8 +29,8 @@
   /** @type {Record<string, {icon: 'check'|'offline'|'device'|'sync'|'cloud', text: string, pending: boolean}>} */
   const states = $derived({
     manual: { icon: 'cloud', text: t('sync.manual', { n: pending }), pending: true },
-    syncing: { icon: 'sync', text: t('sync.syncing'), pending: false },
-    cloud: { icon: 'check', text: t('sync.cloud'), pending: false },
+    syncing: { icon: 'sync', text: t(logbook.mode === 'git' ? 'sync.syncingGit' : 'sync.syncing'), pending: false },
+    cloud: { icon: 'check', text: t(logbook.mode === 'git' ? 'sync.cloudGit' : 'sync.cloud'), pending: false },
     offline: {
       icon: 'offline',
       text: pending ? t('sync.offlinePending', { n: pending }) : t('sync.offline'),
@@ -44,7 +45,7 @@
   <div class="line">
     <Icon name={state.icon} size={18} />
     <!-- The stage is announced, not each percent: the bar carries the value. -->
-    <span>{showProgress && progress ? t(`sync.stages.${progress.stage}`) : state.text}</span>
+    <span>{showProgress && progress ? t(`sync.stages.${progress.stage}${progress.stage === 'connect' && logbook.mode === 'git' ? 'Git' : ''}`) : state.text}</span>
     {#if showProgress}<span class="percent od-value" aria-hidden="true">{percent}&nbsp;%</span>{/if}
   </div>
   {#if showProgress}

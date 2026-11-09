@@ -77,6 +77,11 @@
       <span class="chevron"><Icon name="expand" size={16} /></span>
     </a>
   </nav>
+
+  <a href="/welcome/git" class="own-git" onclick={(e) => go(e, '/welcome/git')}>
+    <Icon name="git" size={20} />
+    <span>{t('welcome.ownGit')}</span>
+  </a>
 </Page>
 
 <style>
@@ -98,6 +103,11 @@
       display: block;
       width: 100%;
       height: calc(var(--f7-safe-area-top) + 196px);
+
+      /* A low window (tablet in landscape): every choice stays in view. */
+      @media (max-height: 820px) {
+        height: calc(var(--f7-safe-area-top) + 96px);
+      }
     }
 
     .ground {
@@ -212,6 +222,27 @@
 
     .chevron {
       display: none;
+    }
+
+    /* Under the three cards: a text link with the git icon. */
+    .own-git {
+      margin: 8px 16px 0;
+      min-height: 48px;
+      padding: 0 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.1px;
+      color: var(--od-text);
+      text-decoration: none;
+
+      :global(.ios) & {
+        font-size: 17px;
+        font-weight: 400;
+      }
     }
 
     /* iOS: an inset grouped list, a chevron on each row. */

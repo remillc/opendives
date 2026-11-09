@@ -801,7 +801,9 @@ Christian approved these on the canvas. Mock-ups: `android-carnet.dc.html`, `car
 - In selection mode, an open trip shows its dives with their own checkboxes, in the same indented surface, selectable like the other rows.
 - The side-menu mock-ups now show the current logbook behind the drawer (no change to the drawer itself).
 
-## [ ] 2026-11-09-11 Own git repository instead of the cloud (to-do #11)
+## [x] 2026-11-09-11 Own git repository instead of the cloud (to-do #11)
 
 Christian wants it done now (no longer waiting for v1). Spec: "Own git repository instead of the cloud" (mock-ups listed there). First-launch link, "Dépôt git" form with the address check through `ls-remote`, branches read from the repository, the Compte screen in git mode, and the token storage rules (Keystore / Keychain, no backup, no logs). Remove to-do #11 from `docs/TODOS.md` when it is done. If libgit2 in the core cannot list remote references or push over HTTPS with a token on Android or iOS, stop and tell Christian.
 
+
+Done in the branch `feature/own-git-repository` (Android only; there is no iOS project yet). Still to check by Christian with a real token: the authenticated check, the first push to the empty private repository and a sync (see the branch report).

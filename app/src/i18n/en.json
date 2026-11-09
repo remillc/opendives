@@ -129,6 +129,11 @@
     "tripDeleted": {
       "one": "Trip deleted, its dives are kept",
       "other": "{n} trips deleted, their dives are kept"
+    },
+    "emptyGit": "Connected to the git repository, no dives",
+    "deleteTextGit": {
+      "one": "The dive is removed from the logbook, on this device and in the repository. You can undo for a few seconds.",
+      "other": "The {n} dives are removed from the logbook, on this device and in the repository. You can undo for a few seconds."
     }
   },
   "sync": {
@@ -138,7 +143,8 @@
       "receive": "Receiving changes…",
       "merge": "Merging changes…",
       "send": "Sending changes…",
-      "read": "Reading the logbook…"
+      "read": "Reading the logbook…",
+      "connectGit": "Connecting to the repository…"
     },
     "outcome": {
       "done": "Sync complete",
@@ -155,7 +161,9 @@
     "offlinePending": {
       "one": "Offline: {n} change will be sent when the network is back",
       "other": "Offline: {n} changes will be sent when the network is back"
-    }
+    },
+    "syncingGit": "Syncing with the git repository…",
+    "cloudGit": "Synced with the git repository"
   },
   "dive": {
     "siteNotSet": "Dive site not set",
@@ -632,7 +640,11 @@
       "one": "On this device · {n} dive",
       "other": "On this device · {n} dives"
     },
-    "accountLabel": "Account: {name}"
+    "accountLabel": "Account: {name}",
+    "gitDives": {
+      "one": "Repository · {n} dive",
+      "other": "Repository · {n} dives"
+    }
   },
   "account": {
     "addDeviceDives": "Add the dives of this device",
@@ -684,7 +696,15 @@
     "autoSyncOff": "Off: changes stay on this device, and those from other devices do not arrive, until you sync",
     "pending": "Changes not sent",
     "bandSignedIn": "Your logbook in the cloud",
-    "bandNone": "No account connected"
+    "bandNone": "No account connected",
+    "bandGit": "Your logbook in your git repository",
+    "gitCaption": "{host} · branch {branch}",
+    "gitDives": "Dives in the repository",
+    "gitGroup": "Git repository",
+    "gitEdit": "Change the repository",
+    "gitEditText": "Address, branch and token",
+    "gitSignOut": "Disconnect from the repository",
+    "gitSignOutText": "Your dives stay in the repository. The token is erased from this device."
   },
   "welcome": {
     "title": "OpenDives",
@@ -695,7 +715,8 @@
     "createText": "Free. Your dives are backed up and shared between your phone, your tablet and your computer. You can bring your divelogs.de logbook into it.",
     "noAccount": "Start without an account",
     "noAccountText": "Your dives stay on this device only: no backup, and no sharing with your other devices. You can create an account later and send your logbook to it.",
-    "choicesLabel": "Ways to start"
+    "choicesLabel": "Ways to start",
+    "ownGit": "Use my own git repository"
   },
   "signOut": {
     "title": "Sign out?",
@@ -711,7 +732,13 @@
     "signOutAnyway": "Sign out anyway",
     "cancel": "Cancel",
     "syncFailed": "The changes could not be sent. You are still signed in.",
-    "failed": "Signing out did not complete. Nothing was deleted."
+    "failed": "Signing out did not complete. Nothing was deleted.",
+    "titleGit": "Disconnect from the repository?",
+    "textNoneGit": "The logbook stays in the repository. A copy stays on this device, not shown, and is used if you reconnect to the same repository. The token is erased from this device.",
+    "textPendingGit": {
+      "one": "{n} change is not sent to the repository yet. If you disconnect anyway, it will be sent the next time you connect to this repository from this device. The token is erased from this device.",
+      "other": "{n} changes are not sent to the repository yet. If you disconnect anyway, they will be sent the next time you connect to this repository from this device. The token is erased from this device."
+    }
   },
   "deleteAccount": {
     "back": "Back to the account",
@@ -1290,7 +1317,8 @@
       "Logbook: while dragging a dive, a horizontal bar shows where it would be dropped.",
       "Logbook: the dive number is back before the date; an open trip is indented, and its dives can be checked in selection mode.",
       "Logbook: a trip can be selected; “Delete this trip” removes the trip and keeps its dives.",
-      "Privacy policy: links and the contact address can be tapped."
+      "Privacy policy: links and the contact address can be tapped.",
+      "Git repository: the logbook can live in your own git repository (GitHub, GitLab, Codeberg or your server) instead of the Subsurface cloud. On the first page, “Use my own git repository”; the access token stays encrypted on the device."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
@@ -1325,7 +1353,8 @@
       "noAccount": "no account",
       "dives": "Dives",
       "lastSync": "Last synchronisation",
-      "lastError": "Last error"
+      "lastError": "Last error",
+      "git": "Git repository"
     },
     "opensElsewhere": "opens in the browser",
     "credit": "The dive core comes from Subsurface, created by Linus Torvalds and Dirk Hohndel, and its contributors.",
@@ -1948,5 +1977,92 @@
       "other": "over {n} years, from {from} to {to}"
     },
     "tools": "Plan, check desaturation, prepare gases"
+  },
+  "gitRepo": {
+    "title": "Git repository",
+    "connect": "Connect",
+    "connecting": "Connecting…",
+    "intro": "Your logbook in a git repository of your own (GitHub, GitLab, Codeberg or your server), instead of the cloud. A copy stays on this device.",
+    "address": "Repository address (HTTPS)",
+    "addressChecking": "Checking the address…",
+    "addressPublic": "Repository found, with an existing logbook",
+    "addressPublicEmpty": "Repository found, empty",
+    "addressPrivate": "Private or missing repository: it will be checked with the token",
+    "addressNone": "No git repository at this address. Check the address, it often ends with .git",
+    "addressNotHttps": "The address must start with https://",
+    "addressInvalid": "Invalid address: it must not contain a user name, spaces or brackets.",
+    "username": "User name",
+    "usernameInvalid": "Letters, digits, dot, hyphen and underscore only",
+    "token": "Access token",
+    "tokenHelper": "A personal access token with write access, not your password",
+    "tokenKeep": "Leave empty to keep the saved token",
+    "tokenChecking": "Checking the token…",
+    "tokenDenied": "Access refused by the server. Check the token and its write access to this repository.",
+    "tokenHow": "How to create an access token",
+    "branch": "Branch",
+    "branchWaiting": "Available once access is accepted",
+    "branchesRead": {
+      "one": "{n} branch read from the repository: {list}",
+      "other": "{n} branches read from the repository: {list}"
+    },
+    "branchEmpty": "Empty repository: the {name} branch will be created in it",
+    "note": "The token stays encrypted on this device. The logbook is saved in Subsurface’s format: Subsurface on a computer can open the same repository.",
+    "errorNetwork": "The server does not answer. Check the connection, then try again.",
+    "errorNoLog": "The branch is no longer in the repository. Open the list of branches and pick one.",
+    "errorFailed": "The connection did not succeed. Nothing was saved.",
+    "pending": "Some changes are not sent to the repository yet. Sync before changing repository.",
+    "connected": "Connected to the repository {repository}"
+  },
+  "tokenHelp": {
+    "title": "Create an access token",
+    "intro": "OpenDives connects to your repository with a personal access token, never with your password. Create a token limited to this one repository, allowed to read and write its contents and nothing else, with an expiry date. The labels below are those of each site’s English interface.",
+    "afterwards": "Then paste the token into OpenDives, with your user name. The site shows the token only once: copy it before leaving the page.",
+    "open": "Open {name}’s token page",
+    "openDocs": "{name} documentation",
+    "github": {
+      "name": "GitHub",
+      "note": "A fine-grained token can be limited to a single repository.",
+      "s1": "Sign in to GitHub, then open Settings (menu of your profile picture).",
+      "s2": "At the bottom of the left column, open Developer settings.",
+      "s3": "Open Personal access tokens, then Fine-grained tokens, then tap Generate new token.",
+      "s4": "Token name: a name you will recognise, for example OpenDives.",
+      "s5": "Expiration: choose a near date, for example in 90 days. On that date the token stops working and you create a new one.",
+      "s6": "Resource owner: your account, or the organisation that owns the repository.",
+      "s7": "Repository access: choose Only select repositories, then the repository of your logbook.",
+      "s8": "Permissions: under Repository permissions, set Contents to Read and write. Add no other permission.",
+      "s9": "Tap Generate token, then copy the token."
+    },
+    "gitlab": {
+      "name": "GitLab",
+      "note": "A project access token is limited to one project. On GitLab.com it needs the Premium or Ultimate plan (any licence on a self-managed GitLab server) and the Maintainer or Owner role on the project. Without that, use a personal access token, which reaches all your projects: GitLab cannot limit it to one.",
+      "projectTitle": "Project access token",
+      "p1": "Open your project, then in the left sidebar Settings, Access tokens.",
+      "p2": "Tap Add new token.",
+      "p3": "Token name: a name you will recognise, for example OpenDives.",
+      "p4": "Expiration date: a near date (365 days at most).",
+      "p5": "Role: the lowest one allowed to push to your branch, Developer, or Maintainer if the branch is protected.",
+      "p6": "Scopes: tick write_repository only.",
+      "p7": "Tap Create project access token, then copy the token.",
+      "personalTitle": "Otherwise, personal access token",
+      "q1": "At the top right, tap your avatar, then Edit profile.",
+      "q2": "In the left sidebar, open Access, then Personal access tokens.",
+      "q3": "In the Generate token list, choose Legacy token.",
+      "q4": "Token name: a name you will recognise. Expiration date: a near date.",
+      "q5": "Scopes: tick write_repository only.",
+      "q6": "Tap Generate token, then copy the token.",
+      "user": "In OpenDives, the user name is your GitLab user name. For Git over HTTPS, GitLab accepts any non-empty name with the token."
+    },
+    "codeberg": {
+      "name": "Codeberg",
+      "note": "Codeberg’s guide says a token gives full access to your account by default: limit it as below.",
+      "s1": "Sign in to Codeberg, open the menu of your profile picture (Profiles and Settings), then Settings.",
+      "s2": "Open the Applications tab.",
+      "s3": "Under Manage Access Tokens, in Generate New Token, type a Token Name you will recognise, for example OpenDives.",
+      "s4": "If the form offers it, limit the token to your repository: choose Specific repositories, then the repository of your logbook.",
+      "s5": "Permissions: for repository, choose Read and Write. Leave the others on No access.",
+      "s6": "If the form offers an expiry date, choose a near one. Codeberg’s guide does not mention one: without a date, delete the token from this page when you stop using it.",
+      "s7": "Tap Generate Token, then copy the token."
+    },
+    "menu": "On this page"
   }
 }
