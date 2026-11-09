@@ -18,6 +18,7 @@
   import {
     formatCylinderSize,
     formatDateTime,
+    formatDuration,
     formatGas,
     formatGasVolume,
     formatNumber,
@@ -63,6 +64,8 @@
         dive,
         {
           id,
+          number: dive.number,
+          durationSeconds: dive.durationSeconds,
           date: dive.date,
           site: dive.site,
           maxDepthMm: dive.maxDepthMm,
@@ -399,7 +402,16 @@
       {#if planner.source}
         <ProfileThumbnail profile={planner.source.profile} maxDepthMm={planner.source.maxDepthMm} {prefs} />
         <span class="text">
-          <span class="title">{t('plan.sourceTitle', { date: formatDateTime(planner.source.date) })}</span>
+          <span class="title"
+            >{[
+              planner.source.number
+                ? t('plan.sourceTitleNumber', { number: String(planner.source.number), date: formatDateTime(planner.source.date) })
+                : t('plan.sourceTitle', { date: formatDateTime(planner.source.date) }),
+              planner.source.durationSeconds ? formatDuration(planner.source.durationSeconds) : '',
+            ]
+              .filter(Boolean)
+              .join(' · ')}</span
+          >
           <span class="sub">{t('plan.sourceText')}</span>
         </span>
       {:else}
@@ -524,7 +536,13 @@
           <ListItem
             link="#"
             title={dive.site || t('dive.siteNotSet')}
-            footer={formatDateTime(dive.date)}
+            footer={[
+              dive.number ? t('detail.number', { number: String(dive.number) }) : '',
+              formatDateTime(dive.date),
+              dive.durationSeconds ? formatDuration(dive.durationSeconds) : '',
+            ]
+              .filter(Boolean)
+              .join(' · ')}
             onClick={() => choose(dive.id)}
           >
             {#snippet media()}<ProfileThumbnail profile={dive.profile} maxDepthMm={dive.maxDepthMm} {prefs} />{/snippet}

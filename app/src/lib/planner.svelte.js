@@ -46,6 +46,8 @@ export const SETTING_KEYS = /** @type {const} */ ([
 /**
  * @typedef {Object} PlanSource
  * @property {number} id
+ * @property {number} number the dive's number; 0 when it has none
+ * @property {number} durationSeconds
  * @property {string} date
  * @property {string} site
  * @property {number} maxDepthMm

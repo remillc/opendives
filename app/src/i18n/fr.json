@@ -1224,21 +1224,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
-      "Carnet synchronisé avec le cloud Subsurface, ou gardé sur l’appareil seulement.",
-      "Téléchargement depuis l’ordinateur de plongée par Bluetooth (Android) : progression régulière, bouton « Arrêter le téléchargement », nouvelles plongées numérotées à la suite.",
-      "Fiche de plongée : profil avec axes gradués et couches à afficher (température, gaz, ppO₂, plafond, tissus).",
-      "Modifier la plongée : tous les champs que modifie Subsurface sur ordinateur, dont les bouteilles et le lest. Le site et le voyage se tapent ou se choisissent dans une liste filtrée par les mots tapés ; un nouveau nom les crée. Choisir un emplacement de lest reprend le dernier poids utilisé.",
-      "Renuméroter une plongée depuis son menu : les plongées concernées sont décalées, les numéros restent uniques et sans trou.",
-      "Partager une plongée : fiche PDF d’une page, ou court résumé avec l’image du profil.",
-      "Exporter les plongées sélectionnées : carnet .ssrf, UDDF, CSV ou fiches PDF, avec l’option Anonymiser.",
-      "Supprimer une plongée depuis son menu, avec « Annuler » pendant 10 secondes.",
-      "Sites : carte, fiche, plongées sans site, sites sans coordonnées et nettoyage des doublons.",
-      "Statistiques, planificateur (réglages sur leur propre écran, plafond de décompression, consommation choisie dans un menu) et outils de gaz.",
-      "Unités : chaque mesure dans l’unité choisie, avec des valeurs par défaut rondes en impérial.",
-      "Synchronisation : étape en cours et progression dans le menu, et un message confirme la fin ou signale l’erreur.",
-      "Tablette : liste et détail côte à côte pour le carnet, les statistiques, les outils et les sites ; l’édition s’ouvre par-dessus le carnet.",
-      "Réglages : format du papier des fiches PDF (selon la région, Lettre US ou A4).",
-      "À propos : politique de confidentialité et « Question / signaler un problème »."
+      "Planificateur : la plongée de départ montre son numéro et sa durée, dans le planificateur et dans la liste pour la choisir."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
@@ -1444,7 +1430,8 @@
     "addDecoGas": "Ajouter un gaz de décompression",
     "removeDecoGas": "Retirer",
     "switchDepth": "Profondeur de changement",
-    "switchDepthAuto": "Vide : la MOD à la pO₂ de décompression, comme dans Subsurface"
+    "switchDepthAuto": "Vide : la MOD à la pO₂ de décompression, comme dans Subsurface",
+    "sourceTitleNumber": "Plongée n° {number} du {date}"
   },
   "filter": {
     "title": "Filtrer",

@@ -1224,21 +1224,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
-      "Logbook synced with the Subsurface cloud, or kept on the device only.",
-      "Download from the dive computer over Bluetooth (Android): steady progress, a “Stop download” button, new dives numbered in sequence.",
-      "Dive page: profile with graduated axes and layers to show (temperature, gas, ppO₂, ceiling, tissues).",
-      "Edit the dive: every field Subsurface desktop edits, cylinders and weights included. Site and trip are typed or chosen from a list narrowed by the words typed; a new name creates them. Choosing a weight location fills in the last weight used.",
-      "Renumber a dive from its menu: the dives it affects shift so that numbers stay unique and without gaps.",
-      "Share a dive: a one-page PDF sheet, or a short summary with the profile image.",
-      "Export the selected dives: .ssrf logbook, UDDF, CSV or PDF sheets, with the Anonymize option.",
-      "Delete a dive from its menu, with “Undo” for 10 seconds.",
-      "Sites: map, site page, dives without a site, sites without coordinates and duplicate clean-up.",
-      "Statistics, planner (settings on their own screen, decompression ceiling, SAC chosen from a menu) and gas tools.",
-      "Units: every measure in the chosen unit, with round defaults in imperial.",
-      "Sync: current step and progress in the menu, and a message confirms the end or reports the error.",
-      "Tablet: list and detail side by side for the logbook, statistics, tools and sites; editing opens over the logbook.",
-      "Settings: paper size of the PDF sheets (from the region, US Letter or A4).",
-      "About: privacy policy and “Question / report a problem”."
+      "Planner: the starting dive shows its number and duration, in the planner and in the list to choose it."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
@@ -1444,7 +1430,8 @@
     "addDecoGas": "Add a deco gas",
     "removeDecoGas": "Remove",
     "switchDepth": "Switch depth",
-    "switchDepthAuto": "Empty: the MOD at the decompression pO₂, as in Subsurface"
+    "switchDepthAuto": "Empty: the MOD at the decompression pO₂, as in Subsurface",
+    "sourceTitleNumber": "Dive no. {number} of {date}"
   },
   "filter": {
     "title": "Filter",
