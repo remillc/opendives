@@ -505,11 +505,15 @@ html.ios {
         font-size: 14px;
         line-height: 20px;
         letter-spacing: 0.25px;
+        display: block;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
     }
 
     li.in-trip {
-      padding: 0 12px;
+      padding: 0 12px 0 32px;
 
       > .item-content {
         min-height: 64px;

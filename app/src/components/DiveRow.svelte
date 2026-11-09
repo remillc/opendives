@@ -84,7 +84,7 @@
         {#if pendingText}
           <div class="item-text pending">{pendingText}</div>
         {:else}
-          <div class="item-text">{formatDateTime(dive.date)}</div>
+          <div class="item-text">{#if number}{number}<span class="separator" aria-hidden="true">·</span>{/if}{formatDateTime(dive.date)}</div>
         {/if}
       </div>
       <div class="values od-value">
@@ -132,6 +132,15 @@
       flex: none;
       margin-right: 16px;
       pointer-events: none;
+
+      /* Android: the row's own 16 dp gap. */
+      :global(.md) & {
+        margin-right: 0;
+      }
+    }
+
+    .separator {
+      margin: 0 0.4em;
     }
 
     .item-text.pending {
