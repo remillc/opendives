@@ -1270,7 +1270,8 @@
       "Menu latéral et en-têtes refaits : bandeau, compte en haut du menu, synchronisation centrée, résumé de chaque section, barre de recherche du carnet. Réglages et À propos s’ouvrent avec le menu ☰.",
       "Carnet : lignes alignées sur la maquette (sans séparateurs), plongées d’un voyage déplié dans un cadre blanc. Compte : même en-tête que les sections.",
       "Carnet : un voyage d’une seule plongée s’affiche comme une plongée, sans flèche.",
-      "Carnet : pendant le glisser-déposer d’une plongée, une barre horizontale montre où elle serait déposée."
+      "Carnet : pendant le glisser-déposer d’une plongée, une barre horizontale montre où elle serait déposée.",
+      "Carnet : le numéro de la plongée revient devant la date ; un voyage ouvert est décalé, et ses plongées se cochent en mode sélection."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",

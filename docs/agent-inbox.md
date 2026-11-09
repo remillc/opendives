@@ -791,7 +791,9 @@ Christian notices that the logbook rows in the app do not match `docs/mockups/an
 - Expanded trip (`docs/mockups/android-carnet.dc.html` now shows the trip of 2 February 2013 open): the arrow turns up, and the trip's dives follow in a white surface (12 dp side margins, 16 dp corners, 4 dp vertical padding), each a dive row as above with 64 dp height and 12 dp side padding, most recent first. Collapsing hides them again.
 Also check the other changes of today on the same screens (task 2026-11-09-08), and the Compte header (same band as the sections, summary "Votre carnet dans le cloud", or "Aucun compte connecté" without an account; the text under "Se déconnecter" reads "Déconnecter votre app du cloud. Vos plongées restent dans le cloud et sur cet appareil."). In every banded header, the faint profile is 34 dp high near the bottom and never touches text.
 
-## [ ] 2026-11-09-10 Logbook: dive numbers, trip open in place, trip dives in selection
+## [x] 2026-11-09-10 Logbook: dive numbers, trip open in place, trip dives in selection
+
+Done in the branch `fix/logbook-numbers-trip-selection`.
 
 Christian approved these on the canvas. Mock-ups: `android-carnet.dc.html`, `carnet-selection-android.dc.html`, `carnet-selection-menu-android.dc.html`.
 - Each dive row starts its second line with the dive number: "N° 9 · 7 févr. 2026, 09:09".

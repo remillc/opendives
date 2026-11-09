@@ -1270,7 +1270,8 @@
       "Side menu and headers redone: band, account at the top of the menu, centred sync, a summary for each section, logbook search bar. Settings and About use the ☰ menu.",
       "Logbook: rows aligned with the design (no dividers), the dives of an expanded trip in a white surface. Account: same header as the sections.",
       "Logbook: a trip of one dive is shown as a dive, without an arrow.",
-      "Logbook: while dragging a dive, a horizontal bar shows where it would be dropped."
+      "Logbook: while dragging a dive, a horizontal bar shows where it would be dropped.",
+      "Logbook: the dive number is back before the date; an open trip is indented, and its dives can be checked in selection mode."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
