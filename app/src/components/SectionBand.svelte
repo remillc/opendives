@@ -12,7 +12,7 @@
   const PROFILE = 'M0 30 L20 38 L45 70 L70 92 L95 96 L120 88 L140 94 L165 80 L185 62 L210 58 L235 50 L255 46 L275 40 L300 36';
 </script>
 
-<div class="band" class:tall class:over-map={overMap} class:pill class:chip>
+<div class="band" class:tall class:over-map={overMap} class:pill class:with-chip={chip}>
   <svg class="profile" viewBox="0 0 300 140" preserveAspectRatio="none" aria-hidden="true">
     <path d="{PROFILE} V140 H0 Z" class="area" />
     <path d={PROFILE} class="line" vector-effect="non-scaling-stroke" />
@@ -46,7 +46,7 @@
       }
 
       /* A small status chip under the summary (Sites, offline). */
-      &.chip {
+      &.with-chip {
         --od-band-h: calc(var(--f7-safe-area-top) + 154px);
       }
 

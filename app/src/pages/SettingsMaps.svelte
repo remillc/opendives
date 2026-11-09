@@ -317,7 +317,7 @@
   </Popover>
 
   {#snippet fixedContent()}
-    {#if !ios && !split}
+    {#if !ios && !split && !empty}
       <!-- Extended floating button, written by hand as in the Logbook. -->
       <div class="fab fab-right-bottom fab-extended od-fab-add">
         <a href="/settings/maps/new">

@@ -1007,7 +1007,9 @@ Christian asked for a fr-CA catalog that holds only what differs from fr. The fi
 - When fr.json changes, fr-CA keeps only its overrides: a key removed from fr is removed from fr-CA too.
 - Delete to-do #19 when done.
 
-## [ ] 2026-11-09-33 Offline maps: regions screen, downloads, updates, Sites map offline
+## [x] 2026-11-09-33 Offline maps: regions screen, downloads, updates, Sites map offline
+
+Done in Offline maps: integrate downloads, screens and tile reading
 
 Christian approved the design. Spec: "Offline maps (decided on 9 November 2026)". Mock-ups in `docs/mockups/`: `android-cartes-hors-ligne`, `-menu`, `-vide`, `-ajout`, `-pays`, `-choix-carte`, `-telechargement`, `-echec`, `-mise-a-jour`, `-donnees-mobiles`, `-espace`, `-plafond`, `-limite`, `-maj-remplacer`, `-suppression`, `-supprimee` (all `.dc.html`), `android-sites-hors-ligne.dc.html`, `appbar-tiroir-android-maj-cartes.dc.html`, `ios-cartes-hors-ligne.dc.html`, `android-tablette-cartes.dc.html`, `tablette-cartes.dc.html`, and the Settings row in `android-reglages.dc.html`.
 

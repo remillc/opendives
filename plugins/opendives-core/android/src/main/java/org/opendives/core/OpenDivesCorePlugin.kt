@@ -867,7 +867,7 @@ class OpenDivesCorePlugin : Plugin() {
         val sha256 = call.getString("sha256")
         if (url.isNullOrEmpty() || sha256.isNullOrEmpty()) return call.reject("Missing url or sha256", "BAD_ARGUMENT")
         MapsManager.start(
-            id, url, sha256, call.getLong("sizeBytes") ?: 0L,
+            id, url, sha256, call.data.optLong("sizeBytes", 0L),
             call.getBoolean("allowCellular") ?: false, call.getString("title") ?: id,
         )
         call.resolve()
@@ -915,8 +915,9 @@ class OpenDivesCorePlugin : Plugin() {
     @PluginMethod
     fun mapsReadRange(call: PluginCall) {
         val id = mapsId(call) ?: return
-        val offset = call.getLong("offset") ?: 0L
-        val length = (call.getLong("length") ?: 0L).coerceIn(0L, MapsManager.MAX_READ_BYTES.toLong()).toInt()
+        // Not getLong(): it returns null for a number that fits an Int.
+        val offset = call.data.optLong("offset", 0L)
+        val length = call.data.optLong("length", 0L).coerceIn(0L, MapsManager.MAX_READ_BYTES.toLong()).toInt()
         mapsIo.execute {
             try {
                 if (!MapsManager.readyFile(id).exists()) return@execute call.reject("No such package", "NOT_FOUND")

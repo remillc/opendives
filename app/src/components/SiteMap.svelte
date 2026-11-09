@@ -116,6 +116,11 @@
     map?.easeTo({ center: lngLat(p), zoom: Math.max(map.getZoom(), 11) }, { programmatic: true });
   }
 
+  /** Frames a region. @param {[number, number, number, number]} bbox west, south, east, north */
+  export function fitBbox([west, south, east, north]) {
+    map?.fitBounds([[west, south], [east, north]], { padding: 24, animate: false }, { programmatic: true });
+  }
+
   // Editable: the map brings a position set by the code (typed, from the
   // device, the site's own) under the fixed pin; one the diver chose by moving
   // the map is already there.

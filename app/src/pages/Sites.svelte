@@ -26,6 +26,13 @@ import { offlineMaps, downloadRegionAt } from '../lib/offline-maps.svelte.js';
   /** @type {SiteMap|undefined} */
   let siteMap = $state();
 
+  // "Voir sur la carte" of the offline maps screen.
+  $effect(() => {
+    if (!offlineMaps.viewBbox || !siteMap) return;
+    siteMap.fitBbox(offlineMaps.viewBbox);
+    offlineMaps.viewBbox = null;
+  });
+
   /** Sites used by dives, the latest dive first. */
   const used = $derived(sites.filter((s) => s.dives > 0).sort((a, b) => b.lastDate.localeCompare(a.lastDate)));
   const located = $derived(used.filter((s) => s.hasLocation));

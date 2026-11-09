@@ -197,7 +197,7 @@ class MapsDownloadWorker(context: Context, params: WorkerParameters) : Worker(co
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val notifications = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             if (notifications.getNotificationChannel(CHANNEL) == null) {
-                notifications.createNotificationChannel(NotificationChannel(CHANNEL, "Offline maps", NotificationManager.IMPORTANCE_LOW))
+                notifications.createNotificationChannel(NotificationChannel(CHANNEL, applicationContext.getString(R.string.od_maps_channel), NotificationManager.IMPORTANCE_LOW))
             }
         }
     }
