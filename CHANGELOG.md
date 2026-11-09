@@ -6,6 +6,12 @@ All notable changes to OpenDives are listed here, newest first. The format follo
 each release; the app's own "What's new" list (About) describes the current version
 in fewer words.
 
+## [Unreleased]
+
+### Added
+
+- **Release check for the planner's calculations** (`tests/release-check.sh`, no tag without a green report for the commit): the 17 cases of Subsurface's planner tests through the façade, an independent ZH-L16C checker over 360 plans, the app chain (units, request, displayed values, alarms), proof that wrong inputs make each fail, the same tests compiled with the NDK and run on the emulator, and planner scenarios in the real app. A GitHub Actions workflow runs the checks that need no device on each push to `main`.
+
 ## [0.2.0] - 2026-11-08
 
 ### Added

@@ -22,6 +22,7 @@
   import { t } from '../lib/i18n.js';
   import { WATER_TYPES, altitudeToPressureMbar, formatHoursMinutes, pressureToAltitudeMm, waterTypeName, waterTypeOfSalinity } from '../lib/tools.js';
   import { sharePlanPdf, sharePlanSummary } from '../lib/share.js';
+  import { MM_PER_FT, ML_PER_CUFT, carriedToMl, depthToMm, gasTotalMl, isShort, mlToCarried, modAlarm, mmToDepth } from '../lib/planner-rules.js';
 
   /**
    * `reopen`: the route /plans/<id>, a saved plan; otherwise /plan/new or /plan/<dive id>.
@@ -34,8 +35,6 @@
   const prefs = $derived(logbook.prefs);
   const feet = $derived(prefs.length === 'ft');
   const cuft = $derived(prefs.volume === 'cuft');
-  const MM_PER_FT = 304.8;
-  const ML_PER_CUFT = 28316.8466;
 
   let result = $state(/** @type {import('opendives-core').PlanResult|null} */ (null));
   let failed = $state(false);
@@ -144,7 +143,7 @@
 
   /** Whole metres or feet. @param {number} mm */
   function depthText(mm) {
-    return `${formatNumber(feet ? mm / MM_PER_FT : mm / 1000, 0)} ${depthUnit(prefs)}`;
+    return `${formatNumber(mmToDepth(mm, feet), 0)} ${depthUnit(prefs)}`;
   }
 
   /** Minutes rounded as Subsurface's plan table. @param {number} seconds */
@@ -172,13 +171,13 @@
   let invalid = $state({});
   let nextKey = 0;
 
-  const volumeValue = (/** @type {number} */ ml) => (ml > 0 ? show(cuft ? ml / ML_PER_CUFT : ml / 1000, 1) : '');
+  const volumeValue = (/** @type {number} */ ml) => (ml > 0 ? show(mlToCarried(ml, cuft), 1) : '');
 
   /** The fields from the plan: on opening, and when "Changer" brings another dive. */
   function fillFields() {
     levelFields = planner.levels.map((l) => ({
       key: nextKey++,
-      depth: show(feet ? l.depthMm / MM_PER_FT : l.depthMm / 1000),
+      depth: show(mmToDepth(l.depthMm, feet)),
       time: show(l.durationSeconds / 60),
     }));
     gasFields = planner.gases.map((g) => ({
@@ -188,7 +187,7 @@
       carried: volumeValue(g.carriedMl),
     }));
     const altitude = pressureToAltitudeMm(planner.surfacePressureMbar);
-    altitudeField = show(Math.max(0, feet ? altitude / MM_PER_FT : altitude / 1000));
+    altitudeField = show(Math.max(0, mmToDepth(altitude, feet)));
     gfLowField = show(planner.deco.gfLow);
     gfHighField = show(planner.deco.gfHigh);
     invalid = {};
@@ -215,7 +214,7 @@
 
   /** @param {number} i */
   function levelDepth(i) {
-    typed(`depth-${levelFields[i].key}`, levelFields[i].depth, 1, feet ? 980 : 300, (v) => (planner.levels[i].depthMm = Math.round(feet ? v * MM_PER_FT : v * 1000)));
+    typed(`depth-${levelFields[i].key}`, levelFields[i].depth, 1, feet ? 980 : 300, (v) => (planner.levels[i].depthMm = depthToMm(v, feet)));
   }
 
   /** @param {number} i */
@@ -266,7 +265,7 @@
       planner.version++;
       return;
     }
-    typed(`carried-${f.key}`, f.carried, cuft ? 1 : 10, cuft ? 1000 : 30000, (v) => (planner.gases[i].carriedMl = Math.round(cuft ? v * ML_PER_CUFT : v * 1000)));
+    typed(`carried-${f.key}`, f.carried, cuft ? 1 : 10, cuft ? 1000 : 30000, (v) => (planner.gases[i].carriedMl = carriedToMl(v, cuft)));
   }
 
   function addGas() {
@@ -382,7 +381,7 @@
   const waterOptions = WATER_TYPES.map((w) => ({ value: w.id, label: waterTypeName(w.id) }));
 
   function altitudeChanged() {
-    typed('altitude', altitudeField, 0, feet ? 16000 : 5000, (v) => (planner.surfacePressureMbar = altitudeToPressureMbar(Math.round(feet ? v * MM_PER_FT : v * 1000))));
+    typed('altitude', altitudeField, 0, feet ? 16000 : 5000, (v) => (planner.surfacePressureMbar = altitudeToPressureMbar(depthToMm(v, feet))));
   }
 
   let modelChoice = $state('');
@@ -480,9 +479,9 @@
     return result.cylinders.map((c, i) => {
       const used = formatGasVolume(c.gasUsedMl, prefs);
       const reserve = formatGasVolume(c.reserveMl, prefs);
-      const total = c.gasUsedMl + c.reserveMl;
+      const total = gasTotalMl(c);
       const carried = planner.gases[i]?.carriedMl ?? 0;
-      const short = carried > 0 && carried < total;
+      const short = isShort(carried, total);
       const parts = [t(i === bottomIndex ? 'plan.volumeBottom' : 'plan.volumeDeco', { used, reserve })];
       if (short) parts.push(t('plan.volumeShort', { missing: formatGasVolume(total - carried, prefs) }));
       return { key: i, label: gasName(c.o2Permille, c.hePermille), hint: parts.join(' '), value: formatGasVolume(total, prefs), alarm: short };
@@ -492,7 +491,7 @@
   /** The bottom gas too rich for the deepest point at the ppO2 for the bottom. */
   const modRow = $derived.by(() => {
     const bottom = result?.cylinders[0];
-    if (!result || !bottom || bottom.bottomModMm <= 0 || result.maxDepthMm <= bottom.bottomModMm) return null;
+    if (!result || !bottom || !modAlarm(result.maxDepthMm, bottom.bottomModMm)) return null;
     return {
       label: t('plan.modTitle'),
       hint: t('plan.modText', { po2: formatNumber((result.setup.bottomPo2Mbar ?? 1400) / 1000, 1), depth: depthText(bottom.bottomModMm) }),

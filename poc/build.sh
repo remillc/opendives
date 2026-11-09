@@ -44,7 +44,7 @@ FLAGS="-std=c++20 -O1 -w
   echo "$ROOT/tests/roundtrip.cpp"; echo "$ROOT/tests/facade.cpp"; echo "$ROOT/tests/cloud.cpp"
   echo "$ROOT/tests/edit_roundtrip.cpp"; echo "$ROOT/tests/cloud_write.cpp"
   echo "$ROOT/tests/regions_test.cpp"; echo "$ROOT/tests/tools_test.cpp"; echo "$ROOT/tests/plan_test.cpp"
-  echo "$ROOT/tests/account_test.cpp"; echo "$ROOT/tests/git_remote_test.cpp"
+  echo "$ROOT/tests/account_test.cpp"; echo "$ROOT/tests/git_remote_test.cpp"; echo "$ROOT/tests/plan_oracle.cpp"
   echo "$ROOT/core/libopendives/opendives.cpp"; echo "$ROOT/core/libopendives/edit.cpp"
   echo "$ROOT/core/libopendives/regions.cpp"; echo "$ROOT/core/libopendives/tools.cpp"
   echo "$ROOT/core/libopendives/settings.cpp"; echo "$ROOT/core/libopendives/plan.cpp"
@@ -64,7 +64,7 @@ export FLAGS B
 xargs -P"$JOBS" -I{} bash -c 'o="$B/obj/$(basename {} .cpp).o"; [ "$o" -nt {} ] || g++ $FLAGS -c {} -o "$o"' < "$B/sources.txt"
 
 # 4. Link.
-OBJS=$(ls "$B"/obj/*.o | grep -Ev '/(roundtrip|facade|cloud|edit_roundtrip|cloud_write|regions_test|tools_test|plan_test|account_test|git_remote_test|stats_test|download_test|opendives|edit|regions|tools|settings|plan|filter|account|stats|download)[.]o$')
+OBJS=$(ls "$B"/obj/*.o | grep -Ev '/(roundtrip|facade|cloud|edit_roundtrip|cloud_write|regions_test|tools_test|plan_test|plan_oracle|account_test|git_remote_test|stats_test|download_test|opendives|edit|regions|tools|settings|plan|filter|account|stats|download)[.]o$')
 FACADE="$B/obj/opendives.o $B/obj/edit.o $B/obj/regions.o $B/obj/tools.o $B/obj/settings.o $B/obj/plan.o $B/obj/filter.o $B/obj/account.o $B/obj/stats.o $B/obj/download.o"
 LIBS="$B/libdc/lib/libdivecomputer.a $(pkg-config --libs libgit2 libxml-2.0 libxslt libzip sqlite3) -lssl -lcrypto -lz -lm"
 g++ $OBJS $FACADE "$B/obj/roundtrip.o" -o "$B/roundtrip" $LIBS
@@ -75,6 +75,7 @@ g++ $OBJS $FACADE "$B/obj/cloud_write.o" -o "$B/cloud-write" $LIBS
 g++ "$B/obj/regions.o" "$B/obj/regions_test.o" -o "$B/regions"
 g++ $OBJS $FACADE "$B/obj/tools_test.o" -o "$B/tools" $LIBS
 g++ $OBJS $FACADE "$B/obj/plan_test.o" -o "$B/plan" $LIBS
+g++ $OBJS $FACADE "$B/obj/plan_oracle.o" -o "$B/plan-oracle" $LIBS
 g++ $OBJS $FACADE "$B/obj/account_test.o" -o "$B/account" $LIBS
 g++ $OBJS $FACADE "$B/obj/git_remote_test.o" -o "$B/git-remote" $LIBS
 g++ $OBJS $FACADE "$B/obj/stats_test.o" -o "$B/stats" $LIBS
