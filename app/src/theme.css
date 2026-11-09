@@ -894,7 +894,7 @@ html.ios {
   --f7-searchbar-inner-padding-left: 0px;
   --f7-searchbar-inner-padding-right: 0px;
   position: relative;
-  margin-top: 16px;
+  margin: 16px 0 0;
   background: none;
   box-shadow: none;
 }
