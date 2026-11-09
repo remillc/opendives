@@ -6,7 +6,8 @@
   // with `editable`, a pin fixed at the centre: the diver moves the map under
   // it, and onmove gets the centre (micro-degrees) when the map stops.
   import { onMount, onDestroy } from 'svelte';
-  import { language, t } from '../lib/i18n.js';
+  import { t } from '../lib/i18n.js';
+  import { MAP_STYLE, showLabelsInLanguage } from '../lib/map-style.js';
 
   // Loaded when a map is first shown: about 800 KB the start-up does not need.
   /** @type {typeof import('maplibre-gl')} */
@@ -23,10 +24,6 @@
    * }}
    */
   let { sites = [], pin = null, editable = false, onmove, onselect, height = '240px' } = $props();
-
-  // Coloured base map (Christian's choice): water, land use and relief read at
-  // a glance, which helps place a dive site.
-  const STYLE = 'https://tiles.openfreemap.org/styles/liberty';
 
   /** @type {HTMLElement|undefined} */
   let container = $state();
@@ -71,7 +68,7 @@
     if (!container?.isConnected) return;
     const m = new maplibregl.Map({
       container,
-      style: STYLE,
+      style: MAP_STYLE,
       center: [0, 20],
       zoom: 1,
       // The credits are a short line of text at the bottom right (below).
@@ -86,7 +83,7 @@
     resize.observe(container);
     m.once('remove', () => resize.disconnect());
     m.on('load', () => {
-      showLabelsInLanguage();
+      showLabelsInLanguage(m);
       drawSites();
       fit();
     });
@@ -109,16 +106,6 @@
    */
   export function centreOn(p) {
     map?.easeTo({ center: lngLat(p), zoom: Math.max(map.getZoom(), 11) }, { programmatic: true });
-  }
-
-  /** Place names in the app's language, else in Latin script, else local. */
-  function showLabelsInLanguage() {
-    if (!map) return;
-    for (const layer of map.getStyle().layers) {
-      if (layer.type === 'symbol' && map.getLayoutProperty(layer.id, 'text-field')) {
-        map.setLayoutProperty(layer.id, 'text-field', ['coalesce', ['get', `name:${language}`], ['get', 'name:latin'], ['get', 'name']]);
-      }
-    }
   }
 
   // Editable: the map brings a position set by the code (typed, from the

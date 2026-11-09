@@ -176,7 +176,7 @@
   let renumbering = $state(false);
 
   /** "Partager" open: the sheet, then the system's share sheet. */
-  // The aerial view behind the header: the top bar is see-through over it,
+  // The map behind the header: the top bar is see-through over it,
   // and gets its colour back as soon as the text scrolls under it.
   let imageShown = $state(false);
   let scrolled = $state(false);

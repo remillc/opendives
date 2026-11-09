@@ -1,71 +1,80 @@
 // @ts-check
-// The aerial view behind the header of a dive (spec, "Dive detail, site map
-// behind the header"): Sentinel-2 cloudless 2016 by EOX, the one year under
-// CC BY 4.0, so usable in an app that is sold. Credited in About. The tiles are
-// kept on the device, so that a site seen once also shows offline.
+// The map behind the header of a dive (spec, "Dive detail, site map behind the
+// header"): the base map of the Sites screen, drawn once off screen as a
+// picture and kept on the device, so that a site seen once also shows offline.
+import { MAP_STYLE } from './map-style.js';
 
-const LAYER = 'https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless_3857/default/g';
-const CACHE = 'od-site-images-v1';
-/** The layer's finest level, about 10 m per pixel at the equator. */
-const ZOOM = 14;
-const SIZE = 256;
-/** How far the view reaches around the site, above and below it, in CSS pixels. */
-const ABOVE = 130;
-const BELOW = 340;
+const CACHE = 'od-site-maps-v2';
+const ZOOM = 13;
+/** The picture is centred on the site and reaches this far above and below it, CSS pixels. */
+export const HALF_HEIGHT = 340;
+/** Longer than this, the map is not coming: the plain header stays. */
+const TIMEOUT_MS = 20000;
 
 /**
- * The tiles covering the view, with their position from the site.
- * @param {number} latUdeg
- * @param {number} lonUdeg
- * @param {number} width of the view, CSS pixels
- * @returns {{ url: string, left: number, top: number }[]}
- */
-export function tilesAround(latUdeg, lonUdeg, width) {
-  const count = 2 ** ZOOM;
-  const world = SIZE * count;
-  const lat = (latUdeg / 1e6) * (Math.PI / 180);
-  const cx = ((lonUdeg / 1e6 + 180) / 360) * world;
-  const cy = ((1 - Math.asinh(Math.tan(lat)) / Math.PI) / 2) * world;
-  const list = [];
-  for (let y = Math.floor((cy - ABOVE) / SIZE); y <= Math.floor((cy + BELOW) / SIZE); y++) {
-    if (y < 0 || y >= count) continue;
-    for (let x = Math.floor((cx - width / 2) / SIZE); x <= Math.floor((cx + width / 2) / SIZE); x++) {
-      const column = ((x % count) + count) % count;
-      list.push({ url: `${LAYER}/${ZOOM}/${y}/${column}.jpg`, left: Math.round(x * SIZE - cx), top: Math.round(y * SIZE - cy) });
-    }
-  }
-  return list;
-}
-
-/** A tile from the device, else from the provider, then kept. @param {string} url */
-async function tileBlob(url) {
-  const cache = typeof caches === 'undefined' ? null : await caches.open(CACHE);
-  const kept = await cache?.match(url);
-  if (kept) return kept.blob();
-  const response = await fetch(url);
-  if (!response.ok) throw new Error(`Tile: ${response.status}`);
-  await cache?.put(url, response.clone());
-  return response.blob();
-}
-
-/**
- * The view's tiles as local addresses, all of them or an error: a view with
- * holes is not shown. The caller frees them (releaseTiles).
+ * Draws the map as a picture; an error when it cannot be complete.
  * @param {number} latUdeg
  * @param {number} lonUdeg
  * @param {number} width
+ * @returns {Promise<Blob>}
  */
-export async function loadSiteTiles(latUdeg, lonUdeg, width) {
-  return Promise.all(
-    tilesAround(latUdeg, lonUdeg, width).map(async (tile) => ({
-      src: URL.createObjectURL(await tileBlob(tile.url)),
-      left: tile.left,
-      top: tile.top,
-    })),
-  );
+async function drawMap(latUdeg, lonUdeg, width) {
+  const module = await import('maplibre-gl');
+  /** @type {typeof import('maplibre-gl')} */
+  const maplibregl = /** @type {any} */ (module).default ?? module;
+  const container = document.createElement('div');
+  container.style.cssText = `position:fixed;left:-${width + 100}px;top:0;width:${width}px;height:${HALF_HEIGHT * 2}px`;
+  document.body.append(container);
+  /** @type {import('maplibre-gl').Map|undefined} */
+  let map;
+  try {
+    return await new Promise((resolve, reject) => {
+      const timer = setTimeout(() => reject(new Error('Site map: timeout')), TIMEOUT_MS);
+      const m = new maplibregl.Map({
+        container,
+        style: MAP_STYLE,
+        center: [lonUdeg / 1e6, latUdeg / 1e6],
+        zoom: ZOOM,
+        interactive: false,
+        attributionControl: false,
+        fadeDuration: 0,
+        canvasContextAttributes: { preserveDrawingBuffer: true },
+      });
+      map = m;
+      m.on('error', (e) => {
+        clearTimeout(timer);
+        reject(e.error ?? new Error('Site map'));
+      });
+      // No place names: they would run under the text of the header.
+      m.once('load', () => {
+        for (const layer of m.getStyle().layers) {
+          if (layer.type === 'symbol') m.setLayoutProperty(layer.id, 'visibility', 'none');
+        }
+      });
+      m.once('idle', () => {
+        clearTimeout(timer);
+        m.getCanvas().toBlob((blob) => (blob ? resolve(blob) : reject(new Error('Site map: no picture'))), 'image/webp', 0.85);
+      });
+    });
+  } finally {
+    map?.remove();
+    container.remove();
+  }
 }
 
-/** @param {{ src: string }[]} tiles */
-export function releaseTiles(tiles) {
-  for (const tile of tiles) URL.revokeObjectURL(tile.src);
+/**
+ * The map's picture as a local address, from the device or drawn and kept. The
+ * caller frees it (URL.revokeObjectURL).
+ * @param {number} latUdeg
+ * @param {number} lonUdeg
+ * @param {number} width of the view, CSS pixels
+ */
+export async function loadSiteMap(latUdeg, lonUdeg, width) {
+  const cache = typeof caches === 'undefined' ? null : await caches.open(CACHE);
+  const key = `https://localhost/site-map/${latUdeg}/${lonUdeg}/${width}`;
+  const kept = await cache?.match(key);
+  if (kept) return URL.createObjectURL(await kept.blob());
+  const blob = await drawMap(latUdeg, lonUdeg, width);
+  await cache?.put(key, new Response(blob, { headers: { 'Content-Type': blob.type } }));
+  return URL.createObjectURL(blob);
 }

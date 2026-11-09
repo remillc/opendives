@@ -28,7 +28,6 @@
   const LINKS = {
     source: 'https://github.com/remillc/opendives',
     osm: 'https://www.openstreetmap.org/copyright',
-    imagery: 'https://cloudless.eox.at',
     geonames: 'https://www.geonames.org/about.html',
   };
 
@@ -89,7 +88,6 @@
         { key: 'licence', text: t('about.licence'), sub: t('about.licenceText'), href: '/about/licence' },
         { key: 'libraries', text: t('about.libraries'), sub: t('about.librariesText'), href: '/about/libraries' },
         { key: 'maps', text: t('about.maps'), sub: t('about.mapsText'), href: LINKS.osm, external: true },
-        { key: 'imagery', text: t('about.imagery'), sub: t('about.imageryText'), href: LINKS.imagery, external: true },
         { key: 'regions', text: t('about.regions'), sub: t('about.regionsText'), href: LINKS.geonames, external: true },
       ],
     },

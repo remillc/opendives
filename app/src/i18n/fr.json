@@ -1326,7 +1326,7 @@
       "Planificateur : un plan enregistré garde ses vitesses, sa réserve et ses autres réglages, et redonne le même résultat quand on le rouvre.",
       "Réglages : les unités choisies sur l’appareil ne reviennent plus à celles du carnet au redémarrage.",
       "Détail d’une plongée : l’écran suit la maquette (barre du haut, voyage en lien, tailles et marges, personnes et étiquettes en puces, point sur la courbe de température au toucher).",
-      "Détail d’une plongée : vue aérienne du site derrière l’en-tête, quand le site a des coordonnées GPS."
+      "Détail d’une plongée : carte du site derrière l’en-tête, quand le site a des coordonnées GPS."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
@@ -1342,8 +1342,6 @@
     },
     "maps": "Cartes",
     "mapsText": "© contributeurs OpenStreetMap, ODbL",
-    "imagery": "Images satellite",
-    "imageryText": "EOxCloudless https://cloudless.eox.at by EOX IT Services GmbH (Contains modified Copernicus Sentinel data 2016), CC BY 4.0",
     "regions": "Pays et régions",
     "regionsText": "GeoNames, CC BY 4.0",
     "privacy": "Confidentialité",
