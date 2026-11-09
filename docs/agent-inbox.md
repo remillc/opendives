@@ -969,7 +969,9 @@ Christian chose the blue version. Spec: "Statistics charts in blue". Mock-up: `d
 - No blue in the Carnet.
 
 
-## [ ] 2026-11-09-29 Planner: gas volume and CNS bars in blue
+## [x] 2026-11-09-29 Planner: gas volume and CNS bars in blue
+
+Done in Planner: gas volume and CNS bars in blue
 
 Christian approved the blue bars and kept the profile in water colours. Spec: "Planner result bars in blue". Mock-ups: `docs/mockups/android-planificateur.dc.html`, `android-planificateur-nouveau.dc.html`. Depends on the tertiary tokens of task 2026-11-09-23.
 - Under each "Volume nécessaire par gaz" row, add an 8 dp rounded bar: consumed part in tertiary, 2 dp gap, reserve hatched on the tertiary container. Width = consumed / (consumed + reserve) for that gas. Give it `role="img"` and an aria-label with both volumes.
