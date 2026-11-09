@@ -444,7 +444,6 @@
       {#if dive.rating > 0}
         <p class="rating">
           <Stars value={dive.rating} size={18} label={t('detail.ratingLabel', { n: dive.rating })} />
-          <span aria-hidden="true">{t('detail.rating')}</span>
         </p>
       {/if}
     </header>

@@ -257,7 +257,6 @@
     },
     "figureWaterMin": "water, minimum",
     "tripLine": "Trip: {name}",
-    "rating": "overall rating",
     "ratingLabel": "Overall rating: {n} of 5",
     "water": "Water",
     "waterTypes": {
@@ -1327,7 +1326,8 @@
       "Settings: the units chosen on the device no longer go back to the logbook’s at restart.",
       "Dive detail: the screen follows the mock-up (top bar, trip as a link, sizes and margins, people and tags as chips, a dot on the temperature curve at the cursor).",
       "Dive detail: map of the site behind the header, prepared ahead on Wi-Fi, when the site has GPS coordinates.",
-      "Dive detail: a dive on its own no longer shows a trip."
+      "Dive detail: a dive on its own no longer shows a trip.",
+      "Dive detail: the rating stars stand alone."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
