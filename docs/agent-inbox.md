@@ -846,7 +846,9 @@ Christian approved this on the canvas. Mock-ups: `docs/mockups/detail3-android.d
 - Remove the text "note globale" after the rating stars in the header of `/dives/:id`. The stars stay alone. Keep the accessible label of the rating ("Note : 4 sur 5").
 - Remove the string from the translations if nothing else uses it. Include this in task 2026-11-09-12 if it is still open.
 
-## [ ] 2026-11-09-16 Dive detail: site map from OpenStreetMap instead of an aerial view, stronger veil
+## [x] 2026-11-09-16 Dive detail: site map from OpenStreetMap instead of an aerial view, stronger veil
+
+Done in Site map: keep OpenFreeMap and the credit in About (task 16)
 
 Christian approved this on the canvas at 11:24. It replaces the aerial view of task 2026-11-09-13. Spec: "Dive detail, site map behind the header" (rewritten). Mock-ups: `docs/mockups/detail3-android.dc.html`, `detail3-android-sombre.dc.html`, `detail3-android-curseur.dc.html`.
 - Use an OpenStreetMap map (standard style, zoom about 12) centred on the site's coordinates instead of the satellite image. Same size and place as now, pin in the middle of the top bar.
