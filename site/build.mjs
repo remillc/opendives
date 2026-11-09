@@ -126,7 +126,9 @@ for (const [lang, l] of Object.entries(languages)) {
 }
 await write('index.html', chooser);
 // The addresses of the policy before the language folders.
-await write('_redirects', '/privacy /en/privacy 301\n/privacy/fr /fr/privacy 301\n');
+await write('_redirects', '/privacy /en/privacy 301\n/privacy/ /en/privacy 301\n/privacy/fr /fr/privacy 301\n/privacy/fr/ /fr/privacy 301\n');
+// Without a 404 page, Cloudflare Pages answers any unknown address with the home page.
+await write('404.html', chooser.replace(/<script>.*<\/script>\n/, '').replace('<title>OpenDives</title>', '<title>OpenDives: page not found / page introuvable</title>').replace('<main><p>', '<main><p>Page not found. Page introuvable.</p><p>'));
 
 await copyFile(join(root, 'app', 'src', 'fonts', 'SourceSans3VF-Upright.ttf.woff2'), join(out, 'assets', 'SourceSans3VF-Upright.ttf.woff2'));
 await copyFile(join(root, 'app', 'src', 'fonts', 'OFL.txt'), join(out, 'assets', 'OFL.txt'));
