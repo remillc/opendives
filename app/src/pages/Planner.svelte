@@ -417,7 +417,6 @@
       {:else}
         <span class="text">
           <span class="title">{t('plan.newDive')}</span>
-          <span class="sub">{t('plan.newDiveText')}</span>
         </span>
       {/if}
       <span class="change">{t('plan.change')}</span>
@@ -531,7 +530,7 @@
         {/snippet}
       </Navbar>
       <List strongIos insetIos dividersIos>
-        <ListItem link="#" title={t('plan.newDive')} footer={t('plan.newDiveText')} onClick={() => choose(null)} />
+        <ListItem link="#" title={t('plan.newDive')} onClick={() => choose(null)} />
         {#each choices as dive (dive.id)}
           <ListItem
             link="#"
@@ -601,6 +600,11 @@
       box-sizing: border-box;
       border: none;
       border-radius: 12px;
+
+      /* "Nouvelle plongée" alone: a one-line item (MD3, 56 dp). */
+      &:not(:has(.sub)) {
+        min-height: 56px;
+      }
       background: var(--od-surface-2);
       color: var(--od-text);
       font: inherit;

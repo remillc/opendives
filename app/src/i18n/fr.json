@@ -1227,7 +1227,8 @@
     "releaseNotes": [
       "Planificateur : la plongée de départ montre son numéro et sa durée, dans le planificateur et dans la liste pour la choisir.",
       "Réglages du planificateur : sans ligne d’introduction, les groupes suivent directement le titre.",
-      "Réglages : la décompression (modèle, facteurs de gradient, END) a sa propre page, ouverte aussi depuis les réglages du planificateur."
+      "Réglages : la décompression (modèle, facteurs de gradient, END) a sa propre page, ouverte aussi depuis les réglages du planificateur.",
+      "Planificateur : « Nouvelle plongée » sans la ligne « Valeurs par défaut du planificateur de Subsurface »."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
@@ -1332,7 +1333,6 @@
     "sourceTitle": "Plongée du {date}",
     "sourceText": "Gaz, bouteille et consommation repris de cette plongée",
     "newDive": "Nouvelle plongée",
-    "newDiveText": "Valeurs par défaut du planificateur de Subsurface",
     "change": "Changer",
     "chooseTitle": "Plongée de départ",
     "chooseClose": "Fermer",

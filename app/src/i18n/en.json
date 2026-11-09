@@ -1227,7 +1227,8 @@
     "releaseNotes": [
       "Planner: the starting dive shows its number and duration, in the planner and in the list to choose it.",
       "Planner settings: no introduction line, the groups follow the title directly.",
-      "Settings: decompression (model, gradient factors, END) has its own page, also opened from the planner settings."
+      "Settings: decompression (model, gradient factors, END) has its own page, also opened from the planner settings.",
+      "Planner: “New dive” without the line “Defaults of the Subsurface planner”."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
@@ -1332,7 +1333,6 @@
     "sourceTitle": "Dive of {date}",
     "sourceText": "Gas, cylinder and consumption taken from this dive",
     "newDive": "New dive",
-    "newDiveText": "Defaults of the Subsurface planner",
     "change": "Change",
     "chooseTitle": "Starting dive",
     "chooseClose": "Close",
