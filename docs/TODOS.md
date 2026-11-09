@@ -27,4 +27,3 @@ Next number: 27
 - #21 [design] ajouter une vue carte des plongées
 - #23 [design] idée : ajouter une section Explorer, une carte qui affiche les sites de plongée des environs
 - #25 [design] / (Carnet) : afficher les intervalles de temps (mois, année) en en-têtes collants (sticky) dans la liste
-- #26 [design] Ajouter une option pour rendre une plongée invalide sur : (1) /, lorsqu'au moins une plongée est sélectionnée, dans le menu 3 dots ; (2) /dives/:id, dans le menu 3 dots
