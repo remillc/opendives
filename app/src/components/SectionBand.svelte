@@ -13,11 +13,12 @@
 </script>
 
 <div class="band" class:tall class:flat>
-  <svg class="profile" viewBox="0 0 300 140" preserveAspectRatio="none" aria-hidden="true">
-    <path d="{PROFILE} V140 H0 Z" class="area" />
-    <path d={PROFILE} class="line" vector-effect="non-scaling-stroke" />
-  </svg>
+  <!-- Flat, the band is one line high: no room for the profile. -->
   {#if !flat}
+    <svg class="profile" viewBox="0 0 300 140" preserveAspectRatio="none" aria-hidden="true">
+      <path d="{PROFILE} V140 H0 Z" class="area" />
+      <path d={PROFILE} class="line" vector-effect="non-scaling-stroke" />
+    </svg>
     <svg class="wave" viewBox="0 0 300 18" preserveAspectRatio="none" aria-hidden="true"><path d="M0 11 Q37.5 2 75 11 T150 11 T225 11 T300 11 V18 H0 Z" /></svg>
   {/if}
   {#if summary}<p class="summary od-value">{summary}</p>{/if}

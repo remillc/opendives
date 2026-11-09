@@ -76,7 +76,8 @@
 
 {#snippet panel()}
   <section class="sites-panel" aria-label={t('sites.listLabel')}>
-    <p class="count od-value">{t('sites.siteCount', { n: used.length })}, {t('sites.diveCount', { n: diveCount })}</p>
+    <!-- On a phone, the band says it. -->
+    {#if !layout.phone}<p class="count od-value">{t('sites.siteCount', { n: used.length })}, {t('sites.diveCount', { n: diveCount })}</p>{/if}
 
     {#if withoutSite || unplaced || duplicates}
       <div class="list links surface">
@@ -160,7 +161,7 @@
   </Navbar>
 
   {#if layout.phone}
-    <SectionBand flat summary={sites.length ? [t('band.sites', { n: sites.length }), t('band.dives', { n: logbook.dives.length })].join(' · ') : ''} />
+    <SectionBand flat summary={used.length ? [t('band.sites', { n: used.length }), t('band.dives', { n: diveCount })].join(' · ') : ''} />
     {@render mapBlock('calc(100vw * 4 / 5)')}
     {@render panel()}
   {/if}
