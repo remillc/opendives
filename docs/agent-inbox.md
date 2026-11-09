@@ -828,9 +828,15 @@ Christian approved this on the canvas. Spec: "Dive detail, site map behind the h
 
 ## [ ] 2026-11-09-14 Dive detail menu: "Retirer du voyage" (to-do #22)
 
-Christian approved this. Spec: "Dive detail menu, \"Retirer du voyage\"". Mock-up: `docs/mockups/detail2-android-menu.dc.html`.
+Christian approved this. Spec: "Dive detail menu, Retirer du voyage". Mock-up: `docs/mockups/detail2-android-menu.dc.html`.
 - Show "Retirer du voyage" in the ⋮ menu of `/dives/:id` only when the dive belongs to a trip, right after "Renuméroter la plongée", with the suitcase-minus icon of the mock-up.
 - No confirmation: remove the dive from its trip through the core (the same operation as Subsurface's "Remove dive(s) from trip"), so the change syncs like any other edit.
 - Snackbar "Plongée retirée du voyage" with "Annuler". If the trip is now empty, it is deleted as in Subsurface, and the snackbar reads "Plongée retirée. Le voyage, maintenant vide, a été supprimé." "Annuler" restores the dive in its trip, and the trip itself when it was deleted.
 - English strings: "Remove from trip", "Dive removed from trip", "Dive removed. The trip, now empty, was deleted.", "Undo".
+
+## [ ] 2026-11-09-15 Dive detail: no "note globale" label next to the stars
+
+Christian approved this on the canvas. Mock-ups: `docs/mockups/detail3-android.dc.html`, `detail3-android-sombre.dc.html`, `detail3-android-curseur.dc.html`.
+- Remove the text "note globale" after the rating stars in the header of `/dives/:id`. The stars stay alone. Keep the accessible label of the rating ("Note : 4 sur 5").
+- Remove the string from the translations if nothing else uses it. Include this in task 2026-11-09-12 if it is still open.
 
