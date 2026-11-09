@@ -1,9 +1,17 @@
 // SPDX-License-Identifier: GPL-2.0
 // Dive planner of the façade (core/libopendives/plan.cpp), compared with the
 // known values of Subsurface's own tests (third_party/subsurface/tests/
-// testplan.cpp: testMetric, testVpmbMetric45m30minTx,
-// testVpmbMetric60m30minAir), then the plan of the planner mock-ups.
+// testplan.cpp, its 17 TestPlan::test* functions: see reference_cases() for
+// those the façade can express and not_expressible() for the others), then
+// the plan of the planner mock-ups and the façade's own behaviour.
 // usage: plan
+//
+// OD_MUTATE=<name> sends a wrong input (a mutation) with every request while
+// the expected values stay the same: the run must then fail. It is how
+// tests/release-check.sh proves that these tests detect errors. Names: sac
+// (SAC +10 %), gf (gradient factor high altered), vpmb (conservatism +1),
+// ascent (ascent rate altered), water (fresh instead of sea water), altitude
+// (surface pressure of about 500 m).
 #include "../core/libopendives/opendives.h"
 
 #include "core/divelog.h"
@@ -14,6 +22,8 @@
 #include <cstdio>
 #include <cstdlib>
 #include <string>
+#include <utility>
+#include <vector>
 
 static int failed = 0;
 
@@ -41,10 +51,42 @@ static size_t item(const std::string &json, const std::string &key, int n)
 	return at;
 }
 
+// The mutation asked for by OD_MUTATE, as keys added at the end of the request
+// (the last value of a key wins in the façade's reader).
+static std::string mutated(std::string request)
+{
+	const char *m = getenv("OD_MUTATE");
+	std::string extra;
+	if (!m || !*m)
+		return request;
+	std::string name = m;
+	if (name == "sac")
+		extra = "\"bottomSacMlMin\":22000,\"decoSacMlMin\":18700";
+	else if (name == "gf")
+		extra = "\"gfHigh\":95";
+	else if (name == "vpmb")
+		extra = "\"vpmbConservatism\":1";
+	else if (name == "ascent")
+		extra = "\"ascent75MmMin\":12000,\"ascent50MmMin\":12000,\"ascentStopsMmMin\":12000";
+	else if (name == "water")
+		extra = "\"salinity\":10000";
+	else if (name == "altitude")
+		extra = "\"surfacePressureMbar\":950";
+	else {
+		printf("unknown mutation %s\n", m);
+		exit(2);
+	}
+	if (!request.empty() && request.back() == '}') {
+		request.pop_back();
+		request += "," + extra + "}";
+	}
+	return request;
+}
+
 static std::string run(const std::string &request)
 {
 	std::string json, error;
-	if (opendives::plan_dive(request, json, error)) {
+	if (opendives::plan_dive(mutated(request), json, error)) {
 		printf("plan_dive: %s\n", error.c_str());
 		return "";
 	}
@@ -64,57 +106,163 @@ static void bar(const std::string &json, const char *what, long expected_bar)
 	check(lrint(mbar / 1000.0) == expected_bar, what);
 }
 
-int main()
+// ---------------------------------------------------------------------------
+// Subsurface's own plan tests (third_party/subsurface/tests/testplan.cpp, the
+// 17 TestPlan::test* functions), through the façade's plan_dive().
+//
+// Two kinds of expected values, as in testplan.cpp:
+//  - the "known Subsurface runtime": what Subsurface computes today. It is
+//    required EXACTLY (testplan.cpp only logs a mismatch; here it fails);
+//  - the "benchmark runtime" of another planner: only within 1 % + 60 s
+//    (testplan.cpp's compareDecoTime()), and only for those values.
+// The minimum gas and the gas changes are required as testplan.cpp does.
+//
+// Cases the façade cannot express are listed by not_expressible() below.
+// Changing an expected value here needs a commit that explains why.
+// ---------------------------------------------------------------------------
+
+static std::string cyl(int o2, int he, long size = 0, long start = 0)
 {
-	opendives::init();
+	std::string s = "{\"o2Permille\":" + std::to_string(o2) + ",\"hePermille\":" + std::to_string(he);
+	if (size)
+		s += ",\"sizeMl\":" + std::to_string(size) + ",\"startMbar\":" + std::to_string(start);
+	return s + '}';
+}
+
+struct Ref {
+	const char *name;
+	std::string profile;   // "depthMm":..,"bottomTimeSeconds":.. or "levels":[..]
+	std::string settings;  // rates, last stop, model, ...
+	std::string cylinders; // JSON array content
+	long min_bar;          // minimum gas of the bottom cylinder, -1: not checked
+	long known_s;          // known Subsurface runtime, exact; -1: none
+	long benchmark_s;      // benchmark runtime, 1 % + 60 s; -1: none
+	std::vector<std::pair<long, int>> switches; // gas changes: depth (mm), cylinder
+};
+
+// Runs one case and checks it; returns its runtime.
+static long run_ref(const Ref &r)
+{
+	std::string name = r.name;
+	std::string json = run("{" + r.profile + "," + r.settings + ",\"when\":1000000000,\"cylinders\":[" + r.cylinders + "]}");
+	long runtime = num(json, "runtimeSeconds");
+	printf("     %s: runtime %ld s (%ld:%02ld)\n", r.name, runtime, runtime / 60, runtime % 60);
+	check(json.find("\"error\":\"\"") != std::string::npos, (name + ": no planner error").c_str());
+	if (r.min_bar >= 0)
+		bar(json, (name + ": minimum gas " + std::to_string(r.min_bar) + " bar").c_str(), r.min_bar);
+	for (const auto &sw: r.switches) {
+		bool at = num(json, "switchDepthMm", item(json, "cylinders", sw.second)) == sw.first;
+		bool stop = false;
+		size_t end = json.find("\"cylinders\"");
+		for (int i = 0; item(json, "stops", i) != std::string::npos && item(json, "stops", i) < end; i++) {
+			size_t s = item(json, "stops", i);
+			if (json.compare(json.find("\"gasChange\":", s) + 12, 4, "true") == 0)
+				stop |= num(json, "depthMm", s) == sw.first && num(json, "cylinder", s) == sw.second;
+		}
+		check(at && stop, (name + ": cylinder " + std::to_string(sw.second) + " at " + std::to_string(sw.first) + " mm").c_str());
+	}
+	if (r.known_s >= 0)
+		check(runtime == r.known_s, (name + ": known Subsurface runtime " + std::to_string(r.known_s) + " s, exactly").c_str());
+	if (r.benchmark_s >= 0)
+		check(close_runtime(runtime, r.benchmark_s), (name + ": benchmark runtime " + std::to_string(r.benchmark_s) + " s, 1 % + 60 s").c_str());
+	return runtime;
+}
+
+// What the façade cannot express, with the reason (printed by every run).
+static void not_expressible()
+{
+	printf("     NOT COVERED testMultipleGases: a gas change during the entered part of the dive (the façade's levels are all on the bottom gas)\n");
+	printf("     NOT COVERED testCcrBailoutGasSelection: closed circuit (the façade plans open circuit only)\n");
+	printf("     NOT COVERED testZeroDurationO2SwitchSampleOrder, testZeroDurationO2SwitchPressureAttribution: passive semi-closed circuit (open circuit only)\n");
+}
+
+static void reference_cases()
+{
+	// Rates of testplan.cpp's setupPrefs(): 30 ft/min, last 6 m 10 ft/min, last stop 6 m.
+	const std::string ft_rates = "\"ascent75MmMin\":9144,\"ascent50MmMin\":9144,\"ascentStopsMmMin\":9144,\"ascentLast6mMmMin\":3048,\"lastStop6m\":true";
+	// setupPrefsVpmb(): 10 m/min everywhere, no 6 m last stop; the descent depends on the case.
+	auto vpmb = [](int descent) {
+		return "\"decoModel\":1,\"vpmbConservatism\":0,\"gfLow\":100,\"gfHigh\":100,\"descentMmMin\":" + std::to_string(descent) +
+		       ",\"ascent75MmMin\":10000,\"ascent50MmMin\":10000,\"ascentStopsMmMin\":10000,\"ascentLast6mMmMin\":10000,\"lastStop6m\":false";
+	};
+	auto profile = [](long depth_mm, long seconds) { return "\"depthMm\":" + std::to_string(depth_mm) + ",\"bottomTimeSeconds\":" + std::to_string(seconds); };
+
 	prefs = default_prefs;
 	prefs.unit_system = METRIC;
 	prefs.units.length = units::METERS;
 
-	// testMetric: Bühlmann GF 100/100, 79 m for 30 min on 15/45 (36 L, 232 bar)
-	// with EAN36 and oxygen; ascents 30 ft/min, last 6 m 10 ft/min, last stop 6 m.
-	prefs.planner_deco_mode = BUEHLMANN;
-	prefs.gflow = prefs.gfhigh = 100;
-	std::string metric = run(
-		"{\"depthMm\":79000,\"bottomTimeSeconds\":1800,\"descentMmMin\":23000,"
-		"\"ascent75MmMin\":9144,\"ascent50MmMin\":9144,\"ascentStopsMmMin\":9144,\"ascentLast6mMmMin\":3048,"
-		"\"lastStop6m\":true,\"when\":1000000000,"
-		"\"cylinders\":[{\"o2Permille\":150,\"hePermille\":450,\"sizeMl\":36000,\"startMbar\":232000},"
-		"{\"o2Permille\":360,\"hePermille\":0},{\"o2Permille\":1000,\"hePermille\":0}]}");
-	printf("     runtime %ld s\n", num(metric, "runtimeSeconds"));
-	bar(metric, "testMetric: minimum gas 148 bar", 148);
-	check(num(metric, "switchDepthMm", item(metric, "cylinders", 1)) == 33000, "testMetric: EAN36 at 33 m");
-	check(num(metric, "switchDepthMm", item(metric, "cylinders", 2)) == 6000, "testMetric: oxygen at 6 m");
-	check(close_runtime(num(metric, "runtimeSeconds"), 109 * 60), "testMetric: run time 109 min");
-	// The gas changes appear on the stops, at 33 m (cylinder 1) and 6 m (cylinder 2).
-	bool ean36 = false, oxygen = false;
-	for (int i = 0; item(metric, "stops", i) != std::string::npos && item(metric, "stops", i) < metric.find("\"cylinders\""); i++) {
-		size_t at = item(metric, "stops", i);
-		if (metric.compare(metric.find("\"gasChange\":", at) + 12, 4, "true") == 0) {
-			ean36 |= num(metric, "depthMm", at) == 33000 && num(metric, "cylinder", at) == 1;
-			oxygen |= num(metric, "depthMm", at) == 6000 && num(metric, "cylinder", at) == 2;
-		}
-	}
-	check(ean36 && oxygen, "testMetric: stops switch to EAN36 at 33 m, oxygen at 6 m");
+	// 1. testMetric: Bühlmann GF 100/100, 79 m for 30 min, 15/45 (36 L, 232 bar), EAN36, oxygen.
+	run_ref({ "testMetric", profile(79000, 1800), "\"decoModel\":0,\"gfLow\":100,\"gfHigh\":100,\"descentMmMin\":23000," + ft_rates,
+		  cyl(150, 450, 36000, 232000) + "," + cyl(360, 0) + "," + cyl(1000, 0), 148, 109 * 60, 109 * 60, { { 33000, 1 }, { 6000, 2 } } });
 
-	// testVpmbMetric45m30minTx: VPM-B +0, 45 m for 30 min on 21/35 (24 L, 232 bar)
-	// with EAN50 and oxygen; ascents 10 m/min, last stop 3 m.
+	// 2. testImperial: the same in feet; 260 ft, 75 ft/min descent, switch depths rounded to 10 ft.
+	prefs.unit_system = IMPERIAL;
+	prefs.units.length = units::FEET;
+	run_ref({ "testImperial", profile(79248, 1800), "\"decoModel\":0,\"gfLow\":100,\"gfHigh\":100,\"descentMmMin\":22860," + ft_rates,
+		  cyl(150, 450, 36000, 232000) + "," + cyl(360, 0) + "," + cyl(1000, 0), 155, 111 * 60 - 2, 111 * 60 - 2, { { 33528, 1 }, { 6096, 2 } } });
+	prefs.unit_system = METRIC;
+	prefs.units.length = units::METERS;
+
+	// 3. testVpmbMetric45m30minTx
+	run_ref({ "testVpmbMetric45m30minTx", profile(45000, 1800), vpmb(23000), cyl(210, 350, 24000, 232000) + "," + cyl(500, 0) + "," + cyl(1000, 0), 108, -1, -1, {} });
+	// 4. testVpmbMetric60m10minTx
+	run_ref({ "testVpmbMetric60m10minTx", profile(60000, 600), vpmb(23000), cyl(180, 450, 24000, 232000) + "," + cyl(500, 150) + "," + cyl(1000, 0), 162, -1, -1, {} });
+	// 5. testVpmbMetric60m30minAir
+	run_ref({ "testVpmbMetric60m30minAir", profile(60000, 1800), vpmb(99000), cyl(210, 0, 100000, 232000), 180, 139 * 60 + 20, 141 * 60 + 20, {} });
+	// 6. testVpmbMetric60m30minEan50
+	run_ref({ "testVpmbMetric60m30minEan50", profile(60000, 1800), vpmb(99000), cyl(210, 0, 36000, 232000) + "," + cyl(500, 0), 155, 96 * 60 + 20, 95 * 60 + 20, { { 21000, 1 } } });
+	// 7. testVpmbMetric60m30minTx
+	run_ref({ "testVpmbMetric60m30minTx", profile(60000, 1800), vpmb(99000), cyl(180, 450, 36000, 232000) + "," + cyl(500, 0), 159, 89 * 60 + 20, 89 * 60 + 20, { { 21000, 1 } } });
+	// 8. testVpmbMetric100m60min
+	run_ref({ "testVpmbMetric100m60min", profile(100000, 3600), vpmb(99000), cyl(180, 450, 200000, 232000) + "," + cyl(500, 0) + "," + cyl(1000, 0), 157,
+		  315 * 60 + 20, 311 * 60 + 20, { { 21000, 1 }, { 6000, 2 } } });
+	// 9. testMultipleGases: not expressible (see not_expressible()).
+	// 10. testVpmbMetricMultiLevelAir: 20 m for 10 min, then a 1 min ramp to 60 m, 29 min at 60 m.
+	// The façade's levels hold a time at depth and add the transit at the descent rate: 60 m is
+	// reached in 24 s, not 60 s, so this is not exactly testplan.cpp's profile. The runtime is
+	// nevertheless the known Subsurface one (169 min 20 s), required exactly: a regression guard
+	// for the façade's own profile; the benchmark (167 min 20 s) keeps its tolerance.
+	run_ref({ "testVpmbMetricMultiLevelAir (24 s transit instead of a 60 s ramp)",
+		  "\"levels\":[{\"depthMm\":20000,\"durationSeconds\":588},{\"depthMm\":60000,\"durationSeconds\":1776}]", vpmb(99000),
+		  cyl(210, 0, 200000, 232000), 101, 169 * 60 + 20, 167 * 60 + 20, {} });
+	// 11. testVpmbMetric100m10min
+	run_ref({ "testVpmbMetric100m10min", profile(100000, 600), vpmb(99000), cyl(180, 450, 60000, 232000) + "," + cyl(500, 0) + "," + cyl(1000, 0), 175,
+		  57 * 60 + 20, 58 * 60 + 20, { { 21000, 1 }, { 6000, 2 } } });
+	// 12. testVpmbMetricRepeat: 30 m 20 min; 100 m then 70 m (30 min in all) with four gases; the first again.
+	Ref first = { "testVpmbMetricRepeat 1", profile(30000, 1200), vpmb(18000), cyl(210, 0, 36000, 232000), 61, 27 * 60 + 20, 27 * 60 + 20, {} };
+	long first_runtime = run_ref(first);
+	run_ref({ "testVpmbMetricRepeat 2", "\"levels\":[{\"depthMm\":100000,\"durationSeconds\":867},{\"depthMm\":70000,\"durationSeconds\":420}]", vpmb(18000),
+		  cyl(120, 650, 36000, 232000) + "," + cyl(210, 350) + "," + cyl(500, 0) + "," + cyl(1000, 0), 85, 127 * 60 + 20, 127 * 60 + 20,
+		  { { 63000, 1 }, { 21000, 2 }, { 6000, 3 } } });
+	first.name = "testVpmbMetricRepeat 3";
+	check(run_ref(first) == first_runtime, "testVpmbMetricRepeat 3: runtime exactly the same as the first time");
+	// 13. testCcrBailoutGasSelection: not expressible.
+	// 14 and 17. testRecreationalWithinNDL / ExceedingNDL. The façade does not choose the
+	// recreational mode (the app does not offer it): it is set in the core's preferences.
+	prefs.planner_deco_mode = RECREATIONAL;
+	prefs.reserve_gas = 40000;
+	std::string rec_gas = "\"cylinders\":[" + cyl(210, 0, 24000, 232000) + "]";
+	std::string within = run("{" + profile(20000, 1200) + ",\"descentMmMin\":23000,\"gfLow\":100,\"gfHigh\":100,\"when\":1000000000," + rec_gas + "}");
+	check(within.find("\"error\":\"\"") != std::string::npos && num(within, "runtimeSeconds") > 0, "testRecreationalWithinNDL: plan ok");
+	std::string beyond = run("{" + profile(50000, 3000) + ",\"descentMmMin\":23000,\"gfLow\":100,\"gfHigh\":100,\"when\":1000000000," + rec_gas + "}");
+	check(beyond.find("\"error\":\"RECREATIONAL_EXCEEDS_NDL\"") != std::string::npos, "testRecreationalExceedingNDL: planner error RECREATIONAL_EXCEEDS_NDL");
+	prefs = default_prefs;
+	prefs.unit_system = METRIC;
+	prefs.units.length = units::METERS;
+	// 15, 16. PSCR tests: not expressible.
+	not_expressible();
+}
+
+int main()
+{
+	opendives::init();
+	reference_cases();
+
+	// A request with its own model and settings leaves the preferences as they were.
+	prefs = default_prefs;
 	prefs.planner_deco_mode = VPMB;
-	prefs.vpmb_conservatism = 0;
-	const char *vpmb_rates = "\"descentMmMin\":23000,\"ascent75MmMin\":10000,\"ascent50MmMin\":10000,"
-				 "\"ascentStopsMmMin\":10000,\"ascentLast6mMmMin\":10000,\"lastStop6m\":false,\"when\":1000000000,";
-	std::string tx = run(std::string("{\"depthMm\":45000,\"bottomTimeSeconds\":1800,") + vpmb_rates +
-		"\"cylinders\":[{\"o2Permille\":210,\"hePermille\":350,\"sizeMl\":24000,\"startMbar\":232000},"
-		"{\"o2Permille\":500,\"hePermille\":0},{\"o2Permille\":1000,\"hePermille\":0}]}");
-	bar(tx, "testVpmbMetric45m30minTx: minimum gas 108 bar", 108);
-
-	// testVpmbMetric60m30minAir: 60 m for 30 min on air (100 L, 232 bar),
-	// descent at 99 m/min.
-	std::string air = run(std::string("{\"depthMm\":60000,\"bottomTimeSeconds\":1800,") + vpmb_rates + "\"descentMmMin\":99000," +
-		"\"cylinders\":[{\"o2Permille\":210,\"hePermille\":0,\"sizeMl\":100000,\"startMbar\":232000}]}");
-	bar(air, "testVpmbMetric60m30minAir: minimum gas 180 bar", 180);
-	printf("     runtime %ld s\n", num(air, "runtimeSeconds"));
-	check(close_runtime(num(air, "runtimeSeconds"), 141 * 60 + 20), "testVpmbMetric60m30minAir: run time 141 min 20 s");
+	run("{\"depthMm\":30000,\"bottomTimeSeconds\":1200,\"decoModel\":0,\"ascent50MmMin\":12000,\"lastStop6m\":true,\"when\":1000000000,"
+	    "\"cylinders\":[{\"o2Permille\":209,\"hePermille\":0,\"sizeMl\":12000,\"startMbar\":200000}]}");
 
 	// Read only: nothing in the logbook, preferences as they were.
 	check(divelog.dives.empty(), "no dive added to the logbook");
