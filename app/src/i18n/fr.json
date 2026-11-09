@@ -1321,7 +1321,8 @@
       "Connexions sécurisées : la bibliothèque OpenSSL est remplacée par Mbed TLS, compatible avec la licence de l’app.",
       "Dépôt git : le carnet peut vivre dans votre propre dépôt git (GitHub, GitLab, Codeberg ou votre serveur) à la place du cloud Subsurface. Sur la première page, « Utiliser mon propre dépôt git » ; le jeton d’accès reste chiffré sur l’appareil.",
       "Tablette : le carnet ouvre la première plongée quand aucune n’est affichée.",
-      "Partage : l’app ne reste plus bloquée sous un voile gris après avoir partagé une plongée ou un plan."
+      "Partage : l’app ne reste plus bloquée sous un voile gris après avoir partagé une plongée ou un plan.",
+      "Profil de plongée : la carte suit la maquette (graphique pleine largeur, échelle jusqu’à la profondeur maximale)."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",

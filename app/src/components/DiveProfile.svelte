@@ -25,10 +25,10 @@
 
   const uid = $props.id();
   let width = $state(320);
-  const HEIGHT = 180;
+  const HEIGHT = 168;
   const MARGIN_LEFT = 30;
-  const MARGIN_TOP = 8;
-  const MARGIN_BOTTOM = 26;
+  const MARGIN_TOP = 6;
+  const MARGIN_BOTTOM = 21;
   const BAND = 22;
 
   const times = $derived(samples.timeSeconds);
@@ -43,11 +43,11 @@
     const mmPerUnit = feet ? 304.8 : 1000;
     const major = feet ? 40 : 10;
     const minor = feet ? 10 : 2;
-    const end = Math.max(minor, Math.ceil(dMax / mmPerUnit / minor) * minor);
+    const end = Math.floor(dMax / mmPerUnit / minor) * minor;
     /** @type {{ value: number, mm: number, major: boolean }[]} */
     const list = [];
     for (let v = 0; v <= end + 1e-9; v += minor) list.push({ value: v, mm: v * mmPerUnit, major: v % major === 0 });
-    return { list, endMm: end * mmPerUnit };
+    return { list };
   });
 
   // Time axis: labelled ticks every 20 min (10 or 5 for short dives), the
@@ -105,13 +105,15 @@
     [...scaleOrder].reverse().find((l) => (l === 'temperature' ? showTemperature : showPpo2)) ?? null,
   );
 
-  const MARGIN_RIGHT = $derived(rightScale ? 34 : 8);
+  const MARGIN_RIGHT = $derived(rightScale ? 28 : 8);
   const plotWidth = $derived(Math.max(10, width - MARGIN_LEFT - MARGIN_RIGHT));
   const plotHeight = $derived(HEIGHT - MARGIN_TOP - MARGIN_BOTTOM);
+  // The deepest point sits just above the time axis.
+  const scaleHeight = $derived(plotHeight - 1);
   /** @param {number} s */
   const x = (s) => MARGIN_LEFT + (s / tMax) * plotWidth;
   /** @param {number} mm */
-  const y = (mm) => MARGIN_TOP + (mm / ticks.endMm) * plotHeight;
+  const y = (mm) => MARGIN_TOP + (mm / dMax) * scaleHeight;
 
   const paths = $derived.by(() => {
     if (!times.length) return null;
@@ -132,14 +134,14 @@
         pen = false;
         continue;
       }
-      const yy = MARGIN_TOP + ((hi - unit(mk[i])) / (hi - lo)) * plotHeight;
+      const yy = MARGIN_TOP + ((hi - unit(mk[i])) / (hi - lo)) * scaleHeight;
       d += `${pen ? 'L' : 'M'}${x(times[i]).toFixed(1)},${yy.toFixed(1)}`;
       pen = true;
     }
     return d;
   });
   /** @param {number} bar */
-  const yPpo2 = (bar) => MARGIN_TOP + (1 - Math.min(bar, PPO2_MAX) / PPO2_MAX) * plotHeight;
+  const yPpo2 = (bar) => MARGIN_TOP + (1 - Math.min(bar, PPO2_MAX) / PPO2_MAX) * scaleHeight;
   const ppo2Path = $derived.by(() => {
     if (!ppo2Available) return '';
     let d = '';
@@ -149,7 +151,7 @@
   const ppo2Labels = $derived([
     { y: MARGIN_TOP + 4, text: formatNumber(1.6, 1) },
     { y: yPpo2(1.4) + 4, text: formatNumber(1.4, 1) },
-    { y: MARGIN_TOP + plotHeight + 2, text: '0' },
+    { y: MARGIN_TOP + scaleHeight + 4, text: '0' },
   ]);
 
   // Ceiling: the core's calculated ceiling (gradient factors of the settings),
@@ -174,7 +176,8 @@
   const T_TOP = 4;
   const T_BOTTOM = 40;
   const T_GAP = 4;
-  const tissueBar = $derived((width - 15 * T_GAP) / 16);
+  const tissuesWidth = $derived(Math.max(10, width - 24));
+  const tissueBar = $derived((tissuesWidth - 15 * T_GAP) / 16);
   const tissueValues = $derived.by(() => {
     if (!tissuesAvailable || !tissueData) return [];
     const i = cursor ?? times.length - 1;
@@ -189,8 +192,8 @@
     const mid = (lo + hi) / 2;
     return [
       { y: MARGIN_TOP + 4, text: `${hi}${symbol}` },
-      { y: MARGIN_TOP + plotHeight / 2 + 4, text: `${Number.isInteger(mid) ? mid : mid.toFixed(1)}°` },
-      { y: MARGIN_TOP + plotHeight + 2, text: `${lo}°` },
+      { y: MARGIN_TOP + scaleHeight / 2 + 4, text: `${Number.isInteger(mid) ? mid : mid.toFixed(1)}°` },
+      { y: MARGIN_TOP + scaleHeight + 4, text: `${lo}°` },
     ];
   });
 
@@ -321,11 +324,11 @@
       {/if}
       {#if rightScale === 'temperature'}
         {#each temperatureLabels as label (label.y)}
-          <text class="temperature-label od-value" x={MARGIN_LEFT + plotWidth + 4} y={label.y}>{label.text}</text>
+          <text class="temperature-label od-value" x={MARGIN_LEFT + plotWidth + 2} y={label.y}>{label.text}</text>
         {/each}
       {:else if rightScale === 'ppo2'}
         {#each ppo2Labels as label (label.y)}
-          <text class="ppo2-label od-value" x={MARGIN_LEFT + plotWidth + 4} y={label.y}>{label.text}</text>
+          <text class="ppo2-label od-value" x={MARGIN_LEFT + plotWidth + 2} y={label.y}>{label.text}</text>
         {/each}
       {/if}
 
@@ -354,18 +357,18 @@
     <!-- Tissues: a separate drawing under the chart, so that the PDF sheet keeps the chart alone. -->
     <svg
       class="tissues"
-      {width}
+      width={tissuesWidth}
       height={T_HEIGHT}
       role="img"
       aria-label={t('profile.tissuesLabel')}
     >
-      <path class="tissue-limit" d="M0 {T_TOP} H{width}" />
+      <path class="tissue-limit" d="M0 {T_TOP} H{tissuesWidth}" />
       {#each tissueValues as percent, c (c)}
         {@const h = tissueHeight(percent)}
         <rect x={c * (tissueBar + T_GAP)} y={T_BOTTOM - h} width={tissueBar} height={h} rx="2" style:fill={tissueColor(percent)} />
       {/each}
       <text class="tick od-value" x="0" y={T_HEIGHT - 4}>{t('desaturation.fast')}</text>
-      <text class="tick od-value" x={width} y={T_HEIGHT - 4} text-anchor="end">{t('desaturation.slow')}</text>
+      <text class="tick od-value" x={tissuesWidth} y={T_HEIGHT - 4} text-anchor="end">{t('desaturation.slow')}</text>
     </svg>
   {/if}
 
@@ -432,7 +435,6 @@
     /* The profile sits in a rounded block (white in the light themes). */
     .profile {
       margin: 14px 16px 0;
-      padding: 8px 12px 0;
       border-radius: 16px;
       overflow: hidden;
     }
@@ -446,6 +448,7 @@
       flex-wrap: wrap;
       gap: 0 24px;
       min-height: 24px;
+      padding: 8px 12px 0;
       align-items: baseline;
       font-size: 14px;
       color: var(--od-text-2);
@@ -522,7 +525,7 @@
 
     .tissues {
       display: block;
-      margin-top: 6px;
+      margin: 6px 12px 0;
       touch-action: pan-y;
     }
 
@@ -581,12 +584,16 @@
       display: flex;
       flex-wrap: nowrap;
       gap: 8px;
-      padding: 0 0 4px;
+      padding: 0 12px 4px;
       overflow-x: auto;
     }
 
     .chip {
-      gap: 4px;
+      gap: 8px;
+
+      &:not(.chip-outline) {
+        padding-left: 8px;
+      }
     }
 
     .filter {
