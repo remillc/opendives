@@ -44,6 +44,9 @@
     --od-tonal: var(--od-secondary-container);
     --od-oxygen: #2E7D32;
     --od-pending: #8A4B00;
+    /* On the header band, whose colours stay light in dark mode too. */
+    --od-band-pending: #8A4B00;
+    --od-band-control: rgb(255 255 255 / 0.78);
 
     --od-background: #F4F4F2;
     --od-surface: #FFFFFF;
@@ -948,6 +951,11 @@ html.ios {
   --od-band-h: calc(var(--f7-safe-area-top) + 190px);
 }
 
+/* A sync pill (40 dp and its margin) between the summary and the search bar. */
+.navbar.od-band-bar.od-band-pill {
+  --od-band-h: calc(var(--f7-safe-area-top) + 242px);
+}
+
 .navbar.od-band-bar .navbar-bg {
   background-image: var(--od-band-gradient);
   background-size: 100% var(--od-band-h);
@@ -964,7 +972,7 @@ html.ios {
   --f7-searchbar-height: 56px;
   --f7-searchbar-input-height: 56px;
   --f7-searchbar-input-border-radius: 28px;
-  --f7-searchbar-input-bg-color: rgb(255 255 255 / 0.78);
+  --f7-searchbar-input-bg-color: var(--od-band-control);
   --f7-searchbar-inner-padding-left: 0px;
   --f7-searchbar-inner-padding-right: 0px;
   position: relative;

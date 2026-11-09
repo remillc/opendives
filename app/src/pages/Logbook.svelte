@@ -8,6 +8,7 @@
   import { Page, Navbar, NavRight, Link, Searchbar, List, ListItem, Block, Button, Popover, f7, theme } from 'framework7-svelte';
   import SyncStatus from '../components/SyncStatus.svelte';
   import SyncFailureRow from '../components/SyncFailureRow.svelte';
+  import SyncPill from '../components/SyncPill.svelte';
   import DiveRow from '../components/DiveRow.svelte';
   import TripRow from '../components/TripRow.svelte';
   import Icon from '../components/Icon.svelte';
@@ -324,6 +325,11 @@
   }
 
   /** The status row of a conflict left for later. */
+  const conflictWaits = $derived(!!logbook.conflict && logbook.conflictLater);
+  const offlineWaits = $derived(logbook.sync === 'offline' && logbook.pending > 0);
+  /** Not simply up to date: the state goes in a pill of the header band. */
+  const showPill = $derived(!logbook.loading && !logbook.error && (conflictWaits || !!logbook.syncFailure || offlineWaits));
+
   const stoppedText = $derived.by(() => {
     const dives = (logbook.conflict?.items ?? []).filter((item) => item.diveId || item.date).length;
     return dives ? t('conflict.stoppedDives', { n: dives }) : t('conflict.stopped');
@@ -1076,7 +1082,7 @@
 </script>
 
 <Page class="od-logbook" onPageInit={keepInSvelteRange}>
-  <Navbar large={theme.ios} class="od-band-bar od-band-tall" title={t('logbook.title')}>
+  <Navbar large={theme.ios} class="od-band-bar od-band-tall {showPill ? 'od-band-pill' : ''}" title={t('logbook.title')}>
     {#snippet left()}<MenuButton />{/snippet}
     <NavRight>
       {#if logbook.dives.length || logbook.preview}
@@ -1091,7 +1097,16 @@
     </NavRight>
   </Navbar>
 
-  <SectionBand tall summary={bandSummary}>
+  <SectionBand tall pill={showPill} summary={bandSummary}>
+    {#if showPill}
+      {#if conflictWaits}
+        <SyncPill icon="sync" text={stoppedText} onclick={() => (logbook.conflictLater = false)} />
+      {:else if logbook.syncFailure}
+        <SyncFailureRow pill />
+      {:else}
+        <SyncPill icon="offline" text={t('sync.offlinePending', { n: logbook.pending })} />
+      {/if}
+    {/if}
     {#if logbook.dives.length || logbook.loading}
       <Searchbar
         inline
@@ -1117,15 +1132,7 @@
       date, and while a "Sync now" runs: the line stays, only its text and
       bar change (to-do #2). The side menu shows every state.
     -->
-    {#if logbook.conflict && logbook.conflictLater}
-      <button type="button" class="sync-stopped" onclick={() => (logbook.conflictLater = false)}>
-        <Icon name="sync" size={16} weight={2} />
-        {stoppedText}
-      </button>
-    {/if}
-    {#if logbook.syncFailure}
-      <SyncFailureRow />
-    {:else if logbook.sync === 'offline' || logbook.sync === 'manual' || (logbook.sync === 'syncing' && !logbook.autoSync && !!logbook.email)}
+    {#if !showPill && (logbook.sync === 'offline' || logbook.sync === 'manual' || (logbook.sync === 'syncing' && !logbook.autoSync && !!logbook.email))}
       <SyncStatus sync={logbook.sync} pending={logbook.pending} progress={logbook.syncProgress} />
     {/if}
   {/if}
@@ -1423,22 +1430,6 @@
     }
 
     /* Selection mode: the number of dives checked, beside the total. */
-    .sync-stopped {
-      width: auto;
-      min-height: 32px;
-      margin: 4px 16px 0;
-      padding: 0;
-      border: none;
-      background: none;
-      color: var(--od-pending);
-      font: inherit;
-      font-size: 13px;
-      line-height: 18px;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-    }
-
     .count-selected {
       color: var(--od-text);
       font-weight: 500;

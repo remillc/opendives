@@ -934,7 +934,9 @@ Christian approved this. Spec: "Sync failures (decided on 9 November 2026)". Moc
 - Automatic retries for the unreachable server (every 5 minutes, then less often). Never a blocking dialog.
 - iOS: same content in a sheet, when the iOS project exists.
 
-## [ ] 2026-11-09-25 Carnet: sync status pill, offline rows, updated state mock-ups
+## [x] 2026-11-09-25 Carnet: sync status pill, offline rows, updated state mock-ups
+
+Done in Logbook: sync status pill in the header band
 
 Christian approved this. Spec: "Carnet sync status pill". It completes tasks 2026-11-09-21 (conflict) and 2026-11-09-24 (sync failures), whose mock-ups were brought up to date: current Carnet header (☰, ⋮, summary, search bar).
 - Show the sync state (offline with waiting changes, failure, conflict) in a translucent white pill under the summary line, text and icon in `--od-pending`, with a chevron when it opens the failure sheet or the conflict dialog. Never as plain text on the band (contrast too low).
