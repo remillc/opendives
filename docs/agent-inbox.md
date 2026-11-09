@@ -922,3 +922,11 @@ Christian approved a palette with MD3 colour roles. Spec: "Colour roles (decided
 - Point the selection tokens of task 2026-11-09-21 (`--od-selected`, `--od-selected-container`, `--od-tonal`) to the secondary role, and the temperature curve (`--od-temperature`) to the tertiary.
 - Do not recolour other screens yet: use the new roles only where a mock-up asks for them. To-do #24 (blue in the logbook charts) will follow.
 
+## [ ] 2026-11-09-24 Sync failures: status row and bottom sheet
+
+Christian approved this. Spec: "Sync failures (decided on 9 November 2026)". Mock-ups: `docs/mockups/android-etat-synchro-motdepasse.dc.html`, `android-etat-synchro-serveur.dc.html`, `android-etat-synchro-depot.dc.html`.
+- Tell apart the three causes from the core's sync errors: authentication refused by the cloud, cloud unreachable while the network works, own git repository refusing access. No network at all stays the offline state.
+- Show the cause in the Carnet status row and the side menu sync card (pending colour, warning icon, chevron). Touching it opens the bottom sheet of the mock-up, with its actions: open the sign-in with the address filled, retry now, or open the git repository form.
+- Automatic retries for the unreachable server (every 5 minutes, then less often). Never a blocking dialog.
+- iOS: same content in a sheet, when the iOS project exists.
+

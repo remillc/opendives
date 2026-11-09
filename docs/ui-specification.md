@@ -411,3 +411,15 @@ The conflict dialog (Android MD3 dialog, iOS sheet) names what is in conflict, s
 - The selection colours (#B4530F badge and check, #FCE9C6 fill, #FBE3B2 tonal button) are under review with the palette rule: put them in tokens (`--od-selected`, `--od-selected-container`, `--od-tonal`), never hard-coded.
 With several dives in conflict, Android uses an MD3 full-screen dialog (iOS: the large sheet, same content): top bar with ✕ (same as "Plus tard"), the title "N plongées en conflit" and a tonal "Continuer" at the right; the intro line; a "Même choix pour toutes" switch ("Toutes ce téléphone, ou toutes le cloud", off by default, it replaces the "apply to all" checkbox: when on, one choice applies to every dive and the per-dive choices are disabled); then one white card per dive: thumbnail, site, number, date and "diffère : <fields>", and under it two small selectable cards side by side, "Ce téléphone" and "Cloud", each with its time and its value cut to two lines, the same check badge and empty circle. Touching the dive header opens the one-dive dialog with the full values. Mock-ups: `android-etat-conflit.dc.html` (one dive), `android-etat-conflit-ordinateurs.dc.html` (dive computer names), `android-etat-conflit-plusieurs.dc.html` (several dives). iOS: the same content in a large sheet with its grabber (`ios-etat-conflit.dc.html`): cards with 14 pt corners, a 0.5 pt outline when not chosen, the check badge at the top right, then a full-width "Continuer" (50 pt, secondary container) and "Plus tard" (plain text) at the bottom.
 
+### Sync failures (decided on 9 November 2026)
+
+A sync failure never blocks the app and never opens a dialog by itself. The Carnet status row turns to the pending colour (`--od-pending`) with a warning icon and a chevron; the sync card of the side menu says the same. Touching it opens an MD3 modal bottom sheet (drag handle, 28 dp top corners, scrim): an icon in a 48 dp sand circle (secondary container), a title, a text that always says the changes stay on the phone, then a text button and a tonal button at the bottom right. Three causes:
+
+| Cause | Status row | Sheet title | Main action | Secondary |
+| --- | --- | --- | --- | --- |
+| Password refused by the cloud | "Synchronisation impossible : mot de passe refusé" | "Le cloud refuse votre mot de passe" | "Corriger le mot de passe" (opens the account sign-in, address filled) | "Plus tard" |
+| Cloud server unreachable while the network works | "Le cloud ne répond pas : nouvel essai dans 5 min" | "Le cloud ne répond pas" | "Réessayer maintenant" | "Fermer" |
+| Own git repository refuses access (token expired or removed, address changed) | "Synchro impossible : dépôt git refusé" | "Le dépôt git refuse l’accès" | "Modifier le dépôt" (opens the git repository form) | "Plus tard" |
+
+Retries are automatic for the unreachable server (every 5 minutes, then less often); the other two wait for the diver. No network at all is not a failure: it keeps the offline state. Mock-ups: `android-etat-synchro-motdepasse.dc.html`, `android-etat-synchro-serveur.dc.html`, `android-etat-synchro-depot.dc.html`.
+
