@@ -25,4 +25,3 @@ Next number: 29
 - #23 [design] idée : ajouter une section Explorer, une carte qui affiche les sites de plongée des environs
 - #25 [design] / (Carnet) : afficher les intervalles de temps (mois, année) en en-têtes collants (sticky) dans la liste
 - #27 [design] Se débarrasser de tout workflow lié à l'état invalide d'une plongée : menus contextuels, recherche, paramétrage. S'assurer au préalable que cette feature n'est pas utilisée.
-- #28 [design] Ajouter une config pour qu'une plongée importée depuis l'ordinateur de plongée, et sans donnée sur le type d'eau, hérite d'une valeur par défaut. Cette valeur est définie dans les préférences.

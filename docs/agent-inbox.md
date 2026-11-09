@@ -1038,3 +1038,11 @@ Christian wrote the text. Mock-up: `docs/mockups/outils-desaturation-android.dc.
 - `desaturation.chartText` becomes, in fr: "Les 16 compartiments du modèle Bühlmann, des plus rapides aux plus lents, en pourcentage de la limite permise." In en: "The 16 compartments of the Bühlmann model, fastest to slowest, as a percentage of the allowed limit."
 - `modelGf` ("Facteurs de gradient 30 / 75, ceux du planificateur.") and `modelVpmb` stay, right after it, in the same paragraph.
 - Keep the note "Ce calcul ne connaît que les plongées du carnet…" and the flight recommendation unchanged.
+
+## [ ] 2026-11-09-35 Settings: default water type for downloaded dives (to-do #28)
+
+Christian approved. Spec: "Default water type for downloaded dives". Mock-ups: `docs/mockups/android-reglages.dc.html` (group "Carnet"), `docs/mockups/reglages-type-eau-android.dc.html` (dialog).
+- New app setting, per device, default "Non précisé". Options: Non précisé, Eau douce (1000 g/l), Eau de mer (1030 g/l), EN 13319 (1020 g/l), as Subsurface's water types.
+- On download from a dive computer, when the dive has no salinity, write the chosen value; "Non précisé" leaves it empty. Never touch dives already in the logbook, nor a salinity the computer gave.
+- Row in Settings › Carnet after "Choisir le type d’eau dans l’éditeur", with supporting text and current value; the choice dialog has the intro sentence from the spec. fr and en keys.
+- The planner's "Type d’eau" in "Conditions par défaut" is unchanged.
