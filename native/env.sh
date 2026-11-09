@@ -14,7 +14,7 @@ LIBGIT2_TAG=v1.8.1
 LIBXML2_TAG=v2.15.1
 LIBXSLT_TAG=v1.1.45
 LIBZIP_TAG=rel-1-5-1
-OPENSSL_TAG=openssl-3.4.4   # the one Subsurface uses for Android
+MBEDTLS_TAG=mbedtls-3.6.7   # used under GPL-2.0-or-later; OpenSSL's Apache 2.0 is not GPL v2 compatible
 SQLITE_VERSION=3190200
 SQLITE_YEAR=2017
 

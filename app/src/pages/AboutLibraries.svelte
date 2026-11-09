@@ -18,7 +18,7 @@
         ['libxml2', 'MIT', 'https://gitlab.gnome.org/GNOME/libxml2'],
         ['libxslt', 'MIT', 'https://gitlab.gnome.org/GNOME/libxslt'],
         ['libzip', 'BSD-3-Clause', 'https://libzip.org'],
-        ['OpenSSL', 'Apache-2.0', 'https://www.openssl.org'],
+        ['Mbed TLS', 'GPL-2.0-or-later', 'https://www.trustedfirmware.org/projects/mbed-tls/'],
         ['SQLite', 'Public domain', 'https://sqlite.org'],
       ],
     },

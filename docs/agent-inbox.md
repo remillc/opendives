@@ -781,3 +781,37 @@ Christian asked to send these changes. Spec: "Side menu" and "Side menu and sect
 - Carnet: search icon replaced by a search bar under the summary; a ⋮ menu with "Filtrer" (opens the existing filter) and "Renuméroter les plongées". The empty, offline and conflict states of the Carnet get the same header.
 - Réglages and À propos: ☰ instead of the back arrow (they are in the menu). Their sub-screens keep the back arrow.
 
+## [x] 2026-11-09-09 Reminder: logbook rows exactly as the mock-up, expanded trip
+
+Done in the branch `fix/logbook-rows-mockup`.
+
+Christian notices that the logbook rows in the app do not match `docs/mockups/android-carnet.dc.html` exactly. Please compare side by side and align, using the mock-up's values:
+- Dive row: 72 dp minimum, padding 8 dp, 24 dp right, 16 dp left, 16 dp gap. Profile thumbnail 56 × 40 dp, 8 dp corners, `#E8E8E5` background, water gradient from #FBE3B2 to the depth colour, profile line 1.25 dp `#1F2124`. Left column: site 16/24 (in `#4A4D52` when the site is missing, "Site à préciser"), date and time 14/20 `#4A4D52`. Right column, right-aligned, tabular figures: maximum depth 16/24 weight 500, duration 14/20 `#4A4D52`. No dividers between rows.
+- Trip row: the same 72 dp, four thumbnails 27 × 19 dp in a 2 × 2 grid inside 56 × 40, title 16/24, summary 14/20 ("4 plongées, de 69 à 94 ft"), expand arrow on the right.
+- Expanded trip (`docs/mockups/android-carnet.dc.html` now shows the trip of 2 February 2013 open): the arrow turns up, and the trip's dives follow in a white surface (12 dp side margins, 16 dp corners, 4 dp vertical padding), each a dive row as above with 64 dp height and 12 dp side padding, most recent first. Collapsing hides them again.
+Also check the other changes of today on the same screens (task 2026-11-09-08), and the Compte header (same band as the sections, summary "Votre carnet dans le cloud", or "Aucun compte connecté" without an account; the text under "Se déconnecter" reads "Déconnecter votre app du cloud. Vos plongées restent dans le cloud et sur cet appareil."). In every banded header, the faint profile is 34 dp high near the bottom and never touches text.
+
+## [x] 2026-11-09-10 Logbook: dive numbers, trip open in place, trip dives in selection
+
+Done in the branch `fix/logbook-numbers-trip-selection`.
+
+Christian approved these on the canvas. Mock-ups: `android-carnet.dc.html`, `carnet-selection-android.dc.html`, `carnet-selection-menu-android.dc.html`.
+- Each dive row starts its second line with the dive number: "N° 9 · 7 févr. 2026, 09:09".
+- An open trip shows its dives most recent first, like the rest of the logbook, so numbers run on without a break (… 5, then 4, 3, 2, 1 inside the trip). The white surface of the trip's dives is indented by 20 dp: left margin 32 dp, right 12 dp.
+- In selection mode, an open trip shows its dives with their own checkboxes, in the same indented surface, selectable like the other rows.
+- The side-menu mock-ups now show the current logbook behind the drawer (no change to the drawer itself).
+
+## [x] 2026-11-09-11 Own git repository instead of the cloud (to-do #11)
+
+Christian wants it done now (no longer waiting for v1). Spec: "Own git repository instead of the cloud" (mock-ups listed there). First-launch link, "Dépôt git" form with the address check through `ls-remote`, branches read from the repository, the Compte screen in git mode, and the token storage rules (Keystore / Keychain, no backup, no logs). Remove to-do #11 from `docs/TODOS.md` when it is done. If libgit2 in the core cannot list remote references or push over HTTPS with a token on Android or iOS, stop and tell Christian.
+
+
+Done in the branch `feature/own-git-repository` (Android only; there is no iOS project yet). Still to check by Christian with a real token: the authenticated check, the first push to the empty private repository and a sync (see the branch report).
+
+## [ ] 2026-11-09-12 Dive detail profile: water gradient missing, view differs from the mock-up
+
+Christian, on the canvas (mock-up `docs/mockups/detail3-android.dc.html`): in the app, the area under the profile is a single grey, and the app's view is different from the mock-up. Rework it so the profile card matches the mock-up.
+- The water column is a vertical gradient: `--od-water-top` (#FBE3B2) at 0 m, down to a mix of `--od-water-top` and `--od-water-bottom` (#B4530F) in the ratio max depth / 60 m. The mock-up's 39 m dive ends at about 65 % of the way to #B4530F. The trace stays #1F2124 on top.
+- `DiveProfile.svelte` and `ProfileThumbnail.svelte` already declare this gradient, so find why it renders grey on the device. A likely cause: `waterBottomColor()` returns `color-mix(...)` with `var()` inside an SVG `stop-color`, which older Android WebViews do not support (the stop then falls back to a default colour). If so, compute the colour in JavaScript from the theme values (light and dark) and pass a plain `rgb()`. Check the result on the device, in light and dark mode, and in the thumbnails (logbook, sites, plans, download).
+- Then compare the whole profile card with the mock-up (hint line, axes and labels, temperature curve and scale, cursor, sizes and margins) and fix every difference. List in your report what differed.
+

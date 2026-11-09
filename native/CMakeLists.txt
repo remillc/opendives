@@ -18,7 +18,7 @@ list(APPEND SOURCES
   "${COMPAT}/qthelper_compat.cpp"
   "${COMPAT}/notifier_compat.cpp"
   "${COMPAT}/cloud_compat.cpp"
-  "${COMPAT}/https_openssl.cpp"
+  "${COMPAT}/https_mbedtls.cpp"
   "${COMPAT}/bluetooth_compat.cpp"
   "${ROOT}/core/libopendives/opendives.cpp"
   "${ROOT}/core/libopendives/edit.cpp"
@@ -48,6 +48,6 @@ target_include_directories(opendives PRIVATE
   "${ROOT}" "${SS}" "${SS}/libdivecomputer/include"
   "${DEPS}/include" "${DEPS}/include/libxml2")
 target_link_directories(opendives PRIVATE "${DEPS}/lib")
-target_link_libraries(opendives PRIVATE divecomputer git2 ssl crypto zip xslt xml2 sqlite3 z m log)
+target_link_libraries(opendives PRIVATE divecomputer git2 mbedtls mbedx509 mbedcrypto zip xslt xml2 sqlite3 z m log)
 target_link_options(opendives PRIVATE
   -Wl,--gc-sections -Wl,-z,max-page-size=16384 -Wl,--exclude-libs,ALL)

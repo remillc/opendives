@@ -52,7 +52,9 @@ export function buildSnapshot(sortedDives, prefs) {
     }
     trip.dives.push(trip.dives.length < TRIP_PROFILES ? dive : { ...dive, profile: [] });
   }
-  return { v: VERSION, total: sortedDives.length, prefs, entries };
+  // A trip of one dive is drawn as that dive, as in the logbook.
+  const drawn = entries.map((e) => (e.type === 'trip' && e.dives.length === 1 ? { type: /** @type {const} */ ('dive'), dive: e.dives[0] } : e));
+  return { v: VERSION, total: sortedDives.length, prefs, entries: drawn };
 }
 
 /** @param {Snapshot|null} snapshot null forgets it */

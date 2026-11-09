@@ -1,6 +1,6 @@
 #!/bin/bash
 # Builds the core dependencies as static libraries for Android:
-# OpenSSL, libgit2 (HTTPS through OpenSSL, no SSH), libxml2, libxslt, sqlite3,
+# Mbed TLS, libgit2 (HTTPS through Mbed TLS, no SSH), libxml2, libxslt, sqlite3,
 # libzip, libdivecomputer.
 # zlib comes from the NDK. Output: build/android/deps/<abi>/{include,lib}
 # usage: native/build-deps.sh [abi...]
@@ -13,7 +13,11 @@ mkdir -p "$SRC"
 clone() { # name url tag
   [ -d "$SRC/$1/.git" ] || git clone -q --depth 1 --branch "$3" "$2" "$SRC/$1"
 }
-clone openssl https://github.com/openssl/openssl.git "$OPENSSL_TAG"
+[ -d "$SRC/mbedtls/.git" ] || git clone -q --depth 1 --recurse-submodules --shallow-submodules --branch "$MBEDTLS_TAG" https://github.com/Mbed-TLS/mbedtls.git "$SRC/mbedtls"
+# The core and libgit2 reach the network from two threads; libgit2's client
+# speaks up to TLS 1.2. In the source's configuration, so that the installed
+# headers, read by libgit2 and the core, say the same as the library.
+sed -i -E 's|^//(#define MBEDTLS_THREADING_(C\|PTHREAD))\b|\1|; s|^(#define MBEDTLS_SSL_(PROTO_TLS1_3\|TLS1_3_[A-Z0-9_]+))\b|//\1|' "$SRC/mbedtls/include/mbedtls/mbedtls_config.h"
 clone libgit2 https://github.com/libgit2/libgit2.git "$LIBGIT2_TAG"
 clone libxml2 https://github.com/GNOME/libxml2.git "$LIBXML2_TAG"
 clone libxslt https://github.com/GNOME/libxslt.git "$LIBXSLT_TAG"
@@ -44,26 +48,18 @@ for ABI in $ABIS; do
 
   TC=$NDK/toolchains/llvm/prebuilt/linux-x86_64/bin
   case $ABI in
-    arm64-v8a) TRIPLE=aarch64-linux-android; OSSL_TARGET=android-arm64 ;;
-    x86_64) TRIPLE=x86_64-linux-android; OSSL_TARGET=android-x86_64 ;;
+    arm64-v8a) TRIPLE=aarch64-linux-android ;;
+    x86_64) TRIPLE=x86_64-linux-android ;;
     *) echo "unknown ABI: $ABI"; exit 1 ;;
   esac
   CC_ABI="$TC/$TRIPLE$ANDROID_API-clang"
 
-  if [ ! -f "$P/lib/libssl.a" ]; then
-    echo "== $ABI : openssl"
-    rm -rf "$W/openssl"; mkdir -p "$W/openssl"
-    (cd "$W/openssl" && export ANDROID_NDK_ROOT="$NDK" PATH="$TC:$PATH" &&
-     "$SRC/openssl/Configure" "$OSSL_TARGET" -D__ANDROID_API__="$ANDROID_API" \
-       --prefix="$P" --libdir=lib no-shared no-tests no-apps no-docs no-engine no-dso no-ui-console \
-       >"$W/openssl.log" 2>&1 &&
-     make -j"$JOBS" build_libs >>"$W/openssl.log" 2>&1 && make install_dev >>"$W/openssl.log" 2>&1) ||
-      { tail -30 "$W/openssl.log"; exit 1; }
-  fi
+  rm -f "$P/lib/libssl.a" "$P/lib/libcrypto.a"; rm -rf "$P/include/openssl" # from older builds
+  cm mbedtls -DENABLE_PROGRAMS=OFF -DENABLE_TESTING=OFF -DMBEDTLS_FATAL_WARNINGS=OFF -DGEN_FILES=OFF -DUSE_SHARED_MBEDTLS_LIBRARY=OFF
 
   # libgit2 forces -std=c90, where the NDK headers do not know "inline".
-  cm libgit2 -DCMAKE_C_FLAGS=-Dinline=__inline__ -DUSE_HTTPS=OpenSSL -DOPENSSL_ROOT_DIR="$P" \
-    -DOPENSSL_USE_STATIC_LIBS=TRUE -DUSE_SSH=OFF -DBUILD_TESTS=OFF -DBUILD_CLI=OFF -DBUILD_EXAMPLES=OFF \
+  cm libgit2 -DCMAKE_C_FLAGS=-Dinline=__inline__ -DUSE_HTTPS=mbedTLS -DUSE_SHA1=CollisionDetection -DUSE_SHA256=Builtin \
+    -DUSE_SSH=OFF -DBUILD_TESTS=OFF -DBUILD_CLI=OFF -DBUILD_EXAMPLES=OFF \
     -DUSE_BUNDLED_ZLIB=OFF -DREGEX_BACKEND=builtin -DUSE_HTTP_PARSER=builtin -DUSE_NTLMCLIENT=OFF -DUSE_GSSAPI=OFF
   cm libxml2 -DLIBXML2_WITH_PYTHON=OFF -DLIBXML2_WITH_ICONV=OFF -DLIBXML2_WITH_ICU=OFF -DLIBXML2_WITH_LZMA=OFF \
     -DLIBXML2_WITH_ZLIB=OFF -DLIBXML2_WITH_PROGRAMS=OFF -DLIBXML2_WITH_TESTS=OFF -DLIBXML2_WITH_DOCS=OFF

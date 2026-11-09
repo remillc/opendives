@@ -10,17 +10,20 @@ Rules (agreed between the design agent and the code agent, see `docs/agent-inbox
 - **Tag:** every item starts with `[design]` or `[code]` right after its number, set by the agent that adds it (`#4 [design] …`). `[design]` = mock-ups, visuals, screen texts, specification; `[code]` = everything else. When unsure, the agent asks Christian. The tag says who handles the item and lets Christian list one kind only.
 - No other content in this file: no history, no checked boxes, no notes from agents.
 
-Next number: 20
+Next number: 24
 
 ## List
 
-- #1 [code] ajouter de l'analytics dans l'app. Penser à corriger privacy
+- #1 [code] ajouter de l'analytics dans l'app. Penser à corriger privacy (en pause : voir docs/analytics-decision.md)
 - #3 [code] urls U1 à U7 (non pour U8, U9 et U10) : U1 /plan/42 → /dives/42/plan ; U2 /plan/new → /plan ; U3 /plan/setup → /settings/planner ; U4 /statistics/year/2014 → /statistics/years/2014 ; U5 /filter/depth → /filter/criteria/depth ; U6 /download/failed → /download-failed ; U7 /add/download (iPhone) → /download ; et (ex-#7) Mettre /plan sous /tools
 - #6 [design] /plan/new: refaire le visuel
 - #8 [design] /tools/desaturation: beaucoup trop de texte. Texte pour me protéger.
 - #10 [design] Compte: Compte subsurface vérifié: ?
-- #11 [code] Plus tard (après la v1) : synchroniser aussi avec un dépôt git choisi par l’utilisateur (GitHub ou autre), en HTTPS, en plus du cloud Subsurface
 - #15 [code] supprimer une plongée: afficher un dialogue de confirmation puis un snackbar
 - #17 [design] ajouter la possibilité d'une switch globale "plongée récréative" qui masque les paramètres avancés et ceux concernant le mode de plongée cc. Ce que SS nomme le mode loisir.
 - #18 [design] uniformiser « e-mail » et « courriel » dans les textes français de l'app : tout en « courriel »
 - #19 [code] ajouter une langue fr-CA : un petit fichier qui ne contient que les mots qui diffèrent du fr (par exemple nuage plutôt que cloud), le reste retombe sur fr
+- #20 [design] ajouter la possibilité pour l'usager de noter l'app dans le store
+- #21 [design] ajouter une vue carte des plongées
+- #22 [design] /dives/:id : ajouter « Retirer du voyage » dans le menu 3 points quand la plongée fait partie d'un voyage
+- #23 [design] idée : ajouter une section Explorer, une carte qui affiche les sites de plongée des environs

@@ -39,7 +39,7 @@
   /**
    * A row of the virtual list. `kind` groups rows of the same layout, hence of
    * the same probable height.
-   * @typedef {{ kind: 'dive'|'inTrip', key: string, index: number, dive: Dive }
+   * @typedef {{ kind: 'dive'|'inTrip', key: string, index: number, dive: Dive, tripFirst?: boolean, tripLast?: boolean }
    *   | { kind: 'trip', key: string, index: number, id: number, location: string, dives: Dive[] }} Row
    */
 
@@ -176,6 +176,53 @@
 
   const checkedIds = $derived(Object.keys(checked).filter((id) => checked[Number(id)]).map(Number));
 
+  /** The dives of a trip. @param {number} tripId */
+  const diveIdsOfTrip = (tripId) => logbook.dives.filter((d) => d.trip?.id === tripId).map((d) => d.id);
+
+  /** The trips all of whose dives are checked: selecting a trip checks its dives. */
+  const checkedTrips = $derived.by(() => {
+    /** @type {Set<number>} */
+    const whole = new Set(logbook.dives.flatMap((d) => (d.trip && checked[d.id] ? [d.trip.id] : [])));
+    for (const d of logbook.dives) if (d.trip && !checked[d.id]) whole.delete(d.trip.id);
+    return [...whole];
+  });
+
+  /** A long press on a trip, or a tap on it while selecting. @param {number} tripId */
+  function selectTrip(tripId) {
+    const ids = diveIdsOfTrip(tripId);
+    if (!ids.length) return;
+    if (!selecting) startSelection(ids[0]);
+    for (const id of ids) checked[id] = true;
+  }
+
+  /** @param {number} tripId */
+  function toggleTripChecked(tripId) {
+    const ids = diveIdsOfTrip(tripId);
+    const all = ids.every((id) => checked[id]);
+    for (const id of ids) checked[id] = !all;
+    if (!Object.values(checked).some(Boolean)) endSelection();
+  }
+
+  /** "Supprimer ce voyage": the trip goes, its dives stay in the logbook. One undoable step. */
+  function deleteCheckedTrips() {
+    const n = checkedTrips.length;
+    const diveIds = checkedTrips.flatMap(diveIdsOfTrip);
+    confirmAction({
+      title: t('logbook.deleteTripTitle', { n }),
+      text: t('logbook.deleteTripText', { n }),
+      action: t('logbook.deleteTripAction'),
+      onConfirm: async () => {
+        try {
+          await tripChange({ action: 'remove', diveIds });
+          endSelection();
+          offerUndo(t('logbook.tripDeleted', { n }));
+        } catch (e) {
+          changeFailed(e);
+        }
+      },
+    });
+  }
+
   /**
    * The trips just above and below the checked dives, when these are dives
    * outside trips that follow one another in the list: "Add to the trip
@@ -218,7 +265,7 @@
     const n = ids.length;
     confirmAction({
       title: t('logbook.deleteTitle', { n }),
-      text: t('logbook.deleteText', { n }),
+      text: t(logbook.mode === 'git' ? 'logbook.deleteTextGit' : 'logbook.deleteText', { n }),
       action: t('logbook.deleteAction'),
       onConfirm: async () => {
         try {
@@ -341,10 +388,25 @@
     /** @param {Event} e */
     const diveOf = (e) => /** @type {HTMLElement|null} */ (/** @type {HTMLElement} */ (e.target).closest('a.dive-row'));
 
+    /** The trip a long press is on: let go, it is selected. */
+    let pressedTrip = 0;
+
     /** @param {PointerEvent} e */
     function down(e) {
       pressed = false;
       dragIds = null;
+      pressedTrip = 0;
+      const target = /** @type {HTMLElement} */ (e.target);
+      const tripRow = /** @type {HTMLElement|null} */ (target.closest('li.trip-row'));
+      if (tripRow && !target.closest('.expand')) {
+        startX = e.clientX;
+        startY = e.clientY;
+        timer = setTimeout(() => {
+          pressed = true;
+          pressedTrip = Number(tripRow.dataset.trip) || 0;
+        }, LONG_PRESS_MS);
+        return;
+      }
       const row = diveOf(e);
       if (!row) return;
       startX = e.clientX;
@@ -376,7 +438,9 @@
       // While another screen slides in over the Logbook, its rows are still
       // visible: a tap then would open a dive from that screen, which
       // Framework7's master-detail routing turns into a second Logbook.
-      if (!el.closest('.page')?.classList.contains('page-current')) {
+      // Beside a detail (tablet), the list stays in use while it is not "current".
+      const listPage = el.closest('.page');
+      if (!listPage?.classList.contains('page-current') && !listPage?.parentElement?.querySelector(':scope > .page-current.page-master-detail')) {
         e.preventDefault();
         e.stopPropagation();
         return;
@@ -397,8 +461,15 @@
         return;
       }
       if (!selecting) return;
+      // In selection mode a dive or a trip is checked, not opened.
+      const trip = /** @type {HTMLElement|null} */ (/** @type {HTMLElement} */ (e.target).closest('li.trip-row'));
+      if (trip) {
+        toggleTripChecked(Number(trip.dataset.trip));
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
       const row = diveOf(e);
-      // In selection mode a dive is checked, not opened; a trip still opens.
       if (!row) return;
       toggleChecked(Number(row.dataset.dive));
       e.preventDefault();
@@ -454,6 +525,28 @@
       ghost.style.top = `${touchY - 72}px`;
     }
 
+    /**
+     * A horizontal bar on the edge of the row under the finger, the nearest
+     * one, while a drop there would do something.
+     * @param {HTMLElement|null} row
+     */
+    function placeDropLine(row) {
+      let line = /** @type {HTMLElement|null} */ (document.querySelector('.od-drop-line'));
+      if (!row) {
+        line?.remove();
+        return;
+      }
+      if (!line) {
+        line = document.createElement('div');
+        line.className = 'od-drop-line';
+        document.body.append(line);
+      }
+      const rect = (row.querySelector('.item-content') ?? row).getBoundingClientRect();
+      line.style.left = `${rect.left + 8}px`;
+      line.style.width = `${rect.width - 16}px`;
+      line.style.top = `${touchY < rect.top + rect.height / 2 ? rect.top : rect.bottom}px`;
+    }
+
     function updateTarget() {
       el?.querySelectorAll('.od-drop-target').forEach((n) => n.classList.remove('od-drop-target'));
       target = null;
@@ -469,6 +562,7 @@
           target = { action: 'remove' };
         }
       }
+      placeDropLine(target ? li : null);
       if (!label) return;
       if (!target) {
         label.textContent = dragged.length > 1 ? t('logbook.dragCount', { n: dragged.length }) : dragged[0]?.site || t('dive.siteNotSet');
@@ -507,7 +601,7 @@
       dragging = false;
       cancelAnimationFrame(scrolling);
       // Every chip, also one left by a drag the list reload cut short.
-      document.querySelectorAll('.od-drag-chip').forEach((n) => n.remove());
+      document.querySelectorAll('.od-drag-chip, .od-drop-line').forEach((n) => n.remove());
       ghost = null;
       label = null;
       dragRow?.classList.remove('od-drag-source', 'od-drag-lift');
@@ -565,14 +659,17 @@
           if (!selecting) startSelection(id);
           else checked[id] = true;
         }
+        if (pressedTrip) selectTrip(pressedTrip);
       }
       dragIds = null;
+      pressedTrip = 0;
     }
 
     function touchCancel() {
       if (dragging) endDrag();
       dragRow?.classList.remove('od-drag-lift');
       dragIds = null;
+      pressedTrip = 0;
     }
 
     el.addEventListener('pointerdown', down);
@@ -641,7 +738,24 @@
       }
       trip.dives.push(dive);
     }
-    return list;
+    // A trip of one dive (automatic grouping makes many) is drawn as that dive.
+    return list.map((e) => (e.type === 'trip' && e.dives.length === 1 ? { type: /** @type {const} */ ('dive'), key: `d${e.dives[0].id}`, dive: e.dives[0] } : e));
+  });
+
+  // Tablet: with nothing in the detail pane, the first dive of the list. Not
+  // over another screen shown there (a trip, the filter).
+  let autoOpening = false;
+  $effect(() => {
+    if (navigation.dive !== null) {
+      autoOpening = false;
+      return;
+    }
+    if (!layout.split || navigation.section !== 'logbook' || logbook.loading || logbook.error || selecting || !listEl) return;
+    const first = entries[0];
+    const dive = first?.type === 'trip' ? first.dives[0] : first?.dive;
+    if (!dive || autoOpening || listEl.closest('.view')?.querySelector('.page-master-detail')) return;
+    autoOpening = true;
+    f7router.navigate(`/dives/${dive.id}`, { reloadDetail: true });
   });
 
   /**
@@ -699,7 +813,9 @@
       const id = entry.dives[0].trip?.id ?? 0;
       list.push({ kind: 'trip', key: entry.key, index: list.length, id, location: entry.location, dives: entry.dives });
       if (expanded[id]) {
-        for (const dive of entry.dives) list.push({ kind: 'inTrip', key: `d${dive.id}`, index: list.length, dive });
+        entry.dives.forEach((dive, i) =>
+          list.push({ kind: 'inTrip', key: `d${dive.id}`, index: list.length, dive, tripFirst: i === 0, tripLast: i === entry.dives.length - 1 }),
+        );
       }
     }
     return list;
@@ -976,7 +1092,7 @@
     <div class="preview" aria-busy="true" aria-label={t('logbook.loading')} role="status" onclickcapture={holdTap}>
       <div aria-hidden="true">
         <p class="count od-value">{t('logbook.count', { n: logbook.preview.total })}</p>
-        <div class="list media-list chevron-center dividers dives">
+        <div class="list media-list {theme.ios ? 'chevron-center dividers' : ''} dives">
           <ul>
             {#each logbook.preview.entries as entry, i (i)}
               {#if entry.type === 'trip'}
@@ -999,7 +1115,7 @@
     <div class="loading skeleton-effect-wave" aria-busy="true" aria-label={t('logbook.loading')} role="status">
       <div aria-hidden="true">
         <p class="count"><span class="skeleton-block bar" style:width="7.5em"></span></p>
-        <List mediaList dividers class="chevron-center dives">
+        <List mediaList dividers={theme.ios} class="{theme.ios ? 'chevron-center' : ''} dives">
           {#each Array(14) as _, i (i)}
             <li>
               <!-- item-link: the same chevron space as the real rows. -->
@@ -1034,7 +1150,7 @@
     </Block>
   {:else if logbook.dives.length === 0}
     <!-- Empty logbook (docs/mockups/*-etat-vide): the choices of "+" directly. -->
-    {#if logbook.email}<p class="count">{t('logbook.emptyCloud')}</p>{/if}
+    {#if logbook.email}<p class="count">{t(logbook.mode === 'git' ? 'logbook.emptyGit' : 'logbook.emptyCloud')}</p>{/if}
     <div class="empty">
       <h2 class="od-state-title">{t('logbook.emptyTitle')}</h2>
       <p class="empty-text">{t('logbook.emptyText')}</p>
@@ -1085,7 +1201,10 @@
       {/if}
       {#if selecting}
         <MenuItem icon="plus" text={t('logbook.menuCreateTrip')} onclick={createTrip} />
-        {#if checkedInTrip.length}
+        {#if checkedTrips.length}
+          <MenuItem icon="ungroup" text={t('logbook.menuDeleteTrip', { n: checkedTrips.length })} destructive onclick={deleteCheckedTrips} />
+        {/if}
+        {#if checkedInTrip.some((id) => !checkedTrips.includes(logbook.dives.find((d) => d.id === id)?.trip?.id ?? 0))}
           <MenuItem icon="remove" text={t('logbook.menuRemoveFromTrip', { n: checkedInTrip.length })} onclick={removeFromTrip} />
         {/if}
         {#if neighbourTrips.above}
@@ -1115,7 +1234,7 @@
   {/if}
 
   {#if !logbook.loading && !logbook.error && rows.length}
-    <div class="list media-list chevron-center dividers virtual-list dives" bind:this={listEl}>
+    <div class="list media-list {theme.ios ? 'chevron-center dividers' : ''} virtual-list dives" bind:this={listEl}>
       <ul>
         {#each visible.items as row (row.key)}
           {#if row.kind === 'trip'}
@@ -1127,6 +1246,8 @@
               ontoggle={() => toggleTrip(row.id)}
               index={row.index}
               top={visible.topPosition}
+              {selecting}
+              checked={checkedTrips.includes(row.id)}
             />
           {:else}
             <DiveRow
@@ -1139,6 +1260,8 @@
               {selecting}
               checked={!!checked[row.dive.id]}
               appear={row.kind === 'inTrip' && row.dive.trip?.id === appearing}
+              tripFirst={row.kind === 'inTrip' && row.tripFirst}
+              tripLast={row.kind === 'inTrip' && row.tripLast}
             />
           {/if}
         {/each}
@@ -1320,6 +1443,28 @@
     }
 
     /* Over a place where the dives can go: the chip in ink. */
+    /* Where the drop would go: a 3 dp bar with a dot at its start. */
+    :global(.od-drop-line) {
+      position: fixed;
+      z-index: 9999;
+      height: 3px;
+      margin-top: -1.5px;
+      border-radius: 2px;
+      background: var(--od-text);
+      pointer-events: none;
+    }
+
+    :global(.od-drop-line::before) {
+      content: '';
+      position: absolute;
+      left: -5px;
+      top: -3.5px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--od-text);
+    }
+
     :global(.od-drag-chip.od-drag-chip-target) {
       background: var(--od-text);
       color: var(--od-surface);

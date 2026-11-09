@@ -9,12 +9,29 @@
   import Icon from '../components/Icon.svelte';
   import SyncButton from '../components/SyncButton.svelte';
   import MenuButton from '../components/MenuButton.svelte';
+  import SectionBand from '../components/SectionBand.svelte';
+  import { OpenDivesCore } from 'opendives-core';
   import { logbook, setAutoSync, signOut, syncNow, deviceDiveCount } from '../lib/logbook.svelte.js';
   import { showSection } from '../lib/navigation.svelte.js';
   import { formatDateTime, formatNumber, formatTimeOfDay } from '../lib/format.js';
   import { t, tIfExists } from '../lib/i18n.js';
 
   const signedIn = $derived(!!logbook.email);
+  /** The logbook lives in the user's own git repository, not in the Subsurface cloud. */
+  const git = $derived(logbook.mode === 'git');
+
+  /** Branch of the connected repository (never its token). */
+  let gitBranch = $state('');
+  $effect(() => {
+    if (!git) return;
+    OpenDivesCore.gitConfig().then(
+      (saved) => (gitBranch = saved.branch),
+      (e) => console.error('Reading the connected repository', e),
+    );
+  });
+  /** "owner/name", then "host · branch main" (spec, section 4, Compte in git mode). */
+  const gitName = $derived(logbook.repository.split('/').slice(1).join('/').replace(/\.git$/, ''));
+  const gitHost = $derived(logbook.repository.split('/')[0]);
 
   /** Dives logged on this device without an account, which the account can take (0: none). */
   let deviceCount = $state(0);
@@ -54,7 +71,7 @@
   function confirmSignOut(e) {
     e?.preventDefault();
     const pending = logbook.pending;
-    const text = pending ? t('signOut.textPending', { n: pending }) : t('signOut.textNone');
+    const text = pending ? t(git ? 'signOut.textPendingGit' : 'signOut.textPending', { n: pending }) : t(git ? 'signOut.textNoneGit' : 'signOut.textNone');
     const content = `
       <p class="od-signout-text">${escape(text)}</p>
       <label class="od-signout-copy${pending ? ' disabled' : ''}">
@@ -73,7 +90,7 @@
           { text: t('signOut.cancel') },
           { text: t('signOut.confirm'), bold: true, onClick: (/** @type {any} */ dialog) => runSignOut(deleteCopy(dialog)) },
         ];
-    f7.dialog.create({ title: t('signOut.title'), content, buttons, verticalButtons: pending > 0, cssClass: 'od-signout' }).open();
+    f7.dialog.create({ title: t(git ? 'signOut.titleGit' : 'signOut.title'), content, buttons, verticalButtons: pending > 0, cssClass: 'od-signout' }).open();
   }
 
   /** @param {boolean} deleteCopy */
@@ -104,17 +121,27 @@
 </script>
 
 <Page>
-  <Navbar title={t('account.title')}>
+  <Navbar class="od-band-bar" title={t('account.title')}>
     {#snippet left()}<MenuButton />{/snippet}
   </Navbar>
 
+  <SectionBand summary={t(signedIn ? (git ? 'account.bandGit' : 'account.bandSignedIn') : 'account.bandNone')} />
+
   {#if signedIn}
     <div class="identity">
-      <span class="avatar"><Icon name="account" size={28} /></span>
-      <span class="text">
-        <span class="name">{logbook.email}</span>
-        <span class="status"><Icon name="cloud" size={16} />{t('account.verified')}</span>
-      </span>
+      {#if git}
+        <span class="avatar"><Icon name="git" size={28} /></span>
+        <span class="text">
+          <span class="name">{gitName}</span>
+          <span class="status">{t('account.gitCaption', { host: gitHost, branch: gitBranch })}</span>
+        </span>
+      {:else}
+        <span class="avatar"><Icon name="account" size={28} /></span>
+        <span class="text">
+          <span class="name">{logbook.email}</span>
+          <span class="status"><Icon name="cloud" size={16} />{t('account.verified')}</span>
+        </span>
+      {/if}
     </div>
 
     <div class="block-title">{t('account.syncGroup')}</div>
@@ -157,7 +184,7 @@
         <li>
           <div class="item-content">
             <div class="item-inner">
-              <div class="item-title">{t('account.cloudDives')}</div>
+              <div class="item-title">{t(git ? 'account.gitDives' : 'account.cloudDives')}</div>
               <div class="item-after od-value">{formatNumber(count)}</div>
             </div>
           </div>
@@ -180,36 +207,56 @@
       </ul>
     </div>
 
-    <div class="block-title">{t('account.subsurfaceGroup')}</div>
-    <div class="list list-strong inset list-dividers">
-      <ul>
-        <li>
-          <a href="#password" class="item-link item-content external" role="button" onclick={notAvailable}>
-            <div class="item-inner">
-              <div class="item-title">
-                {t('account.changePassword')}
-                <div class="item-footer">{t('account.changePasswordText')}</div>
+    {#if git}
+      <div class="block-title">{t('account.gitGroup')}</div>
+      <div class="list list-strong inset list-dividers">
+        <ul>
+          <li>
+            <a href="/account/git" class="item-link item-content" role="button">
+              <div class="item-inner">
+                <div class="item-title">
+                  {t('account.gitEdit')}
+                  <div class="item-footer">{t('account.gitEditText')}</div>
+                </div>
               </div>
-            </div>
-          </a>
-        </li>
-      </ul>
-    </div>
+            </a>
+          </li>
+        </ul>
+      </div>
+    {:else}
+      <div class="block-title">{t('account.subsurfaceGroup')}</div>
+      <div class="list list-strong inset list-dividers">
+        <ul>
+          <li>
+            <a href="#password" class="item-link item-content external" role="button" onclick={notAvailable}>
+              <div class="item-inner">
+                <div class="item-title">
+                  {t('account.changePassword')}
+                  <div class="item-footer">{t('account.changePasswordText')}</div>
+                </div>
+              </div>
+            </a>
+          </li>
+        </ul>
+      </div>
+    {/if}
 
     <div class="block-title">{t('account.leaveGroup')}</div>
     <!-- Leaving the account: buttons, each with its consequence (spec, section 4). -->
     <div class="leave">
-      <button type="button" class="od-outlined-button" onclick={confirmSignOut}>{t('account.signOut')}</button>
-      <span class="consequence">{t('account.signOutText')}</span>
+      <button type="button" class="od-outlined-button" onclick={confirmSignOut}>{t(git ? 'account.gitSignOut' : 'account.signOut')}</button>
+      <span class="consequence">{t(git ? 'account.gitSignOutText' : 'account.signOutText')}</span>
     </div>
-    <div class="leave">
-      <button type="button" class="od-outlined-button danger" onclick={() => f7.views.current?.router.navigate('/account/delete')}>
-        {t('account.delete')}
-      </button>
-      <span class="consequence">{t('account.deleteText')}</span>
-    </div>
+    {#if !git}
+      <div class="leave">
+        <button type="button" class="od-outlined-button danger" onclick={() => f7.views.current?.router.navigate('/account/delete')}>
+          {t('account.delete')}
+        </button>
+        <span class="consequence">{t('account.deleteText')}</span>
+      </div>
+    {/if}
 
-    {#if serverCaption}<p class="caption">{serverCaption}</p>{/if}
+    {#if serverCaption && !git}<p class="caption">{serverCaption}</p>{/if}
   {:else}
     <div class="identity">
       <span class="avatar"><Icon name="device" size={26} /></span>

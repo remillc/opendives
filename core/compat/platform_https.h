@@ -19,7 +19,7 @@ int opendives_https_post(const std::string &url, const std::string &user_agent, 
 			 int timeout_seconds, int &status, std::string &body);
 
 // PEM file of trusted certificate authorities. Empty: the system default store
-// (Linux). Android has none that OpenSSL can read: the app provides one.
+// (Linux). Android has none that the TLS library can read: the app provides one.
 void opendives_https_set_ca_file(const std::string &path);
 
 #endif

@@ -58,7 +58,7 @@
       [t('about.report.device'), model],
       [t('about.report.language'), document.documentElement.lang],
       [t('about.report.units'), units],
-      [t('about.report.mode'), t(logbook.email ? 'about.report.cloud' : 'about.report.noAccount')],
+      [t('about.report.mode'), t(logbook.email ? (logbook.mode === 'git' ? 'about.report.git' : 'about.report.cloud') : 'about.report.noAccount')],
       [t('about.report.dives'), String(logbook.dives.length)],
       [t('about.report.lastSync'), [logbook.lastSync ?? '—', logbook.sync].join(', ')],
       [t('about.report.lastError'), logbook.error ?? '—'],
