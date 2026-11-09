@@ -768,6 +768,35 @@ int main(int argc, char **argv)
 		return 0;
 	}
 
+	if (mode == "computersreload") {
+		// A computer with a serial number takes in another one: read back from
+		// the log, the dives have the serial number too.
+		dive *found = nullptr;
+		for (auto &d: divelog.dives)
+			if (!found && d->dcs.size() >= 2 && !d->dcs[0].serial.empty() && !d->dcs[1].model.empty() &&
+			    (d->dcs[0].model != d->dcs[1].model || d->dcs[0].serial != d->dcs[1].serial))
+				found = d.get();
+		if (!found)
+			return 2;
+		std::string result, error, from = found->dcs[1].model, from_serial = found->dcs[1].serial;
+		std::string model = found->dcs[0].model, serial = found->dcs[0].serial;
+		if (dive_computer_action("merge", from, from_serial, "", model, serial, result, error) || save_local(error)) {
+			printf("error=merge: %s\n", error.c_str());
+			return 1;
+		}
+		if (open_log(repo)) {
+			printf("error=read back\n");
+			return 1;
+		}
+		for (auto &d: divelog.dives)
+			for (const divecomputer &dc: d->dcs)
+				if (dc.model == from && dc.serial == from_serial && !(from == model && from_serial == serial)) {
+					printf("error=the merged computer came back after reading the log\n");
+					return 1;
+				}
+		return 0;
+	}
+
 	if (mode == "computers") {
 		// A dive's second computer merged into its first, then undone; a nickname
 		// set then undone. The script checks that the tree is the original one.
