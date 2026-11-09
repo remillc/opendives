@@ -1,11 +1,9 @@
-# The planner checks that need no device, on each push to main (and by hand).
+# The planner checks that need no device, by hand only, when preparing a release.
 # The full check, with the emulator, is run by hand before a release:
 # tests/release-check.sh (see AGENTS.md, "Conventions").
 name: planner checks
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 jobs:
