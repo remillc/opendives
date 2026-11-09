@@ -267,8 +267,6 @@
     "airTemperature": "Air",
     "gasAndEquipment": "Gaz et équipement",
     "pressureRange": "{start} → {end}",
-    "pressureLeft": "Il restait {percent} % de la pression de départ",
-    "gasUsed": "{volume} consommés",
     "left": "reste {percent} %",
     "sacFull": "Consommation en surface (SAC)",
     "suitRow": "Combinaison",
@@ -326,6 +324,8 @@
       "bailout": "secours, {gas}"
     },
     "service": "Service {pressure}",
+    "pressureUsed": "{pressure} utilisés",
+    "pressureBar": "{end} restants sur {working}, {used} utilisés",
     "switchAt": "changement à {depth}",
     "computers": "Ordinateurs de plongée",
     "mainComputer": "Ordinateur principal",
@@ -1387,6 +1387,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Détail d’une plongée : les barres de pression des bouteilles vont de 0 à la pression de service, avec le restant et l’utilisé.",
       "Planificateur : un plan fait à partir d’une plongée au recycleur part du diluant, jamais de l’oxygène.",
       "Planificateur : une barre montre la part consommée et la réserve de chaque gaz, une autre l’exposition CNS.",
       "Statistiques : les graphiques qui ne mesurent pas la profondeur (plongées par année, durées) sont en bleu.",
