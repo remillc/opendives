@@ -87,6 +87,10 @@
     }
 
     .policy {
+      :global(a) {
+        text-decoration: underline;
+      }
+
       :global(h2) {
         margin: 24px 0 8px;
         font-size: 18px;
