@@ -883,3 +883,10 @@ Done in Logbook menu: shortcut to the logbook dive computers
 Christian approved this. Mock-up: `docs/mockups/android-carnet-menu.dc.html`. Spec: end of "Settings, logbook dive computers".
 - Add a third item "Ordinateurs du carnet" to the ⋮ menu of the Carnet, after "Renuméroter les plongées", with the dive computer icon of the mock-up. It opens the same page as the row in Réglages (task 2026-11-09-18). Back returns to the Carnet.
 
+## [ ] 2026-11-09-20 New logo "Trois vagues": regenerate every icon
+
+Christian chose a new logo. Spec: "Logo (decided on 9 November 2026)". Reference: `docs/mockups/logo-variante-trois.dc.html`. Christian already updated the drawings in `docs/brand/opendives-icon-*.svg`, `docs/brand/opendives-logo-*.svg`, `app/public/favicon.svg` and `app/public/logo-{light,dark}.svg`, and the side menu and About mock-ups.
+- Regenerate from them: the Android adaptive icon (`ic_launcher_foreground.xml`, background #F4F4F2, the PNG fallbacks in every mipmap density, round included), the monochrome layer for themed icons (ring, three waterlines and bubbles in one colour, check that the three wave edges stay readable), the splash mark (light and night), iOS icons when the project exists, and any in-app logo (side menu header, About, first launch).
+- Keep the size rule: grey top arc at 64 px and below, none above. Check the icon in the round and squircle masks.
+- Do not change the drawing. If the three gradients do not convert well to a vector drawable, stop and ask Christian.
+
