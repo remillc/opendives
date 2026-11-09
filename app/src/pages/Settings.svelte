@@ -31,7 +31,7 @@
   import { confirmAction } from '../lib/dialogs.js';
   import { formatNumber, formatDuration, formatDateChoice, formatTimeChoice, formatDepth } from '../lib/format.js';
   import { regionUsesLetter } from '../lib/share.js';
-  import { waterTypeName } from '../lib/tools.js';
+  import { waterTypeName, downloadWaterName } from '../lib/tools.js';
   import { cylinderChoices } from '../lib/cylinder-choices.js';
   import { visibleRegions, updatesCount } from '../lib/offline-maps.svelte.js';
 
@@ -389,6 +389,17 @@
         } },
         { kind: 'switch', id: 'extraEnvironmental', label: t('settings.extraConditions.label'), text: t('settings.extraConditions.text'), checked: p.extraEnvironmental, set: (v) => setCore({ extraEnvironmental: v }) },
         { kind: 'switch', id: 'salinityEdit', label: t('settings.salinity.label'), text: t('settings.salinity.text'), checked: p.salinityEdit, set: (v) => setCore({ salinityEdit: v }) },
+        {
+          kind: 'choice',
+          id: 'downloadWater',
+          label: t('settings.downloadWater.label'),
+          text: t('settings.downloadWater.text'),
+          value: downloadWaterName(settings.downloadWater),
+          current: settings.downloadWater,
+          note: t('settings.downloadWater.intro'),
+          options: () => /** @type {const} */ (['none', 'fresh', 'salt', 'en13319']).map((id) => ({ value: id, label: downloadWaterName(id) })),
+          set: (v) => setAppSetting('downloadWater', /** @type {'none'|'fresh'|'salt'|'en13319'} */ (v)),
+        },
       ],
     },
     {

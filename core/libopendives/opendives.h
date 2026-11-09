@@ -655,7 +655,11 @@ using download_progress = void (*)(const std::string &json, void *userdata);
 // nor a cancellation, the download is tried once more over Classic, with a
 // "retrying" progress state; an OpenDives addition), "name" (the device's
 // Bluetooth name), "forceDownload" (all
-// dives, not only the new ones; default false), "logFile" (path of
+// dives, not only the new ones; default false), "defaultSalinity" (an
+// OpenDives addition: 10000, 10100, 10200 or 10300, the water type written
+// as the dive's user salinity, like EditWaterTypeUser, on the received dives
+// that have no salinity from the computer and none of their own; 0 or
+// absent leaves them as they are), "logFile" (path of
 // libdivecomputer's log, optional)}. The computer is remembered (Settings,
 // dive computers) as Subsurface does after each attempt. Writes
 // {"downloaded":n, "vendor", "product" (as the computer told), "serial",

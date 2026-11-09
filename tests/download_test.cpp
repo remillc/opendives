@@ -540,6 +540,30 @@ static void test_import_step(const char *file)
 	opendives::undo(json, error);
 }
 
+// The default water type (download_dives "defaultSalinity"): only dives with no
+// salinity from the computer and no user_salinity get it.
+static void test_default_salinity(const char *file)
+{
+	struct divelog log;
+	if (parse_file(file, &log) || log.dives.size() < 3) {
+		check("read the dives for the default water type", false, file);
+		return;
+	}
+	log.dives[0]->user_salinity = 0;
+	log.dives[0]->salinity = 0;
+	log.dives[0]->dcs[0].salinity = 0;
+	log.dives[1]->user_salinity = 0;
+	log.dives[1]->dcs[0].salinity = 10300; // given by the computer
+	log.dives[2]->user_salinity = 10000; // already chosen
+	opendives::internal::apply_default_salinity(log, 0);
+	check("0 changes nothing", log.dives[0]->user_salinity == 0);
+	opendives::internal::apply_default_salinity(log, 10200);
+	check("a dive without salinity gets the type", log.dives[0]->user_salinity == 10200);
+	check("a salinity from the computer is kept and no type is added",
+	      log.dives[1]->user_salinity == 0 && log.dives[1]->dcs[0].salinity == 10300);
+	check("a salinity already chosen is kept", log.dives[2]->user_salinity == 10000);
+}
+
 // A downloaded dive after the last one of the log is numbered after it, even
 // when the download also reads an older dive that is not in the log (edit.cpp,
 // number_new_last_dives); the older one stays unnumbered, as in Subsurface.
@@ -679,6 +703,7 @@ int main(int argc, char **argv)
 	test_download_failures();
 	test_fallback();
 	test_import_step(argv[2]);
+	test_default_salinity(argv[2]);
 	test_numbering();
 	test_partial(argv[2]);
 	printf("%s\n", failed ? "FAILED" : "all passed");

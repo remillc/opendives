@@ -703,7 +703,13 @@
       "note": "No cylinder: rebreather dives only have the diluent and the oxygen."
     },
     "dcCeilingText": "Shows the ceiling given by the dive computer",
-    "redCeilingText": "The computer’s ceiling in red rather than as a cut-out"
+    "redCeilingText": "The computer’s ceiling in red rather than as a cut-out",
+    "downloadWater": {
+      "label": "Water type of downloaded dives",
+      "text": "When the dive computer does not give it",
+      "intro": "For dives whose computer gives no water type. Dives already in the logbook do not change.",
+      "none": "Not specified"
+    }
   },
   "gas": {
     "air": "Air",
@@ -1404,6 +1410,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Settings: the water type written on downloaded dives that have none can be chosen (Not specified by default).",
       "Offline maps: download regions (dive areas, countries or a rectangle of your choice) from Settings; a space limit and a free-space floor protect the device, and updates are offered with a badge.",
       "Sites: without a network, the map reads the downloaded regions, else a simplified world map; an \"Offline\" pill says so and a message offers to download the area.",
       "Desaturation: the text under the chart is shorter.",
