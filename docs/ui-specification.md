@@ -28,11 +28,20 @@ The theme is **black and white**: a neutral light background, actions without a 
 | `--od-oxygen` | #2E7D32 (4.7:1) | #7FD283 | ppO2 curve, nitrox and oxygen mixes |
 | `--od-pending` | #8A4B00 (6.2:1) | #F2B84B (10.4:1) | "Offline, waiting to be sent" state; text only, always with an icon |
 
-**One colour for data.** The rust of the water never appears on a button, a link or a state. To check on screen: the pending colour (#8A4B00) is from the same family; it stays readable because it is always text with an icon, never a surface.
+**Colour roles (decided on 9 November 2026).** Besides the water of the dive data, the interface has four MD3 colour roles, each with a colour, an on-colour, a container and an on-container. Each becomes a `--od-*` token and the matching Framework7/MD3 variable.
+
+| Role | Light: colour / on / container / on-container | Dark: colour / on / container / on-container | Use, and only this one |
+| --- | --- | --- | --- |
+| Primary (ink) | #1F2124 / #FFFFFF / #E8E8E5 / #1F2124 | #F4F4F2 / #1F2124 / #2E3033 / #F4F4F2 | Main actions, links, text (unchanged) |
+| Secondary (rust and sand) | #B4530F / #FFFFFF / #FBE3B2 / #3D2200 | #F0A66B / #3D2200 / #4A3216 / #FBE3B2 | Selection and active state (check badge, selected card, active row of the side menu), tonal buttons, small accents; never an alert. Rust text on the light background is 4.6:1: short bold labels only |
+| Tertiary (blue) | #2F6DB5 / #FFFFFF / #DCE8F7 / #0F2F55 | #8AB4F8 / #0F2F55 / #1E3A5F / #DCE8F7 | Data series other than the water: temperature, charts of the logbook and of the statistics; sparingly |
+| Error (red) | #C62828 / #FFFFFF / #FDE2E0 / #5F1010 | #FF8A80 / #3A0A08 / #5C1A16 / #FDE2E0 | Alarms and errors only (unchanged, `--od-alarm`) |
+
+All text pairs reach 4.5:1 and all graphic marks 3:1 (ratios in the reference). Reference: `docs/mockups/palette-roles.dc.html`.
 
 **Dark mode.** Backgrounds are neutral and almost black; the ink becomes #F4F4F2. The water is a tempered amber gradient, from light honey at the surface (#E5B961) to a strong orange at depth (#EF7625), chosen on 5 November 2026: rust looked dull on a dark background, an amber starting from brown was too flat, saturated gradients were too bright. The gradient must stay visible: a shallow dive stays light, a deep dive goes down to the orange. The light profile line has a dark outline, which keeps it readable on the amber and on the background.
 
-**Framework7.** The theme is set with `colors: { primary: '#1F2124' }` when the app is created; in dark mode, the primary colour must be overridden to #F4F4F2, because the one Framework7 derives from a near-black is not readable on a dark background. The Android mock-ups use these MD3 roles (light / dark): primary #1F2124 / #F4F4F2; surface #F4F4F2 / #121314; surface-container #EEEEEC / #1C1D1F; secondary-container #E8E8E5 / #3A3C40; on-secondary-container #1F2124 / #F4F4F2; outline-variant #DADAD6 / #3A3C40. On iOS, `--f7-ios-primary` is the ink; secondary text stays the system one (#3C3C43).
+**Framework7.** The theme is set with `colors: { primary: '#1F2124' }` when the app is created; in dark mode, the primary colour must be overridden to #F4F4F2, because the one Framework7 derives from a near-black is not readable on a dark background. The Android mock-ups use these MD3 roles (light / dark): primary #1F2124 / #F4F4F2; surface #F4F4F2 / #121314; surface-container #EEEEEC / #1C1D1F; outline-variant #DADAD6 / #3A3C40; secondary, tertiary and error as in "Colour roles" above (the former grey secondary-container #E8E8E5 / #3A3C40 becomes the primary container). On iOS, `--f7-ios-primary` is the ink; secondary text stays the system one (#3C3C43).
 
 **Warning:** Framework7 re-injects its variables at initialisation, which can override an override placed in the CSS. The `--od-*` tokens do not have this problem; an override of `--f7-*` must be checked on screen, in light and dark mode.
 

@@ -907,3 +907,11 @@ Christian approved this on the canvas. Spec: "Sync conflict dialog, redesigned".
 
 Christian removed the rule "colour reserved for data" from the spec (section 1, first paragraph). The theme stays black and white with ink actions; the sand-to-rust water column stays in the dive data, and colour may now appear elsewhere when a mock-up uses it (headers, side menu, selection in the conflict dialog). Update the palette comment at the top of `app/src/theme.css` ("neutral light UI, colour only in the data") to match the new wording, and any other comment or doc that repeats the old rule. No colour change in the code for now.
 - Added at 14:17: colour is allowed sparingly, within WCAG 2.2 AA contrast (4.5:1 text, 3:1 large text and meaningful graphics), and never as the only carrier of meaning. Mention this in the `theme.css` comment, and check the contrast of every new colour token you add.
+
+## [ ] 2026-11-09-23 Palette: secondary, tertiary and error roles
+
+Christian approved a palette with MD3 colour roles. Spec: "Colour roles (decided on 9 November 2026)", section 1. Reference: `docs/mockups/palette-roles.dc.html`.
+- Add the tokens in `app/src/theme.css`, light and dark: `--od-secondary`, `--od-on-secondary`, `--od-secondary-container`, `--od-on-secondary-container`, the same four for `--od-tertiary` and `--od-error` (error reuses `--od-alarm`), and `--od-primary-container` / `--od-on-primary-container` for the former grey secondary container. Map them to the Framework7 MD3 variables (`--f7-md-secondary`, `--f7-md-secondary-container`, `--f7-md-tertiary`…), and check on screen that Framework7 does not override them.
+- Point the selection tokens of task 2026-11-09-21 (`--od-selected`, `--od-selected-container`, `--od-tonal`) to the secondary role, and the temperature curve (`--od-temperature`) to the tertiary.
+- Do not recolour other screens yet: use the new roles only where a mock-up asks for them. To-do #24 (blue in the logbook charts) will follow.
+
