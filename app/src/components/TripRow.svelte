@@ -4,6 +4,7 @@
   // thumbnails in a 2 × 2 grid, the trip name, then "4 dives, 21.8 to 28.7 m";
   // a tap expands the trip.
   import Icon from './Icon.svelte';
+  import { theme } from 'framework7-svelte';
   import ProfileThumbnail from './ProfileThumbnail.svelte';
   import { depthValue, formatDepth, formatLongDate } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
@@ -61,7 +62,7 @@
       <div class="od-row-text">
         <div class="item-title">{title}</div>
         <div class="item-text od-value">{summary}</div>
-        {#if location}<div class="item-text">{t('trip.startingOn', { date: formatLongDate(start) })}</div>{/if}
+        {#if location && theme.ios}<div class="item-text">{t('trip.startingOn', { date: formatLongDate(start) })}</div>{/if}
       </div>
       <button
         type="button"

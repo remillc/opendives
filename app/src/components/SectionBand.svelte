@@ -54,9 +54,9 @@
     .profile {
       position: absolute;
       left: 0;
-      bottom: 8px;
+      bottom: 2px;
       width: 100%;
-      height: 70px;
+      height: 34px;
 
       .area {
         fill: rgb(255 255 255 / 0.1);

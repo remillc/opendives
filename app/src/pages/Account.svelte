@@ -9,6 +9,7 @@
   import Icon from '../components/Icon.svelte';
   import SyncButton from '../components/SyncButton.svelte';
   import MenuButton from '../components/MenuButton.svelte';
+  import SectionBand from '../components/SectionBand.svelte';
   import { logbook, setAutoSync, signOut, syncNow, deviceDiveCount } from '../lib/logbook.svelte.js';
   import { showSection } from '../lib/navigation.svelte.js';
   import { formatDateTime, formatNumber, formatTimeOfDay } from '../lib/format.js';
@@ -104,9 +105,11 @@
 </script>
 
 <Page>
-  <Navbar title={t('account.title')}>
+  <Navbar class="od-band-bar" title={t('account.title')}>
     {#snippet left()}<MenuButton />{/snippet}
   </Navbar>
+
+  <SectionBand summary={t(signedIn ? 'account.bandSignedIn' : 'account.bandNone')} />
 
   {#if signedIn}
     <div class="identity">

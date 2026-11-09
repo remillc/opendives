@@ -81,15 +81,19 @@
       &.small {
         width: 100%;
         height: 100%;
-        border-radius: 3px;
+        border-radius: 4px;
       }
     }
 
     .line {
       fill: none;
       stroke: var(--od-trace);
-      stroke-width: 1.5;
+      stroke-width: 1.25;
       stroke-linejoin: round;
+
+      .small & {
+        stroke-width: 1;
+      }
     }
   }
 </style>

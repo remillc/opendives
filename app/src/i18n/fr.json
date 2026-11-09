@@ -638,7 +638,7 @@
     "changePasswordText": "Un lien est envoyé à votre courriel",
     "leaveGroup": "Quitter",
     "signOut": "Se déconnecter",
-    "signOutText": "Le carnet reste dans le cloud. Une copie reste sur cet appareil, non affichée, et sert si vous vous reconnectez.",
+    "signOutText": "Déconnecter votre app du cloud. Vos plongées restent dans le cloud et sur cet appareil.",
     "delete": "Supprimer le compte",
     "deleteText": "Supprime le compte et toutes ses plongées du cloud Subsurface. Irréversible.",
     "server": "Connecté via le serveur {region} ({host}).",
@@ -665,7 +665,9 @@
     },
     "notAvailable": "Pas encore disponible",
     "autoSyncOff": "Désactivée : les modifications restent sur cet appareil, et celles des autres appareils n'arrivent pas, tant que vous ne synchronisez pas",
-    "pending": "Modifications non envoyées"
+    "pending": "Modifications non envoyées",
+    "bandSignedIn": "Votre carnet dans le cloud",
+    "bandNone": "Aucun compte connecté"
   },
   "welcome": {
     "title": "OpenDives",
@@ -1265,7 +1267,8 @@
       "À propos : chaque bibliothèque libre ouvre son site dans le navigateur.",
       "Planificateur : le facteur de consommation sous stress vaut 2,0 par défaut.",
       "Réglages : bouteilles par défaut pour le circuit ouvert et le recycleur (diluant, oxygène, secours), ajoutées quand une plongée passe en recycleur. Types de bouteilles : nombre de plongées et nouvelle fiche. Profil : plafonds réorganisés, grille de profondeur retirée.",
-      "Menu latéral et en-têtes refaits : bandeau, compte en haut du menu, synchronisation centrée, résumé de chaque section, barre de recherche du carnet. Réglages et À propos s’ouvrent avec le menu ☰."
+      "Menu latéral et en-têtes refaits : bandeau, compte en haut du menu, synchronisation centrée, résumé de chaque section, barre de recherche du carnet. Réglages et À propos s’ouvrent avec le menu ☰.",
+      "Carnet : lignes alignées sur la maquette (sans séparateurs), plongées d’un voyage déplié dans un cadre blanc. Compte : même en-tête que les sections."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
