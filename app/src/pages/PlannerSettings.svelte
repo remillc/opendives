@@ -15,6 +15,7 @@
   import { planner, loadSetup, adoptUnitDefaults, plannerDefaults, setting, setSetting, ascentRate, setAscentRate } from '../lib/planner.svelte.js';
   import { formatNumber, depthUnit } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
+  import { carriedToMl, depthToMm, mbarToPressure, mlToCarried, mmToDepth, pressureToMbar } from '../lib/planner-rules.js';
 
   loadSetup()
     .then(() => adoptUnitDefaults(logbook.prefs))
@@ -24,9 +25,6 @@
   const feet = $derived(prefs.length === 'ft');
   const psi = $derived(prefs.pressure === 'psi');
   const cuft = $derived(prefs.volume === 'cuft');
-  const MM_PER_FT = 304.8;
-  const MBAR_PER_PSI = 68.947572932;
-  const ML_PER_CUFT = 28316.8466;
 
   /** @param {number} min @param {number} max @param {number} step */
   function range(min, max, step) {
@@ -68,8 +66,8 @@
     stored,
     def,
     wheel: feet ? range(3, 200, 1) : range(1, 60, 1),
-    toUnit: (mm) => (feet ? mm / MM_PER_FT : mm / 1000),
-    toStored: (v) => Math.round(feet ? v * MM_PER_FT : v * 1000),
+    toUnit: (mm) => mmToDepth(mm, feet),
+    toStored: (v) => depthToMm(v, feet),
     show: (v) => `${formatNumber(v, 0)} ${perMinute}`,
     set,
   });
@@ -83,8 +81,8 @@
     stored: Number(setting(key)),
     def,
     wheel: cuft ? range(0.2, 1.5, 0.01) : range(5, 40, 1),
-    toUnit: (ml) => (cuft ? ml / ML_PER_CUFT : ml / 1000),
-    toStored: (v) => Math.round(cuft ? v * ML_PER_CUFT : v * 1000),
+    toUnit: (ml) => mlToCarried(ml, cuft),
+    toStored: (v) => carriedToMl(v, cuft),
     show: (v) => `${formatNumber(v, cuft ? 2 : 0)} ${sacUnit}`,
     set: (ml) => setSetting(key, ml),
   });
@@ -174,8 +172,8 @@
             stored: Number(setting('reserveMbar')),
             def: defaults.reserveMbar,
             wheel: psi ? range(0, 1500, 10) : range(0, 100, 5),
-            toUnit: (mbar) => (psi ? mbar / MBAR_PER_PSI : mbar / 1000),
-            toStored: (v) => Math.round(psi ? v * MBAR_PER_PSI : v * 1000),
+            toUnit: (mbar) => mbarToPressure(mbar, psi),
+            toStored: (v) => pressureToMbar(v, psi),
             show: (v) => `${formatNumber(v, 0)} ${t(psi ? 'units.psi' : 'units.bar')}`,
             set: (mbar) => setSetting('reserveMbar', mbar),
           },
