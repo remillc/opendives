@@ -693,7 +693,6 @@
     "save": "Save",
     "diveGroup": "The dive",
     "duration": "Duration",
-    "durationNote": "Measured by the dive computer",
     "site": "Site",
     "trip": "Trip",
     "none": "None",
@@ -1234,7 +1233,9 @@
       "Planner settings: no introduction line, the groups follow the title directly.",
       "Planner: “New dive” without the line “Defaults of the Subsurface planner”.",
       "Settings: new group “Default conditions” (water type and altitude), used by the planner and the gas calculator.",
-      "Planner redone: planned dives saved in the logbook, several levels and gases, volumes per gas, a decompression model for each plan, sharing a plan."
+      "Planner redone: planned dives saved in the logbook, several levels and gases, volumes per gas, a decompression model for each plan, sharing a plan.",
+      "Edit dive: every cylinder shows all its fields, no collapsed lines.",
+      "Share: a PDF icon for the sheet. Export: the first format is named “Logbook file (.ssrf)”."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
@@ -1841,14 +1842,14 @@
     },
     "text": "Choose a format. The file then opens in the phone’s share sheet.",
     "formats": {
-      "ssrf": "Full logbook (.ssrf)",
+      "ssrf": "Logbook file (.ssrf)",
       "uddf": "UDDF (.uddf)",
       "csv": "CSV, list of dives",
       "csvProfiles": "CSV, profiles",
       "pdf": "PDF sheets"
     },
     "formatTexts": {
-      "ssrf": "All the content, to import again later",
+      "ssrf": "Subsurface format, also readable by OpenDives",
       "uddf": "Exchange format between dive programs",
       "csv": "One line per dive, for a spreadsheet",
       "csvProfiles": "Time, depth and temperature, point by point",

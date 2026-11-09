@@ -743,7 +743,9 @@ Christian approved the planner redesign. Spec: "Planner, redesigned" (it lists t
 - Partager le plan: share sheet with a PDF sheet of the plan or a text summary.
 If the core does not offer something needed here (for example multi-level plans or altitude in the planner wrapper), stop and tell Christian before working around it.
 
-## [ ] 2026-11-09-05 Editor, share sheet and export: changes approved on the canvas
+## [x] 2026-11-09-05 Editor, share sheet and export: changes approved on the canvas
+
+Done in the branch `fix/editor-share-export`.
 
 Christian approved these by resolving their comment threads. Do them after 2026-11-09-04 or before it, as you prefer (they are independent).
 - Dive editor (`docs/mockups/android-edition.dc.html`, spec "Dive editor, same fields as Subsurface desktop"): remove the helper "Mesurées par l’ordinateur de plongée" under Durée and Profondeur max. Every cylinder block is open with all its fields (Type, Utilisation, Taille, Service, Début, Fin, O₂, He, Changement de gaz à with the MOD helper), no more one-line rows for the second and later cylinders.

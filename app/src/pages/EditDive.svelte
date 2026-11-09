@@ -27,7 +27,7 @@
   import { offerUndo } from '../lib/undo.js';
   import { parseNumber } from '../lib/filter.svelte.js';
   import { WATER_TYPES, waterTypeName, waterTypeOfSalinity } from '../lib/tools.js';
-  import { formatDepth, formatFullDate, formatGas, formatMinSec, formatNumber, formatWeight, locale } from '../lib/format.js';
+  import { formatDepth, formatFullDate, formatMinSec, formatNumber, formatWeight, locale } from '../lib/format.js';
   import { t, tIfExists } from '../lib/i18n.js';
 
   /** @type {{ f7route: { params: { id: string } }, f7router: any }} */
@@ -122,7 +122,7 @@
   /**
    * One cylinder of the editor: its index in the dive (-1 for a new one), its
    * texts and those it opened with.
-   * @typedef {{ index: number, protected: boolean, f: Record<string, string>, initial: Record<string, string>, open: boolean }} EditedCylinder
+   * @typedef {{ index: number, protected: boolean, f: Record<string, string>, initial: Record<string, string> }} EditedCylinder
    */
   /** @type {EditedCylinder[]} */
   let cylinders = $state([]);
@@ -191,7 +191,7 @@
       invalid = d.invalid;
       cylinders = d.cylinders.map((c, index) => {
         const texts = cylinderTexts(c);
-        return { index, protected: c.protected, f: { ...texts }, initial: texts, open: index === 0 };
+        return { index, protected: c.protected, f: { ...texts }, initial: texts };
       });
       weights = d.weights.map((w) => ({ description: w.description, weight: weightText(w.grams), grams0: w.grams, text0: weightText(w.grams) }));
       initialWeights = JSON.stringify(weights);
@@ -288,9 +288,8 @@
   }
 
   function addCylinder() {
-    for (const c of cylinders) c.open = false;
     const texts = { description: '', use: 'OC-gas', size: '', workingPressure: '', start: '', end: '', o2: show(21), he: show(0), depth: '' };
-    cylinders.push({ index: -1, protected: false, f: { ...texts }, initial: texts, open: true });
+    cylinders.push({ index: -1, protected: false, f: { ...texts }, initial: texts });
   }
 
   /** MOD of a cylinder's mix at the bottom ppO₂ of 1.6 bar, in the dive's water. @param {EditedCylinder} c */
@@ -303,14 +302,6 @@
     const mm = ((1.6 / (o2 / 100) - surface) * 1e8) / ((salinity / 10) * 9.80665);
     if (!(mm > 0)) return '';
     return t('edit.mod', { depth: `${depthText(mm)} ${depthUnitText}`, po2: formatNumber(1.6, 1) });
-  }
-
-  /** One-line summary of a closed cylinder: use · mix · start → end. @param {EditedCylinder} c */
-  function cylinderLine(c) {
-    const o2 = Math.round(parseNumber(c.f.o2) * 10) || 210;
-    const he = Math.round(parseNumber(c.f.he) * 10) || 0;
-    const pressures = c.f.start || c.f.end ? `${c.f.start || '–'} → ${c.f.end || '–'} ${pressureUnitText}` : '';
-    return [t(`edit.uses.${c.f.use}`), formatGas(o2, he), pressures].filter(Boolean).join(' · ');
   }
 
   // --- Checks and changes ------------------------------------------------------
@@ -554,7 +545,6 @@
           <div><dt>{t('edit.duration')}</dt><dd class="od-value">{formatMinSec(dive.durationSeconds)}</dd></div>
           <div><dt>{t('edit.maxDepth')}</dt><dd class="od-value">{formatDepth(dive.maxDepthMm, prefs)}</dd></div>
         </dl>
-        <p class="helper">{t('edit.durationNote')}</p>
         <ComboField label={t('edit.site')} bind:value={siteName} options={siteNames} supporting={t('edit.siteHint')} />
         <ComboField label={t('edit.trip')} bind:value={tripName} options={tripNames} supporting={t('edit.tripHint')} />
         <div class="stars-row">
@@ -586,21 +576,14 @@
         {#each cylinders as c, i (i)}
           {@const cb = cylinderBad(c)}
           <div class="cyl-head">
-            <button type="button" class="cyl-title" aria-expanded={c.open} onclick={() => (c.open = !c.open)}>
-              <span class="texts">
-                <span class="name">{t('edit.cylinderTitle', { n: i + 1 })}{c.f.description ? ` · ${c.f.description}` : ''}</span>
-                {#if !c.open}<span class="line">{cylinderLine(c)}</span>{/if}
-              </span>
-              <span class="arrow" class:open={c.open}><Icon name="expand" /></span>
-            </button>
+            <h4 class="cyl-title">{t('edit.cylinderTitle', { n: i + 1 })}{c.f.description ? ` · ${c.f.description}` : ''}</h4>
             {#if !c.protected}
               <button type="button" class="remove" onclick={() => cylinders.splice(i, 1)}>
                 <Icon name="close" /><span class="od-sr-only">{t('edit.removeCylinder')}</span>
               </button>
             {/if}
           </div>
-          {#if c.open}
-            <div class="row">
+          <div class="row">
               <div class="grow">
                 <SelectField
                   label={t('edit.cylinderType')}
@@ -650,7 +633,6 @@
             <TextField label={t('edit.switchDepth')} bind:value={c.f.depth} inputmode="decimal" invalid={cb.depth} supporting={modText(c)}>
               {#snippet trailing()}{@render unit(depthUnitText)}{/snippet}
             </TextField>
-          {/if}
         {/each}
         <button type="button" class="add" onclick={addCylinder}><Icon name="plus" />{t('edit.addCylinder')}</button>
 
@@ -894,13 +876,6 @@
       color: var(--od-text-2);
     }
 
-    .helper {
-      margin: 4px 16px 0;
-      font-size: 12px;
-      line-height: 16px;
-      color: var(--od-text-2);
-    }
-
     /* Duration and maximum depth: plain text side by side, not fields. */
     .measured {
       display: flex;
@@ -952,37 +927,12 @@
     .cyl-title {
       flex: 1;
       min-width: 0;
-      min-height: 48px;
-      padding: 4px 8px 4px 16px;
-      border: none;
-      background: none;
+      margin: 0;
+      padding: 14px 8px 14px 16px;
       color: var(--od-text);
-      font: inherit;
-      text-align: start;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-
-      .texts {
-        flex: 1;
-        min-width: 0;
-        display: flex;
-        flex-direction: column;
-      }
-
-      .name {
-        font-size: 14px;
-        font-weight: 600;
-      }
-
-      .line {
-        font-size: 14px;
-        line-height: 20px;
-        color: var(--od-text-2);
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
+      font-size: 14px;
+      line-height: 20px;
+      font-weight: 600;
     }
 
     .remove {
