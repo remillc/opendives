@@ -438,7 +438,9 @@
       // While another screen slides in over the Logbook, its rows are still
       // visible: a tap then would open a dive from that screen, which
       // Framework7's master-detail routing turns into a second Logbook.
-      if (!el.closest('.page')?.classList.contains('page-current')) {
+      // Beside a detail (tablet), the list stays in use while it is not "current".
+      const listPage = el.closest('.page');
+      if (!listPage?.classList.contains('page-current') && !listPage?.parentElement?.querySelector(':scope > .page-current.page-master-detail')) {
         e.preventDefault();
         e.stopPropagation();
         return;
@@ -738,6 +740,22 @@
     }
     // A trip of one dive (automatic grouping makes many) is drawn as that dive.
     return list.map((e) => (e.type === 'trip' && e.dives.length === 1 ? { type: /** @type {const} */ ('dive'), key: `d${e.dives[0].id}`, dive: e.dives[0] } : e));
+  });
+
+  // Tablet: with nothing in the detail pane, the first dive of the list. Not
+  // over another screen shown there (a trip, the filter).
+  let autoOpening = false;
+  $effect(() => {
+    if (navigation.dive !== null) {
+      autoOpening = false;
+      return;
+    }
+    if (!layout.split || navigation.section !== 'logbook' || logbook.loading || logbook.error || selecting || !listEl) return;
+    const first = entries[0];
+    const dive = first?.type === 'trip' ? first.dives[0] : first?.dive;
+    if (!dive || autoOpening || listEl.closest('.view')?.querySelector('.page-master-detail')) return;
+    autoOpening = true;
+    f7router.navigate(`/dives/${dive.id}`, { reloadDetail: true });
   });
 
   /**

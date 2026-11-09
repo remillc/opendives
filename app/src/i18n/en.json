@@ -1319,7 +1319,8 @@
       "Logbook: a trip can be selected; “Delete this trip” removes the trip and keeps its dives.",
       "Privacy policy: links and the contact address can be tapped.",
       "Secure connections: the OpenSSL library is replaced by Mbed TLS, compatible with the app’s licence.",
-      "Git repository: the logbook can live in your own git repository (GitHub, GitLab, Codeberg or your server) instead of the Subsurface cloud. On the first page, “Use my own git repository”; the access token stays encrypted on the device."
+      "Git repository: the logbook can live in your own git repository (GitHub, GitLab, Codeberg or your server) instead of the Subsurface cloud. On the first page, “Use my own git repository”; the access token stays encrypted on the device.",
+      "Tablet: the logbook opens the first dive when none is shown."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",

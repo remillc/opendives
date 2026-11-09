@@ -5,7 +5,9 @@ import { f7, f7ready } from 'framework7-svelte';
 
 function update() {
   document.querySelectorAll('.page').forEach((page) => {
-    const hidden = page.classList.contains('page-previous') || page.classList.contains('page-next');
+    // On a tablet, the list stays on screen and in use beside the detail.
+    const besideDetail = page.classList.contains('page-master') && page.parentElement?.querySelector(':scope > .page-current.page-master-detail');
+    const hidden = !besideDetail && (page.classList.contains('page-previous') || page.classList.contains('page-next'));
     page.toggleAttribute('inert', hidden);
   });
 }
