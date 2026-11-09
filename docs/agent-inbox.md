@@ -977,3 +977,11 @@ Christian approved the blue bars and kept the profile in water colours. Spec: "P
 - Under each "Volume nécessaire par gaz" row, add an 8 dp rounded bar: consumed part in tertiary, 2 dp gap, reserve hatched on the tertiary container. Width = consumed / (consumed + reserve) for that gas. Give it `role="img"` and an aria-label with both volumes.
 - Under "Exposition à l'oxygène", add an 8 dp track with CNS filled in tertiary (capped at 100 %) and the caption "Limite CNS 100 %".
 - Use tokens, light and dark. The profile chart keeps `waterBottomColor()`.
+
+## [ ] 2026-11-09-30 Dive detail: cylinder pressure bars on the working-pressure scale
+
+Christian chose corrected bars over dial gauges. Spec: "Dive detail, cylinder pressure bars". Mock-ups: `docs/mockups/detail3-android.dc.html`, `detail3-android-sombre.dc.html`. Depends on the tertiary tokens of task 2026-11-09-23.
+- The current bar fills end/start, which is misleading. Scale it from 0 to the working pressure: remaining (end) in tertiary, 2 dp gap in the card colour, used (start − end) in the lighter tertiary, then the track. Bar height 8 dp, radius 4 dp.
+- Supporting text: "Service {wp} · {used} utilisés", plus "· changement à {depth}" when set. Units follow the pressure setting.
+- `role="img"` with an aria-label giving remaining, working and used pressures.
+- When a pressure is missing (no start, no end or no working pressure), hide the bar and keep the text.
