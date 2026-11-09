@@ -1004,3 +1004,28 @@ Christian asked for a fr-CA catalog that holds only what differs from fr. The fi
 - Device language: a tag `fr-CA` picks fr-CA, any other `fr-*` picks fr. Settings "Langue de l'app" offers "Français (Canada)" after "Français". Plural rules and number format stay French.
 - When fr.json changes, fr-CA keeps only its overrides: a key removed from fr is removed from fr-CA too.
 - Delete to-do #19 when done.
+
+## [ ] 2026-11-09-33 Offline maps: regions screen, downloads, updates, Sites map offline
+
+Christian approved the design. Spec: "Offline maps (decided on 9 November 2026)". Mock-ups in `docs/mockups/`: `android-cartes-hors-ligne`, `-menu`, `-vide`, `-ajout`, `-pays`, `-choix-carte`, `-telechargement`, `-echec`, `-mise-a-jour`, `-donnees-mobiles`, `-espace`, `-plafond`, `-limite`, `-maj-remplacer`, `-suppression`, `-supprimee` (all `.dc.html`), `android-sites-hors-ligne.dc.html`, `appbar-tiroir-android-maj-cartes.dc.html`, `ios-cartes-hors-ligne.dc.html`, `android-tablette-cartes.dc.html`, `tablette-cartes.dc.html`, and the Settings row in `android-reglages.dc.html`.
+
+Routes: `/settings/maps/` (list), `/settings/maps/new` (add), `/settings/maps/countries/` and `/settings/maps/countries/:code`, `/settings/maps/area` (choose on the map). Enable the Settings row "Régions téléchargées".
+
+Data needed:
+- A catalogue served by OpenDives (JSON): for each package an id, kind (`zone`, `country`), translated names (fr, en), country code, bounding box, size in bytes, version or date, SHA-256, URL. The server side (building PMTiles from OpenStreetMap, hosting) is not in this task: use a stub catalogue with two or three test packages until it exists, and say where it lives. Build one real test package (Northland, z0–14, without buildings, shops and addresses) with Planetiler or `pmtiles extract`, and report its size: the mock-up sizes are guesses.
+- Logbook data for suggestions: sites with GPS (`list_sites`) and trips with their sites, to find the zones that contain them.
+- Local state per region: id or drawn bounding box, name (a drawn region's name is diver data), file path, size, version, download date, status (`queued`, `waiting-wifi`, `downloading`, `paused`, `failed`, `ready`, `updating`), bytes received. Kept per device, not in the logbook.
+- App settings: "Télécharger sur données mobiles" (off by default) and "Espace maximum pour les cartes" (500 Mo, 1, 2 or 5 Go, 1 Go by default).
+
+Behaviour (details in the spec): Wi-Fi by default, mobile data dialog otherwise; resumable background downloads (HTTP range requests); checksum before use; storage guards (free-space floor of 1 Go or 10 %, cap "Espace maximum pour les cartes" 1 Go by default, pause below the floor during a download, one download at a time, "Remplacer" when an update cannot fit two versions, partial files cleaned after 7 days, packages excluded from backups); update check at start, at most once a day, badges on "Réglages" in the side menu and on the Settings row; old package kept until the new one is checked; delete with confirmation, then snackbar with "Annuler" (6 s) before the file is removed.
+
+Sites map and site maps: MapLibre reads local PMTiles first (`pmtiles://` protocol), then OpenFreeMap online, then a simplified world map shipped in the app (land and coasts only). "Hors ligne" pill under the Sites header when offline. Snackbar "Cette zone n’est pas téléchargée" with "Télécharger", once per area.
+
+Native dependencies to add:
+- `pmtiles` (npm, the MapLibre protocol), reading files through a Capacitor file URL or a small native range reader.
+- Background, resumable downloads: Android `WorkManager` (or `DownloadManager`) with a foreground notification, iOS `URLSession` background configuration. A Capacitor plugin wrapping both (for example `@capacitor/filesystem` plus a download plugin, or a small in-house plugin).
+- `@capacitor/network` for Wi-Fi or cellular and connectivity events.
+- Free disk space: a small native call (`StatFs` on Android, `volumeAvailableCapacityForImportantUsage` on iOS).
+- The simplified world map asset (Natural Earth, public domain) bundled with the app; add its credit to "Bibliothèques libres".
+
+Every visible text is a translation key (fr, en, and fr-CA where "nuage" applies). Snackbars at least 4 s, 6 s with "Annuler".
