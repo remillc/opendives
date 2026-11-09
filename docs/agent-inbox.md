@@ -1052,3 +1052,13 @@ Christian approved. Spec: "Default water type for downloaded dives". Mock-ups: `
 - On download from a dive computer, when the dive has no salinity, write the chosen value; "Non précisé" leaves it empty. Never touch dives already in the logbook, nor a salinity the computer gave.
 - Row in Settings › Carnet after "Choisir le type d’eau dans l’éditeur", with supporting text and current value; the choice dialog has the intro sentence from the spec. fr and en keys.
 - The planner's "Type d’eau" in "Conditions par défaut" is unchanged.
+
+## [ ] 2026-11-09-36 Carnet: month headers that stay on top (to-do #25), on a branch kept for review
+
+Christian wants to try this before deciding. **Work on the branch `feature/carnet-month-headers`, push it, and do not merge it into main and do not delete it, even when done: Christian will review it and decide whether to keep it.** Say in your reply which commit to test.
+
+Spec: "Carnet, month headers that stay on top". Mock-ups: `docs/mockups/android-carnet-entetes.dc.html`, `docs/mockups/android-carnet-entetes-petit.dc.html`.
+- Group the Carnet list by month (newest first). One header per month: year in bold + month, 20 sp, dive count of the month on the right; `role="heading"`.
+- On scroll, the band collapses to its title row, and the current month header sits in the band under the title (gradient, wave at the bottom, count in `#1F2124`). The next header pushes it out (sticky, not overlapping).
+- A trip stays one group under the month of its first dive; inside an open trip the band keeps that month.
+- Keep search, selection mode and the filter working with the headers (a filtered list still shows its month headers, with filtered counts).

@@ -23,5 +23,4 @@ Next number: 29
 - #20 [design] ajouter la possibilité pour l'usager de noter l'app dans le store
 - #21 [design] ajouter une vue carte des plongées
 - #23 [design] idée : ajouter une section Explorer, une carte qui affiche les sites de plongée des environs
-- #25 [design] / (Carnet) : afficher les intervalles de temps (mois, année) en en-têtes collants (sticky) dans la liste
 - #27 [design] Se débarrasser de tout workflow lié à l'état invalide d'une plongée : menus contextuels, recherche, paramétrage. S'assurer au préalable que cette feature n'est pas utilisée.
