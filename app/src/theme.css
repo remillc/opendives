@@ -33,6 +33,9 @@
     --od-tertiary: #2F6DB5;
     --od-on-tertiary: #FFFFFF;
     --od-tertiary-container: #DCE8F7;
+    /* Charts that do not measure depth: smallest value, largest value. */
+    --od-chart-low: #5B8BCB;
+    --od-chart-high: #24589A;
     --od-on-tertiary-container: #0F2F55;
     --od-error: var(--od-alarm);
     --od-on-error: #FFFFFF;
@@ -110,6 +113,8 @@
     --od-tertiary: #8AB4F8;
     --od-on-tertiary: #0F2F55;
     --od-tertiary-container: #1E3A5F;
+    --od-chart-low: #8AB4F8;
+    --od-chart-high: #5B8BCB;
     --od-on-tertiary-container: #DCE8F7;
     --od-on-error: #3A0A08;
     --od-error-container: #5C1A16;

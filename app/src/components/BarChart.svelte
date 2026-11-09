@@ -3,7 +3,7 @@
   // Bar chart of the Statistics section (spec, section 1, "Statistics"),
   // drawn in SVG: one bar per dive or per year, from the bottom. Colours come
   // from the --od-* tokens only: a depth bar takes the water colour of its
-  // depth (same scale as the dive profile), any other bar is in ink. Labels
+  // depth (same scale as the dive profile), a count or a time is blue. Labels
   // under the bars only when there are few of them.
   import { waterBottomColor } from '../lib/water-column.js';
 
@@ -20,9 +20,8 @@
    *   tinted?: boolean,
    * }}
    * `tinted`: the bars of a chart that is not about depth (ready-made charts
-   * of the Statistics screen) take the water colours by their value within
-   * the chart: 70 % of the gradient for the smallest, the bottom colour for
-   * the tallest (task 2026-11-07-25).
+   * of the Statistics screen) go from --od-chart-low for the smallest value
+   * to --od-chart-high for the largest (spec, "Statistics charts in blue").
    * `value`: millimetres for a depth chart (`depth`), else any positive number.
    * `scale`: values per unit of the y axis (60 for seconds shown in minutes,
    * 1000 or 304.8 for millimetres in metres or feet); `unit` is written after
@@ -31,10 +30,10 @@
    */
   let { bars, label, depth = false, height = 110, scale = 1, unit = '', axis: withAxis = true, labelSize = 10, tinted = false } = $props();
 
-  /** @param {number} value @param {number} max */
-  const tint = (value, max) => {
-    const percent = Math.round((0.7 + (0.3 * value) / max) * 1000) / 10;
-    return `color-mix(in srgb, var(--od-water-bottom) ${percent}%, var(--od-water-top))`;
+  /** @param {number} value @param {number} min @param {number} max */
+  const tint = (value, min, max) => {
+    const percent = max > min ? Math.round(((value - min) / (max - min)) * 1000) / 10 : 100;
+    return `color-mix(in srgb, var(--od-chart-high) ${percent}%, var(--od-chart-low))`;
   };
 
   let width = $state(0);
@@ -77,6 +76,7 @@
     const gap = n <= 40 ? Math.min(6, (plotWidth / n) * 0.22) : 0;
     const barWidth = (plotWidth - gap * (n - 1)) / n;
     const highest = Math.max(...bars.map((b) => b.value), 1);
+    const lowest = Math.min(...bars.map((b) => b.value).filter((v) => v > 0), highest);
     return bars.map((b, i) => {
       // Without an axis, the tallest bar reaches the top.
       const max = withAxis ? axis.max : highest;
@@ -86,7 +86,7 @@
         y: plot - h,
         w: barWidth,
         h,
-        fill: depth ? waterBottomColor(b.value) : tinted ? tint(b.value, highest) : 'var(--od-text)',
+        fill: depth ? waterBottomColor(b.value) : tinted ? tint(b.value, lowest, highest) : 'var(--od-text)',
         label: b.label ?? '',
       };
     });
