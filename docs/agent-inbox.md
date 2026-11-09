@@ -952,3 +952,9 @@ Christian approved these on the canvas this morning; they were sent late. Spec: 
 - CCR dive: remove "Changement de gaz à" and its MOD helper from the cylinders whose use is Diluant or Oxygène. Keep them for open circuit and bailout cylinders.
 - When the use becomes Oxygène, set O₂ to 100 % and He to 0. When it becomes Diluant, set O₂ to 21 % and He to 0. The values stay editable; do not overwrite a value the diver typed after choosing the use.
 
+## [ ] 2026-11-09-28 Statistics: charts that do not measure depth in blue (to-do #24)
+
+Christian chose the blue version. Spec: "Statistics charts in blue". Mock-up: `docs/mockups/android-stats.dc.html`. Depends on the tertiary tokens of task 2026-11-09-23.
+- In `BarChart.svelte` and the Statistics charts, colour the bars of count and time charts (dives per year, durations…) with a ramp from #5B8BCB (smallest) to #24589A (largest) through tokens (`--od-chart-low`, `--od-chart-high`, light and dark). Depth charts keep `waterBottomColor()`.
+- No blue in the Carnet.
+

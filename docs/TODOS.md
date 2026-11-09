@@ -26,5 +26,4 @@ Next number: 26
 - #20 [design] ajouter la possibilité pour l'usager de noter l'app dans le store
 - #21 [design] ajouter une vue carte des plongées
 - #23 [design] idée : ajouter une section Explorer, une carte qui affiche les sites de plongée des environs
-- #24 [design] essayer le bleu (couleur tertiaire) dans les graphiques de Statistiques qui ne parlent pas de profondeur (plongées par année, durée), pas dans le Carnet : variante « Statistiques, essai du bleu » sur le canevas
 - #25 [design] / (Carnet) : afficher les intervalles de temps (mois, année) en en-têtes collants (sticky) dans la liste
