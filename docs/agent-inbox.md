@@ -867,3 +867,12 @@ Christian approved these on the canvas. Spec: "Edit dive form, sections and trip
 - When the dive is in a trip, show a clear button ✕ before the arrow (accessible label "Retirer du voyage", 48 dp touch target, 20 dp icon). It sets the field to "Aucun". The dive leaves the trip on Enregistrer, and an empty trip is deleted as with the ⋮ menu action of task 2026-11-09-14.
 - Check the other Android screens: a filled down arrow only on dropdown menus, a right chevron only on fields or rows that open another page or a dialog.
 
+## [ ] 2026-11-09-18 Settings: logbook dive computers, rename, remove, merge duplicates
+
+Christian approved this. Spec: "Settings, logbook dive computers (rename, remove, merge duplicates)". Mock-ups: `docs/mockups/reglages-ordinateurs-android.dc.html`, `reglages-ordinateur-modifier-android.dc.html`, `reglages-ordinateur-fusion-android.dc.html`, and the new first row of the "Ordinateurs de plongée" group in `android-reglages.dc.html` (the ⋮ menu in `reglages-menu-android.dc.html` moved down with it).
+- New row "Ordinateurs du carnet" → page listing every computer the dives come from (device list of the core, plus model and device id found in the dives), with name, model, serial, dive count, and the "Doublon possible" chip (same model as another entry, no serial).
+- "Modifier l'ordinateur": the Nom field edits the nickname (saved in the logbook like Subsurface desktop's "Edit dive computer nicknames"). Model, serial, firmware and dive count are read only.
+- "Retirer de la liste": removes the device entry only. Dives keep their data.
+- "Fusionner avec <name>": confirmation dialog, then for every dive of the duplicate, set the dive computer's model, device id and serial to those of the chosen computer, move the download fingerprint, remove the duplicate's device entry, mark the dives changed so they sync, and show the snackbar "Fusionné avec <name>" with "Annuler" (undo restores everything). Several candidates of the same model: "Fusionner avec…" opens a choice. The result must stay readable by Subsurface desktop: check it by opening the logbook there.
+- If the core cannot do the merge cleanly (for instance a dive that has both computers), stop and tell Christian before improvising.
+
