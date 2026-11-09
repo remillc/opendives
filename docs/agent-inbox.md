@@ -781,7 +781,9 @@ Christian asked to send these changes. Spec: "Side menu" and "Side menu and sect
 - Carnet: search icon replaced by a search bar under the summary; a ⋮ menu with "Filtrer" (opens the existing filter) and "Renuméroter les plongées". The empty, offline and conflict states of the Carnet get the same header.
 - Réglages and À propos: ☰ instead of the back arrow (they are in the menu). Their sub-screens keep the back arrow.
 
-## [ ] 2026-11-09-09 Reminder: logbook rows exactly as the mock-up, expanded trip
+## [x] 2026-11-09-09 Reminder: logbook rows exactly as the mock-up, expanded trip
+
+Done in the branch `fix/logbook-rows-mockup`.
 
 Christian notices that the logbook rows in the app do not match `docs/mockups/android-carnet.dc.html` exactly. Please compare side by side and align, using the mock-up's values:
 - Dive row: 72 dp minimum, padding 8 dp, 24 dp right, 16 dp left, 16 dp gap. Profile thumbnail 56 × 40 dp, 8 dp corners, `#E8E8E5` background, water gradient from #FBE3B2 to the depth colour, profile line 1.25 dp `#1F2124`. Left column: site 16/24 (in `#4A4D52` when the site is missing, "Site à préciser"), date and time 14/20 `#4A4D52`. Right column, right-aligned, tabular figures: maximum depth 16/24 weight 500, duration 14/20 `#4A4D52`. No dividers between rows.

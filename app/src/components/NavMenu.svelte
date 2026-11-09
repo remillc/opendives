@@ -161,9 +161,9 @@
     .profile {
       position: absolute;
       left: 0;
-      bottom: 6px;
+      bottom: 2px;
       width: 100%;
-      height: 56px;
+      height: 34px;
 
       .area {
         fill: rgb(255 255 255 / 0.1);

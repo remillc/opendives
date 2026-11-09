@@ -462,6 +462,77 @@ html.ios {
   }
 
   /*
+   * Android, docs/mockups/android-carnet.dc.html and android-carnet-voyage:
+   * 72 dp rows without dividers or chevron; the dives of an expanded trip in
+   * a white surface, 64 dp each.
+   */
+  .md .list.dives {
+    .item-content:has(> .od-row) {
+      box-sizing: border-box;
+      min-height: 72px;
+      padding: 8px calc(24px + var(--f7-safe-area-right)) 8px calc(16px + var(--f7-safe-area-left));
+      gap: 16px;
+
+      > .item-media {
+        margin: 0;
+        padding: 0;
+      }
+    }
+
+    .item-inner.od-row {
+      min-height: 0;
+      margin: 0;
+      padding: 0;
+      gap: 16px;
+
+      .item-title {
+        font-size: 16px;
+        line-height: 24px;
+        font-weight: 400;
+        letter-spacing: 0.15px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .item-text {
+        font-size: 14px;
+        line-height: 20px;
+        letter-spacing: 0.25px;
+      }
+    }
+
+    li.in-trip {
+      padding: 0 12px;
+
+      > .item-content {
+        min-height: 64px;
+        padding: 8px 12px;
+        border-radius: 0;
+        background: var(--od-surface);
+      }
+
+      &.trip-first > .item-content {
+        padding-top: 12px;
+        border-radius: 16px 16px 0 0;
+      }
+
+      &.trip-last {
+        padding-bottom: 8px;
+
+        > .item-content {
+          padding-bottom: 12px;
+          border-radius: 0 0 16px 16px;
+        }
+      }
+
+      &.trip-first.trip-last > .item-content {
+        border-radius: 16px;
+      }
+    }
+  }
+
+  /*
    * Tonal button ("Sync now"): Android, MD3 tonal button (40 dp, 24 dp side
    * padding, fully rounded); iOS, 44 pt bordered button with 12 pt corners.
    * Framework7 stretches buttons in lists: this one keeps its own width.
@@ -820,4 +891,8 @@ html.ios {
   margin-top: 16px;
   background: none;
   box-shadow: none;
+}
+
+.searchbar.od-band-search .searchbar-inner {
+  padding: 0;
 }

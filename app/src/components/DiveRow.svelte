@@ -21,13 +21,16 @@
    *   selecting?: boolean,
    *   checked?: boolean,
    *   appear?: boolean,
+   *   tripFirst?: boolean,
+   *   tripLast?: boolean,
    * }}
    * `pending`: fields edited and not sent yet; the date gives way to them.
    * `selecting`: the logbook's selection mode, a check box before the row;
    * the logbook handles the taps (data-dive gives the dive).
    * `appear`: the row of a trip just expanded slides into place (accordion).
+   * `tripFirst`, `tripLast`: the ends of the white surface of an expanded trip.
    */
-  let { dive, prefs, inTrip = false, index = undefined, top = undefined, pending = [], selecting = false, checked = false, appear = false } = $props();
+  let { dive, prefs, inTrip = false, index = undefined, top = undefined, pending = [], selecting = false, checked = false, appear = false, tripFirst = false, tripLast = false } = $props();
 
   // "Notes edited, waiting to be sent" (spec, section 4, <DiveRow>).
   const pendingText = $derived(
@@ -54,7 +57,7 @@
   const label = $derived([number, details, pendingText].filter(Boolean).join(', '));
 </script>
 
-<li data-trip={inTrip ? dive.trip?.id : undefined} class:in-trip={inTrip} class:appear class:selected={layout.split && navigation.dive === String(dive.id)} data-virtual-list-index={index} style:top={top === undefined ? undefined : `${top}px`}>
+<li data-trip={inTrip ? dive.trip?.id : undefined} class:in-trip={inTrip} class:trip-first={tripFirst} class:trip-last={tripLast} class:appear class:selected={layout.split && navigation.dive === String(dive.id)} data-virtual-list-index={index} style:top={top === undefined ? undefined : `${top}px`}>
   <!-- data-reload-detail: beside the list (tablet), the dive replaces the one shown. -->
   <a
     href="/dives/{dive.id}"
@@ -81,7 +84,7 @@
         {#if pendingText}
           <div class="item-text pending">{pendingText}</div>
         {:else}
-          <div class="item-text">{#if number}{number}<span class="separator" aria-hidden="true">·</span>{/if}{formatDateTime(dive.date)}</div>
+          <div class="item-text">{formatDateTime(dive.date)}</div>
         {/if}
       </div>
       <div class="values od-value">
@@ -94,8 +97,9 @@
 
 <style>
   @layer od.components {
-    /* Shifted on the left only: values and chevron stay aligned with the other rows. */
-    .in-trip .item-content {
+    /* iOS: shifted on the left only, values and chevron aligned with the other
+       rows. Android: a white surface, in theme.css. */
+    :global(.ios) .in-trip .item-content {
       padding-left: calc(32px + var(--f7-safe-area-left));
     }
 
@@ -130,16 +134,12 @@
       pointer-events: none;
     }
 
-    .separator {
-      margin: 0 0.4em;
-    }
-
     .item-text.pending {
       color: var(--od-pending);
     }
 
     .not-set {
-      color: var(--f7-list-item-text-text-color, var(--f7-md-on-surface-variant));
+      color: var(--od-text-2);
       font-weight: normal;
     }
 
@@ -162,6 +162,22 @@
         font-size: 13px;
         line-height: 18px;
         color: var(--od-text-2);
+      }
+
+      /* Android: docs/mockups/android-carnet.dc.html. */
+      :global(.md) & {
+        gap: 2px;
+
+        strong {
+          font-size: 16px;
+          line-height: 24px;
+          font-weight: 500;
+        }
+
+        span {
+          font-size: 14px;
+          line-height: 20px;
+        }
       }
     }
   }

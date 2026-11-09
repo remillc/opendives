@@ -39,7 +39,7 @@
   /**
    * A row of the virtual list. `kind` groups rows of the same layout, hence of
    * the same probable height.
-   * @typedef {{ kind: 'dive'|'inTrip', key: string, index: number, dive: Dive }
+   * @typedef {{ kind: 'dive'|'inTrip', key: string, index: number, dive: Dive, tripFirst?: boolean, tripLast?: boolean }
    *   | { kind: 'trip', key: string, index: number, id: number, location: string, dives: Dive[] }} Row
    */
 
@@ -699,7 +699,9 @@
       const id = entry.dives[0].trip?.id ?? 0;
       list.push({ kind: 'trip', key: entry.key, index: list.length, id, location: entry.location, dives: entry.dives });
       if (expanded[id]) {
-        for (const dive of entry.dives) list.push({ kind: 'inTrip', key: `d${dive.id}`, index: list.length, dive });
+        entry.dives.forEach((dive, i) =>
+          list.push({ kind: 'inTrip', key: `d${dive.id}`, index: list.length, dive, tripFirst: i === 0, tripLast: i === entry.dives.length - 1 }),
+        );
       }
     }
     return list;
@@ -976,7 +978,7 @@
     <div class="preview" aria-busy="true" aria-label={t('logbook.loading')} role="status" onclickcapture={holdTap}>
       <div aria-hidden="true">
         <p class="count od-value">{t('logbook.count', { n: logbook.preview.total })}</p>
-        <div class="list media-list chevron-center dividers dives">
+        <div class="list media-list {theme.ios ? 'chevron-center dividers' : ''} dives">
           <ul>
             {#each logbook.preview.entries as entry, i (i)}
               {#if entry.type === 'trip'}
@@ -999,7 +1001,7 @@
     <div class="loading skeleton-effect-wave" aria-busy="true" aria-label={t('logbook.loading')} role="status">
       <div aria-hidden="true">
         <p class="count"><span class="skeleton-block bar" style:width="7.5em"></span></p>
-        <List mediaList dividers class="chevron-center dives">
+        <List mediaList dividers={theme.ios} class="{theme.ios ? 'chevron-center' : ''} dives">
           {#each Array(14) as _, i (i)}
             <li>
               <!-- item-link: the same chevron space as the real rows. -->
@@ -1115,7 +1117,7 @@
   {/if}
 
   {#if !logbook.loading && !logbook.error && rows.length}
-    <div class="list media-list chevron-center dividers virtual-list dives" bind:this={listEl}>
+    <div class="list media-list {theme.ios ? 'chevron-center dividers' : ''} virtual-list dives" bind:this={listEl}>
       <ul>
         {#each visible.items as row (row.key)}
           {#if row.kind === 'trip'}
@@ -1139,6 +1141,8 @@
               {selecting}
               checked={!!checked[row.dive.id]}
               appear={row.kind === 'inTrip' && row.dive.trip?.id === appearing}
+              tripFirst={row.kind === 'inTrip' && row.tripFirst}
+              tripLast={row.kind === 'inTrip' && row.tripLast}
             />
           {/if}
         {/each}
