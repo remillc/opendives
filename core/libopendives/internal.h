@@ -41,6 +41,10 @@ struct DownloadedComputer {
 };
 int finish_download(struct divelog &log, const DownloadedComputer &computer, const std::string &failure,
 		    fingerprint_table &fingerprints_before, std::string &json, std::string &error);
+// Sets the water type `salinity` (kg per 10000 l; 0 does nothing) on the
+// dives of `log` that have none: no salinity from the computer and no
+// user_salinity. Never reaches dives already in the logbook.
+void apply_default_salinity(struct divelog &log, int salinity);
 // Drops the dives kept aside after a failure (a new load, a new download).
 void download_forget_partial();
 

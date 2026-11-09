@@ -1041,7 +1041,9 @@ Christian wrote the text. Mock-up: `docs/mockups/outils-desaturation-android.dc.
 - `modelGf` ("Facteurs de gradient 30 / 75, ceux du planificateur.") and `modelVpmb` stay, right after it, in the same paragraph.
 - Keep the note "Ce calcul ne connaît que les plongées du carnet…" and the flight recommendation unchanged.
 
-## [ ] 2026-11-09-35 Settings: default water type for downloaded dives (to-do #28)
+## [x] 2026-11-09-35 Settings: default water type for downloaded dives (to-do #28)
+
+Done in Add a default water type for downloaded dives
 
 Christian approved. Spec: "Default water type for downloaded dives". Mock-ups: `docs/mockups/android-reglages.dc.html` (group "Carnet"), `docs/mockups/reglages-type-eau-android.dc.html` (dialog).
 - New app setting, per device, default "Non précisé". Options: Non précisé, Eau douce (1000 g/l), Eau de mer (1030 g/l), EN 13319 (1020 g/l), as Subsurface's water types.

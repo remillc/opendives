@@ -22,6 +22,7 @@
   import ProfileThumbnail from '../components/ProfileThumbnail.svelte';
   import { afterDownload, logbook } from '../lib/logbook.svelte.js';
   import { settings } from '../lib/settings.svelte.js';
+  import { downloadSalinity } from '../lib/tools.js';
   import { offerUndo } from '../lib/undo.js';
   import { errorCode } from '../lib/account.js';
   import { addressFor, keepReceived, lastAttempt, macOf } from '../lib/download.js';
@@ -191,7 +192,7 @@
     scanning = false;
     console.info('Download from', c.vendor, c.product, c.address);
     try {
-      const result = await OpenDivesCore.downloadDives({ ...c, forceDownload });
+      const result = await OpenDivesCore.downloadDives({ ...c, forceDownload, defaultSalinity: downloadSalinity(settings.downloadWater) });
       await afterDownload(result);
       if (leaving) return;
       leaving = true;

@@ -1123,7 +1123,7 @@ class OpenDivesCorePlugin : Plugin() {
      * Downloads the new dives of a dive computer and adds them to the logbook
      * as one undoable step (download_dives in opendives.h): {vendor, product,
      * address ("LE:" + MAC, or the MAC for Bluetooth Classic), name,
-     * forceDownload}. Progress comes as "downloadProgress" events ({json}).
+     * forceDownload, defaultSalinity (water type for dives without one, 0 for none)}. Progress comes as "downloadProgress" events ({json}).
      * The screen stays on meanwhile. libdivecomputer's log is written to
      * files/libdivecomputer.log; after a failure, its end goes to logcat.
      */
@@ -1145,6 +1145,7 @@ class OpenDivesCorePlugin : Plugin() {
             .put("address", call.getString("address").orEmpty())
             .put("name", call.getString("name").orEmpty())
             .put("forceDownload", call.getBoolean("forceDownload", false) == true)
+            .put("defaultSalinity", call.getInt("defaultSalinity", 0) ?: 0)
         val logFile = File(context.filesDir, LIBDC_LOG)
         request.put("logFile", logFile.absolutePath)
         keepScreenOn(true)

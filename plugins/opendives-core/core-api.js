@@ -634,7 +634,7 @@ import { registerPlugin } from '@capacitor/core';
  * @property {() => Promise<void>} stopBluetoothScan
  * @property {() => Promise<BluetoothVendor[]>} bluetoothModels
  *   The models that download over Bluetooth, for a device whose name says nothing.
- * @property {(options: {vendor: string, product: string, address: string, name: string, classicAddress?: string, forceDownload?: boolean}) => Promise<DownloadResult>} downloadDives
+ * @property {(options: {vendor: string, product: string, address: string, name: string, classicAddress?: string, forceDownload?: boolean, defaultSalinity?: number}) => Promise<DownloadResult>} downloadDives
  *   Downloads the new dives and adds them as one undoable step (download_dives in
  *   opendives.h); "downloadProgress" events meanwhile. `address`: "LE:" + MAC for
  *   Bluetooth Low Energy, the MAC for Classic. Rejects with the core's code first in
@@ -642,6 +642,8 @@ import { registerPlugin } from '@capacitor/core';
  *   NO_BLUETOOTH, BLUETOOTH_OFF, PERMISSION.
  *   `classicAddress`: the MAC of the same device paired as Bluetooth Classic, tried once when the
  *   BLE link fails (progress state "retrying").
+ *   `defaultSalinity`: 10000, 10200 or 10300 (0 or absent: none); written as the water type of the
+ *   received dives that have none, from the computer or their own.
  * @property {(options: {action: 'count'|'keep'|'discard'}) => Promise<any>} downloadPartial
  *   The dives received before a download failed or was cancelled: count ({dives}), keep (one
  *   undoable step, a DownloadResult) or discard. Rejects with NO_PARTIAL.

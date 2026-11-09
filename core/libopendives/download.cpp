@@ -508,8 +508,18 @@ int download_dives(const std::string &request_json, download_progress progress_c
 	}
 	std::string vendor, product, address, btname, log_file, classic_address;
 	bool force = false;
+	int default_salinity = 0;
 	for (const auto &[key, v]: fields) {
-		if (key == "classicAddress")
+		if (key == "defaultSalinity") {
+			// OpenDives addition (Settings, water type of downloaded dives):
+			// 0 leaves the dives as the computer gave them.
+			int n = static_cast<int>(v.number);
+			if (v.kind != JsonValue::NUMBER || (n != 0 && n != 10000 && n != 10100 && n != 10200 && n != 10300)) {
+				error = "BAD_REQUEST: defaultSalinity";
+				return -1;
+			}
+			default_salinity = n;
+		} else if (key == "classicAddress")
 			classic_address = v.text;
 		else if (key == "vendor")
 			vendor = v.text;
@@ -663,6 +673,8 @@ int download_dives(const std::string &request_json, download_progress progress_c
 	std::string failure = cancelled ? "CANCELLED"
 			    : errorText.empty() ? std::string()
 			    : std::string(connected ? "FAILED: " : "NOT_FOUND: ") + errorText;
+	// Before the dives are added or kept aside, so a kept partial download has it too.
+	internal::apply_default_salinity(*log, default_salinity);
 	internal::DownloadedComputer computer { data->devname, data->vendor, data->product, data->devinfo.serial,
 						data->devinfo.firmware };
 	return internal::finish_download(*log, computer, failure, fingerprints_before, json, error);
@@ -705,6 +717,21 @@ std::string result_json(size_t n, const std::string &list_json, const internal::
 }
 
 } // namespace
+
+void internal::apply_default_salinity(struct divelog &log, int salinity)
+{
+	if (!salinity)
+		return;
+	for (auto &d: log.dives) {
+		// Only a dive with no water type at all: none from the computer (any of
+		// its computers) and none chosen by the diver.
+		bool computer_has = d->salinity != 0;
+		for (const divecomputer &dc: d->dcs)
+			computer_has = computer_has || dc.salinity != 0;
+		if (!computer_has && d->user_salinity == 0)
+			d->user_salinity = salinity; // saved as watersalinity, as EditWaterTypeUser
+	}
+}
 
 void internal::download_forget_partial()
 {

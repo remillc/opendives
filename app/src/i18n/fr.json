@@ -468,6 +468,12 @@
       "label": "Choisir le type d’eau dans l’éditeur",
       "text": "Ajoute le champ dans Modifier une plongée. Sinon, l’app garde celui de l’ordinateur de plongée"
     },
+    "downloadWater": {
+      "label": "Type d’eau des plongées téléchargées",
+      "text": "Quand l’ordinateur de plongée ne l’indique pas",
+      "intro": "Pour les plongées dont l’ordinateur ne donne pas le type d’eau. Les plongées déjà dans le carnet ne changent pas.",
+      "none": "Non précisé"
+    },
     "defaultCylinder": {
       "label": "Bouteille, circuit ouvert",
       "text": "Ajoutée aux plongées saisies à la main",
@@ -1387,6 +1393,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Réglages : le type d’eau des plongées téléchargées dont l’ordinateur ne donne rien se choisit (Non précisé par défaut).",
       "Désaturation : le texte sous le graphique est plus court.",
       "Réglages : la langue de l’app peut être Français (Canada), qui dit « nuage » et « courriel » ; un téléphone réglé en français (Canada) la choisit tout seul.",
       "Détail d’une plongée : les barres de pression des bouteilles vont de 0 à la pression de service, avec le restant et l’utilisé.",

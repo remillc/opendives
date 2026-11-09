@@ -468,6 +468,12 @@
       "label": "Choose the water type in the editor",
       "text": "Adds the field to Edit dive. Otherwise the app keeps the one from the dive computer"
     },
+    "downloadWater": {
+      "label": "Water type of downloaded dives",
+      "text": "When the dive computer does not give it",
+      "intro": "For dives whose computer gives no water type. Dives already in the logbook do not change.",
+      "none": "Not specified"
+    },
     "defaultCylinder": {
       "label": "Cylinder, open circuit",
       "text": "Added to dives logged by hand",
@@ -1387,6 +1393,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Settings: the water type written on downloaded dives that have none can be chosen (Not specified by default).",
       "Desaturation: the text under the chart is shorter.",
       "Settings: the app language can be Français (Canada), which says \"nuage\" and \"courriel\"; a phone set to French (Canada) picks it by itself.",
       "Dive detail: the cylinder pressure bars run from 0 to the working pressure, with what is left and what was used.",
