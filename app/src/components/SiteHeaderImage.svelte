@@ -42,12 +42,13 @@
 <div class="image" aria-hidden="true">
   {#if src}
     <img {src} alt="" style:width="{DRAW_WIDTH}px" style:height="{HALF_HEIGHT * 2}px" style:margin-left="{-DRAW_WIDTH / 2}px" style:margin-top="{-HALF_HEIGHT}px" />
+    <div class="fade"></div>
+    <!-- Above the veil, at full strength. -->
     <svg class="pin" width="40" height="40" viewBox="-20 -20 40 40">
       <circle class="halo" r="14" />
       <path class="body" d="M0 4 C-2 -1 -8 -5 -8 -11 A8 8 0 1 1 8 -11 C8 -5 2 -1 0 4Z" />
       <circle class="eye" cy="-11" r="3" />
     </svg>
-    <div class="fade"></div>
   {/if}
 </div>
 
@@ -104,8 +105,8 @@
       inset: 0;
       background: linear-gradient(
         to bottom,
-        color-mix(in srgb, var(--od-background) 10%, transparent) 0%,
-        color-mix(in srgb, var(--od-background) 45%, transparent) 60%,
+        color-mix(in srgb, var(--od-background) 45%, transparent) 0%,
+        color-mix(in srgb, var(--od-background) 70%, transparent) 60%,
         var(--od-background) 100%
       );
     }

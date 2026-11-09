@@ -6,8 +6,8 @@
 import { OpenDivesCore } from 'opendives-core';
 import { MAP_STYLE } from './map-style.js';
 
-const CACHE = 'od-site-maps-v3';
-const ZOOM = 13;
+const CACHE = 'od-site-maps-v4';
+const ZOOM = 12;
 /** The picture, centred on the site, CSS pixels: wide enough for any screen, cropped when shown. */
 export const DRAW_WIDTH = 1000;
 export const HALF_HEIGHT = 300;
