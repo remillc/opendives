@@ -124,9 +124,16 @@
     return { line, water };
   });
 
+  /** @param {number} millikelvin */
+  function yTemperature(millikelvin) {
+    if (!temperature) return MARGIN_TOP;
+    const { unit, lo, hi } = temperature;
+    return MARGIN_TOP + ((hi - unit(millikelvin)) / (hi - lo)) * scaleHeight;
+  }
+
   const temperaturePath = $derived.by(() => {
     if (!temperature) return '';
-    const { mk, unit, lo, hi } = temperature;
+    const { mk } = temperature;
     let d = '';
     let pen = false;
     for (let i = 0; i < times.length; i++) {
@@ -134,8 +141,7 @@
         pen = false;
         continue;
       }
-      const yy = MARGIN_TOP + ((hi - unit(mk[i])) / (hi - lo)) * scaleHeight;
-      d += `${pen ? 'L' : 'M'}${x(times[i]).toFixed(1)},${yy.toFixed(1)}`;
+      d += `${pen ? 'L' : 'M'}${x(times[i]).toFixed(1)},${yTemperature(mk[i]).toFixed(1)}`;
       pen = true;
     }
     return d;
@@ -252,7 +258,7 @@
       <span>{t('profile.time')} <strong>{formatMinSec(times[cursor])}</strong></span>
       <span>{t('profile.depth')} <strong>{formatDepth(depths[cursor], prefs)}</strong></span>
       {#if showTemperature && temperature && temperature.mk[cursor] > 0}
-        <span>{t('profile.water')} <strong>{formatTemperature(temperature.mk[cursor], prefs)}</strong></span>
+        <span>{t('profile.water')} <strong class="water">{formatTemperature(temperature.mk[cursor], prefs)}</strong></span>
       {/if}
       {#if showPpo2}
         <span>{t('profile.ppo2')} <strong>{formatNumber(samples.ppo2Mbar[cursor] / 1000, 2)} bar</strong></span>
@@ -347,8 +353,11 @@
 
       {#if cursor !== null}
         <!-- Halo in the block color, so that the cursor stays visible on any water color. -->
-        <line class="cursor-halo" x1={x(times[cursor])} x2={x(times[cursor])} y1={MARGIN_TOP} y2={MARGIN_TOP + plotHeight} />
-        <line class="cursor" x1={x(times[cursor])} x2={x(times[cursor])} y1={MARGIN_TOP} y2={MARGIN_TOP + plotHeight} />
+        <line class="cursor-halo" x1={x(times[cursor])} x2={x(times[cursor])} y1={MARGIN_TOP} y2={MARGIN_TOP + scaleHeight} />
+        <line class="cursor" x1={x(times[cursor])} x2={x(times[cursor])} y1={MARGIN_TOP} y2={MARGIN_TOP + scaleHeight} />
+        {#if showTemperature && temperature && temperature.mk[cursor] > 0}
+          <circle class="temperature-dot" cx={x(times[cursor])} cy={yTemperature(temperature.mk[cursor])} r="4" />
+        {/if}
       {/if}
     </svg>
   </div>
@@ -446,7 +455,7 @@
     .readout {
       display: flex;
       flex-wrap: wrap;
-      gap: 0 24px;
+      gap: 0 16px;
       min-height: 24px;
       padding: 8px 12px 0;
       align-items: baseline;
@@ -455,6 +464,10 @@
 
       strong {
         color: var(--od-text);
+
+        &.water {
+          color: var(--od-temperature);
+        }
       }
     }
 
@@ -564,6 +577,12 @@
       stroke-width: 5;
     }
 
+    .temperature-dot {
+      fill: var(--od-temperature);
+      stroke: var(--od-block);
+      stroke-width: 2;
+    }
+
     .gas {
       rect {
         fill: var(--od-tint);
@@ -609,5 +628,10 @@
       cursor: pointer;
       font: inherit;
     }
+  }
+
+  /* Framework7's variable, outside the layers. */
+  .layers {
+    --f7-chip-outline-border-color: var(--od-chip-outline);
   }
 </style>

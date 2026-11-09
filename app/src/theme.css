@@ -48,6 +48,7 @@
     --od-trace-outline: transparent;
     /* Profile chart: grid lines of the depth axis, water temperature curve and its scale. */
     --od-chart-grid: #E8E8E5;
+    --od-chip-outline: #75787C;
     --od-temperature: #2F6DB5;
     /* Share sheet: each row's icon in a circle of the water's top colour. */
     --od-share-circle: var(--od-water-top);
@@ -74,13 +75,13 @@
     /* Meaning colours, lighter to keep their contrast on the dark background (spec, section 1). */
     --od-alarm: #FF8A80;
     --od-pending: #F2B84B;
-    --od-background: var(--f7-md-surface);
-    --od-surface: var(--f7-md-surface-1);
-    --od-surface-2: var(--f7-md-surface-variant);
-    --od-text: var(--f7-md-on-surface);
-    --od-text-2: var(--f7-md-on-surface-variant);
-    --od-separator: var(--f7-md-outline-variant);
-    --od-row-divider: var(--f7-md-outline-variant);
+    --od-background: #121314;
+    --od-surface: #1C1D1F;
+    --od-surface-2: #2E3033;
+    --od-text: #F4F4F2;
+    --od-text-2: #B5B8BC;
+    --od-separator: #3A3C40;
+    --od-row-divider: #3A3C40;
     --od-action: #F4F4F2;
     --od-on-action: #1F2124;
     --od-cursor: #F4F4F2;
@@ -89,14 +90,15 @@
     --od-trace: #F4F4F2;
     --od-trace-outline: #121314;
     --od-chart-grid: #3A3C40;
+    --od-chip-outline: #8E9196;
     --od-temperature: #8AB4F8;
     --od-share-circle: #4A3410;
     --od-share-icon: #E5B961;
     --od-block: var(--od-surface);
-    --od-tint: var(--f7-md-surface-variant);
-    --od-on-tint: var(--f7-md-on-surface);
+    --od-tint: var(--od-surface-2);
+    --od-on-tint: var(--od-text);
     --od-oxygen: #7FD283;
-    --od-thumbnail-background: var(--f7-md-surface-variant);
+    --od-thumbnail-background: var(--od-surface-2);
     --od-drawer: var(--f7-md-surface-1);
     --od-dialog: var(--f7-md-surface-3);
     --od-menu: var(--f7-md-surface-2);
@@ -112,6 +114,14 @@
  * --od-* tokens.
  */
 html.md {
+  /* Dark mode: the screen and the selected chips follow the spec's values. */
+  &.dark {
+    --f7-page-bg-color: var(--od-background);
+    --f7-md-surface: var(--od-background);
+    --f7-md-secondary-container: var(--od-surface-2);
+    --f7-md-on-secondary-container: var(--od-text);
+  }
+
   &:not(.dark) {
     --f7-md-primary: var(--od-action);
     --f7-md-on-primary: var(--od-on-action);

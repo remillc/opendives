@@ -1324,7 +1324,8 @@
       "Sharing: the app no longer stays stuck under a grey veil after sharing a dive or a plan.",
       "Dive profile: the card follows the mock-up (full-width chart, scale down to the maximum depth).",
       "Planner: a saved plan keeps its rates, reserve and other settings, and gives the same result when reopened.",
-      "Settings: the units chosen on the device no longer go back to the logbook’s at restart."
+      "Settings: the units chosen on the device no longer go back to the logbook’s at restart.",
+      "Dive detail: the screen follows the mock-up (top bar, trip as a link, sizes and margins, people and tags as chips, a dot on the temperature curve at the cursor)."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",

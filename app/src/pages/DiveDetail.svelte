@@ -340,7 +340,7 @@
 </script>
 
 <!-- no-swipeback: here a swipe to the right shows the previous dive. -->
-<Page onPageInit={watchSwipes} class="no-swipeback {slide ? `od-slide-${slide}` : ''}">
+<Page onPageInit={watchSwipes} class="od-detail no-swipeback {slide ? `od-slide-${slide}` : ''}">
   <Navbar>
     <!-- Named back link: in MD3, Framework7 hides its text and TalkBack would read "#". -->
     {#snippet left()}
@@ -357,7 +357,7 @@
         </Link>
       {:else}
         <Link iconOnly href="/dives/{diveId}/edit">
-          <Icon name="edit" weight={2.2} /><span class="od-sr-only">{t('detail.edit')}</span>
+          <Icon name="edit" weight={2} /><span class="od-sr-only">{t('detail.edit')}</span>
         </Link>
         <Link iconOnly popoverOpen="#{menuId}">
           <Icon name="more" weight={4} /><span class="od-sr-only">{t('detail.moreOptions')}</span>
@@ -412,8 +412,11 @@
         {#if dive.number}<strong>{t('detail.number', { number: String(dive.number) })}</strong>&emsp;{/if}{formatDiveDay(dive.date)}
       </p>
       <h1 class="site" class:not-set={!dive.site}>{dive.site || t('dive.siteNotSet')}</h1>
-      {#if location}<p class="location">{location}</p>{/if}
-      {#if dive.trip?.location}<p class="location">{t('detail.tripLine', { name: dive.trip.location })}</p>{/if}
+      {#if location || dive.trip?.location}
+        <p class="location">
+          {location}{#if location && dive.trip?.location}{' · '}{/if}{#if dive.trip?.location}<a href="/trips/{dive.trip.id}">{t('detail.tripLine', { name: dive.trip.location })}</a>{/if}
+        </p>
+      {/if}
       {#if dive.rating > 0}
         <p class="rating">
           <Stars value={dive.rating} size={18} label={t('detail.ratingLabel', { n: dive.rating })} />
@@ -454,7 +457,7 @@
               <span class="title">{t('detail.conditions')}</span>
               {#if !conditionsOpen}<span class="summary">{conditionsSummary}</span>{/if}
             </span>
-            <span class="arrow" class:open={conditionsOpen}><Icon name="expand" /></span>
+            <span class="arrow" class:open={conditionsOpen}><Icon name="expand" size={22} weight={2} /></span>
           </button>
           {#if conditionsOpen}
             {#each conditions as condition (condition.key)}
@@ -473,10 +476,10 @@
         <h2 class="section-title">{t('detail.people')}</h2>
         <div class="group">
           {#if dive.guides.length}
-            <div class="row"><span>{t('detail.guideRow', { n: dive.guides.length })}</span><span class="value">{dive.guides.join(', ')}</span></div>
+            <div class="row"><span>{t('detail.guideRow', { n: dive.guides.length })}</span><span class="tags end">{#each dive.guides as name, i (i)}<span class="tag">{name}</span>{/each}</span></div>
           {/if}
           {#if dive.buddies.length}
-            <div class="row"><span>{t('detail.buddiesRow', { n: dive.buddies.length })}</span><span class="value">{dive.buddies.join(', ')}</span></div>
+            <div class="row"><span>{t('detail.buddiesRow', { n: dive.buddies.length })}</span><span class="tags end">{#each dive.buddies as name, i (i)}<span class="tag">{name}</span>{/each}</span></div>
           {/if}
         </div>
       </section>
@@ -485,8 +488,8 @@
     {#if dive.tags.length}
       <section class="section">
         <h2 class="section-title">{t('detail.tags', { n: dive.tags.length })}</h2>
-        <ul class="pills">
-          {#each dive.tags as tag (tag)}<li class="pill large outlined">{tag}</li>{/each}
+        <ul class="tags">
+          {#each dive.tags as tag (tag)}<li class="tag">{tag}</li>{/each}
         </ul>
       </section>
     {/if}
@@ -604,9 +607,9 @@
     .site {
       margin: 2px 0 0;
       font-size: 34px;
-      line-height: 38px;
+      line-height: 40px;
       font-weight: 800;
-      letter-spacing: -0.5px;
+      letter-spacing: -0.4px;
       color: var(--od-text);
 
       &.not-set {
@@ -618,7 +621,6 @@
       padding: 14px 20px 0;
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 8px;
     }
 
     .figure {
@@ -629,7 +631,7 @@
       .value {
         font-family: var(--od-title-font);
         font-size: 28px;
-        line-height: 34px;
+        line-height: normal;
         font-weight: 800;
         color: var(--od-text);
       }
@@ -654,7 +656,7 @@
     }
 
     .fact {
-      padding: 10px 0;
+      padding: 9px 0;
       border-bottom: 1px solid var(--od-separator);
       display: flex;
       flex-direction: column;
@@ -668,7 +670,7 @@
 
       dd {
         margin: 0;
-        font-size: 17px;
+        font-size: 16px;
         font-weight: 600;
         color: var(--od-text);
         overflow-wrap: anywhere;
@@ -676,19 +678,25 @@
     }
 
     .location {
+      --f7-theme-color: var(--od-text);
       margin: 2px 0 0;
       font-size: 15px;
       color: var(--od-text-2);
+
+      a {
+        font-weight: 600;
+      }
     }
 
     .section {
-      margin: 20px 16px 0;
+      margin: 22px 16px 0;
     }
 
     .section-title {
-      margin: 0 0 6px 4px;
-      font-size: 13px;
-      font-weight: 600;
+      margin: 0 0 8px;
+      font-family: var(--od-title-font);
+      font-size: 14px;
+      font-weight: 500;
       color: var(--od-text-2);
     }
 
@@ -701,10 +709,10 @@
     }
 
     .cylinder {
-      padding: 12px 16px 14px;
+      padding: 12px 16px;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 6px;
 
       & + & {
         border-top: 1px solid var(--od-separator);
@@ -722,21 +730,21 @@
       display: flex;
       align-items: baseline;
       flex-wrap: wrap;
-      gap: 0 8px;
+      gap: 0 4px;
 
       .gas {
-        font-size: 17px;
+        font-size: 16px;
         font-weight: 700;
       }
 
       .type {
-        font-size: 15px;
+        font-size: 14px;
         color: var(--od-text-2);
       }
     }
 
     .cylinder .value {
-      font-size: 17px;
+      font-size: 16px;
       font-weight: 700;
       white-space: nowrap;
     }
@@ -775,6 +783,7 @@
       /* MD3: one-line list item, 56 dp. */
       :global(.md) & {
         min-height: 56px;
+        padding: 10px 16px;
       }
 
       &:first-child {
@@ -782,7 +791,9 @@
       }
 
       .value {
-        font-weight: 600;
+        font-size: 14px;
+        color: var(--od-text-2);
+        font-variant-numeric: tabular-nums;
         text-align: right;
       }
     }
@@ -832,19 +843,28 @@
       flex-direction: column;
       gap: 2px;
 
+      :global(.md) & {
+        padding: 0;
+      }
+
       .sub {
         font-size: 13px;
         line-height: 18px;
         color: var(--od-text-2);
+
+        :global(.md) & {
+          font-size: 14px;
+          line-height: 20px;
+        }
       }
     }
 
     /* Overall rating under the title. */
     .rating {
-      margin: 6px 0 0;
+      margin: 8px 0 0;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
       font-size: 14px;
       color: var(--od-text-2);
     }
@@ -853,7 +873,7 @@
     .disclosure {
       width: 100%;
       min-height: 56px;
-      padding: 10px 16px;
+      padding: 8px 16px;
       border: none;
       background: none;
       color: var(--od-text);
@@ -895,39 +915,29 @@
       border-top: 1px solid var(--od-separator);
     }
 
-    .pills {
+    /* Tags and people: 32 px chips on the tint. */
+    .tags {
       list-style: none;
       margin: 0;
-      padding: 0 4px;
+      padding: 0;
       display: flex;
       flex-wrap: wrap;
       gap: 6px;
+
+      &.end {
+        justify-content: flex-end;
+      }
     }
 
-    .pill {
-      height: 28px;
-      padding: 0 10px;
-      border-radius: 14px;
+    .tag {
+      height: 32px;
+      padding: 0 12px;
+      border-radius: 8px;
       background: var(--od-tint);
       color: var(--od-on-tint);
       font-size: 14px;
-      font-weight: 600;
       display: inline-flex;
       align-items: center;
-
-      &.large {
-        height: 32px;
-        padding: 0 14px;
-        border-radius: 16px;
-        font-size: 15px;
-        font-weight: 400;
-      }
-
-      &.outlined {
-        background: none;
-        color: var(--od-text);
-        box-shadow: inset 0 0 0 1.5px var(--od-text);
-      }
     }
 
     /* Space after the last block, so that it never touches the bottom bar. */
@@ -942,5 +952,10 @@
       line-height: 22px;
       white-space: pre-line;
     }
+  }
+
+  /* Framework7's variable, outside the layers: the top bar is the page's colour on Android. */
+  :global(.md .od-detail > .navbar) {
+    --f7-navbar-bg-color: var(--od-background);
   }
 </style>
