@@ -242,6 +242,8 @@
 
     .sites-panel {
       border-top: 1px solid var(--od-separator);
+      /* On a phone, the first group sits under the map without the count line. */
+      padding-top: 12px;
       /* Room for the FAB under the last site. */
       padding-bottom: 88px;
     }
