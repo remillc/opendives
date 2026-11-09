@@ -29,6 +29,9 @@ const COMPUTERS_KEY = 'od.diveComputers';
  * @property {boolean} showAllBluetooth the Bluetooth scan shows every device, not only dive computers
  * @property {'system'|'letter'|'a4'} paperSize the PDF sheet of a dive: "system" follows the
  *   device's region (US Letter where it is used, A4 elsewhere)
+ * @property {'fresh'|'salt'|'en13319'} defaultWater "Conditions par défaut": the water type a new
+ *   plan and the gas calculator start from
+ * @property {number} defaultAltitudeMm "Conditions par défaut": the altitude a new plan starts from, mm
  */
 
 /** @type {AppSettings} */
@@ -40,6 +43,8 @@ const APP_DEFAULTS = {
   coordinatesFormat: 'decimal',
   showAllBluetooth: false,
   paperSize: 'system',
+  defaultWater: 'salt',
+  defaultAltitudeMm: 0,
 };
 
 /**

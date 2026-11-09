@@ -721,7 +721,9 @@ Spec: "Settings, modelled on Subsurface" (the sentence on the decompression sett
 
 Done in "Settings: decompression on its own page, linked from Settings and the planner settings". /settings/decompression is the Settings page with section decompression: the warning, the same five rows (same values and behaviour) and the footnote. Settings keeps the group title with one 72 dp row "Modele, facteurs de gradient, END" and the model and GF as supporting text (Buhlmann ZH-L16, GF 30/75; VPM-B, +3 with VPM-B); the planner settings start with one 72 dp row "Modele de decompression" opening the same page, Back returning to them. Checked in the emulator.
 
-## [ ] 2026-11-09-03 Settings: decompression back in Settings, conditions by default
+## [x] 2026-11-09-03 Settings: decompression back in Settings, conditions by default
+
+Done in the branch `fix/settings-decompression-conditions`. The water type also starts the two gas calculator tools (to-do #13).
 
 Christian undoes task 2026-11-09-02. Spec: "Settings, modelled on Subsurface".
 - Remove the page `/settings/decompression` and the planner settings row "Modèle de décompression". Put the five decompression rows back in the Settings group "Décompression", with the warning note and the footnote, as before 2026-11-09-02 (`docs/mockups/android-reglages.dc.html`).

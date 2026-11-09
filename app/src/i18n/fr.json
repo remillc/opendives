@@ -335,6 +335,7 @@
     "groups": {
       "language": "Langue et formats",
       "units": "Unités",
+      "conditions": "Conditions par défaut",
       "logbook": "Carnet",
       "equipment": "Équipement",
       "profile": "Profil de plongée",
@@ -469,8 +470,7 @@
       "o2narcoticText": "Compté dans la profondeur narcotique équivalente (END)",
       "bestMixEnd": "END maximale du meilleur mélange",
       "bestMixEndDialog": "Profondeur narcotique équivalente la plus grande admise pour choisir le meilleur mélange.",
-      "note": "Utilisés par le plafond calculé du profil, le planificateur, la désaturation et le calculateur de gaz.",
-      "link": "Modèle, facteurs de gradient, END"
+      "note": "Utilisés par le plafond calculé du profil, le planificateur, la désaturation et le calculateur de gaz."
     },
     "pp": {
       "po2": "Seuils de pO₂",
@@ -562,6 +562,11 @@
       "text": "Selon la région de l’appareil : {name}",
       "letter": "Lettre US",
       "a4": "A4"
+    },
+    "conditions": {
+      "waterType": "Type d’eau",
+      "altitude": "Altitude",
+      "note": "Le planificateur part de ces valeurs. On peut les changer pour chaque plan."
     }
   },
   "gas": {
@@ -1227,8 +1232,8 @@
     "releaseNotes": [
       "Planificateur : la plongée de départ montre son numéro et sa durée, dans le planificateur et dans la liste pour la choisir.",
       "Réglages du planificateur : sans ligne d’introduction, les groupes suivent directement le titre.",
-      "Réglages : la décompression (modèle, facteurs de gradient, END) a sa propre page, ouverte aussi depuis les réglages du planificateur.",
-      "Planificateur : « Nouvelle plongée » sans la ligne « Valeurs par défaut du planificateur de Subsurface »."
+      "Planificateur : « Nouvelle plongée » sans la ligne « Valeurs par défaut du planificateur de Subsurface ».",
+      "Réglages : nouveau groupe « Conditions par défaut » (type d’eau et altitude), repris par le planificateur et le calculateur de gaz."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
@@ -1323,8 +1328,7 @@
     "decoPo2": "ppO₂ pendant la déco",
     "reserve": "Réserve minimale",
     "problemSolving": "Temps pour régler un problème",
-    "sacFactor": "Facteur de consommation sous stress",
-    "decoModel": "Modèle de décompression"
+    "sacFactor": "Facteur de consommation sous stress"
   },
   "plan": {
     "title": "Planificateur",

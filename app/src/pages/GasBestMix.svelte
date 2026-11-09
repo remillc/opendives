@@ -1,6 +1,6 @@
 <script module>
   // Kept while the app runs, so that the tool shows the last values again.
-  const saved = { po2: 1400, depth: '', water: 'salt' };
+  const saved = { po2: 1400, depth: '', water: '', waterDefault: '' };
 </script>
 
 <script>
@@ -18,6 +18,7 @@
   import Po2Wheel from '../components/Po2Wheel.svelte';
   import GasResults from '../components/GasResults.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
+  import { settings } from '../lib/settings.svelte.js';
   import { depthUnit, formatNumber } from '../lib/format.js';
   import { WATER_TYPES, waterTypeName, salinityOfWaterType, parseDecimal } from '../lib/tools.js';
   import { t } from '../lib/i18n.js';
@@ -26,6 +27,8 @@
   const mmPerUnit = feet ? 304.8 : 1000;
   let po2 = $state(saved.po2);
   let depth = $state(saved.depth || (feet ? '100' : '30'));
+  // The water type of Settings, until changed here or in Settings.
+  if (saved.waterDefault !== settings.defaultWater) saved.water = saved.waterDefault = settings.defaultWater;
   let water = $state(saved.water);
   // The Settings value, in the unit of the depth.
   let maxEnd = $state(formatNumber(logbook.prefs.bestMixEndMm / mmPerUnit, feet ? 0 : 1));

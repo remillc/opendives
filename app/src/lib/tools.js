@@ -67,6 +67,15 @@ export function waterTypeOfSalinity(salinity) {
 }
 
 /**
+ * Surface pressure at an altitude, mbar (Subsurface's altitude_to_pressure,
+ * core/units.h).
+ * @param {number} altitudeMm altitude above sea level, mm
+ */
+export function altitudeToPressureMbar(altitudeMm) {
+  return Math.round(1013 * Math.exp(-altitudeMm / 7800000));
+}
+
+/**
  * A number typed by the user ("12,5" or "12.5"), NaN when it is not one.
  * @param {string} text
  */

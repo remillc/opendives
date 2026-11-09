@@ -26,8 +26,9 @@
     TIME_PATTERNS,
   } from '../lib/settings.svelte.js';
   import { confirmAction } from '../lib/dialogs.js';
-  import { formatNumber, formatDuration, formatDateChoice, formatTimeChoice, formatDepth, decoSummary } from '../lib/format.js';
+  import { formatNumber, formatDuration, formatDateChoice, formatTimeChoice, formatDepth } from '../lib/format.js';
   import { regionUsesLetter } from '../lib/share.js';
+  import { waterTypeName } from '../lib/tools.js';
 
   /** @typedef {import('opendives-core').CorePrefValues} CorePrefValues */
   /** @typedef {{ value: string, label: string, example?: string }} Option */
@@ -40,13 +41,6 @@
    *   | { kind: 'link', id: string, label: string, text?: string, href?: string, action?: () => void, disabled?: boolean }
    *   | { kind: 'info', id: string, label: string, value: string }} Row
    */
-
-  /**
-   * `section` "decompression": the page "Décompression" (/settings/decompression),
-   * the decompression rows only, opened from Settings and from the planner settings.
-   * @type {{ section?: '' | 'decompression' }}
-   */
-  let { section = '' } = $props();
 
   onMount(async () => {
     try {
@@ -171,6 +165,9 @@
 
   /** Depth wheel values (best-mix END), in mm: metre by metre, or 10 ft by 10 ft. */
   const depthWheel = $derived(p.length === 'ft' ? range(0, 330, 10).map((ft) => Math.round(ft * 304.8)) : range(0, 100, 1).map((m) => m * 1000));
+
+  /** Altitude wheel values, in mm: 50 m by 50 m, or 100 ft by 100 ft. */
+  const altitudeWheel = $derived(p.length === 'ft' ? range(0, 16000, 100).map((ft) => Math.round(ft * 304.8)) : range(0, 5000, 50).map((m) => m * 1000));
 
   const computers = $derived(logbook.prefs.diveComputers ?? []);
 
@@ -313,6 +310,29 @@
               example: coordinateExamples[format]().split(', ')[0],
             })),
           set: (v) => setAppSetting('coordinatesFormat', /** @type {'decimal'|'minutes'|'seconds'} */ (v)),
+        },
+      ],
+    },
+    {
+      id: 'conditions',
+      title: t('settings.groups.conditions'),
+      rows: [
+        {
+          kind: 'choice',
+          id: 'defaultWater',
+          label: t('settings.conditions.waterType'),
+          value: waterTypeName(settings.defaultWater),
+          current: settings.defaultWater,
+          options: () => /** @type {const} */ (['fresh', 'salt', 'en13319']).map((id) => ({ value: id, label: waterTypeName(id) })),
+          set: (v) => setAppSetting('defaultWater', /** @type {'fresh'|'salt'|'en13319'} */ (v)),
+        },
+        {
+          kind: 'number',
+          id: 'defaultAltitude',
+          label: t('settings.conditions.altitude'),
+          value: formatDepth(settings.defaultAltitudeMm, p),
+          wheels: () => [wheel(t('settings.conditions.altitude'), altitudeWheel, settings.defaultAltitudeMm, 0, (mm) => formatDepth(mm, p))],
+          set: ([i]) => setAppSetting('defaultAltitudeMm', altitudeWheel[i]),
         },
       ],
     },
@@ -781,26 +801,6 @@
   {/if}
 {/snippet}
 
-{#if section === 'decompression'}
-  <Page class="od-settings">
-    <Navbar title={t('settings.groups.deco')}>
-      {#snippet left()}
-        <Link back iconOnly>
-          <i class="icon icon-back"></i>
-          <span class="od-sr-only">{t('detail.back')}</span>
-        </Link>
-      {/snippet}
-    </Navbar>
-    <div class="warning first" role="note">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l9.5 17h-19z M12 10v4.5 M12 17.5v.01"></path></svg>
-      <span>{t('settings.deco.warning')}</span>
-    </div>
-    <div class="surface" role="list">
-      {#each group('deco').rows as row (row.id)}<div role="listitem">{@render rowView(row)}</div>{/each}
-    </div>
-    <p class="note">{t('settings.deco.note')}</p>
-  </Page>
-{:else}
 <Page class="od-settings">
   <Navbar title={t('settings.title')}>
     {#snippet left()}
@@ -854,18 +854,25 @@
     {/if}
   {/if}
 
+  {#if group('conditions').rows.length}
+    {@render groupView('conditions')}
+    <p class="note">{t('settings.conditions.note')}</p>
+  {/if}
+
   {@render groupView('logbook')}
   {@render groupView('equipment')}
   {@render groupView('profile')}
 
   {#if decoWarningShown}
-    <!-- The decompression settings have their own page: one row leads there. -->
     <h2 class="title">{t('settings.groups.deco')}</h2>
-    <div class="surface" role="list">
-      <div role="listitem">
-        {@render rowView({ kind: 'link', id: 'decompression', label: t('settings.deco.link'), text: decoSummary(p), href: '/settings/decompression' })}
-      </div>
+    <div class="warning" role="note">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l9.5 17h-19z M12 10v4.5 M12 17.5v.01"></path></svg>
+      <span>{t('settings.deco.warning')}</span>
     </div>
+    <div class="surface" role="list">
+      {#each group('deco').rows as row (row.id)}<div role="listitem">{@render rowView(row)}</div>{/each}
+    </div>
+    <p class="note">{t('settings.deco.note')}</p>
   {/if}
 
   {@render groupView('partialPressures')}
@@ -911,7 +918,6 @@
   {#if nothingShown}<p class="note empty">{t('settings.noResult', { text: search.trim() })}</p>{/if}
   <div class="bottom"></div>
 </Page>
-{/if}
 
 {#if renumbering}
   <RenumberDialog oncancel={() => (renumbering = false)} ondone={() => (renumbering = false)} />
@@ -1171,11 +1177,6 @@
 
     .warning {
       margin: 0 var(--od-settings-margin) 10px;
-
-      /* At the top of the page "Décompression". */
-      &.first {
-        margin-top: 16px;
-      }
       padding: 12px 16px;
       border-radius: 12px;
       border: 1px solid var(--od-alarm);

@@ -335,6 +335,7 @@
     "groups": {
       "language": "Language and formats",
       "units": "Units",
+      "conditions": "Default conditions",
       "logbook": "Logbook",
       "equipment": "Equipment",
       "profile": "Dive profile",
@@ -469,8 +470,7 @@
       "o2narcoticText": "Counted in the equivalent narcotic depth (END)",
       "bestMixEnd": "Best mix maximum END",
       "bestMixEndDialog": "Largest equivalent narcotic depth allowed when choosing the best mix.",
-      "note": "Used by the calculated ceiling of the profile, the planner, desaturation and the gas calculator.",
-      "link": "Model, gradient factors, END"
+      "note": "Used by the calculated ceiling of the profile, the planner, desaturation and the gas calculator."
     },
     "pp": {
       "po2": "pO₂ thresholds",
@@ -562,6 +562,11 @@
       "text": "From the device’s region: {name}",
       "letter": "US Letter",
       "a4": "A4"
+    },
+    "conditions": {
+      "waterType": "Water type",
+      "altitude": "Altitude",
+      "note": "The planner starts from these values. They can be changed for each plan."
     }
   },
   "gas": {
@@ -1227,8 +1232,8 @@
     "releaseNotes": [
       "Planner: the starting dive shows its number and duration, in the planner and in the list to choose it.",
       "Planner settings: no introduction line, the groups follow the title directly.",
-      "Settings: decompression (model, gradient factors, END) has its own page, also opened from the planner settings.",
-      "Planner: “New dive” without the line “Defaults of the Subsurface planner”."
+      "Planner: “New dive” without the line “Defaults of the Subsurface planner”.",
+      "Settings: new group “Default conditions” (water type and altitude), used by the planner and the gas calculator."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
@@ -1323,8 +1328,7 @@
     "decoPo2": "Deco ppO₂",
     "reserve": "Minimum reserve",
     "problemSolving": "Problem-solving time",
-    "sacFactor": "SAC factor under stress",
-    "decoModel": "Decompression model"
+    "sacFactor": "SAC factor under stress"
   },
   "plan": {
     "title": "Planner",
