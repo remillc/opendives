@@ -71,7 +71,8 @@ async function inject() {
       },
       visible(sel, text) {
         // Only what is on the page being shown (earlier pages stay in the stack), or outside any page (menus, dialogs).
-        const top = document.elementFromPoint(innerWidth / 2, innerHeight / 2)?.closest('.page');
+        // (elementsFromPoint: a backdrop or a toast over the page does not hide it.)
+        const top = document.elementsFromPoint(innerWidth / 2, innerHeight / 2).map((e) => e.closest('.page')).find(Boolean);
         return [...document.querySelectorAll(sel)].filter(
           (e) => e.offsetParent !== null && (!e.closest('.page') || (top && top.contains(e))) && (text === undefined || e.textContent.replace(/\\s+/g, ' ').trim() === text),
         );
@@ -506,7 +507,7 @@ async function run() {
   await click('.popover .item-link, .popover a, .popover button, .popover li', T('plans.share'));
   await p.waitFor(`__od.visible('.od-share-sheet').length > 0 || __od.visible('.sheet-modal').length > 0`, 'the share sheet');
   yes('12 the share sheet opens with both choices', (await p.eval(`__od.visible('.od-share-sheet .row').length`)) === 2);
-  await click('.od-share-sheet .row', T('plan.shareSummary') + ' ' + T('plan.shareSummaryText'));
+  await click('.od-share-sheet .row .headline', T('plan.shareSummary'));
   await sleep(2500);
   const focus = adb(['shell', 'dumpsys window | grep -E "mCurrentFocus|mFocusedApp"']);
   yes('12 the system share sheet opens', /Chooser|Resolver|sharesheet|intentresolver/i.test(focus), focus.trim().slice(0, 200));
@@ -531,6 +532,11 @@ async function deleteLeftovers() {
   for (let guard = 0; guard < 6; guard++) {
     const left = (await core('listPlans')).map((x) => x.id).filter((id) => !startPlans.includes(id));
     if (!left.length) return 0;
+    // A sheet or a menu left open by an aborted scenario would hide the list.
+    if (await p.eval(`!!document.querySelector('.sheet-modal.modal-in, .popover.modal-in, .dialog.modal-in')`)) {
+      adb(['shell', 'input', 'keyevent', 'KEYCODE_BACK']);
+      await sleep(1200);
+    }
     await go('/tools/');
     await sleep(600);
     await go('/plans/');
@@ -559,7 +565,7 @@ try {
     // screen writes both; it has no way to choose back a personalised set in one tap).
     const units = Object.fromEntries(['length', 'pressure', 'volume', 'weight', 'temperature', 'unitSystem'].map((k) => [k, startPrefs[k]]));
     await core('setPrefs', { changes: units });
-    await p.eval(`(() => { const k = 'od.corePrefs'; const r = JSON.parse(localStorage.getItem(k) || '{}'); Object.assign(r, ${q(units)}); localStorage.setItem(k, JSON.stringify(r)); })()`);
+    if (startLocal !== null) await p.eval(`localStorage.setItem('od.corePrefs', ${q(startLocal)})`);
     const end = await core('getPrefs');
     record('cleanup: the units are back', ['length', 'pressure', 'volume', 'weight', 'temperature'].every((k) => end[k] === startPrefs[k]), JSON.stringify(end));
     await go('/');

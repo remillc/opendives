@@ -50,7 +50,15 @@ export class Page {
   send(method, params = {}) {
     const id = ++this.id;
     return new Promise((resolve, reject) => {
-      this.pending.set(id, { resolve, reject });
+      // A command that is never answered (the app died, the page was replaced) must not hang the run.
+      const timer = setTimeout(() => {
+        this.pending.delete(id);
+        reject(new Error(`no answer to ${method} after 60 s`));
+      }, 60000);
+      this.pending.set(id, {
+        resolve: (v) => (clearTimeout(timer), resolve(v)),
+        reject: (e) => (clearTimeout(timer), reject(e)),
+      });
       this.ws.send(JSON.stringify({ id, method, params }));
     });
   }

@@ -25,13 +25,12 @@ winpath() { case "$ADB" in *.exe) wslpath -w "$1" ;; *) echo "$1" ;; esac; }
 
 if [ "${1:-}" != --no-build ]; then
   native/build-android.sh x86_64
-  (cd app && npm ci --no-audit --no-fund && npm run android:sync)
   if grep -qi microsoft /proc/version 2>/dev/null; then
-    # Gradle runs on Windows, with JDK 21 and the Windows Android SDK.
-    WINAPP=$(wslpath -w "$ROOT/app/android")
-    powershell.exe -NoProfile -Command "\$env:JAVA_HOME = if (\$env:JAVA_HOME) { \$env:JAVA_HOME } else { 'C:\\Program Files\\Java\\jdk-21' }; \$env:ANDROID_HOME = if (\$env:ANDROID_HOME) { \$env:ANDROID_HOME } else { \"\$env:LOCALAPPDATA\\Android\\Sdk\" }; Set-Location '$WINAPP'; .\\gradlew.bat assembleDebug"
+    # Under WSL the web build and Gradle run on Windows (AGENTS.md, "Android app"): JDK 21, the Windows Android SDK.
+    WINAPP=$(wslpath -w "$ROOT/app")
+    powershell.exe -NoProfile -Command "if (-not \$env:JAVA_HOME) { \$env:JAVA_HOME = 'C:\\Program Files\\Java\\jdk-21' }; if (-not \$env:ANDROID_HOME) { \$env:ANDROID_HOME = \"\$env:LOCALAPPDATA\\Android\\Sdk\" }; Set-Location '$WINAPP'; if (-not (Test-Path node_modules\\svelte)) { npm ci --no-audit --no-fund }; npm run android:sync; Set-Location android; .\\gradlew.bat assembleDebug; exit \$LASTEXITCODE"
   else
-    (cd app/android && ./gradlew assembleDebug)
+    (cd app && { [ -d node_modules/svelte ] || npm ci --no-audit --no-fund; } && npm run android:sync && cd android && ./gradlew assembleDebug)
   fi
 fi
 APK=$ROOT/app/android/app/build/outputs/apk/debug/app-debug.apk
