@@ -894,3 +894,11 @@ Christian chose a new logo. Spec: "Logo (decided on 9 November 2026)". Reference
 - Keep the size rule: grey top arc at 64 px and below, none above. Check the icon in the round and squircle masks.
 - Do not change the drawing. If the three gradients do not convert well to a vector drawable, stop and ask Christian.
 
+## [ ] 2026-11-09-21 Sync conflict dialog: name what conflicts, readable differences, one action
+
+Christian approved this on the canvas. Spec: "Sync conflict dialog, redesigned". Mock-ups: `docs/mockups/android-etat-conflit.dc.html`, `android-etat-conflit-ordinateurs.dc.html`. Rework `ConflictSheet.svelte` (Android dialog and iOS sheet):
+- Identity card of what is in conflict (dive: thumbnail, site, number, date and time; dive computer names: icon and "Ordinateurs du carnet").
+- No more "fiche de la plongée": give every git-log line a readable name, and translate the dive computer lines (`deviceid=… serial=… nickname=…`) into the readable summary of the spec (name that differs, computers only on one side and what is lost, unchanged ones).
+- Two selectable cards instead of radios, the differences always shown inside each card, no Comparer toggle, a single tonal "Continuer". Keep the "apply to all" checkbox when several dives conflict.
+- Put the selection colours in tokens (`--od-selected`, `--od-selected-container`, `--od-tonal`): the palette rule is being revised, the values may change.
+
