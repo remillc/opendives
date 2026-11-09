@@ -902,6 +902,7 @@ Christian approved this on the canvas. Spec: "Sync conflict dialog, redesigned".
 - Two selectable cards instead of radios, the differences always shown inside each card, no Comparer toggle, a single tonal "Continuer". Keep the "apply to all" checkbox when several dives conflict.
 - Put the selection colours in tokens (`--od-selected`, `--od-selected-container`, `--od-tonal`): the palette rule is being revised, the values may change.
 - Added at 14:24, Christian wants it in this task: a secondary text button "Plus tard" left of "Continuer" (the dialog may now be closed: sync stays paused, the Carnet status row "Synchronisation arrêtée" reopens it). After "Continuer", apply the choice locally, show a snackbar with "Annuler" for about 8 seconds, and only then push; "Annuler" restores the conflict and reopens the dialog. See the spec paragraph.
+- Added at 14:40: the iOS sheet is redesigned the same way, see `docs/mockups/ios-etat-conflit.dc.html` and the spec (full-width "Continuer", "Plus tard" under it).
 
 ## [x] 2026-11-09-22 Palette rule: colour no longer reserved for data
 
