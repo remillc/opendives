@@ -253,8 +253,6 @@
     {/snippet}
   </Navbar>
 
-  <p class="intro">{t('plannerSettings.intro')}</p>
-
   {#if planner.setup}
     {#each groups as g (g.id)}
       <h2 class="title">{g.title}</h2>
@@ -303,14 +301,8 @@
 <style>
   @layer od.components {
     /* As Settings (spec, section 4, layout): titles on the page background,
-       groups as rounded white surfaces, no dividers, 48 dp rows. */
-    .intro {
-      margin: 8px 20px 0;
-      font-size: 16px;
-      line-height: 24px;
-      color: var(--od-text-2);
-    }
-
+       groups as rounded white surfaces, no dividers, 48 dp rows. The first
+       group title follows the top bar directly. */
     .title {
       margin: 0;
       padding: 22px 20px 8px;

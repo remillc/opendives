@@ -1224,7 +1224,8 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
-      "Planner: the starting dive shows its number and duration, in the planner and in the list to choose it."
+      "Planner: the starting dive shows its number and duration, in the planner and in the list to choose it.",
+      "Planner settings: no introduction line, the groups follow the title directly."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
@@ -1296,7 +1297,6 @@
   },
   "plannerSettings": {
     "title": "Planner settings",
-    "intro": "They apply to every plan.",
     "open": "Planner settings",
     "groups": {
       "rates": "Rates",

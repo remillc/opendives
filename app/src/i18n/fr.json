@@ -1224,7 +1224,8 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
-      "Planificateur : la plongée de départ montre son numéro et sa durée, dans le planificateur et dans la liste pour la choisir."
+      "Planificateur : la plongée de départ montre son numéro et sa durée, dans le planificateur et dans la liste pour la choisir.",
+      "Réglages du planificateur : sans ligne d’introduction, les groupes suivent directement le titre."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
@@ -1296,7 +1297,6 @@
   },
   "plannerSettings": {
     "title": "Réglages du planificateur",
-    "intro": "S’appliquent à chaque plan.",
     "open": "Réglages du planificateur",
     "groups": {
       "rates": "Vitesses",

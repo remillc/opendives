@@ -705,7 +705,8 @@ Use the core's export functions (`save_dives_logic` with the selection for .ssrf
 
 Done in "Logbook selection: Export as..." (Android). Exporter au format... sits after the trip items, then the divider and Supprimer. The sheet follows the mock-up (radio list with descriptions, Anonymiser off by default, Annuler / Exporter) and remembers the last format on the device. The core exports the checked dives as Subsurface does: save_dives_logic for .ssrf, export_dives_xslt with uddf-export.xslt, xml2summarycsv.xslt and xml2detailscsv.xslt (metric, or imperial when depths are in feet), with Subsurface's anonymize option; the app now ships Subsurface's xslt/ stylesheets (copied to its files at start), and the compat stylesheet loader no longer breaks xsl:include. Fiches PDF: one page per dive with a profile drawn from the samples; anonymized, the people and notes are left out. Files go to the cache and the system share sheet (OpenDives-2-plongees-2026-11-08.uddf); the selection is kept. Checked: the four Subsurface formats exported from the sample log on Linux (anonymized names become Xxxxx), and UDDF and a 2-page PDF from the emulator.
 
-## [ ] 2026-11-09-01 Planner settings: no intro line
+## [x] 2026-11-09-01 Planner settings: no intro line
 
 Remove the line "S’appliquent à chaque plan." under the title of "Réglages du planificateur". The first group title follows the top bar directly. Mock-up: `docs/mockups/reglages-planificateur-android.dc.html`.
 
+Done in "Planner settings: no intro line". The line and its i18n key are gone; the first group title (Vitesses) follows the top bar directly. Checked in the emulator.
