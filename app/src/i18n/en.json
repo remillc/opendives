@@ -624,7 +624,15 @@
     },
     "maps": {
       "regions": "Downloaded regions",
-      "none": "None"
+      "none": "None",
+      "count": {
+        "one": "{n} region",
+        "other": "{n} regions"
+      },
+      "updates": {
+        "one": "{n} update",
+        "other": "{n} updates"
+      }
     },
     "advanced": {
       "resetText": "Goes back to the default values for every setting of this device",
@@ -1095,6 +1103,180 @@
     "done": "Dives renumbered",
     "failed": "The dives could not be renumbered. No dive was changed."
   },
+  "maps": {
+    "title": "Offline maps",
+    "units": {
+      "mb": "{value} MB",
+      "gb": "{value} GB"
+    },
+    "summary": {
+      "regions": {
+        "one": "{n} region",
+        "other": "{n} regions"
+      },
+      "usage": "{used} of {cap}",
+      "usageLabel": "Map storage: {used} of {cap} allowed",
+      "free": "{free} free on the device",
+      "freeShort": "{free} free"
+    },
+    "sections": {
+      "downloads": "Downloads",
+      "regions": "Downloaded regions",
+      "settings": "Settings"
+    },
+    "updateAll": "Update all",
+    "noNetwork": "No network. Downloaded regions stay available. Downloads will resume when the network is back.",
+    "add": "Add a region",
+    "empty": {
+      "title": "No region downloaded",
+      "text": "Download the region of your next trip. Its map will stay visible on the boat, even without a network."
+    },
+    "cellular": {
+      "label": "Download on mobile data",
+      "labelShort": "Mobile data",
+      "text": "Otherwise, downloads wait for Wi-Fi"
+    },
+    "limit": {
+      "label": "Maximum space for maps",
+      "labelShort": "Maximum space",
+      "text": "Your maps take {used}. OpenDives also always keeps at least {floor} free on the device."
+    },
+    "region": {
+      "sizeDate": "{size} · {date}",
+      "drawn": "Chosen area · {size} · {date}",
+      "updateAvailable": "Update available",
+      "update": "Update",
+      "options": "Options for {name}",
+      "swipeHint": "Swipe a region to the left to delete it."
+    },
+    "menu": {
+      "update": "Update, {size}",
+      "view": "Show on the map",
+      "delete": "Delete"
+    },
+    "download": {
+      "progress": "{received} of {total} · {percent}%",
+      "waitingWifi": "Waiting for Wi-Fi · {size}",
+      "queued": "Waiting · {size}",
+      "now": "Download now",
+      "stop": "Stop the download",
+      "background": "The download continues if you leave the app.",
+      "pausedAt": "Paused at {received} of {total}",
+      "noSpace": "Not enough space on the device",
+      "resumesWhen": "Will resume when {floor} is free.",
+      "manage": "Manage space",
+      "interrupted": "Interrupted at {received} of {total}",
+      "resumesOnline": "Will resume when the network is back",
+      "updating": "Update · {received} of {total}",
+      "updatingWifi": "Update waiting for Wi-Fi · {size}",
+      "oldStays": "The old map stays usable until the end.",
+      "progressLabel": "Downloading {name}"
+    },
+    "failure": {
+      "title": "Download failed",
+      "network": "The connection was lost",
+      "checksum": "The file received is incomplete or corrupt",
+      "space": "Not enough space on the device",
+      "server": "The server did not answer correctly",
+      "retry": "Try again",
+      "remove": "Remove"
+    },
+    "updateFailed": "The update of {name} failed. The old map stays usable.",
+    "deleted": "{name} deleted",
+    "dialogs": {
+      "cellular": {
+        "title": "Download on mobile data?",
+        "text": "{name} is about {size}. Without Wi-Fi, this data comes out of your plan.",
+        "wait": "Wait for Wi-Fi",
+        "go": "Download"
+      },
+      "space": {
+        "title": "Not enough space",
+        "text": "{name} needs about {size}. Only {remaining} would be left free on the device. OpenDives always keeps at least {floor} free so that the phone keeps working well."
+      },
+      "manage": {
+        "title": "Space on the device",
+        "text": "{free} is free on the device. OpenDives always keeps at least {floor} free so that the phone keeps working well. Delete regions or free space on the device: the download will resume by itself."
+      },
+      "cap": {
+        "title": "Map limit reached",
+        "text": "{name} needs about {size}. Your maps already take {used} of {cap} allowed. Delete a region, or raise the limit.",
+        "view": "See my regions",
+        "change": "Change the limit"
+      },
+      "replace": {
+        "title": "Replace the map?",
+        "text": "Updating {name} needs {size} more during the download. To stay under the limit, the old map will be deleted first. {name} will be unavailable without a network until the end.",
+        "confirm": "Replace"
+      },
+      "delete": {
+        "title": "Delete {name}?",
+        "text": "Its map will no longer be visible without a network. This frees {size}. Your sites and dives do not change.",
+        "confirm": "Delete"
+      }
+    },
+    "addScreen": {
+      "search": "Search for an area or a country",
+      "results": "Results",
+      "noResult": "No area or country matches.",
+      "fromLogbook": "From your logbook",
+      "fromLogbookNote": "The areas where you dived, from your trips and your sites.",
+      "fromLogbookNone": "No area of the catalogue contains your sites yet.",
+      "trip": "Trip {name}, {date} · {sites}",
+      "tripNoDate": "Trip {name} · {sites}",
+      "siteDives": {
+        "one": "{site} · {n} dive",
+        "other": "{site} · {n} dives"
+      },
+      "sitesMore": "{site} and {n} more",
+      "zoneSize": "Dive area · about {size}",
+      "downloaded": "Downloaded",
+      "download": "Download {name}",
+      "all": "All regions",
+      "byCountry": "By country and area",
+      "byCountryText": "The countries of the catalogue, then their dive areas",
+      "onMap": "Choose on the map",
+      "onMapText": "A rectangle around the point you want",
+      "nearTitle": "Area of the map shown",
+      "nearNone": "No area of the catalogue contains this place.",
+      "catalogueFailed": "The map catalogue could not be read. Check the network and try again.",
+      "catalogueLoading": "Reading the catalogue…",
+      "retry": "Try again"
+    },
+    "countries": {
+      "title": "By country and area",
+      "zones": {
+        "one": "{n} dive area",
+        "other": "{n} dive areas"
+      },
+      "wholeCountry": "Whole country",
+      "countryText": "One dive area is enough for a trip. The whole country covers all the areas.",
+      "zonesTitle": "Dive areas",
+      "approx": "about {size}",
+      "downloaded": "downloaded",
+      "none": "No country in the catalogue.",
+      "unknown": "Unknown country"
+    },
+    "area": {
+      "title": "Choose on the map",
+      "help": "Drag the corners of the rectangle to cover the area you want.",
+      "name": "Region name",
+      "nameHelp": "Suggested from the nearest site",
+      "around": "Around {site}",
+      "aroundHere": "Chosen area",
+      "estimate": "About {width} × {height} km · about {size}",
+      "needNetwork": "Choosing on the map needs the network.",
+      "handle": "Rectangle corner, {corner}",
+      "corners": {
+        "nw": "north-west",
+        "ne": "north-east",
+        "sw": "south-west",
+        "se": "south-east"
+      },
+      "download": "Download",
+      "unavailable": "Downloading a chosen area is not available yet."
+    }
+  },
   "dialog": {
     "ok": "OK",
     "cancel": "Cancel"
@@ -1387,6 +1569,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Offline maps: download regions (dive areas, countries or a rectangle of your choice) from Settings; a space limit and a free-space floor protect the device, and updates are offered with a badge.",
       "Dive detail: the cylinder pressure bars run from 0 to the working pressure, with what is left and what was used.",
       "Planner: a plan made from a rebreather dive starts on the diluent, never the oxygen.",
       "Planner: a bar shows the consumed part and the reserve of each gas, another the CNS exposure.",
