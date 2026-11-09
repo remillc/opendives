@@ -750,3 +750,10 @@ Christian approved these by resolving their comment threads. Do them after 2026-
 - Share sheet (`docs/mockups/partage-android.dc.html`): the "Fiche PDF" choice uses the Material Symbols `picture_as_pdf` icon in its coloured circle.
 - Export sheet of the logbook selection (`docs/mockups/carnet-export-android.dc.html`): the first format reads "Fichier de carnet (.ssrf)" with the description "Format Subsurface, lisible aussi par OpenDives" (it exports the checked dives only, as before).
 
+## [ ] 2026-11-09-06 About › Bibliothèques libres: each library opens its website
+
+Christian wants the "Bibliothèques libres" screen (`app/src/pages/AboutLibraries.svelte`) as drawn in `docs/mockups/apropos-bibliotheques-android.dc.html`. Spec: "About".
+- Under the top bar, the line "Toucher une bibliothèque ouvre son site dans le navigateur."
+- Same two groups and rows as now, but each row is a link: the external-link icon on the right (as "Code source" on the About screen), the whole row tappable, opening the library's website in the system browser; screen-reader label "<name>, <licence> (s’ouvre dans le navigateur)".
+- Websites: Subsurface https://subsurface-divelog.org, libdivecomputer https://www.libdivecomputer.org, libgit2 https://libgit2.org, libxml2 https://gitlab.gnome.org/GNOME/libxml2, libxslt https://gitlab.gnome.org/GNOME/libxslt, libzip https://libzip.org, OpenSSL https://www.openssl.org, SQLite https://sqlite.org, Capacitor https://capacitorjs.com, Framework7 https://framework7.io, Svelte https://svelte.dev, MapLibre GL JS https://maplibre.org, Source Sans 3 https://github.com/adobe-fonts/source-sans.
+
