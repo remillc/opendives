@@ -161,7 +161,7 @@
   </Navbar>
 
   {#if layout.phone}
-    <SectionBand flat summary={used.length ? [t('band.sites', { n: used.length }), t('band.dives', { n: diveCount })].join(' · ') : ''} />
+    <SectionBand overMap summary={used.length ? [t('band.sites', { n: used.length }), t('band.dives', { n: diveCount })].join(' · ') : ''} />
     {@render mapBlock('calc(100vw * 4 / 5)')}
     {@render panel()}
   {/if}

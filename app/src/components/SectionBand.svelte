@@ -3,22 +3,21 @@
   // Header band of the four sections (spec, "Side menu and section headers,
   // identity"): under the top bar, the same gradient, a faint dive profile,
   // the one-line summary, and a wave that joins the content. `tall` when a
-  // search bar follows the summary. `flat`, on Sites, whose map runs under
-  // the band: rounded bottom corners and a shadow instead of the wave.
+  // search bar follows the summary. `overMap`, on Sites, whose map runs under
+  // the band: the wave cuts the band, so the map shows under the curve.
 
-  /** @type {{ summary?: string, tall?: boolean, flat?: boolean, pill?: boolean, children?: import('svelte').Snippet }} */
-  let { summary = '', tall = false, flat = false, pill = false, children } = $props();
+  /** @type {{ summary?: string, tall?: boolean, overMap?: boolean, pill?: boolean, children?: import('svelte').Snippet }} */
+  let { summary = '', tall = false, overMap = false, pill = false, children } = $props();
 
   const PROFILE = 'M0 30 L20 38 L45 70 L70 92 L95 96 L120 88 L140 94 L165 80 L185 62 L210 58 L235 50 L255 46 L275 40 L300 36';
 </script>
 
-<div class="band" class:tall class:flat class:pill>
-  <!-- Flat, the band is one line high: no room for the profile. -->
-  {#if !flat}
-    <svg class="profile" viewBox="0 0 300 140" preserveAspectRatio="none" aria-hidden="true">
-      <path d="{PROFILE} V140 H0 Z" class="area" />
-      <path d={PROFILE} class="line" vector-effect="non-scaling-stroke" />
-    </svg>
+<div class="band" class:tall class:over-map={overMap} class:pill>
+  <svg class="profile" viewBox="0 0 300 140" preserveAspectRatio="none" aria-hidden="true">
+    <path d="{PROFILE} V140 H0 Z" class="area" />
+    <path d={PROFILE} class="line" vector-effect="non-scaling-stroke" />
+  </svg>
+  {#if !overMap}
     <svg class="wave" viewBox="0 0 300 18" preserveAspectRatio="none" aria-hidden="true"><path d="M0 11 Q37.5 2 75 11 T150 11 T225 11 T300 11 V18 H0 Z" /></svg>
   {/if}
   {#if summary}<p class="summary od-value">{summary}</p>{/if}
@@ -46,12 +45,13 @@
         --od-band-h: calc(var(--f7-safe-area-top) + 242px);
       }
 
-      &.flat {
+      /* Only the wave's height runs over the map: its pins stay in view. */
+      &.over-map {
         z-index: 3;
-        margin-bottom: -24px;
-        padding-bottom: 16px;
-        border-radius: 0 0 24px 24px;
-        box-shadow: 0 2px 8px rgb(0 0 0 / 0.12);
+        margin-bottom: -18px;
+        mask:
+          linear-gradient(#000, #000) top / 100% calc(100% - 17px) no-repeat,
+          url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%20300%2018%27%20preserveAspectRatio%3D%27none%27%3E%3Cpath%20d%3D%27M0%200%20H300%20V11%20Q262.5%202%20225%2011%20T150%2011%20T75%2011%20T0%2011%20Z%27%20fill%3D%27black%27/%3E%3C/svg%3E") bottom / 100% 18px no-repeat;
       }
     }
 
