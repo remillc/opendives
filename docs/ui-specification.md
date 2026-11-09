@@ -427,3 +427,5 @@ Retries are automatic for the unreachable server (every 5 minutes, then less oft
 
 **Edit dive form, rebreather cylinders (decided on 9 November 2026).** In a rebreather dive (CCR), the cylinders used as Diluant and Oxygène have no "Changement de gaz à" field and no MOD helper: the gas switch depth only applies to open-circuit and bailout cylinders. Choosing the use "Oxygène" sets O₂ to 100 % and He to 0; choosing "Diluant" sets O₂ to 21 % and He to 0 as a starting value. Both stay editable. Mock-up: `android-edition.dc.html`.
 
+**Statistics charts in blue (decided on 9 November 2026).** Charts that do not measure depth (dives per year, dive durations, and any count or time) use the tertiary role: a ramp from #5B8BCB for the smallest value to #24589A for the largest (3.5:1 to 7.2:1 on the white card; dark mode from #8AB4F8 down to #5B8BCB on the dark card, to be checked on screen). Charts of depth keep the water colours. The Carnet keeps no blue: its only charts are the profile thumbnails, which are water. Mock-up: `android-stats.dc.html`.
+
