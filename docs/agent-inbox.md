@@ -808,7 +808,9 @@ Christian wants it done now (no longer waiting for v1). Spec: "Own git repositor
 
 Done in the branch `feature/own-git-repository` (Android only; there is no iOS project yet). Still to check by Christian with a real token: the authenticated check, the first push to the empty private repository and a sync (see the branch report).
 
-## [ ] 2026-11-09-12 Dive detail: the whole screen exactly as the mock-up, water gradient missing
+## [x] 2026-11-09-12 Dive detail: the whole screen exactly as the mock-up, water gradient missing
+
+Done in Dive detail: match the mock-up, dark mode values from the specification
 
 Christian, on the canvas (mock-up `docs/mockups/detail3-android.dc.html`): in the app, the area under the profile is a single grey, and the app's view is different from the mock-up. Rework it so the profile card matches the mock-up.
 - The water column is a vertical gradient: `--od-water-top` (#FBE3B2) at 0 m, down to a mix of `--od-water-top` and `--od-water-bottom` (#B4530F) in the ratio max depth / 60 m. The mock-up's 39 m dive ends at about 65 % of the way to #B4530F. The trace stays #1F2124 on top.
