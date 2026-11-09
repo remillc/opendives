@@ -876,3 +876,8 @@ Christian approved this. Spec: "Settings, logbook dive computers (rename, remove
 - "Fusionner avec <name>": confirmation dialog, then for every dive of the duplicate, set the dive computer's model, device id and serial to those of the chosen computer, move the download fingerprint, remove the duplicate's device entry, mark the dives changed so they sync, and show the snackbar "Fusionné avec <name>" with "Annuler" (undo restores everything). Several candidates of the same model: "Fusionner avec…" opens a choice. The result must stay readable by Subsurface desktop: check it by opening the logbook there.
 - If the core cannot do the merge cleanly (for instance a dive that has both computers), stop and tell Christian before improvising.
 
+## [ ] 2026-11-09-19 Carnet menu: shortcut to "Ordinateurs du carnet"
+
+Christian approved this. Mock-up: `docs/mockups/android-carnet-menu.dc.html`. Spec: end of "Settings, logbook dive computers".
+- Add a third item "Ordinateurs du carnet" to the ⋮ menu of the Carnet, after "Renuméroter les plongées", with the dive computer icon of the mock-up. It opens the same page as the row in Réglages (task 2026-11-09-18). Back returns to the Carnet.
+
