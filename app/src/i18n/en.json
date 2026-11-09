@@ -112,7 +112,24 @@
     "importNoDives": "This file holds no dive. No dive was changed.",
     "importFailed": "This file could not be read. Files from Subsurface (.ssrf, .xml), divelogs.de and other logbooks are accepted. No dive was changed.",
     "importing": "Importing the file",
-    "menuExport": "Export as…"
+    "menuExport": "Export as…",
+    "menuDeleteTrip": {
+      "one": "Delete this trip",
+      "other": "Delete these trips"
+    },
+    "deleteTripTitle": {
+      "one": "Delete this trip?",
+      "other": "Delete these {n} trips?"
+    },
+    "deleteTripText": {
+      "one": "Its dives stay in the logbook, outside any trip.",
+      "other": "Their dives stay in the logbook, outside any trip."
+    },
+    "deleteTripAction": "Delete",
+    "tripDeleted": {
+      "one": "Trip deleted, its dives are kept",
+      "other": "{n} trips deleted, their dives are kept"
+    }
   },
   "sync": {
     "syncing": "Syncing with the Subsurface cloud…",
@@ -824,14 +841,14 @@
     "mergeWith": "Merge with",
     "addDives": "Add dives",
     "addDive": "Add to the trip",
-    "ungroup": "Ungroup the trip",
-    "ungroupTitle": "Ungroup the trip?",
-    "ungroupText": "The dives stay in the logbook, outside any trip.",
+    "ungroup": "Delete this trip",
+    "ungroupTitle": "Delete this trip?",
+    "ungroupText": "Its dives stay in the logbook, outside any trip.",
     "noOtherTrip": "No other trip in the logbook",
     "noLooseDive": "Every dive is already in a trip",
     "edit": "Edit the trip",
     "done": "Trip changed",
-    "ungroupConfirm": "Ungroup"
+    "ungroupConfirm": "Delete"
   },
   "sites": {
     "title": "Sites",
@@ -1271,7 +1288,8 @@
       "Logbook: rows aligned with the design (no dividers), the dives of an expanded trip in a white surface. Account: same header as the sections.",
       "Logbook: a trip of one dive is shown as a dive, without an arrow.",
       "Logbook: while dragging a dive, a horizontal bar shows where it would be dropped.",
-      "Logbook: the dive number is back before the date; an open trip is indented, and its dives can be checked in selection mode."
+      "Logbook: the dive number is back before the date; an open trip is indented, and its dives can be checked in selection mode.",
+      "Logbook: a trip can be selected; “Delete this trip” removes the trip and keeps its dives."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",

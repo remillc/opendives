@@ -176,6 +176,53 @@
 
   const checkedIds = $derived(Object.keys(checked).filter((id) => checked[Number(id)]).map(Number));
 
+  /** The dives of a trip. @param {number} tripId */
+  const diveIdsOfTrip = (tripId) => logbook.dives.filter((d) => d.trip?.id === tripId).map((d) => d.id);
+
+  /** The trips all of whose dives are checked: selecting a trip checks its dives. */
+  const checkedTrips = $derived.by(() => {
+    /** @type {Set<number>} */
+    const whole = new Set(logbook.dives.flatMap((d) => (d.trip && checked[d.id] ? [d.trip.id] : [])));
+    for (const d of logbook.dives) if (d.trip && !checked[d.id]) whole.delete(d.trip.id);
+    return [...whole];
+  });
+
+  /** A long press on a trip, or a tap on it while selecting. @param {number} tripId */
+  function selectTrip(tripId) {
+    const ids = diveIdsOfTrip(tripId);
+    if (!ids.length) return;
+    if (!selecting) startSelection(ids[0]);
+    for (const id of ids) checked[id] = true;
+  }
+
+  /** @param {number} tripId */
+  function toggleTripChecked(tripId) {
+    const ids = diveIdsOfTrip(tripId);
+    const all = ids.every((id) => checked[id]);
+    for (const id of ids) checked[id] = !all;
+    if (!Object.values(checked).some(Boolean)) endSelection();
+  }
+
+  /** "Supprimer ce voyage": the trip goes, its dives stay in the logbook. One undoable step. */
+  function deleteCheckedTrips() {
+    const n = checkedTrips.length;
+    const diveIds = checkedTrips.flatMap(diveIdsOfTrip);
+    confirmAction({
+      title: t('logbook.deleteTripTitle', { n }),
+      text: t('logbook.deleteTripText', { n }),
+      action: t('logbook.deleteTripAction'),
+      onConfirm: async () => {
+        try {
+          await tripChange({ action: 'remove', diveIds });
+          endSelection();
+          offerUndo(t('logbook.tripDeleted', { n }));
+        } catch (e) {
+          changeFailed(e);
+        }
+      },
+    });
+  }
+
   /**
    * The trips just above and below the checked dives, when these are dives
    * outside trips that follow one another in the list: "Add to the trip
@@ -341,10 +388,25 @@
     /** @param {Event} e */
     const diveOf = (e) => /** @type {HTMLElement|null} */ (/** @type {HTMLElement} */ (e.target).closest('a.dive-row'));
 
+    /** The trip a long press is on: let go, it is selected. */
+    let pressedTrip = 0;
+
     /** @param {PointerEvent} e */
     function down(e) {
       pressed = false;
       dragIds = null;
+      pressedTrip = 0;
+      const target = /** @type {HTMLElement} */ (e.target);
+      const tripRow = /** @type {HTMLElement|null} */ (target.closest('li.trip-row'));
+      if (tripRow && !target.closest('.expand')) {
+        startX = e.clientX;
+        startY = e.clientY;
+        timer = setTimeout(() => {
+          pressed = true;
+          pressedTrip = Number(tripRow.dataset.trip) || 0;
+        }, LONG_PRESS_MS);
+        return;
+      }
       const row = diveOf(e);
       if (!row) return;
       startX = e.clientX;
@@ -397,8 +459,15 @@
         return;
       }
       if (!selecting) return;
+      // In selection mode a dive or a trip is checked, not opened.
+      const trip = /** @type {HTMLElement|null} */ (/** @type {HTMLElement} */ (e.target).closest('li.trip-row'));
+      if (trip) {
+        toggleTripChecked(Number(trip.dataset.trip));
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
       const row = diveOf(e);
-      // In selection mode a dive is checked, not opened; a trip still opens.
       if (!row) return;
       toggleChecked(Number(row.dataset.dive));
       e.preventDefault();
@@ -588,14 +657,17 @@
           if (!selecting) startSelection(id);
           else checked[id] = true;
         }
+        if (pressedTrip) selectTrip(pressedTrip);
       }
       dragIds = null;
+      pressedTrip = 0;
     }
 
     function touchCancel() {
       if (dragging) endDrag();
       dragRow?.classList.remove('od-drag-lift');
       dragIds = null;
+      pressedTrip = 0;
     }
 
     el.addEventListener('pointerdown', down);
@@ -1111,7 +1183,10 @@
       {/if}
       {#if selecting}
         <MenuItem icon="plus" text={t('logbook.menuCreateTrip')} onclick={createTrip} />
-        {#if checkedInTrip.length}
+        {#if checkedTrips.length}
+          <MenuItem icon="ungroup" text={t('logbook.menuDeleteTrip', { n: checkedTrips.length })} destructive onclick={deleteCheckedTrips} />
+        {/if}
+        {#if checkedInTrip.some((id) => !checkedTrips.includes(logbook.dives.find((d) => d.id === id)?.trip?.id ?? 0))}
           <MenuItem icon="remove" text={t('logbook.menuRemoveFromTrip', { n: checkedInTrip.length })} onclick={removeFromTrip} />
         {/if}
         {#if neighbourTrips.above}
@@ -1153,6 +1228,8 @@
               ontoggle={() => toggleTrip(row.id)}
               index={row.index}
               top={visible.topPosition}
+              {selecting}
+              checked={checkedTrips.includes(row.id)}
             />
           {:else}
             <DiveRow

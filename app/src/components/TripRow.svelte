@@ -18,10 +18,14 @@
    *   ontoggle: () => void,
    *   index?: number,
    *   top?: number,
+   *   selecting?: boolean,
+   *   checked?: boolean,
    * }}
    * `index` and `top`: position in the logbook's virtual list.
+   * `selecting`, `checked`: the logbook's selection mode, a check box before
+   * the row, checked when all the trip's dives are; the logbook handles the taps.
    */
-  let { dives, location, prefs, expanded, ontoggle, index = undefined, top = undefined } = $props();
+  let { dives, location, prefs, expanded, ontoggle, index = undefined, top = undefined, selecting = false, checked = false } = $props();
 
   // Dives arrive from the most recent to the oldest.
   const start = $derived(dives[dives.length - 1].date);
@@ -50,7 +54,16 @@
 
 <li class="trip-row" data-trip={dives[0].trip?.id} data-virtual-list-index={index} style:top={top === undefined ? undefined : `${top}px`}>
   <!-- The row opens the trip screen (spec, section 4, "Trip"); the arrow expands the trip in place. -->
-  <a href="/trips/{dives[0].trip?.id}" draggable="false" class="item-link item-content no-chevron">
+  <a
+    href="/trips/{dives[0].trip?.id}"
+    draggable="false"
+    class="item-link item-content no-chevron"
+    role={selecting ? 'checkbox' : undefined}
+    aria-checked={selecting ? checked : undefined}
+  >
+    {#if selecting}
+      <span class="checkbox" aria-hidden="true"><input type="checkbox" {checked} tabindex="-1" /><i class="icon-checkbox"></i></span>
+    {/if}
     <div class="item-media">
       <div class="grid" aria-hidden="true">
         {#each preview as d (d.id)}
@@ -86,6 +99,17 @@
       grid-template-columns: 1fr 1fr;
       grid-template-rows: 1fr 1fr;
       gap: 2px;
+    }
+
+    .checkbox {
+      flex: none;
+      margin-right: 16px;
+      pointer-events: none;
+
+      /* Android: the row's own 16 dp gap. */
+      :global(.md) & {
+        margin-right: 0;
+      }
     }
 
     /* 48 px touch target for the arrow, separate from the row's link. */

@@ -112,7 +112,24 @@
     "importNoDives": "Ce fichier ne contient aucune plongée. Aucune plongée n'a été modifiée.",
     "importFailed": "Ce fichier n'a pas pu être lu. Les fichiers de Subsurface (.ssrf, .xml), de divelogs.de et d'autres carnets sont acceptés. Aucune plongée n'a été modifiée.",
     "importing": "Import du fichier en cours",
-    "menuExport": "Exporter au format…"
+    "menuExport": "Exporter au format…",
+    "menuDeleteTrip": {
+      "one": "Supprimer ce voyage",
+      "other": "Supprimer ces voyages"
+    },
+    "deleteTripTitle": {
+      "one": "Supprimer ce voyage ?",
+      "other": "Supprimer ces {n} voyages ?"
+    },
+    "deleteTripText": {
+      "one": "Ses plongées restent dans le carnet, hors de tout voyage.",
+      "other": "Leurs plongées restent dans le carnet, hors de tout voyage."
+    },
+    "deleteTripAction": "Supprimer",
+    "tripDeleted": {
+      "one": "Voyage supprimé, ses plongées sont conservées",
+      "other": "{n} voyages supprimés, leurs plongées sont conservées"
+    }
   },
   "sync": {
     "syncing": "Synchronisation avec le cloud Subsurface…",
@@ -824,14 +841,14 @@
     "mergeWith": "Fusionner avec",
     "addDives": "Ajouter des plongées",
     "addDive": "Ajouter au voyage",
-    "ungroup": "Défaire le voyage",
-    "ungroupTitle": "Défaire le voyage ?",
-    "ungroupText": "Les plongées restent dans le carnet, hors de tout voyage.",
+    "ungroup": "Supprimer ce voyage",
+    "ungroupTitle": "Supprimer ce voyage ?",
+    "ungroupText": "Ses plongées restent dans le carnet, hors de tout voyage.",
     "noOtherTrip": "Aucun autre voyage dans le carnet",
     "noLooseDive": "Toutes les plongées sont déjà dans un voyage",
     "edit": "Modifier le voyage",
     "done": "Voyage modifié",
-    "ungroupConfirm": "Défaire"
+    "ungroupConfirm": "Supprimer"
   },
   "sites": {
     "title": "Sites",
@@ -1271,7 +1288,8 @@
       "Carnet : lignes alignées sur la maquette (sans séparateurs), plongées d’un voyage déplié dans un cadre blanc. Compte : même en-tête que les sections.",
       "Carnet : un voyage d’une seule plongée s’affiche comme une plongée, sans flèche.",
       "Carnet : pendant le glisser-déposer d’une plongée, une barre horizontale montre où elle serait déposée.",
-      "Carnet : le numéro de la plongée revient devant la date ; un voyage ouvert est décalé, et ses plongées se cochent en mode sélection."
+      "Carnet : le numéro de la plongée revient devant la date ; un voyage ouvert est décalé, et ses plongées se cochent en mode sélection.",
+      "Carnet : un voyage se sélectionne ; « Supprimer ce voyage » retire le voyage et garde ses plongées."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
