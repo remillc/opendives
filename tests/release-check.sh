@@ -23,9 +23,14 @@ set -uo pipefail
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
 cd "$ROOT"
 OUT=$ROOT/build/release-check
-# Under WSL, node is the Windows one.
+# Under WSL, node is the Windows one, and a Windows program only sees the variables listed in WSLENV.
 NODE=$(command -v node || command -v node.exe || true)
 [ -n "$NODE" ] || { echo "node not found"; exit 2; }
+export WSLENV="${WSLENV:+$WSLENV:}OD_JS_MUTATE"
+# A git worktree made by Windows git has a .git file WSL's git cannot follow: use git.exe then.
+GIT=git
+git rev-parse HEAD >/dev/null 2>&1 || GIT=git.exe
+git() { "$GIT" "$@" | tr -d '\r'; }
 mkdir -p "$OUT/logs"
 
 commit() { git rev-parse HEAD; }

@@ -33,7 +33,10 @@ list(APPEND SOURCES
   "${ROOT}/core/libopendives/stats.cpp"
   "${ROOT}/core/libopendives/download.cpp")
 
-file(WRITE "${CMAKE_BINARY_DIR}/gen/build-defs.h" "#define SUBSURFACE_SOURCE \"\"\n")
+# Written once: a new time stamp at each configuration would rebuild the whole core.
+if(NOT EXISTS "${CMAKE_BINARY_DIR}/gen/build-defs.h")
+  file(WRITE "${CMAKE_BINARY_DIR}/gen/build-defs.h" "#define SUBSURFACE_SOURCE \"\"\n")
+endif()
 
 # The core and the façade once, the two tests on top.
 add_library(core_objs OBJECT ${SOURCES})
