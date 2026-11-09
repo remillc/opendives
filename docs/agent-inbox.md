@@ -761,7 +761,9 @@ Christian wants the "Bibliothèques libres" screen (`app/src/pages/AboutLibrarie
 - Same two groups and rows as now, but each row is a link: the external-link icon on the right (as "Code source" on the About screen), the whole row tappable, opening the library's website in the system browser; screen-reader label "<name>, <licence> (s’ouvre dans le navigateur)".
 - Websites: Subsurface https://subsurface-divelog.org, libdivecomputer https://www.libdivecomputer.org, libgit2 https://libgit2.org, libxml2 https://gitlab.gnome.org/GNOME/libxml2, libxslt https://gitlab.gnome.org/GNOME/libxslt, libzip https://libzip.org, OpenSSL https://www.openssl.org, SQLite https://sqlite.org, Capacitor https://capacitorjs.com, Framework7 https://framework7.io, Svelte https://svelte.dev, MapLibre GL JS https://maplibre.org, Source Sans 3 https://github.com/adobe-fonts/source-sans.
 
-## [ ] 2026-11-09-07 Settings: equipment defaults for open circuit and rebreather, cylinder types, profile rows
+## [x] 2026-11-09-07 Settings: equipment defaults for open circuit and rebreather, cylinder types, profile rows
+
+Done in the branch `feature/settings-equipment-defaults`. The dive editor adds the rebreather cylinders when the mode is changed to CCR or pSCR; a dive downloaded in that mode keeps the cylinders of its computer.
 
 Christian asked to send these Settings changes. Mock-ups: `android-reglages.dc.html` (and its six variants), `reglages-bouteille-choix-android.dc.html`, `reglages-secours-android.dc.html`, `reglages-bouteilles-android.dc.html`, `reglages-bouteille-type-android.dc.html`, `reglages-bouteille-modifier-android.dc.html`. Spec: the Settings table and "Cylinder types sub-screen".
 - Carnet: "Regrouper les plongées en voyages" loses its helper line. The water-type switch reads "Choisir le type d’eau dans l’éditeur", helper "Ajoute le champ dans Modifier une plongée. Sinon, l’app garde celui de l’ordinateur de plongée", on by default.

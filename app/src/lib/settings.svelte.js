@@ -35,6 +35,9 @@ export const DEFAULT_SAC_FACTOR = 200;
  * @property {'fresh'|'salt'|'en13319'} defaultWater "Conditions par défaut": the water type a new
  *   plan and the gas calculator start from
  * @property {number} defaultAltitudeMm "Conditions par défaut": the altitude a new plan starts from, mm
+ * @property {string} defaultDiluent cylinder type added as diluent when a dive becomes CCR or pSCR
+ * @property {string} defaultOxygen the same for the oxygen cylinder
+ * @property {string[]} defaultBailout the same for the bailout cylinders (open-circuit use)
  */
 
 /** @type {AppSettings} */
@@ -48,6 +51,9 @@ const APP_DEFAULTS = {
   paperSize: 'system',
   defaultWater: 'salt',
   defaultAltitudeMm: 0,
+  defaultDiluent: '',
+  defaultOxygen: '',
+  defaultBailout: [],
 };
 
 /**
@@ -119,6 +125,10 @@ export function applyDeviceSettings() {
   // OpenDives' default stress factor (spec, "Planner settings") instead of the
   // core's 4.0, unless the diver has chosen one.
   storedCore.sacFactor ??= DEFAULT_SAC_FACTOR;
+  // "Choisir le type d’eau dans l’éditeur" is on by default in OpenDives; the
+  // depth grid is no longer a setting: the core's default.
+  storedCore.salinityEdit ??= true;
+  delete storedCore.threeMGrid;
   // A value refused by this core (an older version kept something else): the others are kept.
   if (Object.keys(storedCore).length) {
     send('Restoring the settings of this device', () => OpenDivesCore.setPrefs({ changes: storedCore }));
@@ -213,7 +223,7 @@ export function setAppSetting(key, value) {
  * @param {Partial<CorePrefValues>} defaults
  */
 export async function resetAllSettings(defaults) {
-  await OpenDivesCore.setPrefs({ changes: defaults });
+  await OpenDivesCore.setPrefs({ changes: { ...defaults, salinityEdit: true } });
   for (const key of Object.keys(storedCore)) delete storedCore[/** @type {keyof CorePrefValues} */ (key)];
   writeJson(CORE_KEY, null);
   // The cylinder types too: back to Subsurface's standard list (Christian's choice).

@@ -13,6 +13,7 @@
   import Account from './pages/Account.svelte';
   import DeleteAccount from './pages/DeleteAccount.svelte';
   import WelcomeStart from './pages/WelcomeStart.svelte';
+  import SettingsBailout from './pages/SettingsBailout.svelte';
   import Plans from './pages/Plans.svelte';
   import SignIn from './pages/SignIn.svelte';
   import CreateAccount from './pages/CreateAccount.svelte';
@@ -77,6 +78,7 @@
     { path: '/about/licence', component: AboutText, options: { props: { which: 'licence' } } },
     { path: '/about/privacy', component: AboutText, options: { props: { which: 'privacy' } } },
     { path: '/about/libraries', component: AboutLibraries },
+    { path: '/settings/bailout', component: SettingsBailout },
     { path: '/settings/cylinders/', component: CylinderTypes },
     { path: '/settings/cylinders/new', component: CylinderType },
     { path: '/settings/cylinders/type', component: CylinderType },

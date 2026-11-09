@@ -399,8 +399,7 @@
       "seconds": "Degrees, minutes, seconds"
     },
     "autogroup": {
-      "label": "Group dives into trips",
-      "text": "Saved in the logbook, shared with your other devices"
+      "label": "Group dives into trips"
     },
     "invalidDives": {
       "label": "Show invalid dives",
@@ -411,13 +410,19 @@
       "text": "Adds these three conditions when editing a dive"
     },
     "salinity": {
-      "label": "Edit water salinity",
-      "text": "Otherwise the water type comes from the dive computer"
+      "label": "Choose the water type in the editor",
+      "text": "Adds the field to Edit dive. Otherwise the app keeps the one from the dive computer"
     },
     "defaultCylinder": {
-      "label": "Default cylinder",
+      "label": "Cylinder, open circuit",
       "text": "Added to dives logged by hand",
-      "none": "None"
+      "none": "None",
+      "noneText": "To choose in each dive",
+      "listNote": "The list follows Settings › Cylinder types.",
+      "diluent": "Diluent, rebreather",
+      "oxygen": "Oxygen, rebreather",
+      "bailout": "Bailout, rebreather",
+      "bailoutText": "One or more cylinders"
     },
     "unusedTanks": {
       "label": "Show unused cylinders",
@@ -432,20 +437,11 @@
       "text": "Add, rename, remove"
     },
     "averageDepth": "Mean depth",
-    "depthGrid": {
-      "label": "Depth grid",
-      "text": "Or by multiples of 3: 3, 6, 15",
-      "textThree": "Or by 1, 2, 5 or 10",
-      "standard": "1, 2, 5, 10",
-      "three": "3, 6, 15",
-      "standardText": "Lines at 1, 2, 5 or 10",
-      "threeText": "Lines at multiples of 3"
-    },
     "dcCeiling": "Ceiling from the dive computer",
     "redCeiling": "Ceiling in red",
     "calcCeiling": {
       "label": "Calculated ceiling",
-      "text": "With the decompression model below"
+      "text": "Shows the ceiling calculated with the decompression model below"
     },
     "tankbar": {
       "label": "Tank bar",
@@ -541,11 +537,10 @@
       "hidden": "Standard sizes are hidden: the “Offer standard sizes” setting is off.",
       "add": "Add a type",
       "newTitle": "New type",
-      "editTitle": "Cylinder type",
+      "editTitle": "Edit type",
       "name": "Name",
-      "volume": "Volume ({unit})",
-      "pressure": "Working pressure ({unit})",
-      "pressureHelp": "Optional for a volume in litres",
+      "volume": "Volume",
+      "pressure": "Working pressure",
       "delete": "Remove this type",
       "deleteTitle": "Remove {name}?",
       "deleteText": "The type is no longer offered. Existing dives do not change.",
@@ -555,7 +550,19 @@
       "nameMissing": "Enter a name",
       "volumeInvalid": "Enter a volume greater than 0",
       "pressureInvalid": "Enter a valid pressure",
-      "renamed": "Type renamed"
+      "renamed": "Type renamed",
+      "nameHelp": "The name shown when choosing the type of a cylinder",
+      "unused": "Unused",
+      "inNoDive": "In no dive",
+      "inOneDive": "In 1 dive",
+      "inDives": "In {n} dives",
+      "usedInNoDive": "used in no dive",
+      "usedInOneDive": "used in 1 dive",
+      "usedInDives": "used in {n} dives",
+      "noteStandard": "Standard type, {use}. Renaming it also renames the cylinders of this type in the logbook. Changing its size does not change existing dives.",
+      "noteYours": "Your own type, {use}. Renaming it also renames the cylinders of this type in the logbook. Changing its size does not change existing dives.",
+      "volumeNoteCuft": "The volume of gas at working pressure, in cubic feet. In metric units, you enter the water volume of the cylinder in litres.",
+      "volumeNoteLitres": "The water volume of the cylinder, in litres. In imperial units, you enter the volume of gas at working pressure, in cubic feet. The working pressure is optional for a volume in litres."
     },
     "paperSize": {
       "label": "Paper size",
@@ -567,7 +574,16 @@
       "waterType": "Water type",
       "altitude": "Altitude",
       "note": "The planner starts from these values. They can be changed for each plan."
-    }
+    },
+    "bailout": {
+      "intro": "Added to rebreather dives as open-circuit cylinders. The gas is then set in each dive.",
+      "change": "Change",
+      "remove": "Remove {name}",
+      "add": "Add a bailout cylinder",
+      "note": "No cylinder: rebreather dives only have the diluent and the oxygen."
+    },
+    "dcCeilingText": "Shows the ceiling given by the dive computer",
+    "redCeilingText": "The computer’s ceiling in red rather than as a cut-out"
   },
   "gas": {
     "air": "Air",
@@ -1237,7 +1253,8 @@
       "Edit dive: every cylinder shows all its fields, no collapsed lines.",
       "Share: a PDF icon for the sheet. Export: the first format is named “Logbook file (.ssrf)”.",
       "About: each open source library opens its website in the browser.",
-      "Planner: the SAC factor under stress is 2.0 by default."
+      "Planner: the SAC factor under stress is 2.0 by default.",
+      "Settings: default cylinders for open circuit and rebreather (diluent, oxygen, bailout), added when a dive becomes a rebreather dive. Cylinder types: number of dives and a new form. Profile: ceilings reordered, depth grid removed."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",

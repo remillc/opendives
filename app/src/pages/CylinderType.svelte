@@ -9,12 +9,13 @@
   import { onMount } from 'svelte';
   import { Page, Navbar, Link, f7 } from 'framework7-svelte';
   import { OpenDivesCore } from 'opendives-core';
+  import Icon from '../components/Icon.svelte';
   import TextField from '../components/TextField.svelte';
   import { t } from '../lib/i18n.js';
   import { logbook, renameCylinderType } from '../lib/logbook.svelte.js';
   import { keepCylinderLibrary } from '../lib/settings.svelte.js';
   import { confirmAction } from '../lib/dialogs.js';
-  import { locale } from '../lib/format.js';
+  import { formatNumber, locale } from '../lib/format.js';
 
   /** @type {{ f7route: { query: { name?: string } }, f7router: any }} */
   let { f7route, f7router } = $props();
@@ -114,6 +115,14 @@
     }
   }
 
+  /** "Type standard, utilisé dans 3 plongées." and what a change does. */
+  const usageNote = $derived.by(() => {
+    if (!type) return '';
+    const n = type.dives;
+    const use = t(n === 0 ? 'settings.cylinders.usedInNoDive' : n === 1 ? 'settings.cylinders.usedInOneDive' : 'settings.cylinders.usedInDives', { n: formatNumber(n, 0) });
+    return t(type.standard ? 'settings.cylinders.noteStandard' : 'settings.cylinders.noteYours', { use });
+  });
+
   function remove() {
     confirmAction({
       title: t('settings.cylinders.deleteTitle', { name: original }),
@@ -135,8 +144,8 @@
   <Navbar title={editing ? t('settings.cylinders.editTitle') : t('settings.cylinders.newTitle')}>
     {#snippet left()}
       <Link back iconOnly>
-        <i class="icon icon-back"></i>
-        <span class="od-sr-only">{t('detail.back')}</span>
+        <Icon name="close" />
+        <span class="od-sr-only">{t('plan.chooseClose')}</span>
       </Link>
     {/snippet}
     {#snippet right()}
@@ -145,19 +154,18 @@
   </Navbar>
 
   <div class="od-form-surface">
-    <TextField label={t('settings.cylinders.name')} bind:value={name} supporting={error} invalid={!!error} />
-    <TextField
-      label={t('settings.cylinders.volume', { unit: t(cuft ? 'units.cubicFeet' : 'units.liters') })}
-      bind:value={volume}
-      inputmode="decimal"
-    />
-    <TextField
-      label={t('settings.cylinders.pressure', { unit: t(psi ? 'units.psi' : 'units.bar') })}
-      bind:value={pressure}
-      inputmode="decimal"
-      supporting={cuft ? '' : t('settings.cylinders.pressureHelp')}
-    />
+    <TextField label={t('settings.cylinders.name')} bind:value={name} supporting={error || t('settings.cylinders.nameHelp')} invalid={!!error} />
+    <div class="pair">
+      <TextField label={t('settings.cylinders.volume')} bind:value={volume} inputmode="decimal">
+        {#snippet trailing()}<span class="unit">{t(cuft ? 'units.cubicFeet' : 'units.liters')}</span>{/snippet}
+      </TextField>
+      <TextField label={t('settings.cylinders.pressure')} bind:value={pressure} inputmode="decimal">
+        {#snippet trailing()}<span class="unit">{t(psi ? 'units.psi' : 'units.bar')}</span>{/snippet}
+      </TextField>
+    </div>
   </div>
+  <p class="note first">{t(cuft ? 'settings.cylinders.volumeNoteCuft' : 'settings.cylinders.volumeNoteLitres')}</p>
+  {#if usageNote}<p class="note">{usageNote}</p>{/if}
 
   {#if editing && type}
     {#if type.library}
@@ -172,14 +180,34 @@
 
 <style>
   @layer od.components {
+    .pair {
+      display: flex;
+      gap: 16px;
+
+      & > :global(*) {
+        flex: 1;
+        min-width: 0;
+      }
+    }
+
+    .unit {
+      padding-inline-end: 12px;
+      font-size: 14px;
+      color: var(--od-text-2);
+    }
+
     .action {
       margin-top: 24px;
       display: flex;
       justify-content: center;
     }
 
+    .note.first {
+      margin-top: 12px;
+    }
+
     .note {
-      margin: 24px 20px 0;
+      margin: 8px 20px 0;
       font-size: 13px;
       line-height: 18px;
       color: var(--od-text-2);

@@ -5,6 +5,9 @@
 // mobile-widgets/qml/Settings.qml), and the cylinder types library, ported
 // from qt-models/tankinfomodel.cpp without Qt.
 #include "opendives.h"
+#include "core/dive.h"
+#include <set>
+#include <map>
 #include "internal.h"
 #include "json.h"
 
@@ -468,6 +471,17 @@ int cylinder_types(std::string &json)
 	// TankInfoModel shows the table sorted by name, ignoring case.
 	std::stable_sort(sorted.begin(), sorted.end(),
 			 [](const tank_info *a, const tank_info *b) { return name_less(a->name, b->name); });
+	// How many dives (plans left out) use each type: "Dans 12 plongées".
+	std::map<std::string, int> dives_using;
+	for (const auto &d: divelog.dives) {
+		if (internal::is_plan_only(*d))
+			continue;
+		std::set<std::string> names;
+		for (const cylinder_t &cyl: d->cylinders)
+			names.insert(cyl.type.description);
+		for (const std::string &n: names)
+			dives_using[n]++;
+	}
 	json = "{\"types\":[";
 	bool first = true;
 	for (const tank_info *info: sorted) {
@@ -478,6 +492,7 @@ int cylinder_types(std::string &json)
 		json += "{\"name\":";
 		append_string(json, info->name);
 		json += ",\"ml\":" + std::to_string(size.mliter) + ",\"mbar\":" + std::to_string(pressure.mbar);
+		json += ",\"dives\":" + std::to_string(dives_using[info->name]);
 		json += ",\"standard\":";
 		json += get_tank_info(standard, info->name) ? "true" : "false";
 		json += ",\"library\":";

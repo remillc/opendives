@@ -287,6 +287,25 @@
     c.f.size = sizeText(type.ml, type.workingPressureMbar);
   }
 
+  /**
+   * A cylinder of Settings for a rebreather dive, unless the dive already has it.
+   * @param {string} use @param {string} name @param {number} o2
+   */
+  function addConfiguredCylinder(use, name, o2) {
+    if (!name || cylinders.some((c) => c.f.use === use && c.f.description === name)) return;
+    const texts = { description: name, use, size: '', workingPressure: '', start: '', end: '', o2: show(o2), he: show(0), depth: '' };
+    cylinders.push({ index: -1, protected: false, f: { ...texts }, initial: texts });
+    chooseCylinderType(cylinders[cylinders.length - 1], name);
+  }
+
+  /** The dive becomes a rebreather dive: its cylinders from Settings. @param {string} mode */
+  function modeChanged(mode) {
+    if (mode !== 'CCR' && mode !== 'PSCR') return;
+    addConfiguredCylinder('diluent', settings.defaultDiluent, 21);
+    addConfiguredCylinder('oxygen', settings.defaultOxygen, 100);
+    for (const name of settings.defaultBailout) addConfiguredCylinder('OC-gas', name, 21);
+  }
+
   function addCylinder() {
     const texts = { description: '', use: 'OC-gas', size: '', workingPressure: '', start: '', end: '', o2: show(21), he: show(0), depth: '' };
     cylinders.push({ index: -1, protected: false, f: { ...texts }, initial: texts });
@@ -571,7 +590,7 @@
       {@render header('equipment', t('edit.equipmentGroup'))}
       {#if open.equipment}
         <ComboField label={t('edit.suit')} bind:value={f.suit} options={known.suit} />
-        <SelectField label={t('edit.divemode')} bind:value={f.divemode} options={modeOptions} />
+        <SelectField label={t('edit.divemode')} bind:value={f.divemode} options={modeOptions} onchange={modeChanged} />
 
         {#each cylinders as c, i (i)}
           {@const cb = cylinderBad(c)}

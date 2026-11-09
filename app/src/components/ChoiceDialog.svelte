@@ -15,9 +15,10 @@
    *   value: string,
    *   onselect: (value: string) => void,
    *   oncancel: () => void,
+   *   note?: string,
    * }}
    */
-  let { title, options, value, onselect, oncancel } = $props();
+  let { title, options, value, onselect, oncancel, note = '' } = $props();
 
   // svelte-ignore state_referenced_locally
   let selected = $state(value);
@@ -35,6 +36,7 @@
       </label>
     {/each}
   </div>
+  {#if note}<p class="note">{note}</p>{/if}
   {#snippet actions()}
     <button type="button" onclick={oncancel}>{t('dialog.cancel')}</button>
     <button type="button" onclick={() => onselect(selected)}>{t('dialog.ok')}</button>
@@ -46,6 +48,13 @@
     .choices {
       display: flex;
       flex-direction: column;
+    }
+
+    .note {
+      margin: 8px 24px 0;
+      font-size: 13px;
+      line-height: 18px;
+      color: var(--od-text-2);
     }
 
     .choice {

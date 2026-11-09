@@ -399,8 +399,7 @@
       "seconds": "Degrés, minutes, secondes"
     },
     "autogroup": {
-      "label": "Regrouper les plongées en voyages",
-      "text": "Enregistré dans le carnet, partagé avec vos autres appareils"
+      "label": "Regrouper les plongées en voyages"
     },
     "invalidDives": {
       "label": "Afficher les plongées invalides",
@@ -411,13 +410,19 @@
       "text": "Ajoute ces trois conditions quand on modifie une plongée"
     },
     "salinity": {
-      "label": "Modifier la salinité de l’eau",
-      "text": "Sinon, le type d’eau vient de l’ordinateur de plongée"
+      "label": "Choisir le type d’eau dans l’éditeur",
+      "text": "Ajoute le champ dans Modifier une plongée. Sinon, l’app garde celui de l’ordinateur de plongée"
     },
     "defaultCylinder": {
-      "label": "Bouteille par défaut",
+      "label": "Bouteille, circuit ouvert",
       "text": "Ajoutée aux plongées saisies à la main",
-      "none": "Aucune"
+      "none": "Aucune",
+      "noneText": "À choisir dans chaque plongée",
+      "listNote": "La liste suit Réglages › Types de bouteilles.",
+      "diluent": "Diluant, recycleur",
+      "oxygen": "Oxygène, recycleur",
+      "bailout": "Secours (bailout), recycleur",
+      "bailoutText": "Une ou plusieurs bouteilles"
     },
     "unusedTanks": {
       "label": "Afficher les bouteilles inutilisées",
@@ -432,20 +437,11 @@
       "text": "Ajouter, renommer, retirer"
     },
     "averageDepth": "Profondeur moyenne",
-    "depthGrid": {
-      "label": "Grille de profondeur",
-      "text": "Ou par multiples de 3 : 3, 6, 15",
-      "textThree": "Ou de 1, 2, 5 ou 10",
-      "standard": "1, 2, 5, 10",
-      "three": "3, 6, 15",
-      "standardText": "Lignes à 1, 2, 5 ou 10",
-      "threeText": "Lignes à des multiples de 3"
-    },
     "dcCeiling": "Plafond donné par l’ordinateur",
     "redCeiling": "Plafond en rouge",
     "calcCeiling": {
       "label": "Plafond calculé",
-      "text": "Selon le modèle de décompression ci-dessous"
+      "text": "Affiche le plafond calculé selon le modèle de décompression ci-dessous"
     },
     "tankbar": {
       "label": "Bande des bouteilles",
@@ -541,11 +537,10 @@
       "hidden": "Les tailles standard sont masquées : le réglage « Proposer les tailles standard » est désactivé.",
       "add": "Ajouter un type",
       "newTitle": "Nouveau type",
-      "editTitle": "Type de bouteille",
+      "editTitle": "Modifier le type",
       "name": "Nom",
-      "volume": "Volume ({unit})",
-      "pressure": "Pression de service ({unit})",
-      "pressureHelp": "Facultative pour un volume en litres",
+      "volume": "Volume",
+      "pressure": "Pression de service",
       "delete": "Retirer ce type",
       "deleteTitle": "Retirer {name} ?",
       "deleteText": "Le type n’est plus proposé. Les plongées existantes ne changent pas.",
@@ -555,7 +550,19 @@
       "nameMissing": "Indiquez un nom",
       "volumeInvalid": "Indiquez un volume plus grand que 0",
       "pressureInvalid": "Indiquez une pression valide",
-      "renamed": "Type renommé"
+      "renamed": "Type renommé",
+      "nameHelp": "Le nom affiché dans le choix du type d’une bouteille",
+      "unused": "Inutilisé",
+      "inNoDive": "Dans aucune plongée",
+      "inOneDive": "Dans 1 plongée",
+      "inDives": "Dans {n} plongées",
+      "usedInNoDive": "utilisé dans aucune plongée",
+      "usedInOneDive": "utilisé dans 1 plongée",
+      "usedInDives": "utilisé dans {n} plongées",
+      "noteStandard": "Type standard, {use}. Le renommer renomme aussi les bouteilles de ce type dans le carnet. Changer sa taille ne modifie pas les plongées existantes.",
+      "noteYours": "Type personnel, {use}. Le renommer renomme aussi les bouteilles de ce type dans le carnet. Changer sa taille ne modifie pas les plongées existantes.",
+      "volumeNoteCuft": "Le volume de gaz à la pression de service, en pieds cubes. En unités métriques, on saisit le volume d’eau de la bouteille en litres.",
+      "volumeNoteLitres": "Le volume d’eau de la bouteille, en litres. En unités impériales, on saisit le volume de gaz à la pression de service, en pieds cubes. La pression de service est facultative pour un volume en litres."
     },
     "paperSize": {
       "label": "Format du papier",
@@ -567,7 +574,16 @@
       "waterType": "Type d’eau",
       "altitude": "Altitude",
       "note": "Le planificateur part de ces valeurs. On peut les changer pour chaque plan."
-    }
+    },
+    "bailout": {
+      "intro": "Ajoutées aux plongées en recycleur, comme bouteilles de circuit ouvert. Le gaz se règle ensuite dans chaque plongée.",
+      "change": "Changer",
+      "remove": "Retirer {name}",
+      "add": "Ajouter une bouteille de secours (bailout)",
+      "note": "Aucune bouteille : les plongées en recycleur n’ont que le diluant et l’oxygène."
+    },
+    "dcCeilingText": "Affiche le plafond donné par l’ordinateur de plongée",
+    "redCeilingText": "Le plafond de l’ordinateur en rouge plutôt qu’en découpe"
   },
   "gas": {
     "air": "Air",
@@ -1237,7 +1253,8 @@
       "Modifier la plongée : chaque bouteille montre tous ses champs, sans ligne repliée.",
       "Partager : icône PDF pour la fiche. Exporter : le premier format se nomme « Fichier de carnet (.ssrf) ».",
       "À propos : chaque bibliothèque libre ouvre son site dans le navigateur.",
-      "Planificateur : le facteur de consommation sous stress vaut 2,0 par défaut."
+      "Planificateur : le facteur de consommation sous stress vaut 2,0 par défaut.",
+      "Réglages : bouteilles par défaut pour le circuit ouvert et le recycleur (diluant, oxygène, secours), ajoutées quand une plongée passe en recycleur. Types de bouteilles : nombre de plongées et nouvelle fiche. Profil : plafonds réorganisés, grille de profondeur retirée."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",

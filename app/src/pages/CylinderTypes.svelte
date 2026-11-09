@@ -10,7 +10,7 @@
   import { OpenDivesCore } from 'opendives-core';
   import { t } from '../lib/i18n.js';
   import { logbook } from '../lib/logbook.svelte.js';
-  import { formatCylinderSize, formatPressure } from '../lib/format.js';
+  import { formatCylinderSize, formatNumber, formatPressure } from '../lib/format.js';
 
   /** @type {import('opendives-core').CylinderType[]} */
   let types = $state([]);
@@ -33,18 +33,26 @@
       .join(' · ');
   }
 
+  /** "Dans 12 plongées". @param {number} n */
+  function inDives(n) {
+    return t(n === 0 ? 'settings.cylinders.inNoDive' : n === 1 ? 'settings.cylinders.inOneDive' : 'settings.cylinders.inDives', { n: formatNumber(n, 0) });
+  }
+
   /** @param {string} name */
   function open(name) {
     f7.views.current.router.navigate(`/settings/cylinders/type?name=${encodeURIComponent(name)}`);
   }
 </script>
 
-{#snippet list(/** @type {import('opendives-core').CylinderType[]} */ items)}
+{#snippet list(/** @type {import('opendives-core').CylinderType[]} */ items, /** @type {boolean} */ usage)}
   <div class="surface" role="list">
     {#each items as type (type.name)}
       <div role="listitem">
         <button type="button" class="row" onclick={() => open(type.name)}>
-          <span class="label">{type.name}</span>
+          <span class="texts">
+            <span class="label">{type.name}{#if usage && !type.dives}<span class="unused">{t('settings.cylinders.unused')}</span>{/if}</span>
+            {#if usage}<span class="supporting">{inDives(type.dives)}</span>{/if}
+          </span>
           <span class="value">{size(type)}</span>
         </button>
       </div>
@@ -66,12 +74,12 @@
 
   {#if yours.length}
     <h2 class="title">{t('settings.cylinders.yours')}</h2>
-    {@render list(yours)}
+    {@render list(yours, true)}
   {/if}
 
   <h2 class="title">{t('settings.cylinders.standard')}</h2>
   {#if standard.length}
-    {@render list(standard)}
+    {@render list(standard, false)}
     <p class="note">{t('settings.cylinders.standardNote')}</p>
   {:else}
     <p class="note">{t('settings.cylinders.hidden')}</p>
@@ -129,10 +137,32 @@
       cursor: pointer;
     }
 
-    .label {
+    .texts {
       flex: 1;
       min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .label {
       font-size: 16px;
+    }
+
+    .supporting {
+      font-size: 13px;
+      line-height: 18px;
+      color: var(--od-text-2);
+    }
+
+    /* An outlined label after the name of a type no dive uses. */
+    .unused {
+      margin-inline-start: 8px;
+      padding: 0 6px;
+      border: 1px solid var(--od-text-2);
+      border-radius: 8px;
+      font-size: 11px;
+      line-height: 16px;
+      color: var(--od-text-2);
     }
 
     .value {

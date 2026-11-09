@@ -29,16 +29,17 @@
   import { formatNumber, formatDuration, formatDateChoice, formatTimeChoice, formatDepth } from '../lib/format.js';
   import { regionUsesLetter } from '../lib/share.js';
   import { waterTypeName } from '../lib/tools.js';
+  import { cylinderChoices } from '../lib/cylinder-choices.js';
 
   /** @typedef {import('opendives-core').CorePrefValues} CorePrefValues */
   /** @typedef {{ value: string, label: string, example?: string }} Option */
   /**
-   * @typedef {{ kind: 'switch', id: string, label: string, text?: string, checked: boolean, set: (v: boolean) => unknown }
+   * @typedef {{ kind: 'switch', id: string, label: string, text?: string, checked: boolean, set: (v: boolean) => unknown, dimmed?: boolean }
    *   | { kind: 'choice', id: string, label: string, text?: string, value: string, title?: string, current: string,
-   *       options: () => Option[] | Promise<Option[]>, set: (v: string) => unknown, dimmed?: boolean }
+   *       options: () => Option[] | Promise<Option[]>, set: (v: string) => unknown, dimmed?: boolean, note?: string }
    *   | { kind: 'number', id: string, label: string, text?: string, value: string, title?: string, dialogText?: string,
    *       wheels: () => {label: string, values: string[], index: number, defaultIndex: number}[], set: (indexes: number[]) => unknown, dimmed?: boolean }
-   *   | { kind: 'link', id: string, label: string, text?: string, href?: string, action?: () => void, disabled?: boolean }
+   *   | { kind: 'link', id: string, label: string, text?: string, href?: string, action?: () => void, disabled?: boolean, value?: string }
    *   | { kind: 'info', id: string, label: string, value: string }} Row
    */
 
@@ -145,6 +146,23 @@
       current: p[key],
       options: () => Object.entries(labels).map(([value, text]) => ({ value, label: text() })),
       set: (v) => setCore({ [key]: v }),
+    };
+  }
+
+  /**
+   * The cylinder added to a rebreather dive (OpenDives device settings).
+   * @param {'defaultDiluent'|'defaultOxygen'} key @param {string} label @returns {Row}
+   */
+  function rebreatherRow(key, label) {
+    return {
+      kind: 'choice',
+      id: key,
+      label,
+      value: settings[key] || t('settings.defaultCylinder.none'),
+      current: settings[key],
+      note: t('settings.defaultCylinder.listNote'),
+      options: () => cylinderChoices(p),
+      set: (v) => setAppSetting(key, v),
     };
   }
 
@@ -344,7 +362,6 @@
           kind: 'switch',
           id: 'autogroup',
           label: t('settings.autogroup.label'),
-          text: t('settings.autogroup.text'),
           checked: logbook.prefs.autogroup === true,
           set: async (v) => {
             try {
@@ -379,11 +396,19 @@
           text: t('settings.defaultCylinder.text'),
           value: p.defaultCylinder || t('settings.defaultCylinder.none'),
           current: p.defaultCylinder,
-          options: async () => {
-            const { types } = await OpenDivesCore.cylinderTypes({ action: 'list' });
-            return [{ value: '', label: t('settings.defaultCylinder.none') }, ...types.map((type) => ({ value: type.name, label: type.name }))];
-          },
+          note: t('settings.defaultCylinder.listNote'),
+          options: () => cylinderChoices(p),
           set: (v) => setCore({ defaultCylinder: v }),
+        },
+        rebreatherRow('defaultDiluent', t('settings.defaultCylinder.diluent')),
+        rebreatherRow('defaultOxygen', t('settings.defaultCylinder.oxygen')),
+        {
+          kind: 'link',
+          id: 'defaultBailout',
+          label: t('settings.defaultCylinder.bailout'),
+          text: t('settings.defaultCylinder.bailoutText'),
+          value: settings.defaultBailout.join(', ') || t('settings.defaultCylinder.none'),
+          href: '/settings/bailout',
         },
         { kind: 'switch', id: 'includeUnusedTanks', label: t('settings.unusedTanks.label'), text: t('settings.unusedTanks.text'), checked: p.includeUnusedTanks, set: (v) => setCore({ includeUnusedTanks: v }) },
         { kind: 'switch', id: 'displayDefaultTankInfos', label: t('settings.standardSizes.label'), text: t('settings.standardSizes.text'), checked: p.displayDefaultTankInfos, set: (v) => setCore({ displayDefaultTankInfos: v }) },
@@ -395,21 +420,8 @@
       title: t('settings.groups.profile'),
       rows: [
         { kind: 'switch', id: 'showAverageDepth', label: t('settings.averageDepth'), checked: p.showAverageDepth, set: (v) => setCore({ showAverageDepth: v }) },
-        {
-          kind: 'choice',
-          id: 'threeMGrid',
-          label: t('settings.depthGrid.label'),
-          text: t(p.threeMGrid ? 'settings.depthGrid.textThree' : 'settings.depthGrid.text'),
-          value: t(p.threeMGrid ? 'settings.depthGrid.three' : 'settings.depthGrid.standard'),
-          current: p.threeMGrid ? 'three' : 'standard',
-          options: () => [
-            { value: 'standard', label: t('settings.depthGrid.standard'), example: t('settings.depthGrid.standardText') },
-            { value: 'three', label: t('settings.depthGrid.three'), example: t('settings.depthGrid.threeText') },
-          ],
-          set: (v) => setCore({ threeMGrid: v === 'three' }),
-        },
-        { kind: 'switch', id: 'dcCeiling', label: t('settings.dcCeiling'), checked: p.dcCeiling, set: (v) => setCore({ dcCeiling: v }) },
-        { kind: 'switch', id: 'redCeiling', label: t('settings.redCeiling'), checked: p.redCeiling, set: (v) => setCore({ redCeiling: v }) },
+        { kind: 'switch', id: 'dcCeiling', label: t('settings.dcCeiling'), text: t('settings.dcCeilingText'), checked: p.dcCeiling, set: (v) => setCore({ dcCeiling: v }) },
+        { kind: 'switch', id: 'redCeiling', label: t('settings.redCeiling'), text: t('settings.redCeilingText'), checked: p.redCeiling, dimmed: !p.dcCeiling, set: (v) => setCore({ redCeiling: v }) },
         { kind: 'switch', id: 'calcCeiling', label: t('settings.calcCeiling.label'), text: t('settings.calcCeiling.text'), checked: p.calcCeiling, set: (v) => setCore({ calcCeiling: v }) },
         { kind: 'switch', id: 'tankbar', label: t('settings.tankbar.label'), text: t('settings.tankbar.text'), checked: p.tankbar, set: (v) => setCore({ tankbar: v }) },
       ],
@@ -757,13 +769,13 @@
 
 {#snippet rowView(/** @type {Row} */ row)}
   {#if row.kind === 'switch'}
-    <label class="row">
+    <label class="row" class:dimmed={row.dimmed}>
       <span class="texts">
         <span class="label">{row.label}</span>
         {#if row.text}<span class="supporting">{row.text}</span>{/if}
       </span>
       <span class="toggle">
-        <input type="checkbox" checked={row.checked} onchange={(e) => row.set(e.currentTarget.checked)} />
+        <input type="checkbox" checked={row.checked} disabled={row.dimmed} onchange={(e) => row.set(e.currentTarget.checked)} />
         <span class="toggle-icon"></span>
       </span>
     </label>
@@ -785,7 +797,7 @@
         <span class="label">{row.label}</span>
         {#if row.text}<span class="supporting">{row.text}</span>{/if}
       </span>
-      {#if row.kind !== 'link'}<span class="value">{row.value}</span>{/if}
+      {#if row.kind !== 'link' || row.value}<span class="value">{row.value}</span>{/if}
       <svg class="chevron" class:large={row.kind === 'link'} viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"></path></svg>
     </button>
   {/if}
@@ -929,6 +941,7 @@
     title={row.title ?? row.label}
     options={dialog.options}
     value={row.current}
+    note={row.note}
     oncancel={() => (dialog = null)}
     onselect={(v) => {
       const chosen = row; // read before the dialog closes: row comes from it

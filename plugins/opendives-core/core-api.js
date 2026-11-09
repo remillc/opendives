@@ -152,6 +152,7 @@ import { registerPlugin } from '@capacitor/core';
  * @property {string} name
  * @property {number} ml
  * @property {number} mbar working pressure; 0 when unknown
+ * @property {number} dives how many dives of the logbook use it
  * @property {boolean} standard in the core's default list
  * @property {boolean} library in the device's library (can be removed)
  */
