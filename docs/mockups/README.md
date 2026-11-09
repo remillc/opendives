@@ -120,3 +120,4 @@ Example values (decided on 8 November 2026): the mock-ups show depths in feet, p
 | `carnet-selection-android.dc.html` | Téléphone Android, carnet en sélection multiple (dessiné d’après l’app) |
 | `carnet-selection-menu-android.dc.html` | Téléphone Android, carnet en sélection multiple, menu ⋮ ouvert |
 | `carnet-export-android.dc.html` | Téléphone Android, exporter les plongées cochées : choix du format |
+| `reglages-decompression-android.dc.html` | Téléphone Android, Réglages › Décompression (/settings/decompression) |

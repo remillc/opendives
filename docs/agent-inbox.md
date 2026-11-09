@@ -710,3 +710,12 @@ Done in "Logbook selection: Export as..." (Android). Exporter au format... sits 
 Remove the line "S’appliquent à chaque plan." under the title of "Réglages du planificateur". The first group title follows the top bar directly. Mock-up: `docs/mockups/reglages-planificateur-android.dc.html`.
 
 Done in "Planner settings: no intro line". The line and its i18n key are gone; the first group title (Vitesses) follows the top bar directly. Checked in the emulator.
+
+## [ ] 2026-11-09-02 Decompression settings on their own page, linked from the planner settings
+
+Christian wants the decompression settings on a page of their own, `/settings/decompression` (to-do #5).
+- New page "Décompression" (`docs/mockups/reglages-decompression-android.dc.html`): back arrow, title "Décompression", the warning note in `--od-alarm`, then the rows now in the Settings group: Modèle, Facteurs de gradient, Conservatisme VPM-B, Oxygène narcotique, END maximale du meilleur mélange, and the footnote "Utilisés par le plafond calculé du profil, le planificateur, la désaturation et le calculateur de gaz." Same rows, values and behaviour as today.
+- Settings (`android-reglages.dc.html`): the "Décompression" group keeps its title and holds a single 72 dp row "Modèle, facteurs de gradient, END", with the current model and GF as supporting text ("Bühlmann ZH-L16, GF 30/75") and a chevron, opening the new page.
+- Planner settings (`reglages-planificateur-android.dc.html`): a first white surface before "Vitesses" with one 72 dp row "Modèle de décompression", the same supporting text, chevron, opening the same page. Back from it returns to the planner settings.
+Spec: "Settings, modelled on Subsurface" (the sentence on the decompression settings).
+
