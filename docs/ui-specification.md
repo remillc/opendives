@@ -11,7 +11,7 @@ This document turns the mock-ups into rules the code applies as they are: colour
 
 ## 1. Colours
 
-The theme chosen on 5 November 2026 is **black and white, colour reserved for data**: a neutral light background, actions without a bright colour (#1F2124), strong contrast and sans-serif titles. The only bright colour in the interface belongs to dive data: the water column of the profile and of the thumbnails goes from sand to rust with depth. The code declares each colour once, as a CSS variable `--od-*`, and never hard-codes a value in a component.
+The theme is **black and white**: a neutral light background, actions without a bright colour (#1F2124), strong contrast and sans-serif titles. In dive data, the water column of the profile and of the thumbnails goes from sand to rust with depth. The code declares each colour once, as a CSS variable `--od-*`, and never hard-codes a value in a component.
 
 | Token | Light | Dark | Use, and only this one |
 | --- | --- | --- | --- |
