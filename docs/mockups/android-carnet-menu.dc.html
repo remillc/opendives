@@ -107,7 +107,7 @@ class Component extends DCLogic {
   renderVals() {
     var dives = ROWS.map(function (r) {
       var p = prof(P[r.k], 56, 40);
-      return { site: r.site, siteColor: r.missing ? '#4A4D52' : '#1F2124', date: r.date, max: r.max, dur: r.dur, line: p.line, area: p.area, bottom: p.bottom, gid: 'a-' + r.k, alt: 'Profil, ' + r.max + ' au plus profond' };
+      return { site: r.site, siteColor: r.missing ? '#4A4D52' : '#1F2124', date: 'N° ' + r.k.slice(1) + ' · ' + r.date, max: r.max, dur: r.dur, line: p.line, area: p.area, bottom: p.bottom, gid: 'a-' + r.k, alt: 'Profil, ' + r.max + ' au plus profond' };
     });
     var trip = ['d1', 'd2', 'd3', 'd4'].map(function (k) {
       var p = prof(P[k], 27, 19);
