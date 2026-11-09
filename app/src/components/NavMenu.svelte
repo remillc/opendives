@@ -82,7 +82,7 @@
         <path d={PROFILE} class="line" />
       </svg>
       <div class="brand">
-        <img src="logo-light.svg" alt="" width="44" height="44" />
+        <img src="logo-small-light.svg" alt="" width="44" height="44" />
         <span class="name">{t('menu.title')}</span>
       </div>
       <a href="#account" class="account" aria-label={t('menu.accountLabel', { name: accountName })} onclick={(e) => choose(e, () => showSection('account'))}>

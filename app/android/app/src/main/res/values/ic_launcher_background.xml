@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Background of the "Hublot" logo, light version. -->
+    <!-- Background of the "Trois vagues" logo, light version. -->
     <color name="ic_launcher_background">#F4F4F2</color>
     <!-- Splash screen background: the logo's background (values-night for dark mode). -->
     <color name="splash_background">#F4F4F2</color>
