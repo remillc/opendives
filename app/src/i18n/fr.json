@@ -1236,7 +1236,8 @@
       "Planificateur refait : plongées planifiées enregistrées dans le carnet, plusieurs niveaux et plusieurs gaz, volumes par gaz, modèle de décompression propre à chaque plan, partage du plan.",
       "Modifier la plongée : chaque bouteille montre tous ses champs, sans ligne repliée.",
       "Partager : icône PDF pour la fiche. Exporter : le premier format se nomme « Fichier de carnet (.ssrf) ».",
-      "À propos : chaque bibliothèque libre ouvre son site dans le navigateur."
+      "À propos : chaque bibliothèque libre ouvre son site dans le navigateur.",
+      "Planificateur : le facteur de consommation sous stress vaut 2,0 par défaut."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",

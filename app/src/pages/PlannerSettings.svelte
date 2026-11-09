@@ -11,6 +11,7 @@
   import ChoiceDialog from '../components/ChoiceDialog.svelte';
   import WheelDialog from '../components/WheelDialog.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
+  import { DEFAULT_SAC_FACTOR } from '../lib/settings.svelte.js';
   import { planner, loadSetup, adoptUnitDefaults, plannerDefaults, setting, setSetting, ascentRate, setAscentRate } from '../lib/planner.svelte.js';
   import { formatNumber, depthUnit } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
@@ -195,7 +196,7 @@
             id: 'sacFactor',
             label: t('plannerSettings.sacFactor'),
             stored: Number(setting('sacFactor')),
-            def: 200,
+            def: DEFAULT_SAC_FACTOR,
             wheel: range(1, 5, 0.1),
             toUnit: (x) => x / 100,
             toStored: (v) => Math.round(v * 100),

@@ -13,7 +13,7 @@
 //   "Dive planner setup": set through setPrefs and kept as this device's
 //   settings (settings.svelte.js), read back with plannerSetup.
 import { OpenDivesCore } from 'opendives-core';
-import { settings, setCorePrefs, resetCorePrefs } from './settings.svelte.js';
+import { DEFAULT_SAC_FACTOR, settings, setCorePrefs, resetCorePrefs } from './settings.svelte.js';
 import { altitudeToPressureMbar, salinityOfWaterType } from './tools.js';
 
 /** @typedef {import('opendives-core').PlannerSetup} PlannerSetup */
@@ -193,6 +193,7 @@ export async function resetSettings(prefs) {
     ...Object.fromEntries(ASCENT_KEYS.map((k) => [k, Math.round(d.ascentMmMin)])),
     descentMmMin: Math.round(d.descentMmMin),
     reserveMbar: d.reserveMbar,
+    sacFactor: DEFAULT_SAC_FACTOR,
   });
   await loadSetup();
   planner.version++;

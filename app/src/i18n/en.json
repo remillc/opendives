@@ -1236,7 +1236,8 @@
       "Planner redone: planned dives saved in the logbook, several levels and gases, volumes per gas, a decompression model for each plan, sharing a plan.",
       "Edit dive: every cylinder shows all its fields, no collapsed lines.",
       "Share: a PDF icon for the sheet. Export: the first format is named “Logbook file (.ssrf)”.",
-      "About: each open source library opens its website in the browser."
+      "About: each open source library opens its website in the browser.",
+      "Planner: the SAC factor under stress is 2.0 by default."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",

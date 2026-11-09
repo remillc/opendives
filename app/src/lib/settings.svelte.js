@@ -16,6 +16,9 @@ const APP_KEY = 'od.appSettings';
 /** The last dive computer used and the four remembered ones (setPrefs diveComputerList). */
 const COMPUTERS_KEY = 'od.diveComputers';
 
+/** SAC factor under stress, x100: 2.0, the planner's default. */
+export const DEFAULT_SAC_FACTOR = 200;
+
 /** @typedef {import('opendives-core').CorePrefValues} CorePrefValues */
 
 /**
@@ -113,6 +116,9 @@ export function applyDeviceSettings() {
    * @param {() => Promise<unknown>} call
    */
   const send = (failure, call) => calls.push(call().catch((/** @type {unknown} */ e) => console.error(failure, e)));
+  // OpenDives' default stress factor (spec, "Planner settings") instead of the
+  // core's 4.0, unless the diver has chosen one.
+  storedCore.sacFactor ??= DEFAULT_SAC_FACTOR;
   // A value refused by this core (an older version kept something else): the others are kept.
   if (Object.keys(storedCore).length) {
     send('Restoring the settings of this device', () => OpenDivesCore.setPrefs({ changes: storedCore }));
