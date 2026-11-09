@@ -902,3 +902,7 @@ Christian approved this on the canvas. Spec: "Sync conflict dialog, redesigned".
 - Two selectable cards instead of radios, the differences always shown inside each card, no Comparer toggle, a single tonal "Continuer". Keep the "apply to all" checkbox when several dives conflict.
 - Put the selection colours in tokens (`--od-selected`, `--od-selected-container`, `--od-tonal`): the palette rule is being revised, the values may change.
 
+## [ ] 2026-11-09-22 Palette rule: colour no longer reserved for data
+
+Christian removed the rule "colour reserved for data" from the spec (section 1, first paragraph). The theme stays black and white with ink actions; the sand-to-rust water column stays in the dive data, and colour may now appear elsewhere when a mock-up uses it (headers, side menu, selection in the conflict dialog). Update the palette comment at the top of `app/src/theme.css` ("neutral light UI, colour only in the data") to match the new wording, and any other comment or doc that repeats the old rule. No colour change in the code for now.
+
