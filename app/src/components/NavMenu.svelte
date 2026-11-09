@@ -10,6 +10,7 @@
   import { Panel } from 'framework7-svelte';
   import Icon from './Icon.svelte';
   import SyncStatus from './SyncStatus.svelte';
+  import SyncFailureRow from './SyncFailureRow.svelte';
   import SyncButton from './SyncButton.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
   import { navigation, sections, showSection, closeMenu, restoreFocus, openSettings, openAbout } from '../lib/navigation.svelte.js';
@@ -116,7 +117,11 @@
       <div class="status">
         <!-- The button stays in place while it runs and shows its progress (to-do #2). -->
         {#if logbook.email}<SyncButton />{/if}
-        <SyncStatus sync={logbook.sync} pending={logbook.pending} progress={logbook.syncProgress} live={false} steady />
+        {#if logbook.syncFailure}
+          <SyncFailureRow />
+        {:else}
+          <SyncStatus sync={logbook.sync} pending={logbook.pending} progress={logbook.syncProgress} live={false} steady />
+        {/if}
       </div>
     {/if}
   </nav>

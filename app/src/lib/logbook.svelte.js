@@ -5,6 +5,7 @@ import { defaultPrefs } from './format.js';
 import { mark } from './perf.js';
 import { readSnapshot, saveSnapshot } from './snapshot.js';
 import { nextProgress } from './sync-progress.js';
+import { failureCause, isRefused, retryDelay } from './sync-failure.js';
 import { applyDeviceSettings, keepCylinderLibrary, keepDiveComputers, prefsAfterLoad } from './settings.svelte.js';
 
 /** @typedef {import('opendives-core').Dive} Dive */
@@ -69,6 +70,12 @@ export const logbook = $state({
    * sync of the cloud log, cleared once the diver chose a version.
    */
   conflict: /** @type {Conflict|null} */ (null),
+  /** Why the last sync failed while the network works; null otherwise (spec, "Sync failures"). */
+  syncFailure: /** @type {import('./sync-failure.js').SyncFailure|null} */ (null),
+  /** The sheet explaining the failure is open. */
+  syncFailureOpen: false,
+  /** Minutes until the next automatic try; 0 when none is planned. */
+  retryMinutes: 0,
   /** "Plus tard": the dialog is closed, sync stays paused until the choice is made. */
   conflictLater: false,
   /** First launch is shown (first start, or after signing out): nothing is loaded until a choice is made. */
@@ -483,6 +490,7 @@ async function syncEdits() {
     logbook.sync = !reached ? 'offline' : logbook.autoSync ? 'cloud' : 'manual';
     if (reached) markSynced();
     outcome = reached ? 'done' : status.status === 'offline' ? 'offline' : 'failed';
+    if (!reached) noteFailure(status.cause === 'auth');
     if (status.status === 'merged') await readConflicts();
   } catch (e) {
     console.error('Syncing the edits', e);
@@ -664,6 +672,7 @@ export function repositoryChanged() {
   logbook.pending = 0;
   logbook.pendingByDive = {};
   logbook.conflict = null;
+  clearFailure();
   logbook.lastSync = null;
   try {
     localStorage.removeItem('od.lastSync');
@@ -770,7 +779,32 @@ function readLastSync() {
 }
 
 /** Notes a successful sync, kept across launches. */
+/** @type {ReturnType<typeof setTimeout>|undefined} */
+let retryTimer;
+let retries = 0;
+
+/** @param {boolean} refused the server answered and refused the credentials */
+function noteFailure(refused) {
+  logbook.syncFailure = failureCause({ online: navigator.onLine, gitMode: logbook.mode === 'git', refused });
+  clearTimeout(retryTimer);
+  logbook.retryMinutes = 0;
+  // Only the unreachable server is tried again; the other two wait for the diver.
+  if (logbook.syncFailure === 'server' && logbook.autoSync) {
+    logbook.retryMinutes = retryDelay(retries++);
+    retryTimer = setTimeout(syncNow, logbook.retryMinutes * 60000);
+  }
+}
+
+function clearFailure() {
+  clearTimeout(retryTimer);
+  retries = 0;
+  logbook.retryMinutes = 0;
+  logbook.syncFailure = null;
+  logbook.syncFailureOpen = false;
+}
+
 function markSynced() {
+  clearFailure();
   const now = new Date();
   const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 19);
   logbook.lastSync = local;
@@ -860,6 +894,7 @@ async function loadCloud(force, pre = null) {
       // The server did not answer: the copy shown is the offline logbook.
       console.error('Asking the cloud server for its head', server.error);
       logbook.sync = 'offline';
+      noteFailure(isRefused(/** @type {any} */ (server.error)?.message));
       return true;
     }
   }
@@ -872,11 +907,13 @@ async function loadCloud(force, pre = null) {
     if (fresh.server) logbook.server = fresh.server;
     logbook.sync = fresh.synced ? 'cloud' : 'offline';
     if (fresh.synced) markSynced();
+    else noteFailure(isRefused(fresh.offlineReason));
   } catch (e) {
     if (shownHead === null) throw e;
     // The copy shown stays usable: the logbook is only out of date.
     console.error('Syncing with the cloud', e);
     logbook.sync = 'offline';
+    noteFailure(isRefused(/** @type {any} */ (e)?.message));
   }
   return true;
 }

@@ -13,10 +13,11 @@
   import { errorCode, finishAccount, showFailure, validEmail, validPassword } from '../lib/account.js';
   import { t } from '../lib/i18n.js';
 
-  /** @type {{ f7router: any, welcome?: boolean }} */
-  let { f7router, welcome = false } = $props();
+  /** @type {{ f7router: any, welcome?: boolean, prefilledEmail?: string }} */
+  let { f7router, welcome = false, prefilledEmail = '' } = $props();
 
-  let email = $state('');
+  // svelte-ignore state_referenced_locally
+  let email = $state(prefilledEmail);
   let password = $state('');
   let busy = $state(false);
   let emailError = $state('');

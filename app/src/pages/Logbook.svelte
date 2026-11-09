@@ -7,6 +7,7 @@
   import { onDestroy, tick, untrack } from 'svelte';
   import { Page, Navbar, NavRight, Link, Searchbar, List, ListItem, Block, Button, Popover, f7, theme } from 'framework7-svelte';
   import SyncStatus from '../components/SyncStatus.svelte';
+  import SyncFailureRow from '../components/SyncFailureRow.svelte';
   import DiveRow from '../components/DiveRow.svelte';
   import TripRow from '../components/TripRow.svelte';
   import Icon from '../components/Icon.svelte';
@@ -1122,7 +1123,9 @@
         {stoppedText}
       </button>
     {/if}
-    {#if logbook.sync === 'offline' || logbook.sync === 'manual' || (logbook.sync === 'syncing' && !logbook.autoSync && !!logbook.email)}
+    {#if logbook.syncFailure}
+      <SyncFailureRow />
+    {:else if logbook.sync === 'offline' || logbook.sync === 'manual' || (logbook.sync === 'syncing' && !logbook.autoSync && !!logbook.email)}
       <SyncStatus sync={logbook.sync} pending={logbook.pending} progress={logbook.syncProgress} />
     {/if}
   {/if}
