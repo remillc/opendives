@@ -9,7 +9,7 @@
   import Icon from '../components/Icon.svelte';
   import TextField from '../components/TextField.svelte';
   import ChoiceDialog from '../components/ChoiceDialog.svelte';
-  import { computerName, computerChange, duplicateCandidates, sameRecordings } from '../lib/dive-computers.js';
+  import { computerName, computerChange, duplicatesOf, mergeTargets, sameRecordings } from '../lib/dive-computers.js';
   import { confirmAction } from '../lib/dialogs.js';
   import { offerUndo } from '../lib/undo.js';
   import { formatNumber } from '../lib/format.js';
@@ -28,7 +28,9 @@
   /** @type {LogbookComputer[]} */
   let all = $state([]);
   const computer = $derived(all.find((c) => c.model === model && c.serial === serial) ?? null);
-  const candidates = $derived(computer ? duplicateCandidates(computer, all) : []);
+  const candidates = $derived(computer ? mergeTargets(computer, all) : []);
+  /** This entry is the one to keep: the duplicates are merged from their own sheet. */
+  const duplicates = $derived(computer ? duplicatesOf(computer, all) : []);
   let name = $state('');
   let busy = $state(false);
   let choosing = $state(false);
@@ -137,6 +139,12 @@
         </p>
       </div>
     {/if}
+    {#if !candidates.length && duplicates.length}
+      <p class="about">
+        {t('settings.logbookComputers.hasDuplicateText')}
+        {#each duplicates as other, i (`${other.model}\n${other.serial}`)}{i ? ', ' : ' '}<a href="/settings/computers/edit?model={encodeURIComponent(other.model)}&serial={encodeURIComponent(other.serial)}">{computerName(other)}</a>{/each}
+      </p>
+    {/if}
     {#if computer.listed}
       <div class="action">
         <button type="button" class="od-outlined-button" disabled={busy} onclick={() => change({ action: 'remove', model, serial }, t('settings.logbookComputers.removed'))}>
@@ -189,10 +197,15 @@
     }
 
     .about {
+      --f7-theme-color: var(--od-text);
       margin: 16px 20px 0;
       font-size: 14px;
       line-height: 20px;
       color: var(--od-text-2);
+
+      a {
+        font-weight: 600;
+      }
     }
 
     .action {

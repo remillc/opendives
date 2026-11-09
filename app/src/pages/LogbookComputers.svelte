@@ -5,7 +5,7 @@
   import { Page, Navbar, Link } from 'framework7-svelte';
   import { OpenDivesCore } from 'opendives-core';
   import Icon from '../components/Icon.svelte';
-  import { computerName, duplicateCandidates } from '../lib/dive-computers.js';
+  import { computerName, duplicatesOf, mergeTargets } from '../lib/dive-computers.js';
   import { logbook } from '../lib/logbook.svelte.js';
   import { t } from '../lib/i18n.js';
 
@@ -35,7 +35,7 @@
   /** @param {import('opendives-core').LogbookComputer} c */
   const link = (c) => `/settings/computers/edit?model=${encodeURIComponent(c.model)}&serial=${encodeURIComponent(c.serial)}`;
 
-  const anyDuplicate = $derived(computers.some((c) => duplicateCandidates(c, computers).length > 0));
+  const anyDuplicate = $derived(computers.some((c) => mergeTargets(c, computers).length > 0));
 </script>
 
 <Page>
@@ -53,7 +53,11 @@
           <span class="texts">
             <span class="name">
               <span>{computerName(c)}</span>
-              {#if duplicateCandidates(c, computers).length}<span class="tag">{t('settings.logbookComputers.duplicate')}</span>{/if}
+              {#if mergeTargets(c, computers).length}
+                <span class="tag">{t('settings.logbookComputers.duplicate')}</span>
+              {:else if duplicatesOf(c, computers).length}
+                <span class="tag">{t('settings.logbookComputers.hasDuplicate')}</span>
+              {/if}
             </span>
             <span class="details od-value">{details(c)}</span>
           </span>

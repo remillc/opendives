@@ -527,7 +527,9 @@
       "intro": "The computers your dives come from. The name you choose shows in the logbook and the dive detail.",
       "empty": "No dive computer in this logbook.",
       "duplicate": "Possible duplicate",
-      "duplicateNote": "Possible duplicate: the same serial number as another computer, the same dive profiles, or the same model without a serial number. Touch it to merge it or remove it from the list.",
+      "hasDuplicate": "Has a duplicate",
+      "hasDuplicateText": "To merge from its own entry:",
+      "duplicateNote": "Possible duplicate: the same serial number as another computer, the same dive profiles, or the same model without a serial number. Touch it to merge it into the computer to keep, or remove it from the list.",
       "serialShort": "no. {serial}",
       "noSerial": "No serial number",
       "dives": {

@@ -15,24 +15,55 @@ const sharedWith = (a, b) => a.shared.find((s) => s.model === b.model && s.seria
 const SAME_RECORDING_SHARE = 0.8;
 
 /**
- * The computers this one may be a duplicate of. Two serial numbers decide:
- * the same one is the same computer, different ones are two computers. When
- * one is missing, two computers found in the same dives are compared by their
- * profiles, whatever their names: the name alone proves nothing. Those that
- * never meet in a dive can only be compared by model (spec).
+ * Whether two computers may be one. Two serial numbers decide: the same one is
+ * the same computer, different ones are two computers. When one is missing, two
+ * computers found in the same dives are compared by their profiles, whatever
+ * their names: the name alone proves nothing. Those that never meet in a dive
+ * can only be compared by model (spec).
+ * @param {LogbookComputer} a
+ * @param {LogbookComputer} b
+ */
+function mayBeSame(a, b) {
+  if (a.serial && b.serial) return a.serial === b.serial;
+  const shared = sharedWith(a, b);
+  if (shared) return shared.same / shared.dives >= SAME_RECORDING_SHARE;
+  return a.model === b.model;
+}
+
+/**
+ * The entry to keep of two duplicates: the one with a serial number, then the
+ * one the diver named, then the one with the most dives. Merging the other way
+ * would lose the serial number or the name.
+ * @param {LogbookComputer} a
+ * @param {LogbookComputer} b
+ */
+function keeperOf(a, b) {
+  const order =
+    Number(!!b.serial) - Number(!!a.serial) ||
+    Number(!!b.nickname) - Number(!!a.nickname) ||
+    b.dives - a.dives ||
+    `${a.model}\n${a.serial}`.localeCompare(`${b.model}\n${b.serial}`);
+  return order <= 0 ? a : b;
+}
+
+/**
+ * The computers this one should be merged into: it is the entry to remove.
  * @param {LogbookComputer} computer
  * @param {LogbookComputer[]} all
  */
-export function duplicateCandidates(computer, all) {
+export function mergeTargets(computer, all) {
   return all
-    .filter((other) => {
-      if (other === computer) return false;
-      if (computer.serial && other.serial) return computer.serial === other.serial;
-      const shared = sharedWith(computer, other);
-      if (shared) return shared.same / shared.dives >= SAME_RECORDING_SHARE;
-      return !computer.serial && other.model === computer.model;
-    })
-    .sort((a, b) => Number(!!b.serial) - Number(!!a.serial));
+    .filter((other) => other !== computer && mayBeSame(computer, other) && keeperOf(computer, other) === other)
+    .sort((a, b) => (keeperOf(a, b) === a ? -1 : 1));
+}
+
+/**
+ * The duplicates that should be merged into this computer: it is the one kept.
+ * @param {LogbookComputer} computer
+ * @param {LogbookComputer[]} all
+ */
+export function duplicatesOf(computer, all) {
+  return all.filter((other) => other !== computer && mayBeSame(computer, other) && keeperOf(computer, other) === computer);
 }
 
 /** In how many dives the two are the same recording: only one is kept there. @param {LogbookComputer} a @param {LogbookComputer} b */

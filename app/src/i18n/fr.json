@@ -527,7 +527,9 @@
       "intro": "Les ordinateurs d’où viennent vos plongées. Le nom choisi s’affiche dans le carnet et le détail des plongées.",
       "empty": "Aucun ordinateur dans ce carnet.",
       "duplicate": "Doublon possible",
-      "duplicateNote": "Doublon possible : même numéro de série qu’un autre ordinateur, mêmes profils de plongée, ou même modèle sans numéro de série. Touchez-le pour le fusionner ou le retirer de la liste.",
+      "hasDuplicate": "A un doublon",
+      "hasDuplicateText": "À fusionner depuis sa fiche :",
+      "duplicateNote": "Doublon possible : même numéro de série qu’un autre ordinateur, mêmes profils de plongée, ou même modèle sans numéro de série. Touchez-le pour le fusionner dans l’ordinateur à garder, ou le retirer de la liste.",
       "serialShort": "n° {serial}",
       "noSerial": "Sans numéro de série",
       "dives": {
