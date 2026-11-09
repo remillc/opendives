@@ -903,7 +903,9 @@ Christian approved this on the canvas. Spec: "Sync conflict dialog, redesigned".
 - Put the selection colours in tokens (`--od-selected`, `--od-selected-container`, `--od-tonal`): the palette rule is being revised, the values may change.
 - Added at 14:24, Christian wants it in this task: a secondary text button "Plus tard" left of "Continuer" (the dialog may now be closed: sync stays paused, the Carnet status row "Synchronisation arrêtée" reopens it). After "Continuer", apply the choice locally, show a snackbar with "Annuler" for about 8 seconds, and only then push; "Annuler" restores the conflict and reopens the dialog. See the spec paragraph.
 
-## [ ] 2026-11-09-22 Palette rule: colour no longer reserved for data
+## [x] 2026-11-09-22 Palette rule: colour no longer reserved for data
+
+Done in Palette rule: colour allowed sparingly, within WCAG AA
 
 Christian removed the rule "colour reserved for data" from the spec (section 1, first paragraph). The theme stays black and white with ink actions; the sand-to-rust water column stays in the dive data, and colour may now appear elsewhere when a mock-up uses it (headers, side menu, selection in the conflict dialog). Update the palette comment at the top of `app/src/theme.css` ("neutral light UI, colour only in the data") to match the new wording, and any other comment or doc that repeats the old rule. No colour change in the code for now.
 - Added at 14:17: colour is allowed sparingly, within WCAG 2.2 AA contrast (4.5:1 text, 3:1 large text and meaningful graphics), and never as the only carrier of meaning. Mention this in the `theme.css` comment, and check the contrast of every new colour token you add.

@@ -9,8 +9,10 @@
  *   od.components  styles of the Svelte components (each in this layer).
  * A stronger layer wins whatever the specificity of the selectors.
  *
- * Palette: neutral light UI, colour only in the data (the water column of the
- * profile goes from --od-water-top to --od-water-bottom with depth).
+ * Palette: black and white with ink actions. Colour is allowed sparingly, within
+ * WCAG 2.2 AA contrast (4.5:1 text, 3:1 large text and meaningful graphics), and
+ * never as the only carrier of meaning. The water column of the dive data goes
+ * from --od-water-top to --od-water-bottom with depth.
  */
 @layer framework7, maplibre, od.tokens, od.base, od.components;
 
