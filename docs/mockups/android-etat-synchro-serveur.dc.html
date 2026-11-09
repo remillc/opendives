@@ -25,10 +25,13 @@ h1,h2,h3,h4,h1 *,h2 *,h3 *,h4 *,[style*='font-size: 2'],[style*='font-size: 3'],
   <button aria-label="Menu" aria-haspopup="menu" style="position: absolute; left: 4px; top: 48px; z-index: 3; width: 48px; height: 48px; border: none; background: transparent; border-radius: 24px; display: flex; align-items: center; justify-content: center; padding: 0"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #1F2124; stroke-width: 2.2; stroke-linecap: round"><path d="M4 7h16 M4 12h16 M4 17h16"></path></svg></button>
   <div style="position: relative; overflow: hidden; padding: 40px 4px 52px 16px; display: flex; flex-direction: column; background: linear-gradient(165deg, #FBE3B2 0%, #EFB677 55%, #C97A35 100%)"><svg width="390" height="34" viewBox="0 0 300 140" preserveAspectRatio="none" aria-hidden="true" style="position: absolute; left: 0; bottom: 10px"><path d="M0 30 L20 38 L45 70 L70 92 L95 96 L120 88 L140 94 L165 80 L185 62 L210 58 L235 50 L255 46 L275 40 L300 36 V140 H0 Z" style="fill: rgba(255, 255, 255, 0.10)"></path><path d="M0 30 L20 38 L45 70 L70 92 L95 96 L120 88 L140 94 L165 80 L185 62 L210 58 L235 50 L255 46 L275 40 L300 36" style="fill: none; stroke: rgba(31, 33, 36, 0.22); stroke-width: 1.5; stroke-linejoin: round; vector-effect: non-scaling-stroke"></path></svg><svg width="390" height="18" viewBox="0 0 300 18" preserveAspectRatio="none" aria-hidden="true" style="position: absolute; left: 0; bottom: -1px; display: block"><path d="M0 11 Q37.5 2 75 11 T150 11 T225 11 T300 11 V18 H0 Z" style="fill: #F4F4F2"></path></svg>
     <div style="position: relative; height: 64px; display: flex; align-items: center; gap: 0"><span style="flex: 1; margin-left: 40px; font-size: 22px; line-height: 28px; font-weight: 500">Carnet</span>
+      <button aria-label="Plus d'options" aria-haspopup="menu" aria-expanded="false" style="width: 48px; height: 48px; border: none; background: transparent; border-radius: 24px; display: flex; align-items: center; justify-content: center; padding: 0"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5.5" r="2" style="fill: #1F2124"></circle><circle cx="12" cy="12" r="2" style="fill: #1F2124"></circle><circle cx="12" cy="18.5" r="2" style="fill: #1F2124"></circle></svg></button>
       
     </div>
     
-    <p style="position: relative; margin: 0; font-size: 14px; line-height: 20px; color: #8A4B00; letter-spacing: 0.25px; display: flex; gap: 6px; align-items: center"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" style="flex: none; fill: none; stroke: #8A4B00; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M12 3l9.5 17h-19z M12 10v4.5 M12 17.5v.01"></path></svg>Le cloud ne répond pas : nouvel essai dans 5 min<svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="flex: none; margin-left: 2px; fill: none; stroke: #8A4B00; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M9 5l7 7-7 7"></path></svg></p>
+    <p style="position: relative; margin: 0; font-size: 14px; line-height: 20px; color: #3D3A33; letter-spacing: 0.25px; font-variant-numeric: tabular-nums">9 plongées · 4 sites · dernière plongée il y a 9 mois</p>
+    <a href="#etat-synchro" style="position: relative; margin: 12px 12px 0 0; min-height: 40px; padding: 8px 12px; box-sizing: border-box; border-radius: 20px; background: rgba(255, 255, 255, 0.78); color: #8A4B00; text-decoration: none; font-size: 14px; line-height: 20px; letter-spacing: 0.25px; display: flex; gap: 8px; align-items: center"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="flex: none; fill: none; stroke: #8A4B00; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M12 3l9.5 17h-19z M12 10v4.5 M12 17.5v.01"></path></svg><span>Le cloud ne répond pas : nouvel essai dans 5 min</span><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="flex: none; margin-left: auto; fill: none; stroke: #8A4B00; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M9 5l7 7-7 7"></path></svg></a>
+    <label style="position: relative; margin: 16px 12px 0 0; height: 56px; padding: 0 16px; border-radius: 28px; background: rgba(255, 255, 255, 0.78); display: flex; align-items: center; gap: 16px"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style="flex: none; fill: none; stroke: #4A4D52; stroke-width: 2; stroke-linecap: round"><circle cx="10.5" cy="10.5" r="6.5"></circle><path d="M15.5 15.5L20 20"></path></svg><span style="flex: 1; font-size: 16px; line-height: 24px; color: #4A4D52; letter-spacing: 0.5px">Rechercher dans le carnet</span></label>
   </div>
   <div style="margin-top: 12px; display: flex; flex-direction: column">
     <sc-for list="{{dives}}" as="d" hint-placeholder-count="3">
@@ -40,7 +43,8 @@ h1,h2,h3,h4,h1 *,h2 *,h3 *,h4 *,[style*='font-size: 2'],[style*='font-size: 3'],
         </svg>
         <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
           <span style="font-size: 16px; line-height: 24px; color: {{d.siteColor}}">{{d.site}}</span>
-          <span style="font-size: 14px; line-height: 20px; color: {{d.pendingColor}}">{{d.date}}</span>
+          <span style="font-size: 14px; line-height: 20px; color: #4A4D52">{{d.date}}</span>
+          <span style="display: {{d.pendDisplay}}; font-size: 14px; line-height: 20px; color: #8A4B00">{{d.pending}}</span>
         </span>
         <span style="display: flex; flex-direction: column; align-items: flex-end; gap: 2px; font-variant-numeric: tabular-nums">
           <span style="font-size: 16px; line-height: 24px; font-weight: 500">{{d.max}}</span>
@@ -49,7 +53,8 @@ h1,h2,h3,h4,h1 *,h2 *,h3 *,h4 *,[style*='font-size: 2'],[style*='font-size: 3'],
       </a>
     </sc-for>
   </div>
-<div aria-hidden="true" style="position: absolute; inset: 0; background: rgba(0,0,0,0.32); z-index: 4"></div>
+
+  <div aria-hidden="true" style="position: absolute; inset: 0; background: rgba(0,0,0,0.32); z-index: 4"></div>
   <section role="dialog" aria-labelledby="se-t" style="position: absolute; left: 0; right: 0; bottom: 0; padding: 0 24px 32px 24px; border-radius: 28px 28px 0 0; background: #F0F0EE; z-index: 5">
     <span aria-hidden="true" style="display: block; margin: 22px auto 20px auto; width: 32px; height: 4px; border-radius: 2px; background: #75787C"></span>
     <span aria-hidden="true" style="width: 48px; height: 48px; border-radius: 24px; background: #FBE3B2; display: flex; align-items: center; justify-content: center"><svg width="24" height="24" viewBox="0 0 24 24" style="fill: none; stroke: #3D2200; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M7 18h10a4 4 0 0 0 .5-7.97A6 6 0 0 0 6 9.5 4.25 4.25 0 0 0 7 18z M4 4l16 16"></path></svg></span>
@@ -77,15 +82,15 @@ var P = {
   d7: [[0,0.0],[170,24.0],[390,46.4],[610,57.3],[830,59.6],[1050,55.5],[1160,52.9],[1380,32.4],[1553,20.7],[1632,20.6],[1676,21.1],[1750,22.4],[1970,20.7],[2190,22.3],[2410,24.0],[2630,22.6],[2850,18.2],[3070,16.5],[3290,16.5],[3510,14.3],[3730,16.2],[3950,13.3],[4170,10.0],[4390,10.9],[4610,10.5],[4830,9.9],[5050,7.5],[5270,6.1],[5490,7.6],[5710,6.3],[5930,4.5],[6150,5.0],[6240,0.0]]
 };
 var ROWS = [
-  { k: 'd9', site: 'Site à préciser', missing: true, date: '7 févr. 2026, 09:09', max: '91 ft', dur: '55 min', pending: 'Notes modifiées, en attente d\'envoi' },
-  { k: 'd8', site: 'Site à préciser', missing: true, date: '27 sept. 2025, 11:55', max: '333 ft', dur: '102 min', pending: 'Compagnon ajouté, en attente d\'envoi' },
-  { k: 'd7', site: 'Northern Arch', date: '24 avr. 2022, 10:30', max: '198 ft', dur: '104 min', pending: '' }
+  { k: 'd9', n: 9, site: 'Site à préciser', missing: true, date: '7 févr. 2026, 09:09', max: '91 ft', dur: '55 min', pending: 'Notes modifiées, en attente' },
+  { k: 'd8', n: 8, site: 'Site à préciser', missing: true, date: '27 sept. 2025, 11:55', max: '333 ft', dur: '102 min', pending: 'Compagnon ajouté, en attente' },
+  { k: 'd7', n: 7, site: 'Northern Arch', date: '24 avr. 2022, 10:30', max: '198 ft', dur: '104 min', pending: '' }
 ];
 class Component extends DCLogic {
   renderVals() {
     var dives = ROWS.map(function (r) {
       var p = prof(P[r.k], 56, 36);
-      return { site: r.site, siteColor: r.missing ? '#4A4D52' : '#1F2124', date: r.pending || r.date, pendingColor: r.pending ? '#8A4B00' : '#4A4D52', max: r.max, dur: r.dur, line: p.line, area: p.area, bottom: p.bottom, gid: 'p-' + r.k, alt: 'Profil, ' + r.max + ' au plus profond' };
+      return { site: r.site, siteColor: r.missing ? '#4A4D52' : '#1F2124', date: 'N° ' + r.n + ' · ' + r.date, pending: r.pending, pendDisplay: r.pending ? 'block' : 'none', max: r.max, dur: r.dur, line: p.line, area: p.area, bottom: p.bottom, gid: 'p-' + r.k, alt: 'Profil, ' + r.max + ' au plus profond' };
     });
     return { dives: dives };
   }
