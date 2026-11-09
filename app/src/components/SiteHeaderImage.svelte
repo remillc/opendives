@@ -5,19 +5,17 @@
   // interactive, hidden from screen readers. Until the picture is there
   // (offline and never seen), nothing is shown.
   import { onDestroy } from 'svelte';
-  import { HALF_HEIGHT, loadSiteMap } from '../lib/site-image.js';
+  import { DRAW_WIDTH, HALF_HEIGHT, loadSiteMap } from '../lib/site-image.js';
   import { t } from '../lib/i18n.js';
 
   /** @type {{ latUdeg: number, lonUdeg: number, onshown: (shown: boolean) => void }} */
   let { latUdeg, lonUdeg, onshown } = $props();
 
-  let width = $state(0);
   let src = $state('');
 
   $effect(() => {
-    if (!width) return;
     let stale = false;
-    loadSiteMap(latUdeg, lonUdeg, width)
+    loadSiteMap(latUdeg, lonUdeg)
       .then((url) => {
         if (stale) {
           URL.revokeObjectURL(url);
@@ -42,9 +40,9 @@
   });
 </script>
 
-<div class="image" aria-hidden="true" bind:clientWidth={width}>
+<div class="image" aria-hidden="true">
   {#if src}
-    <img {src} alt="" style:width="{width}px" style:height="{HALF_HEIGHT * 2}px" style:margin-left="{-width / 2}px" style:margin-top="{-HALF_HEIGHT}px" />
+    <img {src} alt="" style:width="{DRAW_WIDTH}px" style:height="{HALF_HEIGHT * 2}px" style:margin-left="{-DRAW_WIDTH / 2}px" style:margin-top="{-HALF_HEIGHT}px" />
     <svg class="pin" width="40" height="40" viewBox="-20 -20 40 40">
       <circle class="halo" r="14" />
       <path class="body" d="M0 4 C-2 -1 -8 -5 -8 -11 A8 8 0 1 1 8 -11 C8 -5 2 -1 0 4Z" />

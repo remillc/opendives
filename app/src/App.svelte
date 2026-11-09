@@ -57,6 +57,8 @@
   import { enableAccessibility } from './lib/accessibility.js';
   import { enableDetailPageCleanup } from './lib/detail-pages.js';
   import { enableModalCleanup } from './lib/modal-cleanup.js';
+  import { schedulePreparingSiteMaps } from './lib/site-image.js';
+  import { logbook } from './lib/logbook.svelte.js';
   import { t } from './lib/i18n.js';
   import { mark } from './lib/perf.js';
   import { settings } from './lib/settings.svelte.js';
@@ -221,6 +223,11 @@
     },
     routes: appRoutes,
   };
+
+  // Each time the logbook is loaded, the maps of its new sites are prepared.
+  $effect(() => {
+    if (logbook.dives.length) schedulePreparingSiteMaps();
+  });
 
   onMount(() => {
     enableBackButton();
