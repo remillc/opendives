@@ -1,0 +1,87 @@
+{
+  "logbook": {
+    "deleteText": {
+      "one": "La plongée est retirée du carnet, sur cet appareil et dans le nuage. Vous pourrez l'annuler pendant quelques secondes.",
+      "other": "Les {n} plongées sont retirées du carnet, sur cet appareil et dans le nuage. Vous pourrez l'annuler pendant quelques secondes."
+    },
+    "emptyCloud": "Connecté au nuage Subsurface, aucune plongée"
+  },
+  "sync": {
+    "failure": {
+      "auth": {
+        "title": "Le nuage refuse votre mot de passe"
+      },
+      "server": {
+        "row": "Le nuage ne répond pas : nouvel essai dans {n} min",
+        "rowManual": "Le nuage ne répond pas",
+        "title": "Le nuage ne répond pas",
+        "intro": "Le réseau fonctionne, mais le serveur du nuage est peut-être en maintenance."
+      }
+    },
+    "syncing": "Synchronisation avec le nuage Subsurface…",
+    "stages": {
+      "connect": "Connexion au nuage…"
+    },
+    "cloud": "Synchronisé avec le nuage Subsurface"
+  },
+  "menu": {
+    "cloudDives": {
+      "one": "Nuage · {n} plongée",
+      "other": "Nuage · {n} plongées"
+    }
+  },
+  "account": {
+    "cloudDives": "Plongées dans le nuage",
+    "signOutText": "Déconnecter votre app du nuage. Vos plongées restent dans le nuage et sur cet appareil.",
+    "deleteText": "Supprime le compte et toutes ses plongées du nuage Subsurface. Irréversible.",
+    "bandSignedIn": "Votre carnet dans le nuage"
+  },
+  "welcome": {
+    "existingText": "Vos plongées sont sauvegardées dans le nuage Subsurface. Une copie reste sur cet appareil : vous la consultez même sans réseau, et elle se met à jour quand le réseau revient."
+  },
+  "signOut": {
+    "textNone": "Le carnet reste dans le nuage. Une copie reste sur cet appareil, non affichée, et sert si vous vous reconnectez.",
+    "textPending": {
+      "one": "{n} modification n'est pas encore envoyée au nuage. Si vous vous déconnectez quand même, elle sera envoyée à votre prochaine connexion à ce compte, depuis cet appareil.",
+      "other": "{n} modifications ne sont pas encore envoyées au nuage. Si vous vous déconnectez quand même, elles seront envoyées à votre prochaine connexion à ce compte, depuis cet appareil."
+    }
+  },
+  "deleteAccount": {
+    "consequence": {
+      "one": "Le compte {email} et sa plongée seront effacés du nuage, sur tous vos appareils et dans toutes les apps qui utilisent ce compte. Il n'y a aucun moyen d'annuler.",
+      "other": "Le compte {email} et ses {n} plongées seront effacés du nuage, sur tous vos appareils et dans toutes les apps qui utilisent ce compte. Il n'y a aucun moyen d'annuler."
+    }
+  },
+  "accountStep": {
+    "emailRow": "Courriel"
+  },
+  "signIn": {
+    "intro": "Le même compte que dans Subsurface sur l'ordinateur ou dans Subsurface-mobile. Vos plongées sont lues depuis le nuage, puis une copie reste sur cet appareil.",
+    "email": "Adresse courriel"
+  },
+  "createAccount": {
+    "intro": "Gratuit. Un code vous est envoyé par courriel pour confirmer l'adresse.",
+    "email": "Adresse courriel",
+    "invalidEmail": "Cette adresse courriel n'est pas valide"
+  },
+  "notAvailable": {
+    "createLocked": "Pendant le développement, créer un compte et écrire dans le nuage sont réservés au compte de test. Rien n'a été envoyé."
+  },
+  "conflict": {
+    "intro": "Modifiée ici et dans le nuage, depuis un autre appareil. Ce qui diffère :",
+    "introComputers": "Modifiés ici et dans le nuage, depuis un autre appareil. Diffèrent :",
+    "onlyInCloud": {
+      "one": "{n} ordinateur présent seulement dans le nuage",
+      "other": "{n} ordinateurs présents seulement dans le nuage"
+    },
+    "loseCloud": {
+      "one": "L’ordinateur présent seulement dans le nuage perd son nom.",
+      "other": "Les {n} ordinateurs présents seulement dans le nuage perdent leur nom."
+    },
+    "cloudCard": "Version du nuage",
+    "keptCloud": "Version du nuage gardée"
+  },
+  "gitRepo": {
+    "intro": "Votre carnet dans un dépôt git à vous (GitHub, GitLab, Codeberg ou votre serveur), à la place du nuage. Une copie reste sur cet appareil."
+  }
+}
