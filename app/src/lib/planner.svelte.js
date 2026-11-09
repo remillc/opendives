@@ -11,7 +11,8 @@
 // - The planner-only settings (rates, reserve, ppO2, last stop, gas switches,
 //   SAC during the ascent) are the core's preferences, as Subsurface-mobile's
 //   "Dive planner setup": set through setPrefs and kept as this device's
-//   settings (settings.svelte.js), read back with plannerSetup.
+//   settings (settings.svelte.js), read back with plannerSetup. A saved plan
+//   keeps its own copy, so that reopening it gives the same result.
 import { OpenDivesCore } from 'opendives-core';
 import { DEFAULT_SAC_FACTOR, settings, setCorePrefs, resetCorePrefs } from './settings.svelte.js';
 import { altitudeToPressureMbar, salinityOfWaterType } from './tools.js';
@@ -42,6 +43,9 @@ export const SETTING_KEYS = /** @type {const} */ ([
   'decoSacMlMin',
   'bottomSacMlMin',
 ]);
+
+/** The settings a saved plan keeps; its bottom SAC is already one of its fields. */
+const KEPT_KEYS = SETTING_KEYS.filter((k) => k !== 'bottomSacMlMin');
 
 /**
  * @typedef {Object} PlanSource
@@ -80,6 +84,8 @@ export const planner = $state({
   /** SAC at the bottom, ml/min (the measured one from a dive). */
   bottomSacMlMin: 20000,
   deco: /** @type {PlanDeco} */ ({ decoModel: 'buehlmann', gfLow: 30, gfHigh: 75, vpmbConservatism: 3 }),
+  /** The settings kept with the plan reopened; null: the core's preferences apply. */
+  kept: /** @type {Record<string, number>|null} */ (null),
   /** The planner settings as the core's preferences hold them, once read. */
   setup: /** @type {PlannerSetup|null} */ (null),
   /** Increases at each change, so that the plan is computed again. */
@@ -95,12 +101,29 @@ export async function loadSetup() {
 }
 
 /**
- * A planner-only setting, as the core holds it.
+ * A planner-only setting: the plan's own while a saved plan is open, else as
+ * the core holds it.
  * @param {typeof SETTING_KEYS[number]} key
  * @returns {number|boolean}
  */
 export function setting(key) {
+  const kept = planner.kept?.[key];
+  if (kept !== undefined) return kept;
   return planner.setup ? planner.setup[key] : 0;
+}
+
+/** The settings to save with a plan, as the core reads them (numbers only). */
+export function planSettings() {
+  if (planner.kept) return { ...planner.kept };
+  const setup = planner.setup;
+  if (!setup) return {};
+  return Object.fromEntries(KEPT_KEYS.map((k) => [k, Math.round(Number(setup[k]))]));
+}
+
+/** A change made while a saved plan is open applies to it too. @param {Record<string, number|boolean>} changes */
+function updateKept(changes) {
+  if (!planner.kept) return;
+  for (const [k, v] of Object.entries(changes)) if (k in planner.kept) planner.kept[k] = Number(v);
 }
 
 /**
@@ -111,6 +134,7 @@ export function setting(key) {
 export async function setSetting(key, value) {
   await setCorePrefs({ [key]: value });
   await loadSetup();
+  updateKept({ [key]: value });
   planner.version++;
 }
 
@@ -176,8 +200,10 @@ export function ascentRate() {
  * @param {number} mmMin
  */
 export async function setAscentRate(mmMin) {
-  await setCorePrefs(Object.fromEntries(ASCENT_KEYS.map((k) => [k, mmMin])));
+  const changes = Object.fromEntries(ASCENT_KEYS.map((k) => [k, mmMin]));
+  await setCorePrefs(changes);
   await loadSetup();
+  updateKept(changes);
   planner.version++;
 }
 
@@ -196,6 +222,7 @@ export async function resetSettings(prefs) {
     sacFactor: DEFAULT_SAC_FACTOR,
   });
   await loadSetup();
+  if (planner.setup) updateKept(Object.fromEntries(KEPT_KEYS.map((k) => [k, Number(planner.setup?.[k])])));
   planner.version++;
 }
 
@@ -324,6 +351,10 @@ export function applyRequest(request, planId, source) {
     gfHigh: request.gfHigh ?? 75,
     vpmbConservatism: request.vpmbConservatism ?? 3,
   };
+  // Saved by an earlier version: none, the current settings apply.
+  const stored = /** @type {Record<string, number|undefined>} */ (/** @type {unknown} */ (request));
+  const kept = Object.fromEntries(KEPT_KEYS.filter((k) => stored[k] !== undefined).map((k) => [k, Number(stored[k])]));
+  planner.kept = Object.keys(kept).length ? kept : null;
   planner.loaded++;
   planner.version++;
 }
@@ -335,8 +366,8 @@ export function nextGas() {
 }
 
 /**
- * The request for the core's planner. The planner-only settings are not
- * sent: the core reads them from its preferences.
+ * The request for the core's planner. The planner-only settings are sent only
+ * for a saved plan that kept its own: else the core reads its preferences.
  * @returns {PlanRequest}
  */
 export function planRequest() {
@@ -346,6 +377,7 @@ export function planRequest() {
       ? { sourceDiveId: planner.source.id }
       : { levels: planner.levels.map((l) => ({ depthMm: Math.round(l.depthMm), durationSeconds: Math.round(l.durationSeconds) })) }),
     ...(planner.when ? { when: planner.when } : {}),
+    ...(planner.kept ?? {}),
     bottomSacMlMin: Math.round(planner.bottomSacMlMin),
     salinity: planner.salinity,
     surfacePressureMbar: planner.surfacePressureMbar,

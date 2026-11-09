@@ -486,6 +486,9 @@ async function run() {
   await useUnits('metric');
   await go('/plans/');
   await p.waitFor(`__od.visible('.list .row').length >= 1`, 'the plans after the reload');
+  // The settings of the moment do not change a saved plan.
+  const setupBeforeReopen = await core('plannerSetup');
+  await core('setPrefs', { changes: { descentMmMin: 3000, reserveMbar: 100000 } });
   await click('.list .row a.open');
   await p.waitFor(`!!__od.root()?.querySelector('.outcome .plan')`, 'the reopened plan');
   await settle();
@@ -493,6 +496,7 @@ async function run() {
   same('12 reopened after a reload: fields', await p.eval(`[__od.field(${q(T('plan.depth'))}, 0).value, __od.field(${q(T('plan.duration'))}, 0).value, __od.field(${q(T('plan.oxygenPercent'))}, 1).value, __od.field(${q(T('plan.carried'))}, 1).value]`), ['45', '25', '50', '12']);
   same('12 reopened after a reload: the same result', [number(reopened.title), reopened.stops.length, reopened.oxygen], [minutes(saved.ref.runtimeSeconds), saved.ref.stops.length, saved.ui.oxygen]);
   same('12 reopened: the alarm is the same', reopened.rows.map((x) => x.alarm), saved.ui.rows.map((x) => x.alarm));
+  await core('setPrefs', { changes: { descentMmMin: setupBeforeReopen.descentMmMin, reserveMbar: setupBeforeReopen.reserveMbar } });
 
   // duplicate, share, delete from the list
   await go('/plans/');

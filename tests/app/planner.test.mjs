@@ -10,7 +10,7 @@ import assert from 'node:assert/strict';
 const root = '../../app/src/';
 const rules = await import(root + 'lib/planner-rules.js');
 const format = await import(root + 'lib/format.js');
-const { planner, planRequest, plannerDefaults, startNewDive, requestOfPlan } = await import(root + 'lib/planner.svelte.js');
+const { planner, planRequest, plannerDefaults, startNewDive, requestOfPlan, applyRequest, planSettings, setting } = await import(root + 'lib/planner.svelte.js');
 const tools = await import(root + 'lib/tools.js');
 const { t } = await import(root + 'lib/i18n.js');
 
@@ -166,4 +166,29 @@ test('the alarm texts name the missing volume in the diver\'s unit', () => {
   const missing = rules.isShort(carried, total) ? t('plan.volumeShort', { missing: format.formatGasVolume(total - carried, imperial) }) : '';
   assert.match(plain(missing), /18 pi³/); // 500 000 ml = 17.66 cuft, shown as a whole number
   assert.match(plain(t('plan.modText', { po2: format.formatNumber(1.4, 1), depth: '56 m' })), /56 m/);
+});
+
+test('a saved plan keeps its settings, whatever Settings say when it is reopened', () => {
+  planner.kept = null;
+  planner.setup = { bottomSacMlMin: 20000, descentMmMin: 18000, ascent75MmMin: 9000, ascent50MmMin: 9000, ascentStopsMmMin: 9000, ascentLast6mMmMin: 9000, reserveMbar: 40000, lastStop6m: true, safetyStop: false, switchAtRequiredStop: false, minSwitchSeconds: 60, o2Breaks: false, dropStone: false, bottomPo2Mbar: 1400, decoPo2Mbar: 1600, problemSolvingMinutes: 4, sacFactor: 200, decoSacMlMin: 17000 };
+  startNewDive({ ...metric });
+  assert.equal(planRequest().descentMmMin, undefined, 'a new plan follows Settings');
+  const saved = { ...planRequest(), ...planSettings() };
+  assert.equal(saved.descentMmMin, 18000);
+  assert.equal(saved.reserveMbar, 40000);
+  assert.equal(saved.lastStop6m, 1, 'a number: the core reads numbers only');
+  assert.equal('bottomSacMlMin' in planSettings(), false, 'the SAC stays the field of the plan');
+
+  planner.setup = { ...planner.setup, descentMmMin: 18288, reserveMbar: 34474 };
+  applyRequest(saved, 7, null);
+  const reopened = planRequest();
+  assert.equal(reopened.descentMmMin, 18000, 'the plan, not the new Settings');
+  assert.equal(reopened.reserveMbar, 40000);
+  assert.equal(setting('descentMmMin'), 18000);
+
+  const older = { ...saved };
+  for (const k of Object.keys(planSettings())) delete older[k];
+  applyRequest(older, 8, null);
+  assert.equal(planner.kept, null, 'a plan saved before: the current Settings');
+  assert.equal(planRequest().descentMmMin, undefined);
 });

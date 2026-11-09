@@ -16,7 +16,7 @@
   import WheelDialog from '../components/WheelDialog.svelte';
   import ShareSheet from '../components/ShareSheet.svelte';
   import { logbook, savePlan } from '../lib/logbook.svelte.js';
-  import { planner, loadSetup, adoptUnitDefaults, planRequest, startFromDive, startNewDive, requestOfPlan, applyRequest, nextGas } from '../lib/planner.svelte.js';
+  import { planner, loadSetup, adoptUnitDefaults, planRequest, startFromDive, startNewDive, requestOfPlan, applyRequest, nextGas, planSettings } from '../lib/planner.svelte.js';
   import { waterBottomColor } from '../lib/water-column.js';
   import { formatDateTime, formatDuration, formatGasVolume, formatMixName, formatGasLong, formatNumber, formatSac, formatTimeOfDay, decoSummary, depthUnit, locale } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
@@ -112,11 +112,18 @@
     const id = f7route.params.id;
     await refresh();
     planner.planId = 0;
+    planner.kept = null;
     if (reopen) await reopenPlan(Number(id));
     else if (id === 'new') startNewDive(prefs);
     else await startFrom(Number(id));
     started = true;
+    keptHere = planner.kept;
   }
+  // Leaving this plan: the screens of Settings show the device's own values.
+  let keptHere = /** @type {typeof planner.kept} */ (null);
+  $effect(() => () => {
+    if (planner.kept === keptHere) planner.kept = null;
+  });
   open();
 
   // The plan is computed again at each change of the dive or the settings,
@@ -522,7 +529,7 @@
     if (!canSave || !result) return;
     saving = true;
     try {
-      await savePlan({ ...planRequest(), when: result.when }, planner.planId);
+      await savePlan({ ...planRequest(), ...planSettings(), when: result.when }, planner.planId);
       toList();
     } catch (e) {
       console.error('Saving the plan', e);

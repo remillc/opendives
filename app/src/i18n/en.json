@@ -1322,7 +1322,8 @@
       "Git repository: the logbook can live in your own git repository (GitHub, GitLab, Codeberg or your server) instead of the Subsurface cloud. On the first page, “Use my own git repository”; the access token stays encrypted on the device.",
       "Tablet: the logbook opens the first dive when none is shown.",
       "Sharing: the app no longer stays stuck under a grey veil after sharing a dive or a plan.",
-      "Dive profile: the card follows the mock-up (full-width chart, scale down to the maximum depth)."
+      "Dive profile: the card follows the mock-up (full-width chart, scale down to the maximum depth).",
+      "Planner: a saved plan keeps its rates, reserve and other settings, and gives the same result when reopened."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
