@@ -946,3 +946,9 @@ Christian approved this on the canvas. Mock-up: `docs/mockups/android-sites.dc.h
 - The map runs under the band, so the wave must cut the band (CSS mask or clip-path on its bottom edge, 18 dp high) rather than be painted in the page colour: the map shows under the curve.
 - Make sure the first map pins and their labels are not hidden under the taller band (initial map view, or padding of the map camera).
 
+## [ ] 2026-11-09-27 Edit dive form: rebreather cylinders (gas switch depth, O₂ defaults)
+
+Christian approved these on the canvas this morning; they were sent late. Spec: "Edit dive form, rebreather cylinders". Mock-up: `docs/mockups/android-edition.dc.html` (it also carries the changes of tasks 2026-11-09-17).
+- CCR dive: remove "Changement de gaz à" and its MOD helper from the cylinders whose use is Diluant or Oxygène. Keep them for open circuit and bailout cylinders.
+- When the use becomes Oxygène, set O₂ to 100 % and He to 0. When it becomes Diluant, set O₂ to 21 % and He to 0. The values stay editable; do not overwrite a value the diver typed after choosing the use.
+
