@@ -147,6 +147,18 @@ export function applyDeviceSettings() {
 }
 
 /**
+ * The core's preferences after the logbook was loaded or changed. Loading
+ * applies the units and displays written in the log (apply_log_prefs): what was
+ * chosen on this device stays; what was not follows the log.
+ */
+export async function prefsAfterLoad() {
+  if (Object.keys(storedCore).length) {
+    await OpenDivesCore.setPrefs({ changes: storedCore }).catch((/** @type {unknown} */ e) => console.error('Restoring the settings of this device', e));
+  }
+  return OpenDivesCore.getPrefs();
+}
+
+/**
  * Sets core preferences and keeps them as this device's values.
  * @param {Partial<CorePrefValues>} changes
  */

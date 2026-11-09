@@ -1323,7 +1323,8 @@
       "Tablette : le carnet ouvre la première plongée quand aucune n’est affichée.",
       "Partage : l’app ne reste plus bloquée sous un voile gris après avoir partagé une plongée ou un plan.",
       "Profil de plongée : la carte suit la maquette (graphique pleine largeur, échelle jusqu’à la profondeur maximale).",
-      "Planificateur : un plan enregistré garde ses vitesses, sa réserve et ses autres réglages, et redonne le même résultat quand on le rouvre."
+      "Planificateur : un plan enregistré garde ses vitesses, sa réserve et ses autres réglages, et redonne le même résultat quand on le rouvre.",
+      "Réglages : les unités choisies sur l’appareil ne reviennent plus à celles du carnet au redémarrage."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",

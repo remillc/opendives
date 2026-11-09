@@ -5,7 +5,7 @@ import { defaultPrefs } from './format.js';
 import { mark } from './perf.js';
 import { readSnapshot, saveSnapshot } from './snapshot.js';
 import { nextProgress } from './sync-progress.js';
-import { applyDeviceSettings, keepCylinderLibrary, keepDiveComputers } from './settings.svelte.js';
+import { applyDeviceSettings, keepCylinderLibrary, keepDiveComputers, prefsAfterLoad } from './settings.svelte.js';
 
 /** @typedef {import('opendives-core').Dive} Dive */
 /** @typedef {import('opendives-core').Prefs} Prefs */
@@ -108,7 +108,7 @@ export async function setAutogroup(on) {
   logbook.undoText = result.undo;
   logbook.redoText = result.redo ?? '';
   logbook.dives = await OpenDivesCore.listLoadedDives();
-  logbook.prefs = await OpenDivesCore.getPrefs();
+  logbook.prefs = await prefsAfterLoad();
   await persistChanges();
 }
 
@@ -349,7 +349,7 @@ export async function importDeviceDives() {
  */
 export async function afterDownload(result) {
   try {
-    logbook.prefs = await OpenDivesCore.getPrefs();
+    logbook.prefs = await prefsAfterLoad();
     if (logbook.prefs.diveComputerList) keepDiveComputers(logbook.prefs.diveComputerList);
   } catch (e) {
     console.error('Reading the remembered dive computers', e);
@@ -788,7 +788,7 @@ async function loadCloud(force, pre = null) {
       if (cached.dives) {
         if (cached.server) logbook.server = cached.server;
         logbook.dives = cached.dives;
-        logbook.prefs = await OpenDivesCore.getPrefs();
+        logbook.prefs = await prefsAfterLoad();
         logbook.sync = 'manual';
         await countPending();
         return true;
@@ -812,7 +812,7 @@ async function loadCloud(force, pre = null) {
     if (cached.server) logbook.server = cached.server;
     if (cached.dives) {
       logbook.dives = cached.dives;
-      logbook.prefs = await OpenDivesCore.getPrefs();
+      logbook.prefs = await prefsAfterLoad();
       logbook.syncProgress = null;
       logbook.sync = 'syncing';
       logbook.loading = false;
@@ -842,7 +842,7 @@ async function loadCloud(force, pre = null) {
     const fresh = await OpenDivesCore.listCloudDives();
     if (fresh.dives) {
       logbook.dives = fresh.dives;
-      logbook.prefs = await OpenDivesCore.getPrefs();
+      logbook.prefs = await prefsAfterLoad();
     }
     if (fresh.server) logbook.server = fresh.server;
     logbook.sync = fresh.synced ? 'cloud' : 'offline';
@@ -890,7 +890,7 @@ export async function loadLogbook({ force = false } = {}) {
       logbook.sync = 'local';
       logbook.pending = 0;
       logbook.pendingByDive = {};
-      logbook.prefs = await OpenDivesCore.getPrefs();
+      logbook.prefs = await prefsAfterLoad();
     }
   } catch (e) {
     // Never the raw core text on screen (spec, section 6): it goes to the log.
