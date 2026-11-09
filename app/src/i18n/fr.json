@@ -129,6 +129,11 @@
     "tripDeleted": {
       "one": "Voyage supprimé, ses plongées sont conservées",
       "other": "{n} voyages supprimés, leurs plongées sont conservées"
+    },
+    "emptyGit": "Connecté au dépôt git, aucune plongée",
+    "deleteTextGit": {
+      "one": "La plongée est retirée du carnet, sur cet appareil et dans le dépôt. Vous pourrez l’annuler pendant quelques secondes.",
+      "other": "Les {n} plongées sont retirées du carnet, sur cet appareil et dans le dépôt. Vous pourrez les annuler pendant quelques secondes."
     }
   },
   "sync": {
@@ -138,7 +143,8 @@
       "receive": "Réception des modifications…",
       "merge": "Fusion des modifications…",
       "send": "Envoi des modifications…",
-      "read": "Lecture du carnet…"
+      "read": "Lecture du carnet…",
+      "connectGit": "Connexion au dépôt…"
     },
     "outcome": {
       "done": "Synchronisation terminée",
@@ -155,7 +161,9 @@
     "offlinePending": {
       "one": "Hors ligne : {n} modification sera envoyée au retour du réseau",
       "other": "Hors ligne : {n} modifications seront envoyées au retour du réseau"
-    }
+    },
+    "syncingGit": "Synchronisation avec le dépôt git…",
+    "cloudGit": "Synchronisé avec le dépôt git"
   },
   "dive": {
     "siteNotSet": "Site à préciser",
@@ -632,7 +640,11 @@
       "one": "Sur cet appareil · {n} plongée",
       "other": "Sur cet appareil · {n} plongées"
     },
-    "accountLabel": "Compte : {name}"
+    "accountLabel": "Compte : {name}",
+    "gitDives": {
+      "one": "Dépôt · {n} plongée",
+      "other": "Dépôt · {n} plongées"
+    }
   },
   "account": {
     "addDeviceDives": "Ajouter les plongées de cet appareil",
@@ -684,7 +696,15 @@
     "autoSyncOff": "Désactivée : les modifications restent sur cet appareil, et celles des autres appareils n'arrivent pas, tant que vous ne synchronisez pas",
     "pending": "Modifications non envoyées",
     "bandSignedIn": "Votre carnet dans le cloud",
-    "bandNone": "Aucun compte connecté"
+    "bandNone": "Aucun compte connecté",
+    "bandGit": "Votre carnet dans votre dépôt git",
+    "gitCaption": "{host} · branche {branch}",
+    "gitDives": "Plongées dans le dépôt",
+    "gitGroup": "Dépôt git",
+    "gitEdit": "Modifier le dépôt",
+    "gitEditText": "Adresse, branche et jeton",
+    "gitSignOut": "Se déconnecter du dépôt",
+    "gitSignOutText": "Vos plongées restent dans le dépôt. Le jeton est effacé de cet appareil."
   },
   "welcome": {
     "title": "OpenDives",
@@ -695,7 +715,8 @@
     "createText": "Gratuit. Vos plongées sont sauvegardées et partagées entre votre téléphone, votre tablette et votre ordinateur. Vous pourrez y reprendre votre carnet divelogs.de.",
     "noAccount": "Commencer sans compte",
     "noAccountText": "Vos plongées restent seulement sur cet appareil : pas de sauvegarde, et pas de partage avec vos autres appareils. Vous pourrez créer un compte plus tard et y envoyer votre carnet.",
-    "choicesLabel": "Façons de commencer"
+    "choicesLabel": "Façons de commencer",
+    "ownGit": "Utiliser mon propre dépôt git"
   },
   "signOut": {
     "title": "Se déconnecter ?",
@@ -711,7 +732,13 @@
     "signOutAnyway": "Se déconnecter quand même",
     "cancel": "Annuler",
     "syncFailed": "Les modifications n'ont pas pu être envoyées. Vous restez connecté.",
-    "failed": "La déconnexion n'a pas abouti. Rien n'a été effacé."
+    "failed": "La déconnexion n'a pas abouti. Rien n'a été effacé.",
+    "titleGit": "Se déconnecter du dépôt ?",
+    "textNoneGit": "Le carnet reste dans le dépôt. Une copie reste sur cet appareil, non affichée, et sert si vous vous reconnectez au même dépôt. Le jeton est effacé de cet appareil.",
+    "textPendingGit": {
+      "one": "{n} modification n’est pas encore envoyée au dépôt. Si vous vous déconnectez quand même, elle sera envoyée à votre prochaine connexion à ce dépôt, depuis cet appareil. Le jeton est effacé de cet appareil.",
+      "other": "{n} modifications ne sont pas encore envoyées au dépôt. Si vous vous déconnectez quand même, elles seront envoyées à votre prochaine connexion à ce dépôt, depuis cet appareil. Le jeton est effacé de cet appareil."
+    }
   },
   "deleteAccount": {
     "back": "Retour au compte",
@@ -1289,7 +1316,8 @@
       "Carnet : un voyage d’une seule plongée s’affiche comme une plongée, sans flèche.",
       "Carnet : pendant le glisser-déposer d’une plongée, une barre horizontale montre où elle serait déposée.",
       "Carnet : le numéro de la plongée revient devant la date ; un voyage ouvert est décalé, et ses plongées se cochent en mode sélection.",
-      "Carnet : un voyage se sélectionne ; « Supprimer ce voyage » retire le voyage et garde ses plongées."
+      "Carnet : un voyage se sélectionne ; « Supprimer ce voyage » retire le voyage et garde ses plongées.",
+      "Dépôt git : le carnet peut vivre dans votre propre dépôt git (GitHub, GitLab, Codeberg ou votre serveur) à la place du cloud Subsurface. Sur la première page, « Utiliser mon propre dépôt git » ; le jeton d’accès reste chiffré sur l’appareil."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
@@ -1324,7 +1352,8 @@
       "noAccount": "sans compte",
       "dives": "Plongées",
       "lastSync": "Dernière synchronisation",
-      "lastError": "Dernière erreur"
+      "lastError": "Dernière erreur",
+      "git": "Dépôt git"
     },
     "opensElsewhere": "s'ouvre dans le navigateur",
     "credit": "Le cœur de calcul vient de Subsurface, créé par Linus Torvalds et Dirk Hohndel, et de ses contributeurs.",
@@ -1947,5 +1976,90 @@
       "other": "sur {n} années, de {from} à {to}"
     },
     "tools": "Planifier, vérifier la désaturation, préparer les gaz"
+  },
+  "gitRepo": {
+    "title": "Dépôt git",
+    "connect": "Connecter",
+    "connecting": "Connexion…",
+    "intro": "Votre carnet dans un dépôt git à vous (GitHub, GitLab, Codeberg ou votre serveur), à la place du cloud. Une copie reste sur cet appareil.",
+    "address": "Adresse du dépôt (HTTPS)",
+    "addressChecking": "Vérification de l’adresse…",
+    "addressPublic": "Dépôt trouvé, avec un carnet existant",
+    "addressPublicEmpty": "Dépôt trouvé, vide",
+    "addressPrivate": "Dépôt privé ou introuvable : il sera vérifié avec le jeton",
+    "addressNone": "Aucun dépôt git à cette adresse. Vérifiez l’adresse, elle se termine souvent par .git",
+    "addressNotHttps": "L’adresse doit commencer par https://",
+    "addressInvalid": "Adresse non valide : elle ne doit contenir ni identifiant, ni espace, ni crochet.",
+    "username": "Nom d’utilisateur",
+    "usernameInvalid": "Lettres, chiffres, point, tiret et tiret bas seulement",
+    "token": "Jeton d’accès",
+    "tokenHelper": "Un jeton d’accès personnel avec le droit d’écriture, pas votre mot de passe",
+    "tokenKeep": "Laissez vide pour garder le jeton enregistré",
+    "tokenChecking": "Vérification du jeton…",
+    "tokenDenied": "Accès refusé par le serveur. Vérifiez le jeton et son droit d’écriture sur ce dépôt.",
+    "tokenHow": "Comment créer un jeton d’accès",
+    "branch": "Branche",
+    "branchWaiting": "Disponible une fois l’accès accepté",
+    "branchesRead": {
+      "one": "{n} branche lue dans le dépôt : {list}",
+      "other": "{n} branches lues dans le dépôt : {list}"
+    },
+    "branchEmpty": "Dépôt vide : la branche {name} y sera créée",
+    "note": "Le jeton reste chiffré sur cet appareil. Le carnet est enregistré au format Subsurface : Subsurface sur ordinateur peut ouvrir le même dépôt.",
+    "errorNetwork": "Le serveur ne répond pas. Vérifiez la connexion, puis réessayez.",
+    "errorNoLog": "La branche n’existe plus dans le dépôt. Rouvrez la liste des branches et choisissez-en une.",
+    "errorFailed": "La connexion n’a pas abouti. Rien n’a été enregistré.",
+    "pending": "Des modifications ne sont pas encore envoyées au dépôt. Synchronisez avant de changer de dépôt."
+  },
+  "tokenHelp": {
+    "title": "Créer un jeton d’accès",
+    "intro": "OpenDives se connecte à votre dépôt avec un jeton d’accès personnel, jamais avec votre mot de passe. Créez un jeton limité à ce seul dépôt, avec le droit de lire et d’écrire son contenu et rien d’autre, et une date d’expiration. Les libellés ci-dessous sont ceux de l’interface anglaise de chaque site.",
+    "afterwards": "Collez ensuite le jeton dans OpenDives, avec votre nom d’utilisateur. Le jeton n’est montré qu’une fois par le site : copiez-le avant de quitter la page.",
+    "open": "Ouvrir la page des jetons de {name}",
+    "openDocs": "Documentation de {name}",
+    "github": {
+      "name": "GitHub",
+      "note": "Un jeton « fine-grained » peut être limité à un seul dépôt.",
+      "s1": "Connectez-vous à GitHub, puis ouvrez Settings (menu de votre photo de profil).",
+      "s2": "Tout en bas de la colonne de gauche, ouvrez Developer settings.",
+      "s3": "Ouvrez Personal access tokens, puis Fine-grained tokens, puis touchez Generate new token.",
+      "s4": "Token name : un nom reconnaissable, par exemple OpenDives.",
+      "s5": "Expiration : choisissez une date proche, par exemple dans 90 jours. À cette date le jeton cesse de fonctionner et vous en créez un nouveau.",
+      "s6": "Resource owner : votre compte, ou l’organisation qui possède le dépôt.",
+      "s7": "Repository access : choisissez Only select repositories, puis le dépôt de votre carnet.",
+      "s8": "Permissions : dans Repository permissions, réglez Contents sur Read and write. N’ajoutez aucune autre permission.",
+      "s9": "Touchez Generate token, puis copiez le jeton."
+    },
+    "gitlab": {
+      "name": "GitLab",
+      "note": "Un jeton de projet est limité à un seul projet. Sur GitLab.com il demande l’offre Premium ou Ultimate (toute licence sur un serveur GitLab auto-hébergé) et le rôle Maintainer ou Owner sur le projet. Sans cela, utilisez un jeton personnel, qui donne accès à tous vos projets : GitLab ne permet pas de le limiter à un seul.",
+      "projectTitle": "Jeton d’accès de projet (project access token)",
+      "p1": "Ouvrez votre projet, puis dans la colonne de gauche Settings, Access tokens.",
+      "p2": "Touchez Add new token.",
+      "p3": "Token name : un nom reconnaissable, par exemple OpenDives.",
+      "p4": "Expiration date : une date proche (365 jours au plus).",
+      "p5": "Rôle : le plus bas qui permet d’envoyer vos modifications sur la branche, Developer, ou Maintainer si la branche est protégée.",
+      "p6": "Scopes : cochez write_repository seulement.",
+      "p7": "Touchez Create project access token, puis copiez le jeton.",
+      "personalTitle": "Sinon, jeton d’accès personnel (personal access token)",
+      "q1": "En haut à droite, touchez votre avatar, puis Edit profile.",
+      "q2": "Dans la colonne de gauche, ouvrez Access, puis Personal access tokens.",
+      "q3": "Dans la liste Generate token, choisissez Legacy token.",
+      "q4": "Token name : un nom reconnaissable. Expiration date : une date proche.",
+      "q5": "Scopes : cochez write_repository seulement.",
+      "q6": "Touchez Generate token, puis copiez le jeton.",
+      "user": "Dans OpenDives, le nom d’utilisateur est le vôtre sur GitLab. Pour Git en HTTPS, GitLab accepte tout nom non vide avec le jeton."
+    },
+    "codeberg": {
+      "name": "Codeberg",
+      "note": "Le guide de Codeberg précise qu’un jeton donne par défaut un accès complet à votre compte : limitez-le comme ci-dessous.",
+      "s1": "Connectez-vous à Codeberg, ouvrez le menu de votre photo de profil (Profiles and Settings), puis Settings.",
+      "s2": "Ouvrez l’onglet Applications.",
+      "s3": "Sous Manage Access Tokens, dans Generate New Token, saisissez un Token Name reconnaissable, par exemple OpenDives.",
+      "s4": "Si le formulaire le propose, limitez le jeton à votre dépôt : choisissez Specific repositories, puis le dépôt de votre carnet.",
+      "s5": "Permissions : pour repository, choisissez Read and Write. Laissez les autres sur No access.",
+      "s6": "Si le formulaire propose une date d’expiration, choisissez une date proche. Le guide de Codeberg n’en parle pas : sans date, supprimez le jeton depuis cette page quand vous ne l’utilisez plus.",
+      "s7": "Touchez Generate Token, puis copiez le jeton."
+    }
   }
 }

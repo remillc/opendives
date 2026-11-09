@@ -63,6 +63,8 @@
   import About from './pages/About.svelte';
   import AboutText from './pages/AboutText.svelte';
   import AboutLibraries from './pages/AboutLibraries.svelte';
+  import GitRepository from './pages/GitRepository.svelte';
+  import TokenHelp from './pages/TokenHelp.svelte';
 
   // Addresses: a resource has no trailing slash, a collection has one (AGENTS.md).
   const appRoutes = [
@@ -90,6 +92,9 @@
     { path: '/account/code', component: ConfirmCode },
     { path: '/account/import', component: BringLogbook },
     { path: '/account/importing', component: ImportProgress },
+    // The logbook in the user's own git repository (Modifier le dépôt).
+    { path: '/account/git', component: GitRepository, options: { props: { edit: true } } },
+    { path: '/account/git/token', component: TokenHelp },
     // First launch, in the view of its popup (components/Welcome.svelte).
     { path: '/welcome', component: WelcomeStart },
     { path: '/welcome/sign-in', component: SignIn, options: { props: { welcome: true } } },
@@ -97,6 +102,8 @@
     { path: '/welcome/code', component: ConfirmCode, options: { props: { welcome: true } } },
     { path: '/welcome/import', component: BringLogbook },
     { path: '/welcome/importing', component: ImportProgress },
+    { path: '/welcome/git', component: GitRepository, options: { props: { welcome: true } } },
+    { path: '/welcome/git/token', component: TokenHelp },
     // Phone: a full screen. Tablet: a sheet (iPad) or a pane (Android) over the
     // list and the dive, chosen when the screen opens (EditDive.svelte).
     {

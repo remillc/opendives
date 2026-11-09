@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 12 and later (android:dataExtractionRules): neither cloud backup nor
+     device-to-device transfer carries the repository access (address, user
+     name, encrypted token). -->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="file" path="git-remote.bin" />
+        <exclude domain="file" path="git-remote.bin.tmp" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="file" path="git-remote.bin" />
+        <exclude domain="file" path="git-remote.bin.tmp" />
+    </device-transfer>
+</data-extraction-rules>

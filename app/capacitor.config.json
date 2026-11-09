@@ -1,5 +1,6 @@
 {
   "appId": "org.opendives.app",
   "appName": "OpenDives",
-  "webDir": "dist"
+  "webDir": "dist",
+  "loggingBehavior": "none"
 }
