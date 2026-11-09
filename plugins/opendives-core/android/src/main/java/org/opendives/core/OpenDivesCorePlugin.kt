@@ -42,6 +42,8 @@ import java.util.concurrent.Executors
     permissions = [
         Permission(strings = [Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT], alias = "bluetooth"),
         Permission(strings = [Manifest.permission.ACCESS_FINE_LOCATION], alias = "bluetoothLocation"),
+        // Android 13 and later: the notification of an offline map download.
+        Permission(strings = [Manifest.permission.POST_NOTIFICATIONS], alias = "notifications"),
     ],
 )
 class OpenDivesCorePlugin : Plugin() {
@@ -72,6 +74,8 @@ class OpenDivesCorePlugin : Plugin() {
     private val setupThread: ExecutorService = Executors.newSingleThreadExecutor()
 
     override fun load() {
+        MapsManager.init(context)
+        MapsManager.listener = { event -> notifyListeners("mapsDownload", JSObject(event.toString())) }
         val home = context.filesDir.absolutePath
         val caFile = File(context.cacheDir, "cacerts.pem")
         coreThread.execute {
@@ -824,6 +828,114 @@ class OpenDivesCorePlugin : Plugin() {
         val wifi = capabilities != null &&
             (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) || capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET))
         call.resolve(JSObject().put("wifi", wifi))
+    }
+
+    // --- Offline maps (MapsManager, MapsDownloadWorker) ---
+
+    private val mapsIo: ExecutorService = Executors.newSingleThreadExecutor()
+
+    override fun handleOnDestroy() {
+        MapsManager.listener = null
+        super.handleOnDestroy()
+    }
+
+    @PluginMethod
+    fun mapsFreeSpace(call: PluginCall) {
+        val (free, total) = MapsManager.freeSpace()
+        call.resolve(JSObject().put("freeBytes", free).put("totalBytes", total))
+    }
+
+    /**
+     * Queues a download ({id, url, sha256, sizeBytes, allowCellular, title}). Asks for the
+     * notification permission first (Android 13+), once; refused, the download still runs.
+     */
+    @PluginMethod
+    fun mapsDownloadStart(call: PluginCall) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && getPermissionState("notifications") == PermissionState.PROMPT) {
+            requestPermissionForAlias("notifications", call, "mapsNotificationResult")
+        } else {
+            startMapsDownload(call)
+        }
+    }
+
+    @PermissionCallback
+    private fun mapsNotificationResult(call: PluginCall) = startMapsDownload(call)
+
+    private fun startMapsDownload(call: PluginCall) {
+        val id = mapsId(call) ?: return
+        val url = call.getString("url")
+        val sha256 = call.getString("sha256")
+        if (url.isNullOrEmpty() || sha256.isNullOrEmpty()) return call.reject("Missing url or sha256", "BAD_ARGUMENT")
+        MapsManager.start(
+            id, url, sha256, call.getLong("sizeBytes") ?: 0L,
+            call.getBoolean("allowCellular") ?: false, call.getString("title") ?: id,
+        )
+        call.resolve()
+    }
+
+    @PluginMethod
+    fun mapsDownloadPause(call: PluginCall) {
+        MapsManager.pause(mapsId(call) ?: return)
+        call.resolve()
+    }
+
+    @PluginMethod
+    fun mapsDownloadResume(call: PluginCall) {
+        MapsManager.resume(mapsId(call) ?: return, call.getBoolean("allowCellular") ?: false)
+        call.resolve()
+    }
+
+    @PluginMethod
+    fun mapsDownloadCancel(call: PluginCall) {
+        MapsManager.cancel(mapsId(call) ?: return)
+        call.resolve()
+    }
+
+    @PluginMethod
+    fun mapsDownloads(call: PluginCall) {
+        val list = org.json.JSONArray()
+        for (e in MapsManager.downloads()) list.put(e.toEvent())
+        call.resolve(JSObject().put("downloads", list))
+    }
+
+    @PluginMethod
+    fun mapsFiles(call: PluginCall) {
+        val list = org.json.JSONArray()
+        for ((id, size) in MapsManager.files()) list.put(JSObject().put("id", id).put("sizeBytes", size))
+        call.resolve(JSObject().put("files", list))
+    }
+
+    @PluginMethod
+    fun mapsDelete(call: PluginCall) {
+        MapsManager.delete(mapsId(call) ?: return)
+        call.resolve()
+    }
+
+    /** Bytes of a ready package, base64 (at most 16 MiB a call). Rejects with NOT_FOUND. */
+    @PluginMethod
+    fun mapsReadRange(call: PluginCall) {
+        val id = mapsId(call) ?: return
+        val offset = call.getLong("offset") ?: 0L
+        val length = (call.getLong("length") ?: 0L).coerceIn(0L, MapsManager.MAX_READ_BYTES.toLong()).toInt()
+        mapsIo.execute {
+            try {
+                if (!MapsManager.readyFile(id).exists()) return@execute call.reject("No such package", "NOT_FOUND")
+                val bytes = MapsManager.readRange(id, offset, length)
+                call.resolve(JSObject().put("base64", Base64.encodeToString(bytes, Base64.NO_WRAP)))
+            } catch (e: Exception) {
+                call.reject(e.message ?: "Cannot read the package", "FAILED")
+            }
+        }
+    }
+
+    /** The package id of a call: letters, digits, dot, dash, underscore (it names a file). */
+    private fun mapsId(call: PluginCall): String? {
+        val id = call.getString("id")
+        if (id == null || !MapsManager.ID_PATTERN.matches(id) || id.contains("..")) {
+            call.reject("Bad package id", "BAD_ARGUMENT")
+            return null
+        }
+        return id
     }
 
     /** Takes back the last conflict choice while it is not sent. */
