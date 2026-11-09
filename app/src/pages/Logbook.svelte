@@ -23,7 +23,7 @@
   import { filter, loadOptions, applyFilter, isEmpty } from '../lib/filter.svelte.js';
   import { layout } from '../lib/layout.svelte.js';
   import { navigation } from '../lib/navigation.svelte.js';
-  import { formatDateTime, formatLongDate, formatTimeAgo } from '../lib/format.js';
+  import { formatDateTime, formatLongDate, formatTimeAgo, localNowIso } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
   import { mark } from '../lib/perf.js';
   import { buildSnapshot, saveSnapshot } from '../lib/snapshot.js';
@@ -709,8 +709,12 @@
   const bandSummary = $derived.by(() => {
     if (!logbook.dives.length) return '';
     const sites = new Set(logbook.dives.map((d) => d.site).filter(Boolean)).size;
-    const latest = logbook.dives.reduce((a, d) => (d.date > a ? d.date : a), logbook.dives[0].date);
-    return [t('band.dives', { n: logbook.dives.length }), t('band.sites', { n: sites }), t('band.lastDive', { ago: formatTimeAgo(latest) })].join(' · ');
+    // A dive dated in the future (a dive computer's clock) is not the last one done.
+    const now = localNowIso();
+    const latest = logbook.dives.reduce((a, d) => (d.date <= now && d.date > a ? d.date : a), '');
+    return [t('band.dives', { n: logbook.dives.length }), t('band.sites', { n: sites }), latest ? t('band.lastDive', { ago: formatTimeAgo(latest) }) : '']
+      .filter(Boolean)
+      .join(' · ');
   });
 
   /** Number of dives shown: follows the search (the filter row counts the filter). */

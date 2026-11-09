@@ -344,15 +344,21 @@ export function formatMixName(o2Permille, hePermille) {
   return `(${o2}/${he})`;
 }
 
+/** Now as a local wall-clock date, like the dates of dives: "2026-11-09T14:30:00". */
+export function localNowIso() {
+  return new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 19);
+}
+
 /**
  * Time since a local date, in days, weeks, months or years: "il y a 9 mois".
+ * Days are days of the calendar: last night's dive is "hier", even under 24 h ago.
  * @param {string} iso
  */
 export function formatTimeAgo(iso) {
-  // Dive times are local wall-clock times: "now" is taken the same way.
-  const days = Math.floor((Date.now() - new Date().getTimezoneOffset() * 60000 - toDate(iso).getTime()) / 86400000);
+  const DAY = 86400000;
+  const days = Math.floor(toDate(localNowIso()).getTime() / DAY) - Math.floor(toDate(iso).getTime() / DAY);
   const rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' });
-  if (days < 7) return rtf.format(-Math.max(0, days), 'day');
+  if (days < 7) return rtf.format(-days, 'day');
   if (days < 60) return rtf.format(-Math.floor(days / 7), 'week');
   if (days < 365) return rtf.format(-Math.floor(days / 30.44), 'month');
   return rtf.format(-Math.floor(days / 365.25), 'year');
