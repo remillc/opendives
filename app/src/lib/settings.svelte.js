@@ -23,7 +23,7 @@ export const DEFAULT_SAC_FACTOR = 200;
 
 /**
  * @typedef {Object} AppSettings
- * @property {'system'|'fr'|'en'} language
+ * @property {'system'|'fr'|'fr-CA'|'en'} language
  * @property {'system'|'light'|'dark'} theme
  * @property {'system'|'iso'|'medium'|'dmy'|'mdy'} dateFormat
  * @property {'system'|'24'|'12'} timeFormat

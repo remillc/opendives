@@ -92,7 +92,8 @@
     return cycle === 'h23' || cycle === 'h24';
   })();
 
-  const languageNames = { fr: 'Français', en: 'English' };
+  /** @type {Record<string, string>} */
+  const languageNames = { fr: 'Français', 'fr-CA': 'Français (Canada)', en: 'English' };
 
   /** @param {number} mbar @param {number} decimals */
   const bar = (mbar, decimals) => `${formatNumber(mbar / 1000, decimals)} ${t('units.bar')}`;
@@ -204,15 +205,16 @@
           kind: 'choice',
           id: 'appLanguage',
           label: t('settings.language.label'),
-          text: settings.language === 'system' ? t('settings.language.systemText', { language: languageNames[deviceLanguage === 'fr' ? 'fr' : 'en'] }) : undefined,
+          text: settings.language === 'system' ? t('settings.language.systemText', { language: languageNames[deviceLanguage] }) : undefined,
           value: settings.language === 'system' ? t('settings.system') : languageNames[settings.language],
           current: settings.language,
           options: () => [
-            { value: 'system', label: t('settings.system'), example: languageNames[deviceLanguage === 'fr' ? 'fr' : 'en'] },
+            { value: 'system', label: t('settings.system'), example: languageNames[deviceLanguage] },
             { value: 'fr', label: languageNames.fr },
+            { value: 'fr-CA', label: languageNames['fr-CA'] },
             { value: 'en', label: languageNames.en },
           ],
-          set: (v) => setAppSetting('language', /** @type {'system'|'fr'|'en'} */ (v)),
+          set: (v) => setAppSetting('language', /** @type {'system'|'fr'|'fr-CA'|'en'} */ (v)),
         },
         {
           kind: 'choice',

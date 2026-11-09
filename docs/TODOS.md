@@ -20,7 +20,6 @@ Next number: 29
 - #15 [code] supprimer une plongée: afficher un dialogue de confirmation puis un snackbar
 - #17 [design] ajouter la possibilité d'une switch globale "plongée récréative" qui masque les paramètres avancés et ceux concernant le mode de plongée cc. Ce que SS nomme le mode loisir.
 - #18 [design] uniformiser « e-mail » et « courriel » dans les textes français de l'app : tout en « courriel »
-- #19 [code] ajouter une langue fr-CA : un petit fichier qui ne contient que les mots qui diffèrent du fr (par exemple nuage plutôt que cloud), le reste retombe sur fr
 - #20 [design] ajouter la possibilité pour l'usager de noter l'app dans le store
 - #21 [design] ajouter une vue carte des plongées
 - #23 [design] idée : ajouter une section Explorer, une carte qui affiche les sites de plongée des environs
