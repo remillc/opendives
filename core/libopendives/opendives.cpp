@@ -458,6 +458,8 @@ int get_dive(int id, std::string &json, std::string &error)
 			json += ',';
 		json += "{\"model\":";
 		append_json_string(json, d->dcs[i].model);
+		json += ",\"nickname\":";
+		append_json_string(json, get_dc_nickname(&d->dcs[i]));
 		json += ",\"divemode\":";
 		append_json_string(json, divemode_text[d->dcs[i].divemode]);
 		json += '}';

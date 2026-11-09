@@ -520,6 +520,55 @@
       "dilution": "Dilution ratio (pSCR)",
       "dilutionDialog": "One part dumped for N parts breathed (1:N).",
       "ocPo2": "Equivalent open-circuit pO₂ (pSCR)"
+    },
+    "logbookComputers": {
+      "title": "Logbook dive computers",
+      "rowText": "Rename, remove duplicates",
+      "intro": "The computers your dives come from. The name you choose shows in the logbook and the dive detail.",
+      "empty": "No dive computer in this logbook.",
+      "duplicate": "Possible duplicate",
+      "duplicateNote": "Possible duplicate: its dive profiles are those of another computer, or the same model without a serial number. Touch it to merge it or remove it from the list.",
+      "serialShort": "no. {serial}",
+      "noSerial": "No serial number",
+      "dives": {
+        "one": "{n} dive",
+        "other": "{n} dives"
+      },
+      "editTitle": "Edit the computer",
+      "name": "Name",
+      "nameHelp": "The name shown in the logbook and the dive detail",
+      "nameNoSerial": "Without a serial number, this computer cannot have a name in Subsurface.",
+      "model": "Model",
+      "serial": "Serial number",
+      "firmware": "Firmware",
+      "divesLabel": "Dives",
+      "unknown": "Unknown",
+      "possible": "Possible duplicate of “{name}” ({details}).",
+      "possibleMany": "{n} possible duplicates.",
+      "mergeWith": "Merge with {name}",
+      "mergeWithMany": "Merge with…",
+      "mergeHelp": {
+        "one": "Its dive goes to {name}, then this entry disappears.",
+        "other": "Its {n} dives go to {name}, then this entry disappears."
+      },
+      "mergeHelpMany": {
+        "one": "Its dive goes to the chosen computer, then this entry disappears.",
+        "other": "Its {n} dives go to the chosen computer, then this entry disappears."
+      },
+      "mergeTitle": "Merge with {name}?",
+      "mergeAction": "Merge",
+      "mergeText": {
+        "one": "The dive of “{name}” will go to “{target}” ({details}). This entry will disappear.",
+        "other": "The {n} dives of “{name}” will go to “{target}” ({details}). This entry will disappear."
+      },
+      "mergeCommon": {
+        "one": "In {n} dive, both computers have the same profile: only one recording will be kept.",
+        "other": "In {n} dives, both computers have the same profile: only one recording will be kept."
+      },
+      "merged": "Merged with {name}",
+      "remove": "Remove from the list",
+      "removeHelp": "Only the entry is removed. The dives keep their data, and it comes back if new dives come from it.",
+      "removed": "Computer removed from the list"
     },
     "computers": {
       "remembered": "Remembered",
@@ -1340,7 +1389,8 @@
       "Dive detail: “Remove from trip” in the ⋮ menu.",
       "About: the map credit also names OpenFreeMap and OpenMapTiles.",
       "Edit a dive: sections always open, the trip chosen from a list, with a button to remove it.",
-      "Edit a dive: choose the main computer when the dive has several."
+      "Edit a dive: choose the main computer when the dive has several.",
+      "Settings: Logbook dive computers, to rename, remove or merge duplicates, found by comparing the profiles."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",

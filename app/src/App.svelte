@@ -63,6 +63,8 @@
   import { mark } from './lib/perf.js';
   import { settings } from './lib/settings.svelte.js';
   import CylinderTypes from './pages/CylinderTypes.svelte';
+  import LogbookComputers from './pages/LogbookComputers.svelte';
+  import LogbookComputer from './pages/LogbookComputer.svelte';
   import CylinderType from './pages/CylinderType.svelte';
   import About from './pages/About.svelte';
   import AboutText from './pages/AboutText.svelte';
@@ -85,6 +87,8 @@
     { path: '/about/privacy', component: AboutText, options: { props: { which: 'privacy' } } },
     { path: '/about/libraries', component: AboutLibraries },
     { path: '/settings/bailout', component: SettingsBailout },
+    { path: '/settings/computers/', component: LogbookComputers },
+    { path: '/settings/computers/edit', component: LogbookComputer },
     { path: '/settings/cylinders/', component: CylinderTypes },
     { path: '/settings/cylinders/new', component: CylinderType },
     { path: '/settings/cylinders/type', component: CylinderType },

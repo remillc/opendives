@@ -316,6 +316,20 @@ int trip_create(const std::vector<int> &dive_ids, std::string &json, std::string
 // {"tripId":0} when none.
 int trips_autogroup(bool on, std::string &json, std::string &error);
 
+// The computers the logbook's dives come from: the core's device list plus
+// the models and serial numbers found in the dives. A JSON array of {model,
+// serial, firmware, nickname, dives, listed, shared}; shared: for each other
+// computer found in the same dives, how many (dives) and in how many the two
+// are the same recording (same).
+void dive_computers(std::string &json);
+// One undoable step on a computer of that list. "rename": the nickname (value),
+// as Subsurface's EditDeviceNickname; needs a serial number. "remove": its
+// device entry only. "merge": every dive of it goes to the computer into_model
+// and into_serial; a dive holding both as the same recording keeps one entry.
+int dive_computer_action(const std::string &action, const std::string &model, const std::string &serial,
+			 const std::string &value, const std::string &into_model, const std::string &into_serial,
+			 std::string &json, std::string &error);
+
 // Renames a cylinder type, as Subsurface's RenameCylinderType: the cylinders
 // of that type in the log, the runtime table and the device's library; one
 // undoable step. NAME_IN_USE when the new name is already a type. Writes

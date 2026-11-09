@@ -372,7 +372,7 @@
     (dive?.diveComputers ?? [])
       .filter((dc) => dc.model)
       .map((dc, i) => ({
-        model: dc.model,
+        model: dc.nickname || dc.model,
         role: [
           i === 0 ? t('detail.mainComputer') : t('detail.otherComputer'),
           tIfExists(`detail.computerModes.${dc.divemode}`) ?? dc.divemode,

@@ -20,6 +20,7 @@
 // the check passes, 1 when it fails, 2 when the log has no dive.
 #include "core/libopendives/opendives.h"
 
+#include "core/device.h"
 #include "core/dive.h"
 #include "core/divelog.h"
 #include "core/tag.h"
@@ -764,6 +765,52 @@ int main(int argc, char **argv)
 			printf("error=final delete: %s\n", error.c_str());
 			return 1;
 		}
+		return 0;
+	}
+
+	if (mode == "computers") {
+		// A dive's second computer merged into its first, then undone; a nickname
+		// set then undone. The script checks that the tree is the original one.
+		std::string result, error, list;
+		dive *found = nullptr;
+		for (auto &d: divelog.dives)
+			if (!found && d->dcs.size() >= 2 && !d->dcs[0].model.empty() && !d->dcs[1].model.empty() &&
+			    (d->dcs[0].model != d->dcs[1].model || d->dcs[0].serial != d->dcs[1].serial))
+				found = d.get();
+		dive_computers(list);
+		int steps = 0;
+		if (found) {
+			std::string from = found->dcs[1].model, serial = found->dcs[1].serial;
+			if (dive_computer_action("merge", from, serial, "", found->dcs[0].model, found->dcs[0].serial, result, error) || save_local(error)) {
+				printf("error=merge: %s\n", error.c_str());
+				return 1;
+			}
+			for (const divecomputer &dc: found->dcs)
+				if (dc.model == from && dc.serial == serial) {
+					printf("error=the merged computer is still in the dive\n");
+					return 1;
+				}
+			steps++;
+		}
+		if (!divelog.devices.empty()) {
+			device dev = divelog.devices[0];
+			if (dive_computer_action("rename", dev.model, dev.serialNumber, "Test name", "", "", result, error) || save_local(error)) {
+				printf("error=rename: %s\n", error.c_str());
+				return 1;
+			}
+			if (divelog.devices[0].nickName != "Test name") {
+				printf("error=the name did not change\n");
+				return 1;
+			}
+			steps++;
+		}
+		if (!steps)
+			return 2;
+		while (steps--)
+			if (undo(result, error) || save_local(error)) {
+				printf("error=undo: %s\n", error.c_str());
+				return 1;
+			}
 		return 0;
 	}
 

@@ -140,6 +140,16 @@ run_one() {
   fi
 
   if [ -z "$why" ]; then
+    # Dive computers of the logbook merged and renamed, then undone: the tree
+    # is the original one again.
+    E="$d/computers"; rm -rf "$E"; cp -r "$d/B" "$E"
+    "$ED" computers "$E[main]" - >"$E.out" 2>"$E.err"; rc=$?
+    if [ $rc = 1 ]; then why="computers: $(value error "$E.out")"
+    elif [ $rc = 0 ] && [ "$(tree "$E")" != "$T0" ]; then why="computers: tree differs after undo: $(echo $(git -C "$E" diff --name-only "$T0" 'main^{tree}'))"
+    fi
+  fi
+
+  if [ -z "$why" ]; then
     # The second computer of a dive made the main one, then undone: the tree
     # is the original one again. Logs without such a dive skip it.
     E="$d/maindc"; rm -rf "$E"; cp -r "$d/B" "$E"

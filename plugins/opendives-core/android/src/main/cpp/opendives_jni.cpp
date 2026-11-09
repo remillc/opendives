@@ -537,6 +537,27 @@ Java_org_opendives_core_NativeCore_tripAction(JNIEnv *env, jobject, jstring acti
 	return edit_result(env, json);
 }
 
+JNIEXPORT jstring JNICALL
+Java_org_opendives_core_NativeCore_diveComputers(JNIEnv *env, jobject)
+{
+	std::string json;
+	opendives::dive_computers(json);
+	return env->NewStringUTF(json.c_str());
+}
+
+JNIEXPORT jstring JNICALL
+Java_org_opendives_core_NativeCore_diveComputerAction(JNIEnv *env, jobject, jstring action, jstring model, jstring serial,
+						      jstring value, jstring intoModel, jstring intoSerial)
+{
+	std::string json, error;
+	if (opendives::dive_computer_action(to_string(env, action), to_string(env, model), to_string(env, serial), to_string(env, value),
+					    to_string(env, intoModel), to_string(env, intoSerial), json, error)) {
+		throw_core_error(env, error);
+		return nullptr;
+	}
+	return edit_result(env, json);
+}
+
 // Read-only site queries: list, site, nearby, duplicates, without (dives without
 // a site), place (country, region and city at a position, in the language `text`).
 JNIEXPORT jstring JNICALL

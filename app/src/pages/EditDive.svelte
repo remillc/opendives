@@ -698,7 +698,7 @@
             <label class="computer">
               <input type="radio" name="od-main-computer" checked={i === mainComputer} onchange={() => (mainComputer = i)} />
               <span class="texts">
-                <span>{computer.model || t('edit.unnamedComputer')}</span>
+                <span>{computer.nickname || computer.model || t('edit.unnamedComputer')}</span>
                 {#if i === mainComputer}<span class="role">{t('edit.mainComputer')}</span>{/if}
               </span>
             </label>

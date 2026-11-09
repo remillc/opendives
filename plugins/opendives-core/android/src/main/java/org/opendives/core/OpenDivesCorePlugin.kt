@@ -826,6 +826,26 @@ class OpenDivesCorePlugin : Plugin() {
         call.resolve(JSObject().put("wifi", wifi))
     }
 
+    /** The computers the logbook's dives come from (dive_computers). */
+    @PluginMethod
+    fun diveComputers(call: PluginCall) = onCoreThread(call) {
+        call.resolve(JSObject().put("json", NativeCore.diveComputers()))
+    }
+
+    /** One undoable change on a computer of the logbook: rename, remove, merge. */
+    @PluginMethod
+    fun diveComputerAction(call: PluginCall) = onCoreThread(call) {
+        val json = NativeCore.diveComputerAction(
+            call.getString("action").orEmpty(),
+            call.getString("model").orEmpty(),
+            call.getString("serial").orEmpty(),
+            call.getString("value").orEmpty(),
+            call.getString("intoModel").orEmpty(),
+            call.getString("intoSerial").orEmpty(),
+        )
+        call.resolve(JSObject().put("json", json))
+    }
+
     /** The planned dives, listed by the planner only (list_plans). */
     @PluginMethod
     fun listPlans(call: PluginCall) = onCoreThread(call) {

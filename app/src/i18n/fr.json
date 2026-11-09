@@ -520,6 +520,55 @@
       "dilution": "Rapport de dilution (pSCR)",
       "dilutionDialog": "Une part rejetée pour N parts respirées (1:N).",
       "ocPo2": "pO₂ équivalente en circuit ouvert (pSCR)"
+    },
+    "logbookComputers": {
+      "title": "Ordinateurs du carnet",
+      "rowText": "Renommer, retirer les doublons",
+      "intro": "Les ordinateurs d’où viennent vos plongées. Le nom choisi s’affiche dans le carnet et le détail des plongées.",
+      "empty": "Aucun ordinateur dans ce carnet.",
+      "duplicate": "Doublon possible",
+      "duplicateNote": "Doublon possible : ses profils de plongée sont ceux d’un autre ordinateur, ou même modèle sans numéro de série. Touchez-le pour le fusionner ou le retirer de la liste.",
+      "serialShort": "n° {serial}",
+      "noSerial": "Sans numéro de série",
+      "dives": {
+        "one": "{n} plongée",
+        "other": "{n} plongées"
+      },
+      "editTitle": "Modifier l’ordinateur",
+      "name": "Nom",
+      "nameHelp": "Le nom affiché dans le carnet et le détail des plongées",
+      "nameNoSerial": "Sans numéro de série, cet ordinateur ne peut pas porter de nom dans Subsurface.",
+      "model": "Modèle",
+      "serial": "Numéro de série",
+      "firmware": "Firmware",
+      "divesLabel": "Plongées",
+      "unknown": "Inconnu",
+      "possible": "Doublon possible de « {name} » ({details}).",
+      "possibleMany": "{n} doublons possibles.",
+      "mergeWith": "Fusionner avec {name}",
+      "mergeWithMany": "Fusionner avec…",
+      "mergeHelp": {
+        "one": "Sa plongée est rattachée à {name}, puis cette fiche disparaît.",
+        "other": "Ses {n} plongées sont rattachées à {name}, puis cette fiche disparaît."
+      },
+      "mergeHelpMany": {
+        "one": "Sa plongée est rattachée à l’ordinateur choisi, puis cette fiche disparaît.",
+        "other": "Ses {n} plongées sont rattachées à l’ordinateur choisi, puis cette fiche disparaît."
+      },
+      "mergeTitle": "Fusionner avec {name} ?",
+      "mergeAction": "Fusionner",
+      "mergeText": {
+        "one": "La plongée de « {name} » sera rattachée à « {target} » ({details}). Cette fiche disparaîtra.",
+        "other": "Les {n} plongées de « {name} » seront rattachées à « {target} » ({details}). Cette fiche disparaîtra."
+      },
+      "mergeCommon": {
+        "one": "Dans {n} plongée, les deux ordinateurs ont le même profil : un seul enregistrement sera gardé.",
+        "other": "Dans {n} plongées, les deux ordinateurs ont le même profil : un seul enregistrement sera gardé."
+      },
+      "merged": "Fusionné avec {name}",
+      "remove": "Retirer de la liste",
+      "removeHelp": "Seule la fiche est retirée. Les plongées gardent leurs données, et il revient si de nouvelles plongées en viennent.",
+      "removed": "Ordinateur retiré de la liste"
     },
     "computers": {
       "remembered": "Mémorisé",
@@ -1340,7 +1389,8 @@
       "Détail d’une plongée : « Retirer du voyage » dans le menu ⋮.",
       "À propos : le crédit des cartes nomme aussi OpenFreeMap et OpenMapTiles.",
       "Modifier une plongée : sections toujours ouvertes, voyage choisi dans une liste, avec un bouton pour le retirer.",
-      "Modifier une plongée : choix de l’ordinateur principal quand la plongée en a plusieurs."
+      "Modifier une plongée : choix de l’ordinateur principal quand la plongée en a plusieurs.",
+      "Réglages : Ordinateurs du carnet, pour renommer, retirer ou fusionner les doublons, détectés en comparant les profils."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",

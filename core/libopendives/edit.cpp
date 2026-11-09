@@ -17,6 +17,9 @@
 #include "json.h"
 
 #include "core/device.h"
+#include <cmath>
+#include <map>
+#include <set>
 #include "core/dive.h"
 #include "core/divecomputer.h"
 #include "core/sample.h"
@@ -116,7 +119,7 @@ struct DiveListChange {
 };
 
 struct Step {
-	enum Kind { DIVE, TRIP_FIELD, MOVE, SITE_FIELD, SITES, CYLINDER_TYPE, DIVE_LIST, FILTER_PRESET, RENUMBER } kind = DIVE;
+	enum Kind { DIVE, TRIP_FIELD, MOVE, SITE_FIELD, SITES, CYLINDER_TYPE, DIVE_LIST, FILTER_PRESET, RENUMBER, DEVICES } kind = DIVE;
 	// DIVE_LIST: as Subsurface's AddDive and ImportDives: what the next undo
 	// or redo puts in and takes out; for an import, the dive computers and
 	// filter presets it brings, and whether they are in the log now.
@@ -168,6 +171,11 @@ struct Step {
 	// back and `type_name` the name in use.
 	std::vector<std::pair<dive *, int>> cylinders;
 	std::string type_name;
+	// DEVICES: the device table, the dives (by id) and the fingerprints' device
+	// ids to swap in on the next undo or redo.
+	device_table devices_swap;
+	std::vector<std::pair<int, std::unique_ptr<dive>>> dive_swaps;
+	std::vector<std::pair<size_t, uint32_t>> fingerprint_moves;
 	std::string text;
 };
 
@@ -2093,8 +2101,108 @@ static std::string dive_list_json(const Step &step)
 	       std::to_string(id) + "}";
 }
 
+// Two entries of one dive that are the same recording, under two names (a
+// download and the computer's own log file). Measured on real dives: the same
+// computer has the same sample times, with depths about 15 cm apart at most;
+// two computers worn together sample at other times, or differ by more.
+static bool same_recording(const divecomputer &a, const divecomputer &b)
+{
+	const divecomputer &few = a.samples.size() <= b.samples.size() ? a : b;
+	const divecomputer &many = &few == &a ? b : a;
+	if (few.samples.size() < 2)
+		return false;
+	double xy = 0, xx = 0;
+	std::vector<std::pair<double, double>> points;
+	for (const sample &s: few.samples) {
+		auto it = std::lower_bound(many.samples.begin(), many.samples.end(), s.time.seconds,
+					   [](const sample &o, int t) { return o.time.seconds < t; });
+		if (it == many.samples.end() || it->time.seconds != s.time.seconds)
+			continue;
+		points.emplace_back(s.depth.mm, it->depth.mm);
+		xy += static_cast<double>(s.depth.mm) * it->depth.mm;
+		xx += static_cast<double>(s.depth.mm) * s.depth.mm;
+	}
+	if (points.size() < 0.9 * few.samples.size() || xx <= 0)
+		return false;
+	double scale = xy / xx, gap = 0;
+	for (const auto &[x, y]: points)
+		gap += std::fabs(y - scale * x);
+	return gap / points.size() <= 300;
+}
+
+struct ComputerEntry {
+	std::string model, serial, firmware, nickname;
+	uint32_t deviceid = 0;
+	int dives = 0;
+	bool listed = false;
+	// The other entries found in the same dives: dives, and same recordings.
+	std::map<int, std::pair<int, int>> shared;
+};
+
+static bool logged_computer(const divecomputer &dc)
+{
+	return !dc.model.empty() && !is_dc_planner(&dc) && !is_dc_manually_added_dive(&dc);
+}
+
+static std::vector<ComputerEntry> computer_entries()
+{
+	std::vector<ComputerEntry> list;
+	auto index = [&](const std::string &model, const std::string &serial) {
+		for (size_t i = 0; i < list.size(); i++)
+			if (list[i].model == model && list[i].serial == serial)
+				return static_cast<int>(i);
+		list.emplace_back();
+		list.back().model = model;
+		list.back().serial = serial;
+		return static_cast<int>(list.size() - 1);
+	};
+	for (const device &dev: divelog.devices) {
+		ComputerEntry &e = list[index(dev.model, dev.serialNumber)];
+		e.nickname = dev.nickName;
+		e.deviceid = dev.deviceId;
+		e.listed = true;
+	}
+	for (const auto &d: divelog.dives) {
+		if (internal::is_plan_only(*d))
+			continue;
+		std::vector<std::pair<int, const divecomputer *>> here;
+		for (const divecomputer &dc: d->dcs) {
+			if (!logged_computer(dc))
+				continue;
+			int i = index(dc.model, dc.serial);
+			ComputerEntry &e = list[i];
+			if (!e.deviceid)
+				e.deviceid = dc.deviceid;
+			if (e.firmware.empty())
+				e.firmware = dc.fw_version;
+			here.emplace_back(i, &dc);
+		}
+		std::set<int> counted;
+		for (const auto &[i, dc]: here) {
+			if (counted.insert(i).second)
+				list[i].dives++;
+			for (const auto &[j, other]: here) {
+				if (i == j)
+					continue;
+				auto &pair = list[i].shared[j];
+				pair.first++;
+				pair.second += same_recording(*dc, *other);
+			}
+		}
+	}
+	return list;
+}
+
+static void apply_devices(Step &step);
+static std::string devices_json();
+
 static int swap_step(Step &step, std::string &result_json, std::string &error)
 {
+	if (step.kind == Step::DEVICES) {
+		apply_devices(step);
+		result_json = devices_json();
+		return 0;
+	}
 	if (step.kind == Step::RENUMBER) {
 		// renumberDives(): the old numbers are kept in the array, so doing it
 		// twice is a no-op.
@@ -2148,6 +2256,162 @@ static int swap_step(Step &step, std::string &result_json, std::string &error)
 	}
 	exchange(d, *step.other);
 	return internal::dive_json(step.dive_id, result_json, error);
+}
+
+// --- Dive computers of the logbook (Settings, "Ordinateurs du carnet") --------
+
+void dive_computers(std::string &json)
+{
+	std::vector<ComputerEntry> list = computer_entries();
+	json = "[";
+	for (size_t i = 0; i < list.size(); i++) {
+		const ComputerEntry &e = list[i];
+		if (i)
+			json += ',';
+		json += "{\"model\":";
+		append_json_string(json, e.model);
+		json += ",\"serial\":";
+		append_json_string(json, e.serial);
+		json += ",\"firmware\":";
+		append_json_string(json, e.firmware);
+		json += ",\"nickname\":";
+		append_json_string(json, e.nickname);
+		json += ",\"dives\":" + std::to_string(e.dives);
+		json += std::string(",\"listed\":") + (e.listed ? "true" : "false");
+		json += ",\"shared\":[";
+		bool first = true;
+		for (const auto &[j, counts]: e.shared) {
+			if (!first)
+				json += ',';
+			first = false;
+			json += "{\"model\":";
+			append_json_string(json, list[j].model);
+			json += ",\"serial\":";
+			append_json_string(json, list[j].serial);
+			json += ",\"dives\":" + std::to_string(counts.first) + ",\"same\":" + std::to_string(counts.second) + '}';
+		}
+		json += "]}";
+	}
+	json += ']';
+}
+
+static void apply_devices(Step &step)
+{
+	std::swap(divelog.devices, step.devices_swap);
+	for (auto &[id, other]: step.dive_swaps)
+		if (dive *d = divelog.dives.get_by_uniq_id(id))
+			exchange(d, *other);
+	for (auto &[i, deviceid]: step.fingerprint_moves)
+		if (i < ::fingerprints.size())
+			std::swap(::fingerprints[i].fdeviceid, deviceid);
+}
+
+static std::string devices_json()
+{
+	return "{\"listChange\":true,\"dives\":" + std::to_string(divelog.dives.size()) + ",\"id\":0}";
+}
+
+int dive_computer_action(const std::string &action, const std::string &model, const std::string &serial,
+			 const std::string &value, const std::string &into_model, const std::string &into_serial,
+			 std::string &json, std::string &error)
+{
+	if (loaded_format_version > dataformat_version) {
+		error = "FORMAT_NEWER";
+		return -1;
+	}
+	Step step;
+	step.kind = Step::DEVICES;
+	step.devices_swap = divelog.devices;
+	auto listed = std::find_if(step.devices_swap.begin(), step.devices_swap.end(), [&](const device &d) {
+		return d.model == model && d.serialNumber == serial;
+	});
+	if (action == "rename") {
+		// EditDeviceNickname (commands/command_device.cpp): Subsurface keeps a
+		// nickname by model and serial number.
+		if (model.empty() || serial.empty()) {
+			error = "BAD_REQUEST: no serial number";
+			return -1;
+		}
+		if (listed != step.devices_swap.end()) {
+			if (listed->nickName == value)
+				return json = devices_json(), 0;
+			listed->nickName = value;
+		} else {
+			create_device_node(step.devices_swap, model, serial, value);
+		}
+		step.text = "Set nickname of device " + model + " (serial " + serial + ") to " + value;
+	} else if (action == "remove") {
+		if (listed == step.devices_swap.end()) {
+			error = "NOT_FOUND";
+			return -1;
+		}
+		step.devices_swap.erase(listed);
+		step.text = "remove dive computer " + model + " from the list";
+	} else if (action == "merge") {
+		std::vector<ComputerEntry> list = computer_entries();
+		auto find = [&](const std::string &m, const std::string &s) {
+			return std::find_if(list.begin(), list.end(), [&](const ComputerEntry &e) { return e.model == m && e.serial == s; });
+		};
+		auto from = find(model, serial), into = find(into_model, into_serial);
+		if (from == list.end() || into == list.end() || from == into) {
+			error = "NOT_FOUND";
+			return -1;
+		}
+		uint32_t into_id = into->deviceid ? into->deviceid : into_serial.empty() ? 0 : calculate_string_hash(into_serial.c_str());
+		auto is_from = [&](const divecomputer &dc) { return logged_computer(dc) && dc.model == model && dc.serial == serial; };
+		auto is_into = [&](const divecomputer &dc) { return logged_computer(dc) && dc.model == into_model && dc.serial == into_serial; };
+		for (const auto &owned: divelog.dives) {
+			dive *d = owned.get();
+			int first_from = -1, first_into = -1;
+			for (size_t i = 0; i < d->dcs.size(); i++) {
+				if (first_from < 0 && is_from(d->dcs[i]))
+					first_from = static_cast<int>(i);
+				if (first_into < 0 && is_into(d->dcs[i]))
+					first_into = static_cast<int>(i);
+			}
+			if (first_from < 0)
+				continue;
+			auto copy = std::make_unique<dive>(*d);
+			// Both in this dive and the same recording: one entry stays, the
+			// first of the two, so that the profile shown does not change.
+			// Different recordings are both kept: nothing is lost.
+			int drop = -1;
+			if (first_into >= 0 && same_recording(d->dcs[first_from], d->dcs[first_into]))
+				drop = std::max(first_from, first_into);
+			if (drop >= 0) {
+				uint32_t diveid = d->dcs[first_into].diveid;
+				copy = divelog.dives.clone_delete_divecomputer(*copy, drop);
+				copy->id = d->id;
+				copy->dcs[std::min(first_from, first_into)].diveid = diveid;
+			}
+			for (size_t i = 0; i < copy->dcs.size(); i++) {
+				divecomputer &dc = copy->dcs[i];
+				bool kept = drop >= 0 && static_cast<int>(i) == std::min(first_from, first_into);
+				if (!kept && !is_from(dc))
+					continue;
+				dc.model = into_model;
+				dc.serial = into_serial;
+				dc.deviceid = into_id;
+				if (dc.fw_version.empty())
+					dc.fw_version = into->firmware;
+			}
+			step.dive_swaps.emplace_back(d->id, std::move(copy));
+		}
+		if (listed != step.devices_swap.end())
+			step.devices_swap.erase(listed);
+		if (from->deviceid && from->deviceid != into_id)
+			for (size_t i = 0; i < ::fingerprints.size(); i++)
+				if (::fingerprints[i].fdeviceid == from->deviceid)
+					step.fingerprint_moves.emplace_back(i, into_id);
+		step.text = "merge dive computer " + model + " into " + into_model;
+	} else {
+		error = "BAD_REQUEST: unknown action " + action;
+		return -1;
+	}
+	apply_devices(step);
+	push_step(std::move(step));
+	json = devices_json();
+	return 0;
 }
 
 int undo(std::string &result_json, std::string &error)

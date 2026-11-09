@@ -13,6 +13,17 @@ import { registerPlugin } from '@capacitor/core';
  */
 
 /**
+ * @typedef {Object} LogbookComputer
+ * @property {string} model
+ * @property {string} serial empty string when unknown
+ * @property {string} firmware empty string when unknown
+ * @property {string} nickname empty string when none
+ * @property {number} dives
+ * @property {boolean} listed it has an entry in the core's device list
+ * @property {{model: string, serial: string, dives: number, same: number}[]} shared other computers in the same dives: in how many, and in how many as the same recording
+ */
+
+/**
  * A dive in the logbook list.
  * @typedef {Object} Dive
  * @property {number} id identifier valid until the next load (for getDive)
@@ -80,7 +91,7 @@ import { registerPlugin } from '@capacitor/core';
  * @property {boolean} invalid marked invalid
  * @property {boolean} manual entered by hand: duration and depth can be edited
  * @property {number} pictures number of pictures and videos referenced
- * @property {{model: string, divemode: string}[]} diveComputers the first is the main one
+ * @property {{model: string, nickname: string, divemode: string}[]} diveComputers the first is the main one
  * @property {string} divemode OC, CCR, PSCR, Freedive
  * @property {string} computer model of the first dive computer
  * @property {number} computers number of dive computers
@@ -600,6 +611,9 @@ import { registerPlugin } from '@capacitor/core';
  *   The planner's settings as the core's preferences hold them.
  * @property {(request: PlanRequest) => Promise<PlanResult>} planDive
  *   Runs Subsurface's planner; read only, nothing is added to the logbook.
+ * @property {() => Promise<LogbookComputer[]>} diveComputers the computers the logbook's dives come from
+ * @property {(options: {action: 'rename'|'remove'|'merge', model: string, serial: string, value?: string, intoModel?: string, intoSerial?: string}) => Promise<EditResult>} diveComputerAction
+ *   One undoable step (opendives.h).
  * @property {() => Promise<{wifi: boolean}>} networkStatus whether the device is on Wi-Fi or Ethernet
  * @property {() => Promise<PlannedDive[]>} listPlans
  * @property {(options: {request: PlanRequest, replaceId?: number}) => Promise<EditResult>} savePlan
@@ -731,6 +745,12 @@ export const OpenDivesCore = {
   },
   async getTrip(options) {
     return JSON.parse((await native.getTrip(options)).json);
+  },
+  async diveComputers() {
+    return JSON.parse((await native.diveComputers()).json);
+  },
+  async diveComputerAction(options) {
+    return JSON.parse((await native.diveComputerAction(options)).json);
   },
   async tripAction(options) {
     return JSON.parse((await native.tripAction(options)).json);

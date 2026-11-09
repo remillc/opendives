@@ -573,6 +573,7 @@
       id: 'computers',
       title: t('settings.groups.computers'),
       rows: [
+        { kind: 'link', id: 'logbookComputers', label: t('settings.logbookComputers.title'), text: t('settings.logbookComputers.rowText'), href: '/settings/computers/' },
         {
           kind: 'switch',
           id: 'showAllBluetooth',
