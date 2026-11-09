@@ -1317,7 +1317,7 @@
       "one": "{n} compartment at 90 % or more.",
       "other": "{n} compartments at 90 % or more."
     },
-    "chartText": "The 16 compartments of the Bühlmann model, fastest to slowest, as in Subsurface's tissue graph: 50 % is the ambient pressure, 100 % the limit (M-value). The colour deepens as the compartment loads, and turns to the alarm colour from 90 %.",
+    "chartText": "The 16 compartments of the Bühlmann model, fastest to slowest, as a percentage of the allowed limit.",
     "modelGf": "Gradient factors {low}/{high}, the planner's.",
     "modelVpmb": "Planner model: VPM-B +{n}.",
     "usedDives": "Calculated from",
@@ -1387,6 +1387,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Desaturation: the text under the chart is shorter.",
       "Settings: the app language can be Français (Canada), which says \"nuage\" and \"courriel\"; a phone set to French (Canada) picks it by itself.",
       "Dive detail: the cylinder pressure bars run from 0 to the working pressure, with what is left and what was used.",
       "Planner: a plan made from a rebreather dive starts on the diluent, never the oxygen.",

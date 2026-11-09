@@ -1317,7 +1317,7 @@
       "one": "{n} compartiment à 90 % ou plus.",
       "other": "{n} compartiments à 90 % ou plus."
     },
-    "chartText": "Les 16 compartiments du modèle Bühlmann, des plus rapides aux plus lents, comme dans le graphique des tissus de Subsurface : 50 % correspond à la pression ambiante, 100 % à la limite (valeur M). La couleur fonce à mesure que le compartiment se charge, et passe à la couleur d’alarme à partir de 90 %.",
+    "chartText": "Les 16 compartiments du modèle Bühlmann, des plus rapides aux plus lents, en pourcentage de la limite permise.",
     "modelGf": "Facteurs de gradient {low} / {high}, ceux du planificateur.",
     "modelVpmb": "Modèle du planificateur : VPM-B +{n}.",
     "usedDives": "Calculé à partir de",
@@ -1387,6 +1387,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Désaturation : le texte sous le graphique est plus court.",
       "Réglages : la langue de l’app peut être Français (Canada), qui dit « nuage » et « courriel » ; un téléphone réglé en français (Canada) la choisit tout seul.",
       "Détail d’une plongée : les barres de pression des bouteilles vont de 0 à la pression de service, avec le restant et l’utilisé.",
       "Planificateur : un plan fait à partir d’une plongée au recycleur part du diluant, jamais de l’oxygène.",
