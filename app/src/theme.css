@@ -36,6 +36,9 @@
     /* Charts that do not measure depth: smallest value, largest value. */
     /* The stripes of a reserve, on the tertiary container. */
     --od-tertiary-hatch: #B9D0EE;
+    /* The cylinder bars of the dive detail: pressure used, empty track. */
+    --od-gauge-used: #B9D0EE;
+    --od-gauge-track: #DCE8F7;
     --od-chart-low: #5B8BCB;
     --od-chart-high: #24589A;
     --od-on-tertiary-container: #0F2F55;
@@ -116,6 +119,8 @@
     --od-on-tertiary: #0F2F55;
     --od-tertiary-container: #1E3A5F;
     --od-tertiary-hatch: #2F5A8C;
+    --od-gauge-used: #456A9C;
+    --od-gauge-track: #2E3033;
     --od-chart-low: #8AB4F8;
     --od-chart-high: #5B8BCB;
     --od-on-tertiary-container: #DCE8F7;

@@ -267,8 +267,6 @@
     "airTemperature": "Air",
     "gasAndEquipment": "Gas and equipment",
     "pressureRange": "{start} → {end}",
-    "pressureLeft": "{percent} % of the start pressure was left",
-    "gasUsed": "{volume} used",
     "left": "{percent} % left",
     "sacFull": "Surface air consumption (SAC)",
     "suitRow": "Suit",
@@ -326,6 +324,8 @@
       "bailout": "bailout, {gas}"
     },
     "service": "Working {pressure}",
+    "pressureUsed": "{pressure} used",
+    "pressureBar": "{end} left of {working}, {used} used",
     "switchAt": "switch at {depth}",
     "computers": "Dive computers",
     "mainComputer": "Main computer",
@@ -1387,6 +1387,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Dive detail: the cylinder pressure bars run from 0 to the working pressure, with what is left and what was used.",
       "Planner: a plan made from a rebreather dive starts on the diluent, never the oxygen.",
       "Planner: a bar shows the consumed part and the reserve of each gas, another the CNS exposure.",
       "Statistics: charts that do not measure depth (dives per year, durations) are blue.",

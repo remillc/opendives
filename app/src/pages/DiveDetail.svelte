@@ -29,7 +29,6 @@
     formatDiveDay,
     formatDuration,
         formatGasLong,
-    formatGasVolume,
     formatNumber,
     formatPressure,
     formatSac,
@@ -323,7 +322,7 @@
               : rebreather
                 ? t('detail.cylinderUses.bailout', { gas: gasLower })
                 : gasLower;
-        const left = c.startMbar > 0 && c.endMbar > 0 ? Math.round((c.endMbar / c.startMbar) * 100) : null;
+        const usedMbar = c.startMbar > 0 && c.endMbar > 0 && c.startMbar >= c.endMbar ? c.startMbar - c.endMbar : null;
         const pressureValue = (/** @type {number} */ mbar) =>
           formatNumber(mbar / (prefs.pressure === 'psi' ? 68.947572932 : 1000), 0);
         return {
@@ -335,11 +334,23 @@
               : c.startMbar > 0
                 ? formatPressure(c.startMbar, prefs)
                 : '',
-          left,
+          // From 0 to the working pressure; no bar when a pressure is missing.
+          bar:
+            usedMbar !== null && c.workingPressureMbar > 0
+              ? {
+                  remaining: Math.min(100, (c.endMbar / c.workingPressureMbar) * 100),
+                  used: Math.min(100, (usedMbar / c.workingPressureMbar) * 100),
+                  label: t('detail.pressureBar', {
+                    end: formatPressure(c.endMbar, prefs),
+                    working: formatPressure(c.workingPressureMbar, prefs),
+                    used: formatPressure(usedMbar, prefs),
+                  }),
+                }
+              : null,
           details: [
             c.workingPressureMbar > 0 && t('detail.service', { pressure: formatPressure(c.workingPressureMbar, prefs) }),
+            usedMbar !== null && t('detail.pressureUsed', { pressure: formatPressure(usedMbar, prefs) }),
             c.switchDepthMm > 0 && t('detail.switchAt', { depth: formatDepth(c.switchDepthMm, prefs) }),
-            c.gasUsedMl > 0 && t('detail.gasUsed', { volume: formatGasVolume(c.gasUsedMl, prefs) }),
           ]
             .filter(Boolean)
             .join(' · '),
@@ -553,9 +564,11 @@
                 <span class="name"><span class="gas">{cylinder.name}</span>{#if cylinder.subtitle}<span class="type">{cylinder.subtitle}</span>{/if}</span>
                 {#if cylinder.pressures}<span class="value od-value">{cylinder.pressures}</span>{/if}
               </div>
-              {#if cylinder.left !== null}
-                <div class="bar" role="img" aria-label={t('detail.pressureLeft', { percent: cylinder.left })}>
-                  <div class="fill" style="width: {cylinder.left}%"></div>
+              {#if cylinder.bar}
+                <div class="bar" role="img" aria-label={cylinder.bar.label}>
+                  <div class="fill" style="width: {cylinder.bar.remaining}%"></div>
+                  <div class="gap"></div>
+                  <div class="used" style="width: {cylinder.bar.used}%"></div>
                 </div>
               {/if}
               {#if cylinder.details}<div class="secondary od-value"><span>{cylinder.details}</span></div>{/if}
@@ -803,16 +816,29 @@
       white-space: nowrap;
     }
 
-    /* Share of the start pressure left. */
+    /* From 0 to the working pressure: what is left, then what was used. */
     .bar {
-      height: 6px;
-      border-radius: 3px;
-      background: var(--od-tint);
+      display: flex;
+      height: 8px;
+      border-radius: 4px;
+      background: var(--od-gauge-track);
       overflow: hidden;
 
+      > div {
+        flex: none;
+      }
+
       .fill {
-        height: 6px;
-        background: var(--od-text);
+        background: var(--od-tertiary);
+      }
+
+      .gap {
+        width: 2px;
+        background: var(--od-surface);
+      }
+
+      .used {
+        background: var(--od-gauge-used);
       }
     }
 
