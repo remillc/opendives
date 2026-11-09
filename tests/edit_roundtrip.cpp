@@ -767,6 +767,31 @@ int main(int argc, char **argv)
 		return 0;
 	}
 
+	if (mode == "maindc") {
+		// The second computer of a dive becomes the first, saved, then undone
+		// and saved: the script checks that the tree is the original one.
+		dive *found = nullptr;
+		for (auto &d: divelog.dives)
+			if (!found && d->dcs.size() >= 2)
+				found = d.get();
+		if (!found)
+			return 2;
+		std::string result, error, second = found->dcs[1].model;
+		if (edit_dive(found->id, "{\"mainComputer\":1}", result, error) || save_local(error)) {
+			printf("error=move to front: %s\n", error.c_str());
+			return 1;
+		}
+		if (found->dcs[0].model != second) {
+			printf("error=the second computer is not first\n");
+			return 1;
+		}
+		if (undo(result, error) || save_local(error)) {
+			printf("error=undo: %s\n", error.c_str());
+			return 1;
+		}
+		return 0;
+	}
+
 	if (mode == "syncundo") {
 		// `repo` is a log with a remote ("git://…[main]"): edit, save, sync
 		// (the commit is only pushed: the log is not read again), then undo,

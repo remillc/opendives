@@ -847,6 +847,7 @@
     "tripClear": "Retirer du voyage",
     "tripNewName": "Nom du voyage",
     "mainComputer": "Principal : son profil est celui de la plongée",
+    "unnamedComputer": "Ordinateur sans nom",
     "mainComputerHelp": "Avec plusieurs ordinateurs, choisissez le principal."
   },
   "tripScreen": {
@@ -1338,7 +1339,8 @@
       "Détail d’une plongée : les étoiles de la note s’affichent seules.",
       "Détail d’une plongée : « Retirer du voyage » dans le menu ⋮.",
       "À propos : le crédit des cartes nomme aussi OpenFreeMap et OpenMapTiles.",
-      "Modifier une plongée : sections toujours ouvertes, voyage choisi dans une liste, avec un bouton pour le retirer."
+      "Modifier une plongée : sections toujours ouvertes, voyage choisi dans une liste, avec un bouton pour le retirer.",
+      "Modifier une plongée : choix de l’ordinateur principal quand la plongée en a plusieurs."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",

@@ -847,6 +847,7 @@
     "tripClear": "Remove from trip",
     "tripNewName": "Trip name",
     "mainComputer": "Main: its profile is the dive’s",
+    "unnamedComputer": "Unnamed computer",
     "mainComputerHelp": "With several computers, choose the main one."
   },
   "tripScreen": {
@@ -1338,7 +1339,8 @@
       "Dive detail: the rating stars stand alone.",
       "Dive detail: “Remove from trip” in the ⋮ menu.",
       "About: the map credit also names OpenFreeMap and OpenMapTiles.",
-      "Edit a dive: sections always open, the trip chosen from a list, with a button to remove it."
+      "Edit a dive: sections always open, the trip chosen from a list, with a button to remove it.",
+      "Edit a dive: choose the main computer when the dive has several."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",

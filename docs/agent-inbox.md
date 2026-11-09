@@ -856,7 +856,9 @@ Christian approved this on the canvas at 11:24. It replaces the aerial view of t
 - Show "© OpenStreetMap" at the right, 10 sp, above the rating line (required by the licence). The map stays decorative: not interactive, hidden from screen readers.
 - Tiles: follow the OpenStreetMap tile usage policy (a real User-Agent for the app, no bulk download, cache the rendered image per site). If the policy does not fit an app, propose another OSM-based tile provider to Christian before adding an API key or a paid service. Remove the satellite provider added for task 13 if nothing else uses it.
 
-## [ ] 2026-11-09-17 Edit dive form: sections always open, Voyage dropdown with a clear button
+## [x] 2026-11-09-17 Edit dive form: sections always open, Voyage dropdown with a clear button
+
+Done in Edit dive: choose the main dive computer
 
 Christian approved these on the canvas. Spec: "Edit dive form, sections and trip field". Mock-up: `docs/mockups/android-edition.dc.html`.
 - Remove the expand/collapse chevrons of all the sections of `/dives/:id/edit` and make every section always open. Section titles become plain headings, not buttons.

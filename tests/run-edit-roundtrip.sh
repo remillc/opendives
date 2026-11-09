@@ -139,6 +139,16 @@ run_one() {
     fi
   fi
 
+  if [ -z "$why" ]; then
+    # The second computer of a dive made the main one, then undone: the tree
+    # is the original one again. Logs without such a dive skip it.
+    E="$d/maindc"; rm -rf "$E"; cp -r "$d/B" "$E"
+    "$ED" maindc "$E[main]" - >"$E.out" 2>"$E.err"; rc=$?
+    if [ $rc = 1 ]; then why="maindc: $(value error "$E.out")"
+    elif [ $rc = 0 ] && [ "$(tree "$E")" != "$T0" ]; then why="maindc: tree differs after undo: $(echo $(git -C "$E" diff --name-only "$T0" 'main^{tree}'))"
+    fi
+  fi
+
   if [ -z "$why" ] && [ "$n" = SampleDivesV2.ssrf ]; then
     # Undo after a sync: the log has a remote (a bare copy of B served by
     # git daemon); edit, save, sync, undo, save, sync: the remote's tree is

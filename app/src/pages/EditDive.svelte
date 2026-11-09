@@ -263,6 +263,9 @@
     for (const d of logbook.dives) if (d.trip?.location && !byName.has(d.trip.location)) byName.set(d.trip.location, d.trip.id);
     return byName;
   });
+  /** The computer chosen as the main one, by its place in the dive; 0: unchanged. */
+  let mainComputer = $state(0);
+
   /** "Nouveau voyage" in the list of trips: its name is asked below. */
   const NEW_TRIP = '\u0000new';
   let newTripName = $state('');
@@ -445,6 +448,11 @@
       }
       if (Object.keys(all).length) {
         await saveDiveChanges(dive.id, all);
+        steps++;
+      }
+      // Subsurface's "Move dive computer to front": its own undoable step.
+      if (mainComputer) {
+        await saveDiveChanges(dive.id, { mainComputer });
         steps++;
       }
       if (tripText !== oldTrip) {
@@ -685,14 +693,13 @@
     {#if dive.diveComputers.length}
       <section class="card">
         {@render header(t('edit.computersGroup'))}
-        <!-- Showing the main computer only: changing it needs a core command. -->
         <div class="computers" role="radiogroup" aria-label={t('edit.computersGroup')}>
           {#each dive.diveComputers as computer, i (i)}
             <label class="computer">
-              <input type="radio" name="od-main-computer" checked={i === 0} disabled />
+              <input type="radio" name="od-main-computer" checked={i === mainComputer} onchange={() => (mainComputer = i)} />
               <span class="texts">
-                <span>{computer.model}</span>
-                {#if i === 0}<span class="sub">{t('edit.mainComputer')}</span>{/if}
+                <span>{computer.model || t('edit.unnamedComputer')}</span>
+                {#if i === mainComputer}<span class="role">{t('edit.mainComputer')}</span>{/if}
               </span>
             </label>
           {/each}
@@ -937,8 +944,9 @@
       font-weight: 600;
     }
 
+    /* The 8 px under the help text are those of the card. */
     .computers {
-      padding: 0 16px 8px;
+      padding: 0 16px;
     }
 
     .computer {
@@ -981,7 +989,7 @@
         color: var(--od-text);
       }
 
-      .sub {
+      .role {
         font-size: 14px;
         line-height: 20px;
         color: var(--od-text-2);

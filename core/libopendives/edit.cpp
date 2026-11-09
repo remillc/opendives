@@ -904,6 +904,34 @@ int edit_dive(int id, const std::string &changes_json, std::string &result_json,
 		return -1;
 	}
 
+	// {"mainComputer": n}: alone, as Subsurface's MoveDiveComputerToFront, its
+	// own command (commands/command_divelist.cpp).
+	if (changes.size() == 1 && changes[0].first == "mainComputer") {
+		const JsonValue &value = changes[0].second;
+		if (value.kind != JsonValue::NUMBER || value.number < 0 || value.number >= d->dcs.size()) {
+			error = "BAD_REQUEST: mainComputer";
+			return -1;
+		}
+		int number = static_cast<int>(value.number);
+		if (number) {
+			std::unique_ptr<dive> moved = clone_make_first_dc(*d, number);
+			moved->id = d->id; // the same dive here: only its computers change places
+			exchange(d, *moved);
+			if (applied < steps.size()) {
+				if (clean_index > static_cast<long>(applied))
+					clean_index = -1;
+				steps.resize(applied);
+			}
+			Step step;
+			step.dive_id = id;
+			step.other = std::move(moved);
+			step.text = "move dive computer to front";
+			steps.push_back(std::move(step));
+			applied++;
+		}
+		return internal::dive_json(id, result_json, error);
+	}
+
 	auto copy = std::make_unique<dive>(*d);
 	std::vector<std::string> fields; // names as in Subsurface's Edit* commands
 	bool water_temp_changed = false;
