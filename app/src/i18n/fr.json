@@ -1387,6 +1387,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Sites : l’en-tête a la même vague et le même profil que les autres sections, et la carte apparaît sous la courbe.",
       "Carnet : l’état de la synchronisation (hors ligne avec des changements en attente, échec, conflit) s’affiche dans une pastille de l’en-tête ; une plongée en attente garde son numéro et sa date.",
       "Synchronisation : quand elle échoue alors que le réseau fonctionne, le Carnet dit pourquoi (mot de passe refusé, cloud qui ne répond pas, dépôt git refusé) et propose quoi faire.",
       "Planificateur : la plongée de départ montre son numéro et sa durée, dans le planificateur et dans la liste pour la choisir.",

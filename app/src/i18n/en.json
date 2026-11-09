@@ -1387,6 +1387,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Sites: the header has the same wave and profile as the other sections, and the map shows under the curve.",
       "Logbook: the sync state (offline with changes waiting, failure, conflict) shows in a pill in the header; a dive waiting to be sent keeps its number and date.",
       "Sync: when it fails while the network works, the Logbook says why (password refused, cloud not answering, git repository refused) and offers what to do.",
       "Planner: the starting dive shows its number and duration, in the planner and in the list to choose it.",
