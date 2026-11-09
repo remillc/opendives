@@ -1387,6 +1387,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Statistics: charts that do not measure depth (dives per year, durations) are blue.",
       "Editing a rebreather dive: no gas switch depth for the diluent and oxygen, and choosing the use fills in the starting mix (21 % or 100 %).",
       "Sites: the header has the same wave and profile as the other sections, and the map shows under the curve.",
       "Logbook: the sync state (offline with changes waiting, failure, conflict) shows in a pill in the header; a dive waiting to be sent keeps its number and date.",
