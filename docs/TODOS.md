@@ -10,7 +10,7 @@ Rules (agreed between the design agent and the code agent, see `docs/agent-inbox
 - **Tag:** every item starts with `[design]` or `[code]` right after its number, set by the agent that adds it (`#4 [design] …`). `[design]` = mock-ups, visuals, screen texts, specification; `[code]` = everything else. When unsure, the agent asks Christian. The tag says who handles the item and lets Christian list one kind only.
 - No other content in this file: no history, no checked boxes, no notes from agents.
 
-Next number: 17
+Next number: 18
 
 ## List
 
@@ -23,3 +23,4 @@ Next number: 17
 - #14 [design] Le bouton synchroniser maintenant dans le menu mobile devrait être centré horizontallement dans le menu
 - #15 [code] supprimer une plongée: afficher un dialogue de confirmation puis un snackbar
 - #16 [code] Il nous faut un outil pour s'assurer que les calculs du planificateur de plongée sont exactes. Ceci passe par une série de tests qu'on doit effectuer avant de faire un release
+- #17 [design] ajouter la possibilité d'une switch globale "plongée récréative" qui masque les paramètres avancés et ceux concernant le mode de plongée cc. Ce que SS nomme le mode loisir.
