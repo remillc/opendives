@@ -140,6 +140,13 @@ run_one() {
   fi
 
   if [ -z "$why" ]; then
+    # A merged computer, read back from the log: its dives have the other's identity.
+    E="$d/computersreload"; rm -rf "$E"; cp -r "$d/B" "$E"
+    "$ED" computersreload "$E[main]" - >"$E.out" 2>"$E.err"; rc=$?
+    [ $rc = 1 ] && why="computersreload: $(value error "$E.out")"
+  fi
+
+  if [ -z "$why" ]; then
     # Dive computers of the logbook merged and renamed, then undone: the tree
     # is the original one again.
     E="$d/computers"; rm -rf "$E"; cp -r "$d/B" "$E"

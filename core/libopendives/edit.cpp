@@ -17,6 +17,7 @@
 #include "json.h"
 
 #include "core/device.h"
+#include "core/extradata.h"
 #include <cmath>
 #include <map>
 #include <set>
@@ -2295,6 +2296,21 @@ void dive_computers(std::string &json)
 	json += ']';
 }
 
+// Subsurface writes a computer's serial number and firmware in the log as extra
+// data, and reads them back from there (add_extra_data()).
+static void set_extra_data(divecomputer &dc, const std::string &key, const std::string &value)
+{
+	auto it = std::find_if(dc.extra_data.begin(), dc.extra_data.end(), [&](const extra_data &e) { return e.key == key; });
+	if (value.empty()) {
+		if (it != dc.extra_data.end())
+			dc.extra_data.erase(it);
+	} else if (it != dc.extra_data.end()) {
+		it->value = value;
+	} else {
+		dc.extra_data.push_back(extra_data { key, value });
+	}
+}
+
 static void apply_devices(Step &step)
 {
 	std::swap(divelog.devices, step.devices_swap);
@@ -2392,8 +2408,11 @@ int dive_computer_action(const std::string &action, const std::string &model, co
 				dc.model = into_model;
 				dc.serial = into_serial;
 				dc.deviceid = into_id;
-				if (dc.fw_version.empty())
+				set_extra_data(dc, "Serial", into_serial);
+				if (dc.fw_version.empty() && !into->firmware.empty()) {
 					dc.fw_version = into->firmware;
+					set_extra_data(dc, "FW Version", into->firmware);
+				}
 			}
 			step.dive_swaps.emplace_back(d->id, std::move(copy));
 		}
