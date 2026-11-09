@@ -4,7 +4,8 @@
 // kept on the device. The pictures are prepared ahead, on Wi-Fi, so that a site
 // shows at once, offline too.
 import { OpenDivesCore } from 'opendives-core';
-import { MAP_STYLE } from './map-style.js';
+import { buildMapStyle } from './map-style.js';
+import { onTileOrigin } from './offline-tiles.js';
 
 const CACHE = 'od-site-maps-v4';
 const ZOOM = 12;
@@ -24,20 +25,31 @@ const PAUSE_MS = 200;
 /** @param {number} latUdeg @param {number} lonUdeg */
 const keyOf = (latUdeg, lonUdeg) => `https://localhost/site-map/${latUdeg}/${lonUdeg}`;
 
+let drawers = 0;
+
 /**
- * An off-screen map that draws one site after the other.
- * @param {() => void} [onTile] called for each tile asked
+ * An off-screen map that draws one site after the other. The tiles come from a
+ * downloaded package, else the network (see map-style.js).
+ * @param {() => void} [onTile] called for each tile asked of the network
  */
 async function createDrawer(onTile) {
   const module = await import('maplibre-gl');
   /** @type {typeof import('maplibre-gl')} */
   const maplibregl = /** @type {any} */ (module).default ?? module;
+  const channel = `draw${++drawers}`;
+  const { style, degraded } = await buildMapStyle(maplibregl, channel);
+  // A picture is kept as the site's map only when nothing was missing.
+  let missing = 0;
+  const stopListening = onTileOrigin(channel, (origin) => {
+    if (origin === 'online') onTile?.();
+    else if (origin === 'missing') missing++;
+  });
   const container = document.createElement('div');
   container.style.cssText = `position:fixed;left:-${DRAW_WIDTH + 100}px;top:0;width:${DRAW_WIDTH}px;height:${HALF_HEIGHT * 2}px`;
   document.body.append(container);
   const map = new maplibregl.Map({
     container,
-    style: MAP_STYLE,
+    style,
     center: [0, 0],
     zoom: ZOOM,
     pixelRatio: 2,
@@ -45,12 +57,9 @@ async function createDrawer(onTile) {
     attributionControl: false,
     fadeDuration: 0,
     canvasContextAttributes: { preserveDrawingBuffer: true },
-    transformRequest: (url) => {
-      if (url.endsWith('.pbf')) onTile?.();
-      return { url };
-    },
   });
   const close = () => {
+    stopListening();
     map.remove();
     container.remove();
   };
@@ -76,12 +85,14 @@ async function createDrawer(onTile) {
   }
 
   /**
-   * The picture of a site; an error when it cannot be complete.
+   * The picture of a site, and whether it is complete (worth keeping): not
+   * when the simplified map was used or a tile could not be had.
    * @param {number} latUdeg
    * @param {number} lonUdeg
-   * @returns {Promise<Blob>}
+   * @returns {Promise<{ blob: Blob, complete: boolean }>}
    */
   function draw(latUdeg, lonUdeg) {
+    missing = 0;
     return new Promise((resolve, reject) => {
       /** @param {{ error?: Error }} e */
       const failed = (e) => done(() => reject(e.error ?? new Error('Site map')));
@@ -94,7 +105,11 @@ async function createDrawer(onTile) {
       const timer = setTimeout(() => done(() => reject(new Error('Site map: timeout'))), TIMEOUT_MS);
       map.on('error', failed);
       map.once('idle', () =>
-        done(() => map.getCanvas().toBlob((blob) => (blob ? resolve(blob) : reject(new Error('Site map: no picture'))), 'image/webp', 0.8)),
+        done(() =>
+          map
+            .getCanvas()
+            .toBlob((blob) => (blob ? resolve({ blob, complete: !degraded && missing === 0 }) : reject(new Error('Site map: no picture'))), 'image/webp', 0.8),
+        ),
       );
       map.jumpTo({ center: [lonUdeg / 1e6, latUdeg / 1e6] });
       map.triggerRepaint();
@@ -124,8 +139,8 @@ export async function loadSiteMap(latUdeg, lonUdeg) {
   if (kept) return URL.createObjectURL(await kept.blob());
   const drawer = await createDrawer();
   try {
-    const blob = await drawer.draw(latUdeg, lonUdeg);
-    await keep(cache, key, blob);
+    const { blob, complete } = await drawer.draw(latUdeg, lonUdeg);
+    if (complete) await keep(cache, key, blob);
     return URL.createObjectURL(blob);
   } finally {
     drawer.close();
@@ -161,7 +176,9 @@ async function prepareSiteMaps() {
       if (await cache.match(key)) continue;
       if (tiles >= MAX_TILES_PER_RUN || !(await canPrepare())) break;
       drawer ??= await createDrawer(() => tiles++);
-      await keep(cache, key, await drawer.draw(site.latUdeg, site.lonUdeg));
+      const { blob, complete } = await drawer.draw(site.latUdeg, site.lonUdeg);
+      if (!complete) break; // the map server does not answer: the next load tries again
+      await keep(cache, key, blob);
       await new Promise((resolve) => setTimeout(resolve, PAUSE_MS));
     }
   } catch (e) {

@@ -55,6 +55,11 @@
     /* On the header band, whose colours stay light in dark mode too. */
     --od-band-pending: #8A4B00;
     --od-band-control: rgb(255 255 255 / 0.78);
+    /* The simplified offline map (sea, land, land inside a downloaded region, roads). */
+    --od-map-sea: #D3E0EC;
+    --od-map-land-low: #EDECE7;
+    --od-map-land: #F7F6F2;
+    --od-map-road: #D9D3C4;
 
     --od-background: #F4F4F2;
     --od-surface: #FFFFFF;
@@ -135,6 +140,10 @@
     --od-text-2: #B5B8BC;
     --od-separator: #3A3C40;
     --od-row-divider: #3A3C40;
+    --od-map-sea: #1E2A36;
+    --od-map-land-low: #232426;
+    --od-map-land: #2A2C2F;
+    --od-map-road: #4A4D52;
     --od-action: #F4F4F2;
     --od-on-action: #1F2124;
     --od-cursor: #F4F4F2;

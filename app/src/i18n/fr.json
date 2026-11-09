@@ -140,8 +140,14 @@
     "failure": {
       "later": "Plus tard",
       "close": "Fermer",
-      "stays": { "one": "Votre modification reste sur ce téléphone.", "other": "Vos {n} modifications restent sur ce téléphone." },
-      "staysAuth": { "one": "Votre modification reste sur ce téléphone et partira dès que le mot de passe sera corrigé.", "other": "Vos {n} modifications restent sur ce téléphone et partiront dès que le mot de passe sera corrigé." },
+      "stays": {
+        "one": "Votre modification reste sur ce téléphone.",
+        "other": "Vos {n} modifications restent sur ce téléphone."
+      },
+      "staysAuth": {
+        "one": "Votre modification reste sur ce téléphone et partira dès que le mot de passe sera corrigé.",
+        "other": "Vos {n} modifications restent sur ce téléphone et partiront dès que le mot de passe sera corrigé."
+      },
       "staysNone": "Vos plongées restent sur ce téléphone.",
       "auth": {
         "row": "Synchronisation impossible : mot de passe refusé",
@@ -547,7 +553,7 @@
       "dilution": "Rapport de dilution (pSCR)",
       "dilutionDialog": "Une part rejetée pour N parts respirées (1:N).",
       "ocPo2": "pO₂ équivalente en circuit ouvert (pSCR)"
-    },
+    },
     "logbookComputers": {
       "title": "Ordinateurs du carnet",
       "rowText": "Renommer, retirer les doublons",
@@ -1077,7 +1083,10 @@
       "one": "La plongée qui l’utilise reste dans le carnet, sans site. C’est annulable.",
       "other": "Les {n} plongées qui l’utilisent restent dans le carnet, sans site. C’est annulable."
     },
-    "deleteSiteTextUnused": "Aucune plongée ne l’utilise. C’est annulable."
+    "deleteSiteTextUnused": "Aucune plongée ne l’utilise. C’est annulable.",
+    "offline": "Hors ligne",
+    "areaNotDownloaded": "Cette zone n’est pas téléchargée",
+    "downloadArea": "Télécharger"
   },
   "renumber": {
     "titleChecked": "Renuméroter les plongées cochées ?",
@@ -1387,6 +1396,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Sites : sans réseau, la carte lit les régions téléchargées, sinon un planisphère simplifié ; une pastille « Hors ligne » l’indique et un message propose de télécharger la zone.",
       "Désaturation : le texte sous le graphique est plus court.",
       "Réglages : la langue de l’app peut être Français (Canada), qui dit « nuage » et « courriel » ; un téléphone réglé en français (Canada) la choisit tout seul.",
       "Détail d’une plongée : les barres de pression des bouteilles vont de 0 à la pression de service, avec le restant et l’utilisé.",
