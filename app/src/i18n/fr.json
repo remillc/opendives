@@ -547,7 +547,7 @@
       "dilution": "Rapport de dilution (pSCR)",
       "dilutionDialog": "Une part rejetée pour N parts respirées (1:N).",
       "ocPo2": "pO₂ équivalente en circuit ouvert (pSCR)"
-    },
+    },
     "logbookComputers": {
       "title": "Ordinateurs du carnet",
       "rowText": "Renommer, retirer les doublons",
@@ -1061,6 +1061,9 @@
     "searchPlaceholder": "Rechercher",
     "noMatch": "Aucun site ne correspond",
     "centreOnMe": "Centrer sur ma position",
+    "offline": "Hors ligne",
+    "areaNotDownloaded": "Cette zone n’est pas téléchargée",
+    "downloadArea": "Télécharger",
     "mapCredits": "© OpenFreeMap, OpenMapTiles, contributeurs OpenStreetMap",
     "listLabel": "Liste des sites",
     "unplacedLink": {
@@ -1387,6 +1390,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Sites : sans réseau, la carte lit les régions téléchargées, sinon un planisphère simplifié ; une pastille « Hors ligne » l’indique et un message propose de télécharger la zone.",
       "Détail d’une plongée : les barres de pression des bouteilles vont de 0 à la pression de service, avec le restant et l’utilisé.",
       "Planificateur : un plan fait à partir d’une plongée au recycleur part du diluant, jamais de l’oxygène.",
       "Planificateur : une barre montre la part consommée et la réserve de chaque gaz, une autre l’exposition CNS.",
