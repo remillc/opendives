@@ -67,7 +67,8 @@ core/compat/              OpenDives additions to build Subsurface's core without
 core/libopendives/        C++ facade over the core
 native/                   Android build of the core and its dependencies
 poc/                      proof of concept: build.sh + report (README.md)
-tests/                    roundtrip.cpp, run-roundtrip.sh, facade.cpp
+tests/                    roundtrip.cpp, run-roundtrip.sh, facade.cpp, plan_test.cpp, plan_oracle.cpp,
+                          release-check.sh (the release lock), app/ (node:test), android/, e2e/
 third_party/subsurface/   pinned Subsurface submodule (+ its libdivecomputer submodule)
 docs/                     design documents
 site/                     public web pages built from the app's files (privacy policy) + README
@@ -115,6 +116,8 @@ Gradle does not rebuild the native code: rerun `native/build-android.sh` when th
 
 - The app is versioned with Semantic Versioning 2.0.0: `MAJOR.MINOR.PATCH`, with an optional pre-release such as `0.2.0-beta.1`. The current version is **0.2.0**. Its one source is `app/package.json`: Android `versionName`, iOS `CFBundleShortVersionString` and the web build read it. Build numbers (`versionCode`, `CFBundleVersion`) are internal and only increase.
 - Each release updates `CHANGELOG.md` at the root (Keep a Changelog: Added, Changed, Fixed, in detail), creates the tag `vX.Y.Z` on `main` and a GitHub release with those notes and the APK attached.
+- **Release lock (planner calculations): no tag without a green report for that commit.** On the commit to release, with the working tree clean, run `tests/release-check.sh` (about 25 minutes; needs the emulator `emulator-5554` on the test account, the NDK, JDK 21, and the app's `npm ci`). It checks: the 17 cases of Subsurface's `testplan.cpp` through the façade (the ones the façade cannot express are listed in its output), an independent ZH-L16C checker over 360 plans, the app chain (units, request, displayed values, alarms), that wrong inputs make each of them fail, the same programs compiled with the NDK and run on the emulator, and the planner scenarios in the real app. It writes `build/release-check/report-<commit>.json`, tied to the commit and to the pinned Subsurface commit. Before tagging, `tests/release-check.sh --verify` must print GREEN; attach the report to the GitHub release. Changing the Subsurface pin or any planner code means a new report. The GitHub Actions workflow `planner checks` runs the checks that need no device (`--ci`) on each push to `main`; its report never releases anything.
+- **Changing a reference value** in these tests (`tests/plan_test.cpp`, `tests/plan_oracle.cpp`, `tests/app/`, `tests/e2e/`) needs a commit that says why: what moved, by how much, and what justifies the new value. A value or a tolerance is never changed to make a test pass; a test that fails is a discrepancy to explain.
 - Release notes (About → Nouveautés, `about.releaseNotes` in `app/src/i18n/fr.json` and `en.json`) describe the current version. Every change a user can see adds or updates a line there in the same commit; a new version starts a new list.
 - Addresses, in the app's routes and on the public site: a resource has no trailing slash (`/about`, `/dive/42`, `/site/7/edit`, `/privacy`); a collection has one (`/sites/`, `/tools/`, `/settings/`, `/statistics/`); the home page is `/`.
 - Branch names always start with a prefix that says what the branch is for: `feature/...`, `fix/...`, `release/1.0.0`, and so on.
