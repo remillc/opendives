@@ -711,7 +711,7 @@ Remove the line "S’appliquent à chaque plan." under the title of "Réglages d
 
 Done in "Planner settings: no intro line". The line and its i18n key are gone; the first group title (Vitesses) follows the top bar directly. Checked in the emulator.
 
-## [ ] 2026-11-09-02 Decompression settings on their own page, linked from the planner settings
+## [x] 2026-11-09-02 Decompression settings on their own page, linked from the planner settings
 
 Christian wants the decompression settings on a page of their own, `/settings/decompression` (to-do #5).
 - New page "Décompression" (`docs/mockups/reglages-decompression-android.dc.html`): back arrow, title "Décompression", the warning note in `--od-alarm`, then the rows now in the Settings group: Modèle, Facteurs de gradient, Conservatisme VPM-B, Oxygène narcotique, END maximale du meilleur mélange, and the footnote "Utilisés par le plafond calculé du profil, le planificateur, la désaturation et le calculateur de gaz." Same rows, values and behaviour as today.
@@ -719,3 +719,4 @@ Christian wants the decompression settings on a page of their own, `/settings/de
 - Planner settings (`reglages-planificateur-android.dc.html`): a first white surface before "Vitesses" with one 72 dp row "Modèle de décompression", the same supporting text, chevron, opening the same page. Back from it returns to the planner settings.
 Spec: "Settings, modelled on Subsurface" (the sentence on the decompression settings).
 
+Done in "Settings: decompression on its own page, linked from Settings and the planner settings". /settings/decompression is the Settings page with section decompression: the warning, the same five rows (same values and behaviour) and the footnote. Settings keeps the group title with one 72 dp row "Modele, facteurs de gradient, END" and the model and GF as supporting text (Buhlmann ZH-L16, GF 30/75; VPM-B, +3 with VPM-B); the planner settings start with one 72 dp row "Modele de decompression" opening the same page, Back returning to them. Checked in the emulator.

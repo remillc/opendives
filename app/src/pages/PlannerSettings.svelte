@@ -12,8 +12,11 @@
   import WheelDialog from '../components/WheelDialog.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
   import { planner, loadSetup, adoptUnitDefaults, plannerDefaults, setting, setSetting, ascentRate, setAscentRate } from '../lib/planner.svelte.js';
-  import { formatNumber, depthUnit } from '../lib/format.js';
+  import { formatNumber, depthUnit, decoSummary } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
+
+  /** @type {{ f7router: { navigate: (url: string) => void } }} */
+  let { f7router } = $props();
 
   loadSetup()
     .then(() => adoptUnitDefaults(logbook.prefs))
@@ -253,6 +256,19 @@
     {/snippet}
   </Navbar>
 
+  <!-- The decompression model and gradient factors: their own page, shared with Settings. -->
+  <div class="surface first" role="list">
+    <div role="listitem">
+      <button type="button" class="row tall" onclick={() => f7router.navigate('/settings/decompression')}>
+        <span class="texts">
+          <span class="label">{t('plannerSettings.decoModel')}</span>
+          <span class="supporting">{decoSummary(prefs)}</span>
+        </span>
+        <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"></path></svg>
+      </button>
+    </div>
+  </div>
+
   {#if planner.setup}
     {#each groups as g (g.id)}
       <h2 class="title">{g.title}</h2>
@@ -321,6 +337,15 @@
       :global(.ios-list) & {
         border-radius: 10px;
       }
+
+      /* The decompression row, before the first group. */
+      &.first {
+        margin-top: 16px;
+      }
+    }
+
+    .row.tall {
+      min-height: 72px;
     }
 
     .row {

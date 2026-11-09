@@ -109,6 +109,7 @@
     // The planner: /plan/new/ for a new dive, /plan/<dive id>/ from a logbook dive.
     // The planner's settings, a screen of their own (task 2026-11-08-01, to-do #3 U3).
     { path: '/settings/planner', component: PlannerSettings },
+    { path: '/settings/decompression', component: Settings, options: { props: { section: 'decompression' } } },
     { path: '/plan/:id', component: Planner },
     { path: '/sites/', component: Sites },
     { path: '/sites/without/', component: DivesWithoutSite },

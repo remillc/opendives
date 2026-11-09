@@ -319,6 +319,17 @@ export function formatGas(o2Permille, hePermille) {
 }
 
 /**
+ * The decompression settings in a few words, for the rows that open their
+ * page: "Bühlmann ZH-L16, GF 30/75" or "VPM-B, +3".
+ * @param {{ decoModel?: string, gfLow?: number, gfHigh?: number, vpmbConservatism?: number }} prefs
+ */
+export function decoSummary(prefs) {
+  return prefs.decoModel === 'vpmb'
+    ? `${t('settings.deco.vpmb')}, +${prefs.vpmbConservatism ?? 0}`
+    : `${t('settings.deco.buehlmann')}, GF ${prefs.gfLow ?? 30}/${prefs.gfHigh ?? 75}`;
+}
+
+/**
  * Mix name as the core writes it (gasname in Subsurface's gas.cpp): air,
  * EAN32, oxygen, (18/45).
  * @param {number} o2Permille

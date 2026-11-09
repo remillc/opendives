@@ -469,7 +469,8 @@
       "o2narcoticText": "Compté dans la profondeur narcotique équivalente (END)",
       "bestMixEnd": "END maximale du meilleur mélange",
       "bestMixEndDialog": "Profondeur narcotique équivalente la plus grande admise pour choisir le meilleur mélange.",
-      "note": "Utilisés par le plafond calculé du profil, le planificateur, la désaturation et le calculateur de gaz."
+      "note": "Utilisés par le plafond calculé du profil, le planificateur, la désaturation et le calculateur de gaz.",
+      "link": "Modèle, facteurs de gradient, END"
     },
     "pp": {
       "po2": "Seuils de pO₂",
@@ -1225,7 +1226,8 @@
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
       "Planificateur : la plongée de départ montre son numéro et sa durée, dans le planificateur et dans la liste pour la choisir.",
-      "Réglages du planificateur : sans ligne d’introduction, les groupes suivent directement le titre."
+      "Réglages du planificateur : sans ligne d’introduction, les groupes suivent directement le titre.",
+      "Réglages : la décompression (modèle, facteurs de gradient, END) a sa propre page, ouverte aussi depuis les réglages du planificateur."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
@@ -1320,7 +1322,8 @@
     "decoPo2": "ppO₂ pendant la déco",
     "reserve": "Réserve minimale",
     "problemSolving": "Temps pour régler un problème",
-    "sacFactor": "Facteur de consommation sous stress"
+    "sacFactor": "Facteur de consommation sous stress",
+    "decoModel": "Modèle de décompression"
   },
   "plan": {
     "title": "Planificateur",

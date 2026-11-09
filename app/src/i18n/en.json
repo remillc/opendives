@@ -469,7 +469,8 @@
       "o2narcoticText": "Counted in the equivalent narcotic depth (END)",
       "bestMixEnd": "Best mix maximum END",
       "bestMixEndDialog": "Largest equivalent narcotic depth allowed when choosing the best mix.",
-      "note": "Used by the calculated ceiling of the profile, the planner, desaturation and the gas calculator."
+      "note": "Used by the calculated ceiling of the profile, the planner, desaturation and the gas calculator.",
+      "link": "Model, gradient factors, END"
     },
     "pp": {
       "po2": "pO₂ thresholds",
@@ -1225,7 +1226,8 @@
     "notesText": "What changed in this version",
     "releaseNotes": [
       "Planner: the starting dive shows its number and duration, in the planner and in the list to choose it.",
-      "Planner settings: no introduction line, the groups follow the title directly."
+      "Planner settings: no introduction line, the groups follow the title directly.",
+      "Settings: decompression (model, gradient factors, END) has its own page, also opened from the planner settings."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
@@ -1320,7 +1322,8 @@
     "decoPo2": "Deco ppO₂",
     "reserve": "Minimum reserve",
     "problemSolving": "Problem-solving time",
-    "sacFactor": "SAC factor under stress"
+    "sacFactor": "SAC factor under stress",
+    "decoModel": "Decompression model"
   },
   "plan": {
     "title": "Planner",
