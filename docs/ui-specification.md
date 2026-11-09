@@ -224,19 +224,21 @@ Layout: titles sit on the page background, 18 px bold; each group is a white sur
 | Vitesses de remontée et de descente | choice | per minute, per second | `units.vertical_speed_time` |
 | Durée | choice | automatic (mm under one hour, else h:mm), always h:mm, always mm | `units.duration_units` |
 | Coordonnées GPS | choice | decimal (-35.4485, default, unlike the core), degrees and decimal minutes (35° 26.9′ S), degrees, minutes and seconds (35° 26′ 54.6″ S) | `coordinates_traditional` covers only seconds (true) and decimal (false) in `printGPSCoords`: OpenDives formats coordinates itself, in all three forms |
-| Regrouper les plongées en voyages | switch | on | logbook `autogroup` |
+| Regrouper les plongées en voyages | switch, no helper | on | logbook `autogroup` |
 | Afficher les plongées invalides | switch | off | `display_invalid_dives` |
 | Vagues de surface, flux-reflux et froid | switch | off | `extraEnvironmentalDefault` |
-| Modifier la salinité de l'eau | switch | off | `salinityEditDefault` |
-| Bouteille par défaut | choice | None, then the cylinder types | `default_cylinder` |
+| Choisir le type d’eau dans l’éditeur | switch, helper "Ajoute le champ dans Modifier une plongée. Sinon, l’app garde celui de l’ordinateur de plongée" | on (decided on 9 November 2026, unlike the core) | `salinityEditDefault` |
+| Bouteille, circuit ouvert | choice dialog (`reglages-bouteille-choix-android.dc.html`): Aucune, then the cylinder types with volume and working pressure | Aucune | `default_cylinder` |
+| Diluant, recycleur | same choice dialog, own title | Aucune | OpenDives device setting; when the dive mode is CCR or pSCR, the app adds this cylinder with the use "diluant" |
+| Oxygène, recycleur | same choice dialog, own title | Aucune | OpenDives device setting; added with the use "oxygène" |
+| Secours (bailout), recycleur | chevron to a sub-screen (`reglages-secours-android.dc.html`): one row per bailout cylinder type with "Changer" and ✕, then "Ajouter une bouteille de secours (bailout)"; supporting text "Une ou plusieurs bouteilles", value the list of types | none | OpenDives device setting; added to CCR and pSCR dives as open-circuit cylinders, the gas set in each dive |
 | Afficher les bouteilles inutilisées | switch | off | `include_unused_tanks` |
 | Proposer les tailles standard | switch | on | `display_default_tank_infos` |
 | Types de bouteilles | chevron | sub-screen, see below | core tank info table |
 | Profondeur moyenne | switch | on | `show_average_depth` |
-| Grille de profondeur | choice | 1, 2, 5, 10; by 3 (3, 6, 15) | `three_m_based_grid` |
-| Plafond donné par l'ordinateur | switch | on | `dcceiling` |
-| Plafond en rouge | switch | off | `redceiling` |
-| Plafond calculé | switch | off; uses the model of the Décompression group | `calcceiling` |
+| Plafond donné par l'ordinateur | switch, helper "Affiche le plafond donné par l’ordinateur de plongée" | on | `dcceiling` |
+| Plafond en rouge | switch right after the computer ceiling, helper "Le plafond de l’ordinateur en rouge plutôt qu’en découpe"; dimmed and inactive when "Plafond donné par l'ordinateur" is off (in the core it only colours the computer ceiling) | off | `redceiling` |
+| Plafond calculé | switch, helper "Affiche le plafond calculé selon le modèle de décompression ci-dessous" | off | `calcceiling` |
 | Décompression · warning | note | under the group title, always shown: an outlined note in `--od-alarm` with a warning icon: "Ces réglages changent les paliers et les limites calculés par l’app. Des valeurs mal choisies exposent à un accident de décompression. Ne les modifiez que si vous savez ce que vous faites." | none |
 | Décompression · Modèle | choice | Bühlmann ZH-L16, VPM-B | `display_deco_mode` and `planner_deco_mode` set together |
 | Décompression · Facteurs de gradient | number (two wheels) | GF low 10–150 % (30), GF high 40–150 % (75) | `gflow`, `gfhigh` |
@@ -257,7 +259,7 @@ Layout: titles sit on the page background, 18 px bold; each group is a white sur
 | Taille du texte | info | follows the device; not a control | none |
 | Régions téléchargées | chevron | offline maps sub-screen (to be designed) | app setting |
 
-*Cylinder types sub-screen* (`reglages-bouteilles-android.dc.html`): "Your types" (from the logbook) then "Standard" (the core's default table: AL80, ALU7, 10L 232 bar, …), each row showing volume and working pressure; a tap opens the type's sheet (name, volume, working pressure, Delete); the "Add a type" floating button opens an empty sheet. Renaming a type also renames the matching cylinders in the logbook; resizing or removing it does not change existing dives (same rule as the core's cylinder-type manager).
+*Cylinder types sub-screen* (`reglages-bouteilles-android.dc.html`): "Your types" (from the logbook) then "Standard" (the core's default table: AL80, ALU7, 10L 232 bar, …), each row showing volume and working pressure; in "Vos types", the supporting text gives how many dives use the type ("Dans 12 plongées"), and a type used by no dive shows an outlined label "Inutilisé" after its name with "Dans aucune plongée" (decided on 9 November 2026). A tap opens the full-screen form "Modifier le type" (`reglages-bouteille-modifier-android.dc.html`: X, title, "Enregistrer"; filled fields Nom with a helper, Volume and Pression de service on one line, a note on the volume unit; a note saying whether the type is standard and how many dives use it; an outlined "Retirer ce type" button). The "Ajouter un type" floating button opens the same form empty, titled "Nouveau type" (`reglages-bouteille-type-android.dc.html`). Renaming a type also renames the matching cylinders in the logbook; resizing or removing it does not change existing dives (same rule as the core's cylinder-type manager).
 
 **Trip (decided on 6 November 2026).** Tapping a trip opens its screen: dates, place (or "Place to be specified"), number of dives and whether the trip was grouped automatically; place and notes are editable; each dive has a menu to remove it from the trip or split the trip there; the top menu merges with another trip, adds dives or ungroups. Reference: `docs/mockups/voyage-android.dc.html`.
 
