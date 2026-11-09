@@ -2640,35 +2640,100 @@ static int sync_and_reload_if_needed(const std::string &log, const std::string &
 
 namespace {
 
-// "key value" lines of a file of the git log, grouped by key; lines starting
-// with a space or a tab continue the previous key.
-std::map<std::string, std::string> git_file_lines(git_repository *repo, const git_tree *tree, const std::string &path)
+// A line of a file of the git log and the key it belongs to: lines starting
+// with a space or a tab continue the previous key. Blank lines are kept, with
+// an empty text, and belong to no value.
+struct LogLine {
+	std::string key, text;
+};
+
+std::vector<LogLine> log_lines(const std::string &text)
 {
-	std::map<std::string, std::string> out;
+	std::vector<LogLine> out;
+	std::string key;
+	size_t start = 0;
+	while (start < text.size()) {
+		size_t nl = text.find('\n', start);
+		std::string line = text.substr(start, nl == std::string::npos ? std::string::npos : nl - start);
+		start = nl == std::string::npos ? text.size() : nl + 1;
+		if (!line.empty() && line[0] != ' ' && line[0] != '\t')
+			key = line.substr(0, line.find(' '));
+		out.push_back({ key, line });
+	}
+	return out;
+}
+
+bool git_file_text(git_repository *repo, const git_tree *tree, const std::string &path, std::string &text)
+{
 	git_tree_entry *entry = nullptr;
 	if (!tree || git_tree_entry_bypath(&entry, tree, path.c_str()))
-		return out;
+		return false;
 	git_blob *blob = nullptr;
-	if (!git_blob_lookup(&blob, repo, git_tree_entry_id(entry))) {
-		std::string text(static_cast<const char *>(git_blob_rawcontent(blob)), git_blob_rawsize(blob));
-		std::string key;
-		size_t start = 0;
-		while (start < text.size()) {
-			size_t nl = text.find('\n', start);
-			std::string line = text.substr(start, nl == std::string::npos ? std::string::npos : nl - start);
-			start = nl == std::string::npos ? text.size() : nl + 1;
-			if (line.empty())
-				continue;
-			if (line[0] != ' ' && line[0] != '\t')
-				key = line.substr(0, line.find(' '));
-			std::string &value = out[key];
-			if (!value.empty())
-				value += '\n';
-			value += line;
-		}
+	bool found = !git_blob_lookup(&blob, repo, git_tree_entry_id(entry));
+	if (found) {
+		text.assign(static_cast<const char *>(git_blob_rawcontent(blob)), git_blob_rawsize(blob));
 		git_blob_free(blob);
 	}
 	git_tree_entry_free(entry);
+	return found;
+}
+
+// "key value" lines of a file of the git log, grouped by key.
+std::map<std::string, std::string> git_file_lines(git_repository *repo, const git_tree *tree, const std::string &path)
+{
+	std::map<std::string, std::string> out;
+	std::string text;
+	if (!git_file_text(repo, tree, path, text))
+		return out;
+	for (const LogLine &line: log_lines(text)) {
+		if (line.text.empty())
+			continue;
+		std::string &value = out[line.key];
+		if (!value.empty())
+			value += '\n';
+		value += line.text;
+	}
+	return out;
+}
+
+// The text of a file with one key as another version of the file has it, every
+// other line untouched. A key this file lacks goes where that version has it.
+std::string with_key_from(const std::string &text, const std::string &other, const std::string &key)
+{
+	std::vector<LogLine> kept, wanted;
+	const std::vector<LogLine> from = log_lines(other);
+	for (const LogLine &line: from)
+		if (line.key == key && !line.text.empty())
+			wanted.push_back(line);
+	size_t at = 0;
+	bool present = false;
+	for (const LogLine &line: log_lines(text)) {
+		if (line.key == key && !line.text.empty()) {
+			if (!present)
+				at = kept.size();
+			present = true;
+		} else {
+			kept.push_back(line);
+		}
+	}
+	if (!present) {
+		for (const LogLine &line: from) {
+			if (line.key == key)
+				break;
+			for (size_t i = kept.size(); i-- > 0;) {
+				if (!line.text.empty() && kept[i].key == line.key) {
+					at = std::max(at, i + 1);
+					break;
+				}
+			}
+		}
+	}
+	kept.insert(kept.begin() + at, wanted.begin(), wanted.end());
+	std::string out;
+	for (const LogLine &line: kept)
+		out += line.text + '\n';
+	if (!text.empty() && text.back() != '\n' && !out.empty())
+		out.pop_back();
 	return out;
 }
 
@@ -2754,6 +2819,12 @@ struct MergeConflicts {
 	std::vector<ConflictFile> files;
 };
 
+// A commit made by resolve_conflicts().
+static bool is_conflict_resolution(const char *message)
+{
+	return strstr(message, "Keep this device's version") || strstr(message, "Take the cloud's version");
+}
+
 int find_merge_conflicts(git_repository *repo, const std::string &branch, MergeConflicts &out)
 {
 	git_commit *head = nullptr, *dev = nullptr, *cld = nullptr, *base_commit = nullptr;
@@ -2764,8 +2835,23 @@ int find_merge_conflicts(git_repository *repo, const std::string &branch, MergeC
 	    git_commit_lookup(&head, repo, &out.head))
 		goto done;
 	ret = 0;
-	if (git_commit_parentcount(head) != 2 || strncmp(git_commit_message(head), "Automatic merge", 15) != 0)
-		goto done;
+	{
+		// The conflict stays while the diver decides later: edits saved since
+		// sit on top of the merge. Not further back than what the server has,
+		// where a merge is an old one, settled or from another program.
+		git_oid remote;
+		bool has_remote = !git_reference_name_to_id(&remote, repo, ("refs/remotes/origin/" + branch).c_str());
+		while (git_commit_parentcount(head) != 2 || strncmp(git_commit_message(head), "Automatic merge", 15) != 0) {
+			if (git_commit_parentcount(head) != 1 || is_conflict_resolution(git_commit_message(head)) ||
+			    (has_remote && git_oid_equal(git_commit_id(head), &remote)))
+				goto done;
+			git_commit *parent = nullptr;
+			if (git_commit_parent(&parent, head, 0))
+				goto done;
+			git_commit_free(head);
+			head = parent;
+		}
+	}
 	{
 		git_oid base;
 		out.device = *git_commit_parent_id(head, 0);
@@ -2938,7 +3024,9 @@ int resolve_conflicts(const std::string &choices_json, std::string &error)
 			return -1;
 		}
 	}
-	// The head's tree, with each conflicting file as the chosen side has it.
+	// The head's tree, with the conflicting lines of each file as the chosen side
+	// has them. The rest of the file stays as it is at the head: what the merge
+	// combined, and edits saved while the conflict waited.
 	git_commit *head = nullptr, *dev = nullptr, *cld = nullptr;
 	git_tree *head_tree = nullptr, *dev_tree = nullptr, *cld_tree = nullptr, *new_tree = nullptr;
 	git_index *index = nullptr;
@@ -2954,17 +3042,26 @@ int resolve_conflicts(const std::string &choices_json, std::string &error)
 		goto done;
 	for (const ConflictFile &f: mc.files) {
 		bool device = keep_device[f.path];
+		// An edit saved since may have moved the dive to another file: adding this
+		// one back would make a second dive.
 		git_tree_entry *entry = nullptr;
-		if (git_tree_entry_bypath(&entry, device ? dev_tree : cld_tree, f.path.c_str()))
-			goto done;
-		git_index_entry ie = {};
-		ie.mode = git_tree_entry_filemode(entry);
-		ie.id = *git_tree_entry_id(entry);
-		ie.path = f.path.c_str();
-		int add = git_index_add(index, &ie);
-		git_tree_entry_free(entry);
-		if (add)
-			goto done;
+		if (!git_tree_entry_bypath(&entry, head_tree, f.path.c_str())) {
+			std::string text, chosen;
+			git_oid blob;
+			git_index_entry ie = {};
+			ie.mode = git_tree_entry_filemode(entry);
+			git_tree_entry_free(entry);
+			if (!git_file_text(repo, head_tree, f.path, text) || !git_file_text(repo, device ? dev_tree : cld_tree, f.path, chosen))
+				goto done;
+			for (const ConflictLine &line: f.lines)
+				text = with_key_from(text, chosen, line.key);
+			if (git_blob_create_frombuffer(&blob, repo, text.data(), text.size()))
+				goto done;
+			ie.id = blob;
+			ie.path = f.path.c_str();
+			if (git_index_add(index, &ie))
+				goto done;
+		}
 		timestamp_t when = dive_time_of_path(f.path);
 		const dive *d = nullptr;
 		for (auto &dp: divelog.dives)
@@ -3007,6 +3104,58 @@ done:
 	if (ret)
 		return -1;
 	// The log in memory is the merged one: read the resolved commit (no network).
+	bool was_local_only = git_local_only;
+	git_local_only = true;
+	int loaded = internal::load(log, error);
+	git_local_only = was_local_only;
+	if (loaded)
+		return -1;
+	apply_log_prefs();
+	divelog.process_loaded_dives();
+	return 0;
+}
+
+int cancel_conflict_resolution(std::string &error)
+{
+	const std::string log = internal::current_log();
+	if (!is_git_log(log)) {
+		error = log.empty() ? "NO_LOG" : "NOT_GIT";
+		return -1;
+	}
+	git_repository *repo = nullptr;
+	std::string branch;
+	if (open_log_repo(log, &repo, branch)) {
+		error = "NOT_GIT";
+		return -1;
+	}
+	git_oid head_id, remote;
+	git_commit *head = nullptr, *parent = nullptr;
+	git_tree *parent_tree = nullptr;
+	git_reference *ref = nullptr, *moved = nullptr;
+	int ret = -1;
+	if (git_reference_lookup(&ref, repo, ("refs/heads/" + branch).c_str()) ||
+	    git_reference_name_to_id(&head_id, repo, ("refs/heads/" + branch).c_str()) || git_commit_lookup(&head, repo, &head_id)) {
+		error = "GIT_ERROR: no head";
+	} else if (!is_conflict_resolution(git_commit_message(head)) || git_commit_parentcount(head) != 1) {
+		error = "NOTHING_TO_DO";
+	} else if (!git_reference_name_to_id(&remote, repo, ("refs/remotes/origin/" + branch).c_str()) && git_oid_equal(&remote, &head_id)) {
+		error = "ALREADY_SENT";
+	} else if (git_commit_parent(&parent, head, 0) || git_commit_tree(&parent_tree, parent) ||
+		   (git_branch_is_head(ref) == 1 && !git_repository_is_bare(repo) &&
+		    update_git_checkout(repo, reinterpret_cast<git_object *>(head), parent_tree)) ||
+		   git_reference_set_target(&moved, ref, git_commit_id(parent), "OpenDives conflict resolution cancelled")) {
+		error = std::string("GIT_ERROR: ") + (git_error_last() ? git_error_last()->message : "cancel failed");
+	} else {
+		ret = 0;
+	}
+	git_reference_free(moved);
+	git_reference_free(ref);
+	git_tree_free(parent_tree);
+	git_commit_free(parent);
+	git_commit_free(head);
+	git_repository_free(repo);
+	if (ret)
+		return -1;
 	bool was_local_only = git_local_only;
 	git_local_only = true;
 	int loaded = internal::load(log, error);

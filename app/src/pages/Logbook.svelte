@@ -18,7 +18,7 @@
   import RenumberDialog from '../components/RenumberDialog.svelte';
   import ExportSheet from '../components/ExportSheet.svelte';
   import { exportDives } from '../lib/share.js';
-  import { logbook, loadLogbook, importFile, undoLastChange, resolveConflict, deleteDives, tripChange } from '../lib/logbook.svelte.js';
+  import { logbook, loadLogbook, importFile, undoLastChange, resolveConflict, sendConflictChoice, cancelConflictChoice, deleteDives, tripChange } from '../lib/logbook.svelte.js';
   import { confirmAction } from '../lib/dialogs.js';
   import { filter, loadOptions, applyFilter, isEmpty } from '../lib/filter.svelte.js';
   import { layout } from '../lib/layout.svelte.js';
@@ -320,6 +320,45 @@
     } catch (e) {
       changeFailed(e);
     }
+  }
+
+  /** The status row of a conflict left for later. */
+  const stoppedText = $derived.by(() => {
+    const dives = (logbook.conflict?.items ?? []).filter((item) => item.diveId || item.date).length;
+    return dives ? t('conflict.stoppedDives', { n: dives }) : t('conflict.stopped');
+  });
+
+  /**
+   * The conflict settled on this phone; nothing is sent while the snackbar
+   * can still take it back.
+   * @param {Record<string, 'device'|'cloud'>} choices
+   */
+  async function chooseConflict(choices) {
+    await resolveConflict(choices);
+    const kept = new Set(Object.values(choices));
+    let undone = false;
+    f7.toast
+      .create({
+        text: kept.size > 1 ? t('conflict.keptMixed') : t(kept.has('cloud') ? 'conflict.keptCloud' : 'conflict.keptDevice'),
+        cssClass: 'od-undo-toast',
+        closeButton: true,
+        closeButtonText: t('edit.undo'),
+        closeTimeout: 8000,
+        position: 'bottom',
+        on: {
+          closeButtonClick: () => {
+            undone = true;
+            cancelConflictChoice().catch((e) => {
+              console.error('Taking back the conflict choice', e);
+              f7.toast.show({ text: t('conflict.failed'), closeTimeout: 4000 });
+            });
+          },
+          closed: () => {
+            if (!undone) sendConflictChoice();
+          },
+        },
+      })
+      .open();
   }
 
   /** "Exporter au format…" open (selection mode). */
@@ -1077,6 +1116,12 @@
       date, and while a "Sync now" runs: the line stays, only its text and
       bar change (to-do #2). The side menu shows every state.
     -->
+    {#if logbook.conflict && logbook.conflictLater}
+      <button type="button" class="sync-stopped" onclick={() => (logbook.conflictLater = false)}>
+        <Icon name="sync" size={16} weight={2} />
+        {stoppedText}
+      </button>
+    {/if}
     {#if logbook.sync === 'offline' || logbook.sync === 'manual' || (logbook.sync === 'syncing' && !logbook.autoSync && !!logbook.email)}
       <SyncStatus sync={logbook.sync} pending={logbook.pending} progress={logbook.syncProgress} />
     {/if}
@@ -1281,8 +1326,7 @@
     />
   {/if}
 
-  <!-- Not reported by the core yet: logbook.conflict stays null (see the report). -->
-  <ConflictSheet conflict={logbook.conflict} onchoose={resolveConflict} />
+  <ConflictSheet conflict={logbook.conflictLater ? null : logbook.conflict} onchoose={chooseConflict} onlater={() => (logbook.conflictLater = true)} />
 
   <!-- The file picker of "Import a file" (hidden; any file: the core tells what it can read). -->
   <input type="file" class="od-sr-only" tabindex="-1" aria-hidden="true" bind:this={fileInput} onchange={fileChosen} />
@@ -1376,6 +1420,22 @@
     }
 
     /* Selection mode: the number of dives checked, beside the total. */
+    .sync-stopped {
+      width: auto;
+      min-height: 32px;
+      margin: 4px 16px 0;
+      padding: 0;
+      border: none;
+      background: none;
+      color: var(--od-pending);
+      font: inherit;
+      font-size: 13px;
+      line-height: 18px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
     .count-selected {
       color: var(--od-text);
       font-weight: 500;

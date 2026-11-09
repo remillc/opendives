@@ -892,6 +892,14 @@ Java_org_opendives_core_NativeCore_saveLocal(JNIEnv *env, jobject)
 }
 
 JNIEXPORT void JNICALL
+Java_org_opendives_core_NativeCore_cancelConflictResolution(JNIEnv *env, jobject)
+{
+	std::string error;
+	if (opendives::cancel_conflict_resolution(error))
+		throw_core_error(env, error);
+}
+
+JNIEXPORT void JNICALL
 Java_org_opendives_core_NativeCore_setCloudTestEmail(JNIEnv *env, jobject, jstring email)
 {
 	opendives::set_cloud_test_email(to_string(env, email));

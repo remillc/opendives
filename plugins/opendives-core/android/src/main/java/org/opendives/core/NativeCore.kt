@@ -37,6 +37,7 @@ internal object NativeCore {
     external fun importDives(file: String, source: String): String
     external fun filterPresets(action: String, name: String, fulltext: String, mode: String, rules: Array<String>, index: Int): String
     external fun syncConflicts(): String
+    external fun cancelConflictResolution()
     external fun resolveConflicts(choices: String)
     external fun statsQuery(kind: String, text: String): String
     external fun siteAction(action: String, uuid: Long, other: Long, uuids: LongArray?, field: String, value: String, lat: Int, lon: Int): String

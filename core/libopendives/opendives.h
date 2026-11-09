@@ -589,6 +589,9 @@ int sync_conflicts(std::string &json, std::string &error);
 // network); the app syncs it like an edit. Cloud writes as save_local(): the
 // test account only.
 int resolve_conflicts(const std::string &choices_json, std::string &error);
+// Takes back the last resolve_conflicts() while it is not sent ("Annuler"): the
+// conflict is as it was. ALREADY_SENT once the server has it.
+int cancel_conflict_resolution(std::string &error);
 // --- Statistics (stats.cpp), read-only --------------------------------------
 //
 // Figures of a set of dives, Subsurface's stats_t (core/statistics.h):
