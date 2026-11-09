@@ -1289,7 +1289,8 @@
       "Logbook: a trip of one dive is shown as a dive, without an arrow.",
       "Logbook: while dragging a dive, a horizontal bar shows where it would be dropped.",
       "Logbook: the dive number is back before the date; an open trip is indented, and its dives can be checked in selection mode.",
-      "Logbook: a trip can be selected; “Delete this trip” removes the trip and keeps its dives."
+      "Logbook: a trip can be selected; “Delete this trip” removes the trip and keeps its dives.",
+      "Privacy policy: links and the contact address can be tapped."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
