@@ -1,28 +1,30 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="108" height="108" viewBox="0 0 108 108">
-  <!-- The "Hublot" logo in the round mask (docs/brand/opendives-icon-*-round.svg), with the
+  <!-- The "Trois vagues" logo in the round mask (docs/brand/opendives-icon-*-round.svg), with the
        grey arc of the small sizes,
        light or dark following the system. -->
   <style>
     .bg { fill: #F4F4F2 } .disc { fill: #FFFFFF } .ink { fill: #1F2124 }
     .ring { fill: none; stroke: #1F2124; stroke-width: 3; stroke-linecap: round } .grey { stroke: #A3A5A8 }
-    .top { stop-color: #FBE3B2 } .bottom { stop-color: #B4530F }
+    .t1 { stop-color: #FDEFD2 } .b1 { stop-color: #F4C98C } .t2 { stop-color: #F5CD93 } .b2 { stop-color: #DE9653 } .t3 { stop-color: #E39A57 } .b3 { stop-color: #B4530F }
     @media (prefers-color-scheme: dark) {
       .bg { fill: #121314 } .disc { fill: #1E2023 } .ink { fill: #F4F4F2 } .ring { stroke: #F4F4F2 } .grey { stroke: #6B6E72 }
-      .top { stop-color: #E5B961 } .bottom { stop-color: #EF7625 }
+      .t1 { stop-color: #F0D597 } .b1 { stop-color: #E5B961 } .t2 { stop-color: #E9BE6E } .b2 { stop-color: #EC9A45 } .t3 { stop-color: #EE9A48 } .b3 { stop-color: #EF7625 }
     }
   </style>
   <defs>
-    <linearGradient id="h" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="top"/><stop offset="1" class="bottom"/></linearGradient>
+    <linearGradient id="h1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="t1"/><stop offset="1" class="b1"/></linearGradient>
+    <linearGradient id="h2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="t2"/><stop offset="1" class="b2"/></linearGradient>
+    <linearGradient id="h3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="t3"/><stop offset="1" class="b3"/></linearGradient>
     <clipPath id="hm"><circle cx="54" cy="54" r="54"/></clipPath>
     <clipPath id="hc"><circle cx="54" cy="54" r="29"/></clipPath>
   </defs>
   <g clip-path="url(#hm)">
     <rect width="108" height="108" class="bg"/>
     <circle cx="54" cy="54" r="30" class="disc"/>
-    <g clip-path="url(#hc)"><path d="M20 61 Q32 55 44 61 T68 61 T92 61 V100 H20 Z" fill="url(#h)"/></g>
-    <path d="M24.83 61 A30 30 0 1 1 83.17 61" class="ring grey"/>
-    <path d="M24.83 61 A30 30 0 0 0 83.17 61" class="ring"/>
-    <circle cx="62" cy="44" r="3" class="ink"/>
-    <circle cx="56.5" cy="36.5" r="2.1" class="ink"/>
+    <g clip-path="url(#hc)"><path d="M-2 52 Q9 61 20 52 T42 52 T64 52 T86 52 T108 52 T130 52 V100 H-2 Z" fill="url(#h1)"/><path d="M-5 60.5 Q6 69.5 17 60.5 T39 60.5 T61 60.5 T83 60.5 T105 60.5 T127 60.5 V100 H-5 Z" fill="url(#h2)"/><path d="M-8 69 Q3 78 14 69 T36 69 T58 69 T80 69 T102 69 T124 69 V100 H-8 Z" fill="url(#h3)"/></g>
+    <path d="M24 54 A30 30 0 1 1 84 54" class="ring grey"/>
+    <path d="M24 54 A30 30 0 0 0 84 54" class="ring"/>
+    <circle cx="62" cy="39" r="3.6" class="ink"/>
+    <circle cx="56.5" cy="30.8" r="2.6" class="ink"/>
   </g>
 </svg>
