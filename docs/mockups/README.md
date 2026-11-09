@@ -30,6 +30,7 @@ When a mock-up and `docs/ui-specification.md` disagree, the specification wins. 
 | `tablette-edition.dc.html` | iPad, Modifier une plongée (feuille) |
 | `tablette-reglages.dc.html` | iPad, Réglages |
 | `android-carnet.dc.html` | Téléphone Android, Carnet |
+| `android-carnet-menu.dc.html` | Téléphone Android, Carnet, menu ⋮ ouvert (Filtrer, Renuméroter les plongées) |
 | `android-stats.dc.html` | Téléphone Android, Statistiques précompilées |
 | `android-accueil.dc.html` | Téléphone Android, Premier lancement |
 | `android-sites.dc.html` | Téléphone Android, Sites (carte hors ligne) |

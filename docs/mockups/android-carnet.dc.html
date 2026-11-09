@@ -23,18 +23,17 @@ h1,h2,h3,h4,h1 *,h2 *,h3 *,h4 *,[style*='font-size: 2'],[style*='font-size: 3'],
 </helmet>
 <div style="width: 390px; height: 844px; box-sizing: border-box; background: #F4F4F2; font-family: 'Source Sans 3 OD', Roboto, 'Google Sans', system-ui, sans-serif; color: #1F2124; display: flex; flex-direction: column; position: relative; overflow: hidden">
   <button aria-label="Menu" aria-haspopup="menu" style="position: absolute; left: 4px; top: 48px; z-index: 3; width: 48px; height: 48px; border: none; background: transparent; border-radius: 24px; display: flex; align-items: center; justify-content: center; padding: 0"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #1F2124; stroke-width: 2.2; stroke-linecap: round"><path d="M4 7h16 M4 12h16 M4 17h16"></path></svg></button>
-  <div style="padding: 40px 4px 0 16px; display: flex; flex-direction: column">
-    <div style="height: 64px; display: flex; align-items: center; justify-content: flex-end; gap: 0">
-      <button aria-label="Rechercher" style="width: 48px; height: 48px; border: none; background: transparent; display: flex; align-items: center; justify-content: center; padding: 0">
-        <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #4A4D52; stroke-width: 2; stroke-linecap: round"><circle cx="10.5" cy="10.5" r="6.5"></circle><path d="M15.5 15.5L20 20"></path></svg>
-      </button>
+  <div style="position: relative; overflow: hidden; padding: 40px 4px 32px 16px; display: flex; flex-direction: column; background: linear-gradient(165deg, #FBE3B2 0%, #EFB677 55%, #C97A35 100%)"><svg width="390" height="70" viewBox="0 0 300 140" preserveAspectRatio="none" aria-hidden="true" style="position: absolute; left: 0; bottom: 8px"><path d="M0 30 L20 38 L45 70 L70 92 L95 96 L120 88 L140 94 L165 80 L185 62 L210 58 L235 50 L255 46 L275 40 L300 36 V140 H0 Z" style="fill: rgba(255, 255, 255, 0.10)"></path><path d="M0 30 L20 38 L45 70 L70 92 L95 96 L120 88 L140 94 L165 80 L185 62 L210 58 L235 50 L255 46 L275 40 L300 36" style="fill: none; stroke: rgba(31, 33, 36, 0.22); stroke-width: 1.5; stroke-linejoin: round; vector-effect: non-scaling-stroke"></path></svg><svg width="390" height="18" viewBox="0 0 300 18" preserveAspectRatio="none" aria-hidden="true" style="position: absolute; left: 0; bottom: -1px; display: block"><path d="M0 11 Q37.5 2 75 11 T150 11 T225 11 T300 11 V18 H0 Z" style="fill: #F4F4F2"></path></svg>
+    <div style="position: relative; height: 64px; display: flex; align-items: center; gap: 0"><span style="flex: 1; margin-left: 40px; font-size: 22px; line-height: 28px; font-weight: 500">Carnet</span>
+      <button aria-label="Plus d'options" aria-haspopup="menu" aria-expanded="false" style="width: 48px; height: 48px; border: none; background: transparent; border-radius: 24px; display: flex; align-items: center; justify-content: center; padding: 0"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5.5" r="2" style="fill: #1F2124"></circle><circle cx="12" cy="12" r="2" style="fill: #1F2124"></circle><circle cx="12" cy="18.5" r="2" style="fill: #1F2124"></circle></svg></button>
       
     </div>
-    <h1 style="margin: 0; font-size: 28px; line-height: 36px; font-weight: 400">Carnet</h1>
-    <p style="margin: 4px 0 0 0; font-size: 14px; line-height: 20px; color: #4A4D52; letter-spacing: 0.25px">Synchronisé avec le cloud Subsurface</p>
+    
+    <p style="position: relative; margin: 0; font-size: 14px; line-height: 20px; color: #3D3A33; letter-spacing: 0.25px; font-variant-numeric: tabular-nums">9 plongées · 4 sites · dernière plongée il y a 9 mois</p>
+    <label style="position: relative; margin: 16px 12px 0 0; height: 56px; padding: 0 16px; border-radius: 28px; background: rgba(255, 255, 255, 0.78); display: flex; align-items: center; gap: 16px"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style="flex: none; fill: none; stroke: #4A4D52; stroke-width: 2; stroke-linecap: round"><circle cx="10.5" cy="10.5" r="6.5"></circle><path d="M15.5 15.5L20 20"></path></svg><span style="flex: 1; font-size: 16px; line-height: 24px; color: #4A4D52; letter-spacing: 0.5px">Rechercher dans le carnet</span></label>
   </div>
 
-  <div style="margin-top: 12px; display: flex; flex-direction: column">
+  <div style="margin-top: 4px; display: flex; flex-direction: column">
     <sc-for list="{{dives}}" as="d" hint-placeholder-count="5">
       <a href="detail3-android.dc.html" style="display: flex; align-items: center; gap: 16px; padding: 8px 24px 8px 16px; min-height: 72px; box-sizing: border-box; color: #1F2124; text-decoration: none">
         <svg width="56" height="40" viewBox="0 0 56 40" preserveAspectRatio="none" role="img" aria-label="{{d.alt}}" style="flex: none; border-radius: 8px; background: #E8E8E5">
