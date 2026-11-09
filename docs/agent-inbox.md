@@ -987,3 +987,10 @@ Christian chose corrected bars over dial gauges. Spec: "Dive detail, cylinder pr
 - Supporting text: "Service {wp} · {used} utilisés", plus "· changement à {depth}" when set. Units follow the pressure setting.
 - `role="img"` with an aria-label giving remaining, working and used pressures.
 - When a pressure is missing (no start, no end or no working pressure), hide the bar and keep the text.
+
+## [ ] 2026-11-09-31 Mark dives invalid from the Carnet selection menu and the detail menu (to-do #26)
+
+Christian approved. Spec: "Marking dives invalid". Mock-ups: `docs/mockups/carnet-selection-menu-android.dc.html`, `docs/mockups/detail2-android-menu.dc.html`.
+- Carnet selection ⋮ menu: "Marquer comme invalides" after "Exporter au format…". Detail ⋮ menu: "Marquer comme invalide" after "Partager". Circle-slash icon, above the separator.
+- Use the core's invalid flag through an undoable command (Subsurface "Mark dive invalid"). No confirmation dialog. Snackbar with "Annuler": "Plongée marquée invalide" or "N plongées marquées invalides".
+- With "Afficher les plongées invalides" off (default), invalid dives leave the Carnet and the statistics; from the detail, go back to the Carnet. With it on, show them dimmed with an outlined "Invalide" label, and offer "Marquer comme valide(s)" instead. A mixed selection gets "Marquer comme invalides".
