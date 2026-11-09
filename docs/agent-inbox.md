@@ -801,5 +801,5 @@ Christian approved these on the canvas. Mock-ups: `android-carnet.dc.html`, `car
 
 ## [ ] 2026-11-09-11 Own git repository instead of the cloud (to-do #11)
 
-**Wait.** Planned after v1: do not start until Christian says so. Spec: "Own git repository instead of the cloud" (mock-ups listed there). First-launch link, "Dépôt git" form with the address check through `ls-remote`, branches read from the repository, the Compte screen in git mode, and the token storage rules (Keystore / Keychain, no backup, no logs). Remove to-do #11 from `docs/TODOS.md` when it is done. If libgit2 in the core cannot list remote references or push over HTTPS with a token on Android or iOS, stop and tell Christian.
+Christian wants it done now (no longer waiting for v1). Spec: "Own git repository instead of the cloud" (mock-ups listed there). First-launch link, "Dépôt git" form with the address check through `ls-remote`, branches read from the repository, the Compte screen in git mode, and the token storage rules (Keystore / Keychain, no backup, no logs). Remove to-do #11 from `docs/TODOS.md` when it is done. If libgit2 in the core cannot list remote references or push over HTTPS with a token on Android or iOS, stop and tell Christian.
 
