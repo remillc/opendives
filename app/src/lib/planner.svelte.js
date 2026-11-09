@@ -16,6 +16,7 @@
 import { OpenDivesCore } from 'opendives-core';
 import { DEFAULT_SAC_FACTOR, settings, setCorePrefs, resetCorePrefs } from './settings.svelte.js';
 import { altitudeToPressureMbar, salinityOfWaterType } from './tools.js';
+import { bottomCylinder } from './plan-gases.js';
 
 /** @typedef {import('opendives-core').PlannerSetup} PlannerSetup */
 /** @typedef {import('opendives-core').DiveDetail} DiveDetail */
@@ -245,7 +246,8 @@ const o2Of = (c) => c.o2Permille || 209;
 
 /**
  * Starts a plan from a logbook dive: its profile, its first breathed
- * open-circuit gas and the richer ones after it, its measured SAC, its water
+ * open-circuit gas (the diluent of a rebreather dive) and the richer ones
+ * after it, its measured SAC, its water
  * and surface pressure. Times and depths stay the dive's.
  * @param {DiveDetail} dive
  * @param {PlanSource} source
@@ -255,7 +257,7 @@ export function startFromDive(dive, source, prefs) {
   planner.source = source;
   planner.when = 0;
   const breathed = dive.cylinders.filter((c) => c.used && c.use === 'OC-gas');
-  const bottom = breathed[0] ?? dive.cylinders.find((c) => c.used) ?? dive.cylinders[0];
+  const bottom = bottomCylinder(dive.cylinders);
   planner.gases = bottom
     ? [bottom, ...breathed.filter((c) => c !== bottom && o2Of(c) > o2Of(bottom))].map((c) => ({
         o2Permille: o2Of(c),

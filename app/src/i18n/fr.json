@@ -1387,6 +1387,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Planificateur : un plan fait à partir d’une plongée au recycleur part du diluant, jamais de l’oxygène.",
       "Planificateur : une barre montre la part consommée et la réserve de chaque gaz, une autre l’exposition CNS.",
       "Statistiques : les graphiques qui ne mesurent pas la profondeur (plongées par année, durées) sont en bleu.",
       "Édition d’une plongée au recycleur : plus de profondeur de changement de gaz pour le diluant et l’oxygène, et choisir l’usage remplit le mélange de départ (21 % ou 100 %).",
