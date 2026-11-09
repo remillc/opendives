@@ -693,7 +693,6 @@
     "save": "Enregistrer",
     "diveGroup": "La plongée",
     "duration": "Durée",
-    "durationNote": "Mesurées par l’ordinateur de plongée",
     "site": "Site",
     "trip": "Voyage",
     "none": "Aucun",
@@ -1234,7 +1233,9 @@
       "Réglages du planificateur : sans ligne d’introduction, les groupes suivent directement le titre.",
       "Planificateur : « Nouvelle plongée » sans la ligne « Valeurs par défaut du planificateur de Subsurface ».",
       "Réglages : nouveau groupe « Conditions par défaut » (type d’eau et altitude), repris par le planificateur et le calculateur de gaz.",
-      "Planificateur refait : plongées planifiées enregistrées dans le carnet, plusieurs niveaux et plusieurs gaz, volumes par gaz, modèle de décompression propre à chaque plan, partage du plan."
+      "Planificateur refait : plongées planifiées enregistrées dans le carnet, plusieurs niveaux et plusieurs gaz, volumes par gaz, modèle de décompression propre à chaque plan, partage du plan.",
+      "Modifier la plongée : chaque bouteille montre tous ses champs, sans ligne repliée.",
+      "Partager : icône PDF pour la fiche. Exporter : le premier format se nomme « Fichier de carnet (.ssrf) »."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
@@ -1841,14 +1842,14 @@
     },
     "text": "Choisissez un format. Le fichier s’ouvre ensuite dans le partage du téléphone.",
     "formats": {
-      "ssrf": "Carnet complet (.ssrf)",
+      "ssrf": "Fichier de carnet (.ssrf)",
       "uddf": "UDDF (.uddf)",
       "csv": "CSV, liste des plongées",
       "csvProfiles": "CSV, profils",
       "pdf": "Fiches PDF"
     },
     "formatTexts": {
-      "ssrf": "Tout le contenu, à réimporter plus tard",
+      "ssrf": "Format Subsurface, lisible aussi par OpenDives",
       "uddf": "Format d’échange entre logiciels de plongée",
       "csv": "Une ligne par plongée, pour un tableur",
       "csvProfiles": "Temps, profondeur et température, point par point",
