@@ -2009,7 +2009,8 @@
     "errorNetwork": "The server does not answer. Check the connection, then try again.",
     "errorNoLog": "The branch is no longer in the repository. Open the list of branches and pick one.",
     "errorFailed": "The connection did not succeed. Nothing was saved.",
-    "pending": "Some changes are not sent to the repository yet. Sync before changing repository."
+    "pending": "Some changes are not sent to the repository yet. Sync before changing repository.",
+    "connected": "Connected to the repository {repository}"
   },
   "tokenHelp": {
     "title": "Create an access token",
@@ -2060,6 +2061,7 @@
       "s5": "Permissions: for repository, choose Read and Write. Leave the others on No access.",
       "s6": "If the form offers an expiry date, choose a near one. Codeberg’s guide does not mention one: without a date, delete the token from this page when you stop using it.",
       "s7": "Tap Generate Token, then copy the token."
-    }
+    },
+    "menu": "On this page"
   }
 }

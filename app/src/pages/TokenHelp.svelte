@@ -46,6 +46,13 @@
       sections: [{ steps: steps('codeberg', 's', 7) }],
     },
   ];
+
+  /** The page menu: to a host's steps, the focus following for screen readers. @param {string} id */
+  function jump(id) {
+    const heading = document.getElementById(`od-token-help-${id}`);
+    heading?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    heading?.focus({ preventScroll: true });
+  }
 </script>
 
 <Page class="od-token-help">
@@ -60,9 +67,15 @@
 
   <p class="intro">{t('tokenHelp.intro')}</p>
 
+  <nav class="page-menu" aria-label={t('tokenHelp.menu')}>
+    {#each PROVIDERS as provider (provider.id)}
+      <button type="button" onclick={() => jump(provider.id)}>{t(`tokenHelp.${provider.id}.name`)}</button>
+    {/each}
+  </nav>
+
   {#each PROVIDERS as provider (provider.id)}
     {@const name = t(`tokenHelp.${provider.id}.name`)}
-    <h2 class="block-title">{name}</h2>
+    <h2 class="block-title" id="od-token-help-{provider.id}" tabindex="-1">{name}</h2>
     <div class="surface">
       <p class="note">{t(`tokenHelp.${provider.id}.note`)}</p>
       {#each provider.sections as section}
@@ -100,6 +113,33 @@
       &.afterwards {
         margin-bottom: calc(var(--f7-safe-area-bottom) + 24px);
       }
+    }
+
+    .page-menu {
+      margin: 12px 16px 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+
+      button {
+        width: auto;
+        min-height: 40px;
+        padding: 0 16px;
+        border: 1px solid var(--od-text-2);
+        border-radius: 20px;
+        background: none;
+        color: var(--od-text);
+        font: inherit;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+      }
+    }
+
+    /* Under the top bar when the menu brings a host to the top. */
+    .block-title {
+      scroll-margin-top: calc(var(--f7-navbar-height) + var(--f7-safe-area-top) + 8px);
+      outline: none;
     }
 
     .surface {

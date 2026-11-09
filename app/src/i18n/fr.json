@@ -2009,7 +2009,8 @@
     "errorNetwork": "Le serveur ne répond pas. Vérifiez la connexion, puis réessayez.",
     "errorNoLog": "La branche n’existe plus dans le dépôt. Rouvrez la liste des branches et choisissez-en une.",
     "errorFailed": "La connexion n’a pas abouti. Rien n’a été enregistré.",
-    "pending": "Des modifications ne sont pas encore envoyées au dépôt. Synchronisez avant de changer de dépôt."
+    "pending": "Des modifications ne sont pas encore envoyées au dépôt. Synchronisez avant de changer de dépôt.",
+    "connected": "Connecté au dépôt {repository}"
   },
   "tokenHelp": {
     "title": "Créer un jeton d’accès",
@@ -2060,6 +2061,7 @@
       "s5": "Permissions : pour repository, choisissez Read and Write. Laissez les autres sur No access.",
       "s6": "Si le formulaire propose une date d’expiration, choisissez une date proche. Le guide de Codeberg n’en parle pas : sans date, supprimez le jeton depuis cette page quand vous ne l’utilisez plus.",
       "s7": "Touchez Generate Token, puis copiez le jeton."
-    }
+    },
+    "menu": "Sur cette page"
   }
 }

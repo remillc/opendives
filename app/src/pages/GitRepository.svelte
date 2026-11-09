@@ -145,6 +145,9 @@
     try {
       await OpenDivesCore.gitConnect({ url: url.trim(), username: username.trim(), token: token.trim(), branch, empty: emptyRepo });
       token = '';
+      // "owner/repository", from the address that was just accepted.
+      const repository = new URL(url.trim()).pathname.replace(/^\/|\.git$|\/$/g, '');
+      f7.toast.create({ text: t('gitRepo.connected', { repository }), closeTimeout: 4000, position: 'bottom' }).open();
       if (edit) {
         f7router.back(f7router.history[0], { force: true });
         repositoryChanged();
