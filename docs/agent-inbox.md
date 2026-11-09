@@ -905,4 +905,4 @@ Christian approved this on the canvas. Spec: "Sync conflict dialog, redesigned".
 ## [ ] 2026-11-09-22 Palette rule: colour no longer reserved for data
 
 Christian removed the rule "colour reserved for data" from the spec (section 1, first paragraph). The theme stays black and white with ink actions; the sand-to-rust water column stays in the dive data, and colour may now appear elsewhere when a mock-up uses it (headers, side menu, selection in the conflict dialog). Update the palette comment at the top of `app/src/theme.css` ("neutral light UI, colour only in the data") to match the new wording, and any other comment or doc that repeats the old rule. No colour change in the code for now.
-
+- Added at 14:17: colour is allowed sparingly, within WCAG 2.2 AA contrast (4.5:1 text, 3:1 large text and meaningful graphics), and never as the only carrier of meaning. Mention this in the `theme.css` comment, and check the contrast of every new colour token you add.
