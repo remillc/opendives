@@ -87,7 +87,7 @@
     }
 
     .policy {
-      :global(a) {
+      :global(a[href]) {
         text-decoration: underline;
       }
 
