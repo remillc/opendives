@@ -826,6 +826,13 @@ class OpenDivesCorePlugin : Plugin() {
         call.resolve(JSObject().put("wifi", wifi))
     }
 
+    /** Takes back the last conflict choice while it is not sent. */
+    @PluginMethod
+    fun cancelConflictResolution(call: PluginCall) = onCoreThread(call) {
+        NativeCore.cancelConflictResolution()
+        call.resolve()
+    }
+
     /** The computers the logbook's dives come from (dive_computers). */
     @PluginMethod
     fun diveComputers(call: PluginCall) = onCoreThread(call) {

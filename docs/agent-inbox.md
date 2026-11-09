@@ -894,7 +894,9 @@ Christian chose a new logo. Spec: "Logo (decided on 9 November 2026)". Reference
 - Keep the size rule: grey top arc at 64 px and below, none above. Check the icon in the round and squircle masks.
 - Do not change the drawing. If the three gradients do not convert well to a vector drawable, stop and ask Christian.
 
-## [ ] 2026-11-09-21 Sync conflict dialog: name what conflicts, readable differences, one action
+## [x] 2026-11-09-21 Sync conflict dialog: name what conflicts, readable differences, one action
+
+Done in Sync conflict dialog: readable differences, cards, undo
 
 Christian approved this on the canvas. Spec: "Sync conflict dialog, redesigned". Mock-ups: `docs/mockups/android-etat-conflit.dc.html`, `android-etat-conflit-ordinateurs.dc.html`. Rework `ConflictSheet.svelte` (Android dialog and iOS sheet):
 - Identity card of what is in conflict (dive: thumbnail, site, number, date and time; dive computer names: icon and "Ordinateurs du carnet").

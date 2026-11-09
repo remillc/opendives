@@ -69,6 +69,8 @@ export const logbook = $state({
    * sync of the cloud log, cleared once the diver chose a version.
    */
   conflict: /** @type {Conflict|null} */ (null),
+  /** "Plus tard": the dialog is closed, sync stays paused until the choice is made. */
+  conflictLater: false,
   /** First launch is shown (first start, or after signing out): nothing is loaded until a choice is made. */
   welcome: readWelcome(),
   /** Last dive changed by an edit or an undo, for the detail screen. */
@@ -376,17 +378,38 @@ async function readConflicts() {
   }
 }
 
+/** A choice just made and not sent yet: its snackbar can still take it back. */
+let choiceHeld = false;
+
 /**
  * The diver's choices for a sync conflict, dive by dive (by file path of the
- * git log): one new commit, then synced like an edit.
+ * git log): one new commit on this device. Nothing is sent before
+ * sendConflictChoice().
  * @param {Record<string, 'device'|'cloud'>} choices
  */
 export async function resolveConflict(choices) {
   await OpenDivesCore.resolveConflicts({ choices });
+  choiceHeld = true;
   logbook.conflict = null;
+  logbook.conflictLater = false;
   undoCleared();
   logbook.dives = await OpenDivesCore.listLoadedDives();
+  await countPending();
+}
+
+/** The snackbar is gone: the choice is sent, like an edit. */
+export async function sendConflictChoice() {
+  choiceHeld = false;
   await persistChanges();
+}
+
+/** "Annuler": the conflict as it was, and its dialog again. */
+export async function cancelConflictChoice() {
+  choiceHeld = false;
+  await OpenDivesCore.cancelConflictResolution();
+  logbook.dives = await OpenDivesCore.listLoadedDives();
+  await readConflicts();
+  await countPending();
 }
 
 /** Undoes the last edit, saved and synced the same way. */
@@ -420,7 +443,7 @@ async function persistChanges() {
   await OpenDivesCore.saveLocal();
   await countPending();
   clearTimeout(syncTimer);
-  if (logbook.email && logbook.autoSync) syncTimer = setTimeout(syncEdits, SYNC_DELAY_MS);
+  if (logbook.email && logbook.autoSync && !logbook.conflict && !choiceHeld) syncTimer = setTimeout(syncEdits, SYNC_DELAY_MS);
 }
 
 /** The core's undo history was emptied (a load): no "Undo" may be offered any more. */
@@ -441,6 +464,8 @@ function undoCleared() {
  * @returns {Promise<SyncOutcome>}
  */
 async function syncEdits() {
+  // Paused while a conflict waits for the diver, and while its choice can be taken back.
+  if (logbook.conflict || choiceHeld) return /** @type {SyncOutcome} */ ('failed');
   logbook.syncProgress = null;
   logbook.sync = 'syncing';
   /** @type {SyncOutcome} */

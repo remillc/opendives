@@ -976,6 +976,28 @@ int main(int argc, char **argv)
 			printf("error=notes are '%s' after keeping %s\n", first_dive()->notes.c_str(), arg.c_str());
 			return 1;
 		}
+		// "Annuler": the conflict is back, and can be settled again.
+		if (cancel_conflict_resolution(error) || sync_conflicts(json, error) || json.find("\"conflict\":true") == std::string::npos) {
+			printf("error=cancel: %s %s\n", json.c_str(), error.c_str());
+			return 1;
+		}
+		// An edit saved while the diver decides later does not hide the conflict.
+		{
+			std::string later;
+			if (edit_dive(first_dive()->id, "{\"suit\":\"later\"}", later, error) || save_local(error) || sync_conflicts(json, error) ||
+			    json.find("\"conflict\":true") == std::string::npos) {
+				printf("error=edit while the conflict waits: %s %s\n", json.c_str(), error.c_str());
+				return 1;
+			}
+		}
+		if (resolve_conflicts("{\"" + path_in_log + "\":\"" + arg + "\"}", error)) {
+			printf("error=resolve again: %s\n", error.c_str());
+			return 1;
+		}
+		if (first_dive()->notes != expected || first_dive()->suit != "later") {
+			printf("error=after resolving again: notes '%s' suit '%s'\n", first_dive()->notes.c_str(), first_dive()->suit.c_str());
+			return 1;
+		}
 		if (sync_conflicts(json, error) || json != "{\"conflict\":false}") {
 			printf("error=conflict still there: %s\n", json.c_str());
 			return 1;

@@ -571,6 +571,7 @@ import { registerPlugin } from '@capacitor/core';
  *   Filter presets: the list ({presetList}), or an undoable save or delete (EditResult).
  * @property {() => Promise<SyncConflicts>} syncConflicts
  *   Read-only: the conflicts left by the last automatic merge.
+ * @property {() => Promise<void>} cancelConflictResolution takes back the last choice while it is not sent
  * @property {(options: {choices: Record<string, 'device'|'cloud'>}) => Promise<void>} resolveConflicts
  *   Keeps the chosen side of each conflicting file (by path), then reads the log again (no network).
  * @property {(options: {kind: 'stats', criteria: Record<string, string[]>} | {kind: 'values', field: string}) => Promise<any>} statsQuery
@@ -737,6 +738,7 @@ export const OpenDivesCore = {
     return JSON.parse((await native.syncConflicts()).json);
   },
   resolveConflicts: (options) => native.resolveConflicts(options),
+  cancelConflictResolution: () => native.cancelConflictResolution(),
   async statsQuery(options) {
     return JSON.parse((await native.statsQuery(options)).json);
   },
