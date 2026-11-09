@@ -1,13 +1,13 @@
 <script>
   // @ts-check
-  // Map of dive sites, with MapLibre GL JS (BSD-3-Clause). Tiles: OpenFreeMap's
-  // vector tiles from OpenStreetMap data, online, until the offline PMTiles of
-  // the architecture exist (MapLibre reads PMTiles too). Markers for the sites;
+  // Map of dive sites, with MapLibre GL JS (BSD-3-Clause). Tiles: a downloaded
+  // PMTiles package first, else OpenFreeMap's vector tiles (OpenStreetMap data)
+  // online, else the simplified world map (see map-style.js). Markers for the sites;
   // with `editable`, a pin fixed at the centre: the diver moves the map under
   // it, and onmove gets the centre (micro-degrees) when the map stops.
   import { onMount, onDestroy } from 'svelte';
   import { t } from '../lib/i18n.js';
-  import { MAP_STYLE, showLabelsInLanguage } from '../lib/map-style.js';
+  import { buildMapStyle, showLabelsInLanguage } from '../lib/map-style.js';
 
   // Loaded when a map is first shown: about 800 KB the start-up does not need.
   /** @type {typeof import('maplibre-gl')} */
@@ -20,10 +20,11 @@
    *   editable?: boolean,
    *   onmove?: (pos: { latUdeg: number, lonUdeg: number }) => void,
    *   onselect?: (uuid: number) => void,
+   *   onview?: (view: { center: [number, number], bounds: [number, number, number, number], zoom: number }) => void,
    *   height?: string,
    * }}
    */
-  let { sites = [], pin = null, editable = false, onmove, onselect, height = '240px' } = $props();
+  let { sites = [], pin = null, editable = false, onmove, onselect, onview, height = '240px' } = $props();
 
   /** @type {HTMLElement|undefined} */
   let container = $state();
@@ -65,10 +66,11 @@
     if (!container) return;
     const module = await import('maplibre-gl');
     maplibregl = /** @type {any} */ (module).default ?? module;
+    const { style } = await buildMapStyle(maplibregl);
     if (!container?.isConnected) return;
     const m = new maplibregl.Map({
       container,
-      style: MAP_STYLE,
+      style,
       center: [0, 20],
       zoom: 1,
       // The credits are a short line of text at the bottom right (below).
@@ -86,6 +88,12 @@
       showLabelsInLanguage(m);
       drawSites();
       fit();
+    });
+    // Where the map looks, for the offline hint (Sites).
+    m.on('moveend', () => {
+      const b = m.getBounds();
+      const c = m.getCenter();
+      onview?.({ center: [c.lng, c.lat], bounds: [b.getWest(), b.getSouth(), b.getEast(), b.getNorth()], zoom: m.getZoom() });
     });
     if (editable) {
       // The position under the pin, once the map stops; moves made by the
@@ -106,6 +114,11 @@
    */
   export function centreOn(p) {
     map?.easeTo({ center: lngLat(p), zoom: Math.max(map.getZoom(), 11) }, { programmatic: true });
+  }
+
+  /** Frames a region. @param {[number, number, number, number]} bbox west, south, east, north */
+  export function fitBbox([west, south, east, north]) {
+    map?.fitBounds([[west, south], [east, north]], { padding: 24, animate: false }, { programmatic: true });
   }
 
   // Editable: the map brings a position set by the code (typed, from the

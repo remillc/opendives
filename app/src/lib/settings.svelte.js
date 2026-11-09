@@ -34,6 +34,8 @@ export const DEFAULT_SAC_FACTOR = 200;
  *   device's region (US Letter where it is used, A4 elsewhere)
  * @property {'fresh'|'salt'|'en13319'} defaultWater "Conditions par défaut": the water type a new
  *   plan and the gas calculator start from
+ * @property {'none'|'fresh'|'salt'|'en13319'} downloadWater water type written on dives downloaded from a
+ *   dive computer that gave none; 'none' (Non précisé) leaves it empty. Per device.
  * @property {number} defaultAltitudeMm "Conditions par défaut": the altitude a new plan starts from, mm
  * @property {string} defaultDiluent cylinder type added as diluent when a dive becomes CCR or pSCR
  * @property {string} defaultOxygen the same for the oxygen cylinder
@@ -50,6 +52,7 @@ const APP_DEFAULTS = {
   showAllBluetooth: false,
   paperSize: 'system',
   defaultWater: 'salt',
+  downloadWater: 'none',
   defaultAltitudeMm: 0,
   defaultDiluent: '',
   defaultOxygen: '',

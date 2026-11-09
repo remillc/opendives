@@ -56,6 +56,20 @@ export function waterTypeName(id) {
   return t(`tools.waterTypes.${id}`);
 }
 
+/** The name of the "water type of downloaded dives" choice. @param {string} id 'none' or a water type */
+export function downloadWaterName(id) {
+  return id === 'none' ? t('settings.downloadWater.none') : waterTypeName(id);
+}
+
+/**
+ * The salinity sent to the core with a download (defaultSalinity): 0 for 'none', which leaves the
+ * dives as the computer gave them.
+ * @param {string} id
+ */
+export function downloadSalinity(id) {
+  return WATER_TYPES.find((w) => w.id === id)?.salinity ?? 0;
+}
+
 /** Salinity of a dive's water type (empty or unknown: sea water). @param {string|undefined} id */
 export function salinityOfWaterType(id) {
   return WATER_TYPES.find((w) => w.id === id)?.salinity ?? SEA_WATER_SALINITY;

@@ -31,8 +31,9 @@
   import { confirmAction } from '../lib/dialogs.js';
   import { formatNumber, formatDuration, formatDateChoice, formatTimeChoice, formatDepth } from '../lib/format.js';
   import { regionUsesLetter } from '../lib/share.js';
-  import { waterTypeName } from '../lib/tools.js';
+  import { waterTypeName, downloadWaterName } from '../lib/tools.js';
   import { cylinderChoices } from '../lib/cylinder-choices.js';
+  import { visibleRegions, updatesCount } from '../lib/offline-maps.svelte.js';
 
   /** @typedef {import('opendives-core').CorePrefValues} CorePrefValues */
   /** @typedef {{ value: string, label: string, example?: string }} Option */
@@ -42,7 +43,7 @@
    *       options: () => Option[] | Promise<Option[]>, set: (v: string) => unknown, dimmed?: boolean, note?: string }
    *   | { kind: 'number', id: string, label: string, text?: string, value: string, title?: string, dialogText?: string,
    *       wheels: () => {label: string, values: string[], index: number, defaultIndex: number}[], set: (indexes: number[]) => unknown, dimmed?: boolean }
-   *   | { kind: 'link', id: string, label: string, text?: string, href?: string, action?: () => void, disabled?: boolean, value?: string }
+   *   | { kind: 'link', id: string, label: string, text?: string, href?: string, action?: () => void, disabled?: boolean, value?: string, badge?: string }
    *   | { kind: 'info', id: string, label: string, value: string }} Row
    */
 
@@ -388,6 +389,17 @@
         } },
         { kind: 'switch', id: 'extraEnvironmental', label: t('settings.extraConditions.label'), text: t('settings.extraConditions.text'), checked: p.extraEnvironmental, set: (v) => setCore({ extraEnvironmental: v }) },
         { kind: 'switch', id: 'salinityEdit', label: t('settings.salinity.label'), text: t('settings.salinity.text'), checked: p.salinityEdit, set: (v) => setCore({ salinityEdit: v }) },
+        {
+          kind: 'choice',
+          id: 'downloadWater',
+          label: t('settings.downloadWater.label'),
+          text: t('settings.downloadWater.text'),
+          value: downloadWaterName(settings.downloadWater),
+          current: settings.downloadWater,
+          note: t('settings.downloadWater.intro'),
+          options: () => /** @type {const} */ (['none', 'fresh', 'salt', 'en13319']).map((id) => ({ value: id, label: downloadWaterName(id) })),
+          set: (v) => setAppSetting('downloadWater', /** @type {'none'|'fresh'|'salt'|'en13319'} */ (v)),
+        },
       ],
     },
     {
@@ -614,8 +626,17 @@
     {
       id: 'maps',
       title: t('settings.groups.maps'),
-      // The offline maps sub-screen is not designed yet: the row is disabled.
-      rows: [{ kind: 'link', id: 'regions', label: t('settings.maps.regions'), text: t('settings.maps.none'), disabled: true }],
+      // Offline maps (/settings/maps/): the number of regions, and a badge when an update is waiting.
+      rows: [
+        {
+          kind: 'link',
+          id: 'regions',
+          label: t('settings.maps.regions'),
+          text: visibleRegions().length ? t('settings.maps.count', { n: visibleRegions().length }) : t('settings.maps.none'),
+          href: '/settings/maps/',
+          badge: updatesCount() ? t('settings.maps.updates', { n: updatesCount() }) : undefined,
+        },
+      ],
     },
   ]);
 
@@ -803,6 +824,7 @@
         <span class="label">{row.label}</span>
         {#if row.text}<span class="supporting">{row.text}</span>{/if}
       </span>
+      {#if row.kind === 'link' && row.badge}<span class="badge">{row.badge}</span>{/if}
       {#if row.kind !== 'link' || row.value}<span class="value">{row.value}</span>{/if}
       <svg class="chevron" class:large={row.kind === 'link'} viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"></path></svg>
     </button>
@@ -1100,6 +1122,18 @@
       color: var(--od-text-2);
       font-variant-numeric: tabular-nums;
       text-align: end;
+    }
+
+    /* Waiting updates: text in the secondary role, never the colour alone. */
+    .badge {
+      flex: none;
+      padding: 2px 10px;
+      border-radius: 12px;
+      background: var(--od-secondary);
+      color: var(--od-on-secondary);
+      font-size: 12px;
+      line-height: 18px;
+      font-weight: 600;
     }
 
     .chevron {

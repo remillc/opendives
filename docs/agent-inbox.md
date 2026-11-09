@@ -1007,7 +1007,9 @@ Christian asked for a fr-CA catalog that holds only what differs from fr. The fi
 - When fr.json changes, fr-CA keeps only its overrides: a key removed from fr is removed from fr-CA too.
 - Delete to-do #19 when done.
 
-## [ ] 2026-11-09-33 Offline maps: regions screen, downloads, updates, Sites map offline
+## [x] 2026-11-09-33 Offline maps: regions screen, downloads, updates, Sites map offline
+
+Done in Offline maps: integrate downloads, screens and tile reading
 
 Christian approved the design. Spec: "Offline maps (decided on 9 November 2026)". Mock-ups in `docs/mockups/`: `android-cartes-hors-ligne`, `-menu`, `-vide`, `-ajout`, `-pays`, `-choix-carte`, `-telechargement`, `-echec`, `-mise-a-jour`, `-donnees-mobiles`, `-espace`, `-plafond`, `-limite`, `-maj-remplacer`, `-suppression`, `-supprimee` (all `.dc.html`), `android-sites-hors-ligne.dc.html`, `appbar-tiroir-android-maj-cartes.dc.html`, `ios-cartes-hors-ligne.dc.html`, `android-tablette-cartes.dc.html`, `tablette-cartes.dc.html`, and the Settings row in `android-reglages.dc.html`.
 
@@ -1041,7 +1043,9 @@ Christian wrote the text. Mock-up: `docs/mockups/outils-desaturation-android.dc.
 - `modelGf` ("Facteurs de gradient 30 / 75, ceux du planificateur.") and `modelVpmb` stay, right after it, in the same paragraph.
 - Keep the note "Ce calcul ne connaît que les plongées du carnet…" and the flight recommendation unchanged.
 
-## [ ] 2026-11-09-35 Settings: default water type for downloaded dives (to-do #28)
+## [x] 2026-11-09-35 Settings: default water type for downloaded dives (to-do #28)
+
+Done in Add a default water type for downloaded dives
 
 Christian approved. Spec: "Default water type for downloaded dives". Mock-ups: `docs/mockups/android-reglages.dc.html` (group "Carnet"), `docs/mockups/reglages-type-eau-android.dc.html` (dialog).
 - New app setting, per device, default "Non précisé". Options: Non précisé, Eau douce (1000 g/l), Eau de mer (1030 g/l), EN 13319 (1020 g/l), as Subsurface's water types.

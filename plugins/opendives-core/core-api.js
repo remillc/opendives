@@ -13,6 +13,17 @@ import { registerPlugin } from '@capacitor/core';
  */
 
 /**
+ * An offline map package download (Android; the screens read it with mapsDownloads and the
+ * "mapsDownload" event).
+ * @typedef {Object} MapDownload
+ * @property {string} id
+ * @property {"queued"|"waiting-wifi"|"downloading"|"paused"|"failed"|"ready"} status
+ * @property {number} bytesReceived
+ * @property {number} totalBytes
+ * @property {"network"|"checksum"|"space"|"server"} [error] with status "failed"
+ */
+
+/**
  * @typedef {Object} LogbookComputer
  * @property {string} model
  * @property {string} serial empty string when unknown
@@ -616,6 +627,25 @@ import { registerPlugin } from '@capacitor/core';
  * @property {(options: {action: 'rename'|'remove'|'merge', model: string, serial: string, value?: string, intoModel?: string, intoSerial?: string}) => Promise<EditResult>} diveComputerAction
  *   One undoable step (opendives.h).
  * @property {() => Promise<{wifi: boolean}>} networkStatus whether the device is on Wi-Fi or Ethernet
+ * @property {() => Promise<{freeBytes: number, totalBytes: number}>} mapsFreeSpace
+ *   Free and total space of the storage that holds the offline maps.
+ * @property {(options: {id: string, url: string, sha256: string, sizeBytes: number, allowCellular: boolean, title: string}) => Promise<void>} mapsDownloadStart
+ *   Queues a package download; one runs at a time, in the background with a notification titled
+ *   `title`, resumed with HTTP Range. Wi-Fi (an unmetered network) only unless `allowCellular`:
+ *   status "waiting-wifi" meanwhile. The file is checked against `sha256` before it is ready; an
+ *   update of an existing id keeps the old file until then. `id` is letters, digits, ".", "-", "_"
+ *   (rejects with BAD_ARGUMENT otherwise). Asks for the notification permission (Android 13+).
+ *   Ready downloads stay in mapsDownloads until mapsDelete. Status "failed" with error "space"
+ *   when a write fails for lack of space.
+ * @property {(options: {id: string}) => Promise<void>} mapsDownloadPause keeps the partial file
+ * @property {(options: {id: string, allowCellular: boolean}) => Promise<void>} mapsDownloadResume
+ *   Also retries a failed download.
+ * @property {(options: {id: string}) => Promise<void>} mapsDownloadCancel removes the partial file
+ * @property {() => Promise<{downloads: MapDownload[]}>} mapsDownloads
+ * @property {() => Promise<{files: {id: string, sizeBytes: number}[]}>} mapsFiles ready packages on disk
+ * @property {(options: {id: string}) => Promise<void>} mapsDelete the package, its partial file and its entry
+ * @property {(options: {id: string, offset: number, length: number}) => Promise<{base64: string}>} mapsReadRange
+ *   Bytes of a ready package for the PMTiles source (at most 16 MiB a call). Rejects with NOT_FOUND.
  * @property {() => Promise<PlannedDive[]>} listPlans
  * @property {(options: {request: PlanRequest, replaceId?: number}) => Promise<EditResult>} savePlan
  *   Saves the plan as a planned dive, or replaces one: one undoable step.
@@ -634,7 +664,7 @@ import { registerPlugin } from '@capacitor/core';
  * @property {() => Promise<void>} stopBluetoothScan
  * @property {() => Promise<BluetoothVendor[]>} bluetoothModels
  *   The models that download over Bluetooth, for a device whose name says nothing.
- * @property {(options: {vendor: string, product: string, address: string, name: string, classicAddress?: string, forceDownload?: boolean}) => Promise<DownloadResult>} downloadDives
+ * @property {(options: {vendor: string, product: string, address: string, name: string, classicAddress?: string, forceDownload?: boolean, defaultSalinity?: number}) => Promise<DownloadResult>} downloadDives
  *   Downloads the new dives and adds them as one undoable step (download_dives in
  *   opendives.h); "downloadProgress" events meanwhile. `address`: "LE:" + MAC for
  *   Bluetooth Low Energy, the MAC for Classic. Rejects with the core's code first in
@@ -642,13 +672,16 @@ import { registerPlugin } from '@capacitor/core';
  *   NO_BLUETOOTH, BLUETOOTH_OFF, PERMISSION.
  *   `classicAddress`: the MAC of the same device paired as Bluetooth Classic, tried once when the
  *   BLE link fails (progress state "retrying").
+ *   `defaultSalinity`: 10000, 10200 or 10300 (0 or absent: none); written as the water type of the
+ *   received dives that have none, from the computer or their own.
  * @property {(options: {action: 'count'|'keep'|'discard'}) => Promise<any>} downloadPartial
  *   The dives received before a download failed or was cancelled: count ({dives}), keep (one
  *   undoable step, a DownloadResult) or discard. Rejects with NO_PARTIAL.
  * @property {() => Promise<void>} cancelDownload
- * @property {(event: 'bluetoothDevice'|'bluetoothScanStopped'|'downloadProgress'|'syncProgress', listener: (data: any) => void) => Promise<{remove: () => Promise<void>}>} addListener
+ * @property {(event: 'bluetoothDevice'|'bluetoothScanStopped'|'downloadProgress'|'syncProgress'|'mapsDownload', listener: (data: any) => void) => Promise<{remove: () => Promise<void>}>} addListener
  *   bluetoothDevice gives a BluetoothDevice, downloadProgress a DownloadProgress, syncProgress
- *   {message}: each message of the core's git work while the cloud log syncs (opendives.h,
+ *   mapsDownload a MapDownload (progress at most twice a second, and every status change),
+ *   syncProgress {message}: each message of the core's git work while the cloud log syncs (opendives.h,
  *   set_sync_progress), in English, e.g. "Transfer from storage (30/80)".
  */
 
@@ -793,6 +826,15 @@ export const OpenDivesCore = {
     return JSON.parse((await native.savePlan(options)).json);
   },
   networkStatus: () => native.networkStatus(),
+  mapsFreeSpace: () => native.mapsFreeSpace(),
+  mapsDownloadStart: (options) => native.mapsDownloadStart(options),
+  mapsDownloadPause: (options) => native.mapsDownloadPause(options),
+  mapsDownloadResume: (options) => native.mapsDownloadResume(options),
+  mapsDownloadCancel: (options) => native.mapsDownloadCancel(options),
+  mapsDownloads: () => native.mapsDownloads(),
+  mapsFiles: () => native.mapsFiles(),
+  mapsDelete: (options) => native.mapsDelete(options),
+  mapsReadRange: (options) => native.mapsReadRange(options),
   bluetoothStatus: () => native.bluetoothStatus(),
   requestBluetoothPermission: () => native.requestBluetoothPermission(),
   enableBluetooth: () => native.enableBluetooth(),

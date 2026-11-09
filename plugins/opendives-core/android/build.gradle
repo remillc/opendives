@@ -49,4 +49,6 @@ dependencies {
     // The plugin's activity (window flags, the system dialog that turns Bluetooth on).
     implementation "androidx.appcompat:appcompat:${rootProject.ext.androidxAppCompatVersion}"
     implementation "androidx.activity:activity:${rootProject.ext.androidxActivityVersion}"
+    // Offline map downloads: background work with a foreground notification.
+    implementation "androidx.work:work-runtime:2.10.0"
 }

@@ -16,6 +16,8 @@
   import { formatDepth, formatLongDate } from '../lib/format.js';
   import { layout, ios, listWidth } from '../lib/layout.svelte.js';
   import { t } from '../lib/i18n.js';
+import { connection } from '../lib/online.svelte.js';
+import { offlineMaps, downloadRegionAt } from '../lib/offline-maps.svelte.js';
 
   /** @type {import('opendives-core').SiteSummary[]} */
   let sites = $state([]);
@@ -24,11 +26,73 @@
   /** @type {SiteMap|undefined} */
   let siteMap = $state();
 
+  // "Voir sur la carte" of the offline maps screen.
+  $effect(() => {
+    if (!offlineMaps.viewBbox || !siteMap) return;
+    siteMap.fitBbox(offlineMaps.viewBbox);
+    offlineMaps.viewBbox = null;
+  });
+
   /** Sites used by dives, the latest dive first. */
   const used = $derived(sites.filter((s) => s.dives > 0).sort((a, b) => b.lastDate.localeCompare(a.lastDate)));
   const located = $derived(used.filter((s) => s.hasLocation));
   const unplaced = $derived(used.length - located.length);
   const diveCount = $derived(used.reduce((n, s) => n + s.dives, 0));
+
+  // Offline, a hint when the map looks mostly outside the downloaded regions
+  // (spec, "Sites map offline"): once per area, an area being a tile of zoom 7.
+  const HINT_MIN_ZOOM = 7;
+  const HINT_AREA_ZOOM = 7;
+  /** @type {{ center: [number, number], bounds: [number, number, number, number], zoom: number }|undefined} */
+  let view = $state.raw();
+  const hinted = new Set();
+
+  /** Share (0 to 1) of the visible area inside a downloaded region, by sampling. */
+  function coveredShare(/** @type {[number, number, number, number]} */ [w, s, e, n]) {
+    const regions = offlineMaps.regions.filter((r) => r.status === 'ready' || r.status === 'updating');
+    const N = 8;
+    let inside = 0;
+    for (let i = 0; i < N; i++) {
+      for (let j = 0; j < N; j++) {
+        const lng = w + ((e - w) * (i + 0.5)) / N;
+        const lat = s + ((n - s) * (j + 0.5)) / N;
+        if (regions.some((r) => lng >= r.bbox[0] && lng <= r.bbox[2] && lat >= r.bbox[1] && lat <= r.bbox[3])) inside++;
+      }
+    }
+    return inside / (N * N);
+  }
+
+  function hintIfNotDownloaded() {
+    if (connection.online || !view || view.zoom < HINT_MIN_ZOOM || coveredShare(view.bounds) >= 0.5) return;
+    const [lng, lat] = view.center;
+    const n = 2 ** HINT_AREA_ZOOM;
+    const x = Math.floor(((lng + 180) / 360) * n);
+    const y = Math.floor(((1 - Math.asinh(Math.tan((lat * Math.PI) / 180)) / Math.PI) / 2) * n);
+    const area = `${x}/${y}`;
+    if (hinted.has(area)) return;
+    hinted.add(area);
+    f7.toast
+      .create({
+        text: t('sites.areaNotDownloaded'),
+        closeButton: true,
+        closeButtonText: t('sites.downloadArea'),
+        closeTimeout: 6000,
+        position: 'bottom',
+        on: { closeButtonClick: () => downloadRegionAt(lng, lat) },
+      })
+      .open();
+  }
+
+  /** @param {{ center: [number, number], bounds: [number, number, number, number], zoom: number }} v */
+  function onview(v) {
+    view = v;
+    hintIfNotDownloaded();
+  }
+
+  // The device goes offline with the map already in view.
+  $effect(() => {
+    if (!connection.online) hintIfNotDownloaded();
+  });
 
   async function load() {
     try {
@@ -65,7 +129,11 @@
   {#if located.length}
     <div class="map">
       <!-- 5:4 landscape, full width (task 2026-11-07-24). -->
-      <SiteMap bind:this={siteMap} sites={located} onselect={open} {height} />
+      <SiteMap bind:this={siteMap} sites={located} onselect={open} {onview} {height} />
+      <!-- Tablet: no header band, the pill sits on the map. -->
+      {#if !layout.phone && !connection.online}
+        <p class="offline-chip over-map" role="status"><Icon name="offline" size={16} weight={2} />{t('sites.offline')}</p>
+      {/if}
       <button type="button" class="locate" onclick={centreOnDevice}>
         <Icon name="locate" size={20} />
         <span class="od-sr-only">{t('sites.centreOnMe')}</span>
@@ -161,7 +229,11 @@
   </Navbar>
 
   {#if layout.phone}
-    <SectionBand overMap summary={used.length ? [t('band.sites', { n: used.length }), t('band.dives', { n: diveCount })].join(' · ') : ''} />
+    <SectionBand overMap chip={!connection.online} summary={used.length ? [t('band.sites', { n: used.length }), t('band.dives', { n: diveCount })].join(' · ') : ''}>
+      {#if !connection.online}
+        <p class="offline-chip" role="status"><Icon name="offline" size={16} weight={2} />{t('sites.offline')}</p>
+      {/if}
+    </SectionBand>
     {@render mapBlock('calc(100vw * 4 / 5)')}
     {@render panel()}
   {/if}
@@ -212,6 +284,30 @@
 
     .split :global(.od-fab-add) {
       position: absolute;
+    }
+
+    /* "Offline" (android-sites-hors-ligne.dc.html): 28 dp, translucent white, under the summary. */
+    .offline-chip {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 28px;
+      margin: 6px 0 0 12px;
+      padding: 0 12px 0 8px;
+      border-radius: 14px;
+      background: var(--od-band-control);
+      color: var(--od-on-band);
+      font-size: 13px;
+      font-weight: 600;
+
+      &.over-map {
+        position: absolute;
+        z-index: 2;
+        top: 16px;
+        left: 16px;
+        margin: 0;
+      }
     }
 
     .map-pane .map {
