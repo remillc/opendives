@@ -15,10 +15,11 @@ const sharedWith = (a, b) => a.shared.find((s) => s.model === b.model && s.seria
 const SAME_RECORDING_SHARE = 0.8;
 
 /**
- * The computers this one may be a duplicate of. Two that appear in the same
- * dives are compared by their profiles, whatever their names: the name alone
- * proves nothing. Those that never meet in a dive can only be compared by
- * model, and then only without a serial number (spec).
+ * The computers this one may be a duplicate of. Two serial numbers decide:
+ * the same one is the same computer, different ones are two computers. When
+ * one is missing, two computers found in the same dives are compared by their
+ * profiles, whatever their names: the name alone proves nothing. Those that
+ * never meet in a dive can only be compared by model (spec).
  * @param {LogbookComputer} computer
  * @param {LogbookComputer[]} all
  */
@@ -26,6 +27,7 @@ export function duplicateCandidates(computer, all) {
   return all
     .filter((other) => {
       if (other === computer) return false;
+      if (computer.serial && other.serial) return computer.serial === other.serial;
       const shared = sharedWith(computer, other);
       if (shared) return shared.same / shared.dives >= SAME_RECORDING_SHARE;
       return !computer.serial && other.model === computer.model;

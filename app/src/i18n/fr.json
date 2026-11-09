@@ -527,7 +527,7 @@
       "intro": "Les ordinateurs d’où viennent vos plongées. Le nom choisi s’affiche dans le carnet et le détail des plongées.",
       "empty": "Aucun ordinateur dans ce carnet.",
       "duplicate": "Doublon possible",
-      "duplicateNote": "Doublon possible : ses profils de plongée sont ceux d’un autre ordinateur, ou même modèle sans numéro de série. Touchez-le pour le fusionner ou le retirer de la liste.",
+      "duplicateNote": "Doublon possible : même numéro de série qu’un autre ordinateur, mêmes profils de plongée, ou même modèle sans numéro de série. Touchez-le pour le fusionner ou le retirer de la liste.",
       "serialShort": "n° {serial}",
       "noSerial": "Sans numéro de série",
       "dives": {
@@ -1390,7 +1390,7 @@
       "À propos : le crédit des cartes nomme aussi OpenFreeMap et OpenMapTiles.",
       "Modifier une plongée : sections toujours ouvertes, voyage choisi dans une liste, avec un bouton pour le retirer.",
       "Modifier une plongée : choix de l’ordinateur principal quand la plongée en a plusieurs.",
-      "Réglages : Ordinateurs du carnet, pour renommer, retirer ou fusionner les doublons, détectés en comparant les profils."
+      "Réglages : Ordinateurs du carnet, pour renommer, retirer ou fusionner les doublons, détectés par le numéro de série, puis en comparant les profils."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
