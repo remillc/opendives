@@ -1,14 +1,18 @@
 # Public web pages
 
-The pages of opendives.app that come from the app: for now the privacy policy.
+The pages of opendives.app, one folder per language: a home page and the privacy policy.
 
 - **Source:** `app/public/privacy/en.html` and `fr.html`. The app shows the same files in About → Privacy policy, so the app and the web page never differ. Edit only these files.
-- **Build:** `node site/build.mjs` writes `build/site/` (not in git): the pages, the app's body font and logo, and `site.css`.
+- **Build:** `node site/build.mjs` writes `build/site/` (not in git): the pages, the app's body font and logo, `site.css`, and `_redirects`.
+- **Adding a language:** add it to `languages` in `site/build.mjs`; the app must have its policy and translation files.
 
 | Page | Address once published |
 | --- | --- |
-| `build/site/privacy.html` | `https://opendives.app/privacy` (English) |
-| `build/site/privacy/fr.html` | `https://opendives.app/privacy/fr` (French) |
+| `build/site/index.html` | `https://opendives.app/`, sends the visitor to their language |
+| `build/site/en/index.html`, `fr/index.html` | `https://opendives.app/en/`, `https://opendives.app/fr/` |
+| `build/site/en/privacy.html`, `fr/privacy.html` | `https://opendives.app/en/privacy`, `https://opendives.app/fr/privacy` |
+
+The former addresses `/privacy` and `/privacy/fr` are redirected to these (`_redirects`, 301).
 
 Addresses follow the rule of the project: a resource (a page) has no trailing slash, a collection has one; the home page is `/`.
 
