@@ -807,3 +807,11 @@ Christian wants it done now (no longer waiting for v1). Spec: "Own git repositor
 
 
 Done in the branch `feature/own-git-repository` (Android only; there is no iOS project yet). Still to check by Christian with a real token: the authenticated check, the first push to the empty private repository and a sync (see the branch report).
+
+## [ ] 2026-11-09-12 Dive detail profile: water gradient missing, view differs from the mock-up
+
+Christian, on the canvas (mock-up `docs/mockups/detail3-android.dc.html`): in the app, the area under the profile is a single grey, and the app's view is different from the mock-up. Rework it so the profile card matches the mock-up.
+- The water column is a vertical gradient: `--od-water-top` (#FBE3B2) at 0 m, down to a mix of `--od-water-top` and `--od-water-bottom` (#B4530F) in the ratio max depth / 60 m. The mock-up's 39 m dive ends at about 65 % of the way to #B4530F. The trace stays #1F2124 on top.
+- `DiveProfile.svelte` and `ProfileThumbnail.svelte` already declare this gradient, so find why it renders grey on the device. A likely cause: `waterBottomColor()` returns `color-mix(...)` with `var()` inside an SVG `stop-color`, which older Android WebViews do not support (the stop then falls back to a default colour). If so, compute the colour in JavaScript from the theme values (light and dark) and pass a plain `rgb()`. Check the result on the device, in light and dark mode, and in the thumbnails (logbook, sites, plans, download).
+- Then compare the whole profile card with the mock-up (hint line, axes and labels, temperature curve and scale, cursor, sizes and margins) and fix every difference. List in your report what differed.
+
