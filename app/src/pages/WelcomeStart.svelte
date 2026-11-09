@@ -103,6 +103,11 @@
       display: block;
       width: 100%;
       height: calc(var(--f7-safe-area-top) + 196px);
+
+      /* A low window (tablet in landscape): every choice stays in view. */
+      @media (max-height: 820px) {
+        height: calc(var(--f7-safe-area-top) + 96px);
+      }
     }
 
     .ground {
