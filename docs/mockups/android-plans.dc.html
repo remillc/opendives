@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Plongées planifiées, Android</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:#1F2124}a:hover{color:#1F2124}
+/* Source Sans 3 for body text, sized to match the system font (size-adjust 108%) */
+@font-face{font-family:'Source Sans 3 OD';font-weight:400;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(../brand/fonts/source-sans-3-latin-400-normal.woff2) format('woff2')}
+@font-face{font-family:'Source Sans 3 OD';font-weight:500;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(../brand/fonts/source-sans-3-latin-500-normal.woff2) format('woff2')}
+@font-face{font-family:'Source Sans 3 OD';font-weight:600;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(../brand/fonts/source-sans-3-latin-600-normal.woff2) format('woff2')}
+@font-face{font-family:'Source Sans 3 OD';font-weight:700;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(../brand/fonts/source-sans-3-latin-700-normal.woff2) format('woff2')}
+@font-face{font-family:'Source Sans 3 OD';font-weight:800;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(../brand/fonts/source-sans-3-latin-800-normal.woff2) format('woff2')}
+@font-face{font-family:'Source Sans 3 OD';font-weight:900;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(../brand/fonts/source-sans-3-latin-900-normal.woff2) format('woff2')}
+h1,h2,h3,h4,h1 *,h2 *,h3 *,h4 *,[style*='font-size: 2'],[style*='font-size: 3'],[style*='font-size: 4'],[style*='font-size: 2'] *,[style*='font-size: 3'] *,[style*='font-size: 4'] *{font-family:Roboto, 'Google Sans', system-ui, sans-serif !important}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #F4F4F2; font-family: 'Source Sans 3 OD', Roboto, 'Google Sans', system-ui, sans-serif; color: #1F2124; position: relative; overflow: hidden">
+  <div style="padding: 40px 8px 0 4px; height: 104px; box-sizing: border-box; display: flex; align-items: center; gap: 4px">
+    <a href="android-outils.dc.html" aria-label="Retour aux outils" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #1F2124; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M20 12H5 M11 6l-6 6 6 6"></path></svg></a>
+    <span style="flex: 1; font-size: 22px; line-height: 28px">Plongées planifiées</span>
+  </div>
+  <p style="margin: 0 16px 8px 16px; font-size: 14px; line-height: 20px; color: #4A4D52; letter-spacing: 0.25px">Les plongées planifiées ne comptent ni dans le carnet ni dans les statistiques.</p>
+  <div style="display: flex; flex-direction: column">
+    <div style="display: flex; align-items: center; gap: 4px; padding: 0 4px 0 0; min-height: 72px">
+      <a href="android-planificateur.dc.html" style="flex: 1; min-width: 0; display: flex; align-items: center; gap: 16px; padding: 8px 8px 8px 16px; box-sizing: border-box; color: #1F2124; text-decoration: none">
+        <svg width="56" height="40" viewBox="0 0 56 40" preserveAspectRatio="none" role="img" aria-label="Profil planifié, 130 ft au plus profond" style="flex: none; border-radius: 8px; background: #E8E8E5"><defs><linearGradient id="pl0" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color: #FBE3B2"></stop><stop offset="1" style="stop-color: #EDC691"></stop></linearGradient></defs><path d="M0.0 0.0 L3.1 38.0 L34.7 38.0 L39.8 5.8 L44.0 5.8 L44.4 2.9 L55.5 2.9 L56.0 0.0" style="fill: url(#pl0); stroke: none"></path><path d="M0.0 0.0 L3.1 38.0 L34.7 38.0 L39.8 5.8 L44.0 5.8 L44.4 2.9 L55.5 2.9 L56.0 0.0" style="fill: none; stroke: #1F2124; stroke-width: 1.25; vector-effect: non-scaling-stroke"></path></svg>
+        <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+          <span style="font-size: 16px; line-height: 24px; letter-spacing: 0.15px; color: #1F2124; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Northern Arch</span>
+          <span style="font-size: 14px; line-height: 20px; color: #4A4D52; letter-spacing: 0.25px">EAN32 · 9 nov. 2026</span>
+        </span>
+        <span style="display: flex; flex-direction: column; align-items: flex-end; gap: 2px; font-variant-numeric: tabular-nums">
+          <span style="font-size: 16px; line-height: 24px; font-weight: 500">130 ft</span>
+          <span style="font-size: 14px; line-height: 20px; color: #4A4D52">48 min</span>
+        </span>
+      </a>
+      <button aria-label="Options du plan Northern Arch" aria-haspopup="menu" aria-expanded="false" style="flex: none; width: 48px; height: 48px; border: none; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 24px; background: transparent"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5.5" r="2" style="fill: #4A4D52"></circle><circle cx="12" cy="12" r="2" style="fill: #4A4D52"></circle><circle cx="12" cy="18.5" r="2" style="fill: #4A4D52"></circle></svg></button>
+    </div>
+    <div style="display: flex; align-items: center; gap: 4px; padding: 0 4px 0 0; min-height: 72px">
+      <a href="android-planificateur.dc.html" style="flex: 1; min-width: 0; display: flex; align-items: center; gap: 16px; padding: 8px 8px 8px 16px; box-sizing: border-box; color: #1F2124; text-decoration: none">
+        <svg width="56" height="40" viewBox="0 0 56 40" preserveAspectRatio="none" role="img" aria-label="Profil planifié, 92 ft au plus profond" style="flex: none; border-radius: 8px; background: #E8E8E5"><defs><linearGradient id="pl1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color: #FBE3B2"></stop><stop offset="1" style="stop-color: #F1CE9B"></stop></linearGradient></defs><path d="M0.0 0.0 L2.4 38.0 L46.5 38.0 L50.8 4.1 L55.5 4.1 L56.0 0.0" style="fill: url(#pl1); stroke: none"></path><path d="M0.0 0.0 L2.4 38.0 L46.5 38.0 L50.8 4.1 L55.5 4.1 L56.0 0.0" style="fill: none; stroke: #1F2124; stroke-width: 1.25; vector-effect: non-scaling-stroke"></path></svg>
+        <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+          <span style="font-size: 16px; line-height: 24px; letter-spacing: 0.15px; color: #4A4D52; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Site à préciser</span>
+          <span style="font-size: 14px; line-height: 20px; color: #4A4D52; letter-spacing: 0.25px">EAN33 · 8 nov. 2026</span>
+        </span>
+        <span style="display: flex; flex-direction: column; align-items: flex-end; gap: 2px; font-variant-numeric: tabular-nums">
+          <span style="font-size: 16px; line-height: 24px; font-weight: 500">92 ft</span>
+          <span style="font-size: 14px; line-height: 20px; color: #4A4D52">36 min</span>
+        </span>
+      </a>
+      <button aria-label="Options du plan Site à préciser" aria-haspopup="menu" aria-expanded="false" style="flex: none; width: 48px; height: 48px; border: none; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 24px; background: transparent"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5.5" r="2" style="fill: #4A4D52"></circle><circle cx="12" cy="12" r="2" style="fill: #4A4D52"></circle><circle cx="12" cy="18.5" r="2" style="fill: #4A4D52"></circle></svg></button>
+    </div>
+    <div style="display: flex; align-items: center; gap: 4px; padding: 0 4px 0 0; min-height: 72px">
+      <a href="android-planificateur.dc.html" style="flex: 1; min-width: 0; display: flex; align-items: center; gap: 16px; padding: 8px 8px 8px 16px; box-sizing: border-box; color: #1F2124; text-decoration: none">
+        <svg width="56" height="40" viewBox="0 0 56 40" preserveAspectRatio="none" role="img" aria-label="Profil planifié, 100 ft au plus profond" style="flex: none; border-radius: 8px; background: #E8E8E5"><defs><linearGradient id="pl2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color: #FBE3B2"></stop><stop offset="1" style="stop-color: #F0CD99"></stop></linearGradient></defs><path d="M0.0 0.0 L1.9 38.0 L34.0 38.0 L36.7 11.2 L39.0 11.2 L39.4 7.5 L45.0 7.5 L45.4 3.7 L55.6 3.7 L56.0 0.0" style="fill: url(#pl2); stroke: none"></path><path d="M0.0 0.0 L1.9 38.0 L34.0 38.0 L36.7 11.2 L39.0 11.2 L39.4 7.5 L45.0 7.5 L45.4 3.7 L55.6 3.7 L56.0 0.0" style="fill: none; stroke: #1F2124; stroke-width: 1.25; vector-effect: non-scaling-stroke"></path></svg>
+        <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+          <span style="font-size: 16px; line-height: 24px; letter-spacing: 0.15px; color: #1F2124; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Hälvälä</span>
+          <span style="font-size: 14px; line-height: 20px; color: #4A4D52; letter-spacing: 0.25px">Air · 2 nov. 2026</span>
+        </span>
+        <span style="display: flex; flex-direction: column; align-items: flex-end; gap: 2px; font-variant-numeric: tabular-nums">
+          <span style="font-size: 16px; line-height: 24px; font-weight: 500">100 ft</span>
+          <span style="font-size: 14px; line-height: 20px; color: #4A4D52">52 min</span>
+        </span>
+      </a>
+      <button aria-label="Options du plan Hälvälä" aria-haspopup="menu" aria-expanded="false" style="flex: none; width: 48px; height: 48px; border: none; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 24px; background: transparent"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5.5" r="2" style="fill: #4A4D52"></circle><circle cx="12" cy="12" r="2" style="fill: #4A4D52"></circle><circle cx="12" cy="18.5" r="2" style="fill: #4A4D52"></circle></svg></button>
+    </div>
+    <div style="display: flex; align-items: center; gap: 4px; padding: 0 4px 0 0; min-height: 72px">
+      <a href="android-planificateur-nouveau.dc.html" style="flex: 1; min-width: 0; display: flex; align-items: center; gap: 16px; padding: 8px 8px 8px 16px; box-sizing: border-box; color: #1F2124; text-decoration: none">
+        <svg width="56" height="40" viewBox="0 0 56 40" preserveAspectRatio="none" role="img" aria-label="Profil planifié, 60 ft au plus profond" style="flex: none; border-radius: 8px; background: #E8E8E5"><defs><linearGradient id="pl3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color: #FBE3B2"></stop><stop offset="1" style="stop-color: #F4D6A3"></stop></linearGradient></defs><path d="M0.0 0.0 L1.3 38.0 L49.7 38.0 L51.9 6.2 L55.6 6.2 L56.0 0.0" style="fill: url(#pl3); stroke: none"></path><path d="M0.0 0.0 L1.3 38.0 L49.7 38.0 L51.9 6.2 L55.6 6.2 L56.0 0.0" style="fill: none; stroke: #1F2124; stroke-width: 1.25; vector-effect: non-scaling-stroke"></path></svg>
+        <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+          <span style="font-size: 16px; line-height: 24px; letter-spacing: 0.15px; color: #4A4D52; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Sans plongée de départ</span>
+          <span style="font-size: 14px; line-height: 20px; color: #4A4D52; letter-spacing: 0.25px">Air · 28 oct. 2026</span>
+        </span>
+        <span style="display: flex; flex-direction: column; align-items: flex-end; gap: 2px; font-variant-numeric: tabular-nums">
+          <span style="font-size: 16px; line-height: 24px; font-weight: 500">60 ft</span>
+          <span style="font-size: 14px; line-height: 20px; color: #4A4D52">47 min</span>
+        </span>
+      </a>
+      <button aria-label="Options du plan Sans plongée de départ" aria-haspopup="menu" aria-expanded="false" style="flex: none; width: 48px; height: 48px; border: none; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 24px; background: transparent"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5.5" r="2" style="fill: #4A4D52"></circle><circle cx="12" cy="12" r="2" style="fill: #4A4D52"></circle><circle cx="12" cy="18.5" r="2" style="fill: #4A4D52"></circle></svg></button>
+    </div>
+  </div>
+  <a href="android-planificateur-nouveau.dc.html" style="position: absolute; right: 16px; bottom: 32px; height: 56px; padding: 0 20px 0 16px; border-radius: 16px; background: #E8E8E5; display: flex; align-items: center; gap: 12px; color: #1F2124; text-decoration: none; font-size: 16px; font-weight: 500; letter-spacing: 0.15px; box-shadow: 0 1px 3px rgba(0,0,0,0.3)"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #1F2124; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M12 5v14 M5 12h14"></path></svg>Nouveau plan</a>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

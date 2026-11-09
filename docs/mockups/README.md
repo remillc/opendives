@@ -34,7 +34,12 @@ When a mock-up and `docs/ui-specification.md` disagree, the specification wins. 
 | `android-accueil.dc.html` | Téléphone Android, Premier lancement |
 | `android-sites.dc.html` | Téléphone Android, Sites (carte hors ligne) |
 | `android-outils.dc.html` | Téléphone Android, Outils et calculateur de gaz |
-| `android-planificateur.dc.html` | Téléphone Android, Planificateur (résultat réel du cœur Subsurface) |
+| `android-planificateur.dc.html` | Téléphone Android, Planificateur depuis une plongée du carnet |
+| `android-planificateur-menu.dc.html` | Téléphone Android, Planificateur, menu ⋮ ouvert (Partager le plan, Réglages) |
+| `android-planificateur-nouveau.dc.html` | Téléphone Android, Planificateur d'une nouvelle plongée (niveaux, gaz, conditions) |
+| `android-plans.dc.html` | Téléphone Android, Plongées planifiées (liste) |
+| `android-plans-menu.dc.html` | Téléphone Android, Plongées planifiées, menu d'un plan |
+| `android-plans-vide.dc.html` | Téléphone Android, Plongées planifiées, liste vide |
 | `reglages-planificateur-android.dc.html` | Téléphone Android, Réglages du planificateur (vitesses, paliers, gaz, réserve) |
 | `android-edition.dc.html` | Téléphone Android, Modifier une plongée recycleur |
 | `android-reglages.dc.html` | Téléphone Android, Réglages |
@@ -120,4 +125,3 @@ Example values (decided on 8 November 2026): the mock-ups show depths in feet, p
 | `carnet-selection-android.dc.html` | Téléphone Android, carnet en sélection multiple (dessiné d’après l’app) |
 | `carnet-selection-menu-android.dc.html` | Téléphone Android, carnet en sélection multiple, menu ⋮ ouvert |
 | `carnet-export-android.dc.html` | Téléphone Android, exporter les plongées cochées : choix du format |
-| `reglages-decompression-android.dc.html` | Téléphone Android, Réglages › Décompression (/settings/decompression) |

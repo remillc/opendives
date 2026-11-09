@@ -720,3 +720,22 @@ Christian wants the decompression settings on a page of their own, `/settings/de
 Spec: "Settings, modelled on Subsurface" (the sentence on the decompression settings).
 
 Done in "Settings: decompression on its own page, linked from Settings and the planner settings". /settings/decompression is the Settings page with section decompression: the warning, the same five rows (same values and behaviour) and the footnote. Settings keeps the group title with one 72 dp row "Modele, facteurs de gradient, END" and the model and GF as supporting text (Buhlmann ZH-L16, GF 30/75; VPM-B, +3 with VPM-B); the planner settings start with one 72 dp row "Modele de decompression" opening the same page, Back returning to them. Checked in the emulator.
+
+## [ ] 2026-11-09-03 Settings: decompression back in Settings, conditions by default
+
+Christian undoes task 2026-11-09-02. Spec: "Settings, modelled on Subsurface".
+- Remove the page `/settings/decompression` and the planner settings row "Modèle de décompression". Put the five decompression rows back in the Settings group "Décompression", with the warning note and the footnote, as before 2026-11-09-02 (`docs/mockups/android-reglages.dc.html`).
+- Add a group "Conditions par défaut" after "Unités": "Type d’eau" (choice: Eau douce, Eau de mer, EN 13319; Eau de mer by default) and "Altitude" (number, in the depth unit; 0 by default), then the note "Le planificateur part de ces valeurs. On peut les changer pour chaque plan." Device settings, like the others. This also covers to-do #13.
+
+## [ ] 2026-11-09-04 Planner: planned dives list, two planner screens, several gases
+
+Christian approved the planner redesign. Spec: "Planner, redesigned" (it lists the mock-ups). Do it after 2026-11-09-03.
+- Plongées planifiées (`/plans/`): the list, the per-plan menu (Dupliquer, Partager, Supprimer), the empty state, the "Nouveau plan" FAB. Outils › Planificateur opens it. Planned dives are stored in the logbook as Subsurface does (planned dive computer) and are hidden from the logbook, statistics, desaturation and numbering.
+- Planner top bar: "Enregistrer", then ⋮ with "Partager le plan" and "Réglages du planificateur". Saving adds the planned dive or replaces the reopened one, then returns to the list.
+- Two screens with the same order: starting card, profile chart, (new dive: Date, Niveaux), Gaz, Conditions, Décompression accordion, Résultat. From a dive, times and depths come from the dive and are not editable.
+- Several gases (Oxygène % and Hélium %), switch depths from the deco ppO₂, no cylinder or start pressure, volumes per gas with the reserve.
+- The decompression accordion holds the plan's own model and gradient factors, initialised from Settings, never written back.
+- Exposition à l’oxygène: one value "CNS N %, M OTU".
+- Partager le plan: share sheet with a PDF sheet of the plan or a text summary.
+If the core does not offer something needed here (for example multi-level plans or altitude in the planner wrapper), stop and tell Christian before working around it.
+
