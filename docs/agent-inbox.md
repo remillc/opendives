@@ -904,6 +904,7 @@ Christian approved this on the canvas. Spec: "Sync conflict dialog, redesigned".
 - Added at 14:24, Christian wants it in this task: a secondary text button "Plus tard" left of "Continuer" (the dialog may now be closed: sync stays paused, the Carnet status row "Synchronisation arrêtée" reopens it). After "Continuer", apply the choice locally, show a snackbar with "Annuler" for about 8 seconds, and only then push; "Annuler" restores the conflict and reopens the dialog. See the spec paragraph.
 - Added at 14:40: the iOS sheet is redesigned the same way, see `docs/mockups/ios-etat-conflit.dc.html` and the spec (full-width "Continuer", "Plus tard" under it).
 - Added at 14:37, Christian: "Plus tard" closes the dialog and returns to where the diver was, or to the Carnet when the conflict appeared while opening the app. The status row of the Carnet and the sync card of the side menu reopen it, and it comes back at the next sync attempt. See the spec.
+- Added at 14:38: several dives in conflict, a full-screen dialog with a "Même choix pour toutes" switch and one card per dive with two small selectable cards. Mock-up `docs/mockups/android-etat-conflit-plusieurs.dc.html`, spec paragraph updated.
 
 ## [x] 2026-11-09-22 Palette rule: colour no longer reserved for data
 
