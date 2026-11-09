@@ -491,7 +491,17 @@
       const short = isShort(carried, total);
       const parts = [t(i === bottomIndex ? 'plan.volumeBottom' : 'plan.volumeDeco', { used, reserve })];
       if (short) parts.push(t('plan.volumeShort', { missing: formatGasVolume(total - carried, prefs) }));
-      return { key: i, label: gasName(c.o2Permille, c.hePermille), hint: parts.join(' '), value: formatGasVolume(total, prefs), alarm: short };
+      const whole = c.gasUsedMl + c.reserveMl;
+      return {
+        key: i,
+        label: gasName(c.o2Permille, c.hePermille),
+        hint: parts.join(' '),
+        value: formatGasVolume(total, prefs),
+        alarm: short,
+        usedPercent: whole > 0 ? (c.gasUsedMl / whole) * 100 : null,
+        hasReserve: c.reserveMl > 0,
+        barLabel: t('plan.volumeBar', { used, reserve }),
+      };
     });
   });
 
@@ -781,7 +791,16 @@
         <div class="results" class:ios={theme.ios}>
           {#each volumeRows as row (row.key)}
             <div class="result">
-              <span class="text"><span class="label">{row.label}</span><span class="hint">{row.hint}</span></span>
+              <span class="text">
+                <span class="label">{row.label}</span>
+                <span class="hint">{row.hint}</span>
+                {#if row.usedPercent !== null}
+                  <span class="bar" role="img" aria-label={row.barLabel}>
+                    <span class="fill" style:width="{row.usedPercent}%"></span>
+                    {#if row.hasReserve}<span class="gap"></span><span class="reserve"></span>{/if}
+                  </span>
+                {/if}
+              </span>
               <span class="value od-value" class:alarm={row.alarm}>{row.value}</span>
             </div>
           {/each}
@@ -792,7 +811,13 @@
             </div>
           {/if}
           <div class="result oxygen">
-            <span class="text"><span class="label">{t('plan.oxygen')}</span></span>
+            <span class="text">
+              <span class="label">{t('plan.oxygen')}</span>
+              <span class="bar" role="img" aria-label={t('plan.cnsBar', { cns: result.cns })}>
+                <span class="fill" style:width="{Math.min(result.cns, 100)}%"></span>
+              </span>
+              <span class="caption">{t('plan.cnsLimit')}</span>
+            </span>
             <span class="value od-value">{t('plan.oxygenValue', { cns: result.cns, otu: result.otu })}</span>
           </div>
         </div>
@@ -1280,6 +1305,36 @@
           color: var(--od-alarm);
         }
       }
+    }
+
+    .bar {
+      display: flex;
+      height: 8px;
+      margin-top: 8px;
+      border-radius: 4px;
+      overflow: hidden;
+      background: var(--od-tertiary-container);
+
+      .fill {
+        background: var(--od-tertiary);
+      }
+
+      .gap {
+        width: 2px;
+        background: var(--od-surface);
+      }
+
+      .reserve {
+        flex: 1;
+        background: repeating-linear-gradient(135deg, var(--od-tertiary-container) 0 4px, var(--od-tertiary-hatch) 4px 8px);
+      }
+    }
+
+    .caption {
+      margin-top: 4px;
+      font-size: 12px;
+      line-height: 16px;
+      color: var(--od-text-2);
     }
 
     .note {

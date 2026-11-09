@@ -1387,6 +1387,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Planificateur : une barre montre la part consommée et la réserve de chaque gaz, une autre l’exposition CNS.",
       "Statistiques : les graphiques qui ne mesurent pas la profondeur (plongées par année, durées) sont en bleu.",
       "Édition d’une plongée au recycleur : plus de profondeur de changement de gaz pour le diluant et l’oxygène, et choisir l’usage remplit le mélange de départ (21 % ou 100 %).",
       "Sites : l’en-tête a la même vague et le même profil que les autres sections, et la carte apparaît sous la courbe.",
@@ -1552,6 +1553,9 @@
     "modText": "pO₂ au fond au-delà de {po2} bar, à utiliser jusqu'à {depth}",
     "oxygen": "Exposition à l’oxygène",
     "oxygenValue": "CNS {cns} %, {otu} OTU",
+    "volumeBar": "{used} consommés, {reserve} de réserve",
+    "cnsBar": "CNS {cns} % de la limite",
+    "cnsLimit": "Limite CNS 100 %",
     "note": "Calculé par le planificateur de Subsurface. Un plan ne remplace ni la formation ni l'ordinateur de plongée.",
     "noteFromDive": "Calculé par le planificateur de Subsurface, avec la consommation mesurée sur la plongée de départ. Un plan ne remplace ni la formation ni l'ordinateur de plongée.",
     "computing": "Calcul du plan",
