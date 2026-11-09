@@ -61,6 +61,7 @@ import { registerPlugin } from '@capacitor/core';
  * @property {number} number
  * @property {string} date
  * @property {string} site
+ * @property {{latUdeg: number, lonUdeg: number}|null} siteCoordinates the site's GPS position, in millionths of a degree
  * @property {{city: string, region: string, country: string}} siteLocation from the site's taxonomy; empty strings when unknown
  * @property {number} maxDepthMm
  * @property {number} meanDepthMm

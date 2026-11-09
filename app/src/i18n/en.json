@@ -1325,7 +1325,8 @@
       "Dive profile: the card follows the mock-up (full-width chart, scale down to the maximum depth).",
       "Planner: a saved plan keeps its rates, reserve and other settings, and gives the same result when reopened.",
       "Settings: the units chosen on the device no longer go back to the logbook’s at restart.",
-      "Dive detail: the screen follows the mock-up (top bar, trip as a link, sizes and margins, people and tags as chips, a dot on the temperature curve at the cursor)."
+      "Dive detail: the screen follows the mock-up (top bar, trip as a link, sizes and margins, people and tags as chips, a dot on the temperature curve at the cursor).",
+      "Dive detail: aerial view of the site behind the header, when the site has GPS coordinates."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
@@ -1341,6 +1342,8 @@
     },
     "maps": "Maps",
     "mapsText": "© OpenStreetMap contributors, ODbL",
+    "imagery": "Satellite images",
+    "imageryText": "EOxCloudless https://cloudless.eox.at by EOX IT Services GmbH (Contains modified Copernicus Sentinel data 2016), CC BY 4.0",
     "regions": "Countries and regions",
     "regionsText": "GeoNames, CC BY 4.0",
     "privacy": "Privacy",

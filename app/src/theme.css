@@ -49,6 +49,9 @@
     /* Profile chart: grid lines of the depth axis, water temperature curve and its scale. */
     --od-chart-grid: #E8E8E5;
     --od-chip-outline: #75787C;
+    /* Pin on the aerial view of a site. */
+    --od-pin: #1F2124;
+    --od-on-pin: #FFFFFF;
     --od-temperature: #2F6DB5;
     /* Share sheet: each row's icon in a circle of the water's top colour. */
     --od-share-circle: var(--od-water-top);
@@ -91,6 +94,8 @@
     --od-trace-outline: #121314;
     --od-chart-grid: #3A3C40;
     --od-chip-outline: #8E9196;
+    --od-pin: #E5B961;
+    --od-on-pin: #121314;
     --od-temperature: #8AB4F8;
     --od-share-circle: #4A3410;
     --od-share-icon: #E5B961;

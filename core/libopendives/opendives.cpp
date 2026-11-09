@@ -389,6 +389,12 @@ int get_dive(int id, std::string &json, std::string &error)
 	append_json_string(json, iso_date(d->when));
 	json += ",\"site\":";
 	append_json_string(json, site_name(*d));
+	json += ",\"siteCoordinates\":";
+	if (d->dive_site && has_location(&d->dive_site->location))
+		json += "{\"latUdeg\":" + std::to_string(d->dive_site->location.lat.udeg) +
+			",\"lonUdeg\":" + std::to_string(d->dive_site->location.lon.udeg) + '}';
+	else
+		json += "null";
 	// Location of the site from its taxonomy (GeoNames), as stored; empty when unknown.
 	json += ",\"siteLocation\":{\"city\":";
 	std::string city;

@@ -15,6 +15,7 @@
   import MenuItem from '../components/MenuItem.svelte';
   import RenumberDiveDialog from '../components/RenumberDiveDialog.svelte';
   import ShareSheet from '../components/ShareSheet.svelte';
+  import SiteHeaderImage from '../components/SiteHeaderImage.svelte';
   import { sharePdf, shareSummary } from '../lib/share.js';
   import { filter } from '../lib/filter.svelte.js';
   import { horizontalSwipe, swipeGoesThrough } from '../lib/swipe.js';
@@ -175,6 +176,19 @@
   let renumbering = $state(false);
 
   /** "Partager" open: the sheet, then the system's share sheet. */
+  // The aerial view behind the header: the top bar is see-through over it,
+  // and gets its colour back as soon as the text scrolls under it.
+  let imageShown = $state(false);
+  let scrolled = $state(false);
+  /** @param {HTMLElement} node */
+  function watchScroll(node) {
+    const scroller = node.closest('.page-content');
+    if (!scroller) return;
+    const update = () => (scrolled = scroller.scrollTop > 12);
+    scroller.addEventListener('scroll', update, { passive: true });
+    return { destroy: () => scroller.removeEventListener('scroll', update) };
+  }
+
   let sharing = $state(false);
   /** @param {'pdf'|'summary'} kind */
   async function share(kind) {
@@ -340,7 +354,7 @@
 </script>
 
 <!-- no-swipeback: here a swipe to the right shows the previous dive. -->
-<Page onPageInit={watchSwipes} class="od-detail no-swipeback {slide ? `od-slide-${slide}` : ''}">
+<Page onPageInit={watchSwipes} class="od-detail no-swipeback {imageShown && !scrolled ? 'od-on-image' : ''} {slide ? `od-slide-${slide}` : ''}">
   <Navbar>
     <!-- Named back link: in MD3, Framework7 hides its text and TalkBack would read "#". -->
     {#snippet left()}
@@ -407,6 +421,10 @@
       <div class="skeleton-block skeleton-profile"></div>
     </div>
   {:else}
+    <div class="hero" use:watchScroll>
+      {#if dive.siteCoordinates}
+        <SiteHeaderImage latUdeg={dive.siteCoordinates.latUdeg} lonUdeg={dive.siteCoordinates.lonUdeg} onshown={(shown) => (imageShown = shown)} />
+      {/if}
     <header class="head">
       <p class="day od-value">
         {#if dive.number}<strong>{t('detail.number', { number: String(dive.number) })}</strong>&emsp;{/if}{formatDiveDay(dive.date)}
@@ -424,6 +442,7 @@
         </p>
       {/if}
     </header>
+    </div>
 
     <div class="figures od-value">
       {#each figures as figure (figure.label)}
@@ -588,8 +607,13 @@
 
 <style>
   @layer od.components {
+    .hero {
+      position: relative;
+    }
+
     /* 16 px under the top bar, as in the detail3 mock-ups. */
     .head {
+      position: relative;
       padding: 16px 20px 0;
     }
 
@@ -957,5 +981,9 @@
   /* Framework7's variable, outside the layers: the top bar is the page's colour on Android. */
   :global(.md .od-detail > .navbar) {
     --f7-navbar-bg-color: var(--od-background);
+  }
+
+  :global(.od-detail.od-on-image > .navbar) {
+    --f7-navbar-bg-color: transparent;
   }
 </style>
