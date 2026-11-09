@@ -57,7 +57,7 @@
   /** The row of the screen shown: Settings or About over a section, else the section. */
   const current = $derived(navigation.page || navigation.section);
   const accountName = $derived(logbook.email || t('menu.noAccount'));
-  const accountLine = $derived(t(logbook.email ? 'menu.cloudDives' : 'menu.localDives', { n: logbook.dives.length }));
+  const accountLine = $derived(t(logbook.email ? (logbook.mode === 'git' ? 'menu.gitDives' : 'menu.cloudDives') : 'menu.localDives',{ n: logbook.dives.length }));
 </script>
 
 <Panel

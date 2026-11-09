@@ -216,6 +216,63 @@ int cloud_probe(std::string &json, std::string &error);
 // Clones nothing, writes nothing, pushes nothing.
 int cloud_branch_status(const std::string &url, bool &exists, std::string &head, std::string &error);
 
+// --- Own git repository instead of the cloud (spec, "Own git repository
+// instead of the cloud"; to-do #11) -------------------------------------
+//
+// The log lives in a repository of the user's (GitHub, GitLab, Codeberg…)
+// opened as Subsurface desktop opens a git address: "https://host/path[branch]".
+// The user name and the access token reach libgit2 only through the core's
+// credential callbacks, in the preferences Subsurface already uses for the
+// cloud (cloud_storage_email_encoded, cloud_storage_password): never in an
+// address, a commit, a message or a file. HTTPS only.
+//
+// Read-only, network only: asks the server for the references of the
+// repository `url` ("https://host/path", no branch, no credentials) with
+// libgit2's normal TLS validation, and writes {"status":…, "branches":[…],
+// "empty":true|false}. Without a token (`token` empty), the question is the
+// anonymous `git ls-remote`:
+//   "public"  the server answered: the repository is readable by anyone;
+//   "auth"    the server asked for credentials (private, or missing: GitHub
+//             answers the same);
+//   "none"    no git answer (HTML page, unknown host, bad certificate…).
+// With a token, the same question is asked as for a push (the receive-pack
+// advertisement: nothing is sent), which checks the token and its right to
+// write:
+//   "ok"      accepted;
+//   "denied"  refused (wrong token, no right on this repository, or missing);
+//   "none"    as above.
+// "branches" are the names under refs/heads/; "empty" is true when the
+// repository holds no reference at all. Errors (-1): BAD_ADDRESS (not HTTPS,
+// or holding credentials, '[', ']', spaces), BAD_CREDENTIALS.
+// May run on another thread than the core's, like cloud_probe(). Nothing
+// persists: no preference is set.
+int git_check(const std::string &url, const std::string &username, const std::string &token, std::string &json,
+	      std::string &error);
+
+// Sets the log to the repository `url` ("https://host/path"), branch `branch`,
+// opened with `username` and `token`; writes the log address
+// ("https://host/path[branch]", no credentials) into `address`. Needs no
+// network. The cloud account is forgotten. Then cloud_list_cached_dives(),
+// cloud_probe(), cloud_list_dives() (its arguments are ignored), sync() and
+// the pending changes work on this log as on the cloud's. Errors: BAD_ADDRESS,
+// BAD_CREDENTIALS, BAD_BRANCH.
+int git_configure(const std::string &url, const std::string &username, const std::string &token,
+		  const std::string &branch, std::string &address, std::string &error);
+
+// The first log of a repository that holds no reference yet: the core creates
+// the branch with an empty commit and pushes it (the one write that
+// git_configure() allows without a log on the server). Refused (LOG_EXISTS,
+// NOT_EMPTY) when the repository is not empty, or unreachable (NETWORK).
+// Writes the same object as cloud_list_dives.
+int git_create_log(std::string &json, std::string &error);
+
+// True after git_configure() until the next cloud_configure() or sign out.
+bool git_mode();
+
+// Tests only, never reachable from the app: accepts any scheme (a local
+// `git daemon`, git://) in git_check() and git_configure().
+void set_git_any_scheme_for_tests(bool allowed);
+
 // --- Editing and saving (edit.cpp; docs/editing-and-sync-plan.md) ---------
 //
 // Errors are returned as -1 with `error` set to a code, optionally followed

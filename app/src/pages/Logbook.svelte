@@ -265,7 +265,7 @@
     const n = ids.length;
     confirmAction({
       title: t('logbook.deleteTitle', { n }),
-      text: t('logbook.deleteText', { n }),
+      text: t(logbook.mode === 'git' ? 'logbook.deleteTextGit' : 'logbook.deleteText', { n }),
       action: t('logbook.deleteAction'),
       onConfirm: async () => {
         try {
@@ -1132,7 +1132,7 @@
     </Block>
   {:else if logbook.dives.length === 0}
     <!-- Empty logbook (docs/mockups/*-etat-vide): the choices of "+" directly. -->
-    {#if logbook.email}<p class="count">{t('logbook.emptyCloud')}</p>{/if}
+    {#if logbook.email}<p class="count">{t(logbook.mode === 'git' ? 'logbook.emptyGit' : 'logbook.emptyCloud')}</p>{/if}
     <div class="empty">
       <h2 class="od-state-title">{t('logbook.emptyTitle')}</h2>
       <p class="empty-text">{t('logbook.emptyText')}</p>

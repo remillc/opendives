@@ -452,14 +452,37 @@ import { registerPlugin } from '@capacitor/core';
  */
 
 /**
+ * Answer of gitCheck. `branches` are the names under refs/heads/; `empty`: the
+ * repository holds no reference at all.
+ * @typedef {{status: 'public'|'auth'|'none'|'ok'|'denied', empty: boolean, branches: string[]}} GitCheck
+ */
+
+/**
  * @typedef {Object} OpenDivesCorePlugin
  * @property {() => Promise<{count: number}>} importSample
  *   Saves the sample log as a local git repository.
  * @property {() => Promise<{exists: boolean, dives: Dive[]}>} listDives
  *   Reads the local git repository again. `exists` is false until a repository has been created.
- * @property {() => Promise<{available: boolean, email: string}>} configureCloud
+ * @property {() => Promise<{available: boolean, email: string, mode?: 'git', repository?: string}>} configureCloud
  *   Sets the cloud account (development credentials), without network.
  *   `available` is false when none is configured; `email` is the account's.
+ *   When the logbook lives in the user's own git repository (gitConnect), that
+ *   repository is set instead: `mode` is 'git', `email` is the user name and
+ *   `repository` is "host/owner/name".
+ * @property {(options: {url: string, username?: string, token?: string, useStored?: boolean}) => Promise<GitCheck>} gitCheck
+ *   Asks the repository's server for its references (`git ls-remote`). Without
+ *   a token: anonymous ('public', 'auth', 'none'). With one (or `useStored`
+ *   with no token typed): as for a push, which checks the token and its right
+ *   to write ('ok', 'denied', 'none'). Network only; nothing is stored.
+ *   Rejects with BAD_ADDRESS (not HTTPS, or holding credentials) or BAD_CREDENTIALS.
+ * @property {() => Promise<{url: string, username: string, branch: string}>} gitConfig
+ *   The connected repository without its token, empty strings when none (for editing it).
+ * @property {(options: {url: string, username: string, token: string, branch: string, empty?: boolean}) => Promise<{created: boolean}>} gitConnect
+ *   Connects the logbook to the repository (an empty token keeps the stored one): checks the
+ *   branch on the server, creates it when `empty` says the repository holds no reference,
+ *   then stores the access (Android Keystore). Rejects with BAD_ADDRESS, BAD_CREDENTIALS,
+ *   BAD_BRANCH, DENIED, NETWORK, NO_LOG, CREATE_FAILED, LOG_EXISTS, NOT_EMPTY; the previous
+ *   access is then set again. signOut forgets it and erases the token.
  * @property {() => Promise<{exists: boolean, head: string}>} probeCloud
  *   Head of the log branch on the server, network only; may run during a load.
  * @property {(options?: {cached?: boolean}) => Promise<CloudDives>} listCloudDives
@@ -623,6 +646,11 @@ const native = registerPlugin('OpenDivesCore');
 export const OpenDivesCore = {
   importSample: () => native.importSample(),
   configureCloud: () => native.configureCloud(),
+  async gitCheck(options) {
+    return JSON.parse((await native.gitCheck(options)).json);
+  },
+  gitConfig: () => native.gitConfig(),
+  gitConnect: (options) => native.gitConnect(options),
   async probeCloud() {
     const { json } = await native.probeCloud();
     return JSON.parse(json);

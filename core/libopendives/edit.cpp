@@ -511,6 +511,10 @@ bool writes_allowed()
 {
 	if (!internal::current_log_is_cloud())
 		return true; // a local log cannot affect the cloud (plan, section 4)
+	// The user's own git repository (git_configure): the Subsurface cloud's
+	// write lock does not apply to it.
+	if (git_mode())
+		return true;
 	return account_writes_allowed(prefs.cloud_storage_email);
 }
 

@@ -25,6 +25,7 @@
    *   disabled?: boolean,
    *   required?: boolean,
    *   position?: 'single'|'first'|'last',
+   *   onchange?: () => void,
    * }}
    * footer / footerError: the iOS footer of the group, when it is not this
    * field's own (helper text, or error).
@@ -42,6 +43,7 @@
     disabled = false,
     required = false,
     position = 'single',
+    onchange,
   } = $props();
 
   const ios = f7.theme === 'ios';
@@ -60,6 +62,7 @@
       {autocomplete}
       {disabled}
       bind:value
+      {onchange}
       placeholder={required && !value ? t('accountStep.required') : ''}
       aria-invalid={!!error}
       autocapitalize="off"
@@ -77,6 +80,7 @@
     {autocomplete}
     {disabled}
     bind:value
+    {onchange}
     invalid={!!error}
     supporting={error || supporting}
   >

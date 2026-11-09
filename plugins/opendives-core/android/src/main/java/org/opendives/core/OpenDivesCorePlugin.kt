@@ -51,6 +51,9 @@ class OpenDivesCorePlugin : Plugin() {
     private val repo: String by lazy { "${repoDir.absolutePath}[main]" }
     private val credentialStore: CredentialStore by lazy { CredentialStore(context) }
 
+    /** The user's own git repository, instead of the cloud account (see GitRemoteStore). */
+    private val gitStore: GitRemoteStore by lazy { GitRemoteStore(context) }
+
     /**
      * An account being created or signed in to whose logbook does not exist
      * yet: kept in memory only, and stored once its logbook is created.
@@ -231,6 +234,21 @@ class OpenDivesCorePlugin : Plugin() {
      */
     @PluginMethod
     fun configureCloud(call: PluginCall) = onCoreThread(call, afterSetup = false) {
+        // The user's own git repository, when one was connected: it takes the
+        // place of the cloud account. `email` is then the user name there.
+        val remote = gitStore.read()
+        if (remote != null) {
+            try {
+                NativeCore.gitConfigure(remote.url.substringBeforeLast('['), remote.username, remote.token, remote.branch)
+                call.resolve(
+                    JSObject().put("available", true).put("email", remote.username).put("mode", "git")
+                        .put("repository", remote.url.substringBeforeLast('[').substringAfter("://")),
+                )
+                return@onCoreThread
+            } catch (e: IllegalStateException) {
+                Log.w(TAG, "The stored repository cannot be used: ${e.message}")
+            }
+        }
         val credentials = accountCredentials()
         if (credentials != null) NativeCore.cloudConfigure(credentials.first, credentials.second)
         // Write lock (docs/editing-and-sync-plan.md, section 4): writing to the
@@ -273,12 +291,17 @@ class OpenDivesCorePlugin : Plugin() {
         val json = if (cached) {
             NativeCore.cloudListCachedDives()
         } else {
-            val credentials = accountCredentials()
-            if (credentials == null) {
-                call.resolve(JSObject().put("available", false))
-                return@onCoreThread
+            if (gitStore.read() != null) {
+                // Own git repository, set by configureCloud: the arguments are ignored.
+                NativeCore.cloudListDives("", "")
+            } else {
+                val credentials = accountCredentials()
+                if (credentials == null) {
+                    call.resolve(JSObject().put("available", false))
+                    return@onCoreThread
+                }
+                NativeCore.cloudListDives(credentials.first, credentials.second)
             }
-            NativeCore.cloudListDives(credentials.first, credentials.second)
         }
         Log.i(TAG, "listCloudDives(cached=$cached): ${json.length} chars, ${System.currentTimeMillis() - start} ms")
         call.resolve(JSObject().put("available", true).put("json", json))
@@ -300,6 +323,7 @@ class OpenDivesCorePlugin : Plugin() {
     fun signOut(call: PluginCall) = onCoreThread(call) {
         NativeCore.cloudSignOut(call.getBoolean("deleteCopy", false) == true)
         credentialStore.delete()
+        gitStore.delete() // "Se déconnecter du dépôt": the token is erased from this device
         pendingAccount = null
         File(context.filesDir, DEV_CREDENTIALS).delete()
         Log.i(TAG, "signOut: credentials forgotten")
@@ -386,6 +410,111 @@ class OpenDivesCorePlugin : Plugin() {
         // The server's reply never holds the password.
         Log.i(TAG, "createAccount: $status (HTTP ${result.optInt("http")}, ${result.optString("reply")})")
         call.resolve(JSObject().put("status", status).put("email", email))
+    }
+
+    // --- Own git repository instead of the cloud (spec, "Own git repository instead of the cloud") ---
+
+    /**
+     * Asks a repository server for its references (git_check): anonymous, or,
+     * with a token, as for a push (checks the token and its right to write).
+     * The token is the typed one, or, with `useStored`, the stored one (the
+     * form that edits the repository, token left empty). Network only: runs
+     * beside a load. Resolves `json` ({status, empty, branches}); rejects
+     * with BAD_ADDRESS or BAD_CREDENTIALS. Nothing is stored or logged.
+     */
+    @PluginMethod
+    fun gitCheck(call: PluginCall) {
+        val url = call.getString("url").orEmpty()
+        var username = call.getString("username").orEmpty().trim()
+        var token = call.getString("token").orEmpty().trim()
+        networkThread.execute {
+            try {
+                setupDone.await()
+                if (call.getBoolean("useStored", false) == true && token.isEmpty()) {
+                    val stored = gitStore.read()
+                    if (stored != null) {
+                        username = stored.username
+                        token = stored.token
+                    }
+                }
+                call.resolve(JSObject().put("json", NativeCore.gitCheck(url, username, token)))
+            } catch (e: IllegalStateException) {
+                // BAD_ADDRESS or BAD_CREDENTIALS, from the core.
+                call.reject(e.message, e.message.orEmpty().substringBefore(':'))
+            } catch (e: Exception) {
+                Log.e(TAG, "Git check error", e)
+                call.reject("CORE_ERROR", "CORE_ERROR")
+            }
+        }
+    }
+
+    /** The stored repository without its token ({url, username, branch}), or empty: for the form that edits it. */
+    @PluginMethod
+    fun gitConfig(call: PluginCall) {
+        val stored = gitStore.read()
+        call.resolve(
+            JSObject()
+                .put("url", stored?.url?.substringBeforeLast('[').orEmpty())
+                .put("username", stored?.username.orEmpty())
+                .put("branch", stored?.branch.orEmpty()),
+        )
+    }
+
+    /**
+     * Uses the repository for the logbook: sets it in the core, asks the
+     * server for the log branch, and, for a repository that holds no
+     * reference at all (`empty`), creates the branch (the first push). The
+     * address, user name, branch and token are then stored (Keystore). On any
+     * failure the previous repository (or account) is set again and nothing is
+     * stored. Rejects with BAD_ADDRESS, BAD_CREDENTIALS, BAD_BRANCH, DENIED,
+     * NETWORK, NO_LOG (the branch is not in the repository), CREATE_FAILED.
+     * The token is never logged.
+     */
+    @PluginMethod
+    fun gitConnect(call: PluginCall) = onCoreThread(call) {
+        val url = call.getString("url").orEmpty()
+        val username = call.getString("username").orEmpty().trim()
+        val branch = call.getString("branch").orEmpty().trim()
+        val previous = gitStore.read()
+        // The form that edits the repository leaves the token empty to keep it.
+        val token = call.getString("token").orEmpty().trim().ifEmpty { previous?.token.orEmpty() }
+        try {
+            NativeCore.gitConfigure(url, username, token, branch)
+            var created = false
+            val exists = JSObject(NativeCore.cloudProbe()).optBoolean("exists")
+            if (!exists) {
+                if (call.getBoolean("empty", false) != true) throw IllegalStateException("NO_LOG")
+                NativeCore.gitCreateLog()
+                created = true
+            }
+            val address = url.trim().trimEnd('/')
+            gitStore.write(GitRemote("$address[$branch]", username, branch, token))
+            Log.i(TAG, "gitConnect: repository set, branch created: $created")
+            call.resolve(JSObject().put("created", created))
+        } catch (e: IllegalStateException) {
+            restoreAfterFailedGitConnect(previous)
+            val code = when {
+                e.message?.contains("Credentials rejected") == true -> "DENIED"
+                else -> e.message.orEmpty().substringBefore(':').ifEmpty { "CORE_ERROR" }
+            }
+            val known = setOf("BAD_ADDRESS", "BAD_CREDENTIALS", "BAD_BRANCH", "DENIED", "NO_LOG", "CREATE_FAILED", "LOG_EXISTS", "NOT_EMPTY")
+            val final = if (code in known) code else "NETWORK"
+            Log.i(TAG, "gitConnect: $final")
+            call.reject(final, final)
+        }
+    }
+
+    /** After a refused connection: the repository (or cloud account) the device had is set again. */
+    private fun restoreAfterFailedGitConnect(previous: GitRemote?) {
+        try {
+            if (previous != null) {
+                NativeCore.gitConfigure(previous.url.substringBeforeLast('['), previous.username, previous.token, previous.branch)
+            } else {
+                configureStoredAccount()
+            }
+        } catch (e: IllegalStateException) {
+            // Nothing to set again.
+        }
     }
 
     /** "Renvoyer le code": the same request as createAccount, for the account waiting for its code. */

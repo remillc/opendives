@@ -11,18 +11,19 @@
    *   value: string,
    *   options: { value: string, label: string }[],
    *   supporting?: string,
+   *   disabled?: boolean,
    *   onchange?: (value: string) => void,
    * }}
    */
-  let { label, value = $bindable(), options, supporting = '', onchange } = $props();
+  let { label, value = $bindable(), options, supporting = '', disabled = false, onchange } = $props();
 
   const id = `od-select-${Math.random().toString(36).slice(2, 9)}`;
 </script>
 
-<div class="field">
+<div class="field" class:disabled>
   <div class="box">
     <label class="label" for={id}>{label}</label>
-    <select {id} bind:value onchange={() => onchange?.(value)}>
+    <select {id} {disabled} bind:value onchange={() => onchange?.(value)}>
       {#each options as option (option.value)}<option value={option.value}>{option.label}</option>{/each}
     </select>
     <span class="arrow"><Icon name="expand" /></span>
@@ -34,6 +35,10 @@
   @layer od.components {
     .field {
       margin: 18px var(--od-field-margin, 16px) 0;
+    }
+
+    .field.disabled {
+      opacity: 0.38;
     }
 
     .box {
