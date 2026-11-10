@@ -14,6 +14,7 @@
   import TripRow from '../components/TripRow.svelte';
   import BandBackdrop from '../components/BandBackdrop.svelte';
   import Icon from '../components/Icon.svelte';
+  import FabMenu from '../components/FabMenu.svelte';
   import MenuItem from '../components/MenuItem.svelte';
   import MenuButton from '../components/MenuButton.svelte';
   import SectionBand from '../components/SectionBand.svelte';
@@ -1061,15 +1062,6 @@
       .open();
   }
 
-  // Android tablet: the "+" button of the rail asks for the choices (an action sheet).
-  let seenRequests = navigation.addRequests;
-  $effect(() => {
-    const n = navigation.addRequests;
-    if (n === seenRequests) return;
-    seenRequests = n;
-    add();
-  });
-
   // Android "+": a floating button that opens its choices above it. The links
   // are "external" (no routing), which Framework7's own click handling skips:
   // the button and the choices open and close it here; Framework7 closes it
@@ -1365,13 +1357,15 @@
         </a>
       </div>
     {/if}
-    {#if !theme.ios && !layout.rail && logbook.dives.length && !selecting}
+    {#if !theme.ios && layout.split && logbook.dives.length && !selecting}
+      <FabMenu choices={addChoices} onchoose={choose} />
+    {:else if !theme.ios && logbook.dives.length && !selecting}
       <!--
         Written by hand: the Fab component of framework7-svelte 9 calls onclick
         twice and leaves the link without a name for screen readers.
       -->
       <div class="fab-backdrop"></div>
-      <div class="fab fab-right-bottom od-fab-add" class:od-logbook--fab-screen={layout.split} bind:this={fabEl}>
+      <div class="fab fab-right-bottom od-fab-add" bind:this={fabEl}>
         <a
           href="#add"
           class="external"
@@ -1424,16 +1418,6 @@
   :global(.md .od-logbook .title-large),
   :global(.md .od-logbook .subnavbar) {
     align-items: flex-start;
-  }
-
-  /* Outside the layers, over Framework7's .fab-right-bottom. Tablet in portrait,
-     no rail (spec, section 7): the "+" sits at the bottom right of the whole
-     screen, over the detail pane, not of the list pane. Scrims of sheets and
-     dialogs cover it. */
-  :global(.fab.od-logbook--fab-screen) {
-    position: fixed;
-    right: calc(24px + var(--f7-safe-area-right, 0px));
-    bottom: calc(24px + var(--f7-safe-area-bottom, 0px));
   }
 
   @layer od.components {

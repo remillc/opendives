@@ -1,14 +1,14 @@
 <script>
   // @ts-check
   // Main navigation of the tablet layout (spec, section 3): the 220 px sidebar
-  // on iPad, the 96 px navigation rail on Android with the "+" button at the
-  // top. Sections, then Account and Settings at the bottom. The phone layout
+  // on iPad, the 96 px navigation rail on Android (no "+": it is the floating button of the
+  // Logbook, spec section 7). Sections, then Account and Settings at the bottom. The phone layout
   // has the side menu instead (NavMenu.svelte).
   import Icon from './Icon.svelte';
   import SyncStatus from './SyncStatus.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
   import { ios } from '../lib/layout.svelte.js';
-  import { navigation, sections, showSection, openSettings, openAbout, requestAdd } from '../lib/navigation.svelte.js';
+  import { navigation, sections, showSection, openSettings, openAbout } from '../lib/navigation.svelte.js';
   import { t } from '../lib/i18n.js';
   import { tolerantTaps } from '../lib/tap.js';
 
@@ -25,11 +25,6 @@
 <nav class="od-nav-rail od-nav-rail--rail" class:ios aria-label={t('menu.sections')} use:tolerantTaps>
   {#if ios}
     <p class="od-nav-rail--title">{t('menu.title')}</p>
-  {:else}
-    <button type="button" class="od-nav-rail--add" onclick={requestAdd}>
-      <Icon name="plus" />
-      <span class="od-sr-only">{t('logbook.add')}</span>
-    </button>
   {/if}
   {#each sections as section (section)}
     <a
@@ -82,20 +77,6 @@
       gap: 12px;
       background: var(--od-background);
       color: var(--od-text);
-    }
-
-    .od-nav-rail--add {
-      width: 56px;
-      height: 56px;
-      margin-bottom: 4px;
-      border: 0;
-      border-radius: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--od-surface-2);
-      color: var(--od-text);
-      box-shadow: 0 1px 3px rgb(0 0 0 / 0.3);
     }
 
     .od-nav-rail--item {
