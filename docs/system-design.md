@@ -181,7 +181,7 @@ Six components do not exist in Framework7; each is a single Svelte component, sh
 
 **`<ActiveFilter>`: the active filter row.** While a filter is applied, a row at the top of the Logbook, the Statistics and the map recalls it with the number of matching dives ("Suit: dry suit, 12 dives") and a button to remove it. The filter is the same in all three sections.
 
-**`<SyncStatus>`: the synchronisation state.** A row under the Logbook title, never a dialog: "Synced with the Subsurface cloud" (secondary text, check mark), "Offline: 2 changes will be sent when the network is back" or "Synchronisation stopped for one dive" (`--od-pending`, with an icon). It interrupts the diver only when a choice is needed (conflict, section 6).
+**`<SyncStatus>`: the synchronisation state.** A row under the Logbook title, never a dialog: "Synced with the Subsurface cloud" (secondary text, check mark), "Offline: 2 changes will be sent when the network is back" or "Synchronisation stopped for one dive" (`--od-pending`, with an icon). It interrupts the diver only when a choice is needed (conflict, section 9).
 
 **Dive rows, duration above depth (decided on 10 November 2026).** In every dive row on Android (Carnet, its trips and selection, export, the states, the dives of a statistic, dives in the Carnet with month headers, tablet Carnet), the right-hand column shows the duration first (16 sp, weight 500, "55 min") and the maximum depth under it (14 sp, `--od-on-surface-variant`, "91 ft"). Both stay right-aligned with tabular figures.
 
@@ -251,7 +251,7 @@ Each screen has five states to build, besides the normal one: loading, empty, er
 
 Kept for context: where these paragraphs differ from the sections above, the sections above apply.
 
-**Colours.** The first "water and buoy" direction (blues and buoy orange) was dropped on 5 November 2026: colours should not evoke water or the sky, but the diver's state of mind, the urge to dive again, with confidence and control. A "fir green and tangerine on cream" palette followed and was dropped the same day. The chosen theme is **black and white**: neutral light interface, ink #1F2124, strong contrast, sans-serif titles; in dive data, the water column goes from sand to rust with depth (honey to amber in dark mode). The earlier rule "colour reserved for data" was dropped on 9 November 2026. Its values are in the [UI specification](ui-specification.md), section 1.
+**Colours.** The first "water and buoy" direction (blues and buoy orange) was dropped on 5 November 2026: colours should not evoke water or the sky, but the diver's state of mind, the urge to dive again, with confidence and control. A "fir green and tangerine on cream" palette followed and was dropped the same day. The chosen theme is **black and white**: neutral light interface, ink #1F2124, strong contrast, sans-serif titles; in dive data, the water column goes from sand to rust with depth (honey to amber in dark mode). The earlier rule "colour reserved for data" was dropped on 9 November 2026. Its values are in section 3.
 
 **Typography.** The system fonts: SF Pro on iOS, Roboto on Android. It is the native choice, and it keeps text readable at every accessibility size. One rule specific to OpenDives: dive figures (depth, duration, pressure) use **tabular figures**, so columns of values stay aligned from one row to the next.
 
