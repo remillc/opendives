@@ -3,7 +3,7 @@
   // <MonthSticky>: the month at the top of the Carnet's list, under the top
   // bar while the list scrolls. It is outside the scrolling area: the logbook
   // reads which month is at the top of the virtual list. The band's gradient
-  // continues in it, a wave closes it.
+  // continues in it, and its bottom edge is cut as a wave: the list shows under the curve.
   import { locale } from '../lib/format.js';
   import { monthName, yearText } from '../lib/carnet-months.js';
   import { t } from '../lib/i18n.js';
@@ -16,7 +16,6 @@
 </script>
 
 <div class="sticky" class:pill role="heading" aria-level="2">
-  <svg class="wave" viewBox="0 0 300 18" preserveAspectRatio="none" aria-hidden="true"><path d="M0 11 Q37.5 2 75 11 T150 11 T225 11 T300 11 V18 H0 Z" /></svg>
   <div class="heading">
     <span class="year">{yearText(year, locale)}</span>
     <span class="month">{monthName(month, locale)}</span>
@@ -42,22 +41,12 @@
       background-position: 0 calc(-1 * (var(--f7-navbar-height) + var(--f7-safe-area-top)));
       background-repeat: no-repeat;
       color: var(--od-on-band);
+      mask:
+        linear-gradient(#000, #000) top / 100% calc(100% - 17px) no-repeat,
+        url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%20300%2018%27%20preserveAspectRatio%3D%27none%27%3E%3Cpath%20d%3D%27M0%200%20H300%20V11%20Q262.5%202%20225%2011%20T150%2011%20T75%2011%20T0%2011%20Z%27%20fill%3D%27black%27/%3E%3C/svg%3E") bottom / 100% 18px no-repeat;
 
       &.pill {
         --od-band-h: calc(var(--f7-safe-area-top) + 242px);
-      }
-    }
-
-    .wave {
-      position: absolute;
-      left: 0;
-      bottom: -1px;
-      width: 100%;
-      height: 18px;
-      display: block;
-
-      path {
-        fill: var(--f7-page-bg-color);
       }
     }
 
