@@ -1497,7 +1497,8 @@
       "Carnet : « Ordinateurs du carnet » dans le menu ⋮.",
       "Nouveau logo « Trois vagues » : icône de l’app, écran de démarrage, menu et À propos.",
       "Conflit de synchronisation : dialogue refait, différences lisibles, « Plus tard », et « Annuler » avant l’envoi.",
-      "Filtrer (Android) : page refaite, critères de bouteille et de gaz regroupés, un filtre enregistré remplit la page, et sa suppression propose « Annuler »."
+      "Filtrer (Android) : page refaite, critères de bouteille et de gaz regroupés, un filtre enregistré remplit la page, et sa suppression propose « Annuler ».",
+      "Filtrer : les phrases d’explication sous les critères disparaissent."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
@@ -1784,13 +1785,7 @@
     "dateHint": "Par exemple 2025-06-30",
     "timeHint": "Par exemple 9:30",
     "invalid": "Valeur non reconnue",
-    "rangeHint": "Laissez un champ vide pour ne pas fixer de limite.",
-    "cylinderSizeHint": "Volume d'eau de la bouteille, en litres. Laissez un champ vide pour ne pas fixer de limite.",
     "atLeast": "Au moins",
-    "starsHint": "Touchez de nouveau l'étoile choisie pour retirer le critère.",
-    "fulltextHint": "Les plongées dont un mot commence par ce texte, dans toute la fiche.",
-    "notesHint": "Les plongées dont les notes contiennent ce texte.",
-    "listHint": "Une plongée correspond si elle a l'une des valeurs choisies.",
     "noValues": "Aucune plongée du carnet n'a de valeur pour ce critère.",
     "chip": "{name} : {value}",
     "activeLabel": "Filtre appliqué",
