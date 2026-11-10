@@ -1181,3 +1181,12 @@ Addendum (2026-11-10 10:10): saved filters. Spec: "Filter, Android" (updated). M
 - Tapping a row applies the filter: its criteria fill the page (mode, Matériel, Autres critères). The applied filter has a grey row and a check icon on the left.
 - Each row has an ✕ icon button on the right, `aria-label` "Supprimer le filtre {nom}": deletes at once, snackbar "Filtre {nom} supprimé" with "Annuler" for 6 s (snackbar style of ui-foundations section 8).
 - Hidden while the search field has text; absent when no filter is saved.
+
+## [ ] 2026-11-10-12 Statistics: "Par …" sections become accordions again, closed by default
+
+Christian reversed the "no accordion" part of task 2026-11-10-09. Spec: "Statistics, items are not clickable" (updated). Mock-up: `docs/mockups/android-stats.dc.html` ("Par année" drawn open, the others closed). Page: `app/src/pages/Statistics.svelte`.
+- Each "Par …" section ("Par année", "Par mode", "Par combinaison", "Par compagnon" and the others) has its title as a 48 dp button: title text (14 sp, medium, `--od-on-surface-variant`) and a chevron on the right, pointing down when closed, up when open. `aria-expanded` on the button, inside the `h2`.
+- All sections are closed by default. Tapping the title opens or closes that section only.
+- The rows inside stay plain content, as in task 09: no link, no chevron, no ripple, no maximum depth.
+- The chart cards, the filter and "Nouvelle statistique" do not change.
+
