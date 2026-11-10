@@ -1435,6 +1435,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Planner (tablet in portrait): opened beside the tools list, it fits in one column instead of adding one at the right of the screen.",
       "About: the app’s description no longer says “free”.",
       "First launch (Android tablet): in landscape, the title and the dive profile on the left and the three choices on the right; in portrait, the title, the profile across the width, then the choices, centred. No scrolling, even on a small tablet.",
       "Statistics: a total of time under water from 24 h is written in days and hours, without minutes (\"80 d 16 h\"), in the key figures, the \"By …\" and \"My statistics\" rows and the dives of a row; under 24 h it stays in hours and minutes.",
