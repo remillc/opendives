@@ -1303,3 +1303,10 @@ Follows task 2026-11-10-21 (Android). Spec: System design, section 8, "Editorial
 - Same shared layout component as task 21, in its iOS look: navigation bar with "Annuler" or "‹ Retour" only (no title, transparent), eyebrow with the bar title and step, 34 pt title, 17 pt introduction, inset grouped sections with 20 pt corners, 56 pt capsule for the primary action, decorative profile above the actions.
 - No text or field changes. A line in the release notes.
 
+## [ ] 2026-11-10-23 First launch on an Android tablet, landscape and portrait
+
+Follows task 2026-11-10-18. Spec: UI specification, section 4, "First launch, redesigned", paragraph "Tablet" (new). Mock-ups: `docs/mockups/android-tablette-premier-lancement-paysage.dc.html`, `docs/mockups/android-tablette-premier-lancement-portrait.dc.html` (new). Component: `app/src/components/Welcome.svelte`.
+- Landscape: heading (logo row, title) on the left with the profile at the bottom from the left edge; the three choices and the git link in a 440 dp column on the right, centred vertically.
+- Portrait: heading in a 520 dp centred column, the profile across the width, then the choices and the git link in a 440 dp column centred vertically in the space left.
+- No scrolling in either orientation, on a small tablet too (to-do #32: check it, then tell Christian so the to-do can be removed).
+
