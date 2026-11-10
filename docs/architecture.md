@@ -116,7 +116,7 @@ The whole logbook lives in **a local Git repository**, in the app's private stor
 
 ## 7. The interface
 
-The interface is a single-page web app in **modern JavaScript (ES modules) documented with JSDoc**, bundled by Vite and embedded by Capacitor. It contains no business rule: it displays what the core returns and sends it commands. Its visual design is set out in the [UI foundations](ui-foundations.md) and the [UI specification](ui-specification.md).
+The interface is a single-page web app in **modern JavaScript (ES modules) documented with JSDoc**, bundled by Vite and embedded by Capacitor. It contains no business rule: it displays what the core returns and sends it commands. Its visual design is set out in the [System design](system-design.md), the [UI foundations](ui-foundations.md) and the [UI specification](ui-specification.md).
 
 | Need | Proposal | Why |
 | --- | --- | --- |
