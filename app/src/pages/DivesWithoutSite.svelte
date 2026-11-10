@@ -1,12 +1,14 @@
 <script>
   // @ts-check
   // Dives without a site (docs/mockups/sites-sans-site-android.dc.html): each
-  // dive with "Choose a site" and "New site", and a suggestion from the site
-  // of the other dives of the same trip.
-  import { Page, Navbar, Link, f7 } from 'framework7-svelte';
-  import { showSnackbar } from '../lib/snackbar.js';
+  // dive opens its profile, with "Choose a site" and "New site" apart, and a
+  // suggestion from the site of the other dives of the same trip.
+  import { Page, Navbar, Link } from 'framework7-svelte';
   import { OpenDivesCore } from 'opendives-core';
-  import { logbook, saveDiveChanges } from '../lib/logbook.svelte.js';
+  import Icon from '../components/Icon.svelte';
+  import ProfileThumbnail from '../components/ProfileThumbnail.svelte';
+  import { logbook } from '../lib/logbook.svelte.js';
+  import { chooseDiveSite, setDiveSite } from '../lib/dive-site.js';
   import { formatDateTime } from '../lib/format.js';
   import { diveLines } from '../lib/sites.svelte.js';
   import { t } from '../lib/i18n.js';
@@ -47,29 +49,8 @@
 
   const siteName = (/** @type {number} */ uuid) => sites.find((s) => s.uuid === uuid)?.name || t('sites.noName');
 
-  /** @param {number} diveId @param {number} uuid */
-  async function setSite(diveId, uuid) {
-    try {
-      await saveDiveChanges(diveId, { site: uuid });
-      logbook.sitesVersion++;
-    } catch (e) {
-      console.error('Set site', e);
-      showSnackbar(t('edit.failed'));
-    }
-  }
-
-  /** The sites with the most dives first. */
-  function chooseSite(/** @type {number} */ diveId) {
-    const choices = [...sites].filter((s) => s.name).sort((a, b) => b.dives - a.dives).slice(0, 12);
-    f7.actions
-      .create({
-        buttons: [
-          [{ text: t('sites.chooseSite'), label: true }, ...choices.map((s) => ({ text: s.name, onClick: () => setSite(diveId, s.uuid) }))],
-          [{ text: t('logbook.cancel') }],
-        ],
-      })
-      .open();
-  }
+  /** The logbook's dives, for the profile thumbnails. */
+  const byId = $derived(new Map(logbook.dives.map((d) => [d.id, d])));
 </script>
 
 <Page>
@@ -85,17 +66,24 @@
     <!-- All the dives in one white surface, with dividers. -->
     <ul class="surface">
       {#each dives as dive (dive.id)}
+        {@const listed = byId.get(dive.id)}
         <li class="dive">
-          <span class="date od-value">{formatDateTime(dive.date)}</span>
-          <span class="sub od-value">{lines[dive.id] ?? ''}</span>
+          <a href="/sites/without-site/{dive.id}" class="od-no-site-open" aria-label={t('sites.seeProfile')}>
+            {#if listed}<ProfileThumbnail profile={listed.profile} maxDepthMm={listed.maxDepthMm} prefs={logbook.prefs} />{/if}
+            <span class="od-no-site-text">
+              <span class="date od-value">{formatDateTime(dive.date)}</span>
+              <span class="sub od-value">{lines[dive.id] ?? ''}</span>
+            </span>
+            <span class="od-no-site-chevron"><Icon name="chevron" size={20} /></span>
+          </a>
           <span class="actions">
             {#if dive.suggestedSite}
               <!-- The suggested site first, as a filled tonal chip. -->
-              <button type="button" class="small tonal" onclick={() => setSite(dive.id, dive.suggestedSite)}>
+              <button type="button" class="small tonal" onclick={() => setDiveSite(dive.id, dive.suggestedSite)}>
                 {siteName(dive.suggestedSite)}
               </button>
             {/if}
-            <button type="button" class="small" onclick={() => chooseSite(dive.id)}>{t('sites.chooseSite')}</button>
+            <button type="button" class="small" onclick={() => chooseDiveSite(dive.id, sites)}>{t('sites.chooseSite')}</button>
             <button type="button" class="small" onclick={() => f7router.navigate(`/sites/new?dive=${dive.id}`)}>{t('sites.newSite')}</button>
           </span>
           {#if dive.suggestedSite}
@@ -126,6 +114,32 @@
       & + .dive {
         border-top: 1px solid var(--od-separator);
       }
+    }
+
+    /* The thumbnail and the text: one tappable area, apart from the buttons. */
+    .od-no-site-open {
+      margin: -4px -8px;
+      padding: 4px 8px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .od-no-site-text {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .od-no-site-chevron {
+      flex: none;
+      display: flex;
+      color: var(--od-text-2);
     }
 
     .date {

@@ -12,6 +12,7 @@
   import { showSnackbar } from '../lib/snackbar.js';
   import { OpenDivesCore } from 'opendives-core';
   import DiveProfile from '../components/DiveProfile.svelte';
+  import DiveFigures from '../components/DiveFigures.svelte';
   import Icon from '../components/Icon.svelte';
   import MenuItem from '../components/MenuItem.svelte';
   import RenumberDiveDialog from '../components/RenumberDiveDialog.svelte';
@@ -28,7 +29,6 @@
     formatCylinderSize,
     formatDepth,
     formatDiveDay,
-    formatDuration,
         formatGasLong,
     formatNumber,
     formatPressure,
@@ -207,18 +207,6 @@
       showSnackbar(t('share.failed'));
     }
   }
-
-  /** Key figures under the title; a figure without a value is left out. */
-  const figures = $derived.by(() => {
-    if (!dive) return [];
-    const water = formatTemperature(dive.waterTempMk, prefs);
-    return [
-      dive.maxDepthMm ? { value: formatDepth(dive.maxDepthMm, prefs), label: t('detail.figureMaxDepth') } : null,
-      { value: formatDuration(dive.durationSeconds), label: t('detail.figureDuration') },
-      // Subsurface keeps the lowest water temperature of the dive.
-      water ? { value: water, label: t('detail.figureWaterMin') } : null,
-    ].filter((f) => f !== null);
-  });
 
   /** Secondary facts in a three-column grid (detail3 mock-ups); a fact without a value is hidden. */
   const facts = $derived.by(() => {
@@ -486,11 +474,7 @@
     </header>
     </div>
 
-    <div class="figures od-value">
-      {#each figures as figure (figure.label)}
-        <span class="figure"><span class="value">{figure.value}</span><span class="label">{figure.label}</span></span>
-      {/each}
-    </div>
+    <DiveFigures {dive} {prefs} />
 
     <DiveProfile
       samples={dive.samples}
@@ -681,31 +665,6 @@
       color: var(--od-text);
 
       &.not-set {
-        color: var(--od-text-2);
-      }
-    }
-
-    .figures {
-      padding: 14px 20px 0;
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-
-    .figure {
-      display: flex;
-      flex-direction: column;
-
-      /* Large key figures: the system font, as the titles (spec, "Fonts"). */
-      .value {
-        font-family: var(--od-title-font);
-        font-size: 28px;
-        line-height: normal;
-        font-weight: 800;
-        color: var(--od-text);
-      }
-
-      .label {
-        font-size: 13px;
         color: var(--od-text-2);
       }
     }

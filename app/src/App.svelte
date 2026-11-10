@@ -26,6 +26,7 @@
   import SiteSheet from './pages/SiteSheet.svelte';
   import SiteEdit from './pages/SiteEdit.svelte';
   import DivesWithoutSite from './pages/DivesWithoutSite.svelte';
+  import DiveNoSiteProfile from './pages/DiveNoSiteProfile.svelte';
   import SitesCleanup from './pages/SitesCleanup.svelte';
   import SitesUnplaced from './pages/SitesUnplaced.svelte';
   import Statistics from './pages/Statistics.svelte';
@@ -141,6 +142,7 @@
     { path: '/plan/:id', component: Planner },
     { path: '/sites/', component: Sites },
     { path: '/sites/without/', component: DivesWithoutSite },
+    { path: '/sites/without-site/:diveId', component: DiveNoSiteProfile },
     { path: '/sites/cleanup', component: SitesCleanup },
     { path: '/sites/unplaced/', component: SitesUnplaced },
     { path: '/sites/new', component: SiteEdit },

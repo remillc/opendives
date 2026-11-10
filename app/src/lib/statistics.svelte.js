@@ -9,7 +9,7 @@
 // are passed as an "id" criterion.
 import { OpenDivesCore } from 'opendives-core';
 import { t, tIfExists } from './i18n.js';
-import { formatDepth, formatGasLong, formatHours, formatLongDate, locale } from './format.js';
+import { formatGasLong, formatHours, formatLongDate, locale } from './format.js';
 import { filter } from './filter.svelte.js';
 
 /** @typedef {import('opendives-core').Dive} Dive */
@@ -81,17 +81,12 @@ export async function computeStatistics(criteria, options = {}) {
 }
 
 /**
- * Supporting line of a row: "4 plongées · 4 h 07 · max 28,7 m"; empty while
- * the core computes.
+ * Supporting line of a row: "4 plongées · 4 h 07"; empty while the core computes.
  * @param {StatsFigures|null|undefined} figures
- * @param {import('opendives-core').Prefs} prefs
  */
-export function summaryLine(figures, prefs) {
+export function summaryLine(figures) {
   if (!figures) return '';
-  const dives = t('trip.dives', { n: figures.dives });
-  return figures.maxDepthMm
-    ? t('stats.rowSummary', { dives, time: formatHours(figures.totalSeconds), depth: formatDepth(figures.maxDepthMm, prefs) })
-    : t('stats.rowSummaryNoDepth', { dives, time: formatHours(figures.totalSeconds) });
+  return t('stats.rowSummary', { dives: t('trip.dives', { n: figures.dives }), time: formatHours(figures.totalSeconds) });
 }
 
 /**

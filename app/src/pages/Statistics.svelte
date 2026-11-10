@@ -147,7 +147,7 @@
               <a href="/statistics/result?c={encodeCriteria(s.criteria)}&saved={s.id}" data-reload-detail="true" class="item-link item-content" onclick={select}>
                 <div class="item-inner">
                   <div class="item-title-row"><div class="item-title">{s.name}</div></div>
-                  <div class="item-text od-value">{summaryLine(saved[s.id], logbook.prefs)}</div>
+                  <div class="item-text od-value">{summaryLine(saved[s.id])}</div>
                 </div>
               </a>
             </li>
@@ -186,7 +186,7 @@
 
     {@render section(
       t('stats.byYear'),
-      yearly.map((y) => ({ key: String(y.year), title: String(y.year), numeric: true, support: summaryLine(y, logbook.prefs) })),
+      yearly.map((y) => ({ key: String(y.year), title: String(y.year), numeric: true, support: summaryLine(y) })),
     )}
     {@render section(t('stats.byMode'), result ? result.byMode.filter((m) => m.dives).map((m) => totalRow(m.mode, t(`detail.modes.${m.mode}`), m)) : null)}
     {@render section(t('stats.bySuit'), result ? result.bySuit.map((v) => totalRow(v.value, v.value || notSetLabel('suit'), v)) : null)}
