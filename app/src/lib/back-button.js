@@ -43,6 +43,12 @@ export function enableBackButton() {
       selection.dispatchEvent(new CustomEvent('od-cancel'));
       return;
     }
+    // 4b. The Sites search closes (pages/Sites.svelte).
+    const sitesSearch = document.querySelector('.od-sites-search.od-open');
+    if (sitesSearch) {
+      sitesSearch.dispatchEvent(new CustomEvent('od-cancel'));
+      return;
+    }
     // 5. An active search of the screen shown closes. Only that screen's: the
     // Logbook's search stays active under an opened dive, and Back then
     // returns to the list with its search, like the back arrow.
