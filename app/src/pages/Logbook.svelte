@@ -16,11 +16,11 @@
   import MenuButton from '../components/MenuButton.svelte';
   import SectionBand from '../components/SectionBand.svelte';
   import ActiveFilter from '../components/ActiveFilter.svelte';
-  import ConflictSheet from '../components/ConflictSheet.svelte';
   import RenumberDialog from '../components/RenumberDialog.svelte';
   import ExportSheet from '../components/ExportSheet.svelte';
   import { exportDives } from '../lib/share.js';
-  import { logbook, loadLogbook, importFile, undoLastChange, resolveConflict, sendConflictChoice, cancelConflictChoice, deleteDives, tripChange } from '../lib/logbook.svelte.js';
+  import { logbook, loadLogbook, importFile, undoLastChange, reopenConflict, deleteDives, tripChange } from '../lib/logbook.svelte.js';
+  import { conflictDiveCount } from '../lib/conflict-choices.js';
   import { confirmAction } from '../lib/dialogs.js';
   import { filter, loadOptions, applyFilter, isEmpty } from '../lib/filter.svelte.js';
   import { layout } from '../lib/layout.svelte.js';
@@ -331,42 +331,9 @@
   const showPill = $derived(!logbook.loading && !logbook.error && (conflictWaits || !!logbook.syncFailure || offlineWaits));
 
   const stoppedText = $derived.by(() => {
-    const dives = (logbook.conflict?.items ?? []).filter((item) => item.diveId || item.date).length;
+    const dives = conflictDiveCount(logbook.conflict);
     return dives ? t('conflict.stoppedDives', { n: dives }) : t('conflict.stopped');
   });
-
-  /**
-   * The conflict settled on this phone; nothing is sent while the snackbar
-   * can still take it back.
-   * @param {Record<string, 'device'|'cloud'>} choices
-   */
-  async function chooseConflict(choices) {
-    await resolveConflict(choices);
-    const kept = new Set(Object.values(choices));
-    let undone = false;
-    f7.toast
-      .create({
-        text: kept.size > 1 ? t('conflict.keptMixed') : t(kept.has('cloud') ? 'conflict.keptCloud' : 'conflict.keptDevice'),
-        cssClass: 'od-undo-toast',
-        closeButton: true,
-        closeButtonText: t('edit.undo'),
-        closeTimeout: 8000,
-        position: 'bottom',
-        on: {
-          closeButtonClick: () => {
-            undone = true;
-            cancelConflictChoice().catch((e) => {
-              console.error('Taking back the conflict choice', e);
-              f7.toast.show({ text: t('conflict.failed'), closeTimeout: 4000 });
-            });
-          },
-          closed: () => {
-            if (!undone) sendConflictChoice();
-          },
-        },
-      })
-      .open();
-  }
 
   /** "Exporter au format…" open (selection mode). */
   let exporting = $state(false);
@@ -1100,7 +1067,7 @@
   <SectionBand tall pill={showPill} summary={bandSummary}>
     {#if showPill}
       {#if conflictWaits}
-        <SyncPill icon="sync" text={stoppedText} onclick={() => (logbook.conflictLater = false)} />
+        <SyncPill icon="sync" text={stoppedText} onclick={reopenConflict} />
       {:else if logbook.syncFailure}
         <SyncFailureRow pill />
       {:else}
@@ -1335,8 +1302,6 @@
       }}
     />
   {/if}
-
-  <ConflictSheet conflict={logbook.conflictLater ? null : logbook.conflict} onchoose={chooseConflict} onlater={() => (logbook.conflictLater = true)} />
 
   <!-- The file picker of "Import a file" (hidden; any file: the core tells what it can read). -->
   <input type="file" class="od-sr-only" tabindex="-1" aria-hidden="true" bind:this={fileInput} onchange={fileChosen} />

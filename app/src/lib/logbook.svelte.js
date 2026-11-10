@@ -404,6 +404,16 @@ export async function resolveConflict(choices) {
   await countPending();
 }
 
+/** "Plus tard": the dialog closes, the diver stays where they were; sync stays paused. */
+export function postponeConflict() {
+  logbook.conflictLater = true;
+}
+
+/** The status row of the Carnet or the sync card of the side menu: the dialog again. */
+export function reopenConflict() {
+  logbook.conflictLater = false;
+}
+
 /** The snackbar is gone: the choice is sent, like an edit. */
 export async function sendConflictChoice() {
   choiceHeld = false;
@@ -450,7 +460,8 @@ async function persistChanges() {
   await OpenDivesCore.saveLocal();
   await countPending();
   clearTimeout(syncTimer);
-  if (logbook.email && logbook.autoSync && !logbook.conflict && !choiceHeld) syncTimer = setTimeout(syncEdits, SYNC_DELAY_MS);
+  // With a conflict waiting, the automatic sync that would run only brings the dialog back (syncEdits).
+  if (logbook.email && logbook.autoSync && !choiceHeld) syncTimer = setTimeout(syncEdits, SYNC_DELAY_MS);
 }
 
 /** The core's undo history was emptied (a load): no "Undo" may be offered any more. */
@@ -471,8 +482,14 @@ function undoCleared() {
  * @returns {Promise<SyncOutcome>}
  */
 async function syncEdits() {
-  // Paused while a conflict waits for the diver, and while its choice can be taken back.
-  if (logbook.conflict || choiceHeld) return /** @type {SyncOutcome} */ ('failed');
+  // Paused while a conflict waits for the diver: a sync attempt brings its dialog
+  // back ("Plus tard" lasts until the next attempt), and nothing is sent.
+  if (logbook.conflict) {
+    logbook.conflictLater = false;
+    return /** @type {SyncOutcome} */ ('failed');
+  }
+  // Also paused while the choice can be taken back.
+  if (choiceHeld) return /** @type {SyncOutcome} */ ('failed');
   logbook.syncProgress = null;
   logbook.sync = 'syncing';
   /** @type {SyncOutcome} */

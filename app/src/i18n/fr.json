@@ -1410,6 +1410,8 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Conflit sur plusieurs plongées : une boîte en plein écran avec un interrupteur « Même choix pour toutes » et une carte par plongée, où vous touchez la version à garder.",
+      "Conflit de synchronisation : « Plus tard » ferme la boîte et vous laisse où vous étiez ; l’état de synchronisation du Carnet et la carte de synchronisation du menu la rouvrent, et elle revient à la prochaine tentative de synchronisation.",
       "Cartes hors ligne : le choix d’une zone s’ouvre sur votre position actuelle.",
       "Cartes hors ligne : une zone sans site du carnet prend le nom du lieu.",
       "Cartes hors ligne : « Choisir sur la carte » montre maintenant un cadre fixe ; déplacez et zoomez la carte dessous, la zone qu’il couvre est celle qui sera téléchargée. Le niveau de détail est choisi pour vous, et la taille affichée est une estimation.",
@@ -2000,7 +2002,16 @@
     "empty": "(vide)",
     "failed": "Le choix n'a pas pu être enregistré. Rien n'a changé.",
     "unknownDive": "Plongée sans date",
-    "forAll": "Appliquer ce choix à toutes les plongées"
+    "titleMany": "{n} plongées en conflit",
+    "introMany": "Modifiées ici et dans le cloud, depuis un autre appareil. Pour chacune, touchez la version à garder. Rien n’est perdu tant que vous n’avez pas choisi. ✕ ferme sans rien changer : vous choisirez plus tard.",
+    "allSame": "Même choix pour toutes",
+    "allSameText": "Toutes ce téléphone, ou toutes le cloud",
+    "phoneShort": "Ce téléphone",
+    "cloudShort": "Cloud",
+    "differs": "diffère : {fields}",
+    "choiceFor": "Version à garder pour {name}",
+    "details": "Voir les détails : {name}",
+    "back": "Retour"
   },
   "confirmCode": {
     "heading": "Confirmer votre adresse",
