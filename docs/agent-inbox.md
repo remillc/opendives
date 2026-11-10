@@ -1103,3 +1103,10 @@ Christian approved (canvas comment). The button "Pas des doublons" had no action
 - Remember the decision in the logbook so it syncs: mark each pair of sites of the group as "not duplicates" (for example a key in each dive site's extra data listing the other site's uuid; keep the core unmodified). The duplicate finder skips marked pairs.
 - Drop the mark when either site changes name or position, so the pair can be proposed again.
 - fr and en keys.
+
+## [ ] 2026-11-10-05 Settings: confirm "Réinitialiser tous les réglages"
+
+Christian approved (canvas comment). Spec: "Settings, \"Réinitialiser tous les réglages\" asks first". Mock-up: `docs/mockups/reglages-reinitialiser-android.dc.html`.
+- The button opens an alert dialog with the title, text and buttons of the spec ("Annuler", "Réinitialiser"). Nothing is reset before "Réinitialiser".
+- After reset, snackbar "Réglages réinitialisés" (4 s). Downloaded offline maps, logbook data, account, planner settings and trip grouping are untouched.
+- fr and en keys.
