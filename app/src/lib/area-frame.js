@@ -3,10 +3,12 @@
 // The frame stays still on the screen; the diver moves and zooms the map under
 // it, and the downloaded area is what the frame covers. The map's zoom limits
 // keep that area between about 20 km across and the largest square that fits
-// OpenFreeMap's limit of 3,000 tiles at zoom 12.
+// OpenFreeMap's limit of 3,000 tiles at full detail (zoom 14).
 
-import { MAX_TILES, MAX_REGION_BYTES, MAX_ZOOM_LESS, countTiles, checkTiles, bboxSizeKm, normalizeBbox, rectAround } from './maps-logic.js';
+import { MAX_TILES, MAX_REGION_BYTES, countTiles, checkTiles, bboxSizeKm, normalizeBbox, rectAround } from './maps-logic.js';
 
+/** Regions are always downloaded at full detail. */
+const DETAIL_ZOOM = 14;
 /** Side of the frame on a normal screen, dp (CSS px). */
 export const FRAME_DP = 300;
 /** Smallest area the frame may cover, km across. */
@@ -45,7 +47,7 @@ export function zoomForFrameKm(lat, km, sidePx) {
 }
 
 /**
- * The largest square (km across) centred here whose tiles up to zoom 12 stay
+ * The largest square (km across) centred here whose tiles up to zoom 14 stay
  * within the limit. It depends on latitude: a degree of longitude is shorter
  * towards the poles, but a tile is too, so the same km hold more tiles there.
  * @param {number} lng @param {number} lat
@@ -56,7 +58,7 @@ export function maxFrameKm(lng, lat) {
   for (let i = 0; i < 30; i++) {
     const mid = (lo + hi) / 2;
     const half = mid / 2;
-    if (countTiles(rectAround(lng, lat, [half, half]), MAX_ZOOM_LESS) <= MAX_TILES) lo = mid;
+    if (countTiles(rectAround(lng, lat, [half, half]), DETAIL_ZOOM) <= MAX_TILES) lo = mid;
     else hi = mid;
   }
   return lo;
@@ -96,16 +98,15 @@ export function frameBbox(topLeft, bottomRight) {
 }
 
 /**
- * Detail and size of what a frame covers. The detail is automatic: zoom 14
- * when the area fits 3,000 tiles at that detail, otherwise zoom 12.
- * `maxZoom` is null when even zoom 12 is over the limit: no download.
+ * Size of what a frame covers. `maxZoom` is null when the area is over the
+ * limit of 3,000 tiles at full detail: no download.
  * @param {number[]} bbox
- * @returns {{ maxZoom: 14|12|null, count: number, fits: boolean, km: [number, number], bytes: number }}
+ * @returns {{ maxZoom: 14|null, count: number, fits: boolean, km: [number, number], bytes: number }}
  */
 export function frameDetail(bbox) {
   const c = checkTiles(bbox);
-  const count = c.maxZoom === 14 ? c.count14 : c.count12;
-  return { maxZoom: c.maxZoom, count, fits: c.maxZoom !== null, km: bboxSizeKm(bbox), bytes: estimateBytes(count) };
+  const fits = c.count14 <= MAX_TILES;
+  return { maxZoom: fits ? DETAIL_ZOOM : null, count: c.count14, fits, km: bboxSizeKm(bbox), bytes: estimateBytes(c.count14) };
 }
 
 /** The estimated download, bytes: never above the 50 MB at which a download stops. @param {number} tileCount */

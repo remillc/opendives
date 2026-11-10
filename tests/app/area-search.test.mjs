@@ -1,7 +1,7 @@
 // "Choisir sur la carte" search: site filter, default rectangle, Nominatim helpers.
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { foldText, filterSites, rectForPoint, waitBeforeRequest, placesUrl, placesKey, parsePlaces, NOMINATIM_GAP_MS } from '../../app/src/lib/area-search.js';
+import { parseReverse, placeNameAt, resetPlacesSearch as resetForReverse, foldText, filterSites, rectForPoint, waitBeforeRequest, placesUrl, placesKey, parsePlaces, NOMINATIM_GAP_MS } from '../../app/src/lib/area-search.js';
 import { checkTiles, bboxSizeKm } from '../../app/src/lib/maps-logic.js';
 
 const site = (name, country, lat, lon, hasLocation = true) => ({ name, country, hasLocation, latUdeg: lat * 1e6, lonUdeg: lon * 1e6 });
@@ -93,4 +93,18 @@ test('parsePlaces', () => {
   ];
   assert.deepEqual(parsePlaces(json), [{ name: 'Dahab', detail: 'South Sinai, Egypt', lng: 34.5, lat: 28.5 }]);
   assert.deepEqual(parsePlaces(null), []);
+});
+
+test('the name of a place comes from the reverse answer', () => {
+  assert.equal(parseReverse({ name: 'Bonaire' }), 'Bonaire');
+  assert.equal(parseReverse({ display_name: 'Kralendijk, Bonaire' }), 'Kralendijk');
+  assert.equal(parseReverse({ error: 'Unable to geocode' }), null);
+});
+
+test('a failed reverse request gives no name', async () => {
+  resetForReverse();
+  const deps = { now: () => 0, sleep: async () => {} };
+  assert.equal(await placeNameAt(1, 2, 'fr', { ...deps, fetchFn: async () => { throw new Error('offline'); } }), null);
+  resetForReverse();
+  assert.equal(await placeNameAt(1, 2, 'fr', { ...deps, fetchFn: async () => ({ ok: false, status: 500, json: async () => ({}) }) }), null);
 });

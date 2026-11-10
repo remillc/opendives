@@ -4,8 +4,7 @@
   // A full-screen map under a fixed square frame: the diver moves and zooms the
   // map, and the downloaded area is what the frame covers, computed from the
   // map (map.unproject of the frame's corners) when Download is pressed. The
-  // detail is automatic (zoom 14 when the frame fits OpenFreeMap's limit of
-  // 3,000 tiles at that detail, otherwise zoom 12), and the map's zoom limits
+  // detail is always full (zoom 14), and the map's zoom limits
   // keep the area between about 20 km across and the largest the limit allows
   // (lib/area-frame.js). The search floats on the map. Needs the network (the
   // map of the place is drawn from the online tiles).
@@ -17,7 +16,7 @@
   import { MAP_STYLE, showLabelsInLanguage } from '../lib/map-style.js';
   import { nearestSite } from '../lib/maps-logic.js';
   import { frameSide, zoomLimits, clampZoom, zoomForFrameKm, frameBbox, frameDetail } from '../lib/area-frame.js';
-  import { filterSites, searchPlaces } from '../lib/area-search.js';
+  import { filterSites, searchPlaces, placeNameAt } from '../lib/area-search.js';
   import { formatNumber } from '../lib/format.js';
   import { formatMapSize } from '../lib/maps-format.js';
   import { offlineMaps, addRegion } from '../lib/offline-maps.svelte.js';
@@ -58,10 +57,21 @@
   /** @param {number} km */
   const roundKm = (km) => (km >= 100 ? Math.round(km / 10) * 10 : Math.round(km));
 
-  /** The name proposed for an area: after the site nearest to its centre. @param {[number, number, number, number]} b */
-  function proposal(b) {
+  /** The centre of an area. @param {[number, number, number, number]} b @returns {[number, number]} */
+  function centreOf(b) {
     const east = b[0] <= b[2] ? b[2] : b[2] + 360;
-    const site = nearestSite((((b[0] + east) / 2 + 540) % 360) - 180, (b[1] + b[3]) / 2, located);
+    return [(((b[0] + east) / 2 + 540) % 360) - 180, (b[1] + b[3]) / 2];
+  }
+
+  /** The logbook's site nearest the centre, among those inside the area. @param {[number, number, number, number]} b */
+  function siteOf(b) {
+    const inside = located.filter((s) => s.lat >= b[1] && s.lat <= b[3] && (b[0] <= b[2] ? s.lng >= b[0] && s.lng <= b[2] : s.lng >= b[0] || s.lng <= b[2]));
+    return nearestSite(...centreOf(b), inside);
+  }
+
+  /** The name proposed for an area, after a site of the logbook inside it. @param {[number, number, number, number]} b */
+  function proposal(b) {
+    const site = siteOf(b);
     return site ? t('maps.area.around', { site: site.name }) : t('maps.area.aroundHere');
   }
 
@@ -225,7 +235,9 @@
     if (!b || !detail || detail.maxZoom === null) return;
     busy = true;
     try {
-      const label = name.trim() || proposal(b);
+      let label = name.trim() || proposal(b);
+      // No site of the logbook here: the name of the place, when it can be known.
+      if (!named && !siteOf(b)) label = (await placeNameAt(...centreOf(b), language)) ?? label;
       if (await addRegion(label, b, detail.maxZoom)) {
         // This screen also opens from the Sites map, without the list behind it.
         if (f7router.history[f7router.history.length - 2] === '/settings/maps/') f7router.back();
@@ -323,7 +335,6 @@
       <div class="field"><TextField label={t('maps.area.name')} bind:value={name} supporting={t('maps.area.nameHelp')} oninput={() => (named = true)} /></div>
       {#if info}
         {#if fits}
-          <p class="estimate">{t(info.maxZoom === 14 ? 'maps.area.detailFull' : 'maps.area.detailReduced')}</p>
           <p class="estimate">
             {t('maps.area.size', { width: formatNumber(roundKm(info.km[0]), 0), height: formatNumber(roundKm(info.km[1]), 0) })}
             {' · '}
@@ -492,6 +503,7 @@
 
     .sheet {
       position: absolute;
+      z-index: 2;
       left: 0;
       right: 0;
       bottom: 0;

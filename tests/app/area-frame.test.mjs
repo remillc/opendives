@@ -26,16 +26,16 @@ test('kmPerPx and zoomForFrameKm agree', () => {
   assert.ok(Math.abs(kmPerPx(40, z) * 300 - 20) < 1e-9);
 });
 
-test('the largest frame depends on latitude and stays within 3,000 tiles at zoom 12', () => {
+test('the largest frame depends on latitude and stays within 3,000 tiles at zoom 14', () => {
   const equator = maxFrameKm(10.3, 0);
   const north = maxFrameKm(10.3, 65);
-  assert.ok(equator > 300 && equator < 500, String(equator));
+  assert.ok(equator > 100 && equator < 130, String(equator));
   assert.ok(north < equator);
   for (const lat of [-60, -35, 0, 20, 48, 65]) {
     const km = maxFrameKm(7.7, lat);
     const half = km / 2;
     const rect = [7.7 - half / (111.32 * Math.cos((lat * Math.PI) / 180)), lat - half / 110.57, 7.7 + half / (111.32 * Math.cos((lat * Math.PI) / 180)), lat + half / 110.57];
-    assert.ok(countTiles(rect, 12) <= MAX_TILES, `${lat}: ${countTiles(rect, 12)}`);
+    assert.ok(countTiles(rect, 14) <= MAX_TILES, `${lat}: ${countTiles(rect, 14)}`);
   }
 });
 
@@ -48,7 +48,7 @@ test('at the zoom limits the frame covers 20 km at most zoomed in, and never mor
       const [w] = bboxSizeKm(cover(lng, lat, maxZoom, side));
       assert.ok(Math.abs(w - MIN_FRAME_KM) < 1.5, `${lat}: ${w}`);
       const out = cover(lng, lat, minZoom, side);
-      assert.ok(countTiles(out, 12) <= MAX_TILES, `${lat}: ${countTiles(out, 12)} tiles`);
+      assert.ok(countTiles(out, 14) <= MAX_TILES, `${lat}: ${countTiles(out, 14)} tiles`);
       assert.equal(clampZoom(0, { minZoom, maxZoom }), minZoom);
       assert.equal(clampZoom(30, { minZoom, maxZoom }), maxZoom);
     }
@@ -66,13 +66,14 @@ test('frameBbox keeps latitudes inside Web Mercator', () => {
   assert.ok(box[3] < 85.06 && box[1] > -85.06);
 });
 
-test('automatic detail: 14 when it fits, else 12, else none', () => {
+test('full detail when it fits, else no download', () => {
   const small = frameDetail(cover(2, 48, 9.5, 300));
   assert.equal(small.maxZoom, 14);
   assert.ok(small.fits && small.count <= MAX_TILES);
+  // Fits 3,000 tiles only at a lower zoom: not offered any more.
   const medium = frameDetail([10, -1.5, 13, 1.5]);
-  assert.equal(medium.maxZoom, 12);
-  assert.ok(medium.fits);
+  assert.equal(medium.maxZoom, null);
+  assert.equal(medium.fits, false);
   const large = frameDetail([10, -5, 20, 5]);
   assert.equal(large.maxZoom, null);
   assert.equal(large.fits, false);
