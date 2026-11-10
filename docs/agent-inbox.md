@@ -1312,3 +1312,10 @@ Follows task 2026-11-10-18. Spec: UI specification, section 4, "First launch, re
 - Portrait: heading in a 520 dp centred column, the profile across the width, then the choices and the git link in a 440 dp column centred vertically in the space left.
 - No scrolling in either orientation, on a small tablet too (to-do #32: check it, then tell Christian so the to-do can be removed).
 
+## [ ] 2026-11-10-24 Dive profile: cursor in the curve colour, curve buttons in their curve colour
+
+Spec: UI specification, section 4, "Dive profile, cursor and curve buttons" (new). Mock-ups: `docs/mockups/detail3-android.dc.html`, `detail3-android-curseur.dc.html`, `detail3-android-sombre.dc.html` (updated). Component: `app/src/components/DiveProfile.svelte`.
+- Cursor: remove the white outline; a 2 dp line in the profile curve colour, round caps.
+- Curve buttons, selected: text and check in the colour of their curve (Température: `--od-tertiary` #2F6DB5 in light, #8AB4F8 in dark). Light mode: white background and a 1 dp border in that colour, for contrast. Dark mode: usual selected background. Unselected: unchanged.
+- Colours as `--od-*` variables. A line in the release notes.
+
