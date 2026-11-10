@@ -157,6 +157,60 @@ export function kindOf(key) {
 }
 
 /**
+ * Rows of "Matériel" on Android that open several criteria on one screen
+ * (docs/mockups/filtre-android.dc.html).
+ * @type {Record<string, (keyof Criteria)[]>}
+ */
+export const combinedRows = {
+  cylinder: ['cylinderTypes', 'cylinderSize'],
+  gas: ['o2', 'he'],
+};
+
+/**
+ * The rows for some criteria of "Matériel": a combined row once, in the place
+ * of its first criterion.
+ * @param {{ key: keyof Criteria }[]} keys
+ * @returns {string[]}
+ */
+export function gearRows(keys) {
+  const rows = keys.map(({ key }) => Object.keys(combinedRows).find((r) => combinedRows[r].includes(key)) ?? key);
+  return [...new Set(rows)];
+}
+
+/**
+ * The criteria a row or a screen opens, those that apply to this logbook.
+ * @param {string} row a criterion, or a key of combinedRows
+ * @param {FilterOptions|null} options
+ * @returns {(keyof Criteria)[]}
+ */
+export function rowCriteria(row, options) {
+  const keys = combinedRows[row] ?? [/** @type {keyof Criteria} */ (row)];
+  const entries = groups.flatMap((g) => g.keys);
+  return keys.filter((key) => {
+    const entry = entries.find((k) => k.key === key);
+    return !entry || applies(entry, options);
+  });
+}
+
+/**
+ * Current value of a "Matériel" row.
+ * @param {string} row
+ * @param {FilterOptions|null} options
+ * @param {Criteria} c
+ * @param {Prefs} prefs
+ */
+export function gearValue(row, options, c, prefs) {
+  const set = rowCriteria(row, options).filter((key) => isSet(key, c));
+  if (!set.length) return t(`filter.anyRow.${row}`);
+  return set
+    .map((key) => {
+      const value = valueText(key, c, prefs);
+      return row === 'gas' ? t('filter.chip', { name: t(`filter.gasShort.${key}`), value }) : value;
+    })
+    .join(', ');
+}
+
+/**
  * Whether a criterion applies to this logbook (spec: a criterion that applies
  * to no dive is not shown). Without options yet, every criterion is offered.
  * @param {{ option?: keyof FilterOptions }} k
@@ -307,9 +361,17 @@ function fulltextOf(c) {
   return { fulltext: c.preset.fulltext, mode: c.preset.mode };
 }
 
+/**
+ * Whether a saved filter still holds rules that the page does not show.
+ * @param {SavedFilter|null} preset
+ */
+function hasRemainder(preset) {
+  return !!preset && (preset.rules.length > 0 || !!preset.fulltext.trim());
+}
+
 /** @param {Criteria} c */
 export function isEmpty(c) {
-  return JSON.stringify(c) === JSON.stringify(emptyCriteria());
+  return JSON.stringify({ ...c, preset: hasRemainder(c.preset) ? c.preset : null }) === JSON.stringify(emptyCriteria());
 }
 
 /**
@@ -370,12 +432,136 @@ export async function deletePreset(index) {
 }
 
 /**
- * The criteria of a saved filter: its rules, kept as the core keeps them.
+ * A bound in the core's unit as the diver would type it (the reverse of
+ * toCore); null when that text would not give back the same value.
+ * @param {keyof Criteria} key
+ * @param {number} value
+ * @param {Prefs} prefs
+ * @returns {string|null}
+ */
+function fromCore(key, value, prefs) {
+  if (!Number.isFinite(value)) return null;
+  /** @type {string} */
+  let text;
+  if (key === 'timeOfDay') {
+    text = `${Math.floor(value / 3600)}:${String(Math.floor((value % 3600) / 60)).padStart(2, '0')}`;
+  } else {
+    const shown = (/** @type {number} */ n) => String(Number(n.toFixed(3))).replace('.', formatNumber(1.5, 1).charAt(1));
+    switch (key) {
+      case 'depth':
+        text = shown(prefs.length === 'ft' ? value / 304.8 : value / 1000);
+        break;
+      case 'duration':
+        text = shown(value / 60);
+        break;
+      case 'sac':
+        text = shown(prefs.volume === 'cuft' ? value / 28316.8 : value / 1000);
+        break;
+      case 'waterTemp':
+      case 'airTemp': {
+        const celsius = value / 1000 - 273.15;
+        text = shown(prefs.temperature === 'F' ? (celsius * 9) / 5 + 32 : celsius);
+        break;
+      }
+      case 'cylinderSize':
+        text = shown(value / 1000);
+        break;
+      case 'o2':
+      case 'he':
+        text = shown(value / 10);
+        break;
+      default:
+        text = String(value);
+    }
+  }
+  return toCore(key, text, prefs) === value ? text : null;
+}
+
+/** Criterion of each of Subsurface's tokens (the reverse of TYPES). */
+const KEYS = /** @type {Record<string, keyof Criteria>} */ (
+  Object.fromEntries(Object.entries(TYPES).map(([key, type]) => [type, key]))
+);
+
+/**
+ * Puts one rule of a saved filter into the criteria it can be shown as.
+ * @param {Criteria} c
+ * @param {FilterRule} r
+ * @param {Prefs} prefs
+ * @returns {boolean} false when the page cannot show that rule as it is
+ */
+function fillFromRule(c, r, prefs) {
+  if (r.negate) return false;
+  if (r.type === 'dive_mode') {
+    const mode = r.data === String(1 << 0) ? 'oc' : r.data === String((1 << 1) | (1 << 2)) ? 'rebreather' : null;
+    if (!mode || c.mode !== 'all') return false;
+    c.mode = mode;
+    return true;
+  }
+  if (r.type === 'day_of_week') {
+    const bits = Number(r.data);
+    const days = choices.weekdays.filter((d) => bits & (1 << Number(d)));
+    if (c.weekdays.length || !days.length || days.length === 7) return false;
+    c.weekdays = days;
+    return true;
+  }
+  if (r.type === 'logged' || r.type === 'planned') {
+    if (c.planned.length) return false;
+    c.planned = [r.type];
+    return true;
+  }
+  const key = KEYS[r.type];
+  if (!key || isSet(key, c)) return false;
+  const kind = kindOf(key);
+  if (kind === 'list') {
+    if (r.stringMode !== 'exact') return false;
+    const values = r.data.split('\n').map((v) => v.trim()).filter(Boolean);
+    if (!values.length) return false;
+    /** @type {any} */ (c)[key] = values;
+    return true;
+  }
+  if (kind === 'text') {
+    const text = r.data.trim();
+    if (r.stringMode !== 'substring' || !text || text.includes('\n')) return false;
+    /** @type {any} */ (c)[key] = text;
+    return true;
+  }
+  const bounds = r.data.split(',');
+  if (kind === 'stars') {
+    const n = Number(bounds[0]);
+    if (r.rangeMode !== 'greater' || !Number.isInteger(n) || n < 1 || n > 5) return false;
+    /** @type {any} */ (c)[key] = n;
+    return true;
+  }
+  if (kind !== 'range' || bounds.length !== 2) return false;
+  const bound = (/** @type {string} */ s) =>
+    key === 'date' ? (/^(\d{4}-\d{2}-\d{2}) 00:00:00$/.exec(s.trim())?.[1] ?? null) : fromCore(key, Number(s), prefs);
+  const hasMin = r.rangeMode === 'range' || r.rangeMode === 'greater';
+  const hasMax = r.rangeMode === 'range' || r.rangeMode === 'less';
+  const min = hasMin ? bound(bounds[0]) : '';
+  const max = hasMax ? bound(bounds[1]) : '';
+  if ((!hasMin && !hasMax) || min === null || max === null) return false;
+  /** @type {any} */ (c)[key] = { min, max };
+  return true;
+}
+
+/**
+ * The criteria of a saved filter, filling the page. What the page cannot show
+ * (a filter made in Subsurface with a negation or another text mode) stays in
+ * `preset`, as the core keeps it, and still applies.
  * @param {import('opendives-core').FilterPreset} p
+ * @param {Prefs} prefs
  * @returns {Criteria}
  */
-export function presetCriteria(p) {
-  return { ...emptyCriteria(), preset: { name: p.name, fulltext: p.filter.fulltext, mode: p.filter.mode, rules: p.filter.rules } };
+export function presetCriteria(p, prefs) {
+  const c = emptyCriteria();
+  const rules = p.filter.rules.filter((r) => !fillFromRule(c, r, prefs));
+  let { fulltext } = p.filter;
+  if (fulltext.trim() && p.filter.mode === 'starts_with') {
+    c.fulltext = fulltext.trim();
+    fulltext = '';
+  }
+  c.preset = { name: p.name, fulltext, mode: p.filter.mode, rules };
+  return c;
 }
 
 /** Opening the Filter screen: the draft starts from the applied filter. */
@@ -513,7 +699,7 @@ export function valueText(key, c, prefs, tripName = (id) => id) {
 export function activeKeys(c) {
   /** @type {(keyof Criteria)[]} */
   const keys = [];
-  if (c.preset) keys.push('preset');
+  if (hasRemainder(c.preset)) keys.push('preset');
   if (c.mode !== 'all') keys.push('mode');
   for (const g of groups) for (const k of g.keys) if (isSet(k.key, c)) keys.push(k.key);
   return keys;
