@@ -1435,6 +1435,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "First launch (Android tablet): in landscape, the title and the dive profile on the left and the three choices on the right; in portrait, the title, the profile across the width, then the choices, centred. No scrolling, even on a small tablet.",
       "Statistics: a total of time under water from 24 h is written in days and hours, without minutes (\"80 d 16 h\"), in the key figures, the \"By …\" and \"My statistics\" rows and the dives of a row; under 24 h it stays in hours and minutes.",
       "Account (iPhone): signing in, creating an account, the confirmation code, bringing your logbook, the import and the git repository take the same layout as on Android: only “Cancel” or “Back” in the bar, a large title, rounded sections, a large capsule button and a dive profile.",
       "Dive profile: the cursor is a plain line in the colour of the curve, without a white outline; the curve buttons (Temperature, ppO₂, Ceiling…) take the colour of their curve when selected.",

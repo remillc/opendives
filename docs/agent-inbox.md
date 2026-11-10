@@ -1309,12 +1309,14 @@ Follows task 2026-11-10-21 (Android). Spec: System design, section 8, "Editorial
 
 Done in `EditorialPage.svelte` (its iOS look) and the inset groups of `AccountField`, `BringLogbook` and `ImportProgress` (20 pt corners; the rows of AccountField now get their rounded corners, which a class name had lost). Checked in the browser with the iOS look; no iPhone build here.
 
-## [ ] 2026-11-10-23 First launch on an Android tablet, landscape and portrait
+## [x] 2026-11-10-23 First launch on an Android tablet, landscape and portrait
 
 Follows task 2026-11-10-18. Spec: UI specification, section 4, "First launch, redesigned", paragraph "Tablet" (new). Mock-ups: `docs/mockups/android-tablette-premier-lancement-paysage.dc.html`, `docs/mockups/android-tablette-premier-lancement-portrait.dc.html` (new). Component: `app/src/components/Welcome.svelte`.
 - Landscape: heading (logo row, title) on the left with the profile at the bottom from the left edge; the three choices and the git link in a 440 dp column on the right, centred vertically.
 - Portrait: heading in a 520 dp centred column, the profile across the width, then the choices and the git link in a 440 dp column centred vertically in the space left.
 - No scrolling in either orientation, on a small tablet too (to-do #32: check it, then tell Christian so the to-do can be removed).
+
+Done in `feature/welcome-tablet`: tablet layouts (width from 768 px) in `WelcomeStart.svelte`, the old low-window rule now limited to phones; release note added.
 
 ## [x] 2026-11-10-24 Dive profile: cursor in the curve colour, curve buttons in their curve colour
 
