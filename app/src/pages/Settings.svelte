@@ -184,7 +184,7 @@
     p.length === 'ft' ? `${formatNumber(0.5, 1)} ${t('units.feet')}/s` : `${formatNumber(0.15, 2)} ${t('units.meters')}/s`,
   );
 
-  /** @param {'mixed'|'minutes'|'hours'} mode */
+  /** @param {'mixed'|'minutes'} mode */
   const durationExample = (mode) => `${formatDuration(2700, mode)}, ${formatDuration(4320, mode)}`;
 
   /** Depth wheel values (best-mix END), in mm: metre by metre, or 10 ft by 10 ft. */
@@ -314,12 +314,12 @@
           value: t(`settings.duration.${p.duration}`),
           current: p.duration,
           options: () =>
-            /** @type {const} */ (['mixed', 'hours', 'minutes']).map((mode) => ({
+            /** @type {const} */ (['mixed', 'minutes']).map((mode) => ({
               value: mode,
               label: t(`settings.duration.${mode}`),
               example: durationExample(mode),
             })),
-          set: (v) => setCore({ duration: /** @type {'mixed'|'minutes'|'hours'} */ (v) }),
+          set: (v) => setCore({ duration: /** @type {'mixed'|'minutes'} */ (v) }),
         },
         {
           kind: 'choice',

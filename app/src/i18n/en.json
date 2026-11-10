@@ -448,8 +448,6 @@
       "label": "Duration",
       "mixed": "Automatic",
       "mixedText": "In minutes under an hour, otherwise in hours and minutes",
-      "hours": "Hours and minutes",
-      "hoursText": "Always in hours and minutes",
       "minutes": "Minutes",
       "minutesText": "Always in minutes"
     },
@@ -1505,7 +1503,8 @@
       "Statistics: each row opens the list of its dives.",
       "Logbook: the month shown in the band is more discreet.",
       "Navigation buttons react to a touch at once.",
-      "Durations of an hour or more read “1 h 11” everywhere."
+      "Durations of an hour or more read “1 h 11” everywhere.",
+      "Settings: the “Always in hours and minutes” duration option is gone."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
