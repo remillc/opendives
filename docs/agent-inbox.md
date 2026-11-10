@@ -1088,3 +1088,10 @@ Christian approved these changes from canvas comments. Mock-up: `docs/mockups/an
 - Bottom sheet: the area size ("Environ 180 × 165 km") and estimated download size update as the zoom changes. Set a minimum and maximum zoom so the area stays between about 20 km and the size of the largest catalogue zone.
 - *Added at 06:09 on 10 November 2026:* the "Télécharger" button of the bottom sheet takes the full width of the sheet, 48 dp high (approved by Christian).
 - *Added at 06:21 on 10 November 2026:* the bottom panel is fixed: square corners, no drag handle, no shadow, a 1 dp divider on top. It is not a bottom sheet (approved by Christian).
+
+## [ ] 2026-11-10-03 Logo: short gradients ("dégradés courts")
+
+Christian chose a new colouring of the "Trois vagues" logo so the three wave layers stay apart at 64 px and below. Spec: "Logo (decided on 9 November 2026): Trois vagues" (gradients updated on 10 November). Reference: `docs/mockups/logo-petit-degrades-courts.dc.html`.
+- Already updated in the repo: `docs/brand/opendives-*.svg`, `app/public/favicon.svg`, `app/public/logo-{light,dark,small-light}.svg`, and the Android vector drawables `res/drawable/ic_launcher_foreground.xml`, `res/drawable/ic_splash_mark.xml`, `res/drawable-night/ic_splash_mark.xml`. Check them in a build.
+- Regenerate what is raster or generated from these sources: `res/mipmap-*/ic_launcher.png` and `ic_launcher_round.png`, the iOS app icon set when the iOS project exists, the store icon, and any other PNG export of the logo.
+- New gradients, light: #FBE3B2→#F4C98C, #E5A661→#D88A45, #C76A25→#A9490C; dark: #F5E2B0→#EFD08F, #EBAD60→#E3923C, #D9702A→#C2550F.
