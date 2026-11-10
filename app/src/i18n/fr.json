@@ -816,7 +816,13 @@
     "noAccount": "Commencer sans compte",
     "noAccountText": "Vos plongées restent seulement sur cet appareil : pas de sauvegarde, et pas de partage avec vos autres appareils. Vous pourrez créer un compte plus tard et y envoyer votre carnet.",
     "choicesLabel": "Façons de commencer",
-    "ownGit": "Utiliser mon propre dépôt git"
+    "ownGit": "Utiliser mon propre dépôt git",
+    "headline": "Votre carnet\nde plongée.",
+    "existingShort": "J’ai un compte Subsurface",
+    "existingNote": "Sauvegardé dans le cloud, consultable hors ligne",
+    "createShort": "Créer un compte",
+    "createNote": "Gratuit. Partagé entre vos appareils",
+    "noAccountNote": "Sur cet appareil seulement"
   },
   "signOut": {
     "title": "Se déconnecter ?",
@@ -1509,7 +1515,8 @@
       "Réglages : l’option de durée « Toujours en heures et minutes » est retirée.",
       "Désaturation : la dernière plongée du carnet, et « Vous pouvez prendre l’avion » quand l’attente est terminée.",
       "Lignes de plongée : la durée au-dessus, la profondeur en dessous.",
-      "Réglages : le système d’unités choisi reste en place après un redémarrage."
+      "Réglages : le système d’unités choisi reste en place après un redémarrage.",
+      "Premier lancement (Android) : une page plus simple, avec trois boutons et leur conséquence en une ligne."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",

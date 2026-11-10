@@ -816,7 +816,13 @@
     "noAccount": "Start without an account",
     "noAccountText": "Your dives stay on this device only: no backup, and no sharing with your other devices. You can create an account later and send your logbook to it.",
     "choicesLabel": "Ways to start",
-    "ownGit": "Use my own git repository"
+    "ownGit": "Use my own git repository",
+    "headline": "Your dive log.",
+    "existingShort": "I have a Subsurface account",
+    "existingNote": "Backed up in the cloud, readable offline",
+    "createShort": "Create an account",
+    "createNote": "Free. Shared across your devices",
+    "noAccountNote": "On this device only"
   },
   "signOut": {
     "title": "Sign out?",
@@ -1509,7 +1515,8 @@
       "Settings: the “Always in hours and minutes” duration option is gone.",
       "Desaturation: the last logbook dive, and “You can fly” once the wait is over.",
       "Dive rows: the duration above, the depth below.",
-      "Settings: the chosen unit system stays after a restart."
+      "Settings: the chosen unit system stays after a restart.",
+      "First launch (Android): a simpler page, with three buttons and their consequence on one line."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
