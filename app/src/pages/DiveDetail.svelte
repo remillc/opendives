@@ -25,6 +25,7 @@
   import { logbook, deleteDive, tripChange } from '../lib/logbook.svelte.js';
   import { layout } from '../lib/layout.svelte.js';
   import { offerUndo } from '../lib/undo.js';
+  import { readySiteMap } from '../lib/site-image.js';
   import { forgetDive, keepDive, preloadDives, readyDive } from '../lib/dive-preload.js';
   import {
     formatCylinderSize,
@@ -193,7 +194,13 @@
   /** "Partager" open: the sheet, then the system's share sheet. */
   // The map behind the header: the top bar is see-through over it,
   // and gets its colour back as soon as the text scrolls under it.
-  let imageShown = $state(false);
+  // True from the first frame when the picture was prepared ahead (no flash of the plain header).
+  let imageShown = $state(
+    (() => {
+      const c = dive?.siteCoordinates;
+      return !!c && readySiteMap(c.latUdeg, c.lonUdeg) !== null;
+    })(),
+  );
   let scrolled = $state(false);
   /** @param {HTMLElement} node */
   function watchScroll(node) {

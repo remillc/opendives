@@ -1434,6 +1434,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Dive: when you swipe to the next or previous dive, the site map and the details are already prepared; the screen arrives whole instead of filling in during the slide.",
       "Statistics and dive: a value is no longer cut in the middle of a number or a word; when the key figures do not fit side by side, the last one moves whole to the next line.",
       "Taps: a button, a menu or rail entry responds even if the finger slides a little while tapping; before, the tap was sometimes ignored.",
       "Start-up: the app no longer stays on a white screen when it starts before its look has loaded.",
