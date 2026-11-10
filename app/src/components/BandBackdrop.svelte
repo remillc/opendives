@@ -8,7 +8,7 @@
   // in <SectionBand bare>, above this layer, and fade as they leave.
   import { onMount } from 'svelte';
   import { locale } from '../lib/format.js';
-  import { monthName, yearText } from '../lib/carnet-months.js';
+  import { monthYearLabel } from '../lib/carnet-months.js';
   import { t } from '../lib/i18n.js';
 
   /**
@@ -71,8 +71,7 @@
     </svg>
     {#if group}
       <div class="od-band-heading" role="heading" aria-level="2">
-        <span class="od-band-year">{yearText(group.year, locale)}</span>
-        <span class="od-band-month">{monthName(group.month, locale)}</span>
+        <span class="od-band-month">{monthYearLabel(group.year, group.month, locale)}</span>
         <span class="od-band-count">{t('band.dives', { n: group.count })}</span>
       </div>
     {/if}
@@ -151,14 +150,9 @@
       display: flex;
       align-items: baseline;
       gap: 8px;
-      font-size: 18px;
-      line-height: 24px;
+      font-size: 14px;
+      line-height: 20px;
       opacity: var(--od-band-month-opacity, 0);
-    }
-
-    .od-band-year {
-      font-weight: 700;
-      font-variant-numeric: tabular-nums;
     }
 
     .od-band-month {
@@ -170,7 +164,6 @@
     }
 
     .od-band-count {
-      font-size: 14px;
       font-variant-numeric: tabular-nums;
       white-space: nowrap;
     }

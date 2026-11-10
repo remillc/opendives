@@ -1502,7 +1502,8 @@
       "Filter (Android): new page, cylinder and gas criteria grouped, a saved filter fills the page, and deleting one offers “Undo”.",
       "Filter: the explanatory sentences under the criteria are gone.",
       "What’s new: the version date next to its number, and the complete list.",
-      "Statistics: each row opens the list of its dives."
+      "Statistics: each row opens the list of its dives.",
+      "Logbook: the month shown in the band is more discreet."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",

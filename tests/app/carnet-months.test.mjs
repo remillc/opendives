@@ -1,7 +1,7 @@
 // Carnet: month grouping and the header kept on top (spec, "Carnet, month headers that stay on top").
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { monthKey, groupByMonth, monthName, yearText, stickyMonth } from '../../app/src/lib/carnet-months.js';
+import { monthKey, groupByMonth, monthYearLabel, stickyMonth } from '../../app/src/lib/carnet-months.js';
 
 /** @param {number} id @param {string} date @param {number} [trip] */
 const dive = (id, date, trip) => ({ id, date, trip: trip ? { id: trip, location: `Trip ${trip}` } : null });
@@ -59,12 +59,11 @@ test('flat grouping (search results) forms no trips', () => {
 });
 
 test('month names and years follow the locale', () => {
-  assert.equal(monthName(4, 'fr-FR'), 'Avril');
-  assert.equal(monthName(4, 'en-US'), 'April');
-  assert.equal(monthName(12, 'fr'), 'Décembre');
-  assert.equal(monthName(0, 'en'), '');
-  assert.equal(yearText(2014, 'fr-FR'), '2014');
-  assert.equal(yearText(2014, 'ar-EG'), '٢٠١٤');
+  assert.equal(monthYearLabel(2014, 4, 'fr-FR'), 'Avril 2014');
+  assert.equal(monthYearLabel(2014, 4, 'en-US'), 'April 2014');
+  assert.equal(monthYearLabel(2013, 12, 'fr'), 'Décembre 2013');
+  assert.equal(monthYearLabel(2014, 0, 'en'), '');
+  assert.equal(monthYearLabel(0, 4, 'en'), '');
 });
 
 // Rows of 44 (headers) and 72, from `top`; the bar ends at 100 and the kept header is 50 high.
