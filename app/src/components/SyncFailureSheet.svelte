@@ -37,36 +37,36 @@
   }
 </script>
 
-<Sheet opened={logbook.syncFailureOpen && !!logbook.syncFailure} swipeToClose backdrop class="od-failure-sheet" style="height: auto" onSheetClosed={close}>
-  <div class="sheet" role="dialog" aria-labelledby="od-failure-title">
-    <div class="handle" aria-hidden="true"></div>
+<Sheet opened={logbook.syncFailureOpen && !!logbook.syncFailure} swipeToClose backdrop class="od-sync-failure-sheet od-sync-failure-sheet--failure-sheet" style="height: auto" onSheetClosed={close}>
+  <div class="od-sync-failure-sheet--sheet" role="dialog" aria-labelledby="od-failure-title">
+    <div class="od-sync-failure-sheet--handle" aria-hidden="true"></div>
     <span class="badge" aria-hidden="true"><Icon name={ICONS[cause]} weight={2} /></span>
-    <h2 id="od-failure-title" class="title">{t(`sync.failure.${cause}.title`)}</h2>
-    <p class="text">
+    <h2 id="od-failure-title" class="od-sync-failure-sheet--title">{t(`sync.failure.${cause}.title`)}</h2>
+    <p class="od-sync-failure-sheet--text">
       {t(`sync.failure.${cause}.intro`)}
       {#if cause === 'server' && logbook.retryMinutes}{t('sync.failure.server.retry', { n: logbook.retryMinutes })}{/if}
       {stays}
     </p>
-    <div class="actions">
-      <button type="button" class="text-button" onclick={close}>{t(cause === 'server' ? 'sync.failure.close' : 'sync.failure.later')}</button>
-      <button type="button" class="tonal" onclick={act}>{t(`sync.failure.${cause}.action`)}</button>
+    <div class="od-sync-failure-sheet--actions">
+      <button type="button" class="od-sync-failure-sheet--text-button" onclick={close}>{t(cause === 'server' ? 'sync.failure.close' : 'sync.failure.later')}</button>
+      <button type="button" class="od-sync-failure-sheet--tonal" onclick={act}>{t(`sync.failure.${cause}.action`)}</button>
     </div>
   </div>
 </Sheet>
 
 <style>
   @layer od.components {
-    :global(.od-failure-sheet) {
+    :global(.od-sync-failure-sheet--failure-sheet) {
       border-radius: 28px 28px 0 0;
       background: var(--od-dialog);
       overflow: hidden;
     }
 
-    .sheet {
+    .od-sync-failure-sheet--sheet {
       padding: 0 24px calc(32px + var(--f7-safe-area-bottom, 0px));
     }
 
-    .handle {
+    .od-sync-failure-sheet--handle {
       width: 32px;
       height: 4px;
       margin: 22px auto 20px;
@@ -85,7 +85,7 @@
       color: var(--od-on-secondary-container);
     }
 
-    .title {
+    .od-sync-failure-sheet--title {
       margin: 16px 0 8px;
       font-size: 22px;
       line-height: 28px;
@@ -93,7 +93,7 @@
       color: var(--od-text);
     }
 
-    .text {
+    .od-sync-failure-sheet--text {
       margin: 0;
       font-size: 14px;
       line-height: 20px;
@@ -101,7 +101,7 @@
       color: var(--od-text-2);
     }
 
-    .actions {
+    .od-sync-failure-sheet--actions {
       display: flex;
       justify-content: flex-end;
       gap: 8px;
@@ -119,14 +119,14 @@
       }
     }
 
-    .text-button {
+    .od-sync-failure-sheet--text-button {
       padding: 0 12px;
       background: transparent;
       color: var(--od-text);
       font-weight: 500;
     }
 
-    .tonal {
+    .od-sync-failure-sheet--tonal {
       padding: 0 24px;
       background: var(--od-tonal);
       color: var(--od-on-secondary-container);

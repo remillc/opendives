@@ -252,13 +252,13 @@
   );
 </script>
 
-<div class="profile od-block no-swipeback">
-  <div class="readout od-value" aria-hidden="true">
+<div class="od-dive-profile od-dive-profile--profile od-block no-swipeback">
+  <div class="od-dive-profile--readout od-value" aria-hidden="true">
     {#if cursor !== null}
       <span>{t('profile.time')} <strong>{formatMinSec(times[cursor])}</strong></span>
       <span>{t('profile.depth')} <strong>{formatDepth(depths[cursor], prefs)}</strong></span>
       {#if showTemperature && temperature && temperature.mk[cursor] > 0}
-        <span>{t('profile.water')} <strong class="water">{formatTemperature(temperature.mk[cursor], prefs)}</strong></span>
+        <span>{t('profile.water')} <strong class="od-dive-profile--water">{formatTemperature(temperature.mk[cursor], prefs)}</strong></span>
       {/if}
       {#if showPpo2}
         <span>{t('profile.ppo2')} <strong>{formatNumber(samples.ppo2Mbar[cursor] / 1000, 2)} bar</strong></span>
@@ -267,11 +267,11 @@
         <span>{t('profile.ceiling')} <strong>{formatDepth(ceilingMm[cursor], prefs)}</strong></span>
       {/if}
     {:else}
-      <span class="hint">{t('profile.hint')}</span>
+      <span class="od-dive-profile--hint">{t('profile.hint')}</span>
     {/if}
   </div>
 
-  <div class="frame" bind:clientWidth={width}>
+  <div class="od-dive-profile--frame" bind:clientWidth={width}>
     <svg
       {width}
       height={HEIGHT + (gasLayer ? BAND + 4 : 0)}
@@ -289,31 +289,31 @@
 
       {#each ticks.list as tick (tick.value)}
         {#if tick.major}
-          <line class="grid" x1={MARGIN_LEFT} x2={MARGIN_LEFT + plotWidth} y1={y(tick.mm)} y2={y(tick.mm)} />
-          <text class="tick od-value" x={MARGIN_LEFT - 4} y={y(tick.mm) + 4} text-anchor="end"
+          <line class="od-dive-profile--grid" x1={MARGIN_LEFT} x2={MARGIN_LEFT + plotWidth} y1={y(tick.mm)} y2={y(tick.mm)} />
+          <text class="od-dive-profile--tick od-value" x={MARGIN_LEFT - 4} y={y(tick.mm) + 4} text-anchor="end"
             >{tick.value === 0 ? `0 ${depthUnit(prefs)}` : tick.value}</text
           >
         {:else}
-          <line class="axis" x1={MARGIN_LEFT} x2={MARGIN_LEFT + 5} y1={y(tick.mm)} y2={y(tick.mm)} />
+          <line class="od-dive-profile--axis" x1={MARGIN_LEFT} x2={MARGIN_LEFT + 5} y1={y(tick.mm)} y2={y(tick.mm)} />
         {/if}
       {/each}
 
       {#if paths}
         <path d={paths.water} fill="url(#water-{uid})" />
         {#if ceilingLayer && ceilingShape}
-          <path d={ceilingShape.area} class="ceiling-area" />
-          <path d={ceilingShape.edge} class="ceiling-line" />
+          <path d={ceilingShape.area} class="od-dive-profile--ceiling-area" />
+          <path d={ceilingShape.edge} class="od-dive-profile--ceiling-line" />
         {/if}
-        <path d={paths.line} class="trace-outline" />
-        <path d={paths.line} class="trace" />
+        <path d={paths.line} class="od-dive-profile--trace-outline" />
+        <path d={paths.line} class="od-dive-profile--trace" />
       {/if}
 
-      <line class="axis" x1={MARGIN_LEFT} x2={MARGIN_LEFT + plotWidth} y1={MARGIN_TOP + plotHeight} y2={MARGIN_TOP + plotHeight} />
+      <line class="od-dive-profile--axis" x1={MARGIN_LEFT} x2={MARGIN_LEFT + plotWidth} y1={MARGIN_TOP + plotHeight} y2={MARGIN_TOP + plotHeight} />
       {#each timeTicks.list as tick (tick.m)}
         {@const tx = x(tick.m * 60)}
-        <line class="axis" x1={tx} x2={tx} y1={MARGIN_TOP + plotHeight} y2={MARGIN_TOP + plotHeight + (tick.major ? 6 : 4)} />
+        <line class="od-dive-profile--axis" x1={tx} x2={tx} y1={MARGIN_TOP + plotHeight} y2={MARGIN_TOP + plotHeight + (tick.major ? 6 : 4)} />
         {#if tick.major}
-          <text class="tick od-value" x={tx} y={MARGIN_TOP + plotHeight + 17} text-anchor="middle"
+          <text class="od-dive-profile--tick od-value" x={tx} y={MARGIN_TOP + plotHeight + 17} text-anchor="middle"
             >{tick.m === timeTicks.lastMajor && tick.m > 0 ? `${tick.m} ${t('units.minutes')}` : tick.m}</text
           >
         {/if}
@@ -321,20 +321,20 @@
 
       {#if showPpo2}
         {#each [1.4, 1.6] as limit (limit)}
-          <line class="ppo2-limit" x1={MARGIN_LEFT} x2={MARGIN_LEFT + plotWidth} y1={yPpo2(limit)} y2={yPpo2(limit)} />
+          <line class="od-dive-profile--ppo2-limit" x1={MARGIN_LEFT} x2={MARGIN_LEFT + plotWidth} y1={yPpo2(limit)} y2={yPpo2(limit)} />
         {/each}
-        <path d={ppo2Path} class="ppo2" />
+        <path d={ppo2Path} class="od-dive-profile--ppo2" />
       {/if}
       {#if showTemperature}
-        <path d={temperaturePath} class="temperature" />
+        <path d={temperaturePath} class="od-dive-profile--temperature" />
       {/if}
       {#if rightScale === 'temperature'}
         {#each temperatureLabels as label (label.y)}
-          <text class="temperature-label od-value" x={MARGIN_LEFT + plotWidth + 2} y={label.y}>{label.text}</text>
+          <text class="od-dive-profile--temperature-label od-value" x={MARGIN_LEFT + plotWidth + 2} y={label.y}>{label.text}</text>
         {/each}
       {:else if rightScale === 'ppo2'}
         {#each ppo2Labels as label (label.y)}
-          <text class="ppo2-label od-value" x={MARGIN_LEFT + plotWidth + 2} y={label.y}>{label.text}</text>
+          <text class="od-dive-profile--ppo2-label od-value" x={MARGIN_LEFT + plotWidth + 2} y={label.y}>{label.text}</text>
         {/each}
       {/if}
 
@@ -342,7 +342,7 @@
         {#each gasSegments as s, i (i)}
           {@const x1 = x(s.start)}
           {@const x2 = Math.max(x(s.end), x1 + 1)}
-          <g class="gas" class:oxygen={s.oxygen}>
+          <g class="od-dive-profile--gas" class:od-dive-profile--oxygen={s.oxygen}>
             <rect x={x1} y={HEIGHT + 2} width={x2 - x1} height={BAND} rx="3" />
             {#if x2 - x1 > 44}
               <text x={x1 + 6} y={HEIGHT + 2 + BAND / 2 + 4}>{s.name}</text>
@@ -353,10 +353,10 @@
 
       {#if cursor !== null}
         <!-- Halo in the block color, so that the cursor stays visible on any water color. -->
-        <line class="cursor-halo" x1={x(times[cursor])} x2={x(times[cursor])} y1={MARGIN_TOP} y2={MARGIN_TOP + scaleHeight} />
-        <line class="cursor" x1={x(times[cursor])} x2={x(times[cursor])} y1={MARGIN_TOP} y2={MARGIN_TOP + scaleHeight} />
+        <line class="od-dive-profile--cursor-halo" x1={x(times[cursor])} x2={x(times[cursor])} y1={MARGIN_TOP} y2={MARGIN_TOP + scaleHeight} />
+        <line class="od-dive-profile--cursor" x1={x(times[cursor])} x2={x(times[cursor])} y1={MARGIN_TOP} y2={MARGIN_TOP + scaleHeight} />
         {#if showTemperature && temperature && temperature.mk[cursor] > 0}
-          <circle class="temperature-dot" cx={x(times[cursor])} cy={yTemperature(temperature.mk[cursor])} r="4" />
+          <circle class="od-dive-profile--temperature-dot" cx={x(times[cursor])} cy={yTemperature(temperature.mk[cursor])} r="4" />
         {/if}
       {/if}
     </svg>
@@ -365,43 +365,43 @@
   {#if tissuesLayer && tissuesAvailable}
     <!-- Tissues: a separate drawing under the chart, so that the PDF sheet keeps the chart alone. -->
     <svg
-      class="tissues"
+      class="od-dive-profile--tissues"
       width={tissuesWidth}
       height={T_HEIGHT}
       role="img"
       aria-label={t('profile.tissuesLabel')}
     >
-      <path class="tissue-limit" d="M0 {T_TOP} H{tissuesWidth}" />
+      <path class="od-dive-profile--tissue-limit" d="M0 {T_TOP} H{tissuesWidth}" />
       {#each tissueValues as percent, c (c)}
         {@const h = tissueHeight(percent)}
         <rect x={c * (tissueBar + T_GAP)} y={T_BOTTOM - h} width={tissueBar} height={h} rx="2" style:fill={tissueColor(percent)} />
       {/each}
-      <text class="tick od-value" x="0" y={T_HEIGHT - 4}>{t('desaturation.fast')}</text>
-      <text class="tick od-value" x={tissuesWidth} y={T_HEIGHT - 4} text-anchor="end">{t('desaturation.slow')}</text>
+      <text class="od-dive-profile--tick od-value" x="0" y={T_HEIGHT - 4}>{t('desaturation.fast')}</text>
+      <text class="od-dive-profile--tick od-value" x={tissuesWidth} y={T_HEIGHT - 4} text-anchor="end">{t('desaturation.slow')}</text>
     </svg>
   {/if}
 
   {#if temperatureAvailable || gasAvailable || ppo2Available || ceilingAvailable || tissuesAvailable}
-    <div class="layers" role="group" aria-label={t('profile.layers')}>
+    <div class="od-dive-profile--layers" role="group" aria-label={t('profile.layers')}>
       <!-- MD3 filter chips, 48 px targets around 32 px chips (spec, section 3); the row scrolls sideways. -->
       {#if temperatureAvailable}
         <button
           type="button"
-          class="filter"
+          class="od-dive-profile--filter"
           aria-pressed={temperatureLayer}
           onclick={() => {
             temperatureLayer = !temperatureLayer;
             trackScale('temperature', temperatureLayer);
           }}
         >
-          <span class="chip" class:chip-outline={!temperatureLayer}>
+          <span class="chip od-dive-profile--chip" class:od-dive-profile--chip-outline={!temperatureLayer}>
             {#if temperatureLayer}<Icon name="check" size={18} weight={2.4} />{/if}<span class="chip-label">{t('profile.temperature')}</span>
           </span>
         </button>
       {/if}
       {#if gasAvailable}
-        <button type="button" class="filter" aria-pressed={gasLayer} onclick={() => (gasLayer = !gasLayer)}>
-          <span class="chip" class:chip-outline={!gasLayer}>
+        <button type="button" class="od-dive-profile--filter" aria-pressed={gasLayer} onclick={() => (gasLayer = !gasLayer)}>
+          <span class="chip od-dive-profile--chip" class:od-dive-profile--chip-outline={!gasLayer}>
             {#if gasLayer}<Icon name="check" size={18} weight={2.4} />{/if}<span class="chip-label">{t('profile.gas')}</span>
           </span>
         </button>
@@ -409,28 +409,28 @@
       {#if ppo2Available}
         <button
           type="button"
-          class="filter"
+          class="od-dive-profile--filter"
           aria-pressed={ppo2Layer}
           onclick={() => {
             ppo2Layer = !ppo2Layer;
             trackScale('ppo2', ppo2Layer);
           }}
         >
-          <span class="chip" class:chip-outline={!ppo2Layer}>
+          <span class="chip od-dive-profile--chip" class:od-dive-profile--chip-outline={!ppo2Layer}>
             {#if ppo2Layer}<Icon name="check" size={18} weight={2.4} />{/if}<span class="chip-label">{t('profile.ppo2')}</span>
           </span>
         </button>
       {/if}
       {#if ceilingAvailable}
-        <button type="button" class="filter" aria-pressed={ceilingLayer} onclick={() => (ceilingLayer = !ceilingLayer)}>
-          <span class="chip" class:chip-outline={!ceilingLayer}>
+        <button type="button" class="od-dive-profile--filter" aria-pressed={ceilingLayer} onclick={() => (ceilingLayer = !ceilingLayer)}>
+          <span class="chip od-dive-profile--chip" class:od-dive-profile--chip-outline={!ceilingLayer}>
             {#if ceilingLayer}<Icon name="check" size={18} weight={2.4} />{/if}<span class="chip-label">{t('profile.ceiling')}</span>
           </span>
         </button>
       {/if}
       {#if tissuesAvailable}
-        <button type="button" class="filter" aria-pressed={tissuesLayer} onclick={() => (tissuesLayer = !tissuesLayer)}>
-          <span class="chip" class:chip-outline={!tissuesLayer}>
+        <button type="button" class="od-dive-profile--filter" aria-pressed={tissuesLayer} onclick={() => (tissuesLayer = !tissuesLayer)}>
+          <span class="chip od-dive-profile--chip" class:od-dive-profile--chip-outline={!tissuesLayer}>
             {#if tissuesLayer}<Icon name="check" size={18} weight={2.4} />{/if}<span class="chip-label">{t('profile.tissues')}</span>
           </span>
         </button>
@@ -442,7 +442,7 @@
 <style>
   @layer od.components {
     /* The profile sits in a rounded block (white in the light themes). */
-    .profile {
+    .od-dive-profile--profile {
       margin: 14px 16px 0;
       border-radius: 16px;
       overflow: hidden;
@@ -452,7 +452,7 @@
       display: block;
     }
 
-    .readout {
+    .od-dive-profile--readout {
       display: flex;
       flex-wrap: wrap;
       gap: 0 16px;
@@ -465,130 +465,130 @@
       strong {
         color: var(--od-text);
 
-        &.water {
+        &.od-dive-profile--water {
           color: var(--od-temperature);
         }
       }
     }
 
-    .hint {
+    .od-dive-profile--hint {
       font-size: 12px;
     }
 
-    .frame {
+    .od-dive-profile--frame {
       width: 100%;
       touch-action: pan-y;
       user-select: none;
     }
 
-    .grid {
+    .od-dive-profile--grid {
       stroke: var(--od-chart-grid);
       stroke-width: 1;
     }
 
-    .axis {
+    .od-dive-profile--axis {
       stroke: var(--od-text-2);
       stroke-width: 1;
     }
 
-    .temperature {
+    .od-dive-profile--temperature {
       fill: none;
       stroke: var(--od-temperature);
       stroke-width: 2;
       stroke-linejoin: round;
     }
 
-    .ppo2 {
+    .od-dive-profile--ppo2 {
       fill: none;
       stroke: var(--od-oxygen);
       stroke-width: 2;
       stroke-linejoin: round;
     }
 
-    .ppo2-limit {
+    .od-dive-profile--ppo2-limit {
       stroke: var(--od-oxygen);
       stroke-opacity: 0.4;
       stroke-width: 1;
       stroke-dasharray: 4 4;
     }
 
-    .ppo2-label {
+    .od-dive-profile--ppo2-label {
       font-size: 10px;
       fill: var(--od-oxygen);
     }
 
     /* The ceiling (as on the planner): an exception to the rule that keeps
        --od-alarm for violations (spec, section 4). */
-    .ceiling-area {
+    .od-dive-profile--ceiling-area {
       fill: var(--od-alarm);
       fill-opacity: 0.35;
     }
 
-    .ceiling-line {
+    .od-dive-profile--ceiling-line {
       fill: none;
       stroke: var(--od-alarm);
       stroke-width: 1.5;
     }
 
-    .tissue-limit {
+    .od-dive-profile--tissue-limit {
       stroke: var(--od-text-2);
       stroke-width: 1;
       stroke-dasharray: 3 3;
     }
 
-    .tissues {
+    .od-dive-profile--tissues {
       display: block;
       margin: 6px 12px 0;
       touch-action: pan-y;
     }
 
-    .temperature-label {
+    .od-dive-profile--temperature-label {
       font-size: 10px;
       fill: var(--od-temperature);
     }
 
-    .tick {
+    .od-dive-profile--tick {
       font-size: 11px;
       fill: var(--od-text-2);
     }
 
     /* Dark mode: a 4.5 px outline under the 2 px line keeps it readable on the bright water. */
-    .trace-outline {
+    .od-dive-profile--trace-outline {
       fill: none;
       stroke: var(--od-trace-outline);
       stroke-width: 4.5;
       stroke-linejoin: round;
     }
 
-    .trace {
+    .od-dive-profile--trace {
       fill: none;
       stroke: var(--od-trace);
       stroke-width: 2;
       stroke-linejoin: round;
     }
 
-    .cursor {
+    .od-dive-profile--cursor {
       stroke: var(--od-cursor);
       stroke-width: 2;
     }
 
-    .cursor-halo {
+    .od-dive-profile--cursor-halo {
       stroke: var(--od-block);
       stroke-width: 5;
     }
 
-    .temperature-dot {
+    .od-dive-profile--temperature-dot {
       fill: var(--od-temperature);
       stroke: var(--od-block);
       stroke-width: 2;
     }
 
-    .gas {
+    .od-dive-profile--gas {
       rect {
         fill: var(--od-tint);
       }
 
-      &.oxygen rect {
+      &.od-dive-profile--oxygen rect {
         stroke: var(--od-oxygen);
         stroke-width: 2;
       }
@@ -599,7 +599,7 @@
       }
     }
 
-    .layers {
+    .od-dive-profile--layers {
       display: flex;
       flex-wrap: nowrap;
       gap: 8px;
@@ -607,15 +607,15 @@
       overflow-x: auto;
     }
 
-    .chip {
+    .od-dive-profile--chip {
       gap: 8px;
 
-      &:not(.chip-outline) {
+      &:not(.od-dive-profile--chip-outline) {
         padding-left: 8px;
       }
     }
 
-    .filter {
+    .od-dive-profile--filter {
       flex: none;
       width: auto;
       min-height: 48px;
@@ -631,7 +631,7 @@
   }
 
   /* Framework7's variable, outside the layers. */
-  .layers {
+  .od-dive-profile--layers {
     --f7-chip-outline-border-color: var(--od-chip-outline);
   }
 </style>

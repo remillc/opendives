@@ -13,22 +13,22 @@
   let { title, rows } = $props();
 </script>
 
-<h2 class="title">{title}</h2>
-<div class="results" role="list" aria-live="polite">
+<h2 class="od-gas-results od-gas-results--title">{title}</h2>
+<div class="od-gas-results od-gas-results--results" role="list" aria-live="polite">
   {#each rows as row, i (i)}
-    <div class="result" role="listitem">
-      <span class="texts">
-        <span class="name">{row.title}</span>
-        <span class="sub" class:alarm={row.alarm}>{row.sub}</span>
+    <div class="od-gas-results--result" role="listitem">
+      <span class="od-gas-results--texts">
+        <span class="od-gas-results--name">{row.title}</span>
+        <span class="od-gas-results--sub" class:od-gas-results--alarm={row.alarm}>{row.sub}</span>
       </span>
-      <span class="value od-value">{row.value}</span>
+      <span class="od-gas-results--value od-value">{row.value}</span>
     </div>
   {/each}
 </div>
 
 <style>
   @layer od.components {
-    .title {
+    .od-gas-results--title {
       margin: 0;
       padding: 20px 20px 8px;
       font-size: 18px;
@@ -36,14 +36,14 @@
       font-weight: 700;
     }
 
-    .results {
+    .od-gas-results--results {
       margin: 0 16px;
       border-radius: 20px;
       background: var(--od-surface);
       overflow: hidden;
     }
 
-    .result {
+    .od-gas-results--result {
       display: flex;
       align-items: center;
       gap: 16px;
@@ -52,29 +52,29 @@
       box-sizing: border-box;
     }
 
-    .texts {
+    .od-gas-results--texts {
       flex: 1;
       min-width: 0;
       display: flex;
       flex-direction: column;
     }
 
-    .name {
+    .od-gas-results--name {
       font-size: 16px;
       line-height: 24px;
     }
 
-    .sub {
+    .od-gas-results--sub {
       font-size: 14px;
       line-height: 20px;
       color: var(--od-text-2);
 
-      &.alarm {
+      &.od-gas-results--alarm {
         color: var(--od-alarm);
       }
     }
 
-    .value {
+    .od-gas-results--value {
       flex: none;
       font-size: 24px;
       line-height: 32px;

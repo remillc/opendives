@@ -277,28 +277,28 @@
   }
 </script>
 
-<Page class="od-maps-area" noToolbar>
+<Page class="od-settings-maps-area" noToolbar>
   <Navbar title={t('maps.area.title')}>
     {#snippet left()}
       <Link back iconOnly>
-        <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" class="close"><path d="M6 6l12 12 M18 6L6 18" /></svg>
+        <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" class="od-settings-maps-area--close"><path d="M6 6l12 12 M18 6L6 18" /></svg>
         <span class="od-sr-only">{t('detail.back')}</span>
       </Link>
     {/snippet}
   </Navbar>
 
-  <div class="stage no-swipeback" bind:this={stage}>
+  <div class="od-settings-maps-area--stage no-swipeback" bind:this={stage}>
     {#if offlineMaps.online}
-      <div class="canvas" bind:this={container} role="region" aria-label={t('maps.area.mapLabel')}></div>
-      <div class="veil" aria-hidden="true" style:left="{frame.left}px" style:top="{frame.top}px" style:width="{frame.side}px" style:height="{frame.side}px">
-        <i class="mark nw"></i><i class="mark ne"></i><i class="mark sw"></i><i class="mark se"></i>
+      <div class="od-settings-maps-area--canvas" bind:this={container} role="region" aria-label={t('maps.area.mapLabel')}></div>
+      <div class="od-settings-maps-area--veil" aria-hidden="true" style:left="{frame.left}px" style:top="{frame.top}px" style:width="{frame.side}px" style:height="{frame.side}px">
+        <i class="od-settings-maps-area--mark od-settings-maps-area--nw"></i><i class="od-settings-maps-area--mark od-settings-maps-area--ne"></i><i class="od-settings-maps-area--mark od-settings-maps-area--sw"></i><i class="od-settings-maps-area--mark od-settings-maps-area--se"></i>
       </div>
-      <p class="credits" style:bottom="{sheetHeight + 8}px">{t('sites.mapCredits')}</p>
+      <p class="od-settings-maps-area--credits" style:bottom="{sheetHeight + 8}px">{t('sites.mapCredits')}</p>
     {:else}
-      <p class="offline" role="status">{t('maps.area.needNetwork')}</p>
+      <p class="od-settings-maps-area--offline" role="status">{t('maps.area.needNetwork')}</p>
     {/if}
 
-    <div class="search">
+    <div class="od-settings-maps-area--search">
       <form
         class="searchbar"
         bind:this={searchbar}
@@ -320,89 +320,89 @@
           aria-label={offlineMaps.online ? t('maps.area.search.label') : t('maps.area.search.offline')}
         />
         {#if query}
-          <button type="button" class="clear" aria-label={t('maps.area.search.clear')} onclick={() => (query = '')}>×</button>
+          <button type="button" class="od-settings-maps-area--clear" aria-label={t('maps.area.search.clear')} onclick={() => (query = '')}>×</button>
         {/if}
       </form>
       {#if panelOpen}
-        <div class="results card">
+        <div class="od-settings-maps-area--results card">
           {#if siteResults.length}
-            <p class="group">{t('maps.area.search.sites')}</p>
+            <p class="od-settings-maps-area--group">{t('maps.area.search.sites')}</p>
             {#each siteResults as hit, i (i)}
-              <button type="button" class="hit" onclick={() => choose(hit, true)}>
-                <span class="hit-name">{hit.name}</span>
-                {#if hit.detail}<span class="hit-detail">{hit.detail}</span>{/if}
+              <button type="button" class="od-settings-maps-area--hit" onclick={() => choose(hit, true)}>
+                <span class="od-settings-maps-area--hit-name">{hit.name}</span>
+                {#if hit.detail}<span class="od-settings-maps-area--hit-detail">{hit.detail}</span>{/if}
               </button>
             {/each}
           {/if}
-          <p class="group">{t('maps.area.search.places')}</p>
+          <p class="od-settings-maps-area--group">{t('maps.area.search.places')}</p>
           {#if !showPlaces}
-            <button type="button" class="hit" onclick={submitSearch}>
-              <span class="hit-name">{t('maps.area.search.searchPlaces', { query: query.trim() })}</span>
+            <button type="button" class="od-settings-maps-area--hit" onclick={submitSearch}>
+              <span class="od-settings-maps-area--hit-name">{t('maps.area.search.searchPlaces', { query: query.trim() })}</span>
             </button>
           {:else if placesState === 'loading'}
-            <p class="note" role="status">{t('maps.area.search.searching')}</p>
+            <p class="od-settings-maps-area--note" role="status">{t('maps.area.search.searching')}</p>
           {:else if placesState === 'error'}
-            <p class="note over" role="alert">{t('maps.area.search.error')}</p>
+            <p class="od-settings-maps-area--note od-settings-maps-area--over" role="alert">{t('maps.area.search.error')}</p>
           {:else}
             {#each places as hit, i (i)}
-              <button type="button" class="hit" onclick={() => choose(hit, false)}>
-                <span class="hit-name">{hit.name}</span>
-                {#if hit.detail}<span class="hit-detail">{hit.detail}</span>{/if}
+              <button type="button" class="od-settings-maps-area--hit" onclick={() => choose(hit, false)}>
+                <span class="od-settings-maps-area--hit-name">{hit.name}</span>
+                {#if hit.detail}<span class="od-settings-maps-area--hit-detail">{hit.detail}</span>{/if}
               </button>
             {:else}
-              <p class="note" role="status">{t('maps.area.search.none')}</p>
+              <p class="od-settings-maps-area--note" role="status">{t('maps.area.search.none')}</p>
             {/each}
-            <p class="note small">{t('maps.area.search.attribution')}</p>
+            <p class="od-settings-maps-area--note od-settings-maps-area--small">{t('maps.area.search.attribution')}</p>
           {/if}
         </div>
       {/if}
     </div>
 
-    <div class="sheet" bind:this={sheet}>
-      <div class="field"><TextField label={t('maps.area.name')} bind:value={name} supporting={t('maps.area.nameHelp')} oninput={() => (named = true)} /></div>
+    <div class="od-settings-maps-area--sheet" bind:this={sheet}>
+      <div class="od-settings-maps-area--field"><TextField label={t('maps.area.name')} bind:value={name} supporting={t('maps.area.nameHelp')} oninput={() => (named = true)} /></div>
       {#if info}
         {#if fits}
-          <p class="estimate">
+          <p class="od-settings-maps-area--estimate">
             {t('maps.area.size', { width: formatNumber(roundKm(info.km[0]), 0), height: formatNumber(roundKm(info.km[1]), 0) })}
             {' · '}
             {t('maps.area.estimate', { size: formatMapSize(Math.max(1e6, info.bytes)) })}
           </p>
         {:else}
-          <p class="estimate over" role="alert">{t('maps.area.tooBig')}</p>
+          <p class="od-settings-maps-area--estimate od-settings-maps-area--over" role="alert">{t('maps.area.tooBig')}</p>
         {/if}
       {/if}
-      <button type="button" class="download" disabled={!bbox || !offlineMaps.online || busy || !fits} onclick={download}>{t('maps.area.download')}</button>
+      <button type="button" class="od-settings-maps-area--download" disabled={!bbox || !offlineMaps.online || busy || !fits} onclick={download}>{t('maps.area.download')}</button>
     </div>
   </div>
 </Page>
 
 <style>
   @layer od.components {
-    :global(.od-maps-area .page-content) {
+    :global(.od-settings-maps-area .page-content) {
       padding: 0;
       overflow: hidden;
     }
 
-    .stage {
+    .od-settings-maps-area--stage {
       position: absolute;
       inset: 0;
       overflow: hidden;
       background: var(--od-surface-2);
     }
 
-    .canvas {
+    .od-settings-maps-area--canvas {
       position: absolute;
       inset: 0;
     }
 
-    .offline {
+    .od-settings-maps-area--offline {
       margin: 0;
       padding: 96px 24px 0;
       text-align: center;
       color: var(--od-text-2);
     }
 
-    .credits {
+    .od-settings-maps-area--credits {
       position: absolute;
       right: 8px;
       margin: 0;
@@ -415,7 +415,7 @@
       pointer-events: none;
     }
 
-    .search {
+    .od-settings-maps-area--search {
       position: absolute;
       z-index: 2;
       top: calc(var(--f7-navbar-height, 56px) + var(--f7-safe-area-top, 0px) + 8px);
@@ -452,7 +452,7 @@
       }
     }
 
-    .clear {
+    .od-settings-maps-area--clear {
       position: absolute;
       top: 4px;
       right: 4px;
@@ -468,7 +468,7 @@
       cursor: pointer;
     }
 
-    .results {
+    .od-settings-maps-area--results {
       margin: 8px 0 0;
       max-height: 45vh;
       overflow-y: auto;
@@ -478,7 +478,7 @@
       padding: 4px 0 8px;
     }
 
-    .group {
+    .od-settings-maps-area--group {
       margin: 8px 20px 0;
       font-size: 12px;
       line-height: 16px;
@@ -486,7 +486,7 @@
       color: var(--od-text-2);
     }
 
-    .hit {
+    .od-settings-maps-area--hit {
       width: 100%;
       min-height: 48px;
       padding: 6px 20px;
@@ -501,34 +501,34 @@
       cursor: pointer;
     }
 
-    .hit-name {
+    .od-settings-maps-area--hit-name {
       font-size: 16px;
       line-height: 22px;
     }
 
-    .hit-detail {
+    .od-settings-maps-area--hit-detail {
       font-size: 13px;
       line-height: 18px;
       color: var(--od-text-2);
     }
 
-    .note {
+    .od-settings-maps-area--note {
       margin: 8px 20px 0;
       font-size: 14px;
       line-height: 20px;
       color: var(--od-text-2);
 
-      &.over {
+      &.od-settings-maps-area--over {
         color: var(--od-alarm);
       }
 
-      &.small {
+      &.od-settings-maps-area--small {
         font-size: 12px;
         line-height: 16px;
       }
     }
 
-    .sheet {
+    .od-settings-maps-area--sheet {
       position: absolute;
       z-index: 2;
       left: 0;
@@ -541,23 +541,23 @@
       flex-direction: column;
     }
 
-    .estimate {
+    .od-settings-maps-area--estimate {
       margin: 0 24px 12px;
       font-size: 14px;
       line-height: 20px;
       color: var(--od-text-2);
     }
 
-    .estimate {
+    .od-settings-maps-area--estimate {
       margin: 8px 24px 12px;
       font-variant-numeric: tabular-nums;
     }
 
-    .estimate.over {
+    .od-settings-maps-area--estimate.od-settings-maps-area--over {
       color: var(--od-alarm);
     }
 
-    .download {
+    .od-settings-maps-area--download {
       width: calc(100% - 48px);
       height: 48px;
       margin: 16px 24px 0;
@@ -578,7 +578,7 @@
     }
 
     /* The fixed frame: its outline, its corner marks, and the veil outside it (a huge shadow). It never takes a touch: the map works under it. */
-    .veil {
+    .od-settings-maps-area--veil {
       position: absolute;
       z-index: 1;
       box-sizing: border-box;
@@ -587,14 +587,14 @@
       pointer-events: none;
     }
 
-    .mark {
+    .od-settings-maps-area--mark {
       position: absolute;
       width: 22px;
       height: 22px;
       border: 0 solid var(--od-area-frame);
       pointer-events: none;
 
-      &.nw {
+      &.od-settings-maps-area--nw {
         top: -2px;
         left: -2px;
         border-top-width: 5px;
@@ -602,7 +602,7 @@
         border-top-left-radius: 2px;
       }
 
-      &.ne {
+      &.od-settings-maps-area--ne {
         top: -2px;
         right: -2px;
         border-top-width: 5px;
@@ -610,7 +610,7 @@
         border-top-right-radius: 2px;
       }
 
-      &.sw {
+      &.od-settings-maps-area--sw {
         bottom: -2px;
         left: -2px;
         border-bottom-width: 5px;
@@ -618,7 +618,7 @@
         border-bottom-left-radius: 2px;
       }
 
-      &.se {
+      &.od-settings-maps-area--se {
         right: -2px;
         bottom: -2px;
         border-bottom-width: 5px;
@@ -628,11 +628,11 @@
     }
 
     /* The top bar: a plain surface with a 1 dp divider, a close mark instead of the back arrow. */
-    :global(.od-maps-area .navbar-bg) {
+    :global(.od-settings-maps-area .navbar-bg) {
       border-bottom: 1px solid var(--od-row-divider);
     }
 
-    .close {
+    .od-settings-maps-area--close {
       fill: none;
       stroke: currentColor;
       stroke-width: 2;

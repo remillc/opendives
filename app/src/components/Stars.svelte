@@ -8,17 +8,17 @@
   const STAR = 'M12 3.5l2.6 5.3 5.8.8-4.2 4.1 1 5.8L12 16.8 6.8 19.5l1-5.8-4.2-4.1 5.8-.8z';
 </script>
 
-<span class="stars" role="img" aria-label={label}>
+<span class="od-stars" role="img" aria-label={label}>
   {#each [1, 2, 3, 4, 5] as i (i)}
     <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-      <path d={STAR} class:filled={i <= value} />
+      <path d={STAR} class:od-stars--filled={i <= value} />
     </svg>
   {/each}
 </span>
 
 <style>
   @layer od.components {
-    .stars {
+    .od-stars {
       display: inline-flex;
       gap: 2px;
       flex: none;
@@ -30,7 +30,7 @@
       stroke-width: 1.6;
       stroke-linejoin: round;
 
-      &.filled {
+      &.od-stars--filled {
         fill: var(--od-text);
       }
     }

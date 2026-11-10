@@ -200,7 +200,7 @@
   const oxygenRich = $derived(o2Value > 40);
 </script>
 
-<Page>
+<Page class="od-gas-blender">
   <Navbar title={t('tools.blender')}>
     {#snippet left()}
       <Link back iconOnly>
@@ -210,34 +210,34 @@
     {/snippet}
   </Navbar>
 
-  <div class="modes" role="radiogroup" aria-label={t('tools.blendMode')}>
+  <div class="od-gas-blender--modes" role="radiogroup" aria-label={t('tools.blendMode')}>
     {#each MODES as choice (choice)}
-      <button type="button" role="radio" aria-checked={mode === choice} class:selected={mode === choice} onclick={() => setMode(choice)}>
+      <button type="button" role="radio" aria-checked={mode === choice} class:od-gas-blender--selected={mode === choice} onclick={() => setMode(choice)}>
         {#if mode === choice}<Icon name="check" size={18} weight={2.4} />{/if}
         {t(`tools.${choice}`)}
       </button>
     {/each}
   </div>
 
-  <h2 class="label">{t('tools.blendWanted')}</h2>
-  <div class="pair">
+  <h2 class="od-gas-blender--label">{t('tools.blendWanted')}</h2>
+  <div class="od-gas-blender--pair">
     <TextField label={t('tools.oxygen')} bind:value={o2} inputmode="decimal" invalid={wantedInvalid} supporting={wantedInvalid ? t('tools.gasInvalid') : ''}>
-      {#snippet trailing()}<span class="unit">{t('units.percent')}</span>{/snippet}
+      {#snippet trailing()}<span class="od-gas-blender--unit">{t('units.percent')}</span>{/snippet}
     </TextField>
     {#if trimix}
       <TextField label={t('tools.helium')} bind:value={he} inputmode="decimal" invalid={wantedInvalid}>
-        {#snippet trailing()}<span class="unit">{t('units.percent')}</span>{/snippet}
+        {#snippet trailing()}<span class="od-gas-blender--unit">{t('units.percent')}</span>{/snippet}
       </TextField>
     {:else}
       <TextField label={t('tools.blendFinalPressure')} bind:value={finalPressure} inputmode="decimal" invalid={finalInvalid}>
-        {#snippet trailing()}<span class="unit">{pressureUnit}</span>{/snippet}
+        {#snippet trailing()}<span class="od-gas-blender--unit">{pressureUnit}</span>{/snippet}
       </TextField>
     {/if}
   </div>
   {#if trimix}
-    <div class="pair">
+    <div class="od-gas-blender--pair">
       <TextField label={t('tools.blendFinalPressure')} bind:value={finalPressure} inputmode="decimal" invalid={finalInvalid}>
-        {#snippet trailing()}<span class="unit">{pressureUnit}</span>{/snippet}
+        {#snippet trailing()}<span class="od-gas-blender--unit">{pressureUnit}</span>{/snippet}
       </TextField>
       <SelectField label={t('tools.blendCylinder')} bind:value={cylinder} options={cylinderOptions} />
     </div>
@@ -245,8 +245,8 @@
     <SelectField label={t('tools.blendCylinder')} bind:value={cylinder} options={cylinderOptions} />
   {/if}
 
-  <h2 class="label">{t('tools.blendInside')}</h2>
-  <div class="pair">
+  <h2 class="od-gas-blender--label">{t('tools.blendInside')}</h2>
+  <div class="od-gas-blender--pair">
     <TextField
       label={t('tools.blendInsidePressure')}
       bind:value={insidePressure}
@@ -254,11 +254,11 @@
       invalid={insideInvalid}
       supporting={insideInvalid ? t('tools.blendInvalid') : t('tools.blendInsideHelp')}
     >
-      {#snippet trailing()}<span class="unit">{pressureUnit}</span>{/snippet}
+      {#snippet trailing()}<span class="od-gas-blender--unit">{pressureUnit}</span>{/snippet}
     </TextField>
   </div>
   <!-- Always shown: oxygen, and helium in trimix mode (task 2026-11-07-23). -->
-  <div class="pair">
+  <div class="od-gas-blender--pair">
     <SelectField label={t('tools.blendInsideOxygen')} bind:value={insideO2} options={percentOptions} />
     {#if trimix}
       <SelectField label={t('tools.blendInsideHelium')} bind:value={insideHe} options={percentOptions} />
@@ -267,58 +267,58 @@
   <SelectField label={t('tools.blendTopUp')} bind:value={topUp} options={topUpOptions} />
   {#if topUp === 'nitrox'}
     <TextField label={t('tools.blendTopUpOxygen')} bind:value={topUpO2} inputmode="decimal" invalid={topUpInvalid}>
-      {#snippet trailing()}<span class="unit">{t('units.percent')}</span>{/snippet}
+      {#snippet trailing()}<span class="od-gas-blender--unit">{t('units.percent')}</span>{/snippet}
     </TextField>
   {/if}
 
   {#if result}
     {#if result.error === 'TOPUP_TOO_RICH'}
-      <p class="notice" role="alert">{t('tools.blendTooRich')}</p>
+      <p class="od-gas-blender--notice" role="alert">{t('tools.blendTooRich')}</p>
     {:else}
       {#if result.error === 'RESIDUAL_TOO_HIGH'}
-        <div class="notice" role="alert">
+        <div class="od-gas-blender--notice" role="alert">
           <strong>{t('tools.blendBleedTitle')}</strong>
           <span>{bleedText && result.bleedToMbar ? t('tools.blendBleedText', { pressure: bleedText }) : t('tools.blendBleedEmpty')}</span>
         </div>
       {/if}
-      <h2 class="title">{t('tools.blendFill')}</h2>
+      <h2 class="od-gas-blender--title">{t('tools.blendFill')}</h2>
       {#if trimix}
-        <div class="modes order" role="radiogroup" aria-label={t('tools.blendOrder')}>
+        <div class="od-gas-blender--modes od-gas-blender--order" role="radiogroup" aria-label={t('tools.blendOrder')}>
           {#each ORDERS as choice (choice)}
-            <button type="button" role="radio" aria-checked={order === choice} class:selected={order === choice} onclick={() => setOrder(choice)}>
+            <button type="button" role="radio" aria-checked={order === choice} class:od-gas-blender--selected={order === choice} onclick={() => setOrder(choice)}>
               {#if order === choice}<Icon name="check" size={18} weight={2.4} />{/if}
               {t(choice === 'helium' ? 'tools.blendOrderHelium' : 'tools.blendOrderOxygen')}
             </button>
           {/each}
         </div>
       {/if}
-      <ol class="steps" aria-live="polite">
+      <ol class="od-gas-blender--steps" aria-live="polite">
         {#each steps as step, i (i)}
           <li>
-            <span class="number" aria-hidden="true">{i + 1}</span>
-            <span class="texts">
-              <span class="name">{step.name}</span>
-              <span class="sub od-value">{step.added}</span>
+            <span class="od-gas-blender--number" aria-hidden="true">{i + 1}</span>
+            <span class="od-gas-blender--texts">
+              <span class="od-gas-blender--name">{step.name}</span>
+              <span class="od-gas-blender--sub od-value">{step.added}</span>
             </span>
-            <span class="upto od-value">{step.upTo}</span>
+            <span class="od-gas-blender--upto od-value">{step.upTo}</span>
           </li>
         {/each}
       </ol>
     {/if}
   {:else if invalid}
-    <p class="notice" role="alert">{t('tools.blendInvalid')}</p>
+    <p class="od-gas-blender--notice" role="alert">{t('tools.blendInvalid')}</p>
   {/if}
 
-  <p class="caption">{t('tools.blendCooled')}</p>
-  <p class="caption" class:alarm={oxygenRich}>{t('tools.blendOxygenClean')}</p>
-  <p class="caption">{t('tools.blendAnalyse')}</p>
-  <div class="bottom"></div>
+  <p class="od-gas-blender--caption">{t('tools.blendCooled')}</p>
+  <p class="od-gas-blender--caption" class:od-gas-blender--alarm={oxygenRich}>{t('tools.blendOxygenClean')}</p>
+  <p class="od-gas-blender--caption">{t('tools.blendAnalyse')}</p>
+  <div class="od-gas-blender--bottom"></div>
 </Page>
 
 <style>
   @layer od.components {
     /* Material 3 segmented buttons; on iOS, a segmented control. */
-    .modes {
+    .od-gas-blender--modes {
       margin: 8px 16px 0;
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -347,7 +347,7 @@
           border-radius: 0 20px 20px 0;
         }
 
-        &.selected {
+        &.od-gas-blender--selected {
           background: var(--od-tint);
           color: var(--od-on-tint);
         }
@@ -368,22 +368,22 @@
           font-size: 13px;
         }
 
-        button.selected {
+        button.od-gas-blender--selected {
           background: var(--od-surface);
           color: var(--od-text);
         }
 
-        :global(.od-icon) {
+        :global(.od-gas-blender--icon) {
           display: none;
         }
       }
     }
 
-    .order {
+    .od-gas-blender--order {
       margin-top: 12px;
     }
 
-    .title {
+    .od-gas-blender--title {
       margin: 0;
       padding: 20px 20px 0;
       font-size: 18px;
@@ -392,7 +392,7 @@
     }
 
     /* "Mélange voulu", "Dans la bouteille": small labels above the fields. */
-    .label {
+    .od-gas-blender--label {
       margin: 0;
       padding: 16px 20px 0;
       font-size: 14px;
@@ -401,13 +401,13 @@
       color: var(--od-text);
     }
 
-    .pair {
+    .od-gas-blender--pair {
       display: flex;
       gap: 12px;
       margin: 0 16px;
       align-items: flex-start;
 
-      :global(.field) {
+      :global(.od-text-field--field) {
         flex: 1;
         min-width: 0;
         margin-left: 0;
@@ -415,19 +415,19 @@
       }
     }
 
-    .unit {
+    .od-gas-blender--unit {
       display: block;
       padding: 24px 8px 0 0;
       font-size: 16px;
       line-height: 24px;
       color: var(--od-text-2);
 
-      :global(.field:not(.floated)) & {
+      :global(.od-text-field--field:not(.od-text-field--floated)) & {
         visibility: hidden;
       }
     }
 
-    .notice {
+    .od-gas-blender--notice {
       margin: 20px 16px 0;
       padding: 12px 16px;
       border-radius: 12px;
@@ -440,7 +440,7 @@
       line-height: 20px;
     }
 
-    .steps {
+    .od-gas-blender--steps {
       list-style: none;
       margin: 8px 16px 0;
       padding: 0;
@@ -458,7 +458,7 @@
       }
     }
 
-    .number {
+    .od-gas-blender--number {
       flex: none;
       width: 28px;
       height: 28px;
@@ -471,42 +471,42 @@
       font-weight: 600;
     }
 
-    .texts {
+    .od-gas-blender--texts {
       flex: 1;
       min-width: 0;
       display: flex;
       flex-direction: column;
     }
 
-    .name {
+    .od-gas-blender--name {
       font-size: 16px;
       line-height: 24px;
     }
 
-    .sub {
+    .od-gas-blender--sub {
       font-size: 13px;
       line-height: 18px;
       color: var(--od-text-2);
     }
 
-    .upto {
+    .od-gas-blender--upto {
       font-size: 20px;
       font-weight: 700;
       white-space: nowrap;
     }
 
-    .caption {
+    .od-gas-blender--caption {
       margin: 12px 20px 0;
       font-size: 13px;
       line-height: 18px;
       color: var(--od-text-2);
 
-      &.alarm {
+      &.od-gas-blender--alarm {
         color: var(--od-alarm);
       }
     }
 
-    .bottom {
+    .od-gas-blender--bottom {
       height: 32px;
     }
   }

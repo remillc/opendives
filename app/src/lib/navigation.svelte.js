@@ -114,7 +114,7 @@ export function enableSectionSwipes() {
 
   /** @param {HTMLElement} el */
   function hasOwnGesture(el) {
-    if (el.closest('.maplibregl-map, .profile, canvas, input, textarea, select, .panel, .modal-in, .fab, .selection-bar')) return true;
+    if (el.closest('.maplibregl-map, .od-dive-profile--profile, .od-planner--profile, canvas, input, textarea, select, .panel, .modal-in, .fab, .od-logbook--selection-bar')) return true;
     for (let n = /** @type {HTMLElement|null} */ (el); n && n !== document.body; n = n.parentElement) {
       const overflow = getComputedStyle(n).overflowX;
       if ((overflow === 'auto' || overflow === 'scroll') && n.scrollWidth > n.clientWidth) return true;
@@ -124,7 +124,7 @@ export function enableSectionSwipes() {
 
   /** @returns {typeof start} */
   function startingPoint() {
-    if (!layout.phone || document.querySelector('.panel-in, .modal-in, .searchbar-enabled, .od-sites-search.od-open, .selection-bar')) return null;
+    if (!layout.phone || document.querySelector('.panel-in, .modal-in, .searchbar-enabled, .od-sites--search.od-sites--open, .od-logbook--selection-bar')) return null;
     const view = f7.views.current;
     const section = view?.el?.id?.replace('view-', '');
     if (!swipeOrder.includes(section)) return null;

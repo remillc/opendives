@@ -38,56 +38,56 @@
   const anyDuplicate = $derived(computers.some((c) => mergeTargets(c, computers).length > 0));
 </script>
 
-<Page>
+<Page class="od-logbook-computers">
   <Navbar title={t('settings.logbookComputers.title')}>
     {#snippet left()}
       <Link back iconOnly><i class="icon icon-back"></i><span class="od-sr-only">{t('detail.back')}</span></Link>
     {/snippet}
   </Navbar>
 
-  <p class="intro">{t('settings.logbookComputers.intro')}</p>
+  <p class="od-logbook-computers--intro">{t('settings.logbookComputers.intro')}</p>
   {#if computers.length}
-    <div class="group">
+    <div class="od-logbook-computers--group">
       {#each computers as c (`${c.model}\n${c.serial}`)}
-        <a class="row" href={link(c)}>
-          <span class="texts">
-            <span class="name">
+        <a class="od-logbook-computers--row" href={link(c)}>
+          <span class="od-logbook-computers--texts">
+            <span class="od-logbook-computers--name">
               <span>{computerName(c)}</span>
               {#if mergeTargets(c, computers).length}
-                <span class="tag">{t('settings.logbookComputers.duplicate')}</span>
+                <span class="od-logbook-computers--tag">{t('settings.logbookComputers.duplicate')}</span>
               {:else if duplicatesOf(c, computers).length}
-                <span class="tag">{t('settings.logbookComputers.hasDuplicate')}</span>
+                <span class="od-logbook-computers--tag">{t('settings.logbookComputers.hasDuplicate')}</span>
               {/if}
             </span>
-            <span class="details od-value">{details(c)}</span>
+            <span class="od-logbook-computers--details od-value">{details(c)}</span>
           </span>
-          <span class="chevron"><Icon name="chevron" size={20} /></span>
+          <span class="od-logbook-computers--chevron"><Icon name="chevron" size={20} /></span>
         </a>
       {/each}
     </div>
-    {#if anyDuplicate}<p class="note">{t('settings.logbookComputers.duplicateNote')}</p>{/if}
+    {#if anyDuplicate}<p class="od-logbook-computers--note">{t('settings.logbookComputers.duplicateNote')}</p>{/if}
   {:else}
-    <p class="note">{t('settings.logbookComputers.empty')}</p>
+    <p class="od-logbook-computers--note">{t('settings.logbookComputers.empty')}</p>
   {/if}
 </Page>
 
 <style>
   @layer od.components {
-    .intro {
+    .od-logbook-computers--intro {
       margin: 8px 20px 0;
       font-size: 14px;
       line-height: 20px;
       color: var(--od-text-2);
     }
 
-    .group {
+    .od-logbook-computers--group {
       margin: 16px 16px 0;
       border-radius: 20px;
       background: var(--od-surface);
       overflow: hidden;
     }
 
-    .row {
+    .od-logbook-computers--row {
       min-height: 64px;
       padding: 8px 24px 8px 16px;
       box-sizing: border-box;
@@ -97,7 +97,7 @@
       color: var(--od-text);
     }
 
-    .texts {
+    .od-logbook-computers--texts {
       flex: 1;
       min-width: 0;
       display: flex;
@@ -105,7 +105,7 @@
       gap: 2px;
     }
 
-    .name {
+    .od-logbook-computers--name {
       display: flex;
       align-items: center;
       flex-wrap: wrap;
@@ -114,7 +114,7 @@
       color: var(--od-text);
     }
 
-    .tag {
+    .od-logbook-computers--tag {
       height: 20px;
       padding: 0 8px;
       box-sizing: border-box;
@@ -127,19 +127,19 @@
       white-space: nowrap;
     }
 
-    .details {
+    .od-logbook-computers--details {
       font-size: 13px;
       line-height: 18px;
       color: var(--od-text-2);
     }
 
-    .chevron {
+    .od-logbook-computers--chevron {
       flex: none;
       display: flex;
       color: var(--od-text-2);
     }
 
-    .note {
+    .od-logbook-computers--note {
       margin: 10px 20px 16px;
       font-size: 13px;
       line-height: 18px;

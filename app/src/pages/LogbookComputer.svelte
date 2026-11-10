@@ -97,7 +97,7 @@
   }
 </script>
 
-<Page>
+<Page class="od-logbook-computer">
   <Navbar title={t('settings.logbookComputers.editTitle')}>
     {#snippet left()}
       <Link back iconOnly><Icon name="close" /><span class="od-sr-only">{t('dialog.cancel')}</span></Link>
@@ -116,21 +116,21 @@
       supporting={serial ? t('settings.logbookComputers.nameHelp') : t('settings.logbookComputers.nameNoSerial')}
     />
 
-    <div class="facts" role="list">
-      <div class="fact" role="listitem"><span>{t('settings.logbookComputers.model')}</span><span class="value od-value">{computer.model}</span></div>
-      <div class="fact" role="listitem"><span>{t('settings.logbookComputers.serial')}</span><span class="value od-value">{computer.serial || t('settings.logbookComputers.unknown')}</span></div>
-      <div class="fact" role="listitem"><span>{t('settings.logbookComputers.firmware')}</span><span class="value od-value">{computer.firmware || t('settings.logbookComputers.unknown')}</span></div>
-      <div class="fact" role="listitem"><span>{t('settings.logbookComputers.divesLabel')}</span><span class="value od-value">{formatNumber(computer.dives, 0)}</span></div>
+    <div class="od-logbook-computer--facts" role="list">
+      <div class="od-logbook-computer--fact" role="listitem"><span>{t('settings.logbookComputers.model')}</span><span class="od-logbook-computer--value od-value">{computer.model}</span></div>
+      <div class="od-logbook-computer--fact" role="listitem"><span>{t('settings.logbookComputers.serial')}</span><span class="od-logbook-computer--value od-value">{computer.serial || t('settings.logbookComputers.unknown')}</span></div>
+      <div class="od-logbook-computer--fact" role="listitem"><span>{t('settings.logbookComputers.firmware')}</span><span class="od-logbook-computer--value od-value">{computer.firmware || t('settings.logbookComputers.unknown')}</span></div>
+      <div class="od-logbook-computer--fact" role="listitem"><span>{t('settings.logbookComputers.divesLabel')}</span><span class="od-logbook-computer--value od-value">{formatNumber(computer.dives, 0)}</span></div>
     </div>
 
     {#if candidates.length}
-      <p class="about">
+      <p class="od-logbook-computer--about">
         {candidates.length === 1
           ? t('settings.logbookComputers.possible', { name: computerName(candidates[0]), details: describe(candidates[0]) })
           : t('settings.logbookComputers.possibleMany', { n: candidates.length })}
       </p>
-      <div class="action">
-        <button type="button" class="filled" disabled={busy} onclick={() => (candidates.length === 1 ? confirmMerge(candidates[0]) : (choosing = true))}>
+      <div class="od-logbook-computer--action">
+        <button type="button" class="od-logbook-computer--filled" disabled={busy} onclick={() => (candidates.length === 1 ? confirmMerge(candidates[0]) : (choosing = true))}>
           {candidates.length === 1 ? t('settings.logbookComputers.mergeWith', { name: computerName(candidates[0]) }) : t('settings.logbookComputers.mergeWithMany')}
         </button>
         <p>
@@ -141,13 +141,13 @@
       </div>
     {/if}
     {#if !candidates.length && duplicates.length}
-      <p class="about">
+      <p class="od-logbook-computer--about">
         {t('settings.logbookComputers.hasDuplicateText')}
         {#each duplicates as other, i (`${other.model}\n${other.serial}`)}{i ? ', ' : ' '}<a href="/settings/computers/edit?model={encodeURIComponent(other.model)}&serial={encodeURIComponent(other.serial)}">{computerName(other)}</a>{/each}
       </p>
     {/if}
     {#if computer.listed}
-      <div class="action">
+      <div class="od-logbook-computer--action">
         <button type="button" class="od-outlined-button" disabled={busy} onclick={() => change({ action: 'remove', model, serial }, t('settings.logbookComputers.removed'))}>
           {t('settings.logbookComputers.remove')}
         </button>
@@ -172,14 +172,14 @@
 
 <style>
   @layer od.components {
-    .facts {
+    .od-logbook-computer--facts {
       margin: 20px 16px 0;
       padding: 4px 0;
       border-radius: 20px;
       background: var(--od-surface);
     }
 
-    .fact {
+    .od-logbook-computer--fact {
       min-height: 48px;
       padding: 6px 16px;
       box-sizing: border-box;
@@ -190,14 +190,14 @@
       font-size: 16px;
       color: var(--od-text);
 
-      .value {
+      .od-logbook-computer--value {
         color: var(--od-text-2);
         text-align: right;
         overflow-wrap: anywhere;
       }
     }
 
-    .about {
+    .od-logbook-computer--about {
       --f7-theme-color: var(--od-text);
       margin: 16px 20px 0;
       font-size: 14px;
@@ -209,7 +209,7 @@
       }
     }
 
-    .action {
+    .od-logbook-computer--action {
       margin: 16px 16px 0;
       display: flex;
       flex-direction: column;
@@ -224,7 +224,7 @@
       }
     }
 
-    .filled {
+    .od-logbook-computer--filled {
       width: auto;
       height: 40px;
       padding: 0 24px;

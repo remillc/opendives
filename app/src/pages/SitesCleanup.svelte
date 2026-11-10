@@ -154,7 +154,7 @@
   }
 </script>
 
-<Page>
+<Page class="od-sites-cleanup">
   <Navbar title={t('sites.cleanupTitle')}>
     {#snippet left()}
       <Link back iconOnly><i class="icon icon-back"></i><span class="od-sr-only">{t('common.back')}</span></Link>
@@ -167,54 +167,54 @@
   {#each pairs as pair (pairKey(pair.a.uuid, pair.b.uuid))}
     {@const key = pairKey(pair.a.uuid, pair.b.uuid)}
     {@const both = ordered(pair)}
-    <fieldset class="surface">
-      <legend class="head">
-        <span class="name">{both[0].name || t('sites.noName')}</span>
-        <span class="sub">{reason(pair)}</span>
+    <fieldset class="od-sites-cleanup--surface">
+      <legend class="od-sites-cleanup--head">
+        <span class="od-sites-cleanup--name">{both[0].name || t('sites.noName')}</span>
+        <span class="od-sites-cleanup--sub">{reason(pair)}</span>
       </legend>
       {#each both as s (s.uuid)}
-        <div class="od-keep-row">
-          <label class="od-keep-pick">
+        <div class="od-sites-cleanup--keep-row">
+          <label class="od-sites-cleanup--keep-pick">
             <span class="radio">
               <input type="radio" name="keep-{key}" value={s.uuid} checked={(kept[key] ?? both[0].uuid) === s.uuid} onchange={() => (kept[key] = s.uuid)} />
               <i class="icon-radio"></i>
             </span>
-            <span class="text"><span class="label">{s.name || t('sites.noName')}</span><span class="sub">{describe(s)}</span></span>
+            <span class="od-sites-cleanup--text"><span class="od-sites-cleanup--label">{s.name || t('sites.noName')}</span><span class="od-sites-cleanup--sub">{describe(s)}</span></span>
           </label>
-          <button type="button" class="od-icon-button od-keep-edit" aria-label={t('sites.editSite', { name: s.name || t('sites.noName') })} onclick={() => edit(s)}>
+          <button type="button" class="od-icon-button od-sites-cleanup--keep-edit" aria-label={t('sites.editSite', { name: s.name || t('sites.noName') })} onclick={() => edit(s)}>
             <Icon name="edit" />
           </button>
         </div>
       {/each}
-      <div class="actions">
+      <div class="od-sites-cleanup--actions">
         <button type="button" class="od-text-button" onclick={() => notDuplicates(pair)}>{t('sites.notDuplicates')}</button>
-        <button type="button" class="filled" onclick={() => merge(pair)}>{t('sites.merge')}</button>
+        <button type="button" class="od-sites-cleanup--filled" onclick={() => merge(pair)}>{t('sites.merge')}</button>
       </div>
     </fieldset>
   {/each}
 
   {#if unused.length}
-    <h2 class="section">{t('sites.unusedTitle')}</h2>
-    <div class="surface">
-      <p class="explain">{t('sites.unusedIntro', { n: unused.length })}</p>
-      <label class="row check-row">
+    <h2 class="od-sites-cleanup--section">{t('sites.unusedTitle')}</h2>
+    <div class="od-sites-cleanup--surface">
+      <p class="od-sites-cleanup--explain">{t('sites.unusedIntro', { n: unused.length })}</p>
+      <label class="od-sites-cleanup--row od-sites-cleanup--check-row">
         <span class="checkbox">
           <input type="checkbox" checked={selection.length === unused.length} indeterminate={selection.length > 0 && selection.length < unused.length} onchange={selectAll} />
           <i class="icon-checkbox"></i>
         </span>
-        <span class="label strong">{t('sites.selectAll')}</span>
+        <span class="od-sites-cleanup--label od-sites-cleanup--strong">{t('sites.selectAll')}</span>
       </label>
       {#each unused as s (s.uuid)}
-        <label class="row check-row">
+        <label class="od-sites-cleanup--row od-sites-cleanup--check-row">
           <span class="checkbox">
             <input type="checkbox" bind:checked={selected[s.uuid]} />
             <i class="icon-checkbox"></i>
           </span>
-          <span class="text"><span class="label">{s.name || t('sites.noName')}</span><span class="sub">{t('sites.noDive')}</span></span>
+          <span class="od-sites-cleanup--text"><span class="od-sites-cleanup--label">{s.name || t('sites.noName')}</span><span class="od-sites-cleanup--sub">{t('sites.noDive')}</span></span>
         </label>
       {/each}
-      <div class="actions">
-        <button type="button" class="filled" disabled={!selection.length} onclick={deleteSelection}>
+      <div class="od-sites-cleanup--actions">
+        <button type="button" class="od-sites-cleanup--filled" disabled={!selection.length} onclick={deleteSelection}>
           {t('sites.deleteSelection', { n: selection.length })}
         </button>
       </div>
@@ -224,7 +224,7 @@
 
 <style>
   @layer od.components {
-    .surface {
+    .od-sites-cleanup--surface {
       margin: 0 16px 12px;
       padding: 0;
       border: none;
@@ -235,7 +235,7 @@
     }
 
     /* Header of a duplicate group: the site's name, then the reason. */
-    .head {
+    .od-sites-cleanup--head {
       float: left;
       width: 100%;
       box-sizing: border-box;
@@ -243,7 +243,7 @@
       display: flex;
       flex-direction: column;
 
-      .name {
+      .od-sites-cleanup--name {
         font-size: 16px;
         line-height: 24px;
         font-weight: 600;
@@ -254,13 +254,13 @@
       }
     }
 
-    .sub {
+    .od-sites-cleanup--sub {
       font-size: 14px;
       line-height: 20px;
       color: var(--od-text-2);
     }
 
-    .row {
+    .od-sites-cleanup--row {
       min-height: 48px;
       padding: 8px 16px;
       box-sizing: border-box;
@@ -272,7 +272,7 @@
     }
 
     /* A choice and, apart from it, the button that edits the site. */
-    .od-keep-row {
+    .od-sites-cleanup--keep-row {
       min-height: 56px;
       box-sizing: border-box;
       padding-right: 4px;
@@ -281,7 +281,7 @@
       border-top: 1px solid var(--od-separator);
     }
 
-    .od-keep-pick {
+    .od-sites-cleanup--keep-pick {
       flex: 1;
       min-width: 0;
       min-height: 56px;
@@ -293,28 +293,28 @@
       cursor: pointer;
     }
 
-    .od-keep-edit {
+    .od-sites-cleanup--keep-edit {
       flex: none;
       width: 48px;
     }
 
-    .text {
+    .od-sites-cleanup--text {
       display: flex;
       flex-direction: column;
       gap: 2px;
       min-width: 0;
     }
 
-    .label {
+    .od-sites-cleanup--label {
       font-size: 16px;
       line-height: 24px;
 
-      &.strong {
+      &.od-sites-cleanup--strong {
         font-weight: 600;
       }
     }
 
-    .actions {
+    .od-sites-cleanup--actions {
       padding: 10px 16px 12px;
       border-top: 1px solid var(--od-separator);
       display: flex;
@@ -323,7 +323,7 @@
     }
 
     /* Filled button in ink: "Fusionner", "Supprimer la sélection". */
-    .filled {
+    .od-sites-cleanup--filled {
       width: auto;
       height: 40px;
       padding: 0 20px;
@@ -343,7 +343,7 @@
     }
 
     /* Title on the page background, as on the site sheet. */
-    .section {
+    .od-sites-cleanup--section {
       margin: 22px 16px 8px;
       font-size: 14px;
       line-height: 20px;
@@ -351,7 +351,7 @@
       color: var(--od-text-2);
     }
 
-    .explain {
+    .od-sites-cleanup--explain {
       margin: 0;
       padding: 12px 16px 10px;
       font-size: 14px;

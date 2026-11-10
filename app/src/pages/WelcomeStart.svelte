@@ -37,48 +37,48 @@
 </script>
 
 <Page class="od-welcome-start">
-  <svg class="profile" viewBox="0 0 {WIDTH} {HEIGHT}" preserveAspectRatio="none" aria-hidden="true">
+  <svg class="od-welcome-start--profile" viewBox="0 0 {WIDTH} {HEIGHT}" preserveAspectRatio="none" aria-hidden="true">
     <defs>
       <linearGradient id="od-welcome-water" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" class="water-top"></stop>
-        <stop offset="1" class="water-bottom"></stop>
+        <stop offset="0" class="od-welcome-start--water-top"></stop>
+        <stop offset="1" class="od-welcome-start--water-bottom"></stop>
       </linearGradient>
     </defs>
-    <rect class="ground" x="0" y="0" width={WIDTH} height={HEIGHT}></rect>
-    <path class="water" d={area}></path>
-    <path class="trace" d={line}></path>
+    <rect class="od-welcome-start--ground" x="0" y="0" width={WIDTH} height={HEIGHT}></rect>
+    <path class="od-welcome-start--water" d={area}></path>
+    <path class="od-welcome-start--trace" d={line}></path>
   </svg>
 
-  <div class="heading">
+  <div class="od-welcome-start--heading">
     <h1>{t('welcome.title')}</h1>
     <p>{t('welcome.intro')}</p>
   </div>
 
-  <nav class="choices" aria-label={t('welcome.choicesLabel')}>
-    <a href="/welcome/sign-in" class="choice filled" onclick={(e) => go(e, '/welcome/sign-in')}>
-      <span class="text">
-        <span class="label">{t('welcome.existing')}</span>
-        <span class="consequence">{t('welcome.existingText')}</span>
+  <nav class="od-welcome-start--choices" aria-label={t('welcome.choicesLabel')}>
+    <a href="/welcome/sign-in" class="od-welcome-start--choice od-welcome-start--filled" onclick={(e) => go(e, '/welcome/sign-in')}>
+      <span class="od-welcome-start--text">
+        <span class="od-welcome-start--label">{t('welcome.existing')}</span>
+        <span class="od-welcome-start--consequence">{t('welcome.existingText')}</span>
       </span>
-      <span class="chevron"><Icon name="expand" size={16} /></span>
+      <span class="od-welcome-start--chevron"><Icon name="expand" size={16} /></span>
     </a>
-    <a href="/welcome/create" class="choice" onclick={(e) => go(e, '/welcome/create')}>
-      <span class="text">
-        <span class="label">{t('welcome.create')}</span>
-        <span class="consequence">{t('welcome.createText')}</span>
+    <a href="/welcome/create" class="od-welcome-start--choice" onclick={(e) => go(e, '/welcome/create')}>
+      <span class="od-welcome-start--text">
+        <span class="od-welcome-start--label">{t('welcome.create')}</span>
+        <span class="od-welcome-start--consequence">{t('welcome.createText')}</span>
       </span>
-      <span class="chevron"><Icon name="expand" size={16} /></span>
+      <span class="od-welcome-start--chevron"><Icon name="expand" size={16} /></span>
     </a>
-    <a href="#no-account" class="choice external" onclick={withoutAccount}>
-      <span class="text">
-        <span class="label">{t('welcome.noAccount')}</span>
-        <span class="consequence">{t('welcome.noAccountText')}</span>
+    <a href="#no-account" class="od-welcome-start--choice external" onclick={withoutAccount}>
+      <span class="od-welcome-start--text">
+        <span class="od-welcome-start--label">{t('welcome.noAccount')}</span>
+        <span class="od-welcome-start--consequence">{t('welcome.noAccountText')}</span>
       </span>
-      <span class="chevron"><Icon name="expand" size={16} /></span>
+      <span class="od-welcome-start--chevron"><Icon name="expand" size={16} /></span>
     </a>
   </nav>
 
-  <a href="/welcome/git" class="own-git" onclick={(e) => go(e, '/welcome/git')}>
+  <a href="/welcome/git" class="od-welcome-start--own-git" onclick={(e) => go(e, '/welcome/git')}>
     <Icon name="git" size={20} />
     <span>{t('welcome.ownGit')}</span>
   </a>
@@ -99,7 +99,7 @@
       }
     }
 
-    .profile {
+    .od-welcome-start--profile {
       display: block;
       width: 100%;
       height: calc(var(--f7-safe-area-top) + 196px);
@@ -110,30 +110,30 @@
       }
     }
 
-    .ground {
+    .od-welcome-start--ground {
       fill: var(--od-welcome-ground);
     }
 
-    .water-top {
+    .od-welcome-start--water-top {
       stop-color: var(--od-water-top);
     }
 
-    .water-bottom {
+    .od-welcome-start--water-bottom {
       stop-color: var(--od-water-bottom);
     }
 
-    .water {
+    .od-welcome-start--water {
       fill: url(#od-welcome-water);
     }
 
-    .trace {
+    .od-welcome-start--trace {
       fill: none;
       stroke: var(--od-trace);
       stroke-width: 2;
       vector-effect: non-scaling-stroke;
     }
 
-    .heading {
+    .od-welcome-start--heading {
       padding: 20px 24px 0;
       display: flex;
       flex-direction: column;
@@ -171,14 +171,14 @@
     }
 
     /* Android: three cards, the first filled, the others outlined. */
-    .choices {
+    .od-welcome-start--choices {
       margin: 16px 16px 0;
       display: flex;
       flex-direction: column;
       gap: 8px;
     }
 
-    .choice {
+    .od-welcome-start--choice {
       padding: 16px;
       border-radius: 12px;
       border: 1px solid var(--od-separator);
@@ -188,17 +188,17 @@
       align-items: center;
       gap: 12px;
 
-      &.filled {
+      &.od-welcome-start--filled {
         border-color: transparent;
         background: var(--od-surface-2);
 
-        .consequence {
+        .od-welcome-start--consequence {
           color: var(--od-text);
         }
       }
     }
 
-    .text {
+    .od-welcome-start--text {
       flex: 1;
       min-width: 0;
       display: flex;
@@ -206,26 +206,26 @@
       gap: 4px;
     }
 
-    .label {
+    .od-welcome-start--label {
       font-size: 16px;
       line-height: 24px;
       font-weight: 500;
       letter-spacing: 0.15px;
     }
 
-    .consequence {
+    .od-welcome-start--consequence {
       font-size: 14px;
       line-height: 20px;
       letter-spacing: 0.25px;
       color: var(--od-text-2);
     }
 
-    .chevron {
+    .od-welcome-start--chevron {
       display: none;
     }
 
     /* Under the three cards: a text link with the git icon. */
-    .own-git {
+    .od-welcome-start--own-git {
       margin: 8px 16px 0;
       min-height: 48px;
       padding: 0 8px;
@@ -246,42 +246,42 @@
     }
 
     /* iOS: an inset grouped list, a chevron on each row. */
-    :global(.ios) .choices {
+    :global(.ios) .od-welcome-start--choices {
       margin-top: 20px;
       gap: 0;
       border-radius: 12px;
       overflow: hidden;
       background: var(--od-background);
 
-      .choice {
+      .od-welcome-start--choice {
         padding: 12px 16px;
         border: none;
         border-radius: 0;
         background: none;
 
-        & + .choice {
+        & + .od-welcome-start--choice {
           box-shadow: inset 0 0.5px 0 var(--od-separator);
         }
       }
 
-      .text {
+      .od-welcome-start--text {
         gap: 3px;
       }
 
-      .label {
+      .od-welcome-start--label {
         font-size: 17px;
         font-weight: 600;
         letter-spacing: 0;
       }
 
-      .consequence {
+      .od-welcome-start--consequence {
         font-size: 13px;
         line-height: 18px;
         letter-spacing: 0;
         color: var(--od-text-2);
       }
 
-      .chevron {
+      .od-welcome-start--chevron {
         display: flex;
         flex: none;
         color: var(--od-text-2);

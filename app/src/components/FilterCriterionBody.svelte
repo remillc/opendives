@@ -71,7 +71,7 @@
 
 {#if kind === 'list' || kind === 'choice'}
   {#if values.length}
-    <List inset={theme.ios} strong={theme.ios} dividers={theme.ios} class="values">
+    <List inset={theme.ios} strong={theme.ios} dividers={theme.ios} class="od-filter-criterion-body--values">
       {#each [{ value: '', text: t('filter.any') }, ...values] as v (v.value)}
         {@const checked = v.value ? selected.includes(v.value) : selected.length === 0}
         {#if theme.ios}
@@ -79,14 +79,14 @@
           <li>
             <button
               type="button"
-              class="item-content od-criterion-value"
+              class="item-content od-filter-criterion-body--value"
               role="checkbox"
               aria-checked={checked}
               onclick={() => (v.value ? toggle(v.value) : clear())}
             >
               <span class="item-inner">
                 <span class="item-title">{v.text}</span>
-                {#if checked}<span class="od-criterion-check"><Icon name="check" size={20} weight={2.2} /></span>{/if}
+                {#if checked}<span class="od-filter-criterion-body--check"><Icon name="check" size={20} weight={2.2} /></span>{/if}
               </span>
             </button>
           </li>
@@ -96,10 +96,10 @@
       {/each}
     </List>
   {:else}
-    <p class="od-criterion-hint">{t('filter.noValues')}</p>
+    <p class="od-filter-criterion-body od-filter-criterion-body--hint">{t('filter.noValues')}</p>
   {/if}
 {:else if kind === 'range' && range}
-  <div class="od-form-surface">
+  <div class="od-filter-criterion-body od-form-surface">
     <TextField
       label={fieldLabel('from')}
       bind:value={range.min}
@@ -116,8 +116,8 @@
     />
   </div>
 {:else if kind === 'stars'}
-  <div class="od-form-surface od-criterion-stars">
-    <p class="od-criterion-stars-label">{t('filter.atLeast')}</p>
+  <div class="od-filter-criterion-body od-form-surface od-filter-criterion-body--stars">
+    <p class="od-filter-criterion-body--stars-label">{t('filter.atLeast')}</p>
     <StarsInput
       value={Number(filter.draft[key])}
       label={t(`filter.criteria.${key}`)}
@@ -125,7 +125,7 @@
     />
   </div>
 {:else}
-  <div class="od-form-surface">
+  <div class="od-filter-criterion-body od-form-surface">
     <TextField
       label={t(`filter.criteria.${key}`)}
       bind:value={text}
@@ -135,7 +135,7 @@
 
 <style>
   @layer od.components {
-    .od-criterion-hint {
+    .od-filter-criterion-body--hint {
       margin: 8px 16px;
       font-size: 13px;
       line-height: 18px;
@@ -146,7 +146,7 @@
       }
     }
 
-    .od-criterion-value {
+    .od-filter-criterion-body--value {
       width: 100%;
       border: none;
       background: none;
@@ -156,18 +156,18 @@
       cursor: pointer;
     }
 
-    .od-criterion-check {
+    .od-filter-criterion-body--check {
       color: var(--od-action);
     }
 
-    .od-criterion-stars {
+    .od-filter-criterion-body--stars {
       padding: 12px 16px;
       display: flex;
       align-items: center;
       gap: 16px;
     }
 
-    .od-criterion-stars-label {
+    .od-filter-criterion-body--stars-label {
       margin: 0;
       flex: 1;
     }

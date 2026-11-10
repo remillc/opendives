@@ -107,7 +107,7 @@
     const entry = logbook.preview?.entries[index];
     if (!entry) return;
     const dive = entry.type === 'trip' ? entry.dives[0] : entry.dive;
-    heldTap = { date: dive.date, number: dive.number, expand: entry.type === 'trip' && !!target.closest('.expand') };
+    heldTap = { date: dive.date, number: dive.number, expand: entry.type === 'trip' && !!target.closest('.od-trip-row--expand') };
   }
 
   // The held tap is replayed on the real row once the dives are loaded.
@@ -121,7 +121,7 @@
       // At start, only the logbook holds links to dives and trips.
       const href = dive.trip ? `/trips/${dive.trip.id}` : `/dives/${dive.id}`;
       const link = /** @type {HTMLElement|null} */ (document.querySelector(`a[href="${href}"]`));
-      /** @type {HTMLElement|null} */ (tap.expand ? link?.querySelector('.expand') : link)?.click();
+      /** @type {HTMLElement|null} */ (tap.expand ? link?.querySelector('.od-trip-row--expand') : link)?.click();
     });
   });
 
@@ -402,7 +402,7 @@
     let dragRow = null;
 
     /** @param {Event} e */
-    const diveOf = (e) => /** @type {HTMLElement|null} */ (/** @type {HTMLElement} */ (e.target).closest('a.dive-row'));
+    const diveOf = (e) => /** @type {HTMLElement|null} */ (/** @type {HTMLElement} */ (e.target).closest('a.od-dive-row--link'));
 
     /** The trip a long press is on: let go, it is selected. */
     let pressedTrip = 0;
@@ -413,8 +413,8 @@
       dragIds = null;
       pressedTrip = 0;
       const target = /** @type {HTMLElement} */ (e.target);
-      const tripRow = /** @type {HTMLElement|null} */ (target.closest('li.trip-row'));
-      if (tripRow && !target.closest('.expand')) {
+      const tripRow = /** @type {HTMLElement|null} */ (target.closest('li.od-trip-row'));
+      if (tripRow && !target.closest('.od-trip-row--expand')) {
         startX = e.clientX;
         startY = e.clientY;
         timer = setTimeout(() => {
@@ -437,7 +437,7 @@
         pressed = true;
         dragIds = checked[id] ? Object.keys(checked).filter((k) => checked[Number(k)]).map(Number) : [id];
         dragRow = row.closest('li');
-        dragRow?.classList.add('od-drag-lift');
+        dragRow?.classList.add('od-logbook--drag-lift');
       }, LONG_PRESS_MS);
     }
     /** @param {PointerEvent} e */
@@ -469,7 +469,7 @@
       }
       // A trip's arrow expands it in place (accordion), without opening it:
       // its button sits in the row's link, which Framework7 would follow.
-      const arrow = /** @type {HTMLElement} */ (e.target).closest('.trip-row .expand');
+      const arrow = /** @type {HTMLElement} */ (e.target).closest('.od-trip-row .od-trip-row--expand');
       if (arrow) {
         e.preventDefault();
         e.stopPropagation();
@@ -478,7 +478,7 @@
       }
       if (!selecting) return;
       // In selection mode a dive or a trip is checked, not opened.
-      const trip = /** @type {HTMLElement|null} */ (/** @type {HTMLElement} */ (e.target).closest('li.trip-row'));
+      const trip = /** @type {HTMLElement|null} */ (/** @type {HTMLElement} */ (e.target).closest('li.od-trip-row'));
       if (trip) {
         toggleTripChecked(Number(trip.dataset.trip));
         e.preventDefault();
@@ -521,13 +521,13 @@
       if (!dragRow) return;
       dragging = true;
       ghost = document.createElement('div');
-      ghost.className = 'od-drag-chip';
+      ghost.className = 'od-logbook--drag-chip';
       ghost.innerHTML =
         '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5C6.5 4.5 9.5 4.5 12 6c2.5-1.5 5.5-1.5 8-.5v13c-2.5-1-5.5-1-8 .5-2.5-1.5-5.5-1.5-8-.5zM12 6v13.5"/></svg>';
       label = document.createElement('span');
       ghost.append(label);
       document.body.append(ghost);
-      dragRow.classList.add('od-drag-source');
+      dragRow.classList.add('od-logbook--drag-source');
       updateTarget();
       placeGhost();
       autoScroll();
@@ -547,14 +547,14 @@
      * @param {HTMLElement|null} row
      */
     function placeDropLine(row) {
-      let line = /** @type {HTMLElement|null} */ (document.querySelector('.od-drop-line'));
+      let line = /** @type {HTMLElement|null} */ (document.querySelector('.od-logbook--drop-line'));
       if (!row) {
         line?.remove();
         return;
       }
       if (!line) {
         line = document.createElement('div');
-        line.className = 'od-drop-line';
+        line.className = 'od-logbook--drop-line';
         document.body.append(line);
       }
       const rect = (row.querySelector('.item-content') ?? row).getBoundingClientRect();
@@ -564,7 +564,7 @@
     }
 
     function updateTarget() {
-      el?.querySelectorAll('.od-drop-target').forEach((n) => n.classList.remove('od-drop-target'));
+      el?.querySelectorAll('.od-logbook--drop-target').forEach((n) => n.classList.remove('od-logbook--drop-target'));
       target = null;
       const under = document.elementFromPoint(touchX, touchY);
       const li = /** @type {HTMLElement|null} */ (under?.closest('li'));
@@ -573,7 +573,7 @@
         const tripId = Number(li.dataset.trip) || 0;
         if (tripId && dragged.some((d) => d.trip?.id !== tripId)) {
           target = { action: 'add', tripId };
-          el.querySelectorAll(`li[data-trip="${tripId}"]`).forEach((n) => n.classList.add('od-drop-target'));
+          el.querySelectorAll(`li[data-trip="${tripId}"]`).forEach((n) => n.classList.add('od-logbook--drop-target'));
         } else if (!tripId && dragged.some((d) => d.trip)) {
           target = { action: 'remove' };
         }
@@ -590,7 +590,7 @@
       } else {
         label.textContent = t('logbook.dragRemove');
       }
-      ghost?.classList.toggle('od-drag-chip-target', !!target);
+      ghost?.classList.toggle('od-logbook--drag-chip-target', !!target);
       placeGhost();
     }
 
@@ -617,11 +617,11 @@
       dragging = false;
       cancelAnimationFrame(scrolling);
       // Every chip, also one left by a drag the list reload cut short.
-      document.querySelectorAll('.od-drag-chip, .od-drop-line').forEach((n) => n.remove());
+      document.querySelectorAll('.od-logbook--drag-chip, .od-logbook--drop-line').forEach((n) => n.remove());
       ghost = null;
       label = null;
-      dragRow?.classList.remove('od-drag-source', 'od-drag-lift');
-      el?.querySelectorAll('.od-drop-target').forEach((n) => n.classList.remove('od-drop-target'));
+      dragRow?.classList.remove('od-logbook--drag-source', 'od-logbook--drag-lift');
+      el?.querySelectorAll('.od-logbook--drop-target').forEach((n) => n.classList.remove('od-logbook--drop-target'));
     }
 
     async function drop() {
@@ -667,10 +667,10 @@
         e.stopPropagation();
         drop();
       } else {
-        if (document.querySelector('.od-drag-chip')) endDrag();
+        if (document.querySelector('.od-logbook--drag-chip')) endDrag();
         // A long press let go without moving: the selection.
         if (dragIds) {
-          dragRow?.classList.remove('od-drag-lift');
+          dragRow?.classList.remove('od-logbook--drag-lift');
           const id = dragIds[0];
           if (!selecting) startSelection(id);
           else checked[id] = true;
@@ -683,7 +683,7 @@
 
     function touchCancel() {
       if (dragging) endDrag();
-      dragRow?.classList.remove('od-drag-lift');
+      dragRow?.classList.remove('od-logbook--drag-lift');
       dragIds = null;
       pressedTrip = 0;
     }
@@ -1128,9 +1128,9 @@
     {#if filtered}
       <ActiveFilter prefs={logbook.prefs} dives={logbook.dives} shown={results ? results.length : sorted.length} />
     {:else if sorted.length && (results || selecting)}
-      <p class="count od-value" role="status">{count}{#if selecting}<span class="separator" aria-hidden="true">·</span><span class="count-selected">{t('logbook.selected', { n: checkedCount })}</span>{/if}</p>
+      <p class="od-logbook--count od-value" role="status">{count}{#if selecting}<span class="od-logbook--separator" aria-hidden="true">·</span><span class="od-logbook--count-selected">{t('logbook.selected', { n: checkedCount })}</span>{/if}</p>
     {/if}
-    {#if filter.failed}<p class="count failed" role="status">{t('logbook.filterFailed')}</p>{/if}
+    {#if filter.failed}<p class="od-logbook--count od-logbook--failed" role="status">{t('logbook.filterFailed')}</p>{/if}
     <!--
       Only offline or in manual synchronisation, when the logbook may be out of
       date, and while a "Sync now" runs: the line stays, only its text and
@@ -1148,10 +1148,10 @@
       the list replaces them (their identifiers are of the previous load).
     -->
     <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
-    <div class="preview" aria-busy="true" aria-label={t('logbook.loading')} role="status" onclickcapture={holdTap}>
+    <div class="od-logbook--preview" aria-busy="true" aria-label={t('logbook.loading')} role="status" onclickcapture={holdTap}>
       <div aria-hidden="true">
-        <p class="count od-value">{t('logbook.count', { n: logbook.preview.total })}</p>
-        <div class="list media-list {theme.ios ? 'chevron-center dividers' : ''} dives">
+        <p class="od-logbook--count od-value">{t('logbook.count', { n: logbook.preview.total })}</p>
+        <div class="list media-list {theme.ios ? 'chevron-center od-logbook--dividers' : ''} od-dive-list">
           <ul>
             {#each logbook.preview.entries as entry, i (i)}
               {#if entry.type === 'trip'}
@@ -1171,23 +1171,23 @@
       the logbook". Each bar is one line of text high, so that the rows keep
       their height when the dives arrive.
     -->
-    <div class="loading skeleton-effect-wave" aria-busy="true" aria-label={t('logbook.loading')} role="status">
+    <div class="od-logbook--loading skeleton-effect-wave" aria-busy="true" aria-label={t('logbook.loading')} role="status">
       <div aria-hidden="true">
-        <p class="count"><span class="skeleton-block bar" style:width="7.5em"></span></p>
-        <List mediaList dividers={theme.ios} class="{theme.ios ? 'chevron-center' : ''} dives">
+        <p class="od-logbook--count"><span class="skeleton-block od-logbook--bar" style:width="7.5em"></span></p>
+        <List mediaList dividers={theme.ios} class="{theme.ios ? 'chevron-center' : ''} od-dive-list">
           {#each Array(14) as _, i (i)}
             <li>
               <!-- item-link: the same chevron space as the real rows. -->
               <div class="item-content item-link">
-                <div class="item-media"><div class="skeleton-block skeleton-thumbnail"></div></div>
+                <div class="item-media"><div class="skeleton-block od-logbook--skeleton-thumbnail"></div></div>
                 <div class="item-inner od-row">
                   <div class="od-row-text">
-                    <div class="item-title"><span class="skeleton-block bar" style:width="{40 + ((i * 17) % 35)}%"></span></div>
-                    <div class="item-text"><span class="skeleton-block bar" style:width="9em"></span></div>
+                    <div class="item-title"><span class="skeleton-block od-logbook--bar" style:width="{40 + ((i * 17) % 35)}%"></span></div>
+                    <div class="item-text"><span class="skeleton-block od-logbook--bar" style:width="9em"></span></div>
                   </div>
-                  <div class="skeleton-values">
-                    <span class="value"><span class="skeleton-block bar" style:width="3em"></span></span>
-                    <span class="duration"><span class="skeleton-block bar" style:width="2.5em"></span></span>
+                  <div class="od-logbook--skeleton-values">
+                    <span class="od-logbook--value"><span class="skeleton-block od-logbook--bar" style:width="3em"></span></span>
+                    <span class="od-logbook--duration"><span class="skeleton-block od-logbook--bar" style:width="2.5em"></span></span>
                   </div>
                 </div>
               </div>
@@ -1209,22 +1209,22 @@
     </Block>
   {:else if logbook.dives.length === 0}
     <!-- Empty logbook (docs/mockups/*-etat-vide): the choices of "+" directly. -->
-    {#if logbook.email}<p class="count">{t(logbook.mode === 'git' ? 'logbook.emptyGit' : 'logbook.emptyCloud')}</p>{/if}
-    <div class="empty">
+    {#if logbook.email}<p class="od-logbook--count">{t(logbook.mode === 'git' ? 'logbook.emptyGit' : 'logbook.emptyCloud')}</p>{/if}
+    <div class="od-logbook--empty">
       <h2 class="od-state-title">{t('logbook.emptyTitle')}</h2>
-      <p class="empty-text">{t('logbook.emptyText')}</p>
+      <p class="od-logbook--empty-text">{t('logbook.emptyText')}</p>
     </div>
     {#if theme.ios}
-      <List inset strong dividers class="empty-choices">
+      <List inset strong dividers class="od-logbook--empty-choices">
         {#each emptyChoices as c, i (c.key)}
-          <ListItem link="#" title={c.text} class={i === 0 ? 'first' : ''} noChevron onClick={() => choose(c.key)}>
+          <ListItem link="#" title={c.text} class={i === 0 ? 'od-logbook--first' : ''} noChevron onClick={() => choose(c.key)}>
             {#snippet media()}<Icon name={c.icon} size={22} />{/snippet}
           </ListItem>
         {/each}
       </List>
     {:else}
-      <div class="empty-buttons">
-        <a href={downloadRoute} class="filled">
+      <div class="od-logbook--empty-buttons">
+        <a href={downloadRoute} class="od-logbook--filled">
           <Icon name="download" size={18} weight={2} />{t('logbook.emptyPair')}
         </a>
         <button type="button" class="od-outlined-button" onclick={() => choose('import')}>{t('logbook.addImport')}</button>
@@ -1232,7 +1232,7 @@
         <a href="/dives/new" class="od-text-button">{t('logbook.addManual')}</a>
       </div>
     {/if}
-    <p class="empty-note">{t('logbook.emptyNote')}</p>
+    <p class="od-logbook--empty-note">{t('logbook.emptyNote')}</p>
   {:else if results && results.length === 0}
     <Block><p>{t('logbook.noResults', { query })}</p></Block>
   {:else if filtered && sorted.length === 0}
@@ -1294,7 +1294,7 @@
   {/if}
 
   {#if !logbook.loading && !logbook.error && rows.length}
-    <div class="list media-list {theme.ios ? 'chevron-center dividers' : ''} virtual-list dives" bind:this={listEl}>
+    <div class="list media-list {theme.ios ? 'chevron-center od-logbook--dividers' : ''} od-logbook--virtual-list od-dive-list" bind:this={listEl}>
       <ul>
         {#each visible.items as row (row.key)}
           {#if row.kind === 'trip'}
@@ -1347,12 +1347,12 @@
   {#snippet fixedContent()}
     {#if selecting}
       <!-- Selection mode: the top bar gives way to the number of dives checked. -->
-      <div class="selection-bar" bind:this={selectionBar}>
+      <div class="od-logbook--selection-bar" bind:this={selectionBar}>
         <button type="button" class="od-icon-button" onclick={endSelection}>
           <Icon name="close" /><span class="od-sr-only">{t('logbook.selectionClose')}</span>
         </button>
-        <span class="selection-count od-value" role="status">{t('logbook.selected', { n: checkedCount })}</span>
-        <a href="#" class="link icon-only popover-open selection-more" data-popover=".od-logbook-menu" role="button">
+        <span class="od-logbook--selection-count od-value" role="status">{t('logbook.selected', { n: checkedCount })}</span>
+        <a href="#" class="link icon-only od-logbook--popover-open od-logbook--selection-more" data-popover=".od-logbook-menu" role="button">
           {#if theme.ios}<Icon name="moreCircle" />{:else}<Icon name="more" weight={4} />{/if}
           <span class="od-sr-only">{t('detail.moreOptions')}</span>
         </a>
@@ -1420,34 +1420,34 @@
   }
 
   @layer od.components {
-    .count {
+    .od-logbook--count {
       margin: 8px 16px 0;
       font-size: 15px;
       line-height: 21px;
       color: var(--od-text-2);
     }
 
-    .count .separator {
+    .od-logbook--count .od-logbook--separator {
       margin: 0 0.4em;
     }
 
     /* Selection mode: the number of dives checked, beside the total. */
-    .count-selected {
+    .od-logbook--count-selected {
       color: var(--od-text);
       font-weight: 500;
     }
 
-    .failed {
+    .od-logbook--failed {
       color: var(--od-alarm);
     }
 
     /* The snapshot of the start: a tap is held until the real list is there. */
-    .preview {
+    .od-logbook--preview {
       user-select: none;
     }
 
     /* Selection mode: over the top bar, the same height. */
-    .selection-bar {
+    .od-logbook--selection-bar {
       position: absolute;
       top: 0;
       left: 0;
@@ -1462,19 +1462,19 @@
       background: var(--od-surface-2);
     }
 
-    .selection-count {
+    .od-logbook--selection-count {
       font-size: 22px;
       line-height: 28px;
       color: var(--od-text);
     }
 
-    .selection-more {
+    .od-logbook--selection-more {
       margin-left: auto;
     }
 
     /* Dragging dives to a trip or out of it: the row lifted under the finger,
        its place faded, the trip it would join tinted. */
-    :global(.od-drag-chip) {
+    :global(.od-logbook--drag-chip) {
       position: fixed;
       z-index: 9000;
       max-width: calc(100vw - 16px);
@@ -1501,7 +1501,7 @@
 
     /* Over a place where the dives can go: the chip in ink. */
     /* Where the drop would go: a 3 dp bar with a dot at its start. */
-    :global(.od-drop-line) {
+    :global(.od-logbook--drop-line) {
       position: fixed;
       z-index: 9999;
       height: 3px;
@@ -1511,7 +1511,7 @@
       pointer-events: none;
     }
 
-    :global(.od-drop-line::before) {
+    :global(.od-logbook--drop-line::before) {
       content: '';
       position: absolute;
       left: -5px;
@@ -1522,13 +1522,13 @@
       background: var(--od-text);
     }
 
-    :global(.od-drag-chip.od-drag-chip-target) {
+    :global(.od-logbook--drag-chip.od-logbook--drag-chip-target) {
       background: var(--od-text);
       color: var(--od-surface);
     }
 
     /* Held by a long press: the row rises a little, ready to be dragged. */
-    :global(li.od-drag-lift) {
+    :global(li.od-logbook--drag-lift) {
       position: relative;
       z-index: 2;
       background: var(--od-surface);
@@ -1536,26 +1536,26 @@
       transition: box-shadow 150ms;
     }
 
-    :global(.od-drag-source) {
+    :global(.od-logbook--drag-source) {
       opacity: 0.35;
     }
 
-    :global(li.od-drop-target) {
+    :global(li.od-logbook--drop-target) {
       background: var(--od-tint);
     }
 
     /* The dives follow the count and the sync status closely. */
-    :global(.list.dives) {
+    :global(.list.od-dive-list) {
       margin-top: 0;
     }
 
     /* The filter button says when a filter is applied: a tinted circle. */
-    :global(.navbar .filter-on) {
+    :global(.navbar .od-logbook--filter-on) {
       background: var(--od-tint);
       border-radius: 50%;
     }
 
-    .empty {
+    .od-logbook--empty {
       margin: 48px 24px 0;
 
       :global(.ios) & {
@@ -1563,7 +1563,7 @@
       }
     }
 
-    .empty-text {
+    .od-logbook--empty-text {
       margin: 0;
       font-size: 16px;
       line-height: 24px;
@@ -1574,7 +1574,7 @@
       }
     }
 
-    .empty-buttons {
+    .od-logbook--empty-buttons {
       margin: 24px 24px 0;
       display: flex;
       flex-direction: column;
@@ -1590,7 +1590,7 @@
     }
 
     /* MD3 filled button with a leading icon: 16 dp before it, 24 dp after the label. */
-    .filled {
+    .od-logbook--filled {
       height: 40px;
       padding: 0 24px 0 16px;
       gap: 8px;
@@ -1602,11 +1602,11 @@
       letter-spacing: 0.1px;
     }
 
-    :global(.empty-choices .first .item-title) {
+    :global(.od-logbook--empty-choices .od-logbook--first .item-title) {
       font-weight: 600;
     }
 
-    .empty-note {
+    .od-logbook--empty-note {
       margin: 16px 24px 0;
       font-size: 12px;
       line-height: 16px;
@@ -1621,30 +1621,30 @@
       }
     }
 
-    .skeleton-thumbnail {
+    .od-logbook--skeleton-thumbnail {
       width: 56px;
       height: 40px;
       border-radius: 8px;
     }
 
     /* Depth and duration on the right, as in <DiveRow>. */
-    .skeleton-values {
+    .od-logbook--skeleton-values {
       display: flex;
       flex-direction: column;
       align-items: flex-end;
       flex: 0 0 auto;
 
-      .value {
+      .od-logbook--value {
         line-height: 22px;
       }
 
-      .duration {
+      .od-logbook--duration {
         line-height: 18px;
       }
     }
 
     /* A greyed bar one line of text high. */
-    .bar {
+    .od-logbook--bar {
       display: inline-block;
       height: 0.8em;
       max-width: 100%;

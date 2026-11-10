@@ -25,18 +25,18 @@
   const name = `od-choice-${Math.random().toString(36).slice(2, 9)}`;
 </script>
 
-<Md3Dialog {title} {oncancel}>
-  <div class="choices" role="radiogroup" aria-label={title}>
+<Md3Dialog class="od-choice-dialog" {title} {oncancel}>
+  <div class="od-choice-dialog--choices" role="radiogroup" aria-label={title}>
     {#each options as option (option.value)}
-      <label class="choice">
+      <label class="od-choice-dialog--choice">
         <input type="radio" {name} value={option.value} bind:group={selected} />
         <span class="radio" aria-hidden="true"></span>
-        <span class="label">{option.label}</span>
-        {#if option.example}<span class="example">{option.example}</span>{/if}
+        <span class="od-choice-dialog--label">{option.label}</span>
+        {#if option.example}<span class="od-choice-dialog--example">{option.example}</span>{/if}
       </label>
     {/each}
   </div>
-  {#if note}<p class="note">{note}</p>{/if}
+  {#if note}<p class="od-choice-dialog--note">{note}</p>{/if}
   {#snippet actions()}
     <button type="button" onclick={oncancel}>{t('dialog.cancel')}</button>
     <button type="button" onclick={() => onselect(selected)}>{t('dialog.ok')}</button>
@@ -45,19 +45,19 @@
 
 <style>
   @layer od.components {
-    .choices {
+    .od-choice-dialog--choices {
       display: flex;
       flex-direction: column;
     }
 
-    .note {
+    .od-choice-dialog--note {
       margin: 8px 24px 0;
       font-size: 13px;
       line-height: 18px;
       color: var(--od-text-2);
     }
 
-    .choice {
+    .od-choice-dialog--choice {
       position: relative;
       min-height: 56px;
       padding: 0 24px;
@@ -104,14 +104,14 @@
       outline-offset: 6px;
     }
 
-    .label {
+    .od-choice-dialog--label {
       flex: 1;
       min-width: 0;
       font-size: 16px;
       font-variant-numeric: tabular-nums;
     }
 
-    .example {
+    .od-choice-dialog--example {
       flex: none;
       font-size: 14px;
       color: var(--od-text-2);

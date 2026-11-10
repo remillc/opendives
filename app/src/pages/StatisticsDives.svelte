@@ -48,7 +48,7 @@
   });
 </script>
 
-<Page class="od-stat-dives">
+<Page class="od-statistics-dives">
   <Navbar {title} subtitle={support}>
     {#snippet left()}
       <Link back iconOnly={!theme.ios}>
@@ -58,7 +58,7 @@
     {/snippet}
   </Navbar>
 
-  <div class="list media-list {theme.ios ? 'chevron-center dividers' : ''} dives od-stat-dives-list">
+  <div class="list media-list {theme.ios ? 'chevron-center od-statistics-dives--dividers' : ''} od-dive-list od-statistics-dives--list">
     <ul>
       {#each dives.slice(0, limit) as dive (dive.id)}
         <DiveRow {dive} prefs={logbook.prefs} />
@@ -69,12 +69,12 @@
 
 <style>
   /* The top bar on the page background (mock-up). */
-  :global(.od-stat-dives) {
+  :global(.od-statistics-dives) {
     --f7-navbar-bg-color: var(--od-background);
   }
 
   @layer od.components {
-    .od-stat-dives-list {
+    .od-statistics-dives--list {
       margin-top: 12px;
     }
   }

@@ -42,8 +42,8 @@
 </script>
 
 <svg
-  class="thumbnail"
-  class:small
+  class="od-profile-thumbnail od-profile-thumbnail--thumbnail"
+  class:od-profile-thumbnail--small={small}
   viewBox="0 0 {W} {H}"
   preserveAspectRatio="none"
   role={small ? undefined : 'img'}
@@ -58,13 +58,13 @@
   </defs>
   {#if shape}
     <path d={shape.water} fill="url(#water-{uid})" />
-    <path d={shape.line} class="line" vector-effect="non-scaling-stroke" />
+    <path d={shape.line} class="od-profile-thumbnail--line" vector-effect="non-scaling-stroke" />
   {/if}
 </svg>
 
 <style>
   @layer od.components {
-    .thumbnail {
+    .od-profile-thumbnail--thumbnail {
       display: block;
       width: 56px;
       height: 40px;
@@ -78,20 +78,20 @@
         border-radius: 4px;
       }
 
-      &.small {
+      &.od-profile-thumbnail--small {
         width: 100%;
         height: 100%;
         border-radius: 4px;
       }
     }
 
-    .line {
+    .od-profile-thumbnail--line {
       fill: none;
       stroke: var(--od-trace);
       stroke-width: 1.25;
       stroke-linejoin: round;
 
-      .small & {
+      .od-profile-thumbnail--small & {
         stroke-width: 1;
       }
     }

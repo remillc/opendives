@@ -17,30 +17,30 @@
   let { label, value, onclick, supporting = '' } = $props();
 </script>
 
-<div class="field">
+<div class="od-button-field od-button-field--field">
   {#if onclick}
-    <button type="button" class="box" {onclick}>
-      <span class="label">{label}</span>
-      <span class="value">{value}</span>
-      <span class="arrow"><Icon name={ios ? 'expand' : 'chevron'} /></span>
+    <button type="button" class="od-button-field--box" {onclick}>
+      <span class="od-button-field--label">{label}</span>
+      <span class="od-button-field--value">{value}</span>
+      <span class="od-button-field--arrow"><Icon name={ios ? 'expand' : 'chevron'} /></span>
     </button>
   {:else}
-    <div class="box readonly">
-      <span class="label">{label}</span>
-      <span class="value">{value}</span>
+    <div class="od-button-field--box od-button-field--readonly">
+      <span class="od-button-field--label">{label}</span>
+      <span class="od-button-field--value">{value}</span>
     </div>
   {/if}
-  {#if supporting}<p class="supporting">{supporting}</p>{/if}
+  {#if supporting}<p class="od-button-field--supporting">{supporting}</p>{/if}
 </div>
 
 <style>
   @layer od.components {
-    .field {
+    .od-button-field--field {
       margin: 18px var(--od-field-margin, 16px) 0;
       min-width: 0;
     }
 
-    .box {
+    .od-button-field--box {
       position: relative;
       display: block;
       width: 100%;
@@ -69,7 +69,7 @@
         background: var(--od-primary-action);
       }
 
-      &.readonly {
+      &.od-button-field--readonly {
         padding-right: 16px;
         color: var(--od-text-2);
       }
@@ -84,7 +84,7 @@
       }
     }
 
-    .label {
+    .od-button-field--label {
       position: absolute;
       left: 16px;
       top: 8px;
@@ -93,7 +93,7 @@
       color: var(--od-text-2);
     }
 
-    .value {
+    .od-button-field--value {
       display: block;
       font-size: 16px;
       line-height: 24px;
@@ -104,7 +104,7 @@
     }
 
     /* A compact field sets --od-button-field-arrow: none and a smaller --od-button-field-end. */
-    .arrow {
+    .od-button-field--arrow {
       position: absolute;
       right: 12px;
       top: 50%;
@@ -113,7 +113,7 @@
       color: var(--od-text-2);
     }
 
-    .supporting {
+    .od-button-field--supporting {
       margin: 4px 16px 0;
       font-size: 12px;
       line-height: 16px;

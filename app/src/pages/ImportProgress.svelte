@@ -147,7 +147,7 @@
   run();
 </script>
 
-<AccountStep
+<AccountStep class="od-import-progress"
   title={t('createAccount.title')}
   step={t('createAccount.step2')}
   heading={phase === 'failed' ? t('importProgress.failedTitle') : t('importProgress.title')}
@@ -167,24 +167,24 @@
   secondaryEnd
   closable={false}
 >
-  <ol class="steps" aria-label={t('importProgress.stepsLabel')}>
+  <ol class="od-import-progress--steps" aria-label={t('importProgress.stepsLabel')}>
     {#each steps as step (step.key)}
-      <li class="state-{step.state}">
-        <span class="mark" aria-hidden="true">
+      <li class="od-import-progress--state-{step.state}">
+        <span class="od-import-progress--mark" aria-hidden="true">
           {#if step.state === 'done'}
-            <span class="done"><Icon name="check" size={18} weight={2.2} /></span>
+            <span class="od-import-progress--done"><Icon name="check" size={18} weight={2.2} /></span>
           {:else if step.state === 'running'}
-            <span class="spinner"></span>
+            <span class="od-import-progress--spinner"></span>
           {:else if step.state === 'failed'}
-            <span class="failed"><Icon name="error" /></span>
+            <span class="od-import-progress--failed"><Icon name="error" /></span>
           {:else}
             <svg width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.2" /></svg>
           {/if}
         </span>
-        <span class="text">
-          <span class="label">{t(`importProgress.steps.${step.key}`)}</span>
+        <span class="od-import-progress--text">
+          <span class="od-import-progress--label">{t(`importProgress.steps.${step.key}`)}</span>
           {#if step.text || step.state === 'running'}
-            <span class="detail">{step.text || t('importProgress.running')}</span>
+            <span class="od-import-progress--detail">{step.text || t('importProgress.running')}</span>
           {/if}
         </span>
       </li>
@@ -194,7 +194,7 @@
 
 <style>
   @layer od.components {
-    .steps {
+    .od-import-progress--steps {
       list-style: none;
       margin: 16px 0 0;
       padding: 0;
@@ -222,7 +222,7 @@
       }
     }
 
-    .mark {
+    .od-import-progress--mark {
       flex: none;
       width: 24px;
       height: 24px;
@@ -238,7 +238,7 @@
       }
     }
 
-    .done {
+    .od-import-progress--done {
       width: 24px;
       height: 24px;
       border-radius: 50%;
@@ -249,12 +249,12 @@
       justify-content: center;
     }
 
-    .failed {
+    .od-import-progress--failed {
       display: flex;
       color: var(--od-alarm);
     }
 
-    .spinner {
+    .od-import-progress--spinner {
       width: 20px;
       height: 20px;
       border: 2.5px solid var(--od-text);
@@ -270,14 +270,14 @@
       }
     }
 
-    .text {
+    .od-import-progress--text {
       flex: 1;
       display: flex;
       flex-direction: column;
       gap: 2px;
     }
 
-    .label {
+    .od-import-progress--label {
       font-size: 16px;
       line-height: 24px;
 
@@ -286,12 +286,12 @@
       }
     }
 
-    .detail {
+    .od-import-progress--detail {
       font-size: 14px;
       line-height: 20px;
       color: var(--od-text-2);
 
-      .state-failed & {
+      .od-import-progress--state-failed & {
         color: var(--od-alarm);
       }
 

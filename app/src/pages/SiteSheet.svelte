@@ -37,7 +37,7 @@
   const byId = $derived(new Map(logbook.dives.map((d) => [d.id, d])));
 </script>
 
-<Page>
+<Page class="od-site-sheet">
   <Navbar>
     {#snippet left()}
       <Link back iconOnly><i class="icon icon-back"></i><span class="od-sr-only">{t('common.back')}</span></Link>
@@ -48,17 +48,17 @@
   </Navbar>
 
   {#if site && site.uuid}
-    <header class="head">
+    <header class="od-site-sheet--head">
       <h1>{site.name || t('sites.noName')}</h1>
-      {#if site.country}<p class="sub">{site.country}</p>{/if}
+      {#if site.country}<p class="od-site-sheet--sub">{site.country}</p>{/if}
     </header>
 
     {#if site.hasLocation}
       <!-- Inside the margins, 16 dp corners, 170 dp high (task 2026-11-07-24). -->
-      <div class="map">
+      <div class="od-site-sheet--map">
         <SiteMap pin={{ latUdeg: site.latUdeg, lonUdeg: site.lonUdeg }} height="170px" />
       </div>
-      <div class="coords">
+      <div class="od-site-sheet--coords">
         <span class="od-value">{formatCoordinates(site.latUdeg, site.lonUdeg)}</span>
         <a class="external od-text-button" href={mapsLink(site.latUdeg, site.lonUdeg, site.name)}>
           {t('sites.openInMaps')}<Icon name="openInNew" size={18} /><span class="od-sr-only">, {t('sites.opensElsewhere')}</span>
@@ -66,37 +66,37 @@
       </div>
     {/if}
 
-    <h2 class="title">{t('sites.about')}</h2>
-    <ul class="surface">
-      <li class="row">
-        <span class="headline">{t('sites.description')}</span>
-        <span class="supporting text">{site.description || t('sites.noDescription')}</span>
+    <h2 class="od-site-sheet--title">{t('sites.about')}</h2>
+    <ul class="od-site-sheet--surface">
+      <li class="od-site-sheet--row">
+        <span class="od-site-sheet--headline">{t('sites.description')}</span>
+        <span class="od-site-sheet--supporting od-site-sheet--text">{site.description || t('sites.noDescription')}</span>
       </li>
-      <li class="row">
-        <span class="headline">{t('sites.notes')}</span>
-        <span class="supporting text">{site.notes || t('sites.noNotes')}</span>
+      <li class="od-site-sheet--row">
+        <span class="od-site-sheet--headline">{t('sites.notes')}</span>
+        <span class="od-site-sheet--supporting od-site-sheet--text">{site.notes || t('sites.noNotes')}</span>
       </li>
       {#if place}
-        <li class="row">
-          <span class="headline">{t('sites.regionCity')}</span>
-          <span class="supporting">{place}<br />{anyManual ? t('sites.corrected') : t('sites.foundAutomatically')}</span>
+        <li class="od-site-sheet--row">
+          <span class="od-site-sheet--headline">{t('sites.regionCity')}</span>
+          <span class="od-site-sheet--supporting">{place}<br />{anyManual ? t('sites.corrected') : t('sites.foundAutomatically')}</span>
         </li>
       {/if}
     </ul>
 
     {#if site.diveList.length}
-      <h2 class="title">{t('sites.divesHere')}</h2>
-      <ul class="surface">
+      <h2 class="od-site-sheet--title">{t('sites.divesHere')}</h2>
+      <ul class="od-site-sheet--surface">
         {#each latestFirst as dive (dive.id)}
           {@const listed = byId.get(dive.id)}
           <li>
-            <a href="/dives/{dive.id}" class="row dive">
+            <a href="/dives/{dive.id}" class="od-site-sheet--row od-site-sheet--dive">
               {#if listed}
                 <ProfileThumbnail profile={listed.profile} maxDepthMm={listed.maxDepthMm} prefs={logbook.prefs} />
               {/if}
-              <span class="text-column">
-                <span class="date od-value">{dive.number ? t('sites.diveNumberDate', { number: dive.number, date: formatLongDateTime(dive.date) }) : formatLongDateTime(dive.date)}</span>
-                <span class="supporting od-value">{lines[dive.id] ?? ''}</span>
+              <span class="od-site-sheet--text-column">
+                <span class="od-site-sheet--date od-value">{dive.number ? t('sites.diveNumberDate', { number: dive.number, date: formatLongDateTime(dive.date) }) : formatLongDateTime(dive.date)}</span>
+                <span class="od-site-sheet--supporting od-value">{lines[dive.id] ?? ''}</span>
               </span>
             </a>
           </li>
@@ -108,7 +108,7 @@
 
 <style>
   @layer od.components {
-    .head {
+    .od-site-sheet--head {
       padding: 0 20px;
 
       h1 {
@@ -120,19 +120,19 @@
       }
     }
 
-    .sub {
+    .od-site-sheet--sub {
       margin: 2px 0 0;
       font-size: 15px;
       color: var(--od-text-2);
     }
 
-    .map {
+    .od-site-sheet--map {
       margin: 14px 16px 0;
       border-radius: 16px;
       overflow: hidden;
     }
 
-    .coords {
+    .od-site-sheet--coords {
       margin: 4px 8px 0 20px;
       min-height: 48px;
       display: flex;
@@ -144,7 +144,7 @@
     }
 
     /* Section titles of the sheet: 14 medium, as in the mock-up. */
-    .title {
+    .od-site-sheet--title {
       margin: 22px 16px 8px;
       font-size: 14px;
       line-height: 20px;
@@ -152,7 +152,7 @@
       color: var(--od-text-2);
     }
 
-    .surface {
+    .od-site-sheet--surface {
       margin: 0 16px;
       padding: 0;
       list-style: none;
@@ -166,7 +166,7 @@
       }
     }
 
-    .row {
+    .od-site-sheet--row {
       min-height: 56px;
       padding: 10px 16px;
       box-sizing: border-box;
@@ -176,24 +176,24 @@
       gap: 2px;
     }
 
-    .headline {
+    .od-site-sheet--headline {
       font-size: 16px;
       line-height: 24px;
       color: var(--od-text);
     }
 
-    .supporting {
+    .od-site-sheet--supporting {
       font-size: 14px;
       line-height: 20px;
       color: var(--od-text-2);
     }
 
-    .text {
+    .od-site-sheet--text {
       white-space: pre-line;
     }
 
     /* A dive: the profile thumbnail, the long date, then minutes, buddies, mode. */
-    .dive {
+    .od-site-sheet--dive {
       min-height: 64px;
       flex-direction: row;
       align-items: center;
@@ -203,7 +203,7 @@
       text-decoration: none;
     }
 
-    .text-column {
+    .od-site-sheet--text-column {
       flex: 1;
       min-width: 0;
       display: flex;
@@ -211,7 +211,7 @@
       gap: 2px;
     }
 
-    .date {
+    .od-site-sheet--date {
       font-size: 16px;
       line-height: 24px;
       font-weight: 600;

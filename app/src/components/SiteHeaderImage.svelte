@@ -39,22 +39,22 @@
   });
 </script>
 
-<div class="image" aria-hidden="true">
+<div class="od-site-header-image od-site-header-image--image" aria-hidden="true">
   {#if src}
     <img {src} alt="" style:width="{DRAW_WIDTH}px" style:height="{HALF_HEIGHT * 2}px" style:margin-left="{-DRAW_WIDTH / 2}px" style:margin-top="{-HALF_HEIGHT}px" />
-    <svg class="pin" width="40" height="40" viewBox="-20 -20 40 40">
-      <circle class="halo" r="14" />
-      <path class="body" d="M0 4 C-2 -1 -8 -5 -8 -11 A8 8 0 1 1 8 -11 C8 -5 2 -1 0 4Z" />
-      <circle class="eye" cy="-11" r="3" />
+    <svg class="od-site-header-image--pin" width="40" height="40" viewBox="-20 -20 40 40">
+      <circle class="od-site-header-image--halo" r="14" />
+      <path class="od-site-header-image--body" d="M0 4 C-2 -1 -8 -5 -8 -11 A8 8 0 1 1 8 -11 C8 -5 2 -1 0 4Z" />
+      <circle class="od-site-header-image--eye" cy="-11" r="3" />
     </svg>
-    <div class="fade"></div>
+    <div class="od-site-header-image--fade"></div>
   {/if}
 </div>
 
 <style>
   @layer od.components {
     /* From the top of the screen to just under the header. */
-    .image {
+    .od-site-header-image--image {
       position: absolute;
       left: 0;
       right: 0;
@@ -66,7 +66,7 @@
 
     /* The site is under the pin, in the middle of the top bar. */
     img,
-    .pin {
+    .od-site-header-image--pin {
       position: absolute;
       left: 50%;
       top: calc(var(--f7-safe-area-top) + var(--f7-navbar-height) / 2);
@@ -80,26 +80,26 @@
       }
     }
 
-    .pin {
+    .od-site-header-image--pin {
       transform: translate(-50%, -50%);
     }
 
-    .halo {
+    .od-site-header-image--halo {
       fill: var(--od-pin);
       fill-opacity: 0.14;
     }
 
-    .body {
+    .od-site-header-image--body {
       fill: var(--od-pin);
       stroke: var(--od-on-pin);
       stroke-width: 1.5;
     }
 
-    .eye {
+    .od-site-header-image--eye {
       fill: var(--od-on-pin);
     }
 
-    .fade {
+    .od-site-header-image--fade {
       position: absolute;
       inset: 0;
       background: linear-gradient(

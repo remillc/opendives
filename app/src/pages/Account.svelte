@@ -74,10 +74,10 @@
     const pending = logbook.pending;
     const text = pending ? t(git ? 'signOut.textPendingGit' : 'signOut.textPending', { n: pending }) : t(git ? 'signOut.textNoneGit' : 'signOut.textNone');
     const content = `
-      <p class="od-signout-text">${escape(text)}</p>
-      <label class="od-signout-copy${pending ? ' disabled' : ''}">
+      <p class="od-account--signout-text">${escape(text)}</p>
+      <label class="od-account--signout-copy${pending ? ' disabled' : ''}">
         <span class="checkbox"><input type="checkbox"${pending ? ' disabled' : ''}><i class="icon-checkbox"></i></span>
-        <span>${escape(t('signOut.deleteCopy'))}${pending ? `<span class="od-signout-hint">${escape(t('signOut.deleteCopyHint'))}</span>` : ''}</span>
+        <span>${escape(t('signOut.deleteCopy'))}${pending ? `<span class="od-account--signout-hint">${escape(t('signOut.deleteCopyHint'))}</span>` : ''}</span>
       </label>`;
     /** @param {any} dialog */
     const deleteCopy = (dialog) => !pending && dialog.$el.find('input[type="checkbox"]')[0]?.checked === true;
@@ -91,7 +91,7 @@
           { text: t('signOut.cancel') },
           { text: t('signOut.confirm'), bold: true, onClick: (/** @type {any} */ dialog) => runSignOut(deleteCopy(dialog)) },
         ];
-    f7.dialog.create({ title: t(git ? 'signOut.titleGit' : 'signOut.title'), content, buttons, verticalButtons: pending > 0, cssClass: 'od-signout' }).open();
+    f7.dialog.create({ title: t(git ? 'signOut.titleGit' : 'signOut.title'), content, buttons, verticalButtons: pending > 0, cssClass: 'od-account--signout' }).open();
   }
 
   /** @param {boolean} deleteCopy */
@@ -121,7 +121,7 @@
   }
 </script>
 
-<Page>
+<Page class="od-account">
   <Navbar class="od-band-bar" title={t('account.title')}>
     {#snippet left()}<MenuButton />{/snippet}
   </Navbar>
@@ -129,18 +129,18 @@
   <SectionBand summary={t(signedIn ? (git ? 'account.bandGit' : 'account.bandSignedIn') : 'account.bandNone')} />
 
   {#if signedIn}
-    <div class="identity">
+    <div class="od-account--identity">
       {#if git}
-        <span class="avatar"><Icon name="git" size={28} /></span>
-        <span class="text">
-          <span class="name">{gitName}</span>
-          <span class="status">{t('account.gitCaption', { host: gitHost, branch: gitBranch })}</span>
+        <span class="od-account--avatar"><Icon name="git" size={28} /></span>
+        <span class="od-account--text">
+          <span class="od-account--name">{gitName}</span>
+          <span class="od-account--status">{t('account.gitCaption', { host: gitHost, branch: gitBranch })}</span>
         </span>
       {:else}
-        <span class="avatar"><Icon name="account" size={28} /></span>
-        <span class="text">
-          <span class="name">{logbook.email}</span>
-          <span class="status"><Icon name="cloud" size={16} />{t('account.verified')}</span>
+        <span class="od-account--avatar"><Icon name="account" size={28} /></span>
+        <span class="od-account--text">
+          <span class="od-account--name">{logbook.email}</span>
+          <span class="od-account--status"><Icon name="cloud" size={16} />{t('account.verified')}</span>
         </span>
       {/if}
     </div>
@@ -169,7 +169,7 @@
             <div class="item-content">
               <div class="item-inner">
                 <div class="item-title">{t('account.pending')}</div>
-                <div class="item-after od-value" class:pending={logbook.pending > 0}>{formatNumber(logbook.pending)}</div>
+                <div class="item-after od-value" class:od-account--pending={logbook.pending > 0}>{formatNumber(logbook.pending)}</div>
               </div>
             </div>
           </li>
@@ -202,7 +202,7 @@
             </a>
           </li>
         {/if}
-        <li class="sync-now">
+        <li class="od-account--sync-now">
           <SyncButton />
         </li>
       </ul>
@@ -244,37 +244,37 @@
 
     <div class="block-title">{t('account.leaveGroup')}</div>
     <!-- Leaving the account: buttons, each with its consequence (spec, section 4). -->
-    <div class="leave">
+    <div class="od-account--leave">
       <button type="button" class="od-outlined-button" onclick={confirmSignOut}>{t(git ? 'account.gitSignOut' : 'account.signOut')}</button>
-      <span class="consequence">{t(git ? 'account.gitSignOutText' : 'account.signOutText')}</span>
+      <span class="od-account--consequence">{t(git ? 'account.gitSignOutText' : 'account.signOutText')}</span>
     </div>
     {#if !git}
-      <div class="leave">
-        <button type="button" class="od-outlined-button danger" onclick={() => f7.views.current?.router.navigate('/account/delete')}>
+      <div class="od-account--leave">
+        <button type="button" class="od-outlined-button od-danger" onclick={() => f7.views.current?.router.navigate('/account/delete')}>
           {t('account.delete')}
         </button>
-        <span class="consequence">{t('account.deleteText')}</span>
+        <span class="od-account--consequence">{t('account.deleteText')}</span>
       </div>
     {/if}
 
-    {#if serverCaption && !git}<p class="caption">{serverCaption}</p>{/if}
+    {#if serverCaption && !git}<p class="od-account--caption">{serverCaption}</p>{/if}
   {:else}
-    <div class="identity">
-      <span class="avatar"><Icon name="device" size={26} /></span>
-      <span class="text">
-        <span class="name">{t('account.noAccount')}</span>
-        <span class="status">{t('account.deviceDives', { n: count })}</span>
+    <div class="od-account--identity">
+      <span class="od-account--avatar"><Icon name="device" size={26} /></span>
+      <span class="od-account--text">
+        <span class="od-account--name">{t('account.noAccount')}</span>
+        <span class="od-account--status">{t('account.deviceDives', { n: count })}</span>
       </span>
     </div>
-    <p class="pitch">{t('account.pitch')}</p>
-    <div class="choices">
-      <a href="/account/create" class="choice primary">
-        <span class="label">{t('account.create')}</span>
-        <span class="consequence">{t('account.createText', { n: count })}</span>
+    <p class="od-account--pitch">{t('account.pitch')}</p>
+    <div class="od-account--choices">
+      <a href="/account/create" class="od-account--choice od-account--primary">
+        <span class="od-account--label">{t('account.create')}</span>
+        <span class="od-account--consequence">{t('account.createText', { n: count })}</span>
       </a>
-      <a href="/account/sign-in" class="choice">
-        <span class="label">{t('account.signIn')}</span>
-        <span class="consequence">{t('account.signInText', { n: count })}</span>
+      <a href="/account/sign-in" class="od-account--choice">
+        <span class="od-account--label">{t('account.signIn')}</span>
+        <span class="od-account--consequence">{t('account.signInText', { n: count })}</span>
       </a>
     </div>
   {/if}
@@ -282,7 +282,7 @@
 
 <style>
   @layer od.components {
-    .identity {
+    .od-account--identity {
       margin: 16px 16px 0;
       padding: 16px;
       border-radius: 16px;
@@ -296,7 +296,7 @@
       }
     }
 
-    .avatar {
+    .od-account--avatar {
       flex: none;
       width: 52px;
       height: 52px;
@@ -308,20 +308,20 @@
       justify-content: center;
     }
 
-    .text {
+    .od-account--text {
       display: flex;
       flex-direction: column;
       gap: 2px;
       min-width: 0;
     }
 
-    .name {
+    .od-account--name {
       font-size: 17px;
       font-weight: 700;
       overflow-wrap: anywhere;
     }
 
-    .status {
+    .od-account--status {
       font-size: 14px;
       line-height: 19px;
       color: var(--od-text-2);
@@ -335,22 +335,22 @@
     }
 
     /* "Sync now": a real button centred in its row (style: .od-tonal-button). */
-    .sync-now {
+    .od-account--sync-now {
       padding: 12px 16px 14px;
       display: flex;
       justify-content: center;
     }
 
-    .pending {
+    .od-account--pending {
       color: var(--od-pending);
     }
 
     /* Sign-out dialog (outside this page in the document): fully global selectors. */
-    :global(.od-signout .od-signout-text) {
+    :global(.od-account--signout .od-account--signout-text) {
       margin: 0 0 12px;
     }
 
-    :global(.od-signout .od-signout-copy) {
+    :global(.od-account--signout .od-account--signout-copy) {
       display: flex;
       align-items: flex-start;
       gap: 12px;
@@ -358,29 +358,29 @@
     }
 
     /* The check box keeps its 18 dp: never shrunk by the text beside it. */
-    :global(.od-signout .od-signout-copy .checkbox) {
+    :global(.od-account--signout .od-account--signout-copy .checkbox) {
       flex: none;
       margin-top: 2px;
     }
 
-    :global(.od-signout .od-signout-copy.disabled) {
+    :global(.od-account--signout .od-account--signout-copy.disabled) {
       opacity: 0.55;
     }
 
-    :global(.od-signout .od-signout-hint) {
+    :global(.od-account--signout .od-account--signout-hint) {
       display: block;
       font-size: 13px;
       color: var(--od-text-2);
     }
 
-    .leave {
+    .od-account--leave {
       margin: 0 16px 18px;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 6px;
 
-      .consequence {
+      .od-account--consequence {
         max-width: 300px;
         font-size: 13px;
         line-height: 18px;
@@ -389,28 +389,28 @@
       }
     }
 
-    .caption {
+    .od-account--caption {
       margin: 14px 20px 24px;
       font-size: 13px;
       line-height: 18px;
       color: var(--od-text-2);
     }
 
-    .pitch {
+    .od-account--pitch {
       margin: 18px 20px 0;
       font-size: 16px;
       line-height: 24px;
       color: var(--od-text-2);
     }
 
-    .choices {
+    .od-account--choices {
       margin: 16px 16px 24px;
       display: flex;
       flex-direction: column;
       gap: 10px;
     }
 
-    .choice {
+    .od-account--choice {
       padding: 14px 16px;
       border-radius: 16px;
       border: 1px solid var(--od-separator);
@@ -425,24 +425,24 @@
         border-radius: 10px;
       }
 
-      &.primary {
+      &.od-account--primary {
         border-color: var(--od-primary-action);
         background: var(--od-primary-action);
         color: var(--od-on-primary-action);
 
-        .consequence {
+        .od-account--consequence {
           color: inherit;
           opacity: 0.85;
         }
       }
     }
 
-    .label {
+    .od-account--label {
       font-size: 17px;
       font-weight: 700;
     }
 
-    .consequence {
+    .od-account--consequence {
       font-size: 14px;
       line-height: 19px;
       color: var(--od-text-2);

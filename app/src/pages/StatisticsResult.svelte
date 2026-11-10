@@ -65,7 +65,7 @@
   }
 </script>
 
-<Page>
+<Page class="od-statistics-result">
   <Navbar large={theme.ios} {title}>
     {#snippet left()}
       <Link back iconOnly={!theme.ios}>
@@ -75,19 +75,19 @@
     {/snippet}
   </Navbar>
 
-  <div class="chips">
+  <div class="od-statistics-result--chips">
     {#each criteria as c, i (c.field)}
-      <span class="chip-input">
+      <span class="od-statistics-result--chip-input">
         {t('stats.criterionValue', {
           criterion: t(`stats.criteria.${c.field}`),
           value: c.values.map((v) => valueLabel(c.field, v, logbook.dives)).join(', '),
         })}
-        <button type="button" class="remove" onclick={() => removeCriterion(i)}>
+        <button type="button" class="od-statistics-result--remove" onclick={() => removeCriterion(i)}>
           <Icon name="close" size={18} weight={2} /><span class="od-sr-only">{t('stats.removeCriterion')}</span>
         </button>
       </span>
     {/each}
-    <span class="count od-value" role="status">
+    <span class="od-statistics-result--count od-value" role="status">
       {result ? t('stats.outOf', { n: result.total.dives, total: result.logDives }) : ''}
     </span>
   </div>
@@ -96,8 +96,8 @@
 
   <!-- As stats-filtre-android.dc.html: one bar per dive in the water colour
        of its depth, the year under each, no axis (task 2026-11-07-24). -->
-  <h2 class="chart-title">{t('stats.depthPerDive')}</h2>
-  <div class="chart-block">
+  <h2 class="od-statistics-result--chart-title">{t('stats.depthPerDive')}</h2>
+  <div class="od-statistics-result--chart-block">
     <BarChart {bars} depth axis={false} labelSize={12} height={120} label={`${t('stats.chartDepthLabel', { n: dives.length })}, ${title}`} />
   </div>
 
@@ -108,8 +108,8 @@
   />
 
   {#if !compare}
-    <div class="compare">
-      <button type="button" class="text-button" onclick={() => (compare = true)}>
+    <div class="od-statistics-result--compare">
+      <button type="button" class="od-statistics-result--text-button" onclick={() => (compare = true)}>
         {t('stats.compareBySuit')}<Icon name="expand" size={18} weight={2} />
       </button>
     </div>
@@ -133,12 +133,12 @@
       </div>
     {/if}
   {/if}
-  <div class="end"></div>
+  <div class="od-statistics-result--end"></div>
 </Page>
 
 <style>
   @layer od.components {
-    .chips {
+    .od-statistics-result--chips {
       margin: 4px 16px 0;
       display: flex;
       align-items: center;
@@ -152,7 +152,7 @@
     }
 
     /* MD3 input chip: 32 dp, 8 dp corners; iOS: a pill. */
-    .chip-input {
+    .od-statistics-result--chip-input {
       height: 32px;
       padding: 0 4px 0 12px;
       border-radius: 8px;
@@ -172,7 +172,7 @@
     }
 
     /* 48 dp touch target around the 18 dp icon, without growing the chip. */
-    .remove {
+    .od-statistics-result--remove {
       width: 32px;
       height: 32px;
       margin: -8px 0;
@@ -192,7 +192,7 @@
       }
     }
 
-    .count {
+    .od-statistics-result--count {
       font-size: 14px;
       color: var(--od-text-2);
 
@@ -201,7 +201,7 @@
       }
     }
 
-    .chart-title {
+    .od-statistics-result--chart-title {
       margin: 22px 16px 8px;
       font-size: 14px;
       line-height: 20px;
@@ -209,7 +209,7 @@
       color: var(--od-text-2);
     }
 
-    .chart-block {
+    .od-statistics-result--chart-block {
       margin: 0 16px;
       padding: 16px;
       border-radius: 12px;
@@ -223,11 +223,11 @@
 
 
     /* MD3 text button (40 dp, 12 dp side padding); a plain text button on iOS. */
-    .compare {
+    .od-statistics-result--compare {
       margin: 12px 8px 0;
     }
 
-    .text-button {
+    .od-statistics-result--text-button {
       height: 40px;
       padding: 0 12px;
       border: none;
@@ -250,7 +250,7 @@
       }
     }
 
-    .end {
+    .od-statistics-result--end {
       height: 32px;
     }
   }

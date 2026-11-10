@@ -13,9 +13,10 @@
    *   oncancel: () => void,
    *   children: import('svelte').Snippet,
    *   actions: import('svelte').Snippet,
+   *   class?: string,
    * }}
    */
-  let { title, text = '', oncancel, children, actions } = $props();
+  let { title, text = '', oncancel, children, actions, class: extraClass = '' } = $props();
 
   const id = `od-dialog-${Math.random().toString(36).slice(2, 9)}`;
 
@@ -51,20 +52,20 @@
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
-<div class="od-dialog modal-in" use:portal onkeydown={keydown}>
+<div class="od-md3-dialog modal-in {extraClass}" use:portal onkeydown={keydown}>
   <!-- svelte-ignore a11y_click_events_have_key_events -->
-  <div class="scrim" onclick={oncancel}></div>
-  <div class="surface" role="dialog" aria-modal="true" aria-labelledby={id} tabindex="-1">
+  <div class="od-md3-dialog--scrim" onclick={oncancel}></div>
+  <div class="od-md3-dialog--surface" role="dialog" aria-modal="true" aria-labelledby={id} tabindex="-1">
     <h2 {id}>{title}</h2>
-    {#if text}<p class="text">{text}</p>{/if}
-    <div class="content">{@render children()}</div>
-    <div class="actions">{@render actions()}</div>
+    {#if text}<p class="od-md3-dialog--text">{text}</p>{/if}
+    <div class="od-md3-dialog--content">{@render children()}</div>
+    <div class="od-md3-dialog--actions">{@render actions()}</div>
   </div>
 </div>
 
 <style>
   @layer od.components {
-    .od-dialog {
+    .od-md3-dialog {
       position: fixed;
       inset: 0;
       z-index: 13500;
@@ -74,13 +75,13 @@
       font-family: inherit;
     }
 
-    .scrim {
+    .od-md3-dialog--scrim {
       position: absolute;
       inset: 0;
       background: var(--od-scrim);
     }
 
-    .surface {
+    .od-md3-dialog--surface {
       position: relative;
       box-sizing: border-box;
       width: min(560px, calc(100% - 48px));
@@ -101,20 +102,20 @@
       font-weight: 400;
     }
 
-    .text {
+    .od-md3-dialog--text {
       margin: -8px 24px 16px;
       font-size: 14px;
       line-height: 20px;
       color: var(--od-text-2);
     }
 
-    .content {
+    .od-md3-dialog--content {
       flex: 1;
       min-height: 0;
       overflow-y: auto;
     }
 
-    .actions {
+    .od-md3-dialog--actions {
       margin: 10px 12px 0 24px;
       display: flex;
       align-items: center;
@@ -122,7 +123,7 @@
       gap: 8px;
     }
 
-    .actions :global(button) {
+    .od-md3-dialog--actions :global(button) {
       /* Framework7 stretches buttons: text buttons keep their own width. */
       width: auto;
       flex: none;
@@ -140,11 +141,11 @@
       cursor: pointer;
     }
 
-    .actions :global(.start) {
+    .od-md3-dialog--actions :global(.od-md3-dialog--start) {
       margin-right: auto;
     }
 
-    :global(.ios) .surface {
+    :global(.ios) .od-md3-dialog--surface {
       width: min(400px, calc(100% - 48px));
       border-radius: 14px;
     }
@@ -156,7 +157,7 @@
       text-align: center;
     }
 
-    :global(.ios) .actions :global(button) {
+    :global(.ios) .od-md3-dialog--actions :global(button) {
       font-size: 17px;
       letter-spacing: 0;
     }

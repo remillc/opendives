@@ -36,13 +36,13 @@
 </script>
 
 {#if keys.length}
-  <div class="active-filter" role="group" aria-label={t('filter.activeLabel')}>
+  <div class="od-active-filter" role="group" aria-label={t('filter.activeLabel')}>
     {#each keys as key (key)}
-      <span class="chip">
+      <span class="chip od-active-filter--chip">
         <span>{chipText(key)}</span>
         <button
           type="button"
-          class="remove"
+          class="od-active-filter--remove"
           aria-label={t('filter.removeCriterion', { name: chipText(key) })}
           onclick={() => removeCriterion(key === 'mode' ? 'mode' : key, prefs)}
         >
@@ -50,16 +50,16 @@
         </button>
       </span>
     {/each}
-    <span class="count od-value" role="status">{t('filter.matching', { n: shown, total: dives.length })}</span>
+    <span class="od-active-filter--count od-value" role="status">{t('filter.matching', { n: shown, total: dives.length })}</span>
     {#if keys.length > 1}
-      <button type="button" class="od-text-button clear" onclick={() => clearFilter(prefs)}>{t('filter.clear')}</button>
+      <button type="button" class="od-text-button od-active-filter--clear" onclick={() => clearFilter(prefs)}>{t('filter.clear')}</button>
     {/if}
   </div>
 {/if}
 
 <style>
   @layer od.components {
-    .active-filter {
+    .od-active-filter {
       margin: 8px 16px 0;
       display: flex;
       align-items: center;
@@ -68,7 +68,7 @@
     }
 
     /* MD3 input chip: 32 dp, 8 dp corners, a trailing remove button. */
-    .chip {
+    .od-active-filter--chip {
       min-height: 32px;
       box-sizing: border-box;
       padding: 0 4px 0 12px;
@@ -90,7 +90,7 @@
     }
 
     /* 24 dp button in the chip; its touch area is widened by padding. */
-    .remove {
+    .od-active-filter--remove {
       width: 32px;
       height: 32px;
       margin: -4px 0;
@@ -104,7 +104,7 @@
       cursor: pointer;
     }
 
-    .count {
+    .od-active-filter--count {
       font-size: 14px;
       color: var(--od-text-2);
 
@@ -113,7 +113,7 @@
       }
     }
 
-    .clear {
+    .od-active-filter--clear {
       margin-inline-start: auto;
     }
   }

@@ -42,7 +42,7 @@
   });
 </script>
 
-<Page>
+<Page class="od-dive-no-site-profile">
   <Navbar title={dive ? formatDateTime(dive.date) : ''} {subtitle}>
     {#snippet left()}
       <Link back iconOnly><i class="icon icon-back"></i><span class="od-sr-only">{t('common.back')}</span></Link>
@@ -59,16 +59,16 @@
       durationSeconds={dive.durationSeconds}
       prefs={logbook.prefs}
     />
-    {#if facts}<p class="od-no-site-facts">{facts}</p>{/if}
-    <div class="od-no-site-end"></div>
+    {#if facts}<p class="od-dive-no-site-profile--facts">{facts}</p>{/if}
+    <div class="od-dive-no-site-profile--end"></div>
   {/if}
 
   {#snippet fixedContent()}
     {#if dive}
-      <div class="od-no-site-bar">
-        <button type="button" class="od-no-site-action od-filled" onclick={() => chooseDiveSite(diveId, sites, () => f7router.back())}>{t('sites.chooseSite')}</button>
+      <div class="od-dive-no-site-profile--bar">
+        <button type="button" class="od-dive-no-site-profile--action od-dive-no-site-profile--filled" onclick={() => chooseDiveSite(diveId, sites, () => f7router.back())}>{t('sites.chooseSite')}</button>
         <!-- Replaces this screen, so that saving the new site ends on the list. -->
-        <button type="button" class="od-no-site-action" onclick={() => f7router.navigate(`/sites/new?dive=${diveId}`, { reloadCurrent: true })}>{t('sites.newSite')}</button>
+        <button type="button" class="od-dive-no-site-profile--action" onclick={() => f7router.navigate(`/sites/new?dive=${diveId}`, { reloadCurrent: true })}>{t('sites.newSite')}</button>
       </div>
     {/if}
   {/snippet}
@@ -76,7 +76,7 @@
 
 <style>
   @layer od.components {
-    .od-no-site-facts {
+    .od-dive-no-site-profile--facts {
       margin: 14px 20px 0;
       font-size: 14px;
       line-height: 20px;
@@ -84,11 +84,11 @@
     }
 
     /* Room for the fixed bar. */
-    .od-no-site-end {
+    .od-dive-no-site-profile--end {
       height: 104px;
     }
 
-    .od-no-site-bar {
+    .od-dive-no-site-profile--bar {
       position: absolute;
       inset-inline: 0;
       bottom: 0;
@@ -100,7 +100,7 @@
       background: var(--od-background);
     }
 
-    .od-no-site-action {
+    .od-dive-no-site-profile--action {
       flex: 1;
       width: auto;
       height: 48px;
@@ -113,7 +113,7 @@
       font-weight: 600;
       cursor: pointer;
 
-      &.od-filled {
+      &.od-dive-no-site-profile--filled {
         border: none;
         background: var(--od-primary-action);
         color: var(--od-on-primary-action);

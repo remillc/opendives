@@ -21,11 +21,11 @@
   }
 </script>
 
-<nav class="rail" class:ios aria-label={t('menu.sections')}>
+<nav class="od-nav-rail od-nav-rail--rail" class:ios aria-label={t('menu.sections')}>
   {#if ios}
-    <p class="title">{t('menu.title')}</p>
+    <p class="od-nav-rail--title">{t('menu.title')}</p>
   {:else}
-    <button type="button" class="add" onclick={requestAdd}>
+    <button type="button" class="od-nav-rail--add" onclick={requestAdd}>
       <Icon name="plus" />
       <span class="od-sr-only">{t('logbook.add')}</span>
     </button>
@@ -33,41 +33,41 @@
   {#each sections as section (section)}
     <a
       href="#{section}"
-      class="item"
+      class="od-nav-rail--item"
       aria-current={navigation.section === section ? 'page' : undefined}
       onclick={(e) => choose(e, () => showSection(section))}
     >
-      <span class="icon"><Icon name={section} size={ios ? 22 : 24} /></span>
-      <span class="label">{t(`tabs.${section}`)}</span>
+      <span class="od-nav-rail--icon"><Icon name={section} size={ios ? 22 : 24} /></span>
+      <span class="od-nav-rail--label">{t(`tabs.${section}`)}</span>
     </a>
   {/each}
-  <div class="spacer"></div>
+  <div class="od-nav-rail--spacer"></div>
   <a
     href="#account"
-    class="item bottom"
+    class="od-nav-rail--item od-nav-rail--bottom"
     aria-current={navigation.section === 'account' ? 'page' : undefined}
     onclick={(e) => choose(e, () => showSection('account'))}
   >
-    <span class="icon"><Icon name="account" size={ios ? 22 : 24} /></span>
-    <span class="label" class:od-sr-only={!ios}>{t('account.title')}</span>
+    <span class="od-nav-rail--icon"><Icon name="account" size={ios ? 22 : 24} /></span>
+    <span class="od-nav-rail--label" class:od-sr-only={!ios}>{t('account.title')}</span>
   </a>
-  <a href="#settings" class="item bottom" onclick={(e) => choose(e, openSettings)}>
-    <span class="icon"><Icon name="settings" size={ios ? 22 : 24} /></span>
-    <span class="label" class:od-sr-only={!ios}>{t('settings.title')}</span>
+  <a href="#settings" class="od-nav-rail--item od-nav-rail--bottom" onclick={(e) => choose(e, openSettings)}>
+    <span class="od-nav-rail--icon"><Icon name="settings" size={ios ? 22 : 24} /></span>
+    <span class="od-nav-rail--label" class:od-sr-only={!ios}>{t('settings.title')}</span>
   </a>
-  <a href="#about" class="item" onclick={(e) => choose(e, openAbout)}>
-    <span class="icon"><Icon name="info" size={ios ? 22 : 24} /></span>
-    <span class="label" class:od-sr-only={!ios}>{t('about.title')}</span>
+  <a href="#about" class="od-nav-rail--item" onclick={(e) => choose(e, openAbout)}>
+    <span class="od-nav-rail--icon"><Icon name="info" size={ios ? 22 : 24} /></span>
+    <span class="od-nav-rail--label" class:od-sr-only={!ios}>{t('about.title')}</span>
   </a>
   {#if ios && !logbook.loading && !logbook.error}
-    <div class="status"><SyncStatus sync={logbook.sync} pending={logbook.pending} progress={logbook.syncProgress} live={false} /></div>
+    <div class="od-nav-rail--status"><SyncStatus sync={logbook.sync} pending={logbook.pending} progress={logbook.syncProgress} live={false} /></div>
   {/if}
 </nav>
 
 <style>
   @layer od.components {
     /* Android: Material 3 navigation rail. */
-    .rail {
+    .od-nav-rail--rail {
       position: fixed;
       inset: 0 auto 0 0;
       z-index: 6000;
@@ -83,7 +83,7 @@
       color: var(--od-text);
     }
 
-    .add {
+    .od-nav-rail--add {
       width: 56px;
       height: 56px;
       margin-bottom: 4px;
@@ -97,7 +97,7 @@
       box-shadow: 0 1px 3px rgb(0 0 0 / 0.3);
     }
 
-    .item {
+    .od-nav-rail--item {
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -109,7 +109,7 @@
       letter-spacing: 0.5px;
       text-decoration: none;
 
-      .icon {
+      .od-nav-rail--icon {
         width: 56px;
         height: 32px;
         border-radius: 16px;
@@ -122,17 +122,17 @@
         color: var(--od-text);
         font-weight: 600;
 
-        .icon {
+        .od-nav-rail--icon {
           background: var(--od-tint);
           color: var(--od-on-tint);
         }
       }
 
       /* Account and Settings: icons only in the rail, in 48 dp targets. */
-      &.bottom {
+      &.od-nav-rail--bottom {
         gap: 0;
 
-        .icon {
+        .od-nav-rail--icon {
           width: 48px;
           height: 48px;
           border-radius: 24px;
@@ -140,24 +140,24 @@
       }
     }
 
-    .spacer {
+    .od-nav-rail--spacer {
       flex: 1;
     }
 
-    .title,
-    .status {
+    .od-nav-rail--title,
+    .od-nav-rail--status {
       display: none;
     }
 
     /* iPad: sidebar with 44 pt rows and a rounded highlight. */
-    .rail.ios {
+    .od-nav-rail--rail.ios {
       align-items: stretch;
       gap: 2px;
       padding: calc(var(--f7-safe-area-top) + 32px) 12px calc(var(--f7-safe-area-bottom) + 16px)
         calc(12px + env(safe-area-inset-left));
       border-right: 0.5px solid var(--od-separator);
 
-      .title {
+      .od-nav-rail--title {
         display: block;
         margin: 0;
         padding: 0 10px 14px;
@@ -165,8 +165,8 @@
         font-weight: 700;
       }
 
-      .item,
-      .item.bottom {
+      .od-nav-rail--item,
+      .od-nav-rail--item.od-nav-rail--bottom {
         height: 44px;
         flex-direction: row;
         gap: 10px;
@@ -177,8 +177,8 @@
         font-weight: 400;
         letter-spacing: normal;
 
-        .icon,
-        &.bottom .icon {
+        .od-nav-rail--icon,
+        &.od-nav-rail--bottom .od-nav-rail--icon {
           width: 22px;
           height: 22px;
           border-radius: 0;
@@ -189,13 +189,13 @@
           background: var(--od-tint);
           font-weight: 600;
 
-          .icon {
+          .od-nav-rail--icon {
             background: none;
           }
         }
       }
 
-      .status {
+      .od-nav-rail--status {
         display: block;
         margin: 6px 10px 0;
       }

@@ -99,7 +99,7 @@ li {
   margin-bottom: 6px;
 }
 
-.updated {
+.od-about-text--updated {
   font-size: 14px;
   color: var(--od-text-2);
 }

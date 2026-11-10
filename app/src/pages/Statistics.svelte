@@ -114,14 +114,14 @@
   });
 </script>
 
-<Page onPageInit={keepInSvelteRange}>
+<Page class="od-statistics" onPageInit={keepInSvelteRange}>
   <Navbar large={theme.ios} class="od-band-bar" title={t('stats.title')}>
     {#snippet left()}<MenuButton />{/snippet}
     <NavRight>
       {#if theme.ios}
         <Link href="/filter">{t('stats.filterShort')}</Link>
       {:else}
-        <Link class="filter-button" href="/filter"><Icon name="filter" size={18} weight={2} />{t('stats.freeFilter')}</Link>
+        <Link class="od-statistics--filter-button" href="/filter"><Icon name="filter" size={18} weight={2} />{t('stats.freeFilter')}</Link>
       {/if}
     </NavRight>
   </Navbar>
@@ -129,7 +129,7 @@
   <SectionBand summary={bandSummary} />
 
   {#if !logbook.loading && !logbook.dives.length}
-    <div class="empty">
+    <div class="od-statistics--empty">
       <p class="od-state-title">{t('stats.emptyTitle')}</p>
       <p>{t('stats.emptyText')}</p>
     </div>
@@ -140,13 +140,13 @@
     <KeyFigures figures={result?.total ?? null} prefs={logbook.prefs} />
 
     <div class="block-title">{t('stats.charts')}</div>
-    <div class="charts">
-      <section class="chart-card">
+    <div class="od-statistics--charts">
+      <section class="od-statistics--chart-card">
         <h3>{t('stats.chartYears')}</h3>
         <p>{result ? t('stats.chartYearsText', { dives: t('trip.dives', { n: result.total.dives }), n: yearBars.length }) : ''}</p>
         <BarChart bars={yearBars} tinted label={t('stats.chartYears')} />
       </section>
-      <section class="chart-card">
+      <section class="od-statistics--chart-card">
         <h3>{t('stats.chartDurations')}</h3>
         <p>{durationRange}</p>
         <BarChart bars={durationBars} tinted scale={60} unit={t('units.minutes')} label={t('stats.chartDurationsLabel', { n: dives.length })} />
@@ -159,7 +159,7 @@
         <ul>
           {#each myStatistics.list as s (s.id)}
             {@const href = rowHref('mine', s.name, s.criteria)}
-            <li class:selected={selected === href}>
+            <li class:od-statistics--selected={selected === href}>
               <a {href} data-reload-detail="true" class="item-link item-content" onclick={select}>
                 <div class="item-inner">
                   <div class="item-title-row"><div class="item-title">{s.name}</div></div>
@@ -170,15 +170,15 @@
           {/each}
           {#if theme.ios}
             <!-- iOS: the action is a row of the group (HIG), not a button. -->
-            <li><a href="/statistics/new" class="item-content action-row"><div class="item-inner"><div class="item-title">{t('stats.newEllipsis')}</div></div></a></li>
+            <li><a href="/statistics/new" class="item-content od-statistics--action-row"><div class="item-inner"><div class="item-title">{t('stats.newEllipsis')}</div></div></a></li>
           {/if}
         </ul>
       </div>
     {/if}
-    {#if !myStatistics.list.length}<p class="note">{t('stats.mineEmpty')}</p>{/if}
+    {#if !myStatistics.list.length}<p class="od-statistics--note">{t('stats.mineEmpty')}</p>{/if}
     {#if !theme.ios}
-      <div class="new">
-        <a href="/statistics/new" class="od-tonal-button new-button"><Icon name="plus" size={18} weight={2} />{t('stats.new')}</a>
+      <div class="od-statistics--new">
+        <a href="/statistics/new" class="od-tonal-button od-statistics--new-button"><Icon name="plus" size={18} weight={2} />{t('stats.new')}</a>
       </div>
     {/if}
 
@@ -187,24 +187,24 @@
       {#if rows?.length}
         {@const title = t(`stats.${key}`)}
         {@const open = !!openSections[key]}
-        <h2 class="od-stat-heading">
-          <button type="button" class="od-stat-toggle" aria-expanded={open} onclick={() => (openSections[key] = !open)}>
-            <span class="od-stat-toggle-text">{title}</span>
-            <span class="od-stat-chevron" class:od-stat-chevron-up={open}><Icon name="expand" size={24} /></span>
+        <h2 class="od-statistics--heading">
+          <button type="button" class="od-statistics--toggle" aria-expanded={open} onclick={() => (openSections[key] = !open)}>
+            <span class="od-statistics--toggle-text">{title}</span>
+            <span class="od-statistics--chevron" class:od-statistics--chevron-up={open}><Icon name="expand" size={24} /></span>
           </button>
         </h2>
         {#if open}
-          <ul class="od-stat-rows">
+          <ul class="od-statistics--rows">
             {#each rows as row (row.key)}
               {@const href = rowHref(key, row.title, row.criteria)}
-              <li class:selected={selected === href}>
-                <a {href} data-reload-detail="true" class="od-stat-row ripple" onclick={select}>
-                  <div class="od-stat-text">
-                    <span class="od-stat-title" class:od-value={row.numeric}>{row.title}</span>
-                    <span class="od-stat-support od-value">{row.support}</span>
+              <li class:od-statistics--selected={selected === href}>
+                <a {href} data-reload-detail="true" class="od-statistics--row ripple" onclick={select}>
+                  <div class="od-statistics--text">
+                    <span class="od-statistics--title" class:od-value={row.numeric}>{row.title}</span>
+                    <span class="od-statistics--support od-value">{row.support}</span>
                   </div>
-                  {#if row.after}<span class="od-stat-after od-value">{row.after}</span>{/if}
-                  <span class="od-stat-row-chevron"><Icon name="chevron" size={20} /></span>
+                  {#if row.after}<span class="od-statistics--after od-value">{row.after}</span>{/if}
+                  <span class="od-statistics--row-chevron"><Icon name="chevron" size={20} /></span>
                 </a>
               </li>
             {/each}
@@ -226,7 +226,7 @@
     {@render section('byMode', result ? result.byMode.filter((m) => m.dives).map((m) => totalRow('mode', m.mode, t(`detail.modes.${m.mode}`), m)) : null)}
     {@render section('bySuit', result ? result.bySuit.map((v) => totalRow('suit', v.value, v.value || notSetLabel('suit'), v)) : null)}
     {@render section('byBuddy', result ? result.byBuddy.map((v) => totalRow('buddy', v.value, v.value || notSetLabel('buddy'), v)) : null)}
-    <div class="end"></div>
+    <div class="od-statistics--end"></div>
   {/if}
 </Page>
 
@@ -239,12 +239,12 @@
     }
 
     /* The title of a "By …" section: a 48 dp button (mock-up android-stats). */
-    .od-stat-heading {
+    .od-statistics--heading {
       margin: 14px 8px 0;
       font: inherit;
     }
 
-    .od-stat-toggle {
+    .od-statistics--toggle {
       width: 100%;
       min-height: 48px;
       padding: 0 12px 0 8px;
@@ -261,21 +261,21 @@
       cursor: pointer;
     }
 
-    .od-stat-toggle-text {
+    .od-statistics--toggle-text {
       flex: 1;
     }
 
-    .od-stat-chevron {
+    .od-statistics--chevron {
       display: flex;
       transition: transform 0.2s;
     }
 
-    .od-stat-chevron-up {
+    .od-statistics--chevron-up {
       transform: rotate(180deg);
     }
 
     /* The "By …" sections: a rounded card of plain rows (mock-up android-stats). */
-    .od-stat-rows {
+    .od-statistics--rows {
       margin: 0 16px;
       padding: 0;
       list-style: none;
@@ -288,11 +288,11 @@
       }
     }
 
-    .od-stat-rows li + li {
+    .od-statistics--rows li + li {
       border-top: 1px solid var(--od-separator);
     }
 
-    .od-stat-row {
+    .od-statistics--row {
       position: relative;
       overflow: hidden;
       display: flex;
@@ -305,13 +305,13 @@
       text-decoration: none;
     }
 
-    .od-stat-row-chevron {
+    .od-statistics--row-chevron {
       flex: none;
       display: flex;
       color: var(--od-text-2);
     }
 
-    .od-stat-text {
+    .od-statistics--text {
       flex: 1;
       min-width: 0;
       display: flex;
@@ -319,33 +319,33 @@
       gap: 2px;
     }
 
-    .od-stat-title {
+    .od-statistics--title {
       font-size: 16px;
       line-height: 24px;
     }
 
-    .od-stat-support,
-    .od-stat-after {
+    .od-statistics--support,
+    .od-statistics--after {
       font-size: 14px;
       line-height: 20px;
     }
 
-    .od-stat-support {
+    .od-statistics--support {
       color: var(--od-text-2);
     }
 
     /* Tablet: the row whose result is shown beside the list. */
-    li.selected {
+    li.od-statistics--selected {
       background: var(--od-tint);
       color: var(--od-on-tint);
     }
 
-    .empty {
+    .od-statistics--empty {
       margin: 32px 20px;
       color: var(--od-text-2);
     }
 
-    .note {
+    .od-statistics--note {
       margin: 8px 20px 0;
       font-size: 13px;
       line-height: 18px;
@@ -353,7 +353,7 @@
     }
 
     /* Top bar text button with its icon (MD3 text button, 12 dp side padding). */
-    :global(.md .filter-button) {
+    :global(.md .od-statistics--filter-button) {
       width: auto;
       white-space: nowrap;
       gap: 8px;
@@ -364,7 +364,7 @@
     }
 
     /* Ready-made charts: cards scrolled sideways, snapping to each card. */
-    .charts {
+    .od-statistics--charts {
       padding: 0 16px;
       display: flex;
       gap: 12px;
@@ -374,7 +374,7 @@
       scrollbar-width: none;
     }
 
-    .chart-card {
+    .od-statistics--chart-card {
       flex: none;
       width: 272px;
       padding: 16px;
@@ -420,12 +420,12 @@
     }
 
     /* Android: "New statistic" is a tonal button under the list (MD3). */
-    .new {
+    .od-statistics--new {
       margin: 12px 16px 0;
       display: flex;
     }
 
-    .new-button {
+    .od-statistics--new-button {
       padding: 0 24px 0 16px;
       display: inline-flex;
       align-items: center;
@@ -435,12 +435,12 @@
     }
 
     /* iOS: the action row of the My statistics group, in bold. */
-    .action-row .item-title {
+    .od-statistics--action-row .item-title {
       font-weight: 600;
       color: var(--od-action);
     }
 
-    .end {
+    .od-statistics--end {
       height: 32px;
     }
   }

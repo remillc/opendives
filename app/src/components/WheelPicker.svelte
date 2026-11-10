@@ -68,10 +68,10 @@
   }
 </script>
 
-<div class="wheel no-swipeback" class:inline>
-  <span class="label" class:od-sr-only={inline} id={id}>{label}</span>
+<div class="od-wheel-picker od-wheel-picker--wheel no-swipeback" class:od-wheel-picker--inline={inline}>
+  <span class="od-wheel-picker--label" class:od-sr-only={inline} id={id}>{label}</span>
   <div
-    class="window"
+    class="od-wheel-picker--window"
     role="spinbutton"
     tabindex="0"
     aria-labelledby={id}
@@ -81,13 +81,13 @@
     aria-valuetext={values[index]}
     onkeydown={keydown}
   >
-    <div class="lines" aria-hidden="true"></div>
-    <div class="scroller" bind:this={scroller} {onscroll} aria-hidden="true">
+    <div class="od-wheel-picker--lines" aria-hidden="true"></div>
+    <div class="od-wheel-picker--scroller" bind:this={scroller} {onscroll} aria-hidden="true">
       {#each values as text, i (i)}
         {@const distance = Math.abs(i - position)}
         <div
-          class="item"
-          class:current={distance < 0.5}
+          class="od-wheel-picker--item"
+          class:od-wheel-picker--current={distance < 0.5}
           style:opacity={distance < 0.5 ? 1 : distance < 1.5 ? 0.6 : distance < 2.5 ? 0.3 : 0.15}
         >
           {text}
@@ -95,12 +95,12 @@
       {/each}
     </div>
   </div>
-  {#if defaultText}<span class="default">{defaultText}</span>{/if}
+  {#if defaultText}<span class="od-wheel-picker--default">{defaultText}</span>{/if}
 </div>
 
 <style>
   @layer od.components {
-    .wheel {
+    .od-wheel-picker--wheel {
       flex: 1;
       min-width: 0;
       display: flex;
@@ -109,13 +109,13 @@
       gap: 6px;
     }
 
-    .label {
+    .od-wheel-picker--label {
       font-size: 14px;
       font-weight: 500;
       color: var(--od-text-2);
     }
 
-    .window {
+    .od-wheel-picker--window {
       position: relative;
       width: 100%;
       height: 200px;
@@ -126,7 +126,7 @@
       }
     }
 
-    .lines {
+    .od-wheel-picker--lines {
       position: absolute;
       left: 8px;
       right: 8px;
@@ -138,7 +138,7 @@
       pointer-events: none;
     }
 
-    .scroller {
+    .od-wheel-picker--scroller {
       height: 100%;
       overflow-y: auto;
       scroll-snap-type: y mandatory;
@@ -157,7 +157,7 @@
       }
     }
 
-    .item {
+    .od-wheel-picker--item {
       height: 40px;
       display: flex;
       align-items: center;
@@ -167,7 +167,7 @@
       font-variant-numeric: tabular-nums;
       color: var(--od-text);
 
-      &.current {
+      &.od-wheel-picker--current {
         font-size: 22px;
         font-weight: 600;
       }
@@ -175,36 +175,36 @@
 
     /* Inline (the gas tools' pO2 wheel): three values visible, the current one
        framed, on a white surface; docs/mockups/outils-ead-mod-android.dc.html. */
-    .inline {
+    .od-wheel-picker--inline {
       flex: none;
       width: 96px;
 
-      .window {
+      .od-wheel-picker--window {
         height: 120px;
         overflow: hidden;
       }
 
-      .lines {
+      .od-wheel-picker--lines {
         left: 4px;
         right: 4px;
         top: 40px;
       }
 
-      .scroller::before,
-      .scroller::after {
+      .od-wheel-picker--scroller::before,
+      .od-wheel-picker--scroller::after {
         height: 40px;
       }
 
-      .item {
+      .od-wheel-picker--item {
         font-size: 17px;
 
-        &.current {
+        &.od-wheel-picker--current {
           font-size: 22px;
         }
       }
     }
 
-    .default {
+    .od-wheel-picker--default {
       font-size: 12px;
       color: var(--od-text-2);
     }

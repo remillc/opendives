@@ -33,7 +33,8 @@ Every component carries a class that names it, prefixed `od-`, in kebab case: `o
 - The component name comes from its file: `StatisticsDives.svelte` is `od-statistics-dives`.
 - CSS custom properties start with `--od-`: `--od-band-rise`.
 - Framework7 and MapLibre classes (`item-content`, `navbar`, `list`) keep their names. Without the prefix, our classes collide with theirs: `.card`, `.chip` and `.panel` have already caused display bugs.
-- Existing code is brought to this rule by to-do #29.
+- Utility classes shared by several components, defined in `app/src/theme.css` (`od-value`, `od-text-button`, `od-sr-only`), have no component in their name.
+- Where a Framework7 class really styles one of our elements (`card`, `chip`), the element keeps it next to its own: `class="chip od-site-edit--chip"`.
 
 **Layers.** Framework7's CSS sits in the `framework7` layer, imported by `app/src/theme.css`; ours in `od.tokens`, `od.base` and `od.components` (the styles of Svelte components). Overrides of the `--f7-*` variables stay outside any layer: Framework7 injects its colours at start-up without a layer, and a rule in a layer would always lose.
 

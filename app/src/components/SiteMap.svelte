@@ -47,7 +47,7 @@
     markers = sites.map((site) => {
       const el = document.createElement('button');
       el.type = 'button';
-      el.className = 'od-site-marker';
+      el.className = 'od-site-map--site-marker';
       el.setAttribute('aria-label', site.name || t('sites.noName'));
       el.addEventListener('click', () => onselect?.(site.uuid));
       const marker = new maplibregl.Marker({ element: el }).setLngLat(lngLat(site)).addTo(/** @type {import('maplibre-gl').Map} */ (map));
@@ -58,7 +58,7 @@
 
   /** During a search, the markers that do not match fade to 30 %. */
   function dim() {
-    for (const { uuid, marker } of markers) marker.getElement().classList.toggle('od-dim', !!matching && !matching.has(uuid));
+    for (const { uuid, marker } of markers) marker.getElement().classList.toggle('od-site-map--dim', !!matching && !matching.has(uuid));
   }
 
   $effect(() => {
@@ -191,33 +191,33 @@
   onDestroy(() => map?.remove());
 </script>
 
-<div class="site-map no-swipeback" style:height role="region" aria-label={t('sites.map')}>
-  <div class="canvas" bind:this={container}></div>
+<div class="od-site-map no-swipeback" style:height role="region" aria-label={t('sites.map')}>
+  <div class="od-site-map--canvas" bind:this={container}></div>
   {#if editable}
     <!-- The tip of the pin is the centre of the map. -->
-    <svg class="center-pin" width="32" height="42" viewBox="-16 -40 32 42" aria-hidden="true">
+    <svg class="od-site-map--center-pin" width="32" height="42" viewBox="-16 -40 32 42" aria-hidden="true">
       <path d="M0 0c-9-11-14-17-14-24a14 14 0 0 1 28 0c0 7-5 13-14 24z" />
       <circle cx="0" cy="-24" r="5" />
     </svg>
   {/if}
   <!-- Credits asked by OpenStreetMap's licence and the tile provider. -->
-  <p class="credits">{t('sites.mapCredits')}</p>
+  <p class="od-site-map--credits">{t('sites.mapCredits')}</p>
 </div>
 
 <style>
   @layer od.components {
-    .site-map {
+    .od-site-map {
       position: relative;
       width: 100%;
       background: var(--od-surface-2);
     }
 
-    .canvas {
+    .od-site-map--canvas {
       position: absolute;
       inset: 0;
     }
 
-    .credits {
+    .od-site-map--credits {
       position: absolute;
       right: 8px;
       bottom: 4px;
@@ -232,7 +232,7 @@
       pointer-events: none;
     }
 
-    .center-pin {
+    .od-site-map--center-pin {
       position: absolute;
       left: 50%;
       top: 50%;
@@ -252,7 +252,7 @@
       }
     }
 
-    :global(.od-site-marker) {
+    :global(.od-site-map--site-marker) {
       width: 16px;
       height: 16px;
       padding: 0;
@@ -264,7 +264,7 @@
       transition: opacity 150ms linear;
 
       /* !important: MapLibre sets an inline opacity on every marker. */
-      &.od-dim {
+      &.od-site-map--dim {
         opacity: 0.3 !important;
       }
 

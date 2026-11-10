@@ -216,14 +216,14 @@
   </Navbar>
 
   <div class="od-form-surface">
-    <button type="button" class="row" onclick={() => (dialog = 'date')}>
-      <span class="row-label">{t('newDive.date')}</span>
-      <span class="row-value">{dateText}</span>
+    <button type="button" class="od-new-dive--row" onclick={() => (dialog = 'date')}>
+      <span class="od-new-dive--row-label">{t('newDive.date')}</span>
+      <span class="od-new-dive--row-value">{dateText}</span>
       <Icon name="chevron" size={18} />
     </button>
-    <button type="button" class="row" onclick={() => (dialog = 'time')}>
-      <span class="row-label">{t('newDive.time')}</span>
-      <span class="row-value">{timeText}</span>
+    <button type="button" class="od-new-dive--row" onclick={() => (dialog = 'time')}>
+      <span class="od-new-dive--row-label">{t('newDive.time')}</span>
+      <span class="od-new-dive--row-value">{timeText}</span>
       <Icon name="chevron" size={18} />
     </button>
     <TextField
@@ -249,14 +249,14 @@
     />
   </div>
 
-  <h2 class="group-title">{t('newDive.cylinder')}</h2>
+  <h2 class="od-new-dive--group-title">{t('newDive.cylinder')}</h2>
   <div class="od-form-surface">
-    <button type="button" class="row" onclick={() => (dialog = 'cylinder')}>
-      <span class="row-label">{t('newDive.cylinderType')}</span>
-      <span class="row-value">{cylinderType || t('newDive.defaultCylinder')}</span>
+    <button type="button" class="od-new-dive--row" onclick={() => (dialog = 'cylinder')}>
+      <span class="od-new-dive--row-label">{t('newDive.cylinderType')}</span>
+      <span class="od-new-dive--row-value">{cylinderType || t('newDive.defaultCylinder')}</span>
       <Icon name="chevron" size={18} />
     </button>
-    <div class="pair">
+    <div class="od-new-dive--pair">
       <TextField
         label={t('newDive.startPressure', { unit: pressureUnit })}
         bind:value={startPressure}
@@ -270,38 +270,38 @@
         invalid={tried && !endOk}
       />
     </div>
-    <div class="pair">
+    <div class="od-new-dive--pair">
       <TextField label={t('newDive.o2')} bind:value={o2} inputmode="decimal" invalid={tried && !gasOk} />
       <TextField label={t('newDive.he')} bind:value={he} inputmode="decimal" invalid={tried && !gasOk} />
     </div>
-    <p class="note">{tried && !gasOk ? t('newDive.gasInvalid') : t('newDive.gasHint')}</p>
+    <p class="od-new-dive--note">{tried && !gasOk ? t('newDive.gasInvalid') : t('newDive.gasHint')}</p>
   </div>
 
-  <h2 class="group-title" id="od-new-site">{t('newDive.site')}</h2>
+  <h2 class="od-new-dive--group-title" id="od-new-site">{t('newDive.site')}</h2>
   <div class="od-form-surface">
     {#if sites.length > 6}<TextField label={t('newDive.searchSite')} bind:value={siteSearch} />{/if}
-    <div class="sites" role="radiogroup" aria-labelledby="od-new-site">
-      <label class="site">
+    <div class="od-new-dive--sites" role="radiogroup" aria-labelledby="od-new-site">
+      <label class="od-new-dive--site">
         <input type="radio" name="od-new-site" value={0} bind:group={site} />
-        <span class="site-text"><span>{t('newDive.noSite')}</span></span>
+        <span class="od-new-dive--site-text"><span>{t('newDive.noSite')}</span></span>
       </label>
       {#each shownSites as s (s.uuid)}
-        <label class="site">
+        <label class="od-new-dive--site">
           <input type="radio" name="od-new-site" value={s.uuid} bind:group={site} />
-          <span class="site-text">
+          <span class="od-new-dive--site-text">
             <span>{s.name}</span>
-            {#if s.lastDate}<span class="hint">{t('newDive.lastDive', { date: formatLongDate(s.lastDate) })}</span>{/if}
+            {#if s.lastDate}<span class="od-new-dive--hint">{t('newDive.lastDive', { date: formatLongDate(s.lastDate) })}</span>{/if}
           </span>
         </label>
       {/each}
     </div>
-    <p class="note">{t('newDive.newSiteNote')}</p>
+    <p class="od-new-dive--note">{t('newDive.newSiteNote')}</p>
   </div>
 
-  <h2 class="group-title">{t('newDive.more')}</h2>
+  <h2 class="od-new-dive--group-title">{t('newDive.more')}</h2>
   <div class="od-form-surface">
     <ChipsField label={t('newDive.buddies')} bind:values={buddies} suggestions={knownBuddies} supporting={t('chips.buddiesHint')} />
-    <div class="rating">
+    <div class="od-new-dive--rating">
       <span>{t('newDive.rating')}</span>
       <StarsInput value={rating} label={t('newDive.rating')} onchange={(n) => (rating = n)} />
     </div>
@@ -351,7 +351,7 @@
       padding-bottom: 32px;
     }
 
-    .group-title {
+    .od-new-dive--group-title {
       margin: 24px 16px 0 28px;
       font-size: 18px;
       font-weight: 700;
@@ -364,7 +364,7 @@
     }
 
     /* A value row, as in Settings: label, value, then a small chevron; it opens a dialog. */
-    .row {
+    .od-new-dive--row {
       width: 100%;
       min-height: 56px;
       padding: 0 12px;
@@ -379,32 +379,32 @@
       gap: 8px;
       cursor: pointer;
 
-      .row-label {
+      .od-new-dive--row-label {
         flex: 1;
       }
 
-      .row-value {
+      .od-new-dive--row-value {
         color: var(--od-text-2);
         font-variant-numeric: tabular-nums;
       }
 
-      :global(.od-icon) {
+      :global(.od-new-dive--icon) {
         color: var(--od-text-2);
       }
     }
 
-    .pair {
+    .od-new-dive--pair {
       display: grid;
       grid-template-columns: 1fr 1fr;
     }
 
-    .sites {
+    .od-new-dive--sites {
       display: flex;
       flex-direction: column;
       padding: 4px 0;
     }
 
-    .site {
+    .od-new-dive--site {
       min-height: 56px;
       padding: 8px 12px;
       box-sizing: border-box;
@@ -421,26 +421,26 @@
       }
     }
 
-    .site-text {
+    .od-new-dive--site-text {
       display: flex;
       flex-direction: column;
       gap: 2px;
       font-size: 16px;
 
-      .hint {
+      .od-new-dive--hint {
         font-size: 14px;
         color: var(--od-text-2);
       }
     }
 
-    .note {
+    .od-new-dive--note {
       margin: 4px 12px 0;
       font-size: 12px;
       line-height: 16px;
       color: var(--od-text-2);
     }
 
-    .rating {
+    .od-new-dive--rating {
       min-height: 56px;
       padding: 0 12px;
       display: flex;

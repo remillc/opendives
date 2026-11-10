@@ -119,7 +119,7 @@
   }
 </script>
 
-<Page onPageBeforeIn={load}>
+<Page class="od-plans" onPageBeforeIn={load}>
   <Navbar title={t('plans.title')}>
     {#snippet left()}
       <Link back iconOnly={!theme.ios}>
@@ -130,30 +130,30 @@
   </Navbar>
 
   {#if failed}
-    <p class="intro">{t('plans.failed')}</p>
+    <p class="od-plans--intro">{t('plans.failed')}</p>
   {:else if plans && plans.length === 0}
-    <div class="empty">
+    <div class="od-plans--empty">
       <Icon name="plan" size={48} />
-      <p class="headline">{t('plans.empty')}</p>
-      <p class="text">{t('plans.emptyText')}</p>
+      <p class="od-plans--headline">{t('plans.empty')}</p>
+      <p class="od-plans--text">{t('plans.emptyText')}</p>
     </div>
   {:else if plans}
-    <p class="intro">{t('plans.intro')}</p>
+    <p class="od-plans--intro">{t('plans.intro')}</p>
     <div class="list">
       {#each plans as plan (plan.id)}
-        <div class="row">
-          <a class="open" href="/plans/{plan.id}">
+        <div class="od-plans--row">
+          <a class="od-plans--open" href="/plans/{plan.id}">
             <ProfileThumbnail profile={plan.profile} maxDepthMm={plan.maxDepthMm} {prefs} />
-            <span class="texts">
-              <span class="name">{title(plan)}</span>
-              <span class="sub">{detail(plan)}</span>
+            <span class="od-plans--texts">
+              <span class="od-plans--name">{title(plan)}</span>
+              <span class="od-plans--sub">{detail(plan)}</span>
             </span>
-            <span class="figures od-value">
-              <span class="depth">{formatDepth(plan.maxDepthMm, prefs)}</span>
-              <span class="time">{formatDuration(plan.durationSeconds)}</span>
+            <span class="od-plans--figures od-value">
+              <span class="od-plans--depth">{formatDepth(plan.maxDepthMm, prefs)}</span>
+              <span class="od-plans--time">{formatDuration(plan.durationSeconds)}</span>
             </span>
           </a>
-          <button type="button" class="more" aria-label={t('plans.more')} onclick={(e) => openMenu(e, plan)}><Icon name="more" weight={4} /></button>
+          <button type="button" class="od-plans--more" aria-label={t('plans.more')} onclick={(e) => openMenu(e, plan)}><Icon name="more" weight={4} /></button>
         </div>
       {/each}
     </div>
@@ -190,20 +190,20 @@
 
 <style>
   @layer od.components {
-    .intro {
+    .od-plans--intro {
       margin: 8px 16px;
       font-size: 14px;
       line-height: 20px;
       color: var(--od-text-2);
     }
 
-    .row {
+    .od-plans--row {
       display: flex;
       align-items: center;
       min-height: 72px;
     }
 
-    .open {
+    .od-plans--open {
       flex: 1;
       min-width: 0;
       padding: 8px 0 8px 16px;
@@ -214,14 +214,14 @@
       text-decoration: none;
     }
 
-    .texts {
+    .od-plans--texts {
       flex: 1;
       min-width: 0;
       display: flex;
       flex-direction: column;
     }
 
-    .name {
+    .od-plans--name {
       font-size: 16px;
       line-height: 24px;
       white-space: nowrap;
@@ -229,7 +229,7 @@
       text-overflow: ellipsis;
     }
 
-    .sub {
+    .od-plans--sub {
       font-size: 14px;
       line-height: 20px;
       color: var(--od-text-2);
@@ -238,24 +238,24 @@
       text-overflow: ellipsis;
     }
 
-    .figures {
+    .od-plans--figures {
       flex: none;
       display: flex;
       flex-direction: column;
       align-items: flex-end;
 
-      .depth {
+      .od-plans--depth {
         font-size: 16px;
         font-weight: 600;
       }
 
-      .time {
+      .od-plans--time {
         font-size: 14px;
         color: var(--od-text-2);
       }
     }
 
-    .more {
+    .od-plans--more {
       flex: none;
       width: 48px;
       height: 48px;
@@ -269,7 +269,7 @@
       cursor: pointer;
     }
 
-    .empty {
+    .od-plans--empty {
       margin-top: 96px;
       padding: 0 32px;
       display: flex;
@@ -278,13 +278,13 @@
       text-align: center;
       color: var(--od-text);
 
-      .headline {
+      .od-plans--headline {
         margin: 16px 0 4px;
         font-size: 16px;
         font-weight: 600;
       }
 
-      .text {
+      .od-plans--text {
         margin: 0;
         font-size: 14px;
         line-height: 20px;

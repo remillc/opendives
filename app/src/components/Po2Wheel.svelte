@@ -18,18 +18,18 @@
   });
 </script>
 
-<div class="po2">
-  <span class="texts">
-    <span class="title">{t('tools.maxPo2')}</span>
-    <span class="hint">{t('tools.wheelHint')}</span>
+<div class="od-po2-wheel od-po2-wheel--po2">
+  <span class="od-po2-wheel--texts">
+    <span class="od-po2-wheel--title">{t('tools.maxPo2')}</span>
+    <span class="od-po2-wheel--hint">{t('tools.wheelHint')}</span>
   </span>
   <WheelPicker inline label={t('tools.maxPo2')} {values} bind:index />
-  <span class="unit">{t('units.bar')}</span>
+  <span class="od-po2-wheel--unit">{t('units.bar')}</span>
 </div>
 
 <style>
   @layer od.components {
-    .po2 {
+    .od-po2-wheel--po2 {
       margin: 0 16px;
       padding: 0 16px;
       border-radius: 20px;
@@ -39,25 +39,25 @@
       gap: 12px;
     }
 
-    .texts {
+    .od-po2-wheel--texts {
       flex: 1;
       min-width: 0;
       display: flex;
       flex-direction: column;
     }
 
-    .title {
+    .od-po2-wheel--title {
       font-size: 16px;
       line-height: 24px;
     }
 
-    .hint {
+    .od-po2-wheel--hint {
       font-size: 13px;
       line-height: 18px;
       color: var(--od-text-2);
     }
 
-    .unit {
+    .od-po2-wheel--unit {
       font-size: 16px;
       color: var(--od-text-2);
     }

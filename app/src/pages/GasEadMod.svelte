@@ -76,7 +76,7 @@
   );
 </script>
 
-<Page>
+<Page class="od-gas-ead-mod">
   <Navbar title={t('tools.eadMod')}>
     {#snippet left()}
       <Link back iconOnly>
@@ -86,16 +86,16 @@
     {/snippet}
   </Navbar>
 
-  <div class="pair">
+  <div class="od-gas-ead-mod--pair">
       <TextField label={t('tools.oxygen')} bind:value={o2} inputmode="numeric" invalid={gasInvalid} supporting={gasInvalid ? t('tools.gasInvalid') : ''}>
-        {#snippet trailing()}<span class="unit">{t('units.percent')}</span>{/snippet}
+        {#snippet trailing()}<span class="od-gas-ead-mod--unit">{t('units.percent')}</span>{/snippet}
       </TextField>
       <TextField label={t('tools.helium')} bind:value={he} inputmode="numeric" invalid={gasInvalid}>
-        {#snippet trailing()}<span class="unit">{t('units.percent')}</span>{/snippet}
+        {#snippet trailing()}<span class="od-gas-ead-mod--unit">{t('units.percent')}</span>{/snippet}
       </TextField>
   </div>
 
-  <div class="gap"></div>
+  <div class="od-gas-ead-mod--gap"></div>
   <Po2Wheel bind:value={po2} />
 
   <TextField
@@ -105,22 +105,22 @@
     invalid={depthInvalid}
     supporting={depthInvalid ? t('tools.depthInvalid') : t('tools.plannedDepthHelp')}
   >
-    {#snippet trailing()}<span class="unit">{depthUnit(logbook.prefs)}</span>{/snippet}
+    {#snippet trailing()}<span class="od-gas-ead-mod--unit">{depthUnit(logbook.prefs)}</span>{/snippet}
   </TextField>
   <SelectField label={t('tools.waterType')} bind:value={water} options={WATER_TYPES.map((w) => ({ value: w.id, label: waterTypeName(w.id) }))} />
 
   <GasResults title={t('tools.results')} {rows} />
-  <p class="caption">{t('tools.eadNote')}</p>
+  <p class="od-gas-ead-mod--caption">{t('tools.eadNote')}</p>
 </Page>
 
 <style>
   @layer od.components {
-    .pair {
+    .od-gas-ead-mod--pair {
       display: flex;
       gap: 12px;
       margin: 0 16px;
 
-      :global(.field) {
+      :global(.od-text-field--field) {
         flex: 1;
         min-width: 0;
         margin-left: 0;
@@ -128,23 +128,23 @@
       }
     }
 
-    .gap {
+    .od-gas-ead-mod--gap {
       height: 16px;
     }
 
-    .unit {
+    .od-gas-ead-mod--unit {
       display: block;
       padding: 24px 8px 0 0;
       font-size: 16px;
       line-height: 24px;
       color: var(--od-text-2);
 
-      :global(.field:not(.floated)) & {
+      :global(.od-text-field--field:not(.od-text-field--floated)) & {
         visibility: hidden;
       }
     }
 
-    .caption {
+    .od-gas-ead-mod--caption {
       margin: 8px 20px 32px;
       font-size: 12px;
       line-height: 16px;

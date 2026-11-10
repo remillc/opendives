@@ -71,11 +71,11 @@
   }
 </script>
 
-<div class="field" class:focused class:floated class:menu-open={proposals.length || isNew}>
+<div class="od-combo-field od-combo-field--field" class:od-combo-field--focused={focused} class:od-combo-field--floated={floated} class:od-combo-field--menu-open={proposals.length || isNew}>
   <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
-  <div class="box" onclick={() => input?.focus()}>
-    <div class="text">
-      <label class="label" for={id}>{label}</label>
+  <div class="od-combo-field--box" onclick={() => input?.focus()}>
+    <div class="od-combo-field--text">
+      <label class="od-combo-field--label" for={id}>{label}</label>
       <input
         {id}
         bind:this={input}
@@ -101,10 +101,10 @@
         enterkeyhint="done"
       />
     </div>
-    <span class="arrow" class:up={open}><DropdownArrow /></span>
+    <span class="od-combo-field--arrow" class:od-combo-field--up={open}><DropdownArrow /></span>
   </div>
   {#if proposals.length || isNew}
-    <ul class="menu" role="listbox" aria-label={label}>
+    <ul class="od-combo-field--menu" role="listbox" aria-label={label}>
       {#each proposals as o (o)}
         <li>
           <button type="button" role="option" aria-selected={o === value} onmousedown={(e) => e.preventDefault()} onclick={() => choose(o)}>
@@ -114,33 +114,33 @@
         </li>
       {/each}
       {#if isNew}
-        <li><button type="button" class="new" onmousedown={(e) => e.preventDefault()} onclick={() => choose(value.trim())}>{t('chips.add', { value: value.trim() })}</button></li>
+        <li><button type="button" class="od-combo-field--new" onmousedown={(e) => e.preventDefault()} onclick={() => choose(value.trim())}>{t('chips.add', { value: value.trim() })}</button></li>
       {/if}
     </ul>
   {/if}
-  {#if supporting}<p class="supporting">{supporting}</p>{/if}
+  {#if supporting}<p class="od-combo-field--supporting">{supporting}</p>{/if}
 </div>
 
 <style>
   @layer od.components {
-    .field {
+    .od-combo-field--field {
       position: relative;
       margin: 18px var(--od-field-margin, 16px) 0;
 
       /* The open menu passes over what follows. */
-      &.menu-open {
+      &.od-combo-field--menu-open {
         z-index: 30;
       }
     }
 
     /* Framework7 gives each list its own stacking level: the list holding an
        open menu comes to the front, above the next cards. */
-    :global(:is(.list, .od-form-surface):has(.menu-open)) {
+    :global(:is(.list, .od-form-surface):has(.od-combo-field--menu-open)) {
       position: relative;
       z-index: 30;
     }
 
-    .box {
+    .od-combo-field--box {
       position: relative;
       min-height: 56px;
       padding: 8px 12px 8px 16px;
@@ -162,20 +162,20 @@
         background: var(--od-text-2);
       }
 
-      .focused &::after {
+      .od-combo-field--focused &::after {
         height: 2px;
         background: var(--od-primary-action);
       }
     }
 
-    .text {
+    .od-combo-field--text {
       position: relative;
       flex: 1;
       min-width: 0;
       padding-top: 16px;
     }
 
-    .label {
+    .od-combo-field--label {
       position: absolute;
       left: 0;
       top: 8px;
@@ -188,13 +188,13 @@
         font-size 150ms,
         line-height 150ms;
 
-      .floated & {
+      .od-combo-field--floated & {
         top: 0;
         font-size: 12px;
         line-height: 16px;
       }
 
-      .focused & {
+      .od-combo-field--focused & {
         color: var(--od-primary-action);
       }
     }
@@ -213,18 +213,18 @@
       line-height: 24px;
     }
 
-    .arrow {
+    .od-combo-field--arrow {
       flex: none;
       display: flex;
       color: var(--od-text-2);
       transition: transform 150ms;
 
-      &.up {
+      &.od-combo-field--up {
         transform: rotate(180deg);
       }
     }
 
-    .menu {
+    .od-combo-field--menu {
       position: absolute;
       left: 0;
       right: 0;
@@ -254,12 +254,12 @@
         justify-content: space-between;
       }
 
-      .new {
+      .od-combo-field--new {
         color: var(--od-text-2);
       }
     }
 
-    .supporting {
+    .od-combo-field--supporting {
       margin: 4px 0 0;
       padding-left: 16px;
       font-size: 12px;

@@ -19,14 +19,14 @@
   <Navbar {title} backLink={t('filter.title')} backLinkShowText={theme.ios} />
 
   {#each keys as key (key)}
-    {#if keys.length > 1}<h2 class="od-criterion-heading">{t(`filter.criteria.${key}`)}</h2>{/if}
+    {#if keys.length > 1}<h2 class="od-filter-criterion--heading">{t(`filter.criteria.${key}`)}</h2>{/if}
     <FilterCriterionBody criterion={key} />
   {/each}
 </Page>
 
 <style>
   @layer od.components {
-    .od-criterion-heading {
+    .od-filter-criterion--heading {
       margin: 20px 16px 8px;
       font-size: 14px;
       line-height: 20px;

@@ -111,7 +111,7 @@
   }
 </script>
 
-<AccountStep
+<AccountStep class="od-bring-logbook"
   title={signedIn ? t('bringLogbook.signedInTitle') : t('createAccount.title')}
   step={signedIn ? '' : t('createAccount.step2')}
   heading={t('bringLogbook.heading')}
@@ -125,33 +125,33 @@
   previous
 >
   <input type="file" class="od-sr-only" tabindex="-1" aria-hidden="true" bind:this={fileInput} onchange={fileChosen} />
-  <div class="sources" role="radiogroup" aria-label={t('bringLogbook.sourceLabel')}>
+  <div class="od-bring-logbook--sources" role="radiogroup" aria-label={t('bringLogbook.sourceLabel')}>
     {#if deviceCount}
       <!-- The dives already on this device come first when there are some. -->
-      <label class="source">
+      <label class="od-bring-logbook--source">
         <span class="radio"><input type="radio" name="od-source" value="device" bind:group={source} disabled={busy} /><i class="icon-radio"></i></span>
-        <span class="text">
-          <span class="label">{t('bringLogbook.device', { n: deviceCount })}</span>
-          <span class="consequence">{t('bringLogbook.deviceText')}</span>
+        <span class="od-bring-logbook--text">
+          <span class="od-bring-logbook--label">{t('bringLogbook.device', { n: deviceCount })}</span>
+          <span class="od-bring-logbook--consequence">{t('bringLogbook.deviceText')}</span>
         </span>
       </label>
     {/if}
     <!-- Order of the mock-ups: empty logbook, divelogs.de, file (divelogs.de stays the default). -->
-    <label class="source">
+    <label class="od-bring-logbook--source">
       <span class="radio"><input type="radio" name="od-source" value="empty" bind:group={source} disabled={busy} /><i class="icon-radio"></i></span>
-      <span class="text">
-        <span class="label">{t('bringLogbook.empty')}</span>
+      <span class="od-bring-logbook--text">
+        <span class="od-bring-logbook--label">{t('bringLogbook.empty')}</span>
       </span>
     </label>
-    <label class="source">
+    <label class="od-bring-logbook--source">
       <span class="radio"><input type="radio" name="od-source" value="divelogs" bind:group={source} disabled={busy} /><i class="icon-radio"></i></span>
-      <span class="text">
-        <span class="label">{t('bringLogbook.divelogs')}</span>
-        <span class="consequence">{t('bringLogbook.divelogsText')}</span>
+      <span class="od-bring-logbook--text">
+        <span class="od-bring-logbook--label">{t('bringLogbook.divelogs')}</span>
+        <span class="od-bring-logbook--consequence">{t('bringLogbook.divelogsText')}</span>
       </span>
     </label>
     {#if source === 'divelogs'}
-      <div class="credentials">
+      <div class="od-bring-logbook--credentials">
         <TextField label={t('bringLogbook.user')} bind:value={user} autocomplete="username" disabled={busy} />
         <TextField
           label={t('bringLogbook.password')}
@@ -164,11 +164,11 @@
         />
       </div>
     {/if}
-    <label class="source">
+    <label class="od-bring-logbook--source">
       <span class="radio"><input type="radio" name="od-source" value="file" bind:group={source} disabled={busy} /><i class="icon-radio"></i></span>
-      <span class="text">
-        <span class="label">{t('bringLogbook.file')}</span>
-        <span class="consequence">{t('bringLogbook.fileText')}</span>
+      <span class="od-bring-logbook--text">
+        <span class="od-bring-logbook--label">{t('bringLogbook.file')}</span>
+        <span class="od-bring-logbook--consequence">{t('bringLogbook.fileText')}</span>
       </span>
     </label>
   </div>
@@ -177,13 +177,13 @@
 <style>
   @layer od.components {
     /* Android: plain rows on the page, radio buttons 20 dp (never shrunk). */
-    .sources {
+    .od-bring-logbook--sources {
       margin: 12px 16px 0;
       display: flex;
       flex-direction: column;
     }
 
-    .source {
+    .od-bring-logbook--source {
       display: flex;
       gap: 16px;
       padding: 8px;
@@ -197,7 +197,7 @@
       }
     }
 
-    .text {
+    .od-bring-logbook--text {
       flex: 1;
       min-width: 0;
       display: flex;
@@ -205,12 +205,12 @@
       gap: 2px;
     }
 
-    .label {
+    .od-bring-logbook--label {
       font-size: 16px;
       line-height: 24px;
     }
 
-    .consequence {
+    .od-bring-logbook--consequence {
       font-size: 14px;
       line-height: 20px;
       letter-spacing: 0.25px;
@@ -218,24 +218,24 @@
     }
 
     /* Under the divelogs.de choice, aligned with its text. */
-    .credentials {
+    .od-bring-logbook--credentials {
       margin: 0 8px 8px 44px;
       --od-field-margin: 0;
     }
 
     /* iOS: a white inset group, a check mark for the choice. */
-    :global(.ios) .sources {
+    :global(.ios) .od-bring-logbook--sources {
       margin-top: 16px;
       border-radius: 10px;
       overflow: hidden;
       background: var(--od-surface);
 
-      .source {
+      .od-bring-logbook--source {
         gap: 12px;
         padding: 12px 16px;
 
-        & + .source,
-        .credentials + & {
+        & + .od-bring-logbook--source,
+        .od-bring-logbook--credentials + & {
           box-shadow: inset 0 0.5px 0 var(--od-separator);
         }
 
@@ -244,22 +244,22 @@
         }
       }
 
-      .text {
+      .od-bring-logbook--text {
         gap: 3px;
       }
 
-      .label {
+      .od-bring-logbook--label {
         font-size: 17px;
         font-weight: 600;
       }
 
-      .consequence {
+      .od-bring-logbook--consequence {
         font-size: 13px;
         line-height: 18px;
         letter-spacing: 0;
       }
 
-      .credentials {
+      .od-bring-logbook--credentials {
         margin: 0 16px 12px 50px;
       }
     }

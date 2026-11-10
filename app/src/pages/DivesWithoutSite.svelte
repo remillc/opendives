@@ -53,7 +53,7 @@
   const byId = $derived(new Map(logbook.dives.map((d) => [d.id, d])));
 </script>
 
-<Page>
+<Page class="od-dives-without-site">
   <Navbar title={t('sites.withoutTitle')}>
     {#snippet left()}
       <Link back iconOnly><i class="icon icon-back"></i><span class="od-sr-only">{t('common.back')}</span></Link>
@@ -64,30 +64,30 @@
 
   {#if dives.length}
     <!-- All the dives in one white surface, with dividers. -->
-    <ul class="surface">
+    <ul class="od-dives-without-site--surface">
       {#each dives as dive (dive.id)}
         {@const listed = byId.get(dive.id)}
-        <li class="dive">
-          <a href="/sites/without-site/{dive.id}" class="od-no-site-open" aria-label={t('sites.seeProfile')}>
+        <li class="od-dives-without-site--dive">
+          <a href="/sites/without-site/{dive.id}" class="od-dives-without-site--open" aria-label={t('sites.seeProfile')}>
             {#if listed}<ProfileThumbnail profile={listed.profile} maxDepthMm={listed.maxDepthMm} prefs={logbook.prefs} />{/if}
-            <span class="od-no-site-text">
-              <span class="date od-value">{formatDateTime(dive.date)}</span>
-              <span class="sub od-value">{lines[dive.id] ?? ''}</span>
+            <span class="od-dives-without-site--text">
+              <span class="od-dives-without-site--date od-value">{formatDateTime(dive.date)}</span>
+              <span class="od-dives-without-site--sub od-value">{lines[dive.id] ?? ''}</span>
             </span>
-            <span class="od-no-site-chevron"><Icon name="chevron" size={20} /></span>
+            <span class="od-dives-without-site--chevron"><Icon name="chevron" size={20} /></span>
           </a>
-          <span class="actions">
+          <span class="od-dives-without-site--actions">
             {#if dive.suggestedSite}
               <!-- The suggested site first, as a filled tonal chip. -->
-              <button type="button" class="small tonal" onclick={() => setDiveSite(dive.id, dive.suggestedSite)}>
+              <button type="button" class="od-dives-without-site--small od-dives-without-site--tonal" onclick={() => setDiveSite(dive.id, dive.suggestedSite)}>
                 {siteName(dive.suggestedSite)}
               </button>
             {/if}
-            <button type="button" class="small" onclick={() => chooseDiveSite(dive.id, sites)}>{t('sites.chooseSite')}</button>
-            <button type="button" class="small" onclick={() => f7router.navigate(`/sites/new?dive=${dive.id}`)}>{t('sites.newSite')}</button>
+            <button type="button" class="od-dives-without-site--small" onclick={() => chooseDiveSite(dive.id, sites)}>{t('sites.chooseSite')}</button>
+            <button type="button" class="od-dives-without-site--small" onclick={() => f7router.navigate(`/sites/new?dive=${dive.id}`)}>{t('sites.newSite')}</button>
           </span>
           {#if dive.suggestedSite}
-            <span class="why">{t('sites.suggestionLine', { n: sameTrip(dive.id, dive.suggestedSite), site: siteName(dive.suggestedSite) })}</span>
+            <span class="od-dives-without-site--why">{t('sites.suggestionLine', { n: sameTrip(dive.id, dive.suggestedSite), site: siteName(dive.suggestedSite) })}</span>
           {/if}
         </li>
       {/each}
@@ -97,7 +97,7 @@
 
 <style>
   @layer od.components {
-    .surface {
+    .od-dives-without-site--surface {
       margin: 14px 16px 24px;
       padding: 0;
       list-style: none;
@@ -106,18 +106,18 @@
       overflow: hidden;
     }
 
-    .dive {
+    .od-dives-without-site--dive {
       padding: 12px 16px;
       display: flex;
       flex-direction: column;
 
-      & + .dive {
+      & + .od-dives-without-site--dive {
         border-top: 1px solid var(--od-separator);
       }
     }
 
     /* The thumbnail and the text: one tappable area, apart from the buttons. */
-    .od-no-site-open {
+    .od-dives-without-site--open {
       margin: -4px -8px;
       padding: 4px 8px;
       border-radius: 12px;
@@ -128,7 +128,7 @@
       text-decoration: none;
     }
 
-    .od-no-site-text {
+    .od-dives-without-site--text {
       flex: 1;
       min-width: 0;
       display: flex;
@@ -136,25 +136,25 @@
       gap: 2px;
     }
 
-    .od-no-site-chevron {
+    .od-dives-without-site--chevron {
       flex: none;
       display: flex;
       color: var(--od-text-2);
     }
 
-    .date {
+    .od-dives-without-site--date {
       font-size: 16px;
       line-height: 24px;
       font-weight: 500;
     }
 
-    .sub {
+    .od-dives-without-site--sub {
       font-size: 14px;
       line-height: 20px;
       color: var(--od-text-2);
     }
 
-    .actions {
+    .od-dives-without-site--actions {
       margin-top: 8px;
       display: flex;
       gap: 8px;
@@ -162,7 +162,7 @@
     }
 
     /* Small outlined buttons: 32 dp, 8 dp corners, 48 dp touch target. */
-    .small {
+    .od-dives-without-site--small {
       position: relative;
       width: auto;
       height: 32px;
@@ -183,14 +183,14 @@
       }
 
       /* The suggested site: a filled tonal chip. */
-      &.tonal {
+      &.od-dives-without-site--tonal {
         border-color: transparent;
         background: var(--od-tint);
         color: var(--od-on-tint);
       }
     }
 
-    .why {
+    .od-dives-without-site--why {
       margin-top: 8px;
       font-size: 13px;
       line-height: 18px;

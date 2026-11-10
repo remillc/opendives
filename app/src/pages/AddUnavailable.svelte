@@ -15,10 +15,10 @@
   const icons = { download: 'download' };
 </script>
 
-<Page>
+<Page class="od-add-unavailable">
   <Navbar title={t(`addUnavailable.${what}.title`)} backLink={t('common.back')} backLinkShowText={theme.ios} />
   <Block>
-    <div class="icon" aria-hidden="true"><Icon name={icons[what]} size={32} /></div>
+    <div class="od-add-unavailable--icon" aria-hidden="true"><Icon name={icons[what]} size={32} /></div>
     <h1 class="od-state-title">{t('addUnavailable.heading')}</h1>
     <p>{t(`addUnavailable.${what}.text`)}</p>
     <p>{t('addUnavailable.nothingChanged')}</p>
@@ -28,7 +28,7 @@
 
 <style>
   @layer od.components {
-    .icon {
+    .od-add-unavailable--icon {
       margin-top: 24px;
       color: var(--od-text-2);
     }

@@ -87,7 +87,7 @@
   });
 </script>
 
-<Page>
+<Page class="od-desaturation">
   <Navbar title={t('desaturation.title')}>
     {#snippet left()}
       <Link back iconOnly>
@@ -98,82 +98,82 @@
   </Navbar>
 
   {#if failed}
-    <p class="lead">{t('desaturation.failed')}</p>
+    <p class="od-desaturation--lead">{t('desaturation.failed')}</p>
   {:else if desat}
-    <p class="lead od-value">{t('desaturation.asOf', { date: formatFullDate(desat.now) })}</p>
+    <p class="od-desaturation--lead od-value">{t('desaturation.asOf', { date: formatFullDate(desat.now) })}</p>
 
     {#if wait && wait.remainingSeconds === 0}
       <!-- The wait is over (docs/mockups/outils-desaturation-terminee-android.dc.html). -->
-      <div class="od-desat-over">
-        <span class="od-desat-over-icon"><Icon name="checkCircle" size={24} weight={2.2} /></span>
-        <span class="od-desat-over-text">
-          <span class="od-desat-over-title">{t('desaturation.canFly')}</span>
-          <span class="od-desat-over-when od-value">{t('desaturation.waitOverAt', { when: formatRelativeDateTime(wait.endsAt, desat.now, false) })}</span>
+      <div class="od-desaturation--over">
+        <span class="od-desaturation--over-icon"><Icon name="checkCircle" size={24} weight={2.2} /></span>
+        <span class="od-desaturation--over-text">
+          <span class="od-desaturation--over-title">{t('desaturation.canFly')}</span>
+          <span class="od-desaturation--over-when od-value">{t('desaturation.waitOverAt', { when: formatRelativeDateTime(wait.endsAt, desat.now, false) })}</span>
         </span>
       </div>
     {:else}
-      <div class="tiles">
-        <div class="tile">
-          <span class="tile-label">{t('desaturation.beforeFlying')}</span>
-          <span class="tile-value od-value">
+      <div class="od-desaturation--tiles">
+        <div class="od-desaturation--tile">
+          <span class="od-desaturation--tile-label">{t('desaturation.beforeFlying')}</span>
+          <span class="od-desaturation--tile-value od-value">
             {#if !wait}{t('desaturation.noWait')}{:else}{formatHoursMinutes(wait.remainingSeconds)}{/if}
           </span>
         </div>
-        <div class="tile">
-          <span class="tile-label">{t('desaturation.lastDive')}</span>
-          <span class="tile-value od-value">
+        <div class="od-desaturation--tile">
+          <span class="od-desaturation--tile-label">{t('desaturation.lastDive')}</span>
+          <span class="od-desaturation--tile-value od-value">
             {desat.surfaceSeconds < 0 ? t('desaturation.noRecentDive') : t('desaturation.ago', { time: formatHoursMinutes(desat.surfaceSeconds) })}
           </span>
         </div>
       </div>
     {/if}
-    <p class="caption">
+    <p class="od-desaturation--caption">
       {wait
         ? t(wait.several ? 'desaturation.ruleSeveral' : 'desaturation.ruleSingle', { hours: wait.hours })
         : t('desaturation.atRest')}
     </p>
 
     {#if lastDive}
-      <h2 class="section">{t('desaturation.lastDive')}</h2>
-      <div class="od-desat-last-card">
-        <a href="/dives/{lastDive.id}" class="od-desat-last ripple">
-          <span class="od-desat-last-text">
-            <span class="od-desat-last-date od-value">{formatRelativeDateTime(lastDive.date, desat.now)}</span>
-            <span class="od-desat-last-line">
+      <h2 class="od-desaturation--section">{t('desaturation.lastDive')}</h2>
+      <div class="od-desaturation--last-card">
+        <a href="/dives/{lastDive.id}" class="od-desaturation--last-dive ripple">
+          <span class="od-desaturation--last-text">
+            <span class="od-desaturation--last-date od-value">{formatRelativeDateTime(lastDive.date, desat.now)}</span>
+            <span class="od-desaturation--last-line">
               {lastDive.site || t('dive.siteNotSet')} · {formatDepth(lastDive.maxDepthMm, logbook.prefs)} · {formatDuration(lastDive.durationSeconds)}
             </span>
-            <span class="od-desat-last-line od-value">{surfaced}</span>
+            <span class="od-desaturation--last-line od-value">{surfaced}</span>
           </span>
-          <span class="od-desat-last-chevron"><Icon name="chevron" size={20} /></span>
+          <span class="od-desaturation--last-chevron"><Icon name="chevron" size={20} /></span>
         </a>
       </div>
     {/if}
 
-    <h2 class="section">{t('desaturation.tissues')}</h2>
-    <div class="card chart">
+    <h2 class="od-desaturation--section">{t('desaturation.tissues')}</h2>
+    <div class="card od-desaturation--card od-desaturation--chart">
       <svg width="100%" viewBox="0 0 {WIDTH} {HEIGHT}" role="img" aria-label={chartLabel}>
-        <path class="limit" d="M0 {TOP} H{WIDTH}" />
-        <text class="axis" x={WIDTH} y="12" text-anchor="end">{t('desaturation.limit')}</text>
+        <path class="od-desaturation--limit" d="M0 {TOP} H{WIDTH}" />
+        <text class="od-desaturation--axis" x={WIDTH} y="12" text-anchor="end">{t('desaturation.limit')}</text>
         {#each desat.tissues as tissue, i (i)}
           {@const h = barHeight(tissue.percent)}
           <rect x={i * (BAR + GAP)} y={BOTTOM - h} width={BAR} height={h} rx="2" style:fill={barColor(tissue.percent)} />
         {/each}
-        <text class="axis" x="0" y="134">{t('desaturation.fast')}</text>
-        <text class="axis" x={WIDTH} y="134" text-anchor="end">{t('desaturation.slow')}</text>
+        <text class="od-desaturation--axis" x="0" y="134">{t('desaturation.fast')}</text>
+        <text class="od-desaturation--axis" x={WIDTH} y="134" text-anchor="end">{t('desaturation.slow')}</text>
       </svg>
     </div>
-    <div class="legend od-value" aria-hidden="true">
+    <div class="od-desaturation--legend od-value" aria-hidden="true">
       <span>{t('desaturation.legendZero')}</span>
-      <span class="gradient"></span>
+      <span class="od-desaturation--gradient"></span>
       <span>{t('desaturation.legendFull')}</span>
-      <span class="alarm-swatch"></span>
+      <span class="od-desaturation--alarm-swatch"></span>
       <span>{t('desaturation.legendAlarm')}</span>
     </div>
-    <p class="caption">{t('desaturation.chartText')} {modelText}</p>
+    <p class="od-desaturation--caption">{t('desaturation.chartText')} {modelText}</p>
 
     {#if desat.dives.length}
-      <h2 class="section">{t('desaturation.usedDives')}</h2>
-      <div class="list list-strong inset list-dividers media-list dives">
+      <h2 class="od-desaturation--section">{t('desaturation.usedDives')}</h2>
+      <div class="list list-strong inset list-dividers media-list od-dive-list">
         <ul>
           {#each [...desat.dives].reverse() as dive (dive.id)}
             <li>
@@ -190,26 +190,26 @@
         </ul>
       </div>
     {:else}
-      <p class="caption">{t('desaturation.noDives')}</p>
+      <p class="od-desaturation--caption">{t('desaturation.noDives')}</p>
     {/if}
 
-    <div class="note" role="note">
-      <span class="note-icon"><Icon name="info" size={20} /></span>
+    <div class="od-desaturation--note" role="note">
+      <span class="od-desaturation--note-icon"><Icon name="info" size={20} /></span>
       <span>{t('desaturation.note')}</span>
     </div>
-    <p class="caption last">{t('desaturation.recommendation')}</p>
+    <p class="od-desaturation--caption od-desaturation--last">{t('desaturation.recommendation')}</p>
   {/if}
 </Page>
 
 <style>
   @layer od.components {
-    .lead {
+    .od-desaturation--lead {
       margin: 8px 20px 0;
       font-size: 14px;
       color: var(--od-text-2);
     }
 
-    .tiles {
+    .od-desaturation--tiles {
       margin: 8px 16px 0;
       padding: 16px;
       border-radius: 12px;
@@ -219,7 +219,7 @@
       gap: 12px;
     }
 
-    .od-desat-over {
+    .od-desaturation--over {
       margin: 8px 16px 0;
       padding: 16px;
       border-radius: 12px;
@@ -229,37 +229,37 @@
       gap: 12px;
     }
 
-    .od-desat-over-icon {
+    .od-desaturation--over-icon {
       flex: none;
       display: flex;
       color: var(--od-text);
     }
 
-    .od-desat-over-text {
+    .od-desaturation--over-text {
       display: flex;
       flex-direction: column;
       gap: 2px;
     }
 
-    .od-desat-over-title {
+    .od-desaturation--over-title {
       font-size: 22px;
       line-height: 28px;
     }
 
-    .od-desat-over-when {
+    .od-desaturation--over-when {
       font-size: 14px;
       line-height: 20px;
       color: var(--od-text-2);
     }
 
-    .od-desat-last-card {
+    .od-desaturation--last-card {
       margin: 0 16px;
       border-radius: 16px;
       background: var(--od-surface);
       overflow: hidden;
     }
 
-    .od-desat-last {
+    .od-desaturation--last-dive {
       position: relative;
       overflow: hidden;
       min-height: 72px;
@@ -272,7 +272,7 @@
       text-decoration: none;
     }
 
-    .od-desat-last-text {
+    .od-desaturation--last-text {
       flex: 1;
       min-width: 0;
       display: flex;
@@ -280,36 +280,36 @@
       gap: 2px;
     }
 
-    .od-desat-last-date {
+    .od-desaturation--last-date {
       font-size: 16px;
       line-height: 24px;
     }
 
-    .od-desat-last-line {
+    .od-desaturation--last-line {
       font-size: 14px;
       line-height: 20px;
       color: var(--od-text-2);
     }
 
-    .od-desat-last-chevron {
+    .od-desaturation--last-chevron {
       flex: none;
       display: flex;
       color: var(--od-text-2);
     }
 
-    .tile {
+    .od-desaturation--tile {
       display: flex;
       flex-direction: column;
       gap: 2px;
     }
 
-    .tile-label {
+    .od-desaturation--tile-label {
       font-size: 12px;
       line-height: 16px;
       color: var(--od-text-2);
     }
 
-    .tile-value {
+    .od-desaturation--tile-value {
       font-size: 22px;
       line-height: 28px;
 
@@ -318,7 +318,7 @@
       }
     }
 
-    .section {
+    .od-desaturation--section {
       margin: 22px 16px 8px;
       font-size: 14px;
       font-weight: 500;
@@ -332,29 +332,29 @@
       }
     }
 
-    .card {
+    .od-desaturation--card {
       margin: 0 16px;
       padding: 16px;
       border-radius: 12px;
       background: var(--od-surface);
     }
 
-    .chart svg {
+    .od-desaturation--chart svg {
       display: block;
     }
 
-    .limit {
+    .od-desaturation--limit {
       stroke: var(--od-text-2);
       stroke-width: 1;
       stroke-dasharray: 4 4;
     }
 
-    .axis {
+    .od-desaturation--axis {
       font-size: 10px;
       fill: var(--od-text-2);
     }
 
-    .legend {
+    .od-desaturation--legend {
       margin: 8px 20px 0;
       display: flex;
       align-items: center;
@@ -363,14 +363,14 @@
       color: var(--od-text-2);
     }
 
-    .gradient {
+    .od-desaturation--gradient {
       flex: 1;
       height: 8px;
       border-radius: 4px;
       background: linear-gradient(90deg, var(--od-water-top), var(--od-water-bottom));
     }
 
-    .alarm-swatch {
+    .od-desaturation--alarm-swatch {
       flex: none;
       width: 12px;
       height: 8px;
@@ -378,22 +378,22 @@
       background: var(--od-alarm);
     }
 
-    .caption {
+    .od-desaturation--caption {
       margin: 8px 20px 0;
       font-size: 13px;
       line-height: 18px;
       color: var(--od-text-2);
 
-      &.last {
+      &.od-desaturation--last {
         margin-bottom: 32px;
       }
     }
 
-    .dives {
+    .od-dive-list {
       margin-top: 0;
     }
 
-    .note {
+    .od-desaturation--note {
       margin: 18px 16px 0;
       padding: 12px 16px;
       border-radius: 12px;
@@ -405,7 +405,7 @@
       line-height: 20px;
     }
 
-    .note-icon {
+    .od-desaturation--note-icon {
       flex: none;
       display: flex;
     }

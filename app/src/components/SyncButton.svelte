@@ -41,25 +41,25 @@
 
 <button
   type="button"
-  class="od-tonal-button sync-button"
+  class="od-tonal-button od-sync-button"
   disabled={logbook.loading || running}
   aria-busy={running}
   onclick={sync}
 >
   {#if running}
     {#if known}
-      <span class="fill" style:width="{percent}%" aria-hidden="true"></span>
+      <span class="od-sync-button--fill" style:width="{percent}%" aria-hidden="true"></span>
     {:else}
-      <span class="sweep" aria-hidden="true"></span>
+      <span class="od-sync-button--sweep" aria-hidden="true"></span>
     {/if}
   {/if}
-  <span class="label">{t('account.syncNow')}</span>
+  <span class="od-sync-button--label">{t('account.syncNow')}</span>
   {#if running}<span class="od-sr-only">, {known ? `${percent} %` : t('sync.syncing')}</span>{/if}
 </button>
 
 <style>
   @layer od.components {
-    .sync-button {
+    .od-sync-button {
       position: relative;
       overflow: hidden;
 
@@ -69,8 +69,8 @@
       }
     }
 
-    .fill,
-    .sweep {
+    .od-sync-button--fill,
+    .od-sync-button--sweep {
       position: absolute;
       top: 0;
       bottom: 0;
@@ -78,12 +78,12 @@
       background: color-mix(in srgb, var(--od-on-tint) 24%, transparent);
     }
 
-    .fill {
+    .od-sync-button--fill {
       transition: width 200ms linear;
     }
 
     /* Before the first stage: a bar a third as wide sweeps across. */
-    .sweep {
+    .od-sync-button--sweep {
       width: 35%;
       background: linear-gradient(
         90deg,
@@ -105,14 +105,14 @@
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .sweep {
+      .od-sync-button--sweep {
         animation: none;
         width: 100%;
         opacity: 0.5;
       }
     }
 
-    .label {
+    .od-sync-button--label {
       position: relative;
     }
   }

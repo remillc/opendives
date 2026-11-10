@@ -63,29 +63,29 @@
   <SectionBand summary={t('band.tools')} />
 
   {#each groups as group (group.title)}
-    <h2 class="title">{group.title}</h2>
-    <div class="surface" role="list">
+    <h2 class="od-tools--title">{group.title}</h2>
+    <div class="od-tools--surface" role="list">
       {#each group.rows as row (row.href)}
         <div role="listitem">
-          <a class="row" class:selected={selected === row.href} href={row.href} data-reload-detail="true" onclick={select}>
-            <span class="icon"><Icon name={row.icon} /></span>
-            <span class="texts">
-              <span class="label">{row.name}</span>
-              <span class="supporting">{row.text}</span>
+          <a class="od-tools--row" class:od-tools--selected={selected === row.href} href={row.href} data-reload-detail="true" onclick={select}>
+            <span class="od-tools--icon"><Icon name={row.icon} /></span>
+            <span class="od-tools--texts">
+              <span class="od-tools--label">{row.name}</span>
+              <span class="od-tools--supporting">{row.text}</span>
             </span>
-            <span class="chevron"><Icon name="chevron" size={24} weight={2} /></span>
+            <span class="od-tools--chevron"><Icon name="chevron" size={24} weight={2} /></span>
           </a>
         </div>
       {/each}
     </div>
   {/each}
-  <div class="bottom"></div>
+  <div class="od-tools--bottom"></div>
 </Page>
 
 <style>
   @layer od.components {
     /* As Settings: titles on the page background, groups as rounded white surfaces. */
-    .title {
+    .od-tools--title {
       margin: 0;
       padding: 22px 20px 8px;
       font-size: 18px;
@@ -94,14 +94,14 @@
       color: var(--od-text);
     }
 
-    .surface {
+    .od-tools--surface {
       margin: 0 16px;
       border-radius: 20px;
       background: var(--od-surface);
       overflow: hidden;
     }
 
-    .row {
+    .od-tools--row {
       box-sizing: border-box;
       width: 100%;
       min-height: 72px;
@@ -114,23 +114,23 @@
     }
 
     /* Tablet: the tool shown beside the list. */
-    .row.selected {
+    .od-tools--row.od-tools--selected {
       background: var(--od-tint);
       color: var(--od-on-tint);
 
-      .supporting,
-      .chevron {
+      .od-tools--supporting,
+      .od-tools--chevron {
         color: inherit;
       }
     }
 
-    .icon {
+    .od-tools--icon {
       flex: none;
       display: flex;
       color: var(--od-text);
     }
 
-    .texts {
+    .od-tools--texts {
       flex: 1;
       min-width: 0;
       display: flex;
@@ -138,24 +138,24 @@
       gap: 2px;
     }
 
-    .label {
+    .od-tools--label {
       font-size: 16px;
       line-height: 22px;
     }
 
-    .supporting {
+    .od-tools--supporting {
       font-size: 14px;
       line-height: 20px;
       color: var(--od-text-2);
     }
 
-    .chevron {
+    .od-tools--chevron {
       flex: none;
       display: flex;
       color: var(--od-text-2);
     }
 
-    .bottom {
+    .od-tools--bottom {
       height: 24px;
     }
   }

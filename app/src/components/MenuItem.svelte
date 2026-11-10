@@ -29,7 +29,7 @@
   {link}
   popoverClose
   title={text}
-  class={destructive ? 'destructive' : ''}
+  class="od-menu-item {destructive ? 'od-menu-item--destructive' : ''}"
   onClick={onclick}
   {...theme.ios ? { after: trailing } : { media: leading }}
 />

@@ -574,7 +574,7 @@ html.ios {
    * 72 dp rows without dividers or chevron; the dives of an expanded trip in
    * a white surface, 64 dp each.
    */
-  .md .list.dives {
+  .md .list.od-dive-list {
     /* A dive has no chevron; only a trip has its arrow. */
     .item-link .item-inner::before,
     .item-link .item-title-row::before {
@@ -620,7 +620,7 @@ html.ios {
       }
     }
 
-    li.in-trip {
+    li.od-dive-row--in-trip {
       padding: 0 12px 0 32px;
 
       > .item-content {
@@ -630,12 +630,12 @@ html.ios {
         background: var(--od-surface);
       }
 
-      &.trip-first > .item-content {
+      &.od-dive-row--trip-first > .item-content {
         padding-top: 12px;
         border-radius: 16px 16px 0 0;
       }
 
-      &.trip-last {
+      &.od-dive-row--trip-last {
         padding-bottom: 8px;
 
         > .item-content {
@@ -644,7 +644,7 @@ html.ios {
         }
       }
 
-      &.trip-first.trip-last > .item-content {
+      &.od-dive-row--trip-first.od-dive-row--trip-last > .item-content {
         border-radius: 16px;
       }
     }
@@ -733,7 +733,7 @@ html.ios {
 
   /*
    * Outlined button ("Sign out", "Delete the account"): same sizes as the
-   * tonal button; ink, or --od-alarm with .danger (text and border).
+   * tonal button; ink, or --od-alarm with .od-danger (text and border).
    */
   .od-outlined-button {
     width: auto;
@@ -751,7 +751,7 @@ html.ios {
     white-space: nowrap;
     cursor: pointer;
 
-    &.danger {
+    &.od-danger {
       border-color: var(--od-alarm);
       color: var(--od-alarm);
     }
@@ -876,8 +876,8 @@ html.ios {
       font-weight: 400;
     }
 
-    .ios .od-menu .destructive .item-title,
-    .ios .od-menu .destructive .item-after {
+    .ios .od-menu .od-menu-item--destructive .item-title,
+    .ios .od-menu .od-menu-item--destructive .item-after {
       color: var(--od-alarm);
     }
 

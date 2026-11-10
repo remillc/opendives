@@ -206,7 +206,7 @@
   }
 </script>
 
-<Page>
+<Page class="od-site-edit">
   <Navbar title={editing ? t('sites.editTitle') : t('sites.newSite')}>
     {#snippet left()}
       <Link back iconOnly><Icon name="close" /><span class="od-sr-only">{t('sites.close')}</span></Link>
@@ -218,20 +218,20 @@
 
   <TextField label={t('sites.name')} bind:value={name} />
 
-  <div class="map-card" class:fullscreen use:lift={fullscreen}>
+  <div class="od-site-edit--map-card" class:od-site-edit--fullscreen={fullscreen} use:lift={fullscreen}>
     <SiteMap pin={position} editable onmove={setPosition} height={fullscreen ? '100%' : '190px'} />
-    <span class="chip">{t('sites.movePin')}</span>
-    <button type="button" class="map-button" onclick={() => (fullscreen = !fullscreen)}>
+    <span class="chip od-site-edit--chip">{t('sites.movePin')}</span>
+    <button type="button" class="od-site-edit--map-button" onclick={() => (fullscreen = !fullscreen)}>
       <Icon name={fullscreen ? 'exitFullscreen' : 'fullscreen'} size={20} weight={2} />
       <span class="od-sr-only">{fullscreen ? t('sites.exitFullscreen') : t('sites.fullscreen')}</span>
     </button>
-    {#if fullscreen && coordsText}<span class="coords od-value">{coordsText}</span>{/if}
+    {#if fullscreen && coordsText}<span class="od-site-edit--coords od-value">{coordsText}</span>{/if}
   </div>
 
   {#if !editing && nearby}
-    <div class="nearby" role="note">
+    <div class="od-site-edit--nearby" role="note">
       <span>{t('sites.nearbyShort', { site: nearby.name || t('sites.noName') })}</span>
-      <button type="button" class="od-text-button use" onclick={useNearby}>{t('sites.useNearby')}</button>
+      <button type="button" class="od-text-button od-site-edit--use" onclick={useNearby}>{t('sites.useNearby')}</button>
     </div>
   {/if}
 
@@ -253,7 +253,7 @@
     </TextField>
     <TextField label={t('sites.country')} bind:value={country} supporting={country && country === autoCountry ? t('sites.fromPosition') : ''} />
     <TextField label={t('sites.region')} bind:value={region} supporting={region && region === autoRegion ? t('sites.fromPosition') : ''} />
-    <p class="explain">{t('sites.placeExplain')}</p>
+    <p class="od-site-edit--explain">{t('sites.placeExplain')}</p>
   </div>
 
   <div class="od-form-surface">
@@ -262,23 +262,23 @@
   </div>
 
   {#if editing}
-    <div class="od-form-surface delete">
-      <button type="button" class="od-outlined-button danger" onclick={deleteSite}>{t('sites.deleteSite')}</button>
-      <p class="explain">{t('sites.deleteSiteHint')}</p>
+    <div class="od-form-surface od-site-edit--delete">
+      <button type="button" class="od-outlined-button od-danger" onclick={deleteSite}>{t('sites.deleteSite')}</button>
+      <p class="od-site-edit--explain">{t('sites.deleteSiteHint')}</p>
     </div>
   {/if}
-  <div class="end"></div>
+  <div class="od-site-edit--end"></div>
 </Page>
 
 <style>
   @layer od.components {
-    .map-card {
+    .od-site-edit--map-card {
       position: relative;
       margin: 8px 16px 0;
       border-radius: 16px;
       overflow: hidden;
 
-      &.fullscreen {
+      &.od-site-edit--fullscreen {
         position: fixed;
         inset: 0;
         z-index: 12000;
@@ -287,7 +287,7 @@
       }
     }
 
-    .chip {
+    .od-site-edit--chip {
       position: absolute;
       left: 12px;
       top: 12px;
@@ -298,12 +298,12 @@
       color: var(--od-text-2);
       pointer-events: none;
 
-      .fullscreen & {
+      .od-site-edit--fullscreen & {
         top: calc(12px + env(safe-area-inset-top));
       }
     }
 
-    .map-button {
+    .od-site-edit--map-button {
       position: absolute;
       right: 4px;
       top: 4px;
@@ -326,16 +326,16 @@
         box-shadow: 0 1px 3px rgb(0 0 0 / 0.2);
       }
 
-      :global(.od-icon) {
+      :global(.od-site-edit--icon) {
         position: relative;
       }
 
-      .fullscreen & {
+      .od-site-edit--fullscreen & {
         top: calc(4px + env(safe-area-inset-top));
       }
     }
 
-    .coords {
+    .od-site-edit--coords {
       position: absolute;
       left: 50%;
       bottom: calc(40px + env(safe-area-inset-bottom));
@@ -347,22 +347,22 @@
       white-space: nowrap;
     }
 
-    .explain {
+    .od-site-edit--explain {
       margin: 12px 16px 0;
       font-size: 13px;
       line-height: 18px;
       color: var(--od-text-2);
     }
 
-    .delete {
+    .od-site-edit--delete {
       padding: 16px 12px;
 
-      .explain {
+      .od-site-edit--explain {
         margin: 8px 4px 0;
       }
     }
 
-    .nearby {
+    .od-site-edit--nearby {
       margin: 18px 16px 0;
       padding: 12px 16px 4px;
       border-radius: 12px;
@@ -374,11 +374,11 @@
       gap: 4px;
     }
 
-    .use {
+    .od-site-edit--use {
       align-self: flex-end;
     }
 
-    .end {
+    .od-site-edit--end {
       height: 32px;
     }
   }

@@ -32,7 +32,7 @@
   onMount(() => {
     const content = holder?.closest('.page-content');
     if (!content || !panel) return;
-    const band = /** @type {HTMLElement|null} */ (content.querySelector('.band'));
+    const band = /** @type {HTMLElement|null} */ (content.querySelector('.od-section-band--band'));
     let frame = 0;
     const update = () => {
       frame = 0;
@@ -62,17 +62,17 @@
   });
 </script>
 
-<div class="od-band-holder" bind:this={holder}>
-  <div class="od-band-layer" class:od-band-layer-pill={pill} bind:this={panel}>
-    <div class="od-band-fill"></div>
-    <svg class="od-band-profile" viewBox="0 0 300 140" preserveAspectRatio="none" aria-hidden="true">
-      <path d="{PROFILE} V140 H0 Z" class="od-band-area" />
-      <path d={PROFILE} class="od-band-line" vector-effect="non-scaling-stroke" />
+<div class="od-band-backdrop od-band-backdrop--holder" bind:this={holder}>
+  <div class="od-band-backdrop--layer" class:od-band-backdrop--layer-pill={pill} bind:this={panel}>
+    <div class="od-band-backdrop--fill"></div>
+    <svg class="od-band-backdrop--profile" viewBox="0 0 300 140" preserveAspectRatio="none" aria-hidden="true">
+      <path d="{PROFILE} V140 H0 Z" class="od-band-backdrop--area" />
+      <path d={PROFILE} class="od-band-backdrop--line" vector-effect="non-scaling-stroke" />
     </svg>
     {#if group}
-      <div class="od-band-heading" role="heading" aria-level="2">
-        <span class="od-band-month">{monthYearLabel(group.year, group.month, locale)}</span>
-        <span class="od-band-count">{t('band.dives', { n: group.count })}</span>
+      <div class="od-band-backdrop--heading" role="heading" aria-level="2">
+        <span class="od-band-backdrop--month">{monthYearLabel(group.year, group.month, locale)}</span>
+        <span class="od-band-backdrop--count">{t('band.dives', { n: group.count })}</span>
       </div>
     {/if}
   </div>
@@ -81,7 +81,7 @@
 <style>
   @layer od.components {
     /* Stays at the top of the scrolling area, under the title; takes no room. */
-    .od-band-holder {
+    .od-band-backdrop--holder {
       position: sticky;
       /* The browser counts from inside the padding of .page-content, already under the title. */
       top: 0;
@@ -91,7 +91,7 @@
       pointer-events: none;
     }
 
-    .od-band-layer {
+    .od-band-backdrop--layer {
       --od-band-bar: calc(var(--f7-navbar-height) + var(--f7-safe-area-top));
       --od-band-h: calc(var(--f7-safe-area-top) + 190px);
       position: absolute;
@@ -107,13 +107,13 @@
         linear-gradient(#000, #000) top / 100% calc(100% - 17px) no-repeat,
         url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%20300%2018%27%20preserveAspectRatio%3D%27none%27%3E%3Cpath%20d%3D%27M0%200%20H300%20V11%20Q262.5%2020%20225%2011%20T150%2011%20T75%2011%20T0%2011%20Z%27%20fill%3D%27black%27/%3E%3C/svg%3E") bottom / 100% 18px no-repeat;
 
-      &.od-band-layer-pill {
+      &.od-band-backdrop--layer-pill {
         --od-band-h: calc(var(--f7-safe-area-top) + 242px);
       }
     }
 
     /* The gradient stays still on the screen: the title's colours continue into it. */
-    .od-band-fill {
+    .od-band-backdrop--fill {
       position: absolute;
       inset: 0;
       background-image: var(--od-band-gradient);
@@ -122,18 +122,18 @@
       transform: translate3d(0, var(--od-band-rise, 0px), 0);
     }
 
-    .od-band-profile {
+    .od-band-backdrop--profile {
       position: absolute;
       left: 0;
       bottom: 2px;
       width: 100%;
       height: 34px;
 
-      .od-band-area {
+      .od-band-backdrop--area {
         fill: rgb(255 255 255 / 0.1);
       }
 
-      .od-band-line {
+      .od-band-backdrop--line {
         fill: none;
         stroke: rgb(31 33 36 / 0.22);
         stroke-width: 1.5;
@@ -141,7 +141,7 @@
       }
     }
 
-    .od-band-heading {
+    .od-band-backdrop--heading {
       position: absolute;
       left: 16px;
       right: 24px;
@@ -155,7 +155,7 @@
       opacity: var(--od-band-month-opacity, 0);
     }
 
-    .od-band-month {
+    .od-band-backdrop--month {
       flex: 1;
       min-width: 0;
       overflow: hidden;
@@ -163,7 +163,7 @@
       white-space: nowrap;
     }
 
-    .od-band-count {
+    .od-band-backdrop--count {
       font-variant-numeric: tabular-nums;
       white-space: nowrap;
     }

@@ -58,14 +58,14 @@
   const label = $derived([number, details, pendingText].filter(Boolean).join(', '));
 </script>
 
-<li data-trip={inTrip ? dive.trip?.id : undefined} class:in-trip={inTrip} class:trip-first={tripFirst} class:trip-last={tripLast} class:appear class:selected={layout.split && navigation.dive === String(dive.id)} data-virtual-list-index={index} style:top={top === undefined ? undefined : `${top}px`}>
+<li class="od-dive-row" data-trip={inTrip ? dive.trip?.id : undefined} class:od-dive-row--in-trip={inTrip} class:od-dive-row--trip-first={tripFirst} class:od-dive-row--trip-last={tripLast} class:od-dive-row--appear={appear} class:od-dive-row--selected={layout.split && navigation.dive === String(dive.id)} data-virtual-list-index={index} style:top={top === undefined ? undefined : `${top}px`}>
   <!-- data-reload-detail: beside the list (tablet), the dive replaces the one shown. -->
   <a
     href="/dives/{dive.id}"
     data-reload-detail="true"
     data-dive={dive.id}
     draggable="false"
-    class="item-link item-content dive-row"
+    class="item-link item-content od-dive-row--link"
     class:no-chevron={selecting}
     role={selecting ? 'checkbox' : undefined}
     aria-checked={selecting ? checked : undefined}
@@ -80,12 +80,12 @@
     <div class="item-inner od-row">
       <div class="od-row-text">
         <div class="item-title">
-          {#if dive.site}{dive.site}{:else}<span class="not-set">{t('dive.siteNotSet')}</span>{/if}
+          {#if dive.site}{dive.site}{:else}<span class="od-dive-row--not-set">{t('dive.siteNotSet')}</span>{/if}
         </div>
-        <div class="item-text">{#if number}{number}<span class="separator" aria-hidden="true">·</span>{/if}{formatDateTime(dive.date)}</div>
-        {#if pendingText}<div class="item-text pending">{pendingText}</div>{/if}
+        <div class="item-text">{#if number}{number}<span class="od-dive-row--separator" aria-hidden="true">·</span>{/if}{formatDateTime(dive.date)}</div>
+        {#if pendingText}<div class="item-text od-dive-row--pending">{pendingText}</div>{/if}
       </div>
-      <div class="values od-value">
+      <div class="od-dive-row--values od-value">
         {#if theme.ios}
           {#if dive.maxDepthMm}<strong>{formatDepth(dive.maxDepthMm, prefs)}</strong>{/if}
           <span>{formatDuration(dive.durationSeconds)}</span>
@@ -103,18 +103,18 @@
   @layer od.components {
     /* iOS: shifted on the left only, values and chevron aligned with the other
        rows. Android: a white surface, in theme.css. */
-    :global(.ios) .in-trip .item-content {
+    :global(.ios) .od-dive-row--in-trip .item-content {
       padding-left: calc(32px + var(--f7-safe-area-left));
     }
 
     /* Beside the list (tablet), the row of the dive shown. */
-    .selected {
+    .od-dive-row--selected {
       background: var(--od-tint);
       color: var(--od-on-tint);
     }
 
     /* A trip just expanded: its dives slide down into place. */
-    .appear {
+    .od-dive-row--appear {
       animation: od-row-appear 220ms ease-out;
     }
 
@@ -126,7 +126,7 @@
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .appear {
+      .od-dive-row--appear {
         animation: none;
       }
     }
@@ -143,21 +143,21 @@
       }
     }
 
-    .separator {
+    .od-dive-row--separator {
       margin: 0 0.4em;
     }
 
-    .item-text.pending {
+    .item-text.od-dive-row--pending {
       color: var(--od-pending);
     }
 
-    .not-set {
+    .od-dive-row--not-set {
       color: var(--od-text-2);
       font-weight: normal;
     }
 
     /* The first value strong, the second small under it; both centred on the row. */
-    .values {
+    .od-dive-row--values {
       display: flex;
       flex-direction: column;
       align-items: flex-end;
