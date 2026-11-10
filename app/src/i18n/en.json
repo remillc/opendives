@@ -1335,7 +1335,10 @@
     "asOf": "As of {date}",
     "beforeFlying": "Before flying",
     "noWait": "No wait",
-    "waitOver": "Wait over",
+    "canFly": "You can fly",
+    "waitOverAt": "Wait over {when}",
+    "surfacedAgo": "Out of the water {time} ago",
+    "surfacedLong": "Out of the water {ago}",
     "lastDive": "Last dive",
     "noRecentDive": "Over 48 h ago",
     "ago": "{time} ago",
@@ -1504,7 +1507,8 @@
       "Logbook: the month shown in the band is more discreet.",
       "Navigation buttons react to a touch at once.",
       "Durations of an hour or more follow the language: “1:11” in English, “1 h 11” in French.",
-      "Settings: the “Always in hours and minutes” duration option is gone."
+      "Settings: the “Always in hours and minutes” duration option is gone.",
+      "Desaturation: the last logbook dive, and “You can fly” once the wait is over."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
