@@ -1410,6 +1410,9 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Offline maps: \"Choose on the map\" now shows a fixed frame; move and zoom the map under it and the area it covers is what you download. The detail is chosen for you, and the size shown is an estimate.",
+      "Offline maps: a search field on \"Choose on the map\" finds a site of your logbook as you type, or a place when you press search, and moves the map there.",
+      "Offline maps: choose an area on the map from Settings to download it (a frame of at most about 3,000 tiles); a space limit and a free-space floor protect the device, and updates are offered with a badge.",
       "Privacy: the policy mentions searching for places on the map.",
       "Offline maps: a search field on \"Choose on the map\" finds a site of your logbook as you type, or a place when you press search, and puts the rectangle around it.",
       "Settings: the water type written on downloaded dives that have none can be chosen (Not specified by default).",
@@ -2376,27 +2379,16 @@
     },
     "area": {
       "title": "Choose on the map",
-      "help": "Drag the corners of the rectangle to cover the area you want.",
       "name": "Region name",
       "nameHelp": "Suggested from the nearest site",
       "around": "Around {site}",
       "aroundHere": "Chosen area",
       "needNetwork": "Choosing on the map needs the network.",
-      "handle": "Rectangle corner, {corner}",
-      "corners": {
-        "nw": "north-west",
-        "ne": "north-east",
-        "sw": "south-west",
-        "se": "south-east"
-      },
       "download": "Download",
       "unavailable": "The map server could not be reached. Try again with a network.",
       "choose": "Choose on the map",
-      "lessDetail": "Less detail (zoom 12): a larger area",
       "size": "About {width} × {height} km",
-      "tiles": "{count} tiles of {limit}",
-      "tooBig": "This area is too large: a download is limited to 3,000 tiles. Make the rectangle smaller.",
-      "suggestLess": "Too many tiles at full detail. Choose less detail to download this area.",
+      "tooBig": "This area is too large to download. Zoom in a little.",
       "search": {
         "label": "Search for a place or a site",
         "offline": "Search unavailable without a network",
@@ -2408,7 +2400,11 @@
         "none": "No place found.",
         "error": "Search is not possible right now. Try again.",
         "attribution": "Places: data © OpenStreetMap contributors, via Nominatim"
-      }
+      },
+      "mapLabel": "Map under a fixed frame. Move and zoom the map to choose the area to download.",
+      "detailFull": "Detailed map: streets, paths and shorelines.",
+      "detailReduced": "Simpler map: main roads, villages and coastlines. This area is too large for full detail.",
+      "estimate": "about {size} to download (estimate)"
     }
   }
 }
