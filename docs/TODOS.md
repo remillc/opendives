@@ -10,7 +10,7 @@ Rules (agreed between the design agent and the code agent, see `docs/agent-inbox
 - **Tag:** every item starts with `[design]` or `[code]` right after its number, set by the agent that adds it (`#4 [design] …`). `[design]` = mock-ups, visuals, screen texts, specification; `[code]` = everything else. When unsure, the agent asks Christian. The tag says who handles the item and lets Christian list one kind only.
 - No other content in this file: no history, no checked boxes, no notes from agents.
 
-Next number: 33
+Next number: 34
 
 ## List
 
@@ -25,3 +25,4 @@ Next number: 33
 - #23 [design] idée : ajouter une section Explorer, une carte qui affiche les sites de plongée des environs
 - #27 [design] Se débarrasser de tout workflow lié à l'état invalide d'une plongée : menus contextuels, recherche, paramétrage. S'assurer au préalable que cette feature n'est pas utilisée.
 - #32 [code] tablette : sur une petite tablette en paysage, le dialogue de /welcome défile. On ne veut pas de défilement dans ce dialogue. Même bogue que l'ex-#31, que Claude VC a traité avec la tâche 2026-11-10-18 : à vérifier sur une petite tablette, puis supprimer.
+- #33 [code] /statistics (tablette) : quand on ferme un groupe (chevron bas/haut), si la plongée affichée dans le panneau de droite appartient à ce groupe, réinitialiser le panneau et afficher la vue vide de départ.
