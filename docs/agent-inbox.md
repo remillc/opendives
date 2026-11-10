@@ -1120,3 +1120,9 @@ Christian approved (canvas comment). Spec: "Settings, \"Réinitialiser tous les 
 Christian asked (canvas comment): use the snackbar of `docs/mockups/sites-nettoyer-pas-doublons-android.dc.html` for every snackbar. Spec: `docs/ui-foundations.md`, section 8 "Snackbar style".
 - Make one shared snackbar component with that style (inverse surface, 4 dp corners, 16 dp side margins, 24 dp from the bottom or above the FAB, 14 sp text, one action in the inverse primary colour), light and dark tokens.
 - Replace every existing snackbar or toast with it. Keep the durations: 4 s minimum, 6 s with an action.
+
+## [ ] 2026-11-10-07 Clean up sites: edit a site from a duplicate group
+
+Christian approved (canvas comment). Spec: "Clean up sites, \"Pas des doublons\"" (paragraph on the pencil). Mock-ups: `docs/mockups/sites-nettoyer-android.dc.html`, `docs/mockups/sites-nettoyer-pas-doublons-android.dc.html`.
+- Each site row of a duplicate group gets a pencil icon button on the right (48 dp target, aria-label "Modifier le site {nom}"), separate from the radio choice.
+- It opens the existing site editor. On save, return to "Nettoyer les sites" at the same scroll position and recompute the groups; a group that no longer matches disappears with the snackbar "{nom} modifié, ce n’est plus un doublon possible" (4 s, shared snackbar style). Back without saving changes nothing.
