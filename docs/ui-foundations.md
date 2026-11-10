@@ -119,3 +119,15 @@ The mock-ups now cover, on iPhone and Android phone: first launch, sites and off
 **divelogs.de (decided on 5 November 2026).** When creating an account, the diver can bring their divelogs.de logbook: dives are downloaded once into the Subsurface account, with no synchronisation afterwards. OpenDives does not keep the divelogs.de credentials.
 
 The values in the planner mock-ups come from Subsurface's real planner, compiled without Qt in the proof of concept.
+
+## 8. Snackbar style (decided on 10 November 2026)
+
+Every snackbar in the app uses one style, the one of `docs/mockups/sites-nettoyer-pas-doublons-android.dc.html`:
+
+- Container: inverse surface, `--od-inverse-surface` #2E3033 in light mode (#E8E8E5 in dark mode), 4 dp corners, shadow 0 2 6 rgba(0, 0, 0, 0.25). Floating 16 dp from the left and right edges and 24 dp above the bottom of the screen, or above the FAB when there is one.
+- Height at least 48 dp; padding 8 dp top and bottom, 16 dp left, 8 dp right. Text on up to two lines.
+- Text: 14 sp, line height 20 sp, `--od-inverse-on-surface` #F4F4F2 (dark mode #1F2124).
+- Action: a text button, 40 dp high, 12 dp side padding, 14 sp semibold, in `--od-inverse-primary` #8AB4F8 (dark mode #2F6DB5). At most one action, usually "Annuler".
+- Duration: at least 4 s, 6 s when there is an action. One snackbar at a time; a new one replaces the old.
+- `role="status"` so screen readers announce it; the action stays reachable with the keyboard and TalkBack until the snackbar closes.
+
