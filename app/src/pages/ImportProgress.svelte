@@ -201,7 +201,7 @@
 
       :global(.ios) & {
         margin: 20px 16px 0;
-        border-radius: 10px;
+        border-radius: 20px;
         overflow: hidden;
         background: var(--od-surface);
       }

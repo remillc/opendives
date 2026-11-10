@@ -1436,6 +1436,7 @@
     "notesText": "What changed in this version",
     "releaseNotes": [
       "Statistics: a total of time under water from 24 h is written in days and hours, without minutes (\"80 d 16 h\"), in the key figures, the \"By …\" and \"My statistics\" rows and the dives of a row; under 24 h it stays in hours and minutes.",
+      "Account (iPhone): signing in, creating an account, the confirmation code, bringing your logbook, the import and the git repository take the same layout as on Android: only “Cancel” or “Back” in the bar, a large title, rounded sections, a large capsule button and a dive profile.",
       "Statistics: the list of dives behind a row opens faster and uses far less memory on a large logbook; only the rows near the screen are drawn.",
       "Dive: when you swipe to the next or previous dive, the site map and the details are already prepared; the screen arrives whole instead of filling in during the slide.",
       "Account (Android): signing in, creating an account, the confirmation code, bringing your logbook and the git repository take the layout of first launch: a large title, the fields in a white card, a large button at the bottom and a dive profile. On a tablet, the title and the card sit side by side in landscape, one above the other in portrait.",
