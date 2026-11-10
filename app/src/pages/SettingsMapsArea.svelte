@@ -331,7 +331,6 @@
     </div>
 
     <div class="sheet" bind:this={sheet}>
-      <div class="handle" aria-hidden="true"></div>
       <div class="field"><TextField label={t('maps.area.name')} bind:value={name} supporting={t('maps.area.nameHelp')} oninput={() => (named = true)} /></div>
       {#if info}
         {#if fits}
@@ -507,21 +506,11 @@
       left: 0;
       right: 0;
       bottom: 0;
-      padding: 8px 0 calc(16px + var(--f7-safe-area-bottom, 0px));
-      border-radius: 28px 28px 0 0;
+      padding: 16px 0 calc(16px + var(--f7-safe-area-bottom, 0px));
+      border-top: 1px solid var(--od-row-divider);
       background: var(--od-dialog);
-      box-shadow: 0 -2px 12px rgb(0 0 0 / 0.18);
       display: flex;
       flex-direction: column;
-    }
-
-    .handle {
-      width: 32px;
-      height: 4px;
-      margin: 4px auto 8px;
-      border-radius: 2px;
-      background: var(--od-text-2);
-      opacity: 0.4;
     }
 
     .estimate {
