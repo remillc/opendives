@@ -14,7 +14,7 @@
   // that has no logbook yet.
   import { OpenDivesCore } from 'opendives-core';
   import TextField from '../components/TextField.svelte';
-  import AccountStep from '../components/AccountStep.svelte';
+  import EditorialPage from '../components/EditorialPage.svelte';
   import { notAvailableYet } from '../lib/not-available.js';
   import { accountFlow, errorCode, finishAccount, showFailure } from '../lib/account.js';
   import { deviceDiveCount } from '../lib/logbook.svelte.js';
@@ -111,7 +111,7 @@
   }
 </script>
 
-<AccountStep class="od-bring-logbook"
+<EditorialPage class="od-bring-logbook"
   title={signedIn ? t('bringLogbook.signedInTitle') : t('createAccount.title')}
   step={signedIn ? '' : t('createAccount.step2')}
   heading={t('bringLogbook.heading')}
@@ -123,6 +123,7 @@
   onaction={run}
   secondary={{ label: t('bringLogbook.previous'), onclick: previous }}
   previous
+  back={!signedIn}
 >
   <input type="file" class="od-sr-only" tabindex="-1" aria-hidden="true" bind:this={fileInput} onchange={fileChosen} />
   <div class="od-bring-logbook--sources" role="radiogroup" aria-label={t('bringLogbook.sourceLabel')}>
@@ -172,7 +173,7 @@
       </span>
     </label>
   </div>
-</AccountStep>
+</EditorialPage>
 
 <style>
   @layer od.components {

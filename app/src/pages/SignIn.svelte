@@ -9,7 +9,7 @@
   // the account's logbook (they stay in the device's logbook).
   import { OpenDivesCore } from 'opendives-core';
   import AccountField from '../components/AccountField.svelte';
-  import AccountStep from '../components/AccountStep.svelte';
+  import EditorialPage from '../components/EditorialPage.svelte';
   import { errorCode, finishAccount, showFailure, validEmail, validPassword } from '../lib/account.js';
   import { t } from '../lib/i18n.js';
 
@@ -43,7 +43,7 @@
   }
 </script>
 
-<AccountStep class="od-sign-in"
+<EditorialPage class="od-sign-in"
   title={t('signIn.title')}
   heading={t('signIn.heading')}
   intro={t('signIn.intro')}
@@ -78,7 +78,7 @@
       position="last"
     />
   </div>
-</AccountStep>
+</EditorialPage>
 
 <style>
   @layer od.components {

@@ -8,7 +8,7 @@
   // the logbook of this device becomes the account's first logbook.
   import { OpenDivesCore } from 'opendives-core';
   import AccountField from '../components/AccountField.svelte';
-  import AccountStep from '../components/AccountStep.svelte';
+  import EditorialPage from '../components/EditorialPage.svelte';
   import Icon from '../components/Icon.svelte';
   import { accountFlow, errorCode, finishAccount, showFailure, toast } from '../lib/account.js';
   import { t } from '../lib/i18n.js';
@@ -59,7 +59,7 @@
   }
 </script>
 
-<AccountStep class="od-confirm-code"
+<EditorialPage class="od-confirm-code"
   title={t('createAccount.title')}
   step={t('createAccount.step1')}
   heading={t('confirmCode.heading')}
@@ -84,7 +84,7 @@
       <button type="button" disabled={busy} onclick={resend}><Icon name="refresh" size={18} weight={2} />{t('confirmCode.resend')}</button>
     </div>
   </div>
-</AccountStep>
+</EditorialPage>
 
 <style>
   @layer od.components {

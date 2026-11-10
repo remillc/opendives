@@ -1288,7 +1288,7 @@ If a state needs a broken network or a conflicting change, describe how you prod
 
 Mark this task done when both parts are in.
 
-## [ ] 2026-11-10-21 Account flow in the editorial layout (Android phone and tablet)
+## [x] 2026-11-10-21 Account flow in the editorial layout (Android phone and tablet)
 
 Spec: System design, section 8, "Editorial pages (account flow)" (new). Mock-ups: the 13 phone mock-ups and 6 tablet mock-ups it lists (`docs/mockups/`, updated or new). Pages: `AccountStep.svelte` and the account pages (`SignIn`, `CreateAccount`, `ConfirmCode`, `BringLogbook`, `GitRepository`).
 - One shared layout component for these pages (for example `od-editorial-page`, with `--eyebrow`, `--title`, `--intro`, `--card`, `--actions`, `--profile` parts): bar with ✕ or ← only, eyebrow, large title, introduction, content in a white card, primary action as a full-width 56 dp pill, decorative profile.

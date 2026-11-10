@@ -1434,6 +1434,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Compte (Android) : la connexion, la création d’un compte, le code de confirmation, la reprise du carnet et le dépôt git prennent la mise en page du premier lancement : grand titre, champs dans une carte blanche, grand bouton en bas et profil de plongée. Sur tablette, le titre et la carte sont côte à côte en paysage, l’un sous l’autre en portrait.",
       "Touchers : un bouton, une entrée du menu ou du rail répond même si le doigt glisse un peu en touchant ; auparavant, le toucher était parfois ignoré.",
       "Démarrage : l’app ne reste plus sur un écran blanc quand elle démarre avant d’avoir chargé son apparence.",
       "Statistiques : les lignes n’indiquent plus la profondeur maximale, et le nom d’une nouvelle statistique vient en premier.",
@@ -2258,6 +2259,7 @@
     "tools": "Planifier, vérifier la désaturation, préparer les gaz"
   },
   "gitRepo": {
+    "heading": "Votre propre dépôt",
     "title": "Dépôt git",
     "connect": "Connecter",
     "connecting": "Connexion…",
@@ -2285,7 +2287,7 @@
       "other": "{n} branches lues dans le dépôt : {list}"
     },
     "branchEmpty": "Dépôt vide : la branche {name} y sera créée",
-    "note": "Le jeton reste chiffré sur cet appareil. Le carnet est enregistré au format Subsurface : Subsurface sur ordinateur peut ouvrir le même dépôt.",
+    "note": "Le jeton reste chiffré sur cet appareil.",
     "errorNetwork": "Le serveur ne répond pas. Vérifiez la connexion, puis réessayez.",
     "errorNoLog": "La branche n’existe plus dans le dépôt. Rouvrez la liste des branches et choisissez-en une.",
     "errorFailed": "La connexion n’a pas abouti. Rien n’a été enregistré.",
