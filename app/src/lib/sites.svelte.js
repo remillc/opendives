@@ -6,6 +6,9 @@ import { logbook, refreshAfterChange } from './logbook.svelte.js';
 import { language, tIfExists } from './i18n.js';
 import { settings } from './settings.svelte.js';
 import { formatMinutes } from './format.js';
+import { isDismissed, parseMarks, withMark, withoutMark } from './site-dismissed.js';
+
+export { pairKey } from './site-dismissed.js';
 
 /**
  * Second line of a dive in the Sites screens: "104 min · Buddy Diver ·
@@ -59,18 +62,20 @@ export async function geocodeSite(uuid) {
   }
 }
 
-/** "These are not duplicates": kept on this device, by pair of uuids. */
-export function dismissedPairs() {
-  try {
-    return new Set(JSON.parse(localStorage.getItem('od.notDuplicates') ?? '[]'));
-  } catch {
-    return new Set();
-  }
+const MARKS_KEY = 'od.notDuplicates';
+
+/** "These are not duplicates": kept on this device (see site-dismissed.js). */
+function storedMarks() {
+  return parseMarks(localStorage.getItem(MARKS_KEY));
 }
 
-/** @param {number} a @param {number} b */
-export function pairKey(a, b) {
-  return a < b ? `${a}-${b}` : `${b}-${a}`;
+/** @param {Record<string, string>} marks */
+function storeMarks(marks) {
+  try {
+    localStorage.setItem(MARKS_KEY, JSON.stringify(marks));
+  } catch {
+    // Not fatal.
+  }
 }
 
 /** Thresholds of the possible duplicates, in metres (to be confirmed). */
@@ -85,7 +90,7 @@ const SAME_PLACE_M = 50;
  * @returns {Promise<{a: import('opendives-core').SiteSummary, b: import('opendives-core').SiteSummary, distanceM: number}[]>}
  */
 export async function possibleDuplicates() {
-  const dismissed = dismissedPairs();
+  const marks = storedMarks();
   /** @type {{a: import('opendives-core').SiteSummary, b: import('opendives-core').SiteSummary, distanceM: number}[]} */
   const pairs = await OpenDivesCore.siteQuery({ kind: 'duplicates', a: SAME_NAME_M, b: SAME_PLACE_M });
   const sameName = (/** @type {(typeof pairs)[number]} */ p) => p.a.name.toLocaleLowerCase() === p.b.name.toLocaleLowerCase();
@@ -98,20 +103,28 @@ export async function possibleDuplicates() {
   }
   return pairs.filter(
     (p) =>
-      !dismissed.has(pairKey(p.a.uuid, p.b.uuid)) &&
+      !isDismissed(marks, p.a, p.b) &&
       (sameName(p) || (placePartners.get(p.a.uuid) === 1 && placePartners.get(p.b.uuid) === 1)),
   );
 }
 
-/** @param {number} a @param {number} b */
+/**
+ * Marks the pair as "not duplicates"; the mark holds both sites' names and
+ * positions, so a rename or a move brings the pair back.
+ * @param {import('./site-dismissed.js').SiteLike} a @param {import('./site-dismissed.js').SiteLike} b
+ */
 export function dismissPair(a, b) {
-  const set = dismissedPairs();
-  set.add(pairKey(a, b));
-  try {
-    localStorage.setItem('od.notDuplicates', JSON.stringify([...set]));
-  } catch {
-    // Not fatal.
-  }
+  storeMarks(withMark(storedMarks(), a, b));
+  logbook.sitesVersion++; // the lists and the count on the Sites screen read again
+}
+
+/**
+ * Takes the mark back (the snackbar's "Annuler").
+ * @param {import('./site-dismissed.js').SiteLike} a @param {import('./site-dismissed.js').SiteLike} b
+ */
+export function restorePair(a, b) {
+  storeMarks(withoutMark(storedMarks(), a, b));
+  logbook.sitesVersion++;
 }
 
 /**

@@ -1052,6 +1052,7 @@
     "withPosition": "avec position",
     "withoutPosition": "sans position",
     "notDuplicates": "Pas des doublons",
+    "notDuplicatesDone": "{a} et {b} ne seront plus proposés comme doublons",
     "merge": "Fusionner",
     "mergeTitle": "Fusionner les sites ?",
     "mergeText": "« {keep} » garde toutes les plongées de « {other} », qui disparaît. C’est annulable.",
@@ -1420,6 +1421,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Nettoyer les sites : « Pas des doublons » retire le groupe de la liste et ne le propose plus (sur cet appareil) ; « Annuler » le remet. Renommer ou déplacer un des deux sites le rend de nouveau proposable.",
       "Sites : un menu change l’ordre de la liste (alphabétique ou plus récent en premier) ; un appui long sur un site le sélectionne, pour fusionner plusieurs sites.",
       "Conflit sur plusieurs plongées : une boîte en plein écran avec un interrupteur « Même choix pour toutes » et une carte par plongée, où vous touchez la version à garder.",
       "Conflit de synchronisation : « Plus tard » ferme la boîte et vous laisse où vous étiez ; l’état de synchronisation du Carnet et la carte de synchronisation du menu la rouvrent, et elle revient à la prochaine tentative de synchronisation.",

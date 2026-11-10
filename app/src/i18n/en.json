@@ -1052,6 +1052,7 @@
     "withPosition": "with a position",
     "withoutPosition": "no position",
     "notDuplicates": "Not duplicates",
+    "notDuplicatesDone": "{a} and {b} will no longer be suggested as duplicates",
     "merge": "Merge",
     "mergeTitle": "Merge the sites?",
     "mergeText": "“{keep}” keeps all the dives of “{other}”, which goes away. It can be undone.",
@@ -1420,6 +1421,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Clean up sites: \"Not duplicates\" removes the group from the list and stops suggesting it (on this device); \"Undo\" puts it back. Renaming or moving one of the two sites makes it suggestible again.",
       "Sites: a menu changes the order of the list (alphabetical or most recent first); a long press selects a site, to merge several sites.",
       "Conflict on several dives: a full-screen dialog with a \"Same choice for all\" switch and one card per dive, where you touch the version to keep.",
       "Sync conflict: \"Later\" closes the dialog and leaves you where you were; the Carnet sync status and the side menu sync card reopen it, and it comes back at the next sync attempt.",
