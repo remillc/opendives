@@ -227,7 +227,7 @@
     /* iOS: a white inset group, a check mark for the choice. */
     :global(.ios) .od-bring-logbook--sources {
       margin-top: 16px;
-      border-radius: 10px;
+      border-radius: 20px;
       overflow: hidden;
       background: var(--od-surface);
 

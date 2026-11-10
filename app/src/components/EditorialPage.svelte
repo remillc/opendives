@@ -12,8 +12,12 @@
   // actions end the card, the profile lies at the bottom of the area behind
   // the content; in landscape the heading is on the left and the card in a
   // column on the right, in portrait both in one centred column.
-  // iOS (until its own editorial look): "Annuler" and the bar title, the step
-  // at the right of the bar, a large title, the content, a full-width button.
+  // iPhone (compte-*-ios.dc.html, ios-compte-import.dc.html): the same
+  // layout with iOS conventions: "Annuler" or "‹ Retour" in a transparent bar
+  // without a title, the eyebrow, the title and the introduction, the
+  // content in inset grouped sections (drawn by each page), the profile, then
+  // the main action as a capsule, a secondary one plain under it or grey
+  // beside it.
   // While a request runs (busy), the button is disabled with a spinner and its
   // busy label, and on Android a linear progress indicator runs under the bar.
   import { Page, Navbar, Link, f7 } from 'framework7-svelte';
@@ -41,11 +45,12 @@
    *   children: import('svelte').Snippet,
    *   class?: string,
    * }}
-   * title: the bar title on iOS, the eyebrow on Android (with the step). No
+   * title: the flow, shown in the eyebrow with the step. No
    * action: no main button. secondaryEnd: the text button sits after the
    * main button (iOS: under it). closable false: no close button (an import
-   * that runs). back: ← instead of ✕ (Android). previous: the text button is
-   * "Précédent" (iOS: a tonal button beside the main one).
+   * that runs). back: ← (iOS: "‹ Retour") instead of ✕ (iOS: "Annuler").
+   * previous: the text button is "Précédent" (iOS: a grey capsule beside the
+   * main one).
    */
   let {
     title,
@@ -71,7 +76,7 @@
   /** "Nouveau compte · étape 2 sur 2": the flow, then the step. */
   const eyebrow = $derived(step ? `${title} · ${step.charAt(0).toLocaleLowerCase()}${step.slice(1)}` : title);
   /** The title ends with a full stop, unless it is a question. */
-  const shownHeading = $derived(ios || /[.?!…]$/.test(heading) ? heading : `${heading}.`);
+  const shownHeading = $derived(/[.?!…]$/.test(heading) ? heading : `${heading}.`);
   /** Tablet (Android): the actions are the last element of the card. */
   const actionsInCard = $derived(!ios && !layout.phone);
 </script>
@@ -95,10 +100,15 @@
 {/snippet}
 
 <Page class="od-editorial-page {extraClass}">
-  <Navbar title={ios ? title : ''} class="od-editorial-page--bar">
+  <Navbar class="od-editorial-page--bar">
     {#snippet left()}
       {#if !closable}
         <span></span>
+      {:else if ios && back}
+        <Link back>
+          <i class="icon icon-back"></i>
+          <span>{t('accountStep.back')}</span>
+        </Link>
       {:else if ios}
         <Link back>{t('accountStep.cancel')}</Link>
       {:else}
@@ -107,9 +117,6 @@
           <span class="od-sr-only">{back ? t('accountStep.back') : t('accountStep.close')}</span>
         </Link>
       {/if}
-    {/snippet}
-    {#snippet right()}
-      {#if step && ios}<span class="od-editorial-page--bar-step">{step}</span>{/if}
     {/snippet}
   </Navbar>
 
@@ -126,7 +133,7 @@
     }}
   >
     <div class="od-editorial-page--heading">
-      {#if !ios}<p class="od-editorial-page--eyebrow">{eyebrow}</p>{/if}
+      <p class="od-editorial-page--eyebrow">{eyebrow}</p>
       <h1 class="od-editorial-page--title">{shownHeading}</h1>
       <p class="od-editorial-page--intro">{intro}</p>
     </div>
@@ -136,7 +143,7 @@
       {#if actionsInCard && (action || secondary)}{@render actions()}{/if}
     </div>
 
-    {#if !ios}<DecorativeProfile class="od-editorial-page--profile" />{/if}
+    <DecorativeProfile class="od-editorial-page--profile" />
 
     {#if !actionsInCard && (action || secondary)}{@render actions()}{/if}
   </form>
@@ -148,8 +155,8 @@
     --f7-page-bg-color: var(--od-background);
   }
 
-  /* Android: the bar carries only ✕ or ←, on the page's own background. */
-  :global(.md .od-editorial-page--bar) {
+  /* The bar carries only ✕ or ← (iOS: "Annuler" or "‹ Retour"), on the page's own background. */
+  :global(.od-editorial-page--bar) {
     --f7-navbar-bg-color: transparent;
   }
 
@@ -167,11 +174,16 @@
   }
 
   @layer od.components {
-    :global(.md .od-editorial-page--bar .navbar-bg) {
+    /* No close button (an import that runs): no empty bar button either. */
+    :global(.od-editorial-page--bar .left:not(:has(a))) {
+      display: none;
+    }
+
+    :global(.od-editorial-page--bar .navbar-bg) {
       background: transparent;
     }
 
-    :global(.md .od-editorial-page--bar .navbar-bg::after) {
+    :global(.od-editorial-page--bar .navbar-bg::after) {
       display: none;
     }
 
@@ -221,10 +233,10 @@
       border-radius: 28px;
       background: var(--od-surface);
 
-      /* The first field starts at the top of the card. */
-      & > :global(:first-child),
-      & > :global(:first-child > .od-text-field--field:first-child),
-      & > :global(:first-child > .od-select-field--field:first-child) {
+      /* Android: the first field starts at the top of the card. */
+      :global(.md) & > :global(:first-child),
+      :global(.md) & > :global(:first-child > .od-text-field--field:first-child),
+      :global(.md) & > :global(:first-child > .od-select-field--field:first-child) {
         margin-top: 0;
       }
     }
@@ -406,57 +418,65 @@
       }
     }
 
-    /* iOS, until its own editorial look (task 2026-11-10-22). */
+    /* iPhone: the same layout with iOS sizes (compte-*-ios.dc.html). */
     :global(.ios) .od-editorial-page--heading {
-      padding: 20px 32px 0;
-      gap: 6px;
+      padding: 4px 24px 0;
+      gap: 10px;
+    }
+
+    :global(.ios) .od-editorial-page--eyebrow {
+      font-size: 15px;
+      line-height: 20px;
+      font-weight: 600;
     }
 
     :global(.ios) .od-editorial-page--title {
-      font-size: 28px;
-      line-height: 34px;
-      font-weight: 700;
-      letter-spacing: 0;
+      font-size: 34px;
+      line-height: 41px;
+      font-weight: 400;
+      letter-spacing: 0.4px;
     }
 
     :global(.ios) .od-editorial-page--intro {
-      font-size: 15px;
-      line-height: 21px;
+      font-size: 17px;
+      line-height: 24px;
     }
 
+    /* The pages draw their own inset grouped sections. */
     :global(.ios) .od-editorial-page--card {
       --od-field-margin: 16px;
-      margin: 0;
+      margin: 4px 0 0;
       padding: 0;
       border-radius: 0;
       background: none;
     }
 
     :global(.ios) .od-editorial-page--actions {
-      margin-top: auto;
-      padding: 24px 16px calc(var(--f7-safe-area-bottom) + 40px);
+      padding: 16px 24px calc(var(--f7-safe-area-bottom) + 24px);
       flex-direction: column;
       align-items: stretch;
+      gap: 12px;
 
       .od-editorial-page--secondary {
         margin: 0;
+        min-height: 44px;
         justify-content: center;
+        font-size: 17px;
       }
 
-      /* The main button first, the text button under it. */
+      /* The main button first, the plain text button under it. */
       &.od-editorial-page--end .od-editorial-page--secondary {
         order: 1;
       }
 
-      /* "Précédent", a tonal button beside the main one. */
+      /* "Précédent", a grey capsule beside the main one. */
       &.od-editorial-page--previous {
         flex-direction: row;
-        gap: 12px;
 
         .od-editorial-page--secondary {
           width: 128px;
-          height: 52px;
-          border-radius: 14px;
+          height: 56px;
+          border-radius: 28px;
           background: var(--od-tint);
           color: var(--od-on-tint);
           font-weight: 600;
@@ -472,8 +492,8 @@
     :global(.ios) .od-editorial-page--filled {
       flex: none;
       width: 100%;
-      height: 52px;
-      border-radius: 14px;
+      height: 56px;
+      border-radius: 28px;
       font-size: 17px;
       font-weight: 600;
       letter-spacing: 0;
@@ -489,13 +509,6 @@
     :global(.ios) .od-editorial-page--spinner {
       width: 18px;
       height: 18px;
-    }
-
-    .od-editorial-page--bar-step {
-      padding-right: 8px;
-      font-size: 15px;
-      color: var(--od-text-2);
-      white-space: nowrap;
     }
   }
 </style>

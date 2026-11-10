@@ -54,7 +54,7 @@
 </script>
 
 {#if ios}
-  <div class="od-account-field od-account-field--ios-row {position}" class:od-account-field--invalid={!!error} class:disabled>
+  <div class="od-account-field od-account-field--ios-row od-account-field--{position}" class:od-account-field--invalid={!!error} class:disabled>
     <label for={id}>{rowLabel}</label>
     <input
       {id}
@@ -117,16 +117,16 @@
 
       &.od-account-field--single {
         margin-top: 20px;
-        border-radius: 10px;
+        border-radius: 20px;
       }
 
       &.od-account-field--first {
         margin-top: 20px;
-        border-radius: 10px 10px 0 0;
+        border-radius: 20px 20px 0 0;
       }
 
       &.od-account-field--last {
-        border-radius: 0 0 10px 10px;
+        border-radius: 0 0 20px 20px;
         box-shadow: inset 0 0.5px 0 var(--od-separator);
       }
 

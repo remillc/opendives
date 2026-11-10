@@ -1301,11 +1301,13 @@ Spec: System design, section 8, "Editorial pages (account flow)" (new). Mock-ups
 
 Done in `EditorialPage.svelte` (it replaces `AccountStep.svelte`) and `DecorativeProfile.svelte` (the profile, shared with first launch). One text added: the git page had no title, it takes the mock-up's "Votre propre dépôt." (`gitRepo.heading`). The full stop after a title is added by the layout; the texts are unchanged. Checked in the browser at phone and tablet sizes; iOS keeps its previous look until task 22.
 
-## [ ] 2026-11-10-22 Account flow in the editorial layout (iPhone)
+## [x] 2026-11-10-22 Account flow in the editorial layout (iPhone)
 
 Follows task 2026-11-10-21 (Android). Spec: System design, section 8, "Editorial pages (account flow)", item "iPhone" (new). Mock-ups: the 10 iPhone mock-ups it lists (`docs/mockups/`, updated).
 - Same shared layout component as task 21, in its iOS look: navigation bar with "Annuler" or "‹ Retour" only (no title, transparent), eyebrow with the bar title and step, 34 pt title, 17 pt introduction, inset grouped sections with 20 pt corners, 56 pt capsule for the primary action, decorative profile above the actions.
 - No text or field changes. A line in the release notes.
+
+Done in `EditorialPage.svelte` (its iOS look) and the inset groups of `AccountField`, `BringLogbook` and `ImportProgress` (20 pt corners; the rows of AccountField now get their rounded corners, which a class name had lost). Checked in the browser with the iOS look; no iPhone build here.
 
 ## [ ] 2026-11-10-23 First launch on an Android tablet, landscape and portrait
 
