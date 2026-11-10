@@ -1452,7 +1452,6 @@
       "Offline maps: frame an area on the map from Settings to download it; a space limit and a free-space floor protect the device, and updates are offered with a badge.",
       "Logbook: while scrolling, the current month shows at the top under the bar.",
       "Settings: the water type written on downloaded dives that have none can be chosen (Not specified by default).",
-      "Offline maps: download regions (dive areas, countries or a rectangle of your choice) from Settings; a space limit and a free-space floor protect the device, and updates are offered with a badge.",
       "Sites: without a network, the map reads the downloaded regions, else a simplified world map; an \"Offline\" pill says so and a message offers to download the area.",
       "Desaturation: the text under the chart is shorter.",
       "Settings: the app language can be Français (Canada), which says \"nuage\" and \"courriel\"; a phone set to French (Canada) picks it by itself.",
