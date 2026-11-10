@@ -1192,6 +1192,7 @@
     "emptyText": "Statistics appear with the first dives of the logbook.",
     "depthPerDive": "Maximum depth per dive",
     "rowSummary": "{dives} · {time}",
+    "rowDivesSupport": "{section} · {summary}",
     "details": "In detail",
     "detail": {
       "total": "Total time",
@@ -1500,7 +1501,8 @@
       "Sync conflict: new dialog, readable differences, “Later”, and “Undo” before anything is sent.",
       "Filter (Android): new page, cylinder and gas criteria grouped, a saved filter fills the page, and deleting one offers “Undo”.",
       "Filter: the explanatory sentences under the criteria are gone.",
-      "What’s new: the version date next to its number, and the complete list."
+      "What’s new: the version date next to its number, and the complete list.",
+      "Statistics: each row opens the list of its dives."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",

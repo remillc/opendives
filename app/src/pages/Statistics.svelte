@@ -6,9 +6,9 @@
   // follow it); the three key figures; two ready-made charts on cards scrolled
   // sideways, dives per year and dive durations (no chart builder; the maximum
   // depth chart is only on the filtered screens); My statistics with "New
-  // statistic"; By year, By mode, By suit, By buddy. The charts and the rows
-  // of the always open "By …" sections are plain content: none has a detail view. No totals
-  // by dive computer. Every figure comes from the core (lib/statistics.svelte.js).
+  // statistic"; By year, By mode, By suit, By buddy, accordions closed at first.
+  // The charts are plain content; every row opens the list of its dives
+  // (StatisticsDives.svelte). No totals by dive computer. Every figure comes from the core (lib/statistics.svelte.js).
   import { Page, Navbar, NavRight, Link, theme } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
   import MenuButton from '../components/MenuButton.svelte';
@@ -78,19 +78,32 @@
     [...(result?.yearly ?? [])].sort((a, b) => a.year - b.year).map((y) => ({ value: y.dives, label: String(y.year) })),
   );
 
-  /** @typedef {{key: string, title: string, numeric?: boolean, support: string, after?: string}} StatRow */
+  /**
+   * Address of the list of a row's dives. The criteria are encoded twice: the
+   * router decodes the query once, and decodeCriteria once more.
+   * @param {string} section key of its section's title
+   * @param {string} title
+   * @param {import('../lib/statistics.svelte.js').Criterion[]} criteria
+   */
+  const rowHref = (section, title, criteria) =>
+    `/statistics/dives/?section=${section}&title=${encodeURIComponent(title)}&c=${encodeURIComponent(encodeCriteria(criteria))}`;
+
+  /** @typedef {{key: string, title: string, numeric?: boolean, support: string, after?: string, criteria: import('../lib/statistics.svelte.js').Criterion[]}} StatRow */
 
   /**
    * A row of By mode, By suit, By buddy: the number of dives, the total time on the right.
-   * @param {string} key @param {string} title
+   * @param {string} field the criterion of the section
+   * @param {string} key the value of the row
+   * @param {string} title
    * @param {import('../lib/statistics.svelte.js').StatsFigures} figures
    * @returns {StatRow}
    */
-  const totalRow = (key, title, figures) => ({
+  const totalRow = (field, key, title, figures) => ({
     key,
     title,
     support: t('trip.dives', { n: figures.dives }),
     after: formatHours(figures.totalSeconds),
+    criteria: [{ field, values: [key] }],
   });
 
   /** "9 plongées sur 6 années, de 2013 à 2026" (the band). */
@@ -145,8 +158,9 @@
       <div class="list list-strong inset list-dividers media-list chevron-center">
         <ul>
           {#each myStatistics.list as s (s.id)}
-            <li class:selected={selected === `/statistics/result?c=${encodeCriteria(s.criteria)}&saved=${s.id}`}>
-              <a href="/statistics/result?c={encodeCriteria(s.criteria)}&saved={s.id}" data-reload-detail="true" class="item-link item-content" onclick={select}>
+            {@const href = rowHref('mine', s.name, s.criteria)}
+            <li class:selected={selected === href}>
+              <a {href} data-reload-detail="true" class="item-link item-content" onclick={select}>
                 <div class="item-inner">
                   <div class="item-title-row"><div class="item-title">{s.name}</div></div>
                   <div class="item-text od-value">{summaryLine(saved[s.id])}</div>
@@ -168,12 +182,13 @@
       </div>
     {/if}
 
-    <!-- The "By …" sections: accordions, closed at first; plain two-line rows (no detail view). -->
-    {#snippet section(/** @type {string} */ title, /** @type {StatRow[]|null} */ rows)}
+    <!-- The "By …" sections: accordions, closed at first; each row opens its dives. -->
+    {#snippet section(/** @type {string} */ key, /** @type {StatRow[]|null} */ rows)}
       {#if rows?.length}
-        {@const open = !!openSections[title]}
+        {@const title = t(`stats.${key}`)}
+        {@const open = !!openSections[key]}
         <h2 class="od-stat-heading">
-          <button type="button" class="od-stat-toggle" aria-expanded={open} onclick={() => (openSections[title] = !open)}>
+          <button type="button" class="od-stat-toggle" aria-expanded={open} onclick={() => (openSections[key] = !open)}>
             <span class="od-stat-toggle-text">{title}</span>
             <span class="od-stat-chevron" class:od-stat-chevron-up={open}><Icon name="expand" size={24} /></span>
           </button>
@@ -181,12 +196,16 @@
         {#if open}
           <ul class="od-stat-rows">
             {#each rows as row (row.key)}
-              <li class="od-stat-row">
-                <div class="od-stat-text">
-                  <span class="od-stat-title" class:od-value={row.numeric}>{row.title}</span>
-                  <span class="od-stat-support od-value">{row.support}</span>
-                </div>
-                {#if row.after}<span class="od-stat-after od-value">{row.after}</span>{/if}
+              {@const href = rowHref(key, row.title, row.criteria)}
+              <li class:selected={selected === href}>
+                <a {href} data-reload-detail="true" class="od-stat-row ripple" onclick={select}>
+                  <div class="od-stat-text">
+                    <span class="od-stat-title" class:od-value={row.numeric}>{row.title}</span>
+                    <span class="od-stat-support od-value">{row.support}</span>
+                  </div>
+                  {#if row.after}<span class="od-stat-after od-value">{row.after}</span>{/if}
+                  <span class="od-stat-row-chevron"><Icon name="chevron" size={20} /></span>
+                </a>
               </li>
             {/each}
           </ul>
@@ -195,12 +214,18 @@
     {/snippet}
 
     {@render section(
-      t('stats.byYear'),
-      yearly.map((y) => ({ key: String(y.year), title: String(y.year), numeric: true, support: summaryLine(y) })),
+      'byYear',
+      yearly.map((y) => ({
+        key: String(y.year),
+        title: String(y.year),
+        numeric: true,
+        support: summaryLine(y),
+        criteria: [{ field: 'year', values: [String(y.year)] }],
+      })),
     )}
-    {@render section(t('stats.byMode'), result ? result.byMode.filter((m) => m.dives).map((m) => totalRow(m.mode, t(`detail.modes.${m.mode}`), m)) : null)}
-    {@render section(t('stats.bySuit'), result ? result.bySuit.map((v) => totalRow(v.value, v.value || notSetLabel('suit'), v)) : null)}
-    {@render section(t('stats.byBuddy'), result ? result.byBuddy.map((v) => totalRow(v.value, v.value || notSetLabel('buddy'), v)) : null)}
+    {@render section('byMode', result ? result.byMode.filter((m) => m.dives).map((m) => totalRow('mode', m.mode, t(`detail.modes.${m.mode}`), m)) : null)}
+    {@render section('bySuit', result ? result.bySuit.map((v) => totalRow('suit', v.value, v.value || notSetLabel('suit'), v)) : null)}
+    {@render section('byBuddy', result ? result.byBuddy.map((v) => totalRow('buddy', v.value, v.value || notSetLabel('buddy'), v)) : null)}
     <div class="end"></div>
   {/if}
 </Page>
@@ -263,17 +288,27 @@
       }
     }
 
+    .od-stat-rows li + li {
+      border-top: 1px solid var(--od-separator);
+    }
+
     .od-stat-row {
+      position: relative;
+      overflow: hidden;
       display: flex;
       align-items: center;
       gap: 12px;
       box-sizing: border-box;
       min-height: 72px;
-      padding: 8px 24px 8px 16px;
+      padding: 8px 16px;
+      color: var(--od-text);
+      text-decoration: none;
+    }
 
-      & + & {
-        border-top: 1px solid var(--od-separator);
-      }
+    .od-stat-row-chevron {
+      flex: none;
+      display: flex;
+      color: var(--od-text-2);
     }
 
     .od-stat-text {
