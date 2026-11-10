@@ -15,13 +15,19 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
-import java.security.MessageDigest
+import java.util.concurrent.Callable
+import java.util.concurrent.Executors
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.AtomicLong
+import java.util.concurrent.atomic.AtomicReference
 
 /**
- * Downloads the first package of the queue (MapsManager.head), resuming a
- * partial file with an HTTP Range request, checks its SHA-256, and makes it
- * ready. Runs as a foreground service of type dataSync (the notification
- * shows the title the screens gave and the progress).
+ * Downloads the first region of the queue (MapsManager.head) tile by tile, with at most
+ * MapsManager.MAX_PARALLEL requests at a time, skipping the tiles already on disk. It stops
+ * at MapsManager.MAX_BYTES (error "limit", the tiles are removed). Runs as a foreground
+ * service of type dataSync (the notification shows the title the screens gave and the
+ * progress).
  */
 class MapsDownloadWorker(context: Context, params: WorkerParameters) : Worker(context, params) {
     private sealed class Outcome {
@@ -40,7 +46,7 @@ class MapsDownloadWorker(context: Context, params: WorkerParameters) : Worker(co
             return Result.success()
         }
         if (!manager.update(head.id, head.gen) { it.status = MapsManager.DOWNLOADING; it.error = null }) return Result.success()
-        showNotification(head.title, head.bytesReceived, head.sizeBytes, true)
+        showNotification(head.title, head.tilesDone, head.tilesTotal, true)
 
         val outcome = try {
             download(head)
@@ -72,107 +78,115 @@ class MapsDownloadWorker(context: Context, params: WorkerParameters) : Worker(co
                 manager.update(head.id, head.gen) { it.status = MapsManager.FAILED; it.error = outcome.error }
             }
         }
-        // The next package of the queue, if any (it may need another network).
+        // The next region of the queue, if any (it may need another network).
         manager.schedule()
         return Result.success()
     }
 
     private fun download(e: MapsManager.Entry): Outcome {
         val manager = MapsManager
-        val part = manager.partFile(e.id)
-        var offset = part.length()
-        if (e.sizeBytes > 0 && offset > e.sizeBytes) {
-            part.delete()
-            offset = 0
-        }
-        if (e.sizeBytes > 0 && manager.freeSpace().first < e.sizeBytes - offset) return Outcome.Failed("space")
+        val part = manager.partDir(e.id)
+        part.mkdirs()
+        if (manager.freeSpace().first < MapsManager.MAX_BYTES) return Outcome.Failed("space")
 
-        var total = e.sizeBytes
-        var retriedFromStart = false
-        while (true) {
-            val connection = URL(e.url).openConnection() as HttpURLConnection
-            try {
-                connection.connectTimeout = 20_000
-                connection.readTimeout = 30_000
-                connection.setRequestProperty("Accept-Encoding", "identity")
-                if (offset > 0) connection.setRequestProperty("Range", "bytes=$offset-")
-                val code = connection.responseCode
-                var append = true
-                when {
-                    code == 206 -> {
-                        // "bytes 100-999/1000"
-                        connection.getHeaderField("Content-Range")?.substringAfter('/')?.toLongOrNull()?.let { total = it }
-                    }
-                    code == 200 -> {
-                        // The server ignores Range: from the start.
-                        if (offset > 0) {
-                            offset = 0
-                            append = false
-                        }
-                        if (connection.contentLengthLong > 0) total = connection.contentLengthLong
-                    }
-                    code == 416 && offset > 0 && !retriedFromStart -> {
-                        part.delete()
-                        offset = 0
-                        retriedFromStart = true
-                        continue
-                    }
-                    else -> return Outcome.Failed("server")
+        val userAgent = manager.userAgent
+        val tiles = MapsManager.tiles(MapsManager.tileRanges(e.bbox, e.maxZoom))
+        val done = AtomicInteger(0)
+        val received = AtomicLong(MapsManager.scan(part).second)
+        val failure = AtomicReference<Outcome.Failed?>(null)
+        val stopped = AtomicBoolean(false)
+        val lastNotification = AtomicLong(0)
+
+        fun nextTile(): IntArray? = synchronized(tiles) { if (tiles.hasNext()) tiles.next() else null }
+
+        // A worker of the pool: takes tiles until none is left, or until something stops the download.
+        val task = Callable {
+            while (failure.get() == null) {
+                if (isStopped || !manager.isRunning(e.id, e.gen)) {
+                    stopped.set(true)
+                    return@Callable
                 }
-                if (!manager.update(e.id, e.gen) { it.totalBytes = total; it.bytesReceived = offset }) return Outcome.Stopped
-                if (total > 0 && manager.freeSpace().first < total - offset) return Outcome.Failed("space")
-
-                val buffer = ByteArray(64 * 1024)
-                var lastNotification = 0L
-                connection.inputStream.use { input ->
-                    FileOutputStream(part, append).use { out ->
-                        while (true) {
-                            if (isStopped || !manager.isRunning(e.id, e.gen)) return Outcome.Stopped
-                            val n = input.read(buffer)
-                            if (n < 0) break
-                            try {
-                                out.write(buffer, 0, n)
-                            } catch (io: IOException) {
-                                if (isSpaceError(io)) return Outcome.Failed("space")
-                                throw io
-                            }
-                            offset += n
-                            manager.progress(e.id, e.gen, offset, total)
-                            val now = System.currentTimeMillis()
-                            if (now - lastNotification > 1000) {
-                                lastNotification = now
-                                showNotification(e.title, offset, total, false)
-                            }
+                val (z, x, y) = nextTile()?.let { Triple(it[0], it[1], it[2]) } ?: return@Callable
+                val file = MapsManager.tileFile(part, z, x, y)
+                try {
+                    if (!file.exists()) {
+                        val bytes = fetch(MapsManager.tileUrl(e.urlTemplate, z, x, y), userAgent) ?: run { stopped.set(true); return@Callable }
+                        file.parentFile!!.mkdirs()
+                        val tmp = File(file.parentFile, "$y.tmp")
+                        FileOutputStream(tmp).use { it.write(bytes) }
+                        if (!tmp.renameTo(file)) throw IOException("Cannot store a tile")
+                        if (received.addAndGet(bytes.size.toLong()) >= MapsManager.MAX_BYTES) {
+                            failure.compareAndSet(null, Outcome.Failed("limit"))
+                            return@Callable
                         }
                     }
+                } catch (io: ServerError) {
+                    failure.compareAndSet(null, Outcome.Failed("server"))
+                    return@Callable
+                } catch (io: IOException) {
+                    failure.compareAndSet(null, Outcome.Failed(if (isSpaceError(io)) "space" else "network"))
+                    return@Callable
                 }
-                if (total > 0 && offset < total) return Outcome.Failed("network") // the connection ended early
-                break
-            } finally {
-                connection.disconnect()
+                val n = done.incrementAndGet()
+                manager.progress(e.id, e.gen, n, received.get())
+                val now = System.currentTimeMillis()
+                if (now - lastNotification.get() > 1000) {
+                    lastNotification.set(now)
+                    showNotification(e.title, n, e.tilesTotal, false)
+                }
             }
         }
 
-        // Checked before it becomes ready; a wrong file is not kept.
-        if (!sha256(part).equals(e.sha256, ignoreCase = true)) {
-            part.delete()
-            return Outcome.Failed("checksum")
+        val pool = Executors.newFixedThreadPool(MapsManager.MAX_PARALLEL)
+        try {
+            pool.invokeAll(List(MapsManager.MAX_PARALLEL) { task })
+        } finally {
+            pool.shutdownNow()
         }
+
+        failure.get()?.let {
+            // Over the limit: nothing of the region is kept.
+            if (it.error == "limit") part.deleteRecursively()
+            return it
+        }
+        if (stopped.get() || isStopped) return Outcome.Stopped
+        if (done.get() < e.tilesTotal) return Outcome.Failed("network")
         return if (manager.finish(e.id, e.gen)) Outcome.Done else Outcome.Stopped
     }
 
-    private fun sha256(file: File): String {
-        val digest = MessageDigest.getInstance("SHA-256")
-        val buffer = ByteArray(256 * 1024)
-        file.inputStream().use { input ->
-            while (true) {
-                if (isStopped) throw IOException("stopped")
-                val n = input.read(buffer)
-                if (n < 0) break
-                digest.update(buffer, 0, n)
+    private class ServerError(val retry: Boolean) : IOException("Tile server error")
+
+    /**
+     * One tile: its bytes, empty for a tile the server does not have (204, 404); null when the
+     * download was stopped meanwhile. Retries a network error or a 429/5xx twice, then fails.
+     */
+    private fun fetch(url: String, userAgent: String): ByteArray? {
+        var attempt = 0
+        while (true) {
+            if (isStopped) return null
+            var failure: IOException
+            val connection = URL(url).openConnection() as HttpURLConnection
+            try {
+                connection.connectTimeout = 20_000
+                connection.readTimeout = 30_000
+                connection.setRequestProperty("User-Agent", userAgent)
+                val code = connection.responseCode
+                if (code == 200) return connection.inputStream.use { it.readBytes() }
+                if (code == 204 || code == 404) return ByteArray(0)
+                failure = ServerError(code == 429 || code >= 500)
+            } catch (io: IOException) {
+                failure = io
+            } finally {
+                connection.disconnect()
+            }
+            if (isSpaceError(failure) || (failure is ServerError && !failure.retry) || attempt >= MAX_RETRIES) throw failure
+            attempt++
+            try {
+                Thread.sleep(1000L * attempt)
+            } catch (ie: InterruptedException) {
+                return null
             }
         }
-        return digest.digest().joinToString("") { "%02x".format(it) }
     }
 
     private fun isSpaceError(e: IOException): Boolean {
@@ -182,7 +196,7 @@ class MapsDownloadWorker(context: Context, params: WorkerParameters) : Worker(co
 
     // --- Foreground notification ---
 
-    private fun notification(title: String, received: Long, total: Long, indeterminate: Boolean) =
+    private fun notification(title: String, done: Int, total: Int, indeterminate: Boolean) =
         NotificationCompat.Builder(applicationContext, CHANNEL)
             .setContentTitle(title)
             .setSmallIcon(android.R.drawable.stat_sys_download)
@@ -190,7 +204,7 @@ class MapsDownloadWorker(context: Context, params: WorkerParameters) : Worker(co
             .setOnlyAlertOnce(true)
             .setSilent(true)
             .setCategory(NotificationCompat.CATEGORY_PROGRESS)
-            .setProgress(if (total > 0) 100 else 0, if (total > 0) (received * 100 / total).toInt() else 0, indeterminate || total <= 0)
+            .setProgress(if (total > 0) 100 else 0, if (total > 0) (done.toLong() * 100 / total).toInt() else 0, indeterminate || total <= 0)
             .build()
 
     private fun ensureChannel() {
@@ -202,9 +216,9 @@ class MapsDownloadWorker(context: Context, params: WorkerParameters) : Worker(co
         }
     }
 
-    private fun showNotification(title: String, received: Long, total: Long, first: Boolean) {
+    private fun showNotification(title: String, done: Int, total: Int, first: Boolean) {
         ensureChannel()
-        val notification = notification(title, received, total, first)
+        val notification = notification(title, done, total, first)
         if (first) {
             try {
                 val type = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC else 0
@@ -228,5 +242,6 @@ class MapsDownloadWorker(context: Context, params: WorkerParameters) : Worker(co
         const val TAG = "OpenDives"
         const val CHANNEL = "offline-maps"
         const val NOTIFICATION_ID = 4201
+        const val MAX_RETRIES = 2
     }
 }
