@@ -1104,7 +1104,9 @@ Christian approved (canvas comment). The button "Pas des doublons" had no action
 - Drop the mark when either site changes name or position, so the pair can be proposed again.
 - fr and en keys.
 
-## [ ] 2026-11-10-05 Settings: confirm "Réinitialiser tous les réglages"
+## [x] 2026-11-10-05 Settings: confirm "Réinitialiser tous les réglages"
+
+Done in Confirm reset of all settings and keep the planner settings
 
 Christian approved (canvas comment). Spec: "Settings, \"Réinitialiser tous les réglages\" asks first". Mock-up: `docs/mockups/reglages-reinitialiser-android.dc.html`.
 - The button opens an alert dialog with the title, text and buttons of the spec ("Annuler", "Réinitialiser"). Nothing is reset before "Réinitialiser".

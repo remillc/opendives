@@ -9,6 +9,7 @@
 // The app's own settings (language, theme, date and time formats, GPS
 // coordinates, Bluetooth filter) live here only.
 import { OpenDivesCore } from 'opendives-core';
+import { coreResetChanges, storedAfterReset, appSettingsAfterReset } from './settings-reset.js';
 
 const CORE_KEY = 'od.corePrefs';
 const LIBRARY_KEY = 'od.cylinderLibrary';
@@ -234,13 +235,17 @@ export function setAppSetting(key, value) {
 /**
  * "Reset all settings": every setting of the device back to Subsurface's
  * default (the core's `defaults`) and the app's own. The planner's own
- * parameters and trip grouping (the logbook's) are not touched.
+ * parameters (core values of SETTING_KEYS, "Conditions par défaut") and trip
+ * grouping (the logbook's) are not touched; nor are the offline maps
+ * (od.offlineMaps*), the account or the logbook.
  * @param {Partial<CorePrefValues>} defaults
  */
 export async function resetAllSettings(defaults) {
-  await OpenDivesCore.setPrefs({ changes: { ...defaults, salinityEdit: true } });
+  await OpenDivesCore.setPrefs({ changes: { ...coreResetChanges(defaults), salinityEdit: true } });
+  const kept = storedAfterReset(storedCore);
   for (const key of Object.keys(storedCore)) delete storedCore[/** @type {keyof CorePrefValues} */ (key)];
-  writeJson(CORE_KEY, null);
+  Object.assign(storedCore, kept);
+  writeJson(CORE_KEY, Object.keys(storedCore).length ? storedCore : null);
   // The cylinder types too: back to Subsurface's standard list (Christian's choice).
   await OpenDivesCore.cylinderTypes({ action: 'standard' });
   writeJson(LIBRARY_KEY, null);
@@ -250,8 +255,8 @@ export async function resetAllSettings(defaults) {
     // Not fatal.
   }
   const languageChanged = settings.language !== APP_DEFAULTS.language;
-  Object.assign(settings, APP_DEFAULTS, { extraConditions: defaults.extraEnvironmental === true, duration: defaults.duration ?? 'mixed' });
-  writeJson(APP_KEY, null);
+  Object.assign(settings, appSettingsAfterReset(settings, APP_DEFAULTS), { extraConditions: defaults.extraEnvironmental === true, duration: defaults.duration ?? 'mixed' });
+  setAppSetting('theme', settings.theme);
   if (languageChanged) location.reload();
   return OpenDivesCore.getPrefs();
 }
