@@ -11,6 +11,8 @@
   import SyncPill from '../components/SyncPill.svelte';
   import DiveRow from '../components/DiveRow.svelte';
   import TripRow from '../components/TripRow.svelte';
+  import MonthHeader from '../components/MonthHeader.svelte';
+  import MonthSticky from '../components/MonthSticky.svelte';
   import Icon from '../components/Icon.svelte';
   import MenuItem from '../components/MenuItem.svelte';
   import MenuButton from '../components/MenuButton.svelte';
@@ -27,6 +29,7 @@
   import { navigation } from '../lib/navigation.svelte.js';
   import { formatDateTime, formatLongDate, formatTimeAgo, localNowIso } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
+  import { groupByMonth, stickyHeader } from '../lib/carnet-months.js';
   import { mark } from '../lib/perf.js';
   import { buildSnapshot, saveSnapshot } from '../lib/snapshot.js';
   import { offerUndo } from '../lib/undo.js';
@@ -41,8 +44,9 @@
   /**
    * A row of the virtual list. `kind` groups rows of the same layout, hence of
    * the same probable height.
-   * @typedef {{ kind: 'dive'|'inTrip', key: string, index: number, dive: Dive, tripFirst?: boolean, tripLast?: boolean }
-   *   | { kind: 'trip', key: string, index: number, id: number, location: string, dives: Dive[] }} Row
+   * @typedef {{ kind: 'dive'|'inTrip', key: string, index: number, month: string, dive: Dive, tripFirst?: boolean, tripLast?: boolean }
+   *   | { kind: 'trip', key: string, index: number, month: string, id: number, location: string, dives: Dive[] }
+   *   | { kind: 'month', key: string, index: number, month: string, year: number, monthNumber: number, count: number }} Row
    */
 
   /** @type {{ f7router: any }} */
@@ -597,7 +601,7 @@
       el?.querySelectorAll('.od-drop-target').forEach((n) => n.classList.remove('od-drop-target'));
       target = null;
       const under = document.elementFromPoint(touchX, touchY);
-      const li = /** @type {HTMLElement|null} */ (under?.closest('li'));
+      const li = /** @type {HTMLElement|null} */ (under?.closest('li:not(.month-header)'));
       const dragged = (dragIds ?? []).map(diveById).filter((d) => d !== undefined);
       if (li && el?.contains(li) && dragged.length) {
         const tripId = Number(li.dataset.trip) || 0;
@@ -765,28 +769,10 @@
     });
   });
 
-  /** Dives outside trips and trips, from the most recent to the oldest. */
-  const entries = $derived.by(() => {
-    /** @type {Entry[]} */
-    const list = [];
-    /** @type {Map<number, Extract<Entry, {type: 'trip'}>>} */
-    const trips = new Map();
-    for (const dive of sorted) {
-      if (!dive.trip) {
-        list.push({ type: 'dive', key: `d${dive.id}`, dive });
-        continue;
-      }
-      let trip = trips.get(dive.trip.id);
-      if (!trip) {
-        trip = { type: 'trip', key: `t${dive.trip.id}`, location: dive.trip.location, dives: [] };
-        trips.set(dive.trip.id, trip);
-        list.push(trip);
-      }
-      trip.dives.push(dive);
-    }
-    // A trip of one dive (automatic grouping makes many) is drawn as that dive.
-    return list.map((e) => (e.type === 'trip' && e.dives.length === 1 ? { type: /** @type {const} */ ('dive'), key: `d${e.dives[0].id}`, dive: e.dives[0] } : e));
-  });
+  /** The dives by month, newest first; a trip is one group under the month of its first dive. */
+  const groups = $derived(groupByMonth(sorted));
+  /** Dives outside trips and trips, month after month. */
+  const entries = $derived(groups.flatMap((g) => g.entries));
 
   // Tablet: with nothing in the detail pane, the first dive of the list. Not
   // over another screen shown there (a trip, the filter).
@@ -847,21 +833,22 @@
   const rows = $derived.by(() => {
     /** @type {Row[]} */
     const list = [];
-    if (results) {
-      for (const dive of results) list.push({ kind: 'dive', key: `d${dive.id}`, index: list.length, dive });
-      return list;
-    }
-    for (const entry of entries) {
-      if (entry.type === 'dive') {
-        list.push({ kind: 'dive', key: entry.key, index: list.length, dive: entry.dive });
-        continue;
-      }
-      const id = entry.dives[0].trip?.id ?? 0;
-      list.push({ kind: 'trip', key: entry.key, index: list.length, id, location: entry.location, dives: entry.dives });
-      if (expanded[id]) {
-        entry.dives.forEach((dive, i) =>
-          list.push({ kind: 'inTrip', key: `d${dive.id}`, index: list.length, dive, tripFirst: i === 0, tripLast: i === entry.dives.length - 1 }),
-        );
+    // The search results are flat (no trip rows) but sit under their months too.
+    for (const group of results ? groupByMonth(results, true) : groups) {
+      const month = group.key;
+      list.push({ kind: 'month', key: `m${month}`, index: list.length, month, year: group.year, monthNumber: group.month, count: group.count });
+      for (const entry of group.entries) {
+        if (entry.type === 'dive') {
+          list.push({ kind: 'dive', key: entry.key, index: list.length, month, dive: entry.dive });
+          continue;
+        }
+        const id = entry.dives[0].trip?.id ?? 0;
+        list.push({ kind: 'trip', key: entry.key, index: list.length, month, id, location: entry.location, dives: entry.dives });
+        if (expanded[id]) {
+          entry.dives.forEach((dive, i) =>
+            list.push({ kind: 'inTrip', key: `d${dive.id}`, index: list.length, month, dive, tripFirst: i === 0, tripLast: i === entry.dives.length - 1 }),
+          );
+        }
       }
     }
     return list;
@@ -899,7 +886,7 @@
   /** @type {Map<string, number>} */
   const measured = new Map();
   /** Height of a row not measured yet: the last one measured of the same kind. */
-  const typical = { dive: 72, inTrip: 72, trip: 96 };
+  const typical = { dive: 72, inTrip: 72, trip: 96, month: 44 };
 
   /** @param {Row} row */
   function rowHeight(row) {
@@ -919,7 +906,72 @@
       changed = true;
     }
     if (changed) vl.update();
+    scheduleSticky();
   }
+
+  // --- Month header kept under the top bar (spec, "Carnet, month headers that
+  // stay on top"). A virtual list renders only the rows near the screen and
+  // positions them itself, so a CSS `position: sticky` header cannot work: it
+  // would leave the document with its month's rows. The header is a single
+  // element outside the scrolling area (<MonthSticky>). On each frame of a
+  // scroll, the rows in the document (about twenty) are read to find the month
+  // at the top, and the element is moved by a transform when the next
+  // header pushes it out: no reflow of the list, the cost does not grow with
+  // the size of the logbook. The list's own month headers stay in it, for
+  // the moment the header comes from below; the kept one covers them.
+
+  /** Height of <MonthSticky> (px): the title line and the wave. */
+  const STICKY_HEIGHT = 50;
+  /** The month kept under the top bar, null when the band itself shows the first one. */
+  let sticky = $state(/** @type {string|null} */ (null));
+  /** @type {HTMLElement|undefined} */
+  let stickyEl = $state();
+  let stickyShift = 0;
+  let stickyFrame = 0;
+  const stickyRow = $derived(sticky ? rows.find((r) => r.kind === 'month' && r.month === sticky) : undefined);
+
+  function scheduleSticky() {
+    if (!stickyFrame) stickyFrame = requestAnimationFrame(updateSticky);
+  }
+
+  function updateSticky() {
+    stickyFrame = 0;
+    if (theme.ios || !vl || !listEl) return;
+    const bar = listEl.closest('.page')?.querySelector('.navbar');
+    if (!bar) return;
+    const edge = bar.getBoundingClientRect().bottom;
+    /** @type {{ month: string, header: boolean, top: number, bottom: number }[]} */
+    const seen = [];
+    for (const li of listEl.querySelectorAll('ul > li[data-virtual-list-index]')) {
+      const row = /** @type {Row|undefined} */ (vl.items[Number(li.getAttribute('data-virtual-list-index'))]);
+      if (!row) continue;
+      const rect = li.getBoundingClientRect();
+      seen.push({ month: row.month, header: row.kind === 'month', top: rect.top, bottom: rect.bottom });
+    }
+    // Rows not drawn yet after a fast scroll: the header stays as it was.
+    if (!seen.some((r) => r.bottom > edge)) return;
+    const { month, shift } = stickyHeader(seen, edge, STICKY_HEIGHT);
+    stickyShift = shift;
+    if (month !== sticky) sticky = month;
+    if (stickyEl) stickyEl.style.transform = shift ? `translate3d(0, ${shift}px, 0)` : '';
+  }
+
+  // The element appears when a month is kept: it takes the shift at once.
+  $effect(() => {
+    if (stickyEl) stickyEl.style.transform = stickyShift ? `translate3d(0, ${stickyShift}px, 0)` : '';
+  });
+
+  $effect(() => {
+    const content = listEl?.closest('.page-content');
+    if (!content) return;
+    content.addEventListener('scroll', scheduleSticky, { passive: true });
+    scheduleSticky();
+    return () => {
+      content.removeEventListener('scroll', scheduleSticky);
+      cancelAnimationFrame(stickyFrame);
+      stickyFrame = 0;
+    };
+  });
 
   function forgetHeights() {
     measured.clear();
@@ -1293,7 +1345,9 @@
     <div class="list media-list {theme.ios ? 'chevron-center dividers' : ''} virtual-list dives" bind:this={listEl}>
       <ul>
         {#each visible.items as row (row.key)}
-          {#if row.kind === 'trip'}
+          {#if row.kind === 'month'}
+            <MonthHeader year={row.year} month={row.monthNumber} count={row.count} index={row.index} top={visible.topPosition} />
+          {:else if row.kind === 'trip'}
             <TripRow
               dives={row.dives}
               location={row.location}
@@ -1343,6 +1397,9 @@
   {#if importing}<p class="od-sr-only" role="status">{t('logbook.importing')}</p>{/if}
 
   {#snippet fixedContent()}
+    {#if stickyRow && stickyRow.kind === 'month' && listEl && !theme.ios}
+      <MonthSticky year={stickyRow.year} month={stickyRow.monthNumber} count={stickyRow.count} pill={showPill} bind:el={stickyEl} />
+    {/if}
     {#if selecting}
       <!-- Selection mode: the top bar gives way to the number of dives checked. -->
       <div class="selection-bar" bind:this={selectionBar}>

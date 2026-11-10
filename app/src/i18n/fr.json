@@ -1410,6 +1410,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Carnet : la liste est découpée par mois ; l’en-tête du mois en cours reste en haut sous la barre pendant le défilement. Un voyage reste groupé sous le mois de sa première plongée.",
       "Réglages : le type d’eau des plongées téléchargées dont l’ordinateur ne donne rien se choisit (Non précisé par défaut).",
       "Cartes hors ligne : téléchargez des régions (zones de plongée, pays ou un rectangle de votre choix) depuis Réglages ; une limite d’espace et un plancher d’espace libre protègent l’appareil, et les mises à jour sont proposées avec un badge.",
       "Sites : sans réseau, la carte lit les régions téléchargées, sinon un planisphère simplifié ; une pastille « Hors ligne » l’indique et un message propose de télécharger la zone.",
