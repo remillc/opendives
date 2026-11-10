@@ -42,14 +42,17 @@
 <Page class="od-welcome-start">
   {#if !theme.ios}
     <div class="od-welcome-start--page">
+      <div class="od-welcome-start--head">
       <div class="od-welcome-start--brand">
         <img class="od-welcome-start--logo od-welcome-start--light" src="logo-light.svg" alt="" width="40" height="40" />
         <img class="od-welcome-start--logo od-welcome-start--dark" src="logo-dark.svg" alt="" width="40" height="40" />
         <span>OpenDives</span>
       </div>
       <h1 class="od-welcome-start--headline">{t('welcome.headline')}</h1>
+      </div>
       <DecorativeProfile class="od-welcome-start--wide-profile" />
       <div class="od-welcome-start--space"></div>
+      <div class="od-welcome-start--actions">
       <nav class="od-welcome-start--buttons" aria-label={t('welcome.choicesLabel')}>
         <div class="od-welcome-start--option">
           <a href="/welcome/sign-in" class="od-welcome-start--pill od-welcome-start--pill-filled" onclick={(e) => go(e, '/welcome/sign-in')}>{t('welcome.existingShort')}</a>
@@ -65,6 +68,7 @@
         </div>
       </nav>
       <a href="/welcome/git" class="od-welcome-start--git-link" onclick={(e) => go(e, '/welcome/git')}>{t('welcome.ownGit')}</a>
+      </div>
     </div>
   {:else}
   <svg class="od-welcome-start--profile" viewBox="0 0 {WIDTH} {HEIGHT}" preserveAspectRatio="none" aria-hidden="true">
@@ -137,6 +141,12 @@
       padding-top: calc(var(--f7-safe-area-top) + 24px);
       display: flex;
       flex-direction: column;
+    }
+
+    /* The wrappers only matter on tablets. */
+    .od-welcome-start--head,
+    .od-welcome-start--actions {
+      display: contents;
     }
 
     .od-welcome-start--brand {
@@ -241,8 +251,8 @@
       text-decoration: underline;
     }
 
-    /* A low window (tablet in landscape): every choice stays in view (to-do #31). */
-    @media (max-height: 820px) {
+    /* A low phone window: every choice stays in view (to-do #31). */
+    @media (max-width: 767.98px) and (max-height: 820px) {
       .od-welcome-start--headline {
         margin-top: 16px;
       }
@@ -254,6 +264,99 @@
 
       .od-welcome-start--buttons {
         gap: 8px;
+      }
+    }
+
+    /* Tablet (width from 768 px; mock-ups android-tablette-premier-lancement-*.dc.html): no scrolling. */
+    @media (min-width: 768px) {
+      .od-welcome-start--page {
+        height: calc(100% - var(--f7-safe-area-bottom) - 24px);
+        min-height: 0;
+      }
+
+      .od-welcome-start--head {
+        display: block;
+      }
+
+      .od-welcome-start--brand,
+      .od-welcome-start--headline {
+        margin-left: 0;
+        margin-right: 0;
+      }
+
+      .od-welcome-start--actions {
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
+        width: 440px;
+        justify-content: center;
+      }
+
+      .od-welcome-start--buttons {
+        max-width: none;
+        padding: 0 0 12px;
+      }
+
+      .od-welcome-start--space {
+        display: none;
+      }
+
+      /* Landscape: heading and profile on the left, choices on the right. */
+      @media (orientation: landscape) {
+        .od-welcome-start--page {
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) 440px;
+          grid-template-rows: auto minmax(0, 1fr);
+          column-gap: 56px;
+          padding-right: 56px;
+        }
+
+        .od-welcome-start--head {
+          grid-column: 1;
+          grid-row: 1;
+          margin: 34px 0 0 56px;
+        }
+
+        :global(.od-welcome-start--wide-profile) {
+          grid-column: 1;
+          grid-row: 2;
+          align-self: end;
+          height: min(230px, 100%);
+          margin-top: 0;
+        }
+
+        .od-welcome-start--actions {
+          grid-column: 2;
+          grid-row: 1 / span 2;
+          align-self: center;
+        }
+      }
+
+      /* Portrait: a centred heading, the profile across the width, the choices centred in what is left. */
+      @media (orientation: portrait) {
+        .od-welcome-start--head {
+          box-sizing: border-box;
+          width: 100%;
+          max-width: 520px;
+          margin: 48px auto 0;
+        }
+
+        .od-welcome-start--headline {
+          margin-top: 48px;
+        }
+
+        :global(.od-welcome-start--wide-profile) {
+          flex: none;
+          height: 260px;
+          margin-top: 32px;
+        }
+
+        .od-welcome-start--actions {
+          flex: 1;
+          min-height: 0;
+          align-self: center;
+          max-width: 100%;
+        }
       }
     }
 
