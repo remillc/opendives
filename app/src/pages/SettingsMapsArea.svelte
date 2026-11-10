@@ -153,8 +153,33 @@
     }
   }
 
+  /** The diver moved the map or chose a result: the position must not take the map away. */
+  let moved = false;
+
+  /** About 40 km across at a point, inside the limits there. @param {number} lng @param {number} lat */
+  function zoomAround(lng, lat) {
+    const limits = zoomLimits(lng, lat, frame.side);
+    map?.setMinZoom(limits.minZoom);
+    map?.setMaxZoom(limits.maxZoom);
+    return clampZoom(zoomForFrameKm(lat, 40, frame.side), limits);
+  }
+
+  /** Opens on the phone's position, as soon as it is known. */
+  function centreOnDevice() {
+    navigator.geolocation?.getCurrentPosition(
+      (pos) => {
+        if (moved || !map || !frame.side) return;
+        const { longitude: lng, latitude: lat } = pos.coords;
+        map.jumpTo({ center: [lng, lat], zoom: zoomAround(lng, lat) });
+      },
+      () => {}, // No position: the map stays where it opened.
+      { timeout: 15000, maximumAge: 600000 },
+    );
+  }
+
   /** @param {{ name: string, lng: number, lat: number }} hit @param {boolean} isSite */
   function choose(hit, isSite) {
+    moved = true;
     if (isSite) {
       name = t('maps.area.around', { site: hit.name });
       named = true; // the diver's choice: moving the map does not rename it
@@ -162,11 +187,7 @@
       named = false;
     }
     if (map && frame.side) {
-      // A suitable zoom: about 40 km across, inside the limits at the new place.
-      const limits = zoomLimits(hit.lng, hit.lat, frame.side);
-      map.setMinZoom(limits.minZoom);
-      map.setMaxZoom(limits.maxZoom);
-      map.easeTo({ center: [hit.lng, hit.lat], zoom: clampZoom(zoomForFrameKm(hit.lat, 40, frame.side), limits), duration: 600 });
+      map.easeTo({ center: [hit.lng, hit.lat], zoom: zoomAround(hit.lng, hit.lat), duration: 600 });
     }
     query = '';
     placesState = 'idle';
@@ -184,10 +205,12 @@
     } catch (e) {
       console.error('Sites for the area name', e);
     }
-    // The first view: around the point given by the Sites map, else around the first site, else the world.
+    // The first view: around the point given by the Sites map, else around the
+    // phone's position once it is known; until then, the first site or the world.
     const qLng = Number(f7route.query?.lng);
     const qLat = Number(f7route.query?.lat);
-    const centre = f7route.query?.lng && Number.isFinite(qLng) && Number.isFinite(qLat) ? { lng: qLng, lat: qLat } : located[0] ?? { lng: 0, lat: 20 };
+    const given = !!f7route.query?.lng && Number.isFinite(qLng) && Number.isFinite(qLat);
+    const centre = given ? { lng: qLng, lat: qLat } : located[0] ?? { lng: 0, lat: 20 };
     if (!offlineMaps.online || !container) return;
 
     const module = await import('maplibre-gl');
@@ -210,6 +233,11 @@
     map = m;
     m.touchZoomRotate.disableRotation();
     layout(); // gives the map its padding
+    // A gesture of the diver has an originalEvent; a move of the code has none.
+    m.on('movestart', (/** @type {any} */ e) => {
+      if (e.originalEvent) moved = true;
+    });
+    if (!given) centreOnDevice();
     m.on('move', refresh);
     m.on('moveend', () => {
       applyLimits();
