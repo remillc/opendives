@@ -1194,7 +1194,9 @@ Christian reversed the "no accordion" part of task 2026-11-10-09. Spec: "Statist
 - The rows inside stay plain content, as in task 09: no link, no chevron, no ripple, no maximum depth.
 - The chart cards, the filter and "Nouvelle statistique" do not change.
 
-## [ ] 2026-11-10-13 Statistics: each row opens the list of its dives
+## [x] 2026-11-10-13 Statistics: each row opens the list of its dives
+
+Done in "Open the list of its dives from each statistics row".
 
 Christian changed his mind on the rows of task 2026-11-10-09: they become clickable. Spec: "Statistics, a row opens its dives" (new) and "Statistics, items are not clickable" (updated). Mock-ups: `docs/mockups/android-stats.dc.html`, `docs/mockups/android-stats-plongees.dc.html` (new). Pages: `app/src/pages/Statistics.svelte`, plus a new page.
 - Every row of "Mes statistiques" and of every "Par …" section becomes a link: chevron right (20 dp, `--od-on-surface-variant`), standard ripple. The chart cards stay plain. The accordions of task 12 do not change.

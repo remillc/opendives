@@ -1192,6 +1192,7 @@
     "emptyText": "Les statistiques apparaissent avec les premières plongées du carnet.",
     "depthPerDive": "Profondeur maximale par plongée",
     "rowSummary": "{dives} · {time}",
+    "rowDivesSupport": "{section} · {summary}",
     "details": "En détail",
     "detail": {
       "total": "Durée totale",
@@ -1500,7 +1501,8 @@
       "Conflit de synchronisation : dialogue refait, différences lisibles, « Plus tard », et « Annuler » avant l’envoi.",
       "Filtrer (Android) : page refaite, critères de bouteille et de gaz regroupés, un filtre enregistré remplit la page, et sa suppression propose « Annuler ».",
       "Filtrer : les phrases d’explication sous les critères disparaissent.",
-      "Nouveautés : la date de la version à côté de son numéro, et la liste complète."
+      "Nouveautés : la date de la version à côté de son numéro, et la liste complète.",
+      "Statistiques : chaque ligne ouvre la liste de ses plongées."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",

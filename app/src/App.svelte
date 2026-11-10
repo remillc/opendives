@@ -31,6 +31,7 @@
   import SitesUnplaced from './pages/SitesUnplaced.svelte';
   import Statistics from './pages/Statistics.svelte';
   import StatisticsResult from './pages/StatisticsResult.svelte';
+  import StatisticsDives from './pages/StatisticsDives.svelte';
   import StatisticNew from './pages/StatisticNew.svelte';
   import Tools from './pages/Tools.svelte';
   import Desaturation from './pages/Desaturation.svelte';
@@ -150,6 +151,7 @@
     { path: '/sites/:uuid/edit', component: SiteEdit },
     { path: '/statistics/', component: Statistics },
     { path: '/statistics/result', component: StatisticsResult },
+    { path: '/statistics/dives/', component: StatisticsDives },
     // Android: a full-screen dialog; iPhone: a sheet (the popup pushes the view back).
     { path: '/statistics/new', popup: { component: StatisticNew } },
     { path: '/tools/', component: Tools },
@@ -182,6 +184,7 @@
       master: true,
       detailRoutes: [
         { path: '/statistics/result', component: StatisticsResult },
+        { path: '/statistics/dives/', component: StatisticsDives },
       ],
     },
     ...appRoutes,
