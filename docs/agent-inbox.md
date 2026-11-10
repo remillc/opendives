@@ -1361,3 +1361,12 @@ Addition to task 2026-11-10-27. Spec: System design, section 7, "Android tablet 
 
 Done in feature/tablet-portrait-menu: the Carnet's floating "+" is fixed 24 dp from the bottom right of the screen when the list and detail are split and there is no rail.
 
+
+## [ ] 2026-11-10-29 Android tablet: "+" out of the rail in landscape, and the Expressive FAB menu
+
+Spec: System design, section 7, "Android tablet in landscape: '+' out of the rail" (new) and "Add" (updated); section 8, "FAB menu (Android tablet)" (new). Mock-ups: `docs/mockups/android-tablette-ajout-paysage.dc.html`, `docs/mockups/android-tablette-ajout-portrait.dc.html` (new), and the `android-tablette-*-paysage.dc.html` of the Carnet section (updated: no "+" in the rail).
+- Landscape: remove the "+" from the top of the rail. On the Carnet screens, show the same floating "+" as in portrait, at the bottom right of the screen, 24 dp from the edges.
+- Tablet, landscape and portrait: the "+" opens the Material 3 Expressive FAB menu instead of the bottom sheet, with the three choices, spacing, close button, scrim and motion of section 8. Check the sizes against the Material library (FloatingActionButtonMenu) and keep our wider spacing: 16 dp between items, 24 dp above the close button.
+- Respect "Remove animations": no motion.
+- The phone keeps its bottom sheet for now.
+- A line in the release notes.

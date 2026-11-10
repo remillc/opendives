@@ -141,7 +141,7 @@ Width decides the layout, not the type of device: below 768 px wide, phone layou
 
 |  | Phone | Tablet |
 | --- | --- | --- |
-| Main navigation | Top bar with a ☰ button on the left that opens a side menu (iOS and Android, decided on 6 November 2026); no bar at the bottom | iOS: 220 px sidebar; Android: 96 px navigation rail with the "+" button at the top |
+| Main navigation | Top bar with a ☰ button on the left that opens a side menu (iOS and Android, decided on 6 November 2026); no bar at the bottom | iOS: 220 px sidebar; Android: 96 px navigation rail (from about 1000 dp wide); the Carnet's "+" is a floating button at the bottom right of the screen |
 | Sections | Logbook, Sites, Statistics, Tools, then Account and Settings after a separator, in the side menu; the synchronisation state at the bottom of the menu. Account is a section (☰ in its top bar): the cloud account, its synchronisation and the server in use, or, without an account, the choices to create one or sign in | The same, plus Account and Settings at the bottom of the bar |
 | Logbook | List, then full-screen detail | List (340 px) and detail side by side |
 | Sites | Map at the top, list in a fixed panel below it (not a draggable bottom sheet: no handle, the panel scrolls on its own) | List on the left, map on the right |
@@ -160,7 +160,9 @@ The four sections use the same band as their header, MD3 Small top app bar (☰,
 
 **Back:** the native gesture (swipe from the edge on iOS, system back on Android) works everywhere; a sheet also closes by dragging it down.
 
-**Add (decided on 5 November 2026):** the Logbook no longer has a permanent Download button, which was of little use. Instead, a "+" button (navigation bar on iOS, floating action button in `secondary-container` on Android, at the top of the rail on tablets) opens three choices: download from the dive computer, import a file, log a dive by hand. The empty logbook offers the same choices directly.
+**Add (decided on 5 November 2026):** the Logbook no longer has a permanent Download button, which was of little use. Instead, a "+" button (navigation bar on iOS, floating action button in `secondary-container` on Android, at the bottom right of the screen on tablets, in landscape and portrait) opens three choices: download from the dive computer, import a file, log a dive by hand. The empty logbook offers the same choices directly.
+
+**Android tablet in landscape: "+" out of the rail (decided on 10 November 2026).** The rail no longer has a "+" at the top. On every screen of the Carnet section, the "+" is a floating action button at the bottom right of the whole screen, 24 dp from the edges, over the detail pane, under any scrim, as in portrait. It opens the FAB menu (section 8). Mock-ups: the `android-tablette-*-paysage.dc.html` of the Carnet section.
 
 **Android tablet in portrait: no rail (decided on 10 November 2026).** The navigation rail shows only when the window is at least about 1000 dp wide (Android tablet in landscape). Below that width, in portrait on a tablet as on a phone, there is no rail: the first pane's top bar has the ☰ button that opens the modal side menu of the phone (300 dp, scrim, same content: account card, Carnet, Sites, Statistiques, Outils, Réglages, À propos, sync card), and the Carnet's "+" is the floating button at the bottom right of the screen (24 dp from the edges, over the detail pane, under any scrim), not of the list pane. The list and detail panes keep their widths (340 dp list in the Carnet, the detail takes the rest: 459 dp on an 800 dp tablet instead of 363). Landscape is unchanged. Mock-ups: `android-tablette-accueil-portrait.dc.html`, `android-tablette-accueil-portrait-menu.dc.html` (menu open), and every `android-tablette-*-portrait.dc.html`.
 
@@ -202,6 +204,16 @@ The first impression of the app continues past first launch: the pages that set 
 - **iPhone (decided on 10 November 2026):** the same layout with iOS conventions: the navigation bar keeps "Annuler" or "‹ Retour", with no title and no background; the bar title and step become the eyebrow (15 pt, semibold, secondary label colour); the title is 34 pt regular; the introduction 17 pt; inset grouped sections with 20 pt corners; the primary action a 56 pt capsule (`--od-primary`), a secondary action as a plain or grey capsule beside or under it; the profile just above the actions. Mock-ups: `compte-connexion-ios.dc.html`, `compte-connexion-encours-ios.dc.html`, `compte-connexion-erreur-ios.dc.html`, `compte-creation-ios.dc.html`, `compte-code-ios.dc.html`, `compte-code-erreur-ios.dc.html`, `ios-compte-import.dc.html`, `compte-import-identifiants-ios.dc.html`, `compte-import-encours-ios.dc.html`, `compte-import-echec-ios.dc.html`.
 - **Git note:** the note under the git form reads only "Le jeton reste chiffré sur cet appareil." (13 sp, `--od-on-surface-variant`), with no background.
 Mock-ups: `compte-connexion-android.dc.html`, `compte-connexion-encours-android.dc.html`, `compte-connexion-erreur-android.dc.html`, `compte-creation-android.dc.html`, `compte-code-android.dc.html`, `compte-code-erreur-android.dc.html`, `android-compte-import.dc.html`, `compte-import-identifiants-android.dc.html`, `compte-import-encours-android.dc.html`, `compte-import-echec-android.dc.html`, `git-config-android.dc.html`, `git-config-erreur-android.dc.html`, `git-config-adresse-android.dc.html`; tablet `android-tablette-compte-connexion-{paysage,portrait}.dc.html`, `android-tablette-compte-creation-…`, `android-tablette-depot-git-…`.
+
+### FAB menu (Android tablet, decided on 10 November 2026)
+
+On an Android tablet, in landscape and portrait, the Carnet's "+" opens the Material 3 Expressive FAB menu instead of a bottom sheet. The phone keeps its sheet for now.
+- **Items,** right-aligned above the button, from bottom to top: "Télécharger depuis l’ordinateur" (primary, `--od-on-surface` #1F2124 background, #F4F4F2 text), "Importer un fichier", "Noter une plongée à la main" (tonal, #E3E1DC background, #1F2124 text). Each is a 56 dp pill, 24 dp padding on both sides, 24 dp icon, 8 dp between icon and label, label 16 sp weight 500 (Title Medium).
+- **Spacing (wider than the Expressive default, so a finger cannot press two items):** 16 dp between items, 24 dp between the lowest item and the close button.
+- **Close button:** the FAB becomes a 56 dp circle in `--od-on-surface` with a ✕, in the FAB's place (24 dp from the right and bottom edges). Scrim rgba(0, 0, 0, 0.16) over the screen; tapping it, ✕ or system back closes the menu.
+- **Motion:** opening, the FAB morphs from its rounded square (16 dp corners) into the circle and its + turns 45° into ✕; the items unfold from the bottom one up, about 50 ms apart, each growing from the right edge and rising slightly with a light spring. Closing is faster, from the top item down, and ✕ turns back into +. Use the Expressive motion scheme springs of the Material library, not custom curves. With "Remove animations" on in Android, the menu appears and disappears without motion.
+- **Accessibility:** the button announces "Ajouter des plongées" and its expanded state; the items are a menu; focus goes to the first item on opening and back to the button on closing.
+Mock-ups: `android-tablette-ajout-paysage.dc.html`, `android-tablette-ajout-portrait.dc.html`.
 
 ### Text fields
 
