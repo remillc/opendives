@@ -644,7 +644,7 @@
       "resetText": "Revient aux valeurs par défaut pour tous les réglages de cet appareil",
       "reset": "Réinitialiser tous les réglages",
       "resetTitle": "Réinitialiser tous les réglages ?",
-      "resetConfirm": "Les réglages de cet appareil reviennent à leurs valeurs par défaut : unités, affichage, carnet. Vos plongées, vos sites, votre compte et vos cartes téléchargées ne changent pas, ni les paramètres du planificateur et le regroupement en voyages.",
+      "resetConfirm": "Les réglages de cet appareil reviennent à leurs valeurs par défaut : unités, affichage, carnet. Vos plongées, vos sites, votre compte, vos cartes téléchargées et votre liste de bouteilles ne changent pas, ni les paramètres du planificateur et le regroupement en voyages.",
       "resetAction": "Réinitialiser",
       "note": "Les paramètres de planification (vitesses, réserve, SAC, ppO₂, déco) ainsi que le regroupement en voyages ne sont pas modifiés.",
       "resetDone": "Réglages réinitialisés"
@@ -1422,6 +1422,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Réglages : la réinitialisation garde votre liste de bouteilles.",
       "Nettoyer les sites : « Pas des doublons » retire le groupe de la liste et ne le propose plus (sur cet appareil) ; « Annuler » le remet. Renommer ou déplacer un des deux sites le rend de nouveau proposable.",
       "Réglages : « Réinitialiser tous les réglages » demande d’abord confirmation, puis annonce « Réglages réinitialisés ». Il ne touche plus aux paramètres du planificateur.",
       "Logo : les trois vagues ont des dégradés plus courts, pour que les couches restent distinctes en petit.",

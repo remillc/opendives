@@ -644,7 +644,7 @@
       "resetText": "Goes back to the default values for every setting of this device",
       "reset": "Reset all settings",
       "resetTitle": "Reset all settings?",
-      "resetConfirm": "The settings of this device go back to their default values: units, display, logbook. Your dives, sites, account and downloaded maps do not change, nor do the planner settings and trip grouping.",
+      "resetConfirm": "The settings of this device go back to their default values: units, display, logbook. Your dives, sites, account, downloaded maps and list of cylinders do not change, nor do the planner settings and trip grouping.",
       "resetAction": "Reset",
       "note": "Planning parameters (rates, reserve, SAC, ppO₂, deco) and trip grouping are not changed.",
       "resetDone": "Settings reset"
@@ -1422,6 +1422,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Settings: resetting keeps your list of cylinders.",
       "Clean up sites: \"Not duplicates\" removes the group from the list and stops suggesting it (on this device); \"Undo\" puts it back. Renaming or moving one of the two sites makes it suggestible again.",
       "Settings: \"Reset all settings\" asks for confirmation first, then says \"Settings reset\". It no longer touches the planner settings.",
       "Logo: the three waves now have shorter gradients, so the layers stay apart at small sizes.",
