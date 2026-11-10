@@ -7,6 +7,7 @@
 // implement such a service on the client side"), at most one request per
 // second, with results cached.
 
+import { OpenDivesCore } from 'opendives-core';
 import { checkTiles, rectAround, DEFAULT_HALF_KM } from './maps-logic.js';
 
 export const NOMINATIM_URL = 'https://nominatim.openstreetmap.org/search';
@@ -97,6 +98,16 @@ export function placesKey(query, lang) {
   return `${lang}|${foldText(query)}`;
 }
 
+/**
+ * The request goes through the plugin, which identifies the app as Nominatim's
+ * policy asks: a request of the WebView cannot set its User-Agent.
+ * @param {string} url
+ */
+async function nativeFetch(url) {
+  const { status, body } = await OpenDivesCore.placesSearch({ url });
+  return { ok: status >= 200 && status < 300, status, json: async () => JSON.parse(body) };
+}
+
 let lastRequestMs = 0;
 /** @type {Map<string, { name: string, detail: string, lng: number, lat: number }[]>} */
 const cache = new Map();
@@ -106,10 +117,10 @@ const cache = new Map();
  * second for the whole app (this module is the only caller), answers cached.
  * Rejects when the server cannot be reached or answers an error.
  * @param {string} query @param {string} lang
- * @param {{ fetchFn?: typeof fetch, now?: () => number, sleep?: (ms: number) => Promise<void> }} [deps]
+ * @param {{ fetchFn?: (url: string) => Promise<{ ok: boolean, status: number, json: () => Promise<any> }>, now?: () => number, sleep?: (ms: number) => Promise<void> }} [deps]
  */
 export async function searchPlaces(query, lang, deps = {}) {
-  const { fetchFn = fetch, now = Date.now, sleep = (ms) => new Promise((r) => setTimeout(r, ms)) } = deps;
+  const { fetchFn = nativeFetch, now = Date.now, sleep = (ms) => new Promise((r) => setTimeout(r, ms)) } = deps;
   const key = placesKey(query, lang);
   const hit = cache.get(key);
   if (hit) return hit;
@@ -117,7 +128,7 @@ export async function searchPlaces(query, lang, deps = {}) {
   const wait = waitBeforeRequest(lastRequestMs, now());
   lastRequestMs = now() + wait;
   if (wait > 0) await sleep(wait);
-  const response = await fetchFn(placesUrl(query, lang), { headers: { Accept: 'application/json' } });
+  const response = await fetchFn(placesUrl(query, lang));
   if (!response.ok) throw new Error(`Nominatim ${response.status}`);
   const places = parsePlaces(await response.json());
   cache.set(key, places);
