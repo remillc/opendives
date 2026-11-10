@@ -1165,3 +1165,13 @@ Christian approved all four. Spec: "Small changes of 10 November 2026" and "Stat
 4. New statistic (`docs/mockups/stats-nouvelle-android.dc.html`): move "Nom" to the top, before "Critère".
 
 Done in Four small changes from canvas comments
+
+## [ ] 2026-11-10-11 Filter (Android): rework the page to match the mock-up
+
+Christian asked to review the filter page against the new Android mock-up. Spec: "Filter, Android". Mock-up: `docs/mockups/filtre-android.dc.html`. Pages: `app/src/pages/Filter.svelte`, `FilterCriterion.svelte`.
+- Full-screen dialog: ✕ (abandon), "Filtrer", text button "Tout effacer".
+- Search field "Chercher un critère" (rounded, 56 dp) under the bar.
+- "Mode de plongée": MD3 segmented button with three options and the check icon on the selected one.
+- "Matériel": card of rows with current value and a chevron to the right (opens the criterion). An active criterion: grey row, value in semibold.
+- "Autres critères": card of groups with their content line and a chevron pointing down; tapping expands the group in place to list its criteria (each opens like a Matériel row).
+- Fixed bottom bar: filled full-width "Afficher les {n} plongées", text button "Enregistrer ce filtre".
