@@ -1095,3 +1095,11 @@ Christian chose a new colouring of the "Trois vagues" logo so the three wave lay
 - Already updated in the repo: `docs/brand/opendives-*.svg`, `app/public/favicon.svg`, `app/public/logo-{light,dark,small-light}.svg`, and the Android vector drawables `res/drawable/ic_launcher_foreground.xml`, `res/drawable/ic_splash_mark.xml`, `res/drawable-night/ic_splash_mark.xml`. Check them in a build.
 - Regenerate what is raster or generated from these sources: `res/mipmap-*/ic_launcher.png` and `ic_launcher_round.png`, the iOS app icon set when the iOS project exists, the store icon, and any other PNG export of the logo.
 - New gradients, light: #FBE3B2→#F4C98C, #E5A661→#D88A45, #C76A25→#A9490C; dark: #F5E2B0→#EFD08F, #EBAD60→#E3923C, #D9702A→#C2550F.
+
+## [ ] 2026-11-10-04 Clean up sites: "Pas des doublons" does something
+
+Christian approved (canvas comment). The button "Pas des doublons" had no action. Spec: "Clean up sites, \"Pas des doublons\"". Mock-ups: `docs/mockups/sites-nettoyer-android.dc.html`, `docs/mockups/sites-nettoyer-pas-doublons-android.dc.html`.
+- Tapping it removes the group from the list right away and shows a snackbar (6 s): "{site A} et {site B} ne seront plus proposés comme doublons", action "Annuler" puts the group back.
+- Remember the decision in the logbook so it syncs: mark each pair of sites of the group as "not duplicates" (for example a key in each dive site's extra data listing the other site's uuid; keep the core unmodified). The duplicate finder skips marked pairs.
+- Drop the mark when either site changes name or position, so the pair can be proposed again.
+- fr and en keys.
