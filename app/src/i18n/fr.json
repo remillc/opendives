@@ -1435,6 +1435,8 @@
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
       "Compte (Android) : la connexion, la création d’un compte, le code de confirmation, la reprise du carnet et le dépôt git prennent la mise en page du premier lancement : grand titre, champs dans une carte blanche, grand bouton en bas et profil de plongée. Sur tablette, le titre et la carte sont côte à côte en paysage, l’un sous l’autre en portrait.",
+      "Cartes hors ligne : elles fonctionnent aussi sur iPhone et iPad.",
+      "Statistiques et plongée : une valeur n’est plus coupée au milieu d’un nombre ou d’un mot ; quand les chiffres clés ne tiennent pas côte à côte, le dernier passe entier à la ligne.",
       "Touchers : un bouton, une entrée du menu ou du rail répond même si le doigt glisse un peu en touchant ; auparavant, le toucher était parfois ignoré.",
       "Démarrage : l’app ne reste plus sur un écran blanc quand elle démarre avant d’avoir chargé son apparence.",
       "Statistiques : les lignes n’indiquent plus la profondeur maximale, et le nom d’une nouvelle statistique vient en premier.",

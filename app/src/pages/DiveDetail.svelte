@@ -700,7 +700,8 @@
         font-size: 16px;
         font-weight: 600;
         color: var(--od-text);
-        overflow-wrap: anywhere;
+        /* Between words only; a word longer than the column still breaks. */
+        overflow-wrap: break-word;
       }
     }
 

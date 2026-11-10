@@ -1435,6 +1435,8 @@
     "notesText": "What changed in this version",
     "releaseNotes": [
       "Account (Android): signing in, creating an account, the confirmation code, bringing your logbook and the git repository take the layout of first launch: a large title, the fields in a white card, a large button at the bottom and a dive profile. On a tablet, the title and the card sit side by side in landscape, one above the other in portrait.",
+      "Offline maps: they now work on iPhone and iPad too.",
+      "Statistics and dive: a value is no longer cut in the middle of a number or a word; when the key figures do not fit side by side, the last one moves whole to the next line.",
       "Taps: a button, a menu or rail entry responds even if the finger slides a little while tapping; before, the tap was sometimes ignored.",
       "Start-up: the app no longer stays on a white screen when it starts before its look has loaded.",
       "Statistics: rows no longer show the maximum depth, and the name of a new statistic comes first.",
