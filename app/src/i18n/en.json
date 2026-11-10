@@ -1411,7 +1411,7 @@
     "notesText": "What changed in this version",
     "releaseNotes": [
       "Settings: the water type written on downloaded dives that have none can be chosen (Not specified by default).",
-      "Offline maps: download regions (dive areas, countries or a rectangle of your choice) from Settings; a space limit and a free-space floor protect the device, and updates are offered with a badge.",
+      "Offline maps: draw a rectangle on the map from Settings to download it (up to 3,000 tiles; less detail allows a larger area); a space limit and a free-space floor protect the device, and updates are offered with a badge.",
       "Sites: without a network, the map reads the downloaded regions, else a simplified world map; an \"Offline\" pill says so and a message offers to download the area.",
       "Desaturation: the text under the chart is shorter.",
       "Settings: the app language can be Français (Canada), which says \"nuage\" and \"courriel\"; a phone set to French (Canada) picks it by itself.",
@@ -2299,57 +2299,57 @@
       "text": "Your maps take {used}. OpenDives also always keeps at least {floor} free on the device."
     },
     "region": {
-      "sizeDate": "{size} · {date}",
-      "drawn": "Chosen area · {size} · {date}",
       "updateAvailable": "Update available",
       "update": "Update",
       "options": "Options for {name}",
-      "swipeHint": "Swipe a region to the left to delete it."
+      "swipeHint": "Swipe a region to the left to delete it.",
+      "fullDetail": "Full detail · {size} · {date}",
+      "lessDetail": "Less detail · {size} · {date}"
     },
     "menu": {
-      "update": "Update, {size}",
+      "update": "Update",
       "view": "Show on the map",
       "delete": "Delete"
     },
     "download": {
-      "progress": "{received} of {total} · {percent}%",
-      "waitingWifi": "Waiting for Wi-Fi · {size}",
-      "queued": "Waiting · {size}",
+      "progress": "{done} of {total} tiles · {percent}%",
+      "waitingWifi": "Waiting for Wi-Fi · {total} tiles",
+      "queued": "Waiting · {total} tiles",
       "now": "Download now",
       "stop": "Stop the download",
       "background": "The download continues if you leave the app.",
-      "pausedAt": "Paused at {received} of {total}",
+      "pausedAt": "Paused at {done} of {total} tiles",
       "noSpace": "Not enough space on the device",
       "resumesWhen": "Will resume when {floor} is free.",
       "manage": "Manage space",
-      "interrupted": "Interrupted at {received} of {total}",
+      "interrupted": "Interrupted at {done} of {total} tiles",
       "resumesOnline": "Will resume when the network is back",
-      "updating": "Update · {received} of {total}",
-      "updatingWifi": "Update waiting for Wi-Fi · {size}",
+      "updating": "Update · {done} of {total} tiles",
+      "updatingWifi": "Update waiting for Wi-Fi",
       "oldStays": "The old map stays usable until the end.",
       "progressLabel": "Downloading {name}"
     },
     "failure": {
       "title": "Download failed",
       "network": "The connection was lost",
-      "checksum": "The file received is incomplete or corrupt",
       "space": "Not enough space on the device",
       "server": "The server did not answer correctly",
       "retry": "Try again",
-      "remove": "Remove"
+      "remove": "Remove",
+      "limit": "This region is over the 50 MB OpenFreeMap allows for a download. Choose a smaller area or less detail."
     },
     "updateFailed": "The update of {name} failed. The old map stays usable.",
     "deleted": "{name} deleted",
     "dialogs": {
       "cellular": {
         "title": "Download on mobile data?",
-        "text": "{name} is about {size}. Without Wi-Fi, this data comes out of your plan.",
+        "text": "{name} can take up to {size}. Without Wi-Fi, this data comes out of your plan.",
         "wait": "Wait for Wi-Fi",
         "go": "Download"
       },
       "space": {
         "title": "Not enough space",
-        "text": "{name} needs about {size}. Only {remaining} would be left free on the device. OpenDives always keeps at least {floor} free so that the phone keeps working well."
+        "text": "{name} can take up to {size}. Only {remaining} would be left free on the device. OpenDives always keeps at least {floor} free so that the phone keeps working well."
       },
       "manage": {
         "title": "Space on the device",
@@ -2357,13 +2357,13 @@
       },
       "cap": {
         "title": "Map limit reached",
-        "text": "{name} needs about {size}. Your maps already take {used} of {cap} allowed. Delete a region, or raise the limit.",
+        "text": "{name} can take up to {size}. Your maps already take {used} of {cap} allowed. Delete a region, or raise the limit.",
         "view": "See my regions",
         "change": "Change the limit"
       },
       "replace": {
         "title": "Replace the map?",
-        "text": "Updating {name} needs {size} more during the download. To stay under the limit, the old map will be deleted first. {name} will be unavailable without a network until the end.",
+        "text": "Updating {name} can take up to {size} more during the download. To stay under the limit, the old map will be deleted first. {name} will be unavailable without a network until the end.",
         "confirm": "Replace"
       },
       "delete": {
@@ -2372,48 +2372,6 @@
         "confirm": "Delete"
       }
     },
-    "addScreen": {
-      "search": "Search for an area or a country",
-      "results": "Results",
-      "noResult": "No area or country matches.",
-      "fromLogbook": "From your logbook",
-      "fromLogbookNote": "The areas where you dived, from your trips and your sites.",
-      "fromLogbookNone": "No area of the catalogue contains your sites yet.",
-      "trip": "Trip {name}, {date} · {sites}",
-      "tripNoDate": "Trip {name} · {sites}",
-      "siteDives": {
-        "one": "{site} · {n} dive",
-        "other": "{site} · {n} dives"
-      },
-      "sitesMore": "{site} and {n} more",
-      "zoneSize": "Dive area · about {size}",
-      "downloaded": "Downloaded",
-      "download": "Download {name}",
-      "all": "All regions",
-      "byCountry": "By country and area",
-      "byCountryText": "The countries of the catalogue, then their dive areas",
-      "onMap": "Choose on the map",
-      "onMapText": "A rectangle around the point you want",
-      "nearTitle": "Area of the map shown",
-      "nearNone": "No area of the catalogue contains this place.",
-      "catalogueFailed": "The map catalogue could not be read. Check the network and try again.",
-      "catalogueLoading": "Reading the catalogue…",
-      "retry": "Try again"
-    },
-    "countries": {
-      "title": "By country and area",
-      "zones": {
-        "one": "{n} dive area",
-        "other": "{n} dive areas"
-      },
-      "wholeCountry": "Whole country",
-      "countryText": "One dive area is enough for a trip. The whole country covers all the areas.",
-      "zonesTitle": "Dive areas",
-      "approx": "about {size}",
-      "downloaded": "downloaded",
-      "none": "No country in the catalogue.",
-      "unknown": "Unknown country"
-    },
     "area": {
       "title": "Choose on the map",
       "help": "Drag the corners of the rectangle to cover the area you want.",
@@ -2421,7 +2379,6 @@
       "nameHelp": "Suggested from the nearest site",
       "around": "Around {site}",
       "aroundHere": "Chosen area",
-      "estimate": "About {width} × {height} km · about {size}",
       "needNetwork": "Choosing on the map needs the network.",
       "handle": "Rectangle corner, {corner}",
       "corners": {
@@ -2431,7 +2388,13 @@
         "se": "south-east"
       },
       "download": "Download",
-      "unavailable": "Downloading a chosen area is not available yet."
+      "unavailable": "The map server could not be reached. Try again with a network.",
+      "choose": "Choose on the map",
+      "lessDetail": "Less detail (zoom 12): a larger area",
+      "size": "About {width} × {height} km",
+      "tiles": "{count} tiles of {limit}",
+      "tooBig": "This area is too large: a download is limited to 3,000 tiles. Make the rectangle smaller.",
+      "suggestLess": "Too many tiles at full detail. Choose less detail to download this area."
     }
   }
 }

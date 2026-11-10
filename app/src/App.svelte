@@ -73,9 +73,6 @@
   import GitRepository from './pages/GitRepository.svelte';
   import TokenHelp from './pages/TokenHelp.svelte';
   import SettingsMaps from './pages/SettingsMaps.svelte';
-  import SettingsMapsNew from './pages/SettingsMapsNew.svelte';
-  import SettingsMapsCountries from './pages/SettingsMapsCountries.svelte';
-  import SettingsMapsCountry from './pages/SettingsMapsCountry.svelte';
   import SettingsMapsArea from './pages/SettingsMapsArea.svelte';
   import MapsDialogs from './components/MapsDialogs.svelte';
   import { startOfflineMaps } from './lib/offline-maps.svelte.js';
@@ -100,11 +97,8 @@
     { path: '/settings/cylinders/', component: CylinderTypes },
     { path: '/settings/cylinders/new', component: CylinderType },
     { path: '/settings/cylinders/type', component: CylinderType },
-    // Offline maps: the list, adding a region (by search, country, or a rectangle on the map).
+    // Offline maps: the list, adding a region (a rectangle drawn on the map).
     { path: '/settings/maps/', component: SettingsMaps },
-    { path: '/settings/maps/new', component: SettingsMapsNew },
-    { path: '/settings/maps/countries/', component: SettingsMapsCountries },
-    { path: '/settings/maps/countries/:code', component: SettingsMapsCountry },
     { path: '/settings/maps/area', component: SettingsMapsArea },
     { path: '/account', component: Account },
     { path: '/account/delete', component: DeleteAccount },

@@ -18,6 +18,7 @@
   import { t } from '../lib/i18n.js';
 import { connection } from '../lib/online.svelte.js';
 import { offlineMaps, downloadRegionAt } from '../lib/offline-maps.svelte.js';
+import { inBbox } from '../lib/maps-logic.js';
 
   /** @type {import('opendives-core').SiteSummary[]} */
   let sites = $state([]);
@@ -56,7 +57,7 @@ import { offlineMaps, downloadRegionAt } from '../lib/offline-maps.svelte.js';
       for (let j = 0; j < N; j++) {
         const lng = w + ((e - w) * (i + 0.5)) / N;
         const lat = s + ((n - s) * (j + 0.5)) / N;
-        if (regions.some((r) => lng >= r.bbox[0] && lng <= r.bbox[2] && lat >= r.bbox[1] && lat <= r.bbox[3])) inside++;
+        if (regions.some((r) => inBbox(lng, lat, r.bbox))) inside++;
       }
     }
     return inside / (N * N);
