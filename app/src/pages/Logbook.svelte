@@ -880,8 +880,8 @@
   // document (about twenty) are read to find the month at the top: no reflow
   // of the list, the cost does not grow with the size of the logbook.
 
-  /** Height of <MonthSticky> (px): the title line and the wave. */
-  const STICKY_HEIGHT = 50;
+  /** Height of the collapsed band (px), as in <BandBackdrop>. */
+  const STICKY_HEIGHT = 64;
   /** The month shown under the top bar, null while the band is fully visible. */
   let sticky = $state(/** @type {string|null} */ (null));
   let stickyFrame = 0;

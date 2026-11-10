@@ -20,7 +20,7 @@
 
   const PROFILE = 'M0 30 L20 38 L45 70 L70 92 L95 96 L120 88 L140 94 L165 80 L185 62 L210 58 L235 50 L255 46 L275 40 L300 36';
   /** Height of the band once collapsed, wave included. */
-  const COLLAPSED = 50;
+  const COLLAPSED = 64;
   /** Over how many px the texts fade out and the month fades in. */
   const FADE = 40;
 
@@ -146,7 +146,8 @@
       position: absolute;
       left: 16px;
       right: 24px;
-      bottom: 22px;
+      /* Clear of the faint profile, which rises 36 px from the bottom. */
+      bottom: 38px;
       display: flex;
       align-items: baseline;
       gap: 8px;
