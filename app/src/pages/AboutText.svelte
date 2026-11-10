@@ -7,6 +7,7 @@
   // of the public web page built by site/build.mjs).
   import { Page, Navbar, Link } from 'framework7-svelte';
   import { language, t, tIfExists } from '../lib/i18n.js';
+  import { formatLongDate } from '../lib/format.js';
 
   /** @type {{ which: 'notes'|'licence'|'privacy' }} */
   let { which } = $props();
@@ -36,7 +37,7 @@
   /** The release notes: about.releaseNotes.0, .1, … */
   /** @type {string[]} */
   const notes = [];
-  for (let i = 0; i < 20; i++) {
+  for (let i = 0; ; i++) {
     const item = tIfExists(`about.releaseNotes.${i}`);
     if (!item) break;
     notes.push(item);
@@ -55,8 +56,12 @@
 
   {#if which === 'notes'}
     <div class="text">
-      <!-- The version of app/package.json, the one source of the version. -->
-      <h2>{t('about.version', { version: __APP_VERSION__ })}</h2>
+      <!-- The version of app/package.json, the one source of the version; its date from CHANGELOG.md. -->
+      <h2>
+        {__APP_RELEASE_DATE__
+          ? t('about.versionDated', { version: __APP_VERSION__, date: formatLongDate(__APP_RELEASE_DATE__) })
+          : t('about.version', { version: __APP_VERSION__ })}
+      </h2>
       <ul>
         {#each notes as note, i (i)}<li>{note}</li>{/each}
       </ul>

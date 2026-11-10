@@ -1418,6 +1418,7 @@
   "about": {
     "title": "About",
     "version": "Version {version}",
+    "versionDated": "Version {version} · {date}",
     "author": "By {name}",
     "copyright": "© {year} {name}.",
     "tagline": "Free and open dive logbook, compatible with Subsurface logbooks.",
@@ -1498,7 +1499,8 @@
       "New “Trois vagues” logo: app icon, launch screen, menu and About.",
       "Sync conflict: new dialog, readable differences, “Later”, and “Undo” before anything is sent.",
       "Filter (Android): new page, cylinder and gas criteria grouped, a saved filter fills the page, and deleting one offers “Undo”.",
-      "Filter: the explanatory sentences under the criteria are gone."
+      "Filter: the explanatory sentences under the criteria are gone.",
+      "What’s new: the version date next to its number, and the complete list."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
