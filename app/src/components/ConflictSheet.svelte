@@ -10,6 +10,7 @@
   import Icon from './Icon.svelte';
   import Md3Dialog from './Md3Dialog.svelte';
   import ProfileThumbnail from './ProfileThumbnail.svelte';
+  import { conflictChoices, conflictLayout } from '../lib/conflict-choices.js';
   import { SETTINGS_FILE, compareComputers, computerNames } from '../lib/conflict-text.js';
   import { formatLongDateTime, locale } from '../lib/format.js';
   import { logbook } from '../lib/logbook.svelte.js';
@@ -31,13 +32,21 @@
   let choices = $state(/** @type {Record<string, 'device'|'cloud'>} */ ({}));
   /** @type {('device'|'cloud')[]} */
   const sides = ['device', 'cloud'];
+  /** "Same choice for all" (several dives): one side applies to every dive. */
   let forAll = $state(false);
+  /** @type {'device'|'cloud'} */
+  let allSide = $state('device');
+  /** The path of the dive whose full values are shown (several dives). */
+  let detail = $state(/** @type {string|null} */ (null));
   let busy = $state(false);
   let failed = $state(false);
 
   const items = $derived(conflict?.items ?? []);
-  /** With "apply to all", only the first dive's choice is asked. */
-  const asked = $derived(forAll ? items.slice(0, 1) : items);
+  /** Several items: a full-screen list, one card each; one item: the dialog with its two cards. */
+  const list = $derived(conflictLayout(items.length) === 'list');
+  const detailItem = $derived(detail ? items.find((i) => i.path === detail) : undefined);
+  /** The items shown with their full values. */
+  const asked = $derived(list ? (detailItem ? [detailItem] : []) : items);
 
   /** The dive of an item, for its site and thumbnail. @param {Item} item */
   const diveOf = (item) => logbook.dives.find((d) => d.id === item.diveId);
@@ -46,7 +55,8 @@
   const computersLine = (item) => (item.path === SETTINGS_FILE ? item.lines.find((l) => l.key === 'divecomputerid') : undefined);
 
   const title = $derived.by(() => {
-    const first = items[0];
+    if (list && !detailItem) return t('conflict.titleMany', { n: items.length });
+    const first = detailItem ?? items[0];
     if (!first || first.date) return t('conflict.title');
     return computersLine(first) ? t('conflict.titleComputers') : t('conflict.titleOther');
   });
@@ -87,10 +97,60 @@
       .join(', ');
   }
 
+  /** The side chosen for an item: the common one when "same choice for all" is on. @param {Item} item */
+  const sideOf = (item) => (forAll ? allSide : (choices[item.path] ?? 'device'));
+
+  /** What differs in an item, in plain words. @param {Item} item */
+  function differsText(item) {
+    return item.lines.map((l) => fieldName(l.key, item)).join(', ');
+  }
+
+  /** A version's value of the first differing field, for the small card (cut to two lines by CSS). @param {Item} item @param {'device'|'cloud'} side */
+  function shortValue(item, side) {
+    const s = summary(item);
+    if (s?.differing.length) return quoted(s.differing[0][side]);
+    const line = item.lines.find((l) => l.key !== 'divecomputerid');
+    return line ? t('conflict.quoted', { text: line[side] || t('conflict.empty') }) : '';
+  }
+
+  /** "Plus tard", Escape, Back: from a dive's full values back to the list, else close. */
+  function dismiss() {
+    if (detail) detail = null;
+    else onlater();
+  }
+
+  /**
+   * The full-screen dialog is moved under <body> (no page transform can clip
+   * it); Back and Escape dismiss it (lib/back-button.js sends od-cancel to a
+   * .od-dialog).
+   * @param {HTMLElement} node
+   */
+  function portal(node) {
+    document.body.appendChild(node);
+    const cancel = (/** @type {Event} */ e) => {
+      e.stopPropagation();
+      dismiss();
+    };
+    node.addEventListener('od-cancel', cancel);
+    queueMicrotask(() => /** @type {HTMLElement|null} */ (node.querySelector('[role="dialog"]'))?.focus({ preventScroll: true }));
+    return {
+      destroy() {
+        node.removeEventListener('od-cancel', cancel);
+        node.remove();
+      },
+    };
+  }
+
+  /** @param {KeyboardEvent} e */
+  function keydown(e) {
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      dismiss();
+    }
+  }
+
   async function choose() {
-    /** @type {Record<string, 'device'|'cloud'>} */
-    const all = {};
-    for (const item of items) all[item.path] = forAll ? (choices[items[0].path] ?? 'device') : (choices[item.path] ?? 'device');
+    const all = conflictChoices(items, choices, forAll, allSide);
     busy = true;
     failed = false;
     try {
@@ -174,9 +234,9 @@
       {@render explanation(item)}
       <div class="cards" role="radiogroup" aria-label={t('conflict.choiceLabel')}>
         {#each sides as side (side)}
-          {@const selected = (choices[item.path] ?? 'device') === side}
+          {@const selected = sideOf(item) === side}
           <label class="choice" class:selected>
-            <input type="radio" name="od-conflict-{item.path}" value={side} checked={selected} onchange={() => (choices[item.path] = side)} />
+            <input type="radio" name="od-conflict-{item.path}" value={side} checked={selected} disabled={forAll} onchange={() => (choices[item.path] = side)} />
             <span class="mark" aria-hidden="true">{#if selected}<Icon name="check" size={16} weight={3} />{/if}</span>
             <span class="card-text">
               <span class="card-title">{t(side === 'device' ? 'conflict.deviceCard' : 'conflict.cloudCard')}</span>
@@ -191,25 +251,108 @@
       {#if s?.same.length}<p class="unchanged">{t('conflict.unchanged', { names: computerNames(s.same) })}</p>{/if}
     </section>
   {/each}
-  {#if items.length > 1}
-    <label class="for-all">
-      <input type="checkbox" bind:checked={forAll} />
-      <span>{t('conflict.forAll')}</span>
+  {#if failed}<p class="failed" role="alert">{t('conflict.failed')}</p>{/if}
+{/snippet}
+
+<!-- Two small selectable cards, side by side (several dives). -->
+{#snippet small(/** @type {Item|null} */ item, /** @type {string} */ name)}
+  <div class="smalls" role="radiogroup" aria-label={t('conflict.choiceFor', { name })}>
+    {#each sides as side (side)}
+      {@const selected = (item ? sideOf(item) : allSide) === side}
+      {@const disabled = !!item && forAll}
+      <label class="small" class:selected class:disabled>
+        <input
+          type="radio"
+          name="od-conflict-{item ? item.path : 'all'}"
+          value={side}
+          checked={selected}
+          {disabled}
+          onchange={() => (item ? (choices[item.path] = side) : (allSide = side))}
+        />
+        <span class="mark small-mark" aria-hidden="true">{#if selected}<Icon name="check" size={13} weight={3} />{/if}</span>
+        <span class="small-title">{t(side === 'device' ? 'conflict.phoneShort' : 'conflict.cloudShort')}</span>
+        {#if item}
+          <span class="small-when">{when(side === 'device' ? (conflict?.deviceTime ?? '') : (conflict?.cloudTime ?? ''))}</span>
+          <span class="small-value">{shortValue(item, side)}</span>
+        {/if}
+      </label>
+    {/each}
+  </div>
+{/snippet}
+
+{#snippet many()}
+  <p class="text intro-many">{t('conflict.introMany')}</p>
+  <div class="all-card">
+    <label class="all-row">
+      <span class="all-texts">
+        <span class="all-title">{t('conflict.allSame')}</span>
+        <span class="all-sub">{t('conflict.allSameText')}</span>
+      </span>
+      <span class="toggle">
+        <input type="checkbox" role="switch" bind:checked={forAll} />
+        <span class="toggle-icon"></span>
+      </span>
     </label>
-  {/if}
+    {#if forAll}{@render small(null, t('conflict.allSame'))}{/if}
+  </div>
+  {#each items as item (item.path)}
+    {@const dive = diveOf(item)}
+    {@const name = (item.date ? dive?.site : '') || (computersLine(item) ? t('conflict.computersCard') : item.date ? t('dive.siteNotSet') : t('conflict.otherCard'))}
+    <section class="dive-card">
+      <button type="button" class="dive-head" aria-label={t('conflict.details', { name })} onclick={() => (detail = item.path)}>
+        {#if item.date && dive}
+          <ProfileThumbnail profile={dive.profile} maxDepthMm={dive.maxDepthMm} prefs={logbook.prefs} />
+        {:else}
+          <span class="identity-icon" aria-hidden="true"><Icon name={computersLine(item) ? 'computer' : 'file'} weight={2} /></span>
+        {/if}
+        <span class="identity-text">
+          <span class="identity-title">{name}</span>
+          <span class="identity-sub od-value">
+            {[item.number ? t('detail.number', { number: String(item.number) }) : '', item.date ? formatLongDateTime(item.date) : '', t('conflict.differs', { fields: differsText(item) })].filter(Boolean).join(' · ')}
+          </span>
+        </span>
+      </button>
+      {@render small(item, name)}
+    </section>
+  {/each}
   {#if failed}<p class="failed" role="alert">{t('conflict.failed')}</p>{/if}
 {/snippet}
 
 {#if conflict}
   {#if theme.ios}
-    <Sheet opened swipeToClose={false} backdrop class="od-conflict-sheet" style="height: auto">
-      <div class="sheet" role="dialog" aria-labelledby="od-conflict-title">
+    <Sheet opened swipeToClose={false} backdrop class="od-conflict-sheet" style={list ? 'height: 92%' : 'height: auto'}>
+      <div class="sheet" class:large={list} role="dialog" aria-labelledby="od-conflict-title">
         <h2 id="od-conflict-title" class="title">{title}</h2>
-        {@render body()}
-        <button type="button" class="tonal wide" disabled={busy} onclick={choose}>{t('conflict.continue')}</button>
-        <button type="button" class="later" disabled={busy} onclick={onlater}>{t('conflict.later')}</button>
+        {#if list && !detailItem}{@render many()}{:else}{@render body()}{/if}
+        {#if detailItem}
+          <button type="button" class="tonal wide" onclick={dismiss}>{t('conflict.back')}</button>
+        {:else}
+          <button type="button" class="tonal wide" disabled={busy} onclick={choose}>{t('conflict.continue')}</button>
+          <button type="button" class="later" disabled={busy} onclick={onlater}>{t('conflict.later')}</button>
+        {/if}
       </div>
     </Sheet>
+  {:else if list}
+    <!-- Android, several dives: an MD3 full-screen dialog. ✕ is "Plus tard" (or back to the list from one dive). -->
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
+    <div class="full od-dialog modal-in" use:portal onkeydown={keydown}>
+      <div class="full-surface" role="dialog" aria-modal="true" aria-labelledby="od-conflict-title" tabindex="-1">
+        <div class="bar">
+          <button type="button" class="bar-close" aria-label={t(detailItem ? 'conflict.back' : 'conflict.later')} disabled={busy} onclick={dismiss}>
+            <Icon name="close" weight={2} />
+          </button>
+          <h1 id="od-conflict-title">{title}</h1>
+          {#if detailItem}
+            <button type="button" class="tonal bar-action" onclick={dismiss}>{t('conflict.back')}</button>
+          {:else}
+            <button type="button" class="tonal bar-action" disabled={busy} onclick={choose}>{t('conflict.continue')}</button>
+          {/if}
+        </div>
+        <div class="full-body">
+          {#if detailItem}{@render body()}{:else}{@render many()}{/if}
+        </div>
+      </div>
+    </div>
   {:else}
     <Md3Dialog {title} oncancel={onlater}>
       <div class="md-body">{@render body()}</div>
@@ -467,22 +610,223 @@
       color: var(--od-text-2);
     }
 
-    .for-all {
-      margin-top: 12px;
-      min-height: 48px;
+    /* Several dives: the full-screen dialog (Android) and the same content in the large sheet (iOS). */
+    .full {
+      position: fixed;
+      inset: 0;
+      z-index: 13500;
+      font-family: inherit;
+    }
+
+    .full-surface {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      background: var(--od-background);
+      color: var(--od-text);
+      outline: none;
+    }
+
+    .bar {
+      flex: none;
       display: flex;
       align-items: center;
-      gap: 16px;
-      font-size: 16px;
+      height: 64px;
+      box-sizing: content-box;
+      padding: var(--f7-safe-area-top, 0px) 4px 0;
+    }
+
+    .bar h1 {
+      flex: 1;
+      min-width: 0;
+      margin: 0 0 0 4px;
+      font-size: 22px;
+      line-height: 28px;
+      font-weight: 500;
+    }
+
+    .bar-close {
+      flex: none;
+      width: 48px;
+      height: 48px;
+      border: none;
+      background: none;
       color: var(--od-text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    button.tonal.bar-action {
+      width: auto;
+      flex: none;
+      margin-right: 12px;
+      padding: 0 16px;
+    }
+
+    .full-body {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      padding: 0 16px calc(16px + var(--f7-safe-area-bottom, 0px));
+    }
+
+    .intro-many {
+      margin: 4px 4px 12px;
+    }
+
+    .all-card,
+    .dive-card {
+      margin-bottom: 12px;
+      border-radius: 20px;
+      background: var(--od-surface);
+
+      :global(.ios) & {
+        border-radius: 14px;
+      }
+    }
+
+    .all-card {
+      padding: 4px 16px;
+    }
+
+    .dive-card {
+      padding: 12px;
+    }
+
+    .all-row {
+      min-height: 56px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .all-texts {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .all-title {
+      font-size: 16px;
+      line-height: 24px;
+    }
+
+    .all-sub {
+      font-size: 13px;
+      line-height: 18px;
+      color: var(--od-text-2);
+    }
+
+    .all-card .smalls {
+      padding-bottom: 12px;
+    }
+
+    button.dive-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      padding: 0;
+      border: none;
+      background: none;
+      color: inherit;
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .smalls {
+      margin-top: 10px;
+      display: flex;
+      gap: 8px;
+    }
+
+    .small {
+      position: relative;
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      box-sizing: border-box;
+      padding: 9px 9px 11px 11px;
+      border: 1px solid var(--od-menu-divider);
+      border-radius: 14px;
+      cursor: pointer;
 
       input {
-        flex: none;
-        width: 18px;
-        height: 18px;
+        position: absolute;
+        width: 1px;
+        height: 1px;
         margin: 0;
-        accent-color: var(--od-action);
+        opacity: 0;
       }
+
+      &.selected {
+        padding: 10px 10px 12px 12px;
+        border: none;
+        border-radius: 20px;
+        background: var(--od-selected-container);
+
+        .small-mark {
+          border: none;
+          background: var(--od-selected);
+          color: var(--od-on-secondary);
+        }
+
+        .small-title,
+        .small-when {
+          color: var(--od-on-secondary-container);
+        }
+      }
+
+      /* Disabled by "Same choice for all": the common choice shows, the card does not answer. */
+      &.disabled {
+        cursor: default;
+        opacity: 0.7;
+      }
+
+      &:has(input:focus-visible) {
+        outline: 2px solid var(--od-text);
+        outline-offset: 2px;
+      }
+    }
+
+    .small-mark {
+      top: 8px;
+      right: 8px;
+      width: 20px;
+      height: 20px;
+      border-radius: 10px;
+    }
+
+    .small-title {
+      padding-right: 24px;
+      font-size: 14px;
+      line-height: 20px;
+      font-weight: 600;
+    }
+
+    .small-when {
+      font-size: 12px;
+      line-height: 16px;
+      color: var(--od-text-2);
+    }
+
+    .small-value {
+      margin-top: 4px;
+      font-size: 13px;
+      line-height: 18px;
+      color: var(--od-text);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      overflow-wrap: anywhere;
     }
 
     .failed {
@@ -521,6 +865,12 @@
       color: var(--od-text);
       font: inherit;
       font-size: 17px;
+    }
+
+    .sheet.large {
+      max-height: none;
+      height: 100%;
+      box-sizing: border-box;
     }
 
     .sheet {

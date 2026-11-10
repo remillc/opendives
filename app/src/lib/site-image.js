@@ -15,11 +15,14 @@ export const HALF_HEIGHT = 300;
 /** Longer than this for one site, the map is not coming. */
 const TIMEOUT_MS = 20000;
 /**
- * OpenFreeMap's terms allow offline downloads of 3,000 tiles or 50 MB at most.
- * At about 100 KB a tile, this stays under both; the rest follows at the next
- * load of the logbook. One site at a time, so never more than 4 requests by far.
+ * OpenFreeMap's terms allow offline downloads of 3,000 tiles or 50 MB at most,
+ * with 4 requests at a time (offline-tiles.js holds that limit for every tile
+ * asked of the network). A site's picture needs about 6 to 12 tiles of zoom 12,
+ * at 100 KB at the very most: counted after each site, a run stops at 300 tiles
+ * plus the last site (about 312 tiles, 31 MB), a tenth of the 3,000 tiles; the
+ * rest follows at the next load of the logbook.
  */
-const MAX_TILES_PER_RUN = 500;
+const MAX_TILES_PER_RUN = 300;
 const PAUSE_MS = 200;
 
 /** @param {number} latUdeg @param {number} lonUdeg */

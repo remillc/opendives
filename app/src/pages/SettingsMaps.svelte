@@ -12,10 +12,9 @@
   import Icon from '../components/Icon.svelte';
   import MenuItem from '../components/MenuItem.svelte';
   import MapsRow from '../components/MapsRow.svelte';
-  import MapsAddContent from '../components/MapsAddContent.svelte';
   import { t } from '../lib/i18n.js';
   import { ios, layout } from '../lib/layout.svelte.js';
-  import { formatMapSize, formatProgress, formatMapDate, percent } from '../lib/maps-format.js';
+  import { formatMapSize, formatMapDate } from '../lib/maps-format.js';
   import {
     offlineMaps,
     visibleRegions,
@@ -24,6 +23,7 @@
     updatesCount,
     regionName,
     activity,
+    tilesPercent,
     floor,
     refreshSpace,
     setCellular,
@@ -102,35 +102,35 @@
         </span>
         <span class="supporting">{failureReason(r)}</span>
         <span class="actions">
-          <button type="button" onclick={() => retryRegion(r.id)}>{t('maps.failure.retry')}</button>
+          {#if r.error !== 'limit'}<button type="button" onclick={() => retryRegion(r.id)}>{t('maps.failure.retry')}</button>{/if}
           <button type="button" onclick={() => removeDownload(r.id)}>{t('maps.failure.remove')}</button>
         </span>
       {:else if interrupted(r)}
-        <span class="supporting">{t('maps.download.interrupted', { received: formatMapSize(r.bytesReceived), total: formatMapSize(r.sizeBytes) })}</span>
+        <span class="supporting">{t('maps.download.interrupted', { done: r.tilesDone, total: r.tilesTotal })}</span>
         <span class="note">{t('maps.download.resumesOnline')}</span>
       {:else if r.pausedReason === 'space'}
-        <span class="supporting">{t('maps.download.pausedAt', { received: formatMapSize(r.bytesReceived), total: formatMapSize(r.sizeBytes) })}</span>
+        <span class="supporting">{t('maps.download.pausedAt', { done: r.tilesDone, total: r.tilesTotal })}</span>
         <span class="status muted">
           <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2" /><path d="M3 15h18 M7 18h.01" /></svg>{t('maps.download.noSpace')}
         </span>
         <span class="note">{t('maps.download.resumesWhen', { floor: formatMapSize(floor()) })}</span>
         <span class="actions"><button type="button" onclick={() => (offlineMaps.dialog = { kind: 'manage' })}>{t('maps.download.manage')}</button></span>
       {:else if r.status === 'waiting-wifi'}
-        <span class="supporting">{t('maps.download.waitingWifi', { size: formatMapSize(r.sizeBytes) })}</span>
+        <span class="supporting">{t('maps.download.waitingWifi', { total: r.tilesTotal })}</span>
         <span class="actions"><button type="button" onclick={() => askCellular(r.id)}>{t('maps.download.now')}</button></span>
       {:else if r.status === 'paused'}
-        <span class="supporting">{t('maps.download.pausedAt', { received: formatMapSize(r.bytesReceived), total: formatMapSize(r.sizeBytes) })}</span>
+        <span class="supporting">{t('maps.download.pausedAt', { done: r.tilesDone, total: r.tilesTotal })}</span>
       {:else if r.status === 'queued'}
-        <span class="supporting">{t('maps.download.queued', { size: formatMapSize(r.sizeBytes) })}</span>
+        <span class="supporting">{t('maps.download.queued', { total: r.tilesTotal })}</span>
       {:else}
-        <span class="supporting">{formatProgress(r.bytesReceived, r.sizeBytes)}</span>
+        <span class="supporting">{t('maps.download.progress', { done: r.tilesDone, total: r.tilesTotal, percent: tilesPercent(r) })}</span>
         <span
           class="progress"
           role="progressbar"
           aria-label={t('maps.download.progressLabel', { name })}
-          aria-valuenow={percent(r.bytesReceived, r.sizeBytes)}
+          aria-valuenow={tilesPercent(r)}
           aria-valuemin="0"
-          aria-valuemax="100"><span style:width="{percent(r.bytesReceived, r.sizeBytes)}%"></span></span
+          aria-valuemax="100"><span style:width="{tilesPercent(r)}%"></span></span
         >
       {/if}
     {/snippet}
@@ -145,28 +145,28 @@
 {#snippet regionRow(/** @type {import('../lib/offline-maps.svelte.js').Region} */ r)}
   {@const name = regionName(r)}
   {@const act = activity(r)}
-  <MapsRow icon={r.kind === 'drawn' ? 'crop' : 'map'}>
+  <MapsRow icon="crop">
     {#snippet body()}
       <span>{name}</span>
       {#if r.status === 'updating'}
         {#if act === 'waiting-wifi'}
-          <span class="supporting">{t('maps.download.updatingWifi', { size: formatMapSize(r.update?.sizeBytes ?? 0) })}</span>
+          <span class="supporting">{t('maps.download.updatingWifi')}</span>
           <span class="actions"><button type="button" onclick={() => askCellular(r.id)}>{t('maps.download.now')}</button></span>
         {:else}
-          <span class="supporting">{t('maps.download.updating', { received: formatMapSize(r.bytesReceived), total: formatMapSize(r.update?.sizeBytes ?? 0) })}</span>
+          <span class="supporting">{t('maps.download.updating', { done: r.tilesDone, total: r.tilesTotal })}</span>
           <span
             class="progress"
             role="progressbar"
             aria-label={t('maps.download.progressLabel', { name })}
-            aria-valuenow={percent(r.bytesReceived, r.update?.sizeBytes ?? 0)}
+            aria-valuenow={tilesPercent(r)}
             aria-valuemin="0"
-            aria-valuemax="100"><span style:width="{percent(r.bytesReceived, r.update?.sizeBytes ?? 0)}%"></span></span
+            aria-valuemax="100"><span style:width="{tilesPercent(r)}%"></span></span
           >
         {/if}
         <span class="note">{t('maps.download.oldStays')}</span>
       {:else}
         <span class="supporting">
-          {t(r.kind === 'drawn' ? 'maps.region.drawn' : 'maps.region.sizeDate', { size: formatMapSize(r.sizeBytes), date: formatMapDate(r.downloadedAt) })}
+          {t('maps.region.sizeDate', { size: formatMapSize(r.sizeBytes), date: formatMapDate(r.downloadedAt) })}
         </span>
         {#if r.update}
           <span class="status">{@render refreshIcon()}{t('maps.region.updateAvailable')}</span>
@@ -226,7 +226,7 @@
       </span>
       <h2>{t('maps.empty.title')}</h2>
       <p>{t('maps.empty.text')}</p>
-      {#if !split}<button type="button" class="filled" onclick={() => go('/settings/maps/new')}>{t('maps.add')}</button>{/if}
+      {#if !split}<button type="button" class="filled" onclick={() => go('/settings/maps/area')}>{t('maps.add')}</button>{/if}
     </div>
   {:else}
     {@render summary()}
@@ -261,7 +261,7 @@
       {/each}
       {#if ios}
         <div role="listitem">
-          <button type="button" class="set-row add-row" onclick={() => go('/settings/maps/new')}>
+          <button type="button" class="set-row add-row" onclick={() => go('/settings/maps/area')}>
             <span class="texts"><span class="label">{t('maps.add')}</span></span>
             <Icon name="chevron" size={20} />
           </button>
@@ -285,7 +285,7 @@
     {/snippet}
     {#snippet right()}
       {#if ios && !split}
-        <Link iconOnly onClick={() => go('/settings/maps/new')}>
+        <Link iconOnly onClick={() => go('/settings/maps/area')}>
           <Icon name="plus" />
           <span class="od-sr-only">{t('maps.add')}</span>
         </Link>
@@ -298,7 +298,8 @@
       <div class="pane list-pane">{@render listPane()}</div>
       <div class="pane add-pane">
         <h2 class="add-title">{t('maps.add')}</h2>
-        <MapsAddContent />
+        <p class="maps-note add-text">{t('maps.empty.text')}</p>
+        <button type="button" class="filled" onclick={() => go('/settings/maps/area')}>{t('maps.area.choose')}</button>
       </div>
     </div>
   {:else}
@@ -309,7 +310,7 @@
   <Popover class="od-menu od-maps-menu" backdrop={false}>
     <List noChevron>
       {#if menuRegion?.update && menuRegion.status === 'ready'}
-        <MenuItem icon="refresh" text={t('maps.menu.update', { size: formatMapSize(menuRegion.update.sizeBytes) })} onclick={() => updateRegion(menuRegion.id)} />
+        <MenuItem icon="refresh" text={t('maps.menu.update')} onclick={() => updateRegion(menuRegion.id)} />
       {/if}
       {#if menuRegion}<MenuItem icon="place" text={t('maps.menu.view')} onclick={() => viewRegion(menuRegion.id)} />{/if}
       {#if menuRegion}<MenuItem icon="delete" text={t('maps.menu.delete')} destructive onclick={() => askDelete(menuRegion.id)} />{/if}
@@ -320,7 +321,7 @@
     {#if !ios && !split && !empty}
       <!-- Extended floating button, written by hand as in the Logbook. -->
       <div class="fab fab-right-bottom fab-extended od-fab-add">
-        <a href="/settings/maps/new">
+        <a href="/settings/maps/area">
           <i class="icon"><Icon name="plus" /></i>
           <div class="fab-text">{t('maps.add')}</div>
         </a>
@@ -568,6 +569,10 @@
       background: var(--od-background);
       border-radius: 0;
       border-left: 1px solid var(--od-separator);
+    }
+
+    .add-pane .filled {
+      margin: 16px 20px 0;
     }
 
     .add-title {

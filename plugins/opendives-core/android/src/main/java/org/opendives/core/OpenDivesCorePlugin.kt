@@ -821,6 +821,34 @@ class OpenDivesCorePlugin : Plugin() {
     }
 
     /** Whether the device is on Wi-Fi or Ethernet (the WebView does not say). */
+    /** A Nominatim request, sent with the app's identification (its usage policy; a WebView cannot set it). */
+    @PluginMethod
+    fun placesSearch(call: PluginCall) {
+        val url = call.getString("url")
+        if (url == null || !url.startsWith("https://nominatim.openstreetmap.org/")) {
+            call.reject("Bad address", "BAD_ARGUMENT")
+            return
+        }
+        networkThread.execute {
+            try {
+                val connection = java.net.URL(url).openConnection() as java.net.HttpURLConnection
+                try {
+                    connection.connectTimeout = 15_000
+                    connection.readTimeout = 15_000
+                    connection.setRequestProperty("User-Agent", MapsManager.userAgent)
+                    connection.setRequestProperty("Accept", "application/json")
+                    val status = connection.responseCode
+                    val body = if (status in 200..299) connection.inputStream.bufferedReader().use { it.readText() } else ""
+                    call.resolve(JSObject().put("status", status).put("body", body))
+                } finally {
+                    connection.disconnect()
+                }
+            } catch (e: Exception) {
+                call.reject(e.message ?: "Cannot reach the server", "NETWORK")
+            }
+        }
+    }
+
     @PluginMethod
     fun networkStatus(call: PluginCall) {
         val manager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -846,11 +874,13 @@ class OpenDivesCorePlugin : Plugin() {
     }
 
     /**
-     * Queues a download ({id, url, sha256, sizeBytes, allowCellular, title}). Asks for the
-     * notification permission first (Android 13+), once; refused, the download still runs.
+     * Queues a region ({id, bbox, maxZoom, urlTemplate, version, allowCellular, title}). Rejects
+     * with TOO_MANY_TILES above 3,000 tiles (counted here, whatever the caller says) or BAD_ARGUMENT.
+     * Asks for the notification permission first (Android 13+), once; refused, the download still runs.
      */
     @PluginMethod
-    fun mapsDownloadStart(call: PluginCall) {
+    fun mapsTilesStart(call: PluginCall) {
+        if (parseMapsRequest(call) == null) return
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && getPermissionState("notifications") == PermissionState.PROMPT) {
             requestPermissionForAlias("notifications", call, "mapsNotificationResult")
         } else {
@@ -861,15 +891,32 @@ class OpenDivesCorePlugin : Plugin() {
     @PermissionCallback
     private fun mapsNotificationResult(call: PluginCall) = startMapsDownload(call)
 
-    private fun startMapsDownload(call: PluginCall) {
-        val id = mapsId(call) ?: return
-        val url = call.getString("url")
-        val sha256 = call.getString("sha256")
-        if (url.isNullOrEmpty() || sha256.isNullOrEmpty()) return call.reject("Missing url or sha256", "BAD_ARGUMENT")
-        MapsManager.start(
-            id, url, sha256, call.data.optLong("sizeBytes", 0L),
+    private class MapsRequest(
+        val id: String, val bbox: DoubleArray, val maxZoom: Int, val urlTemplate: String,
+        val version: String, val allowCellular: Boolean, val title: String,
+    )
+
+    /** The checked request of a call, or null after rejecting it. */
+    private fun parseMapsRequest(call: PluginCall): MapsRequest? {
+        val id = mapsId(call) ?: return null
+        val array = call.data.optJSONArray("bbox")
+        val bbox = if (array != null && array.length() == 4) DoubleArray(4) { array.optDouble(it, Double.NaN) } else null
+        val maxZoom = call.data.optInt("maxZoom", 0)
+        val urlTemplate = call.getString("urlTemplate")
+        val error = MapsManager.check(bbox, maxZoom, urlTemplate)
+        if (error != null) {
+            call.reject(if (error == "TOO_MANY_TILES") "More than ${MapsManager.MAX_TILES} tiles" else "Bad region request", error)
+            return null
+        }
+        return MapsRequest(
+            id, bbox!!, maxZoom, urlTemplate!!, call.getString("version") ?: "",
             call.getBoolean("allowCellular") ?: false, call.getString("title") ?: id,
         )
+    }
+
+    private fun startMapsDownload(call: PluginCall) {
+        val r = parseMapsRequest(call) ?: return
+        MapsManager.start(r.id, r.bbox, r.maxZoom, r.urlTemplate, r.version, r.allowCellular, r.title)
         call.resolve()
     }
 
@@ -901,7 +948,9 @@ class OpenDivesCorePlugin : Plugin() {
     @PluginMethod
     fun mapsFiles(call: PluginCall) {
         val list = org.json.JSONArray()
-        for ((id, size) in MapsManager.files()) list.put(JSObject().put("id", id).put("sizeBytes", size))
+        for (r in MapsManager.files()) {
+            list.put(JSObject().put("id", r.id).put("sizeBytes", r.sizeBytes).put("version", r.version).put("maxZoom", r.maxZoom))
+        }
         call.resolve(JSObject().put("files", list))
     }
 
@@ -911,29 +960,30 @@ class OpenDivesCorePlugin : Plugin() {
         call.resolve()
     }
 
-    /** Bytes of a ready package, base64 (at most 16 MiB a call). Rejects with NOT_FOUND. */
+    /** One tile of a ready region, base64 ('' for an empty tile). Rejects with NOT_FOUND. */
     @PluginMethod
-    fun mapsReadRange(call: PluginCall) {
+    fun mapsReadTile(call: PluginCall) {
         val id = mapsId(call) ?: return
-        // Not getLong(): it returns null for a number that fits an Int.
-        val offset = call.data.optLong("offset", 0L)
-        val length = call.data.optLong("length", 0L).coerceIn(0L, MapsManager.MAX_READ_BYTES.toLong()).toInt()
+        // optInt, not getInt/getLong: those return null for some numbers.
+        val z = call.data.optInt("z", -1)
+        val x = call.data.optInt("x", -1)
+        val y = call.data.optInt("y", -1)
+        if (z < 0 || x < 0 || y < 0) return call.reject("Bad tile", "BAD_ARGUMENT")
         mapsIo.execute {
             try {
-                if (!MapsManager.readyFile(id).exists()) return@execute call.reject("No such package", "NOT_FOUND")
-                val bytes = MapsManager.readRange(id, offset, length)
+                val bytes = MapsManager.readTile(id, z, x, y) ?: return@execute call.reject("No such tile", "NOT_FOUND")
                 call.resolve(JSObject().put("base64", Base64.encodeToString(bytes, Base64.NO_WRAP)))
             } catch (e: Exception) {
-                call.reject(e.message ?: "Cannot read the package", "FAILED")
+                call.reject(e.message ?: "Cannot read the tile", "FAILED")
             }
         }
     }
 
-    /** The package id of a call: letters, digits, dot, dash, underscore (it names a file). */
+    /** The region id of a call: letters, digits, dot, dash, underscore (it names a directory). */
     private fun mapsId(call: PluginCall): String? {
         val id = call.getString("id")
         if (id == null || !MapsManager.ID_PATTERN.matches(id) || id.contains("..")) {
-            call.reject("Bad package id", "BAD_ARGUMENT")
+            call.reject("Bad region id", "BAD_ARGUMENT")
             return null
         }
         return id

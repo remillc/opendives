@@ -1410,6 +1410,16 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Conflict on several dives: a full-screen dialog with a \"Same choice for all\" switch and one card per dive, where you touch the version to keep.",
+      "Sync conflict: \"Later\" closes the dialog and leaves you where you were; the Carnet sync status and the side menu sync card reopen it, and it comes back at the next sync attempt.",
+      "Offline maps: choosing an area opens on your current position.",
+      "Offline maps: an area with no logbook site takes the name of the place.",
+      "Offline maps: \"Choose on the map\" now shows a fixed frame; move and zoom the map under it and the area it covers is what you download. The detail is chosen for you, and the size shown is an estimate.",
+      "Offline maps: a search field on \"Choose on the map\" finds a site of your logbook as you type, or a place when you press search, and moves the map there.",
+      "Offline maps: choose an area on the map from Settings to download it (a frame of at most about 3,000 tiles); a space limit and a free-space floor protect the device, and updates are offered with a badge.",
+      "Privacy: the policy mentions searching for places on the map.",
+      "Offline maps: a search field on \"Choose on the map\" finds a site of your logbook as you type, or a place when you press search, and puts the rectangle around it.",
+      "Offline maps: frame an area on the map from Settings to download it; a space limit and a free-space floor protect the device, and updates are offered with a badge.",
       "Logbook: the list is split by month; the header of the current month stays at the top under the bar while you scroll. A trip stays grouped under the month of its first dive.",
       "Settings: the water type written on downloaded dives that have none can be chosen (Not specified by default).",
       "Offline maps: download regions (dive areas, countries or a rectangle of your choice) from Settings; a space limit and a free-space floor protect the device, and updates are offered with a badge.",
@@ -1994,7 +2004,16 @@
     "empty": "(empty)",
     "failed": "The choice could not be saved. Nothing changed.",
     "unknownDive": "Dive without a date",
-    "forAll": "Apply this choice to all the dives"
+    "titleMany": "{n} dives in conflict",
+    "introMany": "Changed here and in the cloud, from another device. For each one, touch the version to keep. Nothing is lost until you choose. ✕ closes without changing anything: you will choose later.",
+    "allSame": "Same choice for all",
+    "allSameText": "All this phone, or all the cloud",
+    "phoneShort": "This phone",
+    "cloudShort": "Cloud",
+    "differs": "differs: {fields}",
+    "choiceFor": "Version to keep for {name}",
+    "details": "See details: {name}",
+    "back": "Back"
   },
   "confirmCode": {
     "heading": "Confirm your address",
@@ -2301,56 +2320,55 @@
     },
     "region": {
       "sizeDate": "{size} · {date}",
-      "drawn": "Chosen area · {size} · {date}",
       "updateAvailable": "Update available",
       "update": "Update",
       "options": "Options for {name}",
       "swipeHint": "Swipe a region to the left to delete it."
     },
     "menu": {
-      "update": "Update, {size}",
+      "update": "Update",
       "view": "Show on the map",
       "delete": "Delete"
     },
     "download": {
-      "progress": "{received} of {total} · {percent}%",
-      "waitingWifi": "Waiting for Wi-Fi · {size}",
-      "queued": "Waiting · {size}",
+      "progress": "{done} of {total} tiles · {percent}%",
+      "waitingWifi": "Waiting for Wi-Fi · {total} tiles",
+      "queued": "Waiting · {total} tiles",
       "now": "Download now",
       "stop": "Stop the download",
       "background": "The download continues if you leave the app.",
-      "pausedAt": "Paused at {received} of {total}",
+      "pausedAt": "Paused at {done} of {total} tiles",
       "noSpace": "Not enough space on the device",
       "resumesWhen": "Will resume when {floor} is free.",
       "manage": "Manage space",
-      "interrupted": "Interrupted at {received} of {total}",
+      "interrupted": "Interrupted at {done} of {total} tiles",
       "resumesOnline": "Will resume when the network is back",
-      "updating": "Update · {received} of {total}",
-      "updatingWifi": "Update waiting for Wi-Fi · {size}",
+      "updating": "Update · {done} of {total} tiles",
+      "updatingWifi": "Update waiting for Wi-Fi",
       "oldStays": "The old map stays usable until the end.",
       "progressLabel": "Downloading {name}"
     },
     "failure": {
       "title": "Download failed",
       "network": "The connection was lost",
-      "checksum": "The file received is incomplete or corrupt",
       "space": "Not enough space on the device",
       "server": "The server did not answer correctly",
       "retry": "Try again",
-      "remove": "Remove"
+      "remove": "Remove",
+      "limit": "This region is over the 50 MB OpenFreeMap allows for a download. Choose a smaller area or less detail."
     },
     "updateFailed": "The update of {name} failed. The old map stays usable.",
     "deleted": "{name} deleted",
     "dialogs": {
       "cellular": {
         "title": "Download on mobile data?",
-        "text": "{name} is about {size}. Without Wi-Fi, this data comes out of your plan.",
+        "text": "{name} can take up to {size}. Without Wi-Fi, this data comes out of your plan.",
         "wait": "Wait for Wi-Fi",
         "go": "Download"
       },
       "space": {
         "title": "Not enough space",
-        "text": "{name} needs about {size}. Only {remaining} would be left free on the device. OpenDives always keeps at least {floor} free so that the phone keeps working well."
+        "text": "{name} can take up to {size}. Only {remaining} would be left free on the device. OpenDives always keeps at least {floor} free so that the phone keeps working well."
       },
       "manage": {
         "title": "Space on the device",
@@ -2358,13 +2376,13 @@
       },
       "cap": {
         "title": "Map limit reached",
-        "text": "{name} needs about {size}. Your maps already take {used} of {cap} allowed. Delete a region, or raise the limit.",
+        "text": "{name} can take up to {size}. Your maps already take {used} of {cap} allowed. Delete a region, or raise the limit.",
         "view": "See my regions",
         "change": "Change the limit"
       },
       "replace": {
         "title": "Replace the map?",
-        "text": "Updating {name} needs {size} more during the download. To stay under the limit, the old map will be deleted first. {name} will be unavailable without a network until the end.",
+        "text": "Updating {name} can take up to {size} more during the download. To stay under the limit, the old map will be deleted first. {name} will be unavailable without a network until the end.",
         "confirm": "Replace"
       },
       "delete": {
@@ -2373,66 +2391,32 @@
         "confirm": "Delete"
       }
     },
-    "addScreen": {
-      "search": "Search for an area or a country",
-      "results": "Results",
-      "noResult": "No area or country matches.",
-      "fromLogbook": "From your logbook",
-      "fromLogbookNote": "The areas where you dived, from your trips and your sites.",
-      "fromLogbookNone": "No area of the catalogue contains your sites yet.",
-      "trip": "Trip {name}, {date} · {sites}",
-      "tripNoDate": "Trip {name} · {sites}",
-      "siteDives": {
-        "one": "{site} · {n} dive",
-        "other": "{site} · {n} dives"
-      },
-      "sitesMore": "{site} and {n} more",
-      "zoneSize": "Dive area · about {size}",
-      "downloaded": "Downloaded",
-      "download": "Download {name}",
-      "all": "All regions",
-      "byCountry": "By country and area",
-      "byCountryText": "The countries of the catalogue, then their dive areas",
-      "onMap": "Choose on the map",
-      "onMapText": "A rectangle around the point you want",
-      "nearTitle": "Area of the map shown",
-      "nearNone": "No area of the catalogue contains this place.",
-      "catalogueFailed": "The map catalogue could not be read. Check the network and try again.",
-      "catalogueLoading": "Reading the catalogue…",
-      "retry": "Try again"
-    },
-    "countries": {
-      "title": "By country and area",
-      "zones": {
-        "one": "{n} dive area",
-        "other": "{n} dive areas"
-      },
-      "wholeCountry": "Whole country",
-      "countryText": "One dive area is enough for a trip. The whole country covers all the areas.",
-      "zonesTitle": "Dive areas",
-      "approx": "about {size}",
-      "downloaded": "downloaded",
-      "none": "No country in the catalogue.",
-      "unknown": "Unknown country"
-    },
     "area": {
       "title": "Choose on the map",
-      "help": "Drag the corners of the rectangle to cover the area you want.",
       "name": "Region name",
       "nameHelp": "Suggested from the nearest site",
       "around": "Around {site}",
       "aroundHere": "Chosen area",
-      "estimate": "About {width} × {height} km · about {size}",
+      "estimate": "about {size} to download (estimate)",
       "needNetwork": "Choosing on the map needs the network.",
-      "handle": "Rectangle corner, {corner}",
-      "corners": {
-        "nw": "north-west",
-        "ne": "north-east",
-        "sw": "south-west",
-        "se": "south-east"
-      },
       "download": "Download",
-      "unavailable": "Downloading a chosen area is not available yet."
+      "unavailable": "The map server could not be reached. Try again with a network.",
+      "choose": "Choose on the map",
+      "size": "About {width} × {height} km",
+      "tooBig": "This area is too large to download. Zoom in a little.",
+      "search": {
+        "label": "Search for a place or a site",
+        "offline": "Search unavailable without a network",
+        "clear": "Clear the search",
+        "sites": "From your logbook",
+        "places": "Places",
+        "searchPlaces": "Search places for \"{query}\"",
+        "searching": "Searching…",
+        "none": "No place found.",
+        "error": "Search is not possible right now. Try again.",
+        "attribution": "Places: data © OpenStreetMap contributors, via Nominatim"
+      },
+      "mapLabel": "Map under a fixed frame. Move and zoom the map to choose the area to download."
     }
   }
 }

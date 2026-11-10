@@ -125,6 +125,8 @@
         {#if logbook.email}<SyncButton />{/if}
         {#if logbook.syncFailure}
           <SyncFailureRow />
+        {:else if logbook.conflict && logbook.conflictLater}
+          <SyncFailureRow conflict />
         {:else}
           <SyncStatus sync={logbook.sync} pending={logbook.pending} progress={logbook.syncProgress} live={false} steady />
         {/if}
