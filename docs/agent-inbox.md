@@ -1148,3 +1148,4 @@ Christian approved (canvas comments). Spec: "Sites, search open and its animatio
 Christian approved (canvas comment). Spec: "Statistics, items are not clickable". Mock-up: `docs/mockups/android-stats.dc.html`.
 - On `/statistics/`, the chart cards and the result rows are not links: no chevron, no ripple, no focus stop.
 - Remove the one-year view and its route; remove any link to it. Keep the filter and "Nouvelle statistique".
+- *Added at 09:40 on 10 November 2026:* this covers every grouped section of the page: "Par année", "Par mode", "Par combinaison", "Par compagnon" and any other "Par …" section. None has a detail view, so none of their rows is clickable (approved by Christian).
