@@ -79,7 +79,10 @@
       "other": "Les {n} ordinateurs présents seulement dans le nuage perdent leur nom."
     },
     "cloudCard": "Version du nuage",
-    "keptCloud": "Version du nuage gardée"
+    "keptCloud": "Version du nuage gardée",
+    "introMany": "Modifiées ici et dans le nuage, depuis un autre appareil. Pour chacune, touchez la version à garder. Rien n’est perdu tant que vous n’avez pas choisi. ✕ ferme sans rien changer : vous choisirez plus tard.",
+    "allSameText": "Toutes ce téléphone, ou toutes le nuage",
+    "cloudShort": "Nuage"
   },
   "gitRepo": {
     "intro": "Votre carnet dans un dépôt git à vous (GitHub, GitLab, Codeberg ou votre serveur), à la place du nuage. Une copie reste sur cet appareil."

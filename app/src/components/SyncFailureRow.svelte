@@ -1,28 +1,43 @@
 <script>
   // @ts-check
   // The sync failure in the Logbook's header band and the side menu's sync card
-  // (spec, "Sync failures"): touching it opens <SyncFailureSheet>.
+  // (spec, "Sync failures"): touching it opens <SyncFailureSheet>. With `conflict`, the
+  // same row says that sync is stopped by a conflict left for later; touching it
+  // closes the menu and reopens the conflict dialog (spec, "Sync conflict dialog").
   import Icon from './Icon.svelte';
   import SyncPill from './SyncPill.svelte';
-  import { logbook } from '../lib/logbook.svelte.js';
+  import { logbook, reopenConflict } from '../lib/logbook.svelte.js';
+  import { conflictDiveCount } from '../lib/conflict-choices.js';
+  import { closeMenu } from '../lib/navigation.svelte.js';
   import { t } from '../lib/i18n.js';
 
-  /** @type {{ pill?: boolean }} */
-  let { pill = false } = $props();
+  /** @type {{ pill?: boolean, conflict?: boolean }} */
+  let { pill = false, conflict = false } = $props();
 
-  const open = () => (logbook.syncFailureOpen = true);
+  function open() {
+    if (!conflict) {
+      logbook.syncFailureOpen = true;
+      return;
+    }
+    closeMenu();
+    reopenConflict();
+  }
 
   const text = $derived.by(() => {
+    if (conflict) {
+      const dives = conflictDiveCount(logbook.conflict);
+      return dives ? t('conflict.stoppedDives', { n: dives }) : t('conflict.stopped');
+    }
     if (logbook.syncFailure !== 'server') return t(`sync.failure.${logbook.syncFailure}.row`);
     return logbook.retryMinutes ? t('sync.failure.server.row', { n: logbook.retryMinutes }) : t('sync.failure.server.rowManual');
   });
 </script>
 
 {#if pill}
-  <SyncPill icon="warning" {text} onclick={open} />
+  <SyncPill icon={conflict ? 'sync' : 'warning'} {text} onclick={open} />
 {:else}
   <button type="button" class="failure" aria-haspopup="dialog" onclick={open}>
-    <Icon name="warning" size={18} weight={2} />
+    <Icon name={conflict ? 'sync' : 'warning'} size={18} weight={2} />
     <span class="text">{text}</span>
     <Icon name="chevron" size={18} weight={2} />
   </button>
