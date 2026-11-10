@@ -141,3 +141,11 @@ Example values (decided on 8 November 2026): the mock-ups show depths in feet, p
 | `git-jeton-aide-android.dc.html` | Téléphone Android, Créer un jeton d’accès (aide du dépôt git) |
 | `git-config-erreur-android.dc.html` | Téléphone Android, Dépôt git : accès refusé |
 | `git-config-adresse-android.dc.html` | Téléphone Android, Dépôt git : aucun dépôt à cette adresse |
+| `android-tablette-compte-connexion-paysage.dc.html` | Tablette Android, Se connecter, paysage |
+| `android-tablette-compte-connexion-portrait.dc.html` | Tablette Android, Se connecter, portrait |
+| `android-tablette-compte-creation-paysage.dc.html` | Tablette Android, Nouveau compte, paysage |
+| `android-tablette-compte-creation-portrait.dc.html` | Tablette Android, Nouveau compte, portrait |
+| `android-tablette-depot-git-paysage.dc.html` | Tablette Android, Dépôt git, paysage |
+| `android-tablette-depot-git-portrait.dc.html` | Tablette Android, Dépôt git, portrait |
+| `android-tablette-premier-lancement-paysage.dc.html` | Tablette Android, Premier lancement, paysage |
+| `android-tablette-premier-lancement-portrait.dc.html` | Tablette Android, Premier lancement, portrait |

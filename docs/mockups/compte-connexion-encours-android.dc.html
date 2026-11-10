@@ -25,16 +25,14 @@ h1,h2,h3,h4,h1 *,h2 *,h3 *,h4 *,[style*='font-size: 2'],[style*='font-size: 3'],
 </style>
 </helmet>
 <div style="width: 390px; height: 844px; box-sizing: border-box; background: #F4F4F2; font-family: 'Source Sans 3 OD', Roboto, 'Google Sans', system-ui, sans-serif; color: #1F2124; position: relative; overflow: hidden">
-  <div style="padding: 40px 8px 0 4px; height: 104px; box-sizing: border-box; display: flex; align-items: center; gap: 4px">
+  <div style="padding: 32px 8px 0 12px; height: 88px; box-sizing: border-box; display: flex; align-items: center; gap: 4px">
     <a href="compte-android-sans-compte.dc.html" aria-label="Fermer" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #1F2124; stroke-width: 2; stroke-linecap: round"><path d="M6 6l12 12 M18 6L6 18"></path></svg></a>
-    <span style="flex: 1; font-size: 22px; line-height: 28px">Se connecter</span>
+    
   </div>
   <div role="progressbar" aria-label="Connexion en cours" style="position: absolute; left: 0; right: 0; top: 104px; height: 4px; background: #DADAD6; overflow: hidden"><span style="position: absolute; top: 0; width: 40%; height: 4px; border-radius: 2px; background: #1F2124; animation: odlin 1.4s linear infinite"></span></div>
-  <div style="padding: 8px 24px 0 24px; display: flex; flex-direction: column; gap: 8px">
-    <h1 style="margin: 0; font-size: 24px; line-height: 32px; font-weight: 400">Votre compte Subsurface</h1>
-    <p style="margin: 0; font-size: 14px; line-height: 20px; color: #4A4D52; letter-spacing: 0.25px">Le même compte que dans Subsurface sur l'ordinateur ou dans Subsurface-mobile. Vos plongées sont lues depuis le cloud, puis une copie reste sur cet appareil.</p>
-  </div>
-  <form onsubmit="return false" style="margin: 24px 16px 0 16px; display: flex; flex-direction: column; gap: 16px">
+  <div style="padding: 4px 24px 0 24px; display: flex; flex-direction: column"><p style="margin: 0; font-size: 14px; line-height: 20px; font-weight: 500; letter-spacing: 0.1px; color: #4A4D52">Se connecter</p><h1 style="margin: 6px 0 0 0; font-size: 34px; line-height: 40px; font-weight: 400; letter-spacing: -0.4px">Votre compte Subsurface.</h1><p style="margin: 12px 0 0 0; font-size: 16px; line-height: 24px; color: #4A4D52">Le même compte que dans Subsurface sur l'ordinateur ou dans Subsurface-mobile. Vos plongées sont lues depuis le cloud, puis une copie reste sur cet appareil.</p></div>
+  <div style="margin: 24px 16px 0 16px; padding: 20px 16px; border-radius: 28px; background: #FFFFFF; position: relative; z-index: 1">
+  <form onsubmit="return false" style="margin: 0; display: flex; flex-direction: column; gap: 16px">
       <div>
         <label style="opacity: 0.38; position: relative; display: flex; align-items: center; gap: 8px; height: 56px; background: #E8E8E5; border-bottom: 1px solid #75787C; border-radius: 4px 4px 0 0; padding: 0 16px; box-sizing: border-box">
           <span style="position: absolute; left: 16px; top: 8px; font-size: 12px; line-height: 16px; color: #4A4D52">Adresse e-mail</span>
@@ -48,9 +46,11 @@ h1,h2,h3,h4,h1 *,h2 *,h3 *,h4 *,[style*='font-size: 2'],[style*='font-size: 3'],
         </label><span style="display: block; padding: 4px 16px 0 16px; font-size: 12px; line-height: 16px; letter-spacing: 0.4px; color: #4A4D52; opacity: 0.38">Gardé seulement dans le stockage sécurisé de cet appareil</span>
       </div>
   </form>
-  <div style="position: absolute; left: 24px; right: 24px; bottom: 32px; display: flex; justify-content: space-between; align-items: center">
+  </div>
+  <div style="position: absolute; left: 24px; right: 24px; bottom: 28px; z-index: 2; display: flex; justify-content: space-between; align-items: center; gap: 8px">
     <span style="flex: 1"></span><button disabled aria-busy="true" style="height: 40px; padding: 0 24px 0 16px; border: none; border-radius: 20px; background: rgba(31,33,36,0.12); color: rgba(31,33,36,0.6); font-family: inherit; font-size: 14px; font-weight: 500; letter-spacing: 0.1px; display: inline-flex; align-items: center; gap: 8px"><span aria-hidden="true" style="width: 14px; height: 14px; border: 2px solid rgba(31,33,36,0.6); border-right-color: transparent; border-radius: 50%; box-sizing: border-box; animation: odspin 0.9s linear infinite"></span>Connexion…</button>
   </div>
+  <svg width="390" height="130" viewBox="0 0 390 130" aria-hidden="true" style="position: absolute; left: 0; bottom: 108px; display: block"><defs><linearGradient id="jz-compte-connexion-encours-android" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color: #FBE3B2; stop-opacity: 0.9"></stop><stop offset="1" style="stop-color: #B4530F; stop-opacity: 0.9"></stop></linearGradient></defs><path d="M0.0 10.0 L10.6 56.2 L24.4 99.4 L38.1 120.4 L51.9 124.8 L65.6 116.9 L72.5 111.9 L86.2 72.4 L97.1 49.9 L102.0 49.7 L104.8 50.7 L109.4 53.2 L123.1 49.9 L136.9 53.0 L150.6 56.2 L164.4 53.5 L178.1 45.1 L191.9 41.8 L205.6 41.8 L219.4 37.6 L233.1 41.2 L246.9 35.6 L260.6 29.3 L274.4 31.0 L288.1 30.2 L301.9 29.1 L315.6 24.5 L329.4 21.8 L343.1 24.6 L356.9 22.1 L370.6 18.7 L384.4 19.6 L390.0 10.0 Z" style="fill: url(#jz-compte-connexion-encours-android)"></path><path d="M0.0 10.0 L10.6 56.2 L24.4 99.4 L38.1 120.4 L51.9 124.8 L65.6 116.9 L72.5 111.9 L86.2 72.4 L97.1 49.9 L102.0 49.7 L104.8 50.7 L109.4 53.2 L123.1 49.9 L136.9 53.0 L150.6 56.2 L164.4 53.5 L178.1 45.1 L191.9 41.8 L205.6 41.8 L219.4 37.6 L233.1 41.2 L246.9 35.6 L260.6 29.3 L274.4 31.0 L288.1 30.2 L301.9 29.1 L315.6 24.5 L329.4 21.8 L343.1 24.6 L356.9 22.1 L370.6 18.7 L384.4 19.6 L390.0 10.0" style="fill: none; stroke: #1F2124; stroke-width: 1.5; stroke-linejoin: round"></path></svg>
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>

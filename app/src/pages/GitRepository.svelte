@@ -3,7 +3,8 @@
   // "Dépôt git" (docs/mockups/git-config-android.dc.html,
   // git-config-adresse-android.dc.html, git-config-erreur-android.dc.html;
   // spec, section 4, "Own git repository instead of the cloud"): the logbook
-  // in the user's own git repository. Full screen: X, title, "Connecter".
+  // in the user's own git repository, in the editorial layout of the account
+  // flow (EditorialPage): the fields in its card, "Connecter" its main action.
   // - When the address field loses its focus, the server is asked for the
   //   references of the repository (git ls-remote): found / private or missing
   //   / no git answer.
@@ -16,10 +17,10 @@
   // The token stays in this field: it is only passed to the plugin, never
   // kept, stored or logged here.
   import { OpenDivesCore } from 'opendives-core';
-  import { Page, Navbar, Link, f7 } from 'framework7-svelte';
   import { showSnackbar } from '../lib/snackbar.js';
   import { onMount } from 'svelte';
   import AccountField from '../components/AccountField.svelte';
+  import EditorialPage from '../components/EditorialPage.svelte';
   import SelectField from '../components/SelectField.svelte';
   import Icon from '../components/Icon.svelte';
   import { errorCode } from '../lib/account.js';
@@ -29,7 +30,6 @@
   /** @type {{ f7router: any, welcome?: boolean, edit?: boolean }} */
   let { f7router, welcome = false, edit = false } = $props();
 
-  const ios = f7.theme === 'ios';
   const USERNAME = /^[A-Za-z0-9._-]+$/;
 
   let url = $state('');
@@ -197,128 +197,74 @@
   );
 </script>
 
-<Page class="od-git-repository">
-  <Navbar title={t('gitRepo.title')}>
-    {#snippet left()}
-      {#if ios}
-        <Link back>{t('accountStep.cancel')}</Link>
-      {:else}
-        <Link back iconOnly>
-          <Icon name="close" />
-          <span class="od-sr-only">{t('accountStep.close')}</span>
-        </Link>
-      {/if}
-    {/snippet}
-    {#snippet right()}
-      <button type="button" class="od-text-button od-git-repository--connect" disabled={!canConnect} aria-busy={busy} onclick={connect}>
-        {busy ? t('gitRepo.connecting') : t('gitRepo.connect')}
-      </button>
-    {/snippet}
-  </Navbar>
-
-  {#if busy && !ios}
-    <div class="od-git-repository--linear" role="progressbar" aria-label={t('gitRepo.connecting')}><span></span></div>
+<EditorialPage class="od-git-repository"
+  title={t('gitRepo.title')}
+  heading={t('gitRepo.heading')}
+  intro={t('gitRepo.intro')}
+  action={t('gitRepo.connect')}
+  busyLabel={t('gitRepo.connecting')}
+  {busy}
+  actionDisabled={!canConnect}
+  onaction={connect}
+>
+  <AccountField
+    label={t('gitRepo.address')}
+    rowLabel={t('gitRepo.address')}
+    bind:value={url}
+    error={addressError}
+    disabled={busy}
+    position="single"
+    onchange={checkAddress}
+  />
+  {#if addressState === 'checking'}
+    <p class="od-git-repository--status">{t('gitRepo.addressChecking')}</p>
+  {:else if addressState === 'public' || addressState === 'publicEmpty'}
+    <p class="od-git-repository--status od-git-repository--ok"><Icon name="check" size={16} />{t(addressState === 'public' ? 'gitRepo.addressPublic' : 'gitRepo.addressPublicEmpty')}</p>
+  {:else if addressState === 'private'}
+    <p class="od-git-repository--status"><Icon name="info" size={16} />{t('gitRepo.addressPrivate')}</p>
   {/if}
 
-  <form class="od-git-repository--body" novalidate onsubmit={(e) => e.preventDefault()}>
-    <p class="od-git-repository--intro">{t('gitRepo.intro')}</p>
+  <AccountField
+    label={t('gitRepo.username')}
+    rowLabel={t('gitRepo.username')}
+    autocomplete="username"
+    bind:value={username}
+    error={usernameError}
+    disabled={busy}
+    position="first"
+    onchange={checkAccess}
+  />
+  <AccountField
+    label={t('gitRepo.token')}
+    rowLabel={t('gitRepo.token')}
+    type="password"
+    autocomplete="off"
+    bind:value={token}
+    supporting={accessState === 'checking' ? t('gitRepo.tokenChecking') : edit ? t('gitRepo.tokenKeep') : t('gitRepo.tokenHelper')}
+    error={tokenError}
+    disabled={busy}
+    position="last"
+    onchange={checkAccess}
+  />
+  <a href="/git/token" class="od-git-repository--help" onclick={openHelp}>{t('gitRepo.tokenHow')}</a>
 
-    <div class="od-git-repository--fields">
-      <AccountField
-        label={t('gitRepo.address')}
-        rowLabel={t('gitRepo.address')}
-        bind:value={url}
-        error={addressError}
-        disabled={busy}
-        position="single"
-        onchange={checkAddress}
-      />
-      {#if addressState === 'checking'}
-        <p class="od-git-repository--status">{t('gitRepo.addressChecking')}</p>
-      {:else if addressState === 'public' || addressState === 'publicEmpty'}
-        <p class="od-git-repository--status od-git-repository--ok"><Icon name="check" size={16} />{t(addressState === 'public' ? 'gitRepo.addressPublic' : 'gitRepo.addressPublicEmpty')}</p>
-      {:else if addressState === 'private'}
-        <p class="od-git-repository--status"><Icon name="info" size={16} />{t('gitRepo.addressPrivate')}</p>
-      {/if}
+  <SelectField
+    label={t('gitRepo.branch')}
+    bind:value={branch}
+    options={branches.map((b) => ({ value: b, label: b }))}
+    supporting={branchHelper}
+    disabled={accessState !== 'ok' || busy}
+  />
 
-      <AccountField
-        label={t('gitRepo.username')}
-        rowLabel={t('gitRepo.username')}
-        autocomplete="username"
-        bind:value={username}
-        error={usernameError}
-        disabled={busy}
-        position="first"
-        onchange={checkAccess}
-      />
-      <AccountField
-        label={t('gitRepo.token')}
-        rowLabel={t('gitRepo.token')}
-        type="password"
-        autocomplete="off"
-        bind:value={token}
-        supporting={accessState === 'checking' ? t('gitRepo.tokenChecking') : edit ? t('gitRepo.tokenKeep') : t('gitRepo.tokenHelper')}
-        error={tokenError}
-        disabled={busy}
-        position="last"
-        onchange={checkAccess}
-      />
-      <a href="/git/token" class="od-git-repository--help" onclick={openHelp}>{t('gitRepo.tokenHow')}</a>
+  {#if formError}<p class="od-git-repository--form-error" role="alert"><Icon name="error" size={18} />{formError}</p>{/if}
 
-      <SelectField
-        label={t('gitRepo.branch')}
-        bind:value={branch}
-        options={branches.map((b) => ({ value: b, label: b }))}
-        supporting={branchHelper}
-        disabled={accessState !== 'ok' || busy}
-      />
-    </div>
-
-    {#if formError}<p class="od-git-repository--form-error" role="alert"><Icon name="error" size={18} />{formError}</p>{/if}
-
-    <p class="od-git-repository--note">{t('gitRepo.note')}</p>
-  </form>
-</Page>
+  <p class="od-git-repository--note">{t('gitRepo.note')}</p>
+</EditorialPage>
 
 <style>
   @layer od.components {
-    .od-git-repository--body {
-      min-height: 100%;
-      display: flex;
-      flex-direction: column;
-      padding-bottom: calc(var(--f7-safe-area-bottom) + 24px);
-    }
-
-    .od-git-repository--intro {
-      margin: 8px 24px 0;
-      font-size: 14px;
-      line-height: 20px;
-      letter-spacing: 0.25px;
-      color: var(--od-text-2);
-
-      :global(.ios) & {
-        margin: 16px 32px 0;
-        font-size: 15px;
-        line-height: 21px;
-        letter-spacing: 0;
-      }
-    }
-
-    .od-git-repository--fields {
-      margin-top: 6px;
-    }
-
-    /* "Connecter" in the top bar, at the end. */
-    .od-git-repository--connect {
-      margin-right: 4px;
-    }
-
-    .od-git-repository--connect:disabled {
-      color: color-mix(in srgb, var(--od-text) 38%, transparent);
-    }
-
     .od-git-repository--status {
-      margin: 4px 32px 0;
+      margin: 4px 16px 0;
       font-size: 12px;
       line-height: 16px;
       letter-spacing: 0.4px;
@@ -331,64 +277,50 @@
       &.od-git-repository--ok :global(svg) {
         color: var(--od-oxygen);
       }
+
+      :global(.ios) & {
+        margin: 4px 32px 0;
+      }
     }
 
     .od-git-repository--help {
-      margin: 8px 16px 0;
-      padding: 8px 0;
+      margin: 8px 0 0;
+      padding: 8px 16px;
       display: inline-block;
       font-size: 14px;
       font-weight: 500;
       color: var(--od-text);
       text-decoration: underline;
+
+      :global(.ios) & {
+        margin: 8px 16px 0;
+        padding: 8px 0;
+      }
     }
 
     .od-git-repository--form-error {
-      margin: 16px 24px 0;
+      margin: 16px 16px 0;
       font-size: 14px;
       line-height: 20px;
       color: var(--od-alarm);
       display: flex;
       align-items: flex-start;
       gap: 8px;
+
+      :global(.ios) & {
+        margin: 16px 24px 0;
+      }
     }
 
+    /* The note: plain text, no background. */
     .od-git-repository--note {
-      margin: 24px 24px 0;
+      margin: 16px 16px 0;
       font-size: 13px;
       line-height: 18px;
       color: var(--od-text-2);
-    }
 
-    /* MD3 linear progress indicator, indeterminate, under the top bar. */
-    .od-git-repository--linear {
-      position: absolute;
-      z-index: 600;
-      left: 0;
-      right: 0;
-      top: calc(var(--f7-safe-area-top) + var(--f7-navbar-height));
-      height: 4px;
-      overflow: hidden;
-      background: var(--od-separator);
-
-      span {
-        position: absolute;
-        top: 0;
-        width: 40%;
-        height: 4px;
-        border-radius: 2px;
-        background: var(--od-primary-action);
-        animation: od-git-linear 1.4s linear infinite;
-      }
-    }
-
-    @keyframes od-git-linear {
-      from {
-        left: -40%;
-      }
-
-      to {
-        left: 100%;
+      :global(.ios) & {
+        margin: 24px 24px 0;
       }
     }
   }

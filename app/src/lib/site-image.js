@@ -150,6 +150,62 @@ export async function loadSiteMap(latUdeg, lonUdeg) {
   }
 }
 
+// --- The pictures of the dives around the one shown, ready in memory ---
+//
+// A swipe to the next or previous dive must find its picture at once: read
+// from the device (or drawn), then decoded, before the swipe. The last few are
+// kept as local addresses shared by every header; one that falls out is freed
+// (an image already on screen stays drawn).
+
+const SHARED_MAX = 6;
+/** @type {Map<string, string>} key → local address, the most recent last */
+const shared = new Map();
+/** @type {Map<string, Promise<string>>} */
+const loading = new Map();
+
+/**
+ * The picture of a site if it is ready in memory, at once; else null.
+ * @param {number} latUdeg @param {number} lonUdeg
+ */
+export function readySiteMap(latUdeg, lonUdeg) {
+  return shared.get(keyOf(latUdeg, lonUdeg)) ?? null;
+}
+
+/**
+ * The picture of a site, kept in memory and decoded. Not to be freed by the caller.
+ * @param {number} latUdeg @param {number} lonUdeg
+ * @returns {Promise<string>}
+ */
+export function sharedSiteMap(latUdeg, lonUdeg) {
+  const key = keyOf(latUdeg, lonUdeg);
+  const ready = shared.get(key);
+  if (ready) {
+    shared.delete(key);
+    shared.set(key, ready);
+    return Promise.resolve(ready);
+  }
+  let promise = loading.get(key);
+  if (!promise) {
+    promise = loadSiteMap(latUdeg, lonUdeg)
+      .then(async (url) => {
+        const image = new Image();
+        image.src = url;
+        // Decoded now, not during the swipe.
+        await image.decode().catch(() => {});
+        shared.set(key, url);
+        while (shared.size > SHARED_MAX) {
+          const [oldest, address] = shared.entries().next().value;
+          shared.delete(oldest);
+          URL.revokeObjectURL(address);
+        }
+        return url;
+      })
+      .finally(() => loading.delete(key));
+    loading.set(key, promise);
+  }
+  return promise;
+}
+
 /** Never on mobile data, nor with the app in the background. */
 async function canPrepare() {
   if (document.hidden || !navigator.onLine) return false;

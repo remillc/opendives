@@ -5,8 +5,8 @@
   // and figures, then its dives, newest first, as flat Logbook rows. The row's
   // criteria arrive in the address (?section=…&title=…&c=…); the core counts
   // them with the free filter in force, so the list matches the row.
-  import { untrack } from 'svelte';
-  import { Page, Navbar, Link, theme } from 'framework7-svelte';
+  import { onDestroy, tick, untrack } from 'svelte';
+  import { Page, Navbar, Link, theme, f7 } from 'framework7-svelte';
   import DiveRow from '../components/DiveRow.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
   import { filter } from '../lib/filter.svelte.js';
@@ -38,13 +38,66 @@
     return logbook.dives.filter((d) => ids.has(d.id)).sort((a, b) => b.date.localeCompare(a.date));
   });
 
-  // A row can hold over a thousand dives: the page opens at once, the rest follows in steps.
-  const STEP = 60;
-  let limit = $state(STEP);
+  // A row can hold over a thousand dives: only the rows near the screen are in
+  // the document (Framework7's virtual list, as in the Logbook). A row's height
+  // depends on the text size and on long site names that wrap, so each rendered
+  // row is measured and its height kept by dive.
+  /** @type {HTMLElement|undefined} */
+  let listEl = $state();
+  /** @type {any} */
+  let vl = null;
+  let visible = $state({ items: /** @type {typeof dives} */ ([]), topPosition: 0, from: 0 });
+  /** @type {Map<number, number>} */
+  const measured = new Map();
+  let typical = 72;
+
+  /** @param {{ id: number }} dive */
+  const rowHeight = (dive) => measured.get(dive.id) ?? typical;
+
+  async function measure() {
+    await tick();
+    if (!vl || !listEl) return;
+    let changed = false;
+    for (const li of listEl.querySelectorAll('ul > li[data-virtual-list-index]')) {
+      const dive = vl.items[Number(li.getAttribute('data-virtual-list-index'))];
+      const height = /** @type {HTMLElement} */ (li).offsetHeight;
+      if (!dive || !height || rowHeight(dive) === height) continue;
+      measured.set(dive.id, height);
+      typical = height;
+      changed = true;
+    }
+    if (changed) vl.update();
+  }
+
+  function forgetHeights() {
+    measured.clear();
+    vl?.update();
+  }
+
   $effect(() => {
-    if (limit >= dives.length) return;
-    const timer = setTimeout(() => (limit += STEP), 60);
-    return () => clearTimeout(timer);
+    const items = dives;
+    if (!listEl) return;
+    if (!vl) {
+      vl = f7.virtualList.create({
+        el: listEl,
+        items,
+        height: rowHeight,
+        renderExternal: (/** @type {any} */ _vl, /** @type {{ items: typeof dives, topPosition: number, fromIndex: number }} */ data) => {
+          visible = { items: data.items, topPosition: data.topPosition, from: data.fromIndex };
+          measure();
+        },
+      });
+    } else {
+      vl.replaceAllItems(items);
+    }
+  });
+
+  // The text size or the width changed: every height is to be measured again.
+  if (typeof window !== 'undefined') window.addEventListener('resize', forgetHeights);
+  onDestroy(() => {
+    window.removeEventListener('resize', forgetHeights);
+    vl?.destroy();
+    vl = null;
   });
 </script>
 
@@ -58,10 +111,10 @@
     {/snippet}
   </Navbar>
 
-  <div class="list media-list {theme.ios ? 'chevron-center od-statistics-dives--dividers' : ''} od-dive-list od-statistics-dives--list">
+  <div class="list media-list {theme.ios ? 'chevron-center od-statistics-dives--dividers' : ''} od-dive-list od-statistics-dives--list" bind:this={listEl}>
     <ul>
-      {#each dives.slice(0, limit) as dive (dive.id)}
-        <DiveRow {dive} prefs={logbook.prefs} />
+      {#each visible.items as dive, i (dive.id)}
+        <DiveRow {dive} prefs={logbook.prefs} index={visible.from + i} top={visible.topPosition} />
       {/each}
     </ul>
   </div>

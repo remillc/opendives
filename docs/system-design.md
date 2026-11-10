@@ -133,6 +133,8 @@ Files: [`docs/brand/`](brand/).
 | Temperature | 1 decimal |
 | Volume, SAC | 1 decimal |
 
+**Long totals of time (decided on 10 November 2026).** A total of time under water (statistics key figures, "Par …" and "Mes statistiques" rows, any sum of dive durations) under 24 hours keeps hours and minutes ("11 h 26"). From 24 hours it is written in days and hours, without minutes: "80 j 16 h" in French, "80 d 16 h" in English (keys in the translation files), never "1936 h 02". A single dive duration does not change (see the dive duration format above).
+
 ## 7. Layout and navigation
 
 Width decides the layout, not the type of device: below 768 px wide, phone layout; from 768 px, tablet layout. A phone that is folded or unfolded therefore changes layout without restarting.
@@ -185,6 +187,19 @@ Six components do not exist in Framework7; each is a single Svelte component, sh
 **`<SyncStatus>`: the synchronisation state.** A row under the Logbook title, never a dialog: "Synced with the Subsurface cloud" (secondary text, check mark), "Offline: 2 changes will be sent when the network is back" or "Synchronisation stopped for one dive" (`--od-pending`, with an icon). It interrupts the diver only when a choice is needed (conflict, section 9).
 
 **Dive rows, duration above depth (decided on 10 November 2026).** In every dive row on Android (Carnet, its trips and selection, export, the states, the dives of a statistic, dives in the Carnet with month headers, tablet Carnet), the right-hand column shows the duration first (16 sp, weight 500, "55 min") and the maximum depth under it (14 sp, `--od-on-surface-variant`, "91 ft"). Both stay right-aligned with tabular figures.
+
+### Editorial pages (account flow, decided on 10 November 2026)
+
+The first impression of the app continues past first launch: the pages that set up the log use the same editorial layout. They are, on Android: sign in (with its in-progress and error states), new account step 1, confirmation code (and wrong code), step 2 "Reprendre votre carnet" (with refused credentials, import in progress, import failed) and the git repository form (with its error states).
+- **Top bar:** only ✕ (or ← for step 2), 48 dp target, no title in the bar.
+- **Heading block,** 24 dp side margins: an eyebrow (14 sp, weight 500, `--od-on-surface-variant`) that names the flow and the step ("Se connecter", "Nouveau compte · étape 2 sur 2", "Dépôt git"); the page title (34 sp phone, 40 sp tablet, regular, line-height 40/48, letter-spacing −0.4/−0.5) ending with a full stop or its question mark (non-breaking space before "?" in French); the introduction (16 sp, line-height 24, `--od-on-surface-variant`).
+- **Content card:** the fields, choices or progress in one `--od-surface-container-lowest` (white) card, 28 dp corners, 20 dp × 16 dp padding (28 × 24 on tablet), 24 dp below the introduction.
+- **Actions:** the primary action is a 56 dp full-width pill in `--od-primary` with `--od-on-primary` text (16 sp, weight 500); a secondary action stays a text button beside it ("Précédent", "Annuler l’import", "Carnet vide"). Phone: anchored 28 dp above the bottom. Tablet: last element of the card.
+- **Profile:** the decorative dive profile of first launch (1.5 dp `--od-on-surface` line over the water gradient, `aria-hidden`), across the whole width, 130 dp high: phone, just above the actions; tablet, at the bottom of the content area, behind the columns.
+- **Tablet:** landscape, heading block on the left (from 48 dp) and the card in a 480 dp column on the right, centred vertically; portrait, one 520 dp column, card under the heading.
+- **iPhone (decided on 10 November 2026):** the same layout with iOS conventions: the navigation bar keeps "Annuler" or "‹ Retour", with no title and no background; the bar title and step become the eyebrow (15 pt, semibold, secondary label colour); the title is 34 pt regular; the introduction 17 pt; inset grouped sections with 20 pt corners; the primary action a 56 pt capsule (`--od-primary`), a secondary action as a plain or grey capsule beside or under it; the profile just above the actions. Mock-ups: `compte-connexion-ios.dc.html`, `compte-connexion-encours-ios.dc.html`, `compte-connexion-erreur-ios.dc.html`, `compte-creation-ios.dc.html`, `compte-code-ios.dc.html`, `compte-code-erreur-ios.dc.html`, `ios-compte-import.dc.html`, `compte-import-identifiants-ios.dc.html`, `compte-import-encours-ios.dc.html`, `compte-import-echec-ios.dc.html`.
+- **Git note:** the note under the git form reads only "Le jeton reste chiffré sur cet appareil." (13 sp, `--od-on-surface-variant`), with no background.
+Mock-ups: `compte-connexion-android.dc.html`, `compte-connexion-encours-android.dc.html`, `compte-connexion-erreur-android.dc.html`, `compte-creation-android.dc.html`, `compte-code-android.dc.html`, `compte-code-erreur-android.dc.html`, `android-compte-import.dc.html`, `compte-import-identifiants-android.dc.html`, `compte-import-encours-android.dc.html`, `compte-import-echec-android.dc.html`, `git-config-android.dc.html`, `git-config-erreur-android.dc.html`, `git-config-adresse-android.dc.html`; tablet `android-tablette-compte-connexion-{paysage,portrait}.dc.html`, `android-tablette-compte-creation-…`, `android-tablette-depot-git-…`.
 
 ### Text fields
 

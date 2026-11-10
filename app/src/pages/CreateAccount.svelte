@@ -9,7 +9,7 @@
   // now, except on the test account (write lock).
   import { OpenDivesCore } from 'opendives-core';
   import AccountField from '../components/AccountField.svelte';
-  import AccountStep from '../components/AccountStep.svelte';
+  import EditorialPage from '../components/EditorialPage.svelte';
   import { notAvailableYet } from '../lib/not-available.js';
   import { accountFlow, errorCode, finishAccount, showFailure, validEmail, validPassword } from '../lib/account.js';
   import { t } from '../lib/i18n.js';
@@ -61,7 +61,7 @@
   }
 </script>
 
-<AccountStep class="od-create-account"
+<EditorialPage class="od-create-account"
   title={t('createAccount.title')}
   step={t('createAccount.step1')}
   heading={confirmed ? t('createAccount.createdHeading') : t('createAccount.heading')}
@@ -96,7 +96,7 @@
       />
     {/if}
   </div>
-</AccountStep>
+</EditorialPage>
 
 <style>
   @layer od.components {

@@ -52,8 +52,10 @@
       background: var(--od-surface);
       color: var(--od-text);
       text-decoration: none;
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      /* A value is never cut: when the three do not fit side by side (a
+         narrow list column), the last one goes to the next line, whole. */
+      display: flex;
+      flex-wrap: wrap;
       gap: 12px;
 
       :global(.ios) & {
@@ -65,10 +67,11 @@
     }
 
     .od-key-figures--figure {
+      flex: 1 0 0;
+      min-width: max-content;
       display: flex;
       flex-direction: column;
       gap: 2px;
-      min-width: 0;
     }
 
     .od-key-figures--label {
@@ -86,7 +89,7 @@
     .od-key-figures--value {
       font-size: 24px;
       line-height: 32px;
-      overflow-wrap: anywhere;
+      white-space: nowrap;
 
       :global(.ios) & {
         font-size: 22px;

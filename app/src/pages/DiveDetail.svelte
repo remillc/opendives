@@ -25,6 +25,8 @@
   import { logbook, deleteDive, tripChange } from '../lib/logbook.svelte.js';
   import { layout } from '../lib/layout.svelte.js';
   import { offerUndo } from '../lib/undo.js';
+  import { readySiteMap } from '../lib/site-image.js';
+  import { forgetDive, keepDive, preloadDives, readyDive } from '../lib/dive-preload.js';
   import {
     formatCylinderSize,
     formatDepth,
@@ -127,6 +129,7 @@
     const next = order[at + 1] ?? order[at - 1];
     try {
       await deleteDive(id);
+      forgetDive(id);
       if (layout.split && next) f7router.navigate(`/dives/${next.id}`, { reloadDetail: true });
       else f7router.back();
       offerUndo(t('detail.deleted'), undefined, 10000);
@@ -152,23 +155,36 @@
     };
   });
 
-  let dive = $state(/** @type {import('opendives-core').DiveDetail|null} */ (null));
+  // Prepared before the swipe that led here (dive-preload.js): shown from the
+  // first frame, then read again from the core in case it changed.
+  // svelte-ignore state_referenced_locally
+  let dive = $state(/** @type {import('opendives-core').DiveDetail|null} */ (readyDive(Number(f7route.params.id))));
   let failed = $state(false);
   const prefs = $derived(logbook.prefs);
 
   // After an edit or an undo of this dive, show the result at once.
   $effect(() => {
     const edited = logbook.edited;
-    if (edited && dive && edited.id === dive.id) dive = edited.dive;
+    if (edited && dive && edited.id === dive.id) {
+      dive = edited.dive;
+      keepDive(edited.id, edited.dive);
+    }
   });
 
   async function loadDive() {
+    const id = Number(diveId);
     try {
-      dive = await OpenDivesCore.getDive({ id: Number(diveId) });
+      dive = await OpenDivesCore.getDive({ id });
+      keepDive(id, dive);
     } catch (e) {
       console.error('Dive detail', e);
       failed = true;
+      return;
     }
+    // The dives a swipe can lead to, the next (older) one first.
+    const ids = listOrder();
+    const at = ids.indexOf(id);
+    if (at >= 0) preloadDives([ids[at + 1], ids[at - 1]].filter((n) => n !== undefined));
   }
   onMount(loadDive);
 
@@ -178,7 +194,13 @@
   /** "Partager" open: the sheet, then the system's share sheet. */
   // The map behind the header: the top bar is see-through over it,
   // and gets its colour back as soon as the text scrolls under it.
-  let imageShown = $state(false);
+  // True from the first frame when the picture was prepared ahead (no flash of the plain header).
+  let imageShown = $state(
+    (() => {
+      const c = dive?.siteCoordinates;
+      return !!c && readySiteMap(c.latUdeg, c.lonUdeg) !== null;
+    })(),
+  );
   let scrolled = $state(false);
   /** @param {HTMLElement} node */
   function watchScroll(node) {
@@ -700,7 +722,8 @@
         font-size: 16px;
         font-weight: 600;
         color: var(--od-text);
-        overflow-wrap: anywhere;
+        /* Between words only; a word longer than the column still breaks. */
+        overflow-wrap: break-word;
       }
     }
 

@@ -16,6 +16,7 @@
   import { navigation, sections, showSection, closeMenu, restoreFocus, openSettings, openAbout } from '../lib/navigation.svelte.js';
   import { t } from '../lib/i18n.js';
   import { updatesCount } from '../lib/offline-maps.svelte.js';
+  import { tolerantTaps } from '../lib/tap.js';
 
   /** @type {Record<string, 'logbook'|'sites'|'statistics'|'tools'>} */
   const icons = { logbook: 'logbook', sites: 'sites', statistics: 'statistics', tools: 'tools' };
@@ -79,7 +80,7 @@
   onPanelClose={onClose}
   onPanelClosed={restoreFocus}
 >
-  <nav class="od-nav-menu--menu" aria-label={t('menu.sections')} bind:this={menu}>
+  <nav class="od-nav-menu--menu" aria-label={t('menu.sections')} bind:this={menu} use:tolerantTaps>
     <div class="od-nav-menu--band">
       <svg class="od-nav-menu--profile" viewBox="0 0 300 140" preserveAspectRatio="none" aria-hidden="true">
         <path d="{PROFILE} V140 H0 Z" class="od-nav-menu--area" />

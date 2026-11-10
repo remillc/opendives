@@ -1288,3 +1288,41 @@ If a state needs a broken network or a conflicting change, describe how you prod
 
 Mark this task done when both parts are in.
 
+## [x] 2026-11-10-21 Account flow in the editorial layout (Android phone and tablet)
+
+Spec: System design, section 8, "Editorial pages (account flow)" (new). Mock-ups: the 13 phone mock-ups and 6 tablet mock-ups it lists (`docs/mockups/`, updated or new). Pages: `AccountStep.svelte` and the account pages (`SignIn`, `CreateAccount`, `ConfirmCode`, `BringLogbook`, `GitRepository`).
+- One shared layout component for these pages (for example `od-editorial-page`, with `--eyebrow`, `--title`, `--intro`, `--card`, `--actions`, `--profile` parts): bar with ✕ or ← only, eyebrow, large title, introduction, content in a white card, primary action as a full-width 56 dp pill, decorative profile.
+- Tablet: landscape in two columns (heading left, card right), portrait in one 520 dp column, as in the tablet mock-ups.
+- Git form: the note keeps only "Le jeton reste chiffré sur cet appareil." with no background (`gitRepo.note` shortened in both languages).
+- No text or field changes otherwise. Android only; iPhone follows in a later task.
+- A line in the release notes.
+
+Done in `EditorialPage.svelte` (it replaces `AccountStep.svelte`) and `DecorativeProfile.svelte` (the profile, shared with first launch). One text added: the git page had no title, it takes the mock-up's "Votre propre dépôt." (`gitRepo.heading`). The full stop after a title is added by the layout; the texts are unchanged. Checked in the browser at phone and tablet sizes; iOS keeps its previous look until task 22.
+
+## [ ] 2026-11-10-22 Account flow in the editorial layout (iPhone)
+
+Follows task 2026-11-10-21 (Android). Spec: System design, section 8, "Editorial pages (account flow)", item "iPhone" (new). Mock-ups: the 10 iPhone mock-ups it lists (`docs/mockups/`, updated).
+- Same shared layout component as task 21, in its iOS look: navigation bar with "Annuler" or "‹ Retour" only (no title, transparent), eyebrow with the bar title and step, 34 pt title, 17 pt introduction, inset grouped sections with 20 pt corners, 56 pt capsule for the primary action, decorative profile above the actions.
+- No text or field changes. A line in the release notes.
+
+## [ ] 2026-11-10-23 First launch on an Android tablet, landscape and portrait
+
+Follows task 2026-11-10-18. Spec: UI specification, section 4, "First launch, redesigned", paragraph "Tablet" (new). Mock-ups: `docs/mockups/android-tablette-premier-lancement-paysage.dc.html`, `docs/mockups/android-tablette-premier-lancement-portrait.dc.html` (new). Component: `app/src/components/Welcome.svelte`.
+- Landscape: heading (logo row, title) on the left with the profile at the bottom from the left edge; the three choices and the git link in a 440 dp column on the right, centred vertically.
+- Portrait: heading in a 520 dp centred column, the profile across the width, then the choices and the git link in a 440 dp column centred vertically in the space left.
+- No scrolling in either orientation, on a small tablet too (to-do #32: check it, then tell Christian so the to-do can be removed).
+
+## [ ] 2026-11-10-24 Dive profile: cursor in the curve colour, curve buttons in their curve colour
+
+Spec: UI specification, section 4, "Dive profile, cursor and curve buttons" (new). Mock-ups: `docs/mockups/detail3-android.dc.html`, `detail3-android-curseur.dc.html`, `detail3-android-sombre.dc.html` (updated). Component: `app/src/components/DiveProfile.svelte`.
+- Cursor: remove the white outline; a 2 dp line in the profile curve colour, round caps.
+- Curve buttons, selected: text and check in the colour of their curve (Température: `--od-tertiary` #2F6DB5 in light, #8AB4F8 in dark). Light mode: white background and a 1 dp border in that colour, for contrast. Dark mode: usual selected background. Unselected: unchanged.
+- Colours as `--od-*` variables. A line in the release notes.
+
+## [ ] 2026-11-10-25 Long totals of time in days and hours
+
+Spec: System design, section 6, "Long totals of time" (new). Canvas note beside "30 · Statistiques · tablette Android".
+- In `app/src/lib/format.js` (or wherever totals are formatted), a total of time under water from 24 h is shown as days and hours without minutes: "80 j 16 h" in French, "80 d 16 h" in English, from translation keys. Under 24 h: unchanged ("11 h 26").
+- Applies to the statistics key figures, the "Par …" and "Mes statistiques" rows, the dives of a row (task 13 supporting line) and any other sum of durations. Single dive durations stay as they are.
+- Unit tests for 23 h 59, 24 h, and a large total. A line in the release notes.
+
