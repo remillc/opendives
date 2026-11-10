@@ -1269,3 +1269,22 @@ Spec: UI specification, section 4, item "Help page \"Comment créer un jeton d'a
 - Accessibility: `role="tablist"`, `role="tab"` with `aria-selected`, the card as `role="tabpanel"` labelled by its tab.
 - Remove `tokenHelp.menu` if it is no longer used. A line in the release notes.
 
+## [ ] 2026-11-10-20 Android tablet: the screens not yet captured (no code change)
+
+Follow-up to task 2026-11-10-17, same rules: tablet emulator, light theme, French, 1 dp = 1 px, PNG in `docs/screenshots/android-tablet/`, a line per screen in its README. This task changes no code.
+
+**1. Does the app have a screen for each of these? Answer yes or no in the README, and capture the ones that exist, in landscape and in portrait:**
+- 13 Carnet, offline with changes waiting (airplane mode after an edit is enough).
+- 14 Sync failure: password refused, cloud unreachable, git repository refused (each one that can be produced without touching the real account's password: a test account or a wrong saved password on the emulator only).
+- 15 Sync conflict dialog, one dive and several dives.
+- 16 Empty logbook.
+- 55 Account without an account ("Sans compte").
+- 56 Sign out confirmation, and Delete account (the dialog only, never confirm).
+- 57 Account in git mode.
+- 75 First launch (`/welcome`), after task 2026-11-10-18.
+If a state needs a broken network or a conflicting change, describe how you produced it. Never change or delete anything on the real cloud account; a conflict may only be made on the test account.
+
+**2. Phone screenshots for the screens that have no phone mock-up yet** (Pixel phone size, portrait only, `docs/screenshots/android-phone/`, same naming and a README): 08 download, 10 new dive by hand, 12 a filter criterion (Combinaison), 25 sites without coordinates, 71 release notes, 72 licence, 73 privacy policy. The design session will draw the phone and tablet mock-ups from them.
+
+Mark this task done when both parts are in.
+
