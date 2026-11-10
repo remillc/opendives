@@ -120,6 +120,7 @@ When a mock-up and `docs/ui-specification.md` disagree, the specification wins. 
 | `ios-stats-annee.dc.html` | Statistiques, une année · iPhone |
 | `ios-stats-nouvelle.dc.html` | Nouvelle statistique · iPhone |
 | `outils-desaturation-android.dc.html` | Désaturation · Android |
+| `outils-desaturation-terminee-android.dc.html` | Désaturation, avion permis · Android |
 | `sites-modifier-android.dc.html` | Modifier le site · Android |
 | `police-source-android.dc.html` | Police du texte courant, Source Sans 3 (retenue) · Android |
 | `outils-ead-mod-android.dc.html` | Outils, EAD et MOD · Android |

@@ -1215,3 +1215,12 @@ Christian changed task 2026-11-09-36. Work on branch `feature/carnet-month-heade
 - The line shows the month of the first visible dive and switches when that dive is in another month. A trip counts under the month of its first dive, as before.
 
 Addendum (2026-11-10 10:55): the month label follows the display language. Build it with `Intl.DateTimeFormat(locale, { month: 'long', year: 'numeric' })` and capitalise the first letter: "Avril 2014" in French, "April 2014" in English. No bold: month and year in regular weight, 14 sp. Mock-ups updated.
+
+## [ ] 2026-11-10-15 Desaturation: last dive block, and the "flying allowed" state
+
+Spec: "Tools", item "Desaturation, last dive and flying allowed" (new). Mock-ups: `docs/mockups/outils-desaturation-android.dc.html` (updated), `docs/mockups/outils-desaturation-terminee-android.dc.html` (new). Page: `app/src/pages/Desaturation.svelte`.
+- New section "Dernière plongée" under the summary card: one row (date and time, "{site} · {depth} · {duration}", "Sortie de l’eau il y a {durée}"), chevron, opens `/dive/:id`. The time since surfacing uses the end of the dive and updates with the screen.
+- When the wait before flying is over: the summary card shows "Vous pouvez prendre l’avion" with "Attente terminée {jour}, {heure}", and "Désaturation terminée" with "{jour}, {heure}", each with a check-circle icon, instead of the two figures. Relative days ("Aujourd’hui", "Hier").
+- If desaturation is over but flying is not yet allowed, keep the two figures ("0 h 00" for desaturation).
+- New texts in `fr.json` and `en.json`; a line in the release notes.
+
