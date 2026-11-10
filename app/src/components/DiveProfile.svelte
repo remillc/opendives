@@ -352,8 +352,6 @@
       {/if}
 
       {#if cursor !== null}
-        <!-- Halo in the block color, so that the cursor stays visible on any water color. -->
-        <line class="od-dive-profile--cursor-halo" x1={x(times[cursor])} x2={x(times[cursor])} y1={MARGIN_TOP} y2={MARGIN_TOP + scaleHeight} />
         <line class="od-dive-profile--cursor" x1={x(times[cursor])} x2={x(times[cursor])} y1={MARGIN_TOP} y2={MARGIN_TOP + scaleHeight} />
         {#if showTemperature && temperature && temperature.mk[cursor] > 0}
           <circle class="od-dive-profile--temperature-dot" cx={x(times[cursor])} cy={yTemperature(temperature.mk[cursor])} r="4" />
@@ -394,14 +392,14 @@
             trackScale('temperature', temperatureLayer);
           }}
         >
-          <span class="chip od-dive-profile--chip" class:od-dive-profile--chip-outline={!temperatureLayer}>
+          <span class="chip od-dive-profile--chip" class:od-dive-profile--chip-outline={!temperatureLayer} class:od-dive-profile--chip-temperature={temperatureLayer}>
             {#if temperatureLayer}<Icon name="check" size={18} weight={2.4} />{/if}<span class="chip-label">{t('profile.temperature')}</span>
           </span>
         </button>
       {/if}
       {#if gasAvailable}
         <button type="button" class="od-dive-profile--filter" aria-pressed={gasLayer} onclick={() => (gasLayer = !gasLayer)}>
-          <span class="chip od-dive-profile--chip" class:od-dive-profile--chip-outline={!gasLayer}>
+          <span class="chip od-dive-profile--chip" class:od-dive-profile--chip-outline={!gasLayer} class:od-dive-profile--chip-ink={gasLayer}>
             {#if gasLayer}<Icon name="check" size={18} weight={2.4} />{/if}<span class="chip-label">{t('profile.gas')}</span>
           </span>
         </button>
@@ -416,21 +414,21 @@
             trackScale('ppo2', ppo2Layer);
           }}
         >
-          <span class="chip od-dive-profile--chip" class:od-dive-profile--chip-outline={!ppo2Layer}>
+          <span class="chip od-dive-profile--chip" class:od-dive-profile--chip-outline={!ppo2Layer} class:od-dive-profile--chip-ppo2={ppo2Layer}>
             {#if ppo2Layer}<Icon name="check" size={18} weight={2.4} />{/if}<span class="chip-label">{t('profile.ppo2')}</span>
           </span>
         </button>
       {/if}
       {#if ceilingAvailable}
         <button type="button" class="od-dive-profile--filter" aria-pressed={ceilingLayer} onclick={() => (ceilingLayer = !ceilingLayer)}>
-          <span class="chip od-dive-profile--chip" class:od-dive-profile--chip-outline={!ceilingLayer}>
+          <span class="chip od-dive-profile--chip" class:od-dive-profile--chip-outline={!ceilingLayer} class:od-dive-profile--chip-ceiling={ceilingLayer}>
             {#if ceilingLayer}<Icon name="check" size={18} weight={2.4} />{/if}<span class="chip-label">{t('profile.ceiling')}</span>
           </span>
         </button>
       {/if}
       {#if tissuesAvailable}
         <button type="button" class="od-dive-profile--filter" aria-pressed={tissuesLayer} onclick={() => (tissuesLayer = !tissuesLayer)}>
-          <span class="chip od-dive-profile--chip" class:od-dive-profile--chip-outline={!tissuesLayer}>
+          <span class="chip od-dive-profile--chip" class:od-dive-profile--chip-outline={!tissuesLayer} class:od-dive-profile--chip-ink={tissuesLayer}>
             {#if tissuesLayer}<Icon name="check" size={18} weight={2.4} />{/if}<span class="chip-label">{t('profile.tissues')}</span>
           </span>
         </button>
@@ -570,11 +568,7 @@
     .od-dive-profile--cursor {
       stroke: var(--od-cursor);
       stroke-width: 2;
-    }
-
-    .od-dive-profile--cursor-halo {
-      stroke: var(--od-block);
-      stroke-width: 5;
+      stroke-linecap: round;
     }
 
     .od-dive-profile--temperature-dot {
@@ -608,11 +602,35 @@
     }
 
     .od-dive-profile--chip {
+      --od-curve: var(--od-trace);
       gap: 8px;
 
       &:not(.od-dive-profile--chip-outline) {
         padding-left: 8px;
       }
+    }
+
+    /* Selected curve button: text, check and border in the colour of its curve. */
+    .od-dive-profile--chip:not(.od-dive-profile--chip-outline) {
+      background: var(--od-curve-chip-bg);
+      color: var(--od-curve);
+      box-shadow: inset 0 0 0 var(--od-curve-chip-border-width) var(--od-curve);
+
+      .chip-label {
+        color: var(--od-curve);
+      }
+    }
+
+    .od-dive-profile--chip-temperature {
+      --od-curve: var(--od-temperature);
+    }
+
+    .od-dive-profile--chip-ppo2 {
+      --od-curve: var(--od-oxygen);
+    }
+
+    .od-dive-profile--chip-ceiling {
+      --od-curve: var(--od-alarm);
     }
 
     .od-dive-profile--filter {
