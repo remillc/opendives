@@ -1520,7 +1520,8 @@
       "Premier lancement (Android) : une page plus simple, avec trois boutons et leur conséquence en une ligne.",
       "Aide sur le jeton d’accès : un onglet par site (GitHub, GitLab, Codeberg).",
       "Premier lancement : en plein écran sur tablette, tous les choix visibles.",
-      "Tablette : après la déconnexion, la dernière plongée du compte ne reste plus affichée à côté du carnet vide."
+      "Tablette : après la déconnexion, la dernière plongée du compte ne reste plus affichée à côté du carnet vide.",
+      "Tablette : Réglages et À propos s’ouvrent en pleine largeur, et non plus à côté de la liste du carnet."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
