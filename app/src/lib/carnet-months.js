@@ -95,34 +95,23 @@ export function groupByMonth(dives, flat = false) {
 
 /** @type {Map<string, Intl.DateTimeFormat>} */
 const monthFormats = new Map();
-/** @type {Map<string, Intl.NumberFormat>} */
-const yearFormats = new Map();
 
 /**
- * The month's name in the device's language, capitalised ("Avril", "April").
+ * The month as the display language writes it, first letter in capitals:
+ * "Avril 2014", "April 2014".
+ * @param {number} year
  * @param {number} month 1 to 12
  * @param {string} locale
  */
-export function monthName(month, locale) {
-  if (!(month >= 1 && month <= 12)) return '';
+export function monthYearLabel(year, month, locale) {
+  if (!year || !(month >= 1 && month <= 12)) return '';
   let f = monthFormats.get(locale);
   if (!f) {
-    f = new Intl.DateTimeFormat(locale, { month: 'long', timeZone: 'UTC' });
+    f = new Intl.DateTimeFormat(locale, { month: 'long', year: 'numeric', timeZone: 'UTC' });
     monthFormats.set(locale, f);
   }
-  const name = f.format(new Date(Date.UTC(2001, month - 1, 15)));
-  return name.charAt(0).toLocaleUpperCase(locale) + name.slice(1);
-}
-
-/** The year in the device's digits, without a group separator ("2014"). @param {number} year @param {string} locale */
-export function yearText(year, locale) {
-  if (!year) return '';
-  let f = yearFormats.get(locale);
-  if (!f) {
-    f = new Intl.NumberFormat(locale, { useGrouping: false });
-    yearFormats.set(locale, f);
-  }
-  return f.format(year);
+  const label = f.format(new Date(Date.UTC(year, month - 1, 15)));
+  return label.charAt(0).toLocaleUpperCase(locale) + label.slice(1);
 }
 
 /**
