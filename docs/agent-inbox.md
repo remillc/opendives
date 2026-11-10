@@ -1128,3 +1128,11 @@ Christian asked (canvas comment): use the snackbar of `docs/mockups/sites-nettoy
 Christian approved (canvas comment). Spec: "Clean up sites, \"Pas des doublons\"" (paragraph on the pencil). Mock-ups: `docs/mockups/sites-nettoyer-android.dc.html`, `docs/mockups/sites-nettoyer-pas-doublons-android.dc.html`.
 - Each site row of a duplicate group gets a pencil icon button on the right (48 dp target, aria-label "Modifier le site {nom}"), separate from the radio choice.
 - It opens the existing site editor. On save, return to "Nettoyer les sites" at the same scroll position and recompute the groups; a group that no longer matches disappears with the snackbar "{nom} modifié, ce n’est plus un doublon possible" (4 s, shared snackbar style). Back without saving changes nothing.
+
+## [ ] 2026-11-10-08 Sites: search open state and its open and close animation
+
+Christian approved (canvas comments). Spec: "Sites, search open and its animation". Mock-ups: `docs/mockups/android-sites.dc.html` (closed), `docs/mockups/android-sites-recherche.dc.html` (open).
+- Open state as in the mock-up: ← and a rounded field with ✕ in the band, result count under it, non-matching pins at 30 %, list filtered to results with the match highlighted, "à faire" card and + hidden.
+- Opening: 300 ms, emphasized decelerate; the field grows from the 🔍 button (right-anchored), title and ☰ fade out as ← fades in, card and + fade out; focus and keyboard at the end.
+- Closing (←, back gesture, back on empty field): 200 ms, emphasized accelerate; keyboard first, field shrinks into 🔍, title and ☰ back, card and + back, pins back to 100 %, map back to its previous view. ✕ only clears.
+- Reduced motion: 150 ms cross-fade only.
