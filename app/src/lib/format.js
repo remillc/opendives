@@ -69,8 +69,7 @@ export function formatDepth(mm, prefs) {
  */
 export function formatDuration(seconds, mode = settings.duration) {
   const minutes = Math.round(seconds / 60);
-  if (mode === 'hours' || (mode === 'mixed' && minutes >= 60))
-    return `${Math.floor(minutes / 60)}:${String(minutes % 60).padStart(2, '0')}`;
+  if (mode === 'hours' || (mode === 'mixed' && minutes >= 60)) return formatHours(seconds);
   return `${formatNumber(minutes, 0)}${NBSP}${t('units.minutes')}`;
 }
 

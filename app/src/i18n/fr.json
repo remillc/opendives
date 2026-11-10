@@ -1504,7 +1504,8 @@
       "Nouveautés : la date de la version à côté de son numéro, et la liste complète.",
       "Statistiques : chaque ligne ouvre la liste de ses plongées.",
       "Carnet : le mois affiché dans le bandeau est plus discret.",
-      "Les boutons de navigation réagissent tout de suite au toucher."
+      "Les boutons de navigation réagissent tout de suite au toucher.",
+      "Les durées d’une heure ou plus s’écrivent partout « 1 h 11 »."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
