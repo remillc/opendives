@@ -101,7 +101,7 @@ The planner settings screen loses its "Modèle de décompression" row. Reference
 **Own git repository instead of the cloud (decided on 9 November 2026, to-do #11, after v1).** Besides a Subsurface cloud account and no account, the logbook can live in the user's own git repository (GitHub, GitLab, Codeberg or any server), in place of the cloud, as Subsurface desktop can open a git URL. A copy stays on the device, as with the cloud.
 - *First launch:* at the bottom, a text link "Utiliser mon propre dépôt git", opening the "Dépôt git" form (`android-accueil-c.dc.html`).
 
-**First launch, redesigned (decided on 10 November 2026, Android; replaces `android-accueil.dc.html`, kept for reference).** Mock-up: `android-accueil-c.dc.html`. The first impression of the app: sober, efficient, in good taste. On the page background, from top to bottom:
+**First launch, redesigned (decided on 10 November 2026, Android; replaces `android-accueil.dc.html`, removed from the canvas).** Mock-up: `android-accueil-c.dc.html`. The first impression of the app: sober, efficient, in good taste. On the page background, from top to bottom:
 - The logo (40 dp, light or dark version with the theme) and "OpenDives" (20 sp, weight 500), 24 dp from the sides, under the status bar.
 - The title "Votre carnet de plongée." in two lines (40 sp, regular, line-height 48, letter-spacing −0.5), about 72 dp under the logo row.
 - A dive profile across the whole width, about 190 dp high: a 1.5 dp line in `--od-on-surface` filled with the water gradient (sand #FBE3B2 to rust #B4530F, honey to amber in dark mode), drawn from the bundled sample dive (Northern Arch), decorative (`aria-hidden`, no label read).
