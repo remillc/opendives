@@ -162,6 +162,8 @@ The four sections use the same band as their header, MD3 Small top app bar (☰,
 
 **Add (decided on 5 November 2026):** the Logbook no longer has a permanent Download button, which was of little use. Instead, a "+" button (navigation bar on iOS, floating action button in `secondary-container` on Android, at the top of the rail on tablets) opens three choices: download from the dive computer, import a file, log a dive by hand. The empty logbook offers the same choices directly.
 
+**Android tablet in portrait: no rail (decided on 10 November 2026).** The navigation rail shows only when the window is at least about 1000 dp wide (Android tablet in landscape). Below that width, in portrait on a tablet as on a phone, there is no rail: the first pane's top bar has the ☰ button that opens the modal side menu of the phone (300 dp, scrim, same content: account card, Carnet, Sites, Statistiques, Outils, Réglages, À propos, sync card), and the Carnet's "+" is the floating button at the bottom right of the list. The list and detail panes keep their widths (340 dp list in the Carnet, the detail takes the rest: 459 dp on an 800 dp tablet instead of 363). Landscape is unchanged. Mock-ups: `android-tablette-accueil-portrait.dc.html`, `android-tablette-accueil-portrait-menu.dc.html` (menu open), and every `android-tablette-*-portrait.dc.html`.
+
 ## 8. Shared components
 
 Six components do not exist in Framework7; each is a single Svelte component, shared by iOS and Android, which only changes its colours and sizes with the theme.
