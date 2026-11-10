@@ -1343,3 +1343,12 @@ Spec: UI specification, section 1, "About" (updated). Mock-up: `docs/mockups/apr
 - A line in the release notes.
 
 Done in `about.tagline` (fr, en) and a release-notes line.
+
+## [ ] 2026-11-10-27 Android tablet in portrait: side menu instead of the rail
+
+Spec: System design, section 7, "Android tablet in portrait: no rail" (new). Mock-ups: `docs/mockups/android-tablette-accueil-portrait.dc.html`, `docs/mockups/android-tablette-accueil-portrait-menu.dc.html` (new). Code: `app/src/lib/layout.svelte.js`, `App.svelte`, `NavRail.svelte`, `NavMenu.svelte`.
+- New breakpoint for the rail: shown from about 1000 dp wide only. Below it (tablet in portrait), use the phone's ☰ and modal side menu, and the Carnet's floating "+" button.
+- The list/detail split itself stays from 768 dp, as today: only the navigation changes.
+- Check a foldable and window resizing: the navigation switches without restarting.
+- A line in the release notes.
+

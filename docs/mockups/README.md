@@ -149,3 +149,5 @@ Example values (decided on 8 November 2026): the mock-ups show depths in feet, p
 | `android-tablette-depot-git-portrait.dc.html` | Tablette Android, Dépôt git, portrait |
 | `android-tablette-premier-lancement-paysage.dc.html` | Tablette Android, Premier lancement, paysage |
 | `android-tablette-premier-lancement-portrait.dc.html` | Tablette Android, Premier lancement, portrait |
+| `android-tablette-accueil-portrait.dc.html` | Tablette Android, Carnet, accueil, portrait |
+| `android-tablette-accueil-portrait-menu.dc.html` | Tablette Android, Carnet, accueil, menu ouvert, portrait |
