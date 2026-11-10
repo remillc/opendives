@@ -200,7 +200,7 @@
   },
   "dive": {
     "siteNotSet": "Dive site not set",
-    "screenReader": "{site}, {date}, max. depth {depth}, duration {duration}",
+    "screenReader": "{site}, {date}, duration {duration}, max. depth {depth}",
     "screenReaderNoDepth": "{site}, {date}, duration {duration}",
     "thumbnail": "Profile, {depth} max. depth",
     "pending": "{what}, waiting to be sent",
@@ -1508,7 +1508,8 @@
       "Navigation buttons react to a touch at once.",
       "Durations of an hour or more follow the language: “1:11” in English, “1 h 11” in French.",
       "Settings: the “Always in hours and minutes” duration option is gone.",
-      "Desaturation: the last logbook dive, and “You can fly” once the wait is over."
+      "Desaturation: the last logbook dive, and “You can fly” once the wait is over.",
+      "Dive rows: the duration above, the depth below."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",

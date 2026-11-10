@@ -200,7 +200,7 @@
   },
   "dive": {
     "siteNotSet": "Site à préciser",
-    "screenReader": "{site}, {date}, profondeur maximale {depth}, durée {duration}",
+    "screenReader": "{site}, {date}, durée {duration}, profondeur maximale {depth}",
     "screenReaderNoDepth": "{site}, {date}, durée {duration}",
     "thumbnail": "Profil, {depth} au plus profond",
     "pending": "{what}, en attente d'envoi",
@@ -1508,7 +1508,8 @@
       "Les boutons de navigation réagissent tout de suite au toucher.",
       "Les durées d’une heure ou plus suivent la langue : « 1 h 11 » en français, « 1:11 » en anglais.",
       "Réglages : l’option de durée « Toujours en heures et minutes » est retirée.",
-      "Désaturation : la dernière plongée du carnet, et « Vous pouvez prendre l’avion » quand l’attente est terminée."
+      "Désaturation : la dernière plongée du carnet, et « Vous pouvez prendre l’avion » quand l’attente est terminée.",
+      "Lignes de plongée : la durée au-dessus, la profondeur en dessous."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
