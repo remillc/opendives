@@ -1297,3 +1297,9 @@ Spec: System design, section 8, "Editorial pages (account flow)" (new). Mock-ups
 - No text or field changes otherwise. Android only; iPhone follows in a later task.
 - A line in the release notes.
 
+## [ ] 2026-11-10-22 Account flow in the editorial layout (iPhone)
+
+Follows task 2026-11-10-21 (Android). Spec: System design, section 8, "Editorial pages (account flow)", item "iPhone" (new). Mock-ups: the 10 iPhone mock-ups it lists (`docs/mockups/`, updated).
+- Same shared layout component as task 21, in its iOS look: navigation bar with "Annuler" or "‹ Retour" only (no title, transparent), eyebrow with the bar title and step, 34 pt title, 17 pt introduction, inset grouped sections with 20 pt corners, 56 pt capsule for the primary action, decorative profile above the actions.
+- No text or field changes. A line in the release notes.
+
