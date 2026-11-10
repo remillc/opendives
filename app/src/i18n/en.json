@@ -1410,6 +1410,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Privacy: the policy mentions searching for places on the map.",
       "Offline maps: a search field on \"Choose on the map\" finds a site of your logbook as you type, or a place when you press search, and puts the rectangle around it.",
       "Settings: the water type written on downloaded dives that have none can be chosen (Not specified by default).",
       "Offline maps: draw a rectangle on the map from Settings to download it (up to 3,000 tiles; less detail allows a larger area); a space limit and a free-space floor protect the device, and updates are offered with a badge.",

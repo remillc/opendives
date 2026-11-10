@@ -1410,6 +1410,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Confidentialité : la politique mentionne la recherche de lieux sur la carte.",
       "Cartes hors ligne : un champ de recherche sur « Choisir sur la carte » trouve un site de votre carnet pendant la frappe, ou un lieu quand vous lancez la recherche, et place le rectangle autour.",
       "Réglages : le type d’eau des plongées téléchargées dont l’ordinateur ne donne rien se choisit (Non précisé par défaut).",
       "Cartes hors ligne : dessinez un rectangle sur la carte depuis Réglages pour le télécharger (jusqu’à 3 000 tuiles ; moins de détails permet une zone plus grande) ; une limite d’espace et un plancher d’espace libre protègent l’appareil, et les mises à jour sont proposées avec un badge.",

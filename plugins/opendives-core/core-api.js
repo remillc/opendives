@@ -590,6 +590,8 @@ import { registerPlugin } from '@capacitor/core';
  *   Read-only statistics (opendives.h, stats and stats_values): the StatsResult of the
  *   dives meeting the criteria ({field: [keys]}; any key of a field, every field), or the
  *   values of one field in the log, [{key, dives, location?}]. Rejects with BAD_REQUEST.
+ * @property {(options: {url: string}) => Promise<{status: number, body: string}>} placesSearch
+ *   A Nominatim request sent with the app's User-Agent; only nominatim.openstreetmap.org addresses.
  * @property {(options: {action: 'create'|'edit'|'geocode'|'merge'|'delete'|'deleteSite', uuid?: number, other?: number, uuids?: number[], field?: string, value?: string, lat?: number, lon?: number}) => Promise<EditResult>} siteAction
  *   One undoable site change, as Subsurface's site commands.
  * @property {(options: {tripId: number}) => Promise<TripDetail>} getTrip
@@ -836,6 +838,7 @@ export const OpenDivesCore = {
   },
   networkStatus: () => native.networkStatus(),
   mapsFreeSpace: () => native.mapsFreeSpace(),
+  placesSearch: (options) => native.placesSearch(options),
   mapsTilesStart: (options) => native.mapsTilesStart(options),
   mapsDownloadPause: (options) => native.mapsDownloadPause(options),
   mapsDownloadResume: (options) => native.mapsDownloadResume(options),

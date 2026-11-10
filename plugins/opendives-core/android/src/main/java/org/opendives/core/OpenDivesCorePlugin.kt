@@ -821,6 +821,34 @@ class OpenDivesCorePlugin : Plugin() {
     }
 
     /** Whether the device is on Wi-Fi or Ethernet (the WebView does not say). */
+    /** A Nominatim request, sent with the app's identification (its usage policy; a WebView cannot set it). */
+    @PluginMethod
+    fun placesSearch(call: PluginCall) {
+        val url = call.getString("url")
+        if (url == null || !url.startsWith("https://nominatim.openstreetmap.org/")) {
+            call.reject("Bad address", "BAD_ARGUMENT")
+            return
+        }
+        networkThread.execute {
+            try {
+                val connection = java.net.URL(url).openConnection() as java.net.HttpURLConnection
+                try {
+                    connection.connectTimeout = 15_000
+                    connection.readTimeout = 15_000
+                    connection.setRequestProperty("User-Agent", MapsManager.userAgent)
+                    connection.setRequestProperty("Accept", "application/json")
+                    val status = connection.responseCode
+                    val body = if (status in 200..299) connection.inputStream.bufferedReader().use { it.readText() } else ""
+                    call.resolve(JSObject().put("status", status).put("body", body))
+                } finally {
+                    connection.disconnect()
+                }
+            } catch (e: Exception) {
+                call.reject(e.message ?: "Cannot reach the server", "NETWORK")
+            }
+        }
+    }
+
     @PluginMethod
     fun networkStatus(call: PluginCall) {
         val manager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
