@@ -1352,3 +1352,8 @@ Spec: System design, section 7, "Android tablet in portrait: no rail" (new). Moc
 - Check a foldable and window resizing: the navigation switches without restarting.
 - A line in the release notes.
 
+## [ ] 2026-11-10-28 Android tablet in portrait: "+" at the bottom right of the screen
+
+Addition to task 2026-11-10-27. Spec: System design, section 7, "Android tablet in portrait: no rail" (updated). Mock-ups: the `android-tablette-*-portrait.dc.html` of the Carnet section (updated).
+- In portrait, the Carnet's floating "+" sits at the bottom right of the whole screen, 24 dp from the edges, over the detail pane; scrims of sheets and dialogs cover it.
+
