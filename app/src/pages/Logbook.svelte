@@ -756,6 +756,13 @@
     f7router.navigate(`/dives/${dive.id}`, { reloadDetail: true });
   });
 
+  // Tablet: a logbook emptied (signed out, data of this device deleted) keeps
+  // no dive beside the list; the dive of the account that left must not stay.
+  $effect(() => {
+    if (!layout.split || logbook.loading || logbook.dives.length || navigation.dive === null) return;
+    f7router.back('/', { force: true, animate: false });
+  });
+
   /**
    * Search, in the core: Subsurface's fulltext index (notes, buddies, dive
    * guide, suit, tags, cylinder and weight types, site name and country, trip
