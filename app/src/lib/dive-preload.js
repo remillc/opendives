@@ -58,13 +58,16 @@ function read(id) {
  * @param {number[]} ids
  */
 export async function preloadDives(ids) {
-  for (const id of ids) {
-    try {
-      const dive = details.get(id) ?? (await read(id));
-      const c = dive.siteCoordinates;
-      if (c) await sharedSiteMap(c.latUdeg, c.lonUdeg).catch(() => {});
-    } catch (e) {
-      console.warn('Preparing a dive', id, e);
-    }
-  }
+  // Side by side: the swipe can go either way, so neither waits for the other.
+  await Promise.all(
+    ids.map(async (id) => {
+      try {
+        const dive = details.get(id) ?? (await read(id));
+        const c = dive.siteCoordinates;
+        if (c) await sharedSiteMap(c.latUdeg, c.lonUdeg).catch(() => {});
+      } catch (e) {
+        console.warn('Preparing a dive', id, e);
+      }
+    }),
+  );
 }
