@@ -644,9 +644,10 @@
       "resetText": "Goes back to the default values for every setting of this device",
       "reset": "Reset all settings",
       "resetTitle": "Reset all settings?",
-      "resetConfirm": "Every setting of this device goes back to Subsurface’s default value. Dives do not change.",
+      "resetConfirm": "The settings of this device go back to their default values: units, display, logbook. Your dives, sites, account and downloaded maps do not change, nor do the planner settings and trip grouping.",
       "resetAction": "Reset",
-      "note": "Planning parameters (rates, reserve, SAC, ppO₂, deco) and trip grouping are not changed."
+      "note": "Planning parameters (rates, reserve, SAC, ppO₂, deco) and trip grouping are not changed.",
+      "resetDone": "Settings reset"
     },
     "cylinders": {
       "title": "Cylinder types",
@@ -1110,7 +1111,8 @@
     "keepTitle": "Which site to keep?",
     "keepNote": "The dives of the other sites move to this one, and those sites disappear. This can be undone.",
     "sortName": "Alphabetical order",
-    "sortRecent": "Most recent first"
+    "sortRecent": "Most recent first",
+    "notDuplicatesDone": "{a} and {b} will no longer be suggested as duplicates"
   },
   "renumber": {
     "titleChecked": "Renumber the checked dives?",
@@ -1420,6 +1422,9 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Clean up sites: \"Not duplicates\" removes the group from the list and stops suggesting it (on this device); \"Undo\" puts it back. Renaming or moving one of the two sites makes it suggestible again.",
+      "Settings: \"Reset all settings\" asks for confirmation first, then says \"Settings reset\". It no longer touches the planner settings.",
+      "Logo: the three waves now have shorter gradients, so the layers stay apart at small sizes.",
       "Sites: a menu changes the order of the list (alphabetical or most recent first); a long press selects a site, to merge several sites.",
       "Conflict on several dives: a full-screen dialog with a \"Same choice for all\" switch and one card per dive, where you touch the version to keep.",
       "Sync conflict: \"Later\" closes the dialog and leaves you where you were; the Carnet sync status and the side menu sync card reopen it, and it comes back at the next sync attempt.",

@@ -786,6 +786,7 @@
         try {
           logbook.prefs = await resetAllSettings(defaults);
           applyTheme('system');
+          f7.toast.show({ text: t('settings.advanced.resetDone'), closeTimeout: 4000 });
         } catch (e) {
           failed(e);
         }

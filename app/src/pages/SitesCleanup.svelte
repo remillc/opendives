@@ -7,7 +7,7 @@
   import { Page, Navbar, Link, f7 } from 'framework7-svelte';
   import { OpenDivesCore } from 'opendives-core';
   import { logbook } from '../lib/logbook.svelte.js';
-  import { dismissPair, pairKey, possibleDuplicates, siteChange } from '../lib/sites.svelte.js';
+  import { dismissPair, pairKey, possibleDuplicates, restorePair, siteChange } from '../lib/sites.svelte.js';
   import { t } from '../lib/i18n.js';
   import { confirmAction } from '../lib/dialogs.js';
   import { offerUndo } from '../lib/undo.js';
@@ -78,6 +78,21 @@
     });
   }
 
+  /** @param {(typeof pairs)[number]} pair */
+  function notDuplicates(pair) {
+    dismissPair(pair.a, pair.b);
+    f7.toast
+      .create({
+        text: t('sites.notDuplicatesDone', { a: pair.a.name || t('sites.noName'), b: pair.b.name || t('sites.noName') }),
+        closeButton: true,
+        closeButtonText: t('edit.undo'),
+        closeTimeout: 6000,
+        position: 'bottom',
+        on: { closeButtonClick: () => restorePair(pair.a, pair.b) },
+      })
+      .open();
+  }
+
   function deleteSelection() {
     const n = selection.length;
     if (!n) return;
@@ -136,7 +151,7 @@
         </label>
       {/each}
       <div class="actions">
-        <button type="button" class="od-text-button" onclick={() => { dismissPair(pair.a.uuid, pair.b.uuid); load(); }}>{t('sites.notDuplicates')}</button>
+        <button type="button" class="od-text-button" onclick={() => notDuplicates(pair)}>{t('sites.notDuplicates')}</button>
         <button type="button" class="filled" onclick={() => merge(pair)}>{t('sites.merge')}</button>
       </div>
     </fieldset>
