@@ -1435,6 +1435,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Unités : après « Impérial » (ou « Métrique ») puis le changement d’une seule unité, les autres unités sont gardées au redémarrage de l’app ; auparavant, elles revenaient au système métrique.",
       "Planificateur (tablette en portrait) : ouvert à côté de la liste des outils, il tient en une colonne au lieu d’en ajouter une à droite de l’écran.",
       "À propos : la description de l’app ne dit plus « gratuit ».",
       "Premier lancement (tablette Android) : en paysage, le titre et le profil de plongée à gauche, les trois choix à droite ; en portrait, le titre, le profil sur toute la largeur puis les choix, centrés. Sans défilement, même sur une petite tablette.",
