@@ -1212,3 +1212,4 @@ Christian changed task 2026-11-09-36. Work on branch `feature/carnet-month-heade
 - Keep only the month line in the collapsed band, under the title: year (bold), month, and "{n} plongées" on the right. All three in 14 sp (was 20 sp for year and month).
 - The line shows the month of the first visible dive and switches when that dive is in another month. A trip counts under the month of its first dive, as before.
 
+Addendum (2026-11-10 10:55): the month label follows the display language. Build it with `Intl.DateTimeFormat(locale, { month: 'long', year: 'numeric' })` and capitalise the first letter: "Avril 2014" in French, "April 2014" in English. No bold: month and year in regular weight, 14 sp. Mock-ups updated.
