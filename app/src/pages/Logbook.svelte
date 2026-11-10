@@ -11,7 +11,7 @@
   import SyncPill from '../components/SyncPill.svelte';
   import DiveRow from '../components/DiveRow.svelte';
   import TripRow from '../components/TripRow.svelte';
-  import MonthSticky from '../components/MonthSticky.svelte';
+  import BandBackdrop from '../components/BandBackdrop.svelte';
   import Icon from '../components/Icon.svelte';
   import MenuItem from '../components/MenuItem.svelte';
   import MenuButton from '../components/MenuButton.svelte';
@@ -876,7 +876,7 @@
 
   // --- The month at the top of the list, shown under the top bar only: the
   // list has no month rows. The header is a single element outside the
-  // scrolling area (<MonthSticky>). On each frame of a scroll, the rows in the
+  // scrolling area (<BandBackdrop>). On each frame of a scroll, the rows in the
   // document (about twenty) are read to find the month at the top: no reflow
   // of the list, the cost does not grow with the size of the logbook.
 
@@ -1099,7 +1099,8 @@
     </NavRight>
   </Navbar>
 
-  <SectionBand tall pill={showPill} summary={bandSummary}>
+  {#if !theme.ios}<BandBackdrop pill={showPill} group={stickyGroup} />{/if}
+  <SectionBand tall pill={showPill} bare={!theme.ios} summary={bandSummary}>
     {#if showPill}
       {#if conflictWaits}
         <SyncPill icon="sync" text={stoppedText} onclick={reopenConflict} />
@@ -1343,9 +1344,6 @@
   {#if importing}<p class="od-sr-only" role="status">{t('logbook.importing')}</p>{/if}
 
   {#snippet fixedContent()}
-    {#if stickyGroup && listEl && !theme.ios}
-      <MonthSticky year={stickyGroup.year} month={stickyGroup.month} count={stickyGroup.count} pill={showPill} />
-    {/if}
     {#if selecting}
       <!-- Selection mode: the top bar gives way to the number of dives checked. -->
       <div class="selection-bar" bind:this={selectionBar}>
