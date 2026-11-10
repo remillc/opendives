@@ -1111,7 +1111,8 @@
     "keepTitle": "Quel site garder ?",
     "keepNote": "Les plongées des autres sites passent à celui-ci, et ces sites disparaissent. C’est annulable.",
     "sortName": "Ordre alphabétique",
-    "sortRecent": "Plus récent en premier"
+    "sortRecent": "Plus récent en premier",
+    "notDuplicatesDone": "{a} et {b} ne seront plus proposés comme doublons"
   },
   "renumber": {
     "titleChecked": "Renuméroter les plongées cochées ?",
@@ -1421,6 +1422,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Nettoyer les sites : « Pas des doublons » retire le groupe de la liste et ne le propose plus (sur cet appareil) ; « Annuler » le remet. Renommer ou déplacer un des deux sites le rend de nouveau proposable.",
       "Réglages : « Réinitialiser tous les réglages » demande d’abord confirmation, puis annonce « Réglages réinitialisés ». Il ne touche plus aux paramètres du planificateur.",
       "Logo : les trois vagues ont des dégradés plus courts, pour que les couches restent distinctes en petit.",
       "Sites : un menu change l’ordre de la liste (alphabétique ou plus récent en premier) ; un appui long sur un site le sélectionne, pour fusionner plusieurs sites.",
