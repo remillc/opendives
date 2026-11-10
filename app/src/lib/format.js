@@ -62,8 +62,8 @@ export function formatDepth(mm, prefs) {
 
 /**
  * Dive duration in whole minutes, as the Duration setting says (the core's
- * units.duration_units): automatic, "45 min" under an hour and "1 h 12" from
- * an hour, or always minutes ("72 min").
+ * units.duration_units): automatic, "45 min" under an hour and from an hour
+ * as the language writes it ("1 h 12", "1:12"), or always minutes ("72 min").
  * @param {number} seconds
  * @param {'mixed'|'minutes'} [mode]
  */
@@ -73,7 +73,7 @@ export function formatDuration(seconds, mode = settings.duration) {
   return `${formatNumber(minutes, 0)}${NBSP}${t('units.minutes')}`;
 }
 
-/** Time under water in hours and minutes, for totals: "11 h 26", "0 h 56". @param {number} seconds */
+/** Hours and minutes as the language writes them (units.hoursMinutes): "11 h 26", "11:26". @param {number} seconds */
 export function formatHours(seconds) {
   const minutes = Math.round(seconds / 60);
   return t('units.hoursMinutes', {

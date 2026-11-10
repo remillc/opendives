@@ -1503,7 +1503,7 @@
       "Statistiques : chaque ligne ouvre la liste de ses plongées.",
       "Carnet : le mois affiché dans le bandeau est plus discret.",
       "Les boutons de navigation réagissent tout de suite au toucher.",
-      "Les durées d’une heure ou plus s’écrivent partout « 1 h 11 ».",
+      "Les durées d’une heure ou plus suivent la langue : « 1 h 11 » en français, « 1:11 » en anglais.",
       "Réglages : l’option de durée « Toujours en heures et minutes » est retirée."
     ],
     "source": "Code source",

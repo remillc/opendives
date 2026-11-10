@@ -383,7 +383,7 @@
     "percent": "%",
     "kilograms": "kg",
     "pounds": "lb",
-    "hoursMinutes": "{h} h {mm}"
+    "hoursMinutes": "{h}:{mm}"
   },
   "settings": {
     "title": "Settings",
@@ -1327,7 +1327,7 @@
     "blendCooled": "Read the pressures on a cooled cylinder.",
     "blendOxygenClean": "Above 40 % oxygen, the cylinder and the valve must be oxygen clean.",
     "blendAnalyse": "Analyse the mix before diving.",
-    "hoursMinutes": "{h} h {m}"
+    "hoursMinutes": "{h} h {m} min"
   },
   "desaturation": {
     "title": "Desaturation",
@@ -1503,7 +1503,7 @@
       "Statistics: each row opens the list of its dives.",
       "Logbook: the month shown in the band is more discreet.",
       "Navigation buttons react to a touch at once.",
-      "Durations of an hour or more read “1 h 11” everywhere.",
+      "Durations of an hour or more follow the language: “1:11” in English, “1 h 11” in French.",
       "Settings: the “Always in hours and minutes” duration option is gone."
     ],
     "source": "Source code",
