@@ -1071,3 +1071,12 @@ Christian asked for it in a canvas comment. Mock-up: `docs/mockups/android-carte
 - Under the top bar of `/settings/maps/area`, a search field "Rechercher un lieu ou un site" (surface card, 56 dp, rounded). Results: logbook sites first (name, region), then places from Nominatim (OpenStreetMap geocoder; follow its usage policy: debounce, at most one request per second, a generic app identifier with no personal data).
 - Choosing a result centres the map on it and places the rectangle around it; for a logbook site, the region name defaults to "Autour de {site}".
 - This screen needs the network; offline, the field is disabled with "Recherche indisponible sans réseau".
+
+## [ ] 2026-11-10-02 Offline maps: "Choisir sur la carte" with a fixed frame (replaces the rectangle with handles)
+
+Christian approved these changes from canvas comments. Mock-up: `docs/mockups/android-cartes-choix-carte.dc.html`. Spec: "Offline maps", *Adding*. Builds on 2026-11-09-33 and 2026-11-10-01.
+- No draggable rectangle and no handles. A fixed square frame (300 dp, 1.5 dp outline, thick corner marks) stays centred in the visible part of the map (between the search field and the bottom sheet). The diver pans and zooms the map under it; the downloaded area is what the frame covers.
+- Outside the frame, a 40 % dark veil over the map.
+- Top bar on a plain surface with a 1 dp bottom divider: ✕ and "Choisir sur la carte". No gradient, no instruction line (keep the instruction in the map's accessible label).
+- The search field from 2026-11-10-01 floats on the map just under the top bar (surface card, light shadow).
+- Bottom sheet: the area size ("Environ 180 × 165 km") and estimated download size update as the zoom changes. Set a minimum and maximum zoom so the area stays between about 20 km and the size of the largest catalogue zone.
