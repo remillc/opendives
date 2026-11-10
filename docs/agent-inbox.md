@@ -1142,3 +1142,9 @@ Christian approved (canvas comments). Spec: "Sites, search open and its animatio
 - Opening: 300 ms, emphasized decelerate; the field grows from the 🔍 button (right-anchored), title and ☰ fade out as ← fades in, card and + fade out; focus and keyboard at the end.
 - Closing (←, back gesture, back on empty field): 200 ms, emphasized accelerate; keyboard first, field shrinks into 🔍, title and ☰ back, card and + back, pins back to 100 %, map back to its previous view. ✕ only clears.
 - Reduced motion: 150 ms cross-fade only.
+
+## [ ] 2026-11-10-09 Statistics: nothing clickable, remove the one-year view
+
+Christian approved (canvas comment). Spec: "Statistics, items are not clickable". Mock-up: `docs/mockups/android-stats.dc.html`.
+- On `/statistics/`, the chart cards and the result rows are not links: no chevron, no ripple, no focus stop.
+- Remove the one-year view and its route; remove any link to it. Keep the filter and "Nouvelle statistique".
