@@ -3,8 +3,8 @@
   // Filtered result of the Statistics section (docs/mockups/stats-filtre-android.dc.html,
   // ios-stats.dc.html): the criteria as removable input chips with "6 dives out
   // of 9", the key figures, maximum depth per dive, details, and "Compare by
-  // suit". Criteria arrive in the URL (?c=…), from a row of the Statistics
-  // section or a saved statistic (&saved=<id>). Figures from the core.
+  // suit". Criteria arrive in the URL (?c=…), from "New statistic" or a saved
+  // statistic (&saved=<id>). Figures from the core.
   import { untrack } from 'svelte';
   import { Page, Navbar, Link, theme } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';

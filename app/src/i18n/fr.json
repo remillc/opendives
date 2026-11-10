@@ -1154,7 +1154,6 @@
     "figureDeepest": "La plus profonde",
     "pendingValue": "Non disponible",
     "charts": "Graphiques",
-    "chartDepth": "Profondeur maximale",
     "chartDepthLabel": {
       "one": "Profondeur maximale de {n} plongée",
       "other": "Profondeur maximale de {n} plongées"
@@ -1178,8 +1177,6 @@
     "byMode": "Par mode",
     "bySuit": "Par combinaison",
     "byBuddy": "Par compagnon",
-    "byMonth": "Par mois",
-    "byTrip": "Par voyage",
     "notSet": "Non renseigné",
     "notSetFor": {
       "suit": "Non renseignée",
@@ -1189,12 +1186,6 @@
     "emptyTitle": "Pas encore de statistiques",
     "emptyText": "Les statistiques apparaissent avec les premières plongées du carnet.",
     "depthPerDive": "Profondeur maximale par plongée",
-    "chartYearLabel": {
-      "one": "Profondeur maximale de la plongée de {year} : {max}",
-      "other": "Profondeur maximale des {n} plongées de {year}, de {min} à {max}"
-    },
-    "tripLine": "{dives} · {place}",
-    "placeToSpecify": "lieu à préciser",
     "rowSummary": "{dives} · {time} · max {depth}",
     "rowSummaryNoDepth": "{dives} · {time}",
     "details": "En détail",
@@ -1430,6 +1421,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Statistiques : les sections « Par … » sont toujours dépliées. Les graphiques et les lignes de ces sections ne s’ouvrent plus, et la vue d’une année disparaît.",
       "Sites : la recherche s’ouvre depuis la loupe avec une animation. Le champ s’agrandit dans la barre du haut, le nombre de résultats s’affiche dessous, les sites qui ne correspondent pas s’estompent sur la carte et la liste ne garde que les résultats, avec le texte trouvé surligné. La flèche, le geste retour ou la touche retour la ferment et ramènent la carte où elle était ; la croix efface seulement le texte. Avec les animations réduites, le changement est un court fondu.",
       "Nettoyer les sites : un crayon sur chaque site d’un groupe de doublons ouvre son éditeur, puis revient au même endroit ; un groupe qui ne correspond plus disparaît.",
       "Messages : un seul style pour toutes les barres de message, sombre en mode clair et clair en mode sombre, flottant au-dessus du bas de l’écran (au-dessus du bouton + s’il y en a un), avec une seule action en bleu.",
