@@ -1434,6 +1434,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Profil de plongée : le curseur est un simple trait de la couleur de la courbe, sans contour blanc ; les boutons de courbe (Température, ppO₂, Plafond…) prennent la couleur de leur courbe quand ils sont choisis.",
       "Statistiques : la liste des plongées derrière une ligne s’ouvre plus vite et utilise bien moins de mémoire sur un grand carnet ; seules les lignes proches de l’écran sont dessinées.",
       "Plongée : en passant d’une plongée à la suivante ou à la précédente d’un balayage, la carte du site et le détail sont déjà prêts ; l’écran arrive entier au lieu de se remplir pendant le glissement.",
       "Compte (Android) : la connexion, la création d’un compte, le code de confirmation, la reprise du carnet et le dépôt git prennent la mise en page du premier lancement : grand titre, champs dans une carte blanche, grand bouton en bas et profil de plongée. Sur tablette, le titre et la carte sont côte à côte en paysage, l’un sous l’autre en portrait.",
