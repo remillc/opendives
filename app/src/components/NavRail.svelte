@@ -10,6 +10,7 @@
   import { ios } from '../lib/layout.svelte.js';
   import { navigation, sections, showSection, openSettings, openAbout, requestAdd } from '../lib/navigation.svelte.js';
   import { t } from '../lib/i18n.js';
+  import { tolerantTaps } from '../lib/tap.js';
 
   /**
    * @param {MouseEvent} e
@@ -21,7 +22,7 @@
   }
 </script>
 
-<nav class="od-nav-rail od-nav-rail--rail" class:ios aria-label={t('menu.sections')}>
+<nav class="od-nav-rail od-nav-rail--rail" class:ios aria-label={t('menu.sections')} use:tolerantTaps>
   {#if ios}
     <p class="od-nav-rail--title">{t('menu.title')}</p>
   {:else}
