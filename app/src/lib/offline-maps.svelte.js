@@ -5,6 +5,7 @@
 // side (downloads, files, free space) is the plugin's maps* methods; the rules
 // are in maps-logic.js.
 import { f7 } from 'framework7-svelte';
+import { showSnackbar } from './snackbar.js';
 import { OpenDivesCore } from 'opendives-core';
 import { t, language } from './i18n.js';
 import { showSection } from './navigation.svelte.js';
@@ -164,7 +165,7 @@ export async function refreshSpace() {
 
 /** @param {string} text */
 function toast(text) {
-  f7.toast.create({ text, closeTimeout: 4000, position: 'bottom' }).open();
+  showSnackbar(text);
 }
 
 /** @param {string} path */
@@ -488,26 +489,19 @@ export function deleteRegion(id) {
   r.pendingDelete = true;
   save();
   let undone = false;
-  f7.toast
-    .create({
-      text: t('maps.deleted', { name: regionName(r) }),
-      cssClass: 'od-undo-toast',
-      closeButton: true,
-      closeButtonText: t('edit.undo'),
-      closeTimeout: 6000,
-      position: 'bottom',
-      on: {
-        closeButtonClick: () => {
-          undone = true;
-          r.pendingDelete = false;
-          save();
-        },
-        closed: () => {
-          if (!undone) finishDelete(id);
-        },
-      },
-    })
-    .open();
+  showSnackbar(t('maps.deleted', { name: regionName(r) }), {
+    undoable: true,
+    action: t('edit.undo'),
+    timeout: 6000,
+    onAction: () => {
+      undone = true;
+      r.pendingDelete = false;
+      save();
+    },
+    onClosed: () => {
+      if (!undone) finishDelete(id);
+    },
+  });
 }
 
 /** The file goes. @param {string} id */

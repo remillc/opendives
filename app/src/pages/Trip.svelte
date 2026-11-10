@@ -8,6 +8,7 @@
   // that of the current load: never stored.
   import { onMount, tick } from 'svelte';
   import { Page, Navbar, Link, List, Popover, f7 } from 'framework7-svelte';
+  import { showSnackbar } from '../lib/snackbar.js';
   import MenuItem from '../components/MenuItem.svelte';
   import { OpenDivesCore } from 'opendives-core';
   import Icon from '../components/Icon.svelte';
@@ -40,7 +41,7 @@
 
   /** @param {string} text */
   function toast(text) {
-    f7.toast.create({ text, closeTimeout: 4000, position: 'center' }).open();
+    showSnackbar(text);
   }
 
   /**

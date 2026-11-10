@@ -6,7 +6,7 @@
   // number is typed, and the main button then reads "Renuméroter et décaler"
   // (no second dialog). One undoable step, as Subsurface's RenumberDives.
   // Dive numbers are shown without thousands separators.
-  import { f7 } from 'framework7-svelte';
+  import { showSnackbar } from '../lib/snackbar.js';
   import Md3Dialog from './Md3Dialog.svelte';
   import TextField from './TextField.svelte';
   import { renumberDivesTo, renumberShiftPlan } from '../lib/logbook.svelte.js';
@@ -47,9 +47,7 @@
       console.error('Renumber a dive', e);
       ondone();
       const code = String(/** @type {any} */ (e)?.message ?? '');
-      f7.toast
-        .create({ text: code.startsWith('WRITE_LOCKED') ? t('edit.writeLocked') : t('renumber.failed'), closeTimeout: 4000 })
-        .open();
+      showSnackbar(code.startsWith('WRITE_LOCKED') ? t('edit.writeLocked') : t('renumber.failed'));
     }
   }
 </script>

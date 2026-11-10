@@ -5,7 +5,7 @@
   // the side menu on any section. "Plus tard" only closes it: the diver is
   // where they were. The choice is applied on the phone first; nothing is sent
   // while the snackbar can still take it back.
-  import { f7 } from 'framework7-svelte';
+  import { showSnackbar } from '../lib/snackbar.js';
   import ConflictSheet from './ConflictSheet.svelte';
   import { logbook, resolveConflict, sendConflictChoice, cancelConflictChoice, postponeConflict } from '../lib/logbook.svelte.js';
   import { t } from '../lib/i18n.js';
@@ -15,28 +15,21 @@
     await resolveConflict(choices);
     const kept = new Set(Object.values(choices));
     let undone = false;
-    f7.toast
-      .create({
-        text: kept.size > 1 ? t('conflict.keptMixed') : t(kept.has('cloud') ? 'conflict.keptCloud' : 'conflict.keptDevice'),
-        cssClass: 'od-undo-toast',
-        closeButton: true,
-        closeButtonText: t('edit.undo'),
-        closeTimeout: 8000,
-        position: 'bottom',
-        on: {
-          closeButtonClick: () => {
-            undone = true;
-            cancelConflictChoice().catch((e) => {
-              console.error('Taking back the conflict choice', e);
-              f7.toast.show({ text: t('conflict.failed'), closeTimeout: 4000 });
-            });
-          },
-          closed: () => {
-            if (!undone) sendConflictChoice();
-          },
-        },
-      })
-      .open();
+    showSnackbar(kept.size > 1 ? t('conflict.keptMixed') : t(kept.has('cloud') ? 'conflict.keptCloud' : 'conflict.keptDevice'), {
+      undoable: true,
+      action: t('edit.undo'),
+      timeout: 8000,
+      onAction: () => {
+        undone = true;
+        cancelConflictChoice().catch((e) => {
+          console.error('Taking back the conflict choice', e);
+          showSnackbar(t('conflict.failed'));
+        });
+      },
+      onClosed: () => {
+        if (!undone) sendConflictChoice();
+      },
+    });
   }
 </script>
 

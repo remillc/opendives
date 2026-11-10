@@ -10,6 +10,7 @@
   // the logbook's. The planner's own parameters stay in the planner.
   import { onMount } from 'svelte';
   import { Page, Navbar, Link, f7 } from 'framework7-svelte';
+  import { showSnackbar } from '../lib/snackbar.js';
   import { OpenDivesCore } from 'opendives-core';
   import ChoiceDialog from '../components/ChoiceDialog.svelte';
   import MenuButton from '../components/MenuButton.svelte';
@@ -69,7 +70,7 @@
   /** @param {unknown} e */
   function failed(e) {
     console.error('Changing a setting', e);
-    f7.toast.show({ text: t('settings.error'), closeTimeout: 4000 });
+    showSnackbar(t('settings.error'));
   }
 
   /** @param {Partial<CorePrefValues>} changes */
@@ -786,7 +787,7 @@
         try {
           logbook.prefs = await resetAllSettings(defaults);
           applyTheme('system');
-          f7.toast.show({ text: t('settings.advanced.resetDone'), closeTimeout: 4000 });
+          showSnackbar(t('settings.advanced.resetDone'));
         } catch (e) {
           failed(e);
         }

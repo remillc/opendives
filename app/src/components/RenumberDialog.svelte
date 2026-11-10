@@ -4,7 +4,7 @@
   // all the dives (RenumberDialog, desktop-widgets/simplewidgets.cpp). The
   // dialog says what changes, asks for the first number, and renumbers all the
   // dives in date order as one undoable step; the "Undo" message follows.
-  import { f7 } from 'framework7-svelte';
+  import { showSnackbar } from '../lib/snackbar.js';
   import Md3Dialog from './Md3Dialog.svelte';
   import TextField from './TextField.svelte';
   import { logbook, renumberDives } from '../lib/logbook.svelte.js';
@@ -41,9 +41,7 @@
       console.error('Renumber', e);
       ondone();
       const code = String(/** @type {any} */ (e)?.message ?? '');
-      f7.toast
-        .create({ text: code.startsWith('WRITE_LOCKED') ? t('edit.writeLocked') : t('renumber.failed'), closeTimeout: 4000 })
-        .open();
+      showSnackbar(code.startsWith('WRITE_LOCKED') ? t('edit.writeLocked') : t('renumber.failed'));
     }
   }
 </script>

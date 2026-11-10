@@ -111,6 +111,10 @@
     /* "Choisir sur la carte": the fixed frame and the 40 % veil outside it. */
     --od-area-frame: #1F2124;
     --od-area-veil: rgb(31 33 36 / 0.4);
+    /* Snackbar (ui-foundations, section 8): surface, text 12.0:1, action 6.3:1. */
+    --od-inverse-surface: #2E3033;
+    --od-inverse-on-surface: #F4F4F2;
+    --od-inverse-primary: #8AB4F8;
   }
 
   /* Dark mode: system surfaces from Framework7, bright water with an outlined line. */
@@ -172,6 +176,10 @@
     --od-menu-divider: var(--f7-md-outline-variant);
     --od-area-frame: #F4F4F2;
     --od-area-veil: rgb(0 0 0 / 0.4);
+    /* Snackbar, dark: text 13.1:1; action 4.7:1 (#2F6DB5 of the spec gives 4.3:1, under AA). */
+    --od-inverse-surface: #E8E8E5;
+    --od-inverse-on-surface: #1F2124;
+    --od-inverse-primary: #2B66AD;
   }
 }
 
@@ -1010,4 +1018,65 @@ html.ios {
 
 .searchbar.od-band-search .searchbar-inner {
   padding: 0;
+}
+
+/*
+ * The snackbar (ui-foundations, section 8): Framework7's toast, one style for
+ * every message of the app (lib/snackbar.js). The same on iOS and Android.
+ */
+@layer od.components {
+  .toast.od-snackbar {
+    --od-snackbar-bottom: 24px;
+    inset: auto 16px calc(var(--od-snackbar-bottom) + var(--f7-safe-area-bottom)) 16px;
+    width: auto;
+    max-width: 568px;
+    margin: 0;
+    border-radius: 4px;
+    background: var(--od-inverse-surface);
+    color: var(--od-inverse-on-surface);
+    box-shadow: 0 2px 6px rgb(0 0 0 / 0.25);
+    transform: scale(0.9);
+    transition-duration: 200ms;
+
+    &.modal-in,
+    &.modal-out {
+      transform: scale(1);
+    }
+
+    /* A FAB is 56 dp at 16 dp from the bottom: 16 dp of air above it. */
+    &.od-snackbar-above-fab {
+      --od-snackbar-bottom: 88px;
+    }
+
+    .toast-content {
+      min-height: 48px;
+      padding: 8px 8px 8px 16px;
+    }
+
+    .toast-text {
+      padding: 6px 0;
+      font-size: 14px;
+      line-height: 20px;
+      /* Up to two lines. */
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      overflow: hidden;
+    }
+
+    .toast-button {
+      min-width: 0;
+      height: 40px;
+      margin: 0 0 0 8px;
+      padding: 0 12px;
+      border-radius: 4px;
+      background: none;
+      color: var(--od-inverse-primary);
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: none;
+      letter-spacing: normal;
+    }
+  }
 }

@@ -7,7 +7,7 @@
   // Until the core gives a first stage (and when there is nothing to
   // exchange, it may give none), a bar sweeps across the button; at the end
   // it fills to 100 % for a moment, so that a quick sync is seen too.
-  import { f7 } from 'framework7-svelte';
+  import { showSnackbar } from '../lib/snackbar.js';
   import { logbook, syncNow } from '../lib/logbook.svelte.js';
   import { t } from '../lib/i18n.js';
 
@@ -35,14 +35,7 @@
     }
     busy = false;
     finishing = false;
-    f7.toast
-      .create({
-        text: t(`sync.outcome.${outcome}`),
-        cssClass: 'od-sync-toast',
-        closeTimeout: outcome === 'done' ? 4000 : 6000,
-        position: 'bottom',
-      })
-      .open();
+    showSnackbar(t(`sync.outcome.${outcome}`), { timeout: outcome === 'done' ? 4000 : 6000 });
   }
 </script>
 
