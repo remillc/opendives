@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Premier lancement, Android</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:#1F2124}a:hover{color:#1F2124}
+/* Source Sans 3 for body text, sized to match the system font (size-adjust 108%) */
+@font-face{font-family:'Source Sans 3 OD';font-weight:400;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(../brand/fonts/source-sans-3-latin-400-normal.woff2) format('woff2')}
+@font-face{font-family:'Source Sans 3 OD';font-weight:500;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(../brand/fonts/source-sans-3-latin-500-normal.woff2) format('woff2')}
+@font-face{font-family:'Source Sans 3 OD';font-weight:600;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(../brand/fonts/source-sans-3-latin-600-normal.woff2) format('woff2')}
+@font-face{font-family:'Source Sans 3 OD';font-weight:700;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(../brand/fonts/source-sans-3-latin-700-normal.woff2) format('woff2')}
+@font-face{font-family:'Source Sans 3 OD';font-weight:800;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(../brand/fonts/source-sans-3-latin-800-normal.woff2) format('woff2')}
+@font-face{font-family:'Source Sans 3 OD';font-weight:900;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(../brand/fonts/source-sans-3-latin-900-normal.woff2) format('woff2')}
+h1,h2,h3,h4,h1 *,h2 *,h3 *,h4 *,[style*='font-size: 2'],[style*='font-size: 3'],[style*='font-size: 4'],[style*='font-size: 2'] *,[style*='font-size: 3'] *,[style*='font-size: 4'] *{font-family:Roboto, 'Google Sans', system-ui, sans-serif !important}
+</style>
+</helmet>
+<div style="width: 390px; height: 900px; box-sizing: border-box; background: #F4F4F2; font-family: 'Source Sans 3 OD', Roboto, 'Google Sans', system-ui, sans-serif; color: #1F2124; position: relative; overflow: hidden; display: flex; flex-direction: column">
+  <div style="padding: 56px 24px 0 24px; display: flex; align-items: center; gap: 10px"><svg width="40" height="40" aria-hidden="true" viewBox="21 21 66 66"><defs><linearGradient id="c3od1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color: #F5E2B0"></stop><stop offset="1" style="stop-color: #EFD08F"></stop></linearGradient><linearGradient id="c3od2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color: #EBAD60"></stop><stop offset="1" style="stop-color: #E3923C"></stop></linearGradient><linearGradient id="c3od3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color: #D9702A"></stop><stop offset="1" style="stop-color: #C2550F"></stop></linearGradient></defs><circle cx="54" cy="54" r="30" style="fill: #1E2023"></circle><clipPath id="c3odc"><circle cx="54" cy="54" r="29"></circle></clipPath><g clip-path="url(#c3odc)"><path d="M-2 52 Q9 61 20 52 T42 52 T64 52 T86 52 T108 52 T130 52 V100 H-2 Z" style="fill: url(#c3od1)"></path><path d="M-5 60.5 Q6 69.5 17 60.5 T39 60.5 T61 60.5 T83 60.5 T105 60.5 T127 60.5 V100 H-5 Z" style="fill: url(#c3od2)"></path><path d="M-8 69 Q3 78 14 69 T36 69 T58 69 T80 69 T102 69 T124 69 V100 H-8 Z" style="fill: url(#c3od3)"></path></g><path d="M24 54 A30 30 0 0 0 84 54" style="fill: none; stroke: #F4F4F2; stroke-width: 3; stroke-linecap: round"></path><circle cx="62" cy="39" r="3.6" style="fill: #F4F4F2"></circle><circle cx="56.5" cy="30.8" r="2.6" style="fill: #F4F4F2"></circle></svg>
+<span style="font-size: 20px; line-height: 28px; font-weight: 500; letter-spacing: 0.2px">OpenDives</span></div>
+  <h1 style="margin: 72px 24px 0 24px; font-size: 40px; line-height: 48px; font-weight: 400; letter-spacing: -0.5px">Votre carnet<br>de plongée.</h1>
+  <svg width="390" height="190" viewBox="0 0 390 190" role="img" aria-label="Profil d’une plongée" style="display: block; margin-top: 28px">
+    <defs><linearGradient id="c3w" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color: #FBE3B2; stop-opacity: 0.9"></stop><stop offset="1" style="stop-color: #B4530F; stop-opacity: 0.9"></stop></linearGradient></defs>
+    <path d="{{area}}" style="fill: url(#c3w)"></path>
+    <path d="{{line}}" style="fill: none; stroke: #1F2124; stroke-width: 1.5; stroke-linejoin: round"></path>
+  </svg>
+  <div style="flex: 1"></div>
+  <nav aria-label="Façons de commencer" style="padding: 0 24px 16px 24px; display: flex; flex-direction: column; gap: 14px">
+    <div style="display: flex; flex-direction: column; gap: 6px"><a href="compte-connexion-android.dc.html" style="height: 56px; border-radius: 28px; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 16px; font-weight: 500; letter-spacing: 0.1px; box-sizing: border-box; background: #1F2124; color: #F4F4F2; border: none">J’ai un compte Subsurface</a><p style="margin: 0 8px; font-size: 13px; line-height: 18px; color: #4A4D52; text-align: center">Sauvegardé dans le cloud, consultable hors ligne</p></div>
+    <div style="display: flex; flex-direction: column; gap: 6px"><a href="compte-creation-android.dc.html" style="height: 56px; border-radius: 28px; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 16px; font-weight: 500; letter-spacing: 0.1px; box-sizing: border-box; background: transparent; color: #1F2124; border: 1px solid #75787C">Créer un compte</a><p style="margin: 0 8px; font-size: 13px; line-height: 18px; color: #4A4D52; text-align: center">Gratuit. Partagé entre vos appareils</p></div>
+    <div style="display: flex; flex-direction: column; gap: 6px"><a href="android-carnet.dc.html" style="height: 56px; border-radius: 28px; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 16px; font-weight: 500; letter-spacing: 0.1px; box-sizing: border-box; background: transparent; color: #1F2124; border: none">Commencer sans compte</a><p style="margin: 0 8px; font-size: 13px; line-height: 18px; color: #4A4D52; text-align: center">Sur cet appareil seulement</p></div>
+  </nav>
+  <a href="git-config-android.dc.html" style="margin: 0 auto 24px auto; font-size: 13px; line-height: 18px; color: #4A4D52; text-decoration: underline">Utiliser mon propre dépôt git</a>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":900}}'>
+var PTS = [[0,0.0],[170,24.0],[390,46.4],[610,57.3],[830,59.6],[1050,55.5],[1160,52.9],[1380,32.4],[1553,20.7],[1632,20.6],[1676,21.1],[1750,22.4],[1970,20.7],[2190,22.3],[2410,24.0],[2630,22.6],[2850,18.2],[3070,16.5],[3290,16.5],[3510,14.3],[3730,16.2],[3950,13.3],[4170,10.0],[4390,10.9],[4610,10.5],[4830,9.9],[5050,7.5],[5270,6.1],[5490,7.6],[5710,6.3],[5930,4.5],[6150,5.0],[6240,0.0]];
+class Component extends DCLogic {
+  renderVals() {
+    var line = 'M' + PTS.map(function (p) { return (p[0] / 6240 * 390).toFixed(1) + ' ' + (8 + p[1] / 60.2 * 174).toFixed(1); }).join(' L');
+    return { line: line, area: line + ' Z' };
+  }
+}
+</script>
+</body>
+</html>
