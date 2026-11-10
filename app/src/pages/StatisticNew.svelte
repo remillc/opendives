@@ -4,8 +4,8 @@
   // docs/mockups/stats-nouvelle-android.dc.html as a full-screen dialog, iPhone
   // ios-stats-nouvelle.dc.html as a sheet with Annuler / Enregistrer). A
   // criterion, the values found in the logbook for it with their number of
-  // dives, "Add a criterion", the live result (opening the filtered result), an
-  // optional name proposed from the criteria. "Enregistrer" adds it to My
+  // dives, "Add a criterion", the live result (opening the filtered result); the
+  // optional name, proposed from the criteria, comes first. "Enregistrer" adds it to My
   // statistics, on this device. No chart builder.
   import { Popup, View, Page, Navbar, Link, f7, theme } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
@@ -123,6 +123,23 @@
         {/snippet}
       </Navbar>
 
+      {#if theme.ios}
+        <div class="block-title">{t('stats.name')}</div>
+        <div class="list list-strong inset list-dividers inline-labels">
+          <ul>
+            <li class="item-content item-input">
+              <div class="item-inner">
+                <div class="item-title item-label" aria-hidden="true">{t('stats.name')}</div>
+                <div class="item-input-wrap"><input type="text" aria-label={t('stats.name')} value={name} oninput={onName} /></div>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <p class="note">{t('stats.nameHint')}</p>
+      {:else}
+        <TextField label={t('stats.name')} bind:value={name} oninput={() => (nameTyped = true)} supporting={t('stats.nameHintShort')} />
+      {/if}
+
       {#each criteria as c, index (index)}
         {@const values = valuesByField[c.field]}
         {#if theme.ios}
@@ -217,23 +234,7 @@
       <!-- The result card opens the filtered result (in the Statistics section, behind this dialog). -->
       <KeyFigures figures={result?.total ?? null} prefs={logbook.prefs} href={canSave ? resultHref : undefined} onclick={openResult} />
 
-      {#if theme.ios}
-        <div class="block-title">{t('stats.name')}</div>
-        <div class="list list-strong inset list-dividers inline-labels">
-          <ul>
-            <li class="item-content item-input">
-              <div class="item-inner">
-                <div class="item-title item-label" aria-hidden="true">{t('stats.name')}</div>
-                <div class="item-input-wrap"><input type="text" aria-label={t('stats.name')} value={name} oninput={onName} /></div>
-              </div>
-            </li>
-          </ul>
-        </div>
-        <p class="note">{t('stats.nameHint')} {t('stats.rules')}</p>
-      {:else}
-        <TextField label={t('stats.name')} bind:value={name} oninput={() => (nameTyped = true)} supporting={t('stats.nameHintShort')} />
-        <p class="note rules">{t('stats.rulesValues')} {t('stats.rules')}</p>
-      {/if}
+      <p class="note rules">{theme.ios ? '' : `${t('stats.rulesValues')} `}{t('stats.rules')}</p>
       <div class="end"></div>
     </Page>
   </View>

@@ -95,7 +95,7 @@
                 <ProfileThumbnail profile={listed.profile} maxDepthMm={listed.maxDepthMm} prefs={logbook.prefs} />
               {/if}
               <span class="text-column">
-                <span class="date od-value">{formatLongDateTime(dive.date)}</span>
+                <span class="date od-value">{dive.number ? t('sites.diveNumberDate', { number: dive.number, date: formatLongDateTime(dive.date) }) : formatLongDateTime(dive.date)}</span>
                 <span class="supporting od-value">{lines[dive.id] ?? ''}</span>
               </span>
             </a>
