@@ -1434,6 +1434,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Plongée : en passant d’une plongée à la suivante ou à la précédente d’un balayage, la carte du site et le détail sont déjà prêts ; l’écran arrive entier au lieu de se remplir pendant le glissement.",
       "Compte (Android) : la connexion, la création d’un compte, le code de confirmation, la reprise du carnet et le dépôt git prennent la mise en page du premier lancement : grand titre, champs dans une carte blanche, grand bouton en bas et profil de plongée. Sur tablette, le titre et la carte sont côte à côte en paysage, l’un sous l’autre en portrait.",
       "Cartes hors ligne : elles fonctionnent aussi sur iPhone et iPad.",
       "Statistiques et plongée : une valeur n’est plus coupée au milieu d’un nombre ou d’un mot ; quand les chiffres clés ne tiennent pas côte à côte, le dernier passe entier à la ligne.",

@@ -4,23 +4,26 @@
   // mock-ups; spec, "Dive detail, site map behind the header"). Decorative: not
   // interactive, hidden from screen readers. Until the picture is there
   // (offline and never seen), nothing is shown. The map's credits are in About.
-  import { onDestroy } from 'svelte';
-  import { DRAW_WIDTH, HALF_HEIGHT, loadSiteMap } from '../lib/site-image.js';
+  import { DRAW_WIDTH, HALF_HEIGHT, readySiteMap, sharedSiteMap } from '../lib/site-image.js';
 
   /** @type {{ latUdeg: number, lonUdeg: number, onshown: (shown: boolean) => void }} */
   let { latUdeg, lonUdeg, onshown } = $props();
 
-  let src = $state('');
+  // Prepared ahead (the dives beside this one, dive-preload.js): there from the first frame.
+  // svelte-ignore state_referenced_locally
+  let src = $state(readySiteMap(latUdeg, lonUdeg) ?? '');
 
   $effect(() => {
     let stale = false;
-    loadSiteMap(latUdeg, lonUdeg)
+    const ready = readySiteMap(latUdeg, lonUdeg);
+    if (ready) {
+      src = ready;
+      onshown(true);
+      return;
+    }
+    sharedSiteMap(latUdeg, lonUdeg)
       .then((url) => {
-        if (stale) {
-          URL.revokeObjectURL(url);
-          return;
-        }
-        if (src) URL.revokeObjectURL(src);
+        if (stale) return;
         src = url;
         onshown(true);
       })
@@ -32,10 +35,6 @@
     return () => {
       stale = true;
     };
-  });
-
-  onDestroy(() => {
-    if (src) URL.revokeObjectURL(src);
   });
 </script>
 
