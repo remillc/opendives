@@ -1175,3 +1175,9 @@ Christian asked to review the filter page against the new Android mock-up. Spec:
 - "Matériel": card of rows with current value and a chevron to the right (opens the criterion). An active criterion: grey row, value in semibold.
 - "Autres critères": card of groups with their content line and a chevron pointing down; tapping expands the group in place to list its criteria (each opens like a Matériel row).
 - Fixed bottom bar: filled full-width "Afficher les {n} plongées", text button "Enregistrer ce filtre".
+
+Addendum (2026-11-10 10:10): saved filters. Spec: "Filter, Android" (updated). Mock-up: `docs/mockups/filtre-android.dc.html` (updated).
+- Under the search field, a section "Filtres enregistrés": a card with one 56 dp row per saved filter, name only, no description line.
+- Tapping a row applies the filter: its criteria fill the page (mode, Matériel, Autres critères). The applied filter has a grey row and a check icon on the left.
+- Each row has an ✕ icon button on the right, `aria-label` "Supprimer le filtre {nom}": deletes at once, snackbar "Filtre {nom} supprimé" with "Annuler" for 6 s (snackbar style of ui-foundations section 8).
+- Hidden while the search field has text; absent when no filter is saved.
