@@ -1411,7 +1411,7 @@
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
       "Réglages : le type d’eau des plongées téléchargées dont l’ordinateur ne donne rien se choisit (Non précisé par défaut).",
-      "Cartes hors ligne : téléchargez des régions (zones de plongée, pays ou un rectangle de votre choix) depuis Réglages ; une limite d’espace et un plancher d’espace libre protègent l’appareil, et les mises à jour sont proposées avec un badge.",
+      "Cartes hors ligne : dessinez un rectangle sur la carte depuis Réglages pour le télécharger (jusqu’à 3 000 tuiles ; moins de détails permet une zone plus grande) ; une limite d’espace et un plancher d’espace libre protègent l’appareil, et les mises à jour sont proposées avec un badge.",
       "Sites : sans réseau, la carte lit les régions téléchargées, sinon un planisphère simplifié ; une pastille « Hors ligne » l’indique et un message propose de télécharger la zone.",
       "Désaturation : le texte sous le graphique est plus court.",
       "Réglages : la langue de l’app peut être Français (Canada), qui dit « nuage » et « courriel » ; un téléphone réglé en français (Canada) la choisit tout seul.",
@@ -2299,57 +2299,57 @@
       "text": "Vos cartes occupent {used}. OpenDives garde aussi toujours au moins {floor} libre sur l’appareil."
     },
     "region": {
-      "sizeDate": "{size} · {date}",
-      "drawn": "Zone choisie · {size} · {date}",
       "updateAvailable": "Mise à jour disponible",
       "update": "Mettre à jour",
       "options": "Options pour {name}",
-      "swipeHint": "Balayez une région vers la gauche pour la supprimer."
+      "swipeHint": "Balayez une région vers la gauche pour la supprimer.",
+      "fullDetail": "Détails complets · {size} · {date}",
+      "lessDetail": "Moins de détails · {size} · {date}"
     },
     "menu": {
-      "update": "Mettre à jour, {size}",
+      "update": "Mettre à jour",
       "view": "Voir sur la carte",
       "delete": "Supprimer"
     },
     "download": {
-      "progress": "{received} sur {total} · {percent} %",
-      "waitingWifi": "En attente du Wi-Fi · {size}",
-      "queued": "En attente · {size}",
+      "progress": "{done} sur {total} tuiles · {percent} %",
+      "waitingWifi": "En attente du Wi-Fi · {total} tuiles",
+      "queued": "En attente · {total} tuiles",
       "now": "Télécharger maintenant",
       "stop": "Arrêter le téléchargement",
       "background": "Le téléchargement continue si vous quittez l’app.",
-      "pausedAt": "En pause à {received} sur {total}",
+      "pausedAt": "En pause à {done} sur {total} tuiles",
       "noSpace": "Espace insuffisant sur l’appareil",
       "resumesWhen": "Reprendra quand {floor} sera libre.",
       "manage": "Gérer l’espace",
-      "interrupted": "Interrompu à {received} sur {total}",
+      "interrupted": "Interrompu à {done} sur {total} tuiles",
       "resumesOnline": "Reprendra au retour du réseau",
-      "updating": "Mise à jour · {received} sur {total}",
-      "updatingWifi": "Mise à jour en attente du Wi-Fi · {size}",
+      "updating": "Mise à jour · {done} sur {total} tuiles",
+      "updatingWifi": "Mise à jour en attente du Wi-Fi",
       "oldStays": "L’ancienne carte reste utilisable jusqu’à la fin.",
       "progressLabel": "Téléchargement de {name}"
     },
     "failure": {
       "title": "Échec du téléchargement",
       "network": "La connexion a été coupée",
-      "checksum": "Le fichier reçu est incomplet ou corrompu",
       "space": "Espace insuffisant sur l’appareil",
       "server": "Le serveur n’a pas répondu correctement",
       "retry": "Réessayer",
-      "remove": "Retirer"
+      "remove": "Retirer",
+      "limit": "Cette région dépasse les 50 Mo qu’OpenFreeMap permet pour un téléchargement. Choisissez une zone plus petite ou moins de détails."
     },
     "updateFailed": "La mise à jour de {name} a échoué. L’ancienne carte reste utilisable.",
     "deleted": "{name} supprimée",
     "dialogs": {
       "cellular": {
         "title": "Télécharger sur données mobiles ?",
-        "text": "{name} pèse environ {size}. Sans Wi-Fi, ces données sont prises sur votre forfait.",
+        "text": "{name} peut peser jusqu’à {size}. Sans Wi-Fi, ces données sont prises sur votre forfait.",
         "wait": "Attendre le Wi-Fi",
         "go": "Télécharger"
       },
       "space": {
         "title": "Espace insuffisant",
-        "text": "{name} demande environ {size}. Il ne resterait que {remaining} libres sur l’appareil. OpenDives garde toujours au moins {floor} libre pour que le téléphone continue de bien fonctionner."
+        "text": "{name} peut demander jusqu’à {size}. Il ne resterait que {remaining} libres sur l’appareil. OpenDives garde toujours au moins {floor} libre pour que le téléphone continue de bien fonctionner."
       },
       "manage": {
         "title": "Espace sur l’appareil",
@@ -2357,13 +2357,13 @@
       },
       "cap": {
         "title": "Limite des cartes atteinte",
-        "text": "{name} demande environ {size}. Vos cartes occupent déjà {used} sur {cap} permis. Supprimez une région, ou augmentez la limite.",
+        "text": "{name} peut demander jusqu’à {size}. Vos cartes occupent déjà {used} sur {cap} permis. Supprimez une région, ou augmentez la limite.",
         "view": "Voir mes régions",
         "change": "Changer la limite"
       },
       "replace": {
         "title": "Remplacer la carte ?",
-        "text": "La mise à jour de {name} demande {size} de plus pendant le téléchargement. Pour rester sous la limite, l’ancienne carte sera supprimée d’abord. {name} sera indisponible sans réseau jusqu’à la fin.",
+        "text": "La mise à jour de {name} peut demander jusqu’à {size} de plus pendant le téléchargement. Pour rester sous la limite, l’ancienne carte sera supprimée d’abord. {name} sera indisponible sans réseau jusqu’à la fin.",
         "confirm": "Remplacer"
       },
       "delete": {
@@ -2372,48 +2372,6 @@
         "confirm": "Supprimer"
       }
     },
-    "addScreen": {
-      "search": "Rechercher une zone ou un pays",
-      "results": "Résultats",
-      "noResult": "Aucune zone ni aucun pays ne correspond.",
-      "fromLogbook": "Depuis votre carnet",
-      "fromLogbookNote": "Les zones où vous avez plongé, d’après vos voyages et vos sites.",
-      "fromLogbookNone": "Aucune zone du catalogue ne contient vos sites pour le moment.",
-      "trip": "Voyage {name}, {date} · {sites}",
-      "tripNoDate": "Voyage {name} · {sites}",
-      "siteDives": {
-        "one": "{site} · {n} plongée",
-        "other": "{site} · {n} plongées"
-      },
-      "sitesMore": "{site} et {n} autres",
-      "zoneSize": "Zone de plongée · environ {size}",
-      "downloaded": "Téléchargée",
-      "download": "Télécharger {name}",
-      "all": "Toutes les régions",
-      "byCountry": "Par pays et par zone",
-      "byCountryText": "Les pays du catalogue, puis leurs zones de plongée",
-      "onMap": "Choisir sur la carte",
-      "onMapText": "Un rectangle autour du point voulu",
-      "nearTitle": "Zone de la carte affichée",
-      "nearNone": "Aucune zone du catalogue ne contient cet endroit.",
-      "catalogueFailed": "Le catalogue des cartes n’a pas pu être lu. Vérifiez le réseau et réessayez.",
-      "catalogueLoading": "Lecture du catalogue…",
-      "retry": "Réessayer"
-    },
-    "countries": {
-      "title": "Par pays et par zone",
-      "zones": {
-        "one": "{n} zone de plongée",
-        "other": "{n} zones de plongée"
-      },
-      "wholeCountry": "Tout le pays",
-      "countryText": "Une zone de plongée suffit pour un voyage. Le pays entier couvre toutes les zones.",
-      "zonesTitle": "Zones de plongée",
-      "approx": "environ {size}",
-      "downloaded": "téléchargé",
-      "none": "Aucun pays dans le catalogue.",
-      "unknown": "Pays inconnu"
-    },
     "area": {
       "title": "Choisir sur la carte",
       "help": "Faites glisser les coins du rectangle pour couvrir la zone voulue.",
@@ -2421,7 +2379,6 @@
       "nameHelp": "Proposé d’après le site le plus proche",
       "around": "Autour de {site}",
       "aroundHere": "Zone choisie",
-      "estimate": "Environ {width} × {height} km · environ {size}",
       "needNetwork": "Choisir sur la carte demande le réseau.",
       "handle": "Coin du rectangle, {corner}",
       "corners": {
@@ -2431,7 +2388,13 @@
         "se": "sud-est"
       },
       "download": "Télécharger",
-      "unavailable": "Le téléchargement d’une zone choisie n’est pas encore disponible."
+      "unavailable": "Le serveur de cartes est injoignable. Réessayez avec un réseau.",
+      "choose": "Choisir sur la carte",
+      "lessDetail": "Moins de détails (zoom 12) : une zone plus grande",
+      "size": "Environ {width} × {height} km",
+      "tiles": "{count} tuiles sur {limit}",
+      "tooBig": "Cette zone est trop grande : un téléchargement est limité à 3 000 tuiles. Réduisez le rectangle.",
+      "suggestLess": "Trop de tuiles avec tous les détails. Choisissez moins de détails pour télécharger cette zone."
     }
   }
 }

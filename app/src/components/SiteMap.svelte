@@ -1,13 +1,15 @@
 <script>
   // @ts-check
   // Map of dive sites, with MapLibre GL JS (BSD-3-Clause). Tiles: a downloaded
-  // PMTiles package first, else OpenFreeMap's vector tiles (OpenStreetMap data)
+  // region first, else OpenFreeMap's vector tiles (OpenStreetMap data)
   // online, else the simplified world map (see map-style.js). Markers for the sites;
   // with `editable`, a pin fixed at the centre: the diver moves the map under
   // it, and onmove gets the centre (micro-degrees) when the map stops.
   import { onMount, onDestroy } from 'svelte';
   import { t } from '../lib/i18n.js';
   import { buildMapStyle, showLabelsInLanguage } from '../lib/map-style.js';
+  import { applyZoomCap } from '../lib/offline-tiles.js';
+  import { offlineMaps } from '../lib/offline-maps.svelte.js';
 
   // Loaded when a map is first shown: about 800 KB the start-up does not need.
   /** @type {typeof import('maplibre-gl')} */
@@ -91,6 +93,8 @@
     });
     // Where the map looks, for the offline hint (Sites).
     m.on('moveend', () => {
+      // Offline over a region of less detail (zoom 12), the map does not zoom further.
+      applyZoomCap(m);
       const b = m.getBounds();
       const c = m.getCenter();
       onview?.({ center: [c.lng, c.lat], bounds: [b.getWest(), b.getSouth(), b.getEast(), b.getNorth()], zoom: m.getZoom() });
@@ -106,6 +110,13 @@
       // A tap brings that point under the pin.
       m.on('click', (e) => m.easeTo({ center: e.lngLat }));
     }
+  });
+
+  // The connection or the regions change: the zoom cap follows.
+  $effect(() => {
+    offlineMaps.online;
+    offlineMaps.regions.map((r) => `${r.status}${r.maxZoom}`);
+    if (map) applyZoomCap(map);
   });
 
   /**

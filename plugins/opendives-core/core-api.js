@@ -13,14 +13,15 @@ import { registerPlugin } from '@capacitor/core';
  */
 
 /**
- * An offline map package download (Android; the screens read it with mapsDownloads and the
+ * An offline map region download (Android; the screens read it with mapsDownloads and the
  * "mapsDownload" event).
  * @typedef {Object} MapDownload
  * @property {string} id
  * @property {"queued"|"waiting-wifi"|"downloading"|"paused"|"failed"|"ready"} status
+ * @property {number} tilesDone
+ * @property {number} tilesTotal
  * @property {number} bytesReceived
- * @property {number} totalBytes
- * @property {"network"|"checksum"|"space"|"server"} [error] with status "failed"
+ * @property {"network"|"space"|"server"|"limit"} [error] with status "failed"; "limit" is the 50 MiB stop
  */
 
 /**
@@ -629,23 +630,31 @@ import { registerPlugin } from '@capacitor/core';
  * @property {() => Promise<{wifi: boolean}>} networkStatus whether the device is on Wi-Fi or Ethernet
  * @property {() => Promise<{freeBytes: number, totalBytes: number}>} mapsFreeSpace
  *   Free and total space of the storage that holds the offline maps.
- * @property {(options: {id: string, url: string, sha256: string, sizeBytes: number, allowCellular: boolean, title: string}) => Promise<void>} mapsDownloadStart
- *   Queues a package download; one runs at a time, in the background with a notification titled
- *   `title`, resumed with HTTP Range. Wi-Fi (an unmetered network) only unless `allowCellular`:
- *   status "waiting-wifi" meanwhile. The file is checked against `sha256` before it is ready; an
- *   update of an existing id keeps the old file until then. `id` is letters, digits, ".", "-", "_"
- *   (rejects with BAD_ARGUMENT otherwise). Asks for the notification permission (Android 13+).
- *   Ready downloads stay in mapsDownloads until mapsDelete. Status "failed" with error "space"
- *   when a write fails for lack of space.
- * @property {(options: {id: string}) => Promise<void>} mapsDownloadPause keeps the partial file
+ * @property {(options: {id: string, bbox: number[], maxZoom: 12|14, urlTemplate: string, version: string, allowCellular: boolean, title: string}) => Promise<void>} mapsTilesStart
+ *   Queues a region: the rectangle `bbox` = [west, south, east, north] in degrees (west > east
+ *   crosses the antimeridian), tiles of zooms 0 to `maxZoom`, fetched one by one from
+ *   `urlTemplate` (https, with {z}, {x}, {y}); `version` is kept with the region. Native code
+ *   enforces the terms of the tile server, whatever the caller does: it counts the tiles itself
+ *   and rejects with TOO_MANY_TILES above 3,000 (BAD_ARGUMENT for a malformed request; `id` is
+ *   letters, digits, ".", "-", "_"); it sends at most 4 requests at a time, each with the
+ *   User-Agent `OpenDives/<versionName> (dive log app; https://github.com/remillc/opendives)`;
+ *   it stops at 50 MiB with status "failed", error "limit", and removes the tiles. One region
+ *   runs at a time, in the background with a notification titled `title`. Wi-Fi (an unmetered
+ *   network) only unless `allowCellular`: status "waiting-wifi" meanwhile. The same request
+ *   again resumes (tiles already on disk are skipped); an update of a ready id downloads aside
+ *   and swaps when complete, so the old tiles stay readable. A tile answered 204 or 404 is an
+ *   empty tile. Asks for the notification permission (Android 13+). Ready regions stay in
+ *   mapsDownloads until mapsDelete. Status "failed" with error "space" when storage is short.
+ * @property {(options: {id: string}) => Promise<void>} mapsDownloadPause keeps the tiles already downloaded
  * @property {(options: {id: string, allowCellular: boolean}) => Promise<void>} mapsDownloadResume
  *   Also retries a failed download.
- * @property {(options: {id: string}) => Promise<void>} mapsDownloadCancel removes the partial file
+ * @property {(options: {id: string}) => Promise<void>} mapsDownloadCancel removes the unfinished tiles
  * @property {() => Promise<{downloads: MapDownload[]}>} mapsDownloads
- * @property {() => Promise<{files: {id: string, sizeBytes: number}[]}>} mapsFiles ready packages on disk
- * @property {(options: {id: string}) => Promise<void>} mapsDelete the package, its partial file and its entry
- * @property {(options: {id: string, offset: number, length: number}) => Promise<{base64: string}>} mapsReadRange
- *   Bytes of a ready package for the PMTiles source (at most 16 MiB a call). Rejects with NOT_FOUND.
+ * @property {() => Promise<{files: {id: string, sizeBytes: number, version: string, maxZoom: number}[]}>} mapsFiles ready regions on disk
+ * @property {(options: {id: string}) => Promise<void>} mapsDelete the region, its unfinished tiles and its entry
+ * @property {(options: {id: string, z: number, x: number, y: number}) => Promise<{base64: string}>} mapsReadTile
+ *   One tile of a ready region, base64 ('' for an empty tile). Rejects with NOT_FOUND when the
+ *   region or the tile is absent.
  * @property {() => Promise<PlannedDive[]>} listPlans
  * @property {(options: {request: PlanRequest, replaceId?: number}) => Promise<EditResult>} savePlan
  *   Saves the plan as a planned dive, or replaces one: one undoable step.
@@ -827,14 +836,14 @@ export const OpenDivesCore = {
   },
   networkStatus: () => native.networkStatus(),
   mapsFreeSpace: () => native.mapsFreeSpace(),
-  mapsDownloadStart: (options) => native.mapsDownloadStart(options),
+  mapsTilesStart: (options) => native.mapsTilesStart(options),
   mapsDownloadPause: (options) => native.mapsDownloadPause(options),
   mapsDownloadResume: (options) => native.mapsDownloadResume(options),
   mapsDownloadCancel: (options) => native.mapsDownloadCancel(options),
   mapsDownloads: () => native.mapsDownloads(),
   mapsFiles: () => native.mapsFiles(),
   mapsDelete: (options) => native.mapsDelete(options),
-  mapsReadRange: (options) => native.mapsReadRange(options),
+  mapsReadTile: (options) => native.mapsReadTile(options),
   bluetoothStatus: () => native.bluetoothStatus(),
   requestBluetoothPermission: () => native.requestBluetoothPermission(),
   enableBluetooth: () => native.enableBluetooth(),

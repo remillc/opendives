@@ -7,13 +7,16 @@
 import { f7 } from 'framework7-svelte';
 import { OpenDivesCore } from 'opendives-core';
 import { t, language } from './i18n.js';
-import { loadCatalogue } from './map-catalogue.js';
 import { showSection } from './navigation.svelte.js';
+import { readTileSource } from './tilejson.js';
 import {
   CAP_CHOICES,
   DEFAULT_CAP,
+  MAX_REGION_BYTES,
+  MAX_TILES,
   checkStart,
   checkUpdate,
+  countTiles,
   shouldPause,
   canResume,
   floorBytes,
@@ -21,30 +24,27 @@ import {
   isNewer,
   stalePartials,
   usedBytes as sumUsed,
-  packageForPoint,
-  packageName,
 } from './maps-logic.js';
 
-/** @typedef {import('./maps-logic.js').CataloguePackage} CataloguePackage */
-
 /**
+ * A region is a rectangle the diver drew; it holds the tiles of OpenFreeMap
+ * for zooms 0 to `maxZoom`.
  * @typedef {Object} Region
- * @property {string} id catalogue id, or `drawn-…` for a region drawn by the diver
- * @property {'zone'|'country'|'drawn'} kind
- * @property {string} name a drawn region's name is diver data; the others show the catalogue's name in the language
- * @property {{fr?: string, en?: string}} [names] translated names of a zone or a country
+ * @property {string} id `area-...`, also the name of its folder on the device
+ * @property {string} name diver data, never translated
  * @property {[number, number, number, number]} bbox [west, south, east, north]
- * @property {number} sizeBytes size of the package on the device (final size while downloading)
- * @property {string|number} version
- * @property {string} downloadedAt ISO date, empty until the package is ready
+ * @property {12|14} maxZoom 14: full detail; 12: less detail, a larger area
+ * @property {number} sizeBytes size on the device: what was received while downloading, the final size once ready
+ * @property {string} version OpenFreeMap build of the tiles (from its TileJSON)
+ * @property {string} downloadedAt ISO date, empty until the region is ready
  * @property {'queued'|'waiting-wifi'|'downloading'|'paused'|'failed'|'ready'|'updating'} status
  * @property {number} bytesReceived
- * @property {string} [country]
- * @property {{ url: string, sha256: string }} [source] what to download again after a failure
- * @property {'network'|'checksum'|'space'|'server'|''} [error]
+ * @property {number} tilesDone
+ * @property {number} tilesTotal
+ * @property {'network'|'space'|'server'|'limit'|''} [error] `limit`: the 50 MB of OpenFreeMap's terms were reached
  * @property {number} [failedAt] ms
  * @property {'space'|''} [pausedReason] a download paused by the free-space floor
- * @property {{ version: string|number, sizeBytes: number, sha256: string, url: string }|null} [update] a newer package
+ * @property {{ version: string }|null} [update] a newer build of OpenFreeMap's data exists
  * @property {'queued'|'waiting-wifi'|'downloading'|'paused'|'failed'|'ready'} [transfer] the update's download, while status is 'updating'
  * @property {boolean} [pendingDelete] deleted on screen, the file goes when the snackbar closes
  */
@@ -87,7 +87,8 @@ const core = OpenDivesCore;
 
 export const offlineMaps = $state({
   /** @type {Region[]} */
-  regions: readJson(REGIONS_KEY) ?? [],
+  // Regions kept by a version that downloaded packages (no maxZoom) are not tiles on this device: left out.
+  regions: (readJson(REGIONS_KEY) ?? []).filter((/** @type {Region} */ r) => r.maxZoom === 12 || r.maxZoom === 14),
   /** "Télécharger sur données mobiles": off by default. */
   cellular: stored.cellular === true,
   /** "Espace maximum pour les cartes", bytes. */
@@ -95,11 +96,7 @@ export const offlineMaps = $state({
   freeBytes: 0,
   totalBytes: 0,
   online: typeof navigator === 'undefined' ? true : navigator.onLine,
-  /** @type {CataloguePackage[]} */
-  catalogue: [],
-  catalogueLoading: false,
-  catalogueFailed: false,
-  /** Last time the catalogue was compared with the regions, ms. */
+  /** Last time OpenFreeMap's version was compared with the regions', ms. */
   lastCheck: Number(stored.lastCheck) || 0,
   /** @type {MapsDialog|null} */
   dialog: null,
@@ -127,35 +124,11 @@ export const visibleRegions = () => offlineMaps.regions.filter((r) => !r.pending
 /** @param {string} id */
 export const findRegion = (id) => offlineMaps.regions.find((r) => r.id === id);
 
-/** Name shown: the diver's own for a drawn region, else the catalogue's in the app's language. @param {Region} r */
-export function regionName(r) {
-  return r.kind === 'drawn' ? r.name : (r.names ? packageName({ names: r.names }, language) : '') || r.name;
-}
+/** @param {Region} r */
+export const regionName = (r) => r.name;
 
-/** @param {CataloguePackage} pkg */
-export const catalogueName = (pkg) => packageName(pkg, language);
-
-/**
- * Names of a package as the diver reads them in a list of regions: a zone
- * carries its country ("Canterbury, Nouvelle-Zélande"), a country is alone.
- * @param {CataloguePackage} pkg
- */
-export function fullNames(pkg) {
-  if (pkg.kind !== 'zone') return pkg.names;
-  const country = offlineMaps.catalogue.find((p) => p.kind === 'country' && p.country === pkg.country);
-  if (!country) return pkg.names;
-  /** @type {{fr?: string, en?: string}} */
-  const out = {};
-  for (const l of /** @type {const} */ (['fr', 'en'])) {
-    const zone = pkg.names[l] ?? pkg.names.en;
-    const name = country.names[l] ?? country.names.en;
-    out[l] = zone && name ? `${zone}, ${name}` : zone;
-  }
-  return out;
-}
-
-/** @param {CataloguePackage} pkg */
-export const fullName = (pkg) => packageName({ names: fullNames(pkg) }, language);
+/** Progress of a download as a share of the tiles, 0 to 100. @param {Region} r */
+export const tilesPercent = (r) => (r.tilesTotal > 0 ? Math.min(100, Math.floor((r.tilesDone / r.tilesTotal) * 100)) : 0);
 
 /** Bytes the maps take or will take. */
 export const usedBytes = () => sumUsed(visibleRegions());
@@ -207,53 +180,30 @@ export function viewRegion(id) {
   showSection('sites');
 }
 
-// --- Catalogue and updates ---------------------------------------------------------
+// --- Update check ------------------------------------------------------------------------
 
 /**
- * The catalogue, read once per run (or again when `force`).
- * @param {boolean} [force]
- */
-export async function ensureCatalogue(force = false) {
-  if (offlineMaps.catalogueLoading) return offlineMaps.catalogue;
-  if (offlineMaps.catalogue.length && !force) return offlineMaps.catalogue;
-  offlineMaps.catalogueLoading = true;
-  try {
-    offlineMaps.catalogue = await loadCatalogue();
-    offlineMaps.catalogueFailed = false;
-  } catch (e) {
-    console.error('Reading the map catalogue', e);
-    offlineMaps.catalogueFailed = true;
-  } finally {
-    offlineMaps.catalogueLoading = false;
-  }
-  return offlineMaps.catalogue;
-}
-
-/** Compares the regions' versions with the catalogue's. @param {CataloguePackage[]} catalogue */
-function markUpdates(catalogue) {
-  for (const r of offlineMaps.regions) {
-    if (r.kind === 'drawn' || r.status === 'updating') continue;
-    const pkg = catalogue.find((p) => p.id === r.id);
-    r.update =
-      r.status === 'ready' && pkg && isNewer(r.version, pkg.version)
-        ? { version: pkg.version, sizeBytes: pkg.sizeBytes, sha256: pkg.sha256, url: pkg.url }
-        : null;
-  }
-  save();
-}
-
-/**
- * At start, when online, at most once a day: reads the catalogue and compares
- * versions. Never automatic beyond that: updating is the diver's choice.
+ * At start, when online, at most once a day: reads OpenFreeMap's TileJSON and
+ * compares its version with each region's. Never automatic beyond that:
+ * updating is the diver's choice.
  * @param {{ force?: boolean }} [options]
  */
 export async function checkForUpdates({ force = false } = {}) {
   if (!offlineMaps.online) return;
   if (!force && !updateCheckDue(offlineMaps.lastCheck, Date.now())) return;
   if (!offlineMaps.regions.length && !force) return;
-  const catalogue = await ensureCatalogue(true);
-  if (offlineMaps.catalogueFailed) return;
-  markUpdates(catalogue);
+  let source;
+  try {
+    source = await readTileSource();
+  } catch (e) {
+    console.warn('Reading the OpenFreeMap TileJSON', e);
+    return;
+  }
+  for (const r of offlineMaps.regions) {
+    if (r.status === 'updating') continue;
+    r.update = r.status === 'ready' && isNewer(r.version, source.version) ? { version: source.version } : null;
+  }
+  save();
   offlineMaps.lastCheck = Date.now();
   saveSettings();
 }
@@ -275,52 +225,41 @@ export function setCap(bytes) {
 
 // --- Downloads ---------------------------------------------------------------------
 
-/** @param {CataloguePackage} pkg @param {Partial<Region>} [extra] @returns {Region} */
-function regionOf(pkg, extra = {}) {
-  return {
-    id: pkg.id,
-    kind: pkg.kind,
-    name: fullName(pkg),
-    names: fullNames(pkg),
-    bbox: pkg.bbox,
-    sizeBytes: pkg.sizeBytes,
-    version: pkg.version,
-    downloadedAt: '',
-    status: 'queued',
-    bytesReceived: 0,
-    country: pkg.country,
-    source: { url: pkg.url, sha256: pkg.sha256 },
-    error: '',
-    ...extra,
-  };
-}
-
 /**
- * Sends a package to the native downloader (one runs at a time there).
- * @param {Region} r @param {{ url: string, sha256: string, sizeBytes: number }} source
+ * Sends a region to the native downloader (one runs at a time there). The
+ * tile address and the version are read from OpenFreeMap just before.
+ * @param {Region} r
+ * @param {{ template: string, version: string }} source
  */
 async function startNative(r, source) {
   try {
-    await core.mapsDownloadStart({
+    await core.mapsTilesStart({
       id: r.id,
-      url: source.url,
-      sha256: source.sha256,
-      sizeBytes: source.sizeBytes,
+      bbox: r.bbox,
+      maxZoom: r.maxZoom,
+      urlTemplate: source.template,
+      version: source.version,
       allowCellular: offlineMaps.cellular,
       title: regionName(r),
     });
   } catch (e) {
     console.error('Starting a map download', e);
+    if (/** @type {any} */ (e)?.code === 'TOO_MANY_TILES') {
+      toast(t('maps.area.tooBig'));
+      offlineMaps.regions = offlineMaps.regions.filter((x) => x.id !== r.id);
+      save();
+      return;
+    }
     fail(r, 'server');
   }
 }
 
-/** @param {Region} r @param {'network'|'checksum'|'space'|'server'} error */
+/** @param {Region} r @param {'network'|'space'|'server'|'limit'} error */
 function fail(r, error) {
   r.error = error;
   r.failedAt = Date.now();
-  if (r.update && r.sizeBytes) {
-    // The old package stays usable: the update is what failed.
+  if (r.status === 'updating') {
+    // The old region stays usable: the update is what failed.
     r.status = 'ready';
     r.transfer = undefined;
     toast(t('maps.updateFailed', { name: regionName(r) }));
@@ -343,87 +282,86 @@ function refuse(name, sizeBytes, verdict) {
       : { kind: 'cap', name, sizeBytes, usedBytes: verdict.usedBytes, capBytes: verdict.capBytes };
 }
 
+/** Free space as the guards read it: without the native part (web) they pass. */
+const spaceFigures = () => ({
+  freeBytes: offlineMaps.totalBytes ? offlineMaps.freeBytes : Number.MAX_SAFE_INTEGER / 2,
+  totalBytes: offlineMaps.totalBytes,
+});
+
 /**
- * Starts the download of a package (zone, country, or a region drawn on the
- * map). Refused with a dialog when it would leave less than the floor free or
- * go over the cap. Returns whether it started.
- * @param {CataloguePackage} pkg
- * @param {{ name?: string }} [options] the diver's name for a drawn region
+ * Starts the download of a rectangle drawn on the map. Refused with a toast
+ * above 3,000 tiles (the area screen blocks it before), and with a dialog
+ * when it could leave less than the floor free or go over the cap (a region
+ * takes 50 MB at most). Returns whether it started.
+ * @param {string} name the diver's name for the region
+ * @param {[number, number, number, number]} bbox
+ * @param {12|14} maxZoom
  */
-export async function addRegion(pkg, { name } = {}) {
-  const existing = findRegion(pkg.id);
-  if (existing && !existing.pendingDelete) return false;
-  await refreshSpace();
-  const verdict = checkStart({
-    sizeBytes: pkg.sizeBytes,
-    freeBytes: offlineMaps.totalBytes ? offlineMaps.freeBytes : Number.MAX_SAFE_INTEGER / 2,
-    totalBytes: offlineMaps.totalBytes,
-    usedBytes: usedBytes(),
-    capBytes: offlineMaps.capBytes,
-  });
-  if (!verdict.ok) {
-    refuse(name || catalogueName(pkg), pkg.sizeBytes, verdict);
+export async function addRegion(name, bbox, maxZoom) {
+  const tilesTotal = countTiles(bbox, maxZoom);
+  if (tilesTotal > MAX_TILES) {
+    toast(t('maps.area.tooBig'));
     return false;
   }
-  if (existing) offlineMaps.regions = offlineMaps.regions.filter((r) => r.id !== pkg.id);
-  const region = regionOf(pkg, name ? { name } : {});
-  offlineMaps.regions.push(region);
-  save();
-  const r = /** @type {Region} */ (findRegion(pkg.id));
-  await startNative(r, pkg);
-  return true;
-}
-
-/**
- * Where the server builds and serves a package for a rectangle chosen on the
- * map. Not decided yet (the server side is not part of this task): empty, the
- * download is then refused with a message.
- */
-export const DRAWN_PACKAGE_URL = '';
-
-/**
- * A region drawn by the diver on the map: its name is diver data.
- * @param {string} name @param {[number, number, number, number]} bbox @param {number} sizeBytes estimate
- */
-export async function addDrawnRegion(name, bbox, sizeBytes) {
-  if (!DRAWN_PACKAGE_URL) {
+  await refreshSpace();
+  const verdict = checkStart({ sizeBytes: MAX_REGION_BYTES, ...spaceFigures(), usedBytes: usedBytes(), capBytes: offlineMaps.capBytes });
+  if (!verdict.ok) {
+    refuse(name, MAX_REGION_BYTES, verdict);
+    return false;
+  }
+  let source;
+  try {
+    source = await readTileSource();
+  } catch (e) {
+    console.error('Reading the OpenFreeMap TileJSON', e);
     toast(t('maps.area.unavailable'));
     return false;
   }
-  const query = `bbox=${bbox.join(',')}`;
-  return addRegion(
-    {
-      id: `drawn-${Date.now().toString(36)}`,
-      kind: /** @type {any} */ ('drawn'),
-      names: {},
-      country: '',
-      bbox,
-      sizeBytes,
-      version: '',
-      sha256: '',
-      url: `${DRAWN_PACKAGE_URL}?${query}`,
-    },
-    { name },
-  );
+  offlineMaps.regions.push({
+    id: `area-${Date.now().toString(36)}`,
+    name,
+    bbox,
+    maxZoom,
+    sizeBytes: 0,
+    version: source.version,
+    downloadedAt: '',
+    status: 'queued',
+    bytesReceived: 0,
+    tilesDone: 0,
+    tilesTotal,
+    error: '',
+  });
+  save();
+  const r = /** @type {Region} */ (offlineMaps.regions[offlineMaps.regions.length - 1]);
+  await startNative(r, source);
+  return true;
 }
 
-/** "Réessayer" on a failed download: the partial file is resumed. @param {string} id */
+/** "Réessayer" on a failed download: the tiles already received are kept. @param {string} id */
 export async function retryRegion(id) {
   const r = findRegion(id);
-  if (!r?.source) return;
+  if (!r) return;
   await refreshSpace();
   const verdict = checkStart({
-    sizeBytes: Math.max(0, r.sizeBytes - r.bytesReceived),
-    freeBytes: offlineMaps.totalBytes ? offlineMaps.freeBytes : Number.MAX_SAFE_INTEGER / 2,
-    totalBytes: offlineMaps.totalBytes,
+    sizeBytes: Math.max(0, MAX_REGION_BYTES - r.bytesReceived),
+    ...spaceFigures(),
     usedBytes: sumUsed(visibleRegions().filter((x) => x.id !== id)),
     capBytes: offlineMaps.capBytes,
   });
-  if (!verdict.ok) return refuse(regionName(r), r.sizeBytes, verdict);
+  if (!verdict.ok) return refuse(regionName(r), MAX_REGION_BYTES, verdict);
+  let source;
+  try {
+    source = await readTileSource();
+  } catch (e) {
+    console.error('Reading the OpenFreeMap TileJSON', e);
+    toast(t('maps.area.unavailable'));
+    return;
+  }
   r.status = 'queued';
   r.error = '';
+  r.version = source.version;
   save();
-  await startNative(r, { ...r.source, sizeBytes: r.sizeBytes });
+  await startNative(r, source);
 }
 
 /** "Retirer" on a failed download, and ✕ on a running one: the partial file goes. @param {string} id */
@@ -460,11 +398,12 @@ export function askCellular(id) {
   offlineMaps.dialog = { kind: 'cellular', id };
 }
 
-// --- Updates -------------------------------------------------------------------------
+// --- Updating ------------------------------------------------------------------------
 
 /**
- * Updates one region: both versions stay on the device until the new one is
- * checked. If that does not fit, "Remplacer la carte ?" (the old package goes
+ * Updates one region: the same rectangle is downloaded again from OpenFreeMap's
+ * current build, and both versions stay on the device until the new one is
+ * complete. If that does not fit, "Remplacer la carte ?" (the old tiles go
  * first); if even that does not fit, the dialog says why. Returns whether an
  * update started.
  * @param {string} id
@@ -472,48 +411,54 @@ export function askCellular(id) {
  */
 export async function updateRegion(id, { replace = false } = {}) {
   const r = findRegion(id);
-  const upd = r?.update;
-  if (!r || !upd || r.status !== 'ready') return false;
+  if (!r?.update || r.status !== 'ready') return false;
   await refreshSpace();
   const verdict = checkUpdate({
-    newBytes: upd.sizeBytes,
+    newBytes: MAX_REGION_BYTES,
     oldBytes: r.sizeBytes,
-    freeBytes: offlineMaps.totalBytes ? offlineMaps.freeBytes : Number.MAX_SAFE_INTEGER / 2,
-    totalBytes: offlineMaps.totalBytes,
+    ...spaceFigures(),
     usedBytes: usedBytes(),
     capBytes: offlineMaps.capBytes,
   });
   if (verdict.mode === 'blocked') {
-    refuse(regionName(r), upd.sizeBytes, verdict);
+    refuse(regionName(r), MAX_REGION_BYTES, verdict);
+    return false;
+  }
+  if (verdict.mode === 'replace' && !replace) {
+    offlineMaps.dialog = { kind: 'replace', id };
+    return false;
+  }
+  let source;
+  try {
+    source = await readTileSource();
+  } catch (e) {
+    console.error('Reading the OpenFreeMap TileJSON', e);
+    toast(t('maps.area.unavailable'));
     return false;
   }
   if (verdict.mode === 'replace') {
-    if (!replace) {
-      offlineMaps.dialog = { kind: 'replace', id };
-      return false;
-    }
-    // The old package goes first: the region is unavailable until the new one is complete.
+    // The old tiles go first: the region is unavailable until the new ones are complete.
     try {
       await core.mapsDelete({ id });
     } catch (e) {
-      console.error('Removing the old map package', e);
+      console.error('Removing the old region', e);
     }
-    r.sizeBytes = upd.sizeBytes;
-    r.version = upd.version;
-    r.source = { url: upd.url, sha256: upd.sha256 };
     r.update = null;
+    r.sizeBytes = 0;
     r.downloadedAt = '';
     r.bytesReceived = 0;
+    r.tilesDone = 0;
     r.status = 'queued';
-    save();
-    await startNative(r, { ...r.source, sizeBytes: r.sizeBytes });
-    return true;
+    r.version = source.version;
+  } else {
+    r.update = { version: source.version };
+    r.status = 'updating';
+    r.transfer = 'queued';
+    r.bytesReceived = 0;
+    r.tilesDone = 0;
   }
-  r.status = 'updating';
-  r.transfer = 'queued';
-  r.bytesReceived = 0;
   save();
-  await startNative(r, upd);
+  await startNative(r, source);
   return true;
 }
 
@@ -586,24 +531,27 @@ async function finishDelete(id) {
 
 let lastSpaceCheck = 0;
 
-/** @param {{ id: string, status: string, bytesReceived: number, totalBytes: number, error?: 'network'|'checksum'|'space'|'server' }} d */
+/** @param {{ id: string, status: string, tilesDone: number, tilesTotal: number, bytesReceived: number, error?: 'network'|'space'|'server'|'limit' }} d */
 function applyDownload(d) {
   const r = findRegion(d.id);
   if (!r) return;
   const updating = r.status === 'updating';
   r.bytesReceived = d.bytesReceived;
-  if (d.totalBytes && !updating) r.sizeBytes = d.totalBytes;
+  r.tilesDone = d.tilesDone;
+  if (d.tilesTotal) r.tilesTotal = d.tilesTotal;
+  if (!updating) r.sizeBytes = d.bytesReceived;
   switch (d.status) {
     case 'ready':
       if (r.update) {
         r.version = r.update.version;
-        r.sizeBytes = r.update.sizeBytes;
-        r.source = { url: r.update.url, sha256: r.update.sha256 };
         r.update = null;
       }
+      r.sizeBytes = d.bytesReceived;
       r.status = 'ready';
       r.transfer = undefined;
-      r.downloadedAt = new Date().toISOString();
+      // Local time without a zone, the form of the app's other dates.
+      const now = new Date();
+      r.downloadedAt = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 19);
       r.error = '';
       r.pausedReason = '';
       refreshSpace();
@@ -670,8 +618,8 @@ async function reconcile() {
       if (d && d.status !== 'ready') applyDownload(d);
       else if (file && (r.status === 'ready' || r.status === 'updating')) r.sizeBytes = r.status === 'ready' ? file.sizeBytes : r.sizeBytes;
       else if (file && !d) {
-        // The package became ready while the app was closed.
-        applyDownload({ id: r.id, status: 'ready', bytesReceived: file.sizeBytes, totalBytes: file.sizeBytes });
+        // The region became ready while the app was closed.
+        applyDownload({ id: r.id, status: 'ready', tilesDone: r.tilesTotal, tilesTotal: r.tilesTotal, bytesReceived: file.sizeBytes });
       } else if (!file && !d && (r.status === 'ready' || r.status === 'updating')) {
         // The file is gone (cleared by the system, or by the diver).
         if (r.status === 'ready') offlineMaps.regions = offlineMaps.regions.filter((x) => x.id !== r.id);
@@ -738,12 +686,10 @@ export async function startOfflineMaps() {
 // --- From the Sites map ------------------------------------------------------------------
 
 /**
- * "Télécharger" in the snackbar of the Sites map: opens the add flow for what
- * contains this point (the smallest dive zone, else the country).
+ * "Télécharger" in the snackbar of the Sites map: opens the area screen
+ * with a rectangle around this point.
  * @param {number} lng @param {number} lat
  */
-export async function downloadRegionAt(lng, lat) {
-  const catalogue = await ensureCatalogue();
-  const pkg = packageForPoint(lng, lat, catalogue);
-  go(`/settings/maps/new?lng=${lng.toFixed(5)}&lat=${lat.toFixed(5)}${pkg ? `&id=${encodeURIComponent(pkg.id)}` : ''}`);
+export function downloadRegionAt(lng, lat) {
+  go(`/settings/maps/area?lng=${lng.toFixed(5)}&lat=${lat.toFixed(5)}`);
 }
