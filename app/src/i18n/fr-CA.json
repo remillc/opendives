@@ -37,7 +37,8 @@
     "bandSignedIn": "Votre carnet dans le nuage"
   },
   "welcome": {
-    "existingText": "Vos plongées sont sauvegardées dans le nuage Subsurface. Une copie reste sur cet appareil : vous la consultez même sans réseau, et elle se met à jour quand le réseau revient."
+    "existingText": "Vos plongées sont sauvegardées dans le nuage Subsurface. Une copie reste sur cet appareil : vous la consultez même sans réseau, et elle se met à jour quand le réseau revient.",
+    "existingNote": "Sauvegardé dans le nuage, consultable hors ligne"
   },
   "signOut": {
     "textNone": "Le carnet reste dans le nuage. Une copie reste sur cet appareil, non affichée, et sert si vous vous reconnectez.",

@@ -1248,7 +1248,9 @@ Christian wants the Android tablet mock-ups redrawn to match what the app shows 
 - Commit the home screen pair first, in its own commit and push, so the design work can start; then the rest.
 - Mark this task done when all screens are in.
 
-## [ ] 2026-11-10-18 First launch, redesigned (Android)
+## [x] 2026-11-10-18 First launch, redesigned (Android)
+
+Done in "First launch redesigned on Android, every choice in view on a landscape tablet".
 
 Spec: UI specification, section 4, "First launch, redesigned" (new). Mock-up: `docs/mockups/android-accueil-c.dc.html` (new; it replaces `android-accueil.dc.html`, which is no longer on the canvas). Component: `app/src/components/Welcome.svelte`.
 - New layout: logo and "OpenDives" at the top, the large title "Votre carnet de plongée.", a full-width dive profile (water gradient, decorative), then the three choices at the bottom as pill buttons of decreasing weight (filled, outlined, text), each with its one-line consequence under it, and the centred link "Utiliser mon propre dépôt git".
