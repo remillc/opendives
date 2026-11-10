@@ -1509,7 +1509,8 @@
       "Les durées d’une heure ou plus suivent la langue : « 1 h 11 » en français, « 1:11 » en anglais.",
       "Réglages : l’option de durée « Toujours en heures et minutes » est retirée.",
       "Désaturation : la dernière plongée du carnet, et « Vous pouvez prendre l’avion » quand l’attente est terminée.",
-      "Lignes de plongée : la durée au-dessus, la profondeur en dessous."
+      "Lignes de plongée : la durée au-dessus, la profondeur en dessous.",
+      "Réglages : le système d’unités choisi reste en place après un redémarrage."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
