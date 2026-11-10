@@ -50,10 +50,10 @@ export function standaloneSvg(svg) {
     }
   });
   // The chart only: its height without the gas band below it.
-  const band = copy.querySelector('.gas rect');
+  const band = copy.querySelector('.od-dive-profile--gas rect');
   const w = svg.getAttribute('width') ?? String(svg.clientWidth);
   const h = band ? String(Number(band.getAttribute('y')) - 2) : (svg.getAttribute('height') ?? String(svg.clientHeight));
-  for (const el of copy.querySelectorAll('.gas, .cursor, .cursor-halo')) el.remove();
+  for (const el of copy.querySelectorAll('.od-dive-profile--gas, .od-dive-profile--cursor, .od-dive-profile--cursor-halo')) el.remove();
   for (const el of [copy, ...copy.querySelectorAll('*')]) el.removeAttribute('class');
   copy.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
   copy.setAttribute('height', h);

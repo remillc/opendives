@@ -36,7 +36,7 @@
   ];
 </script>
 
-<Page>
+<Page class="od-about-libraries">
   <Navbar title={t('about.libraries')}>
     {#snippet left()}
       <Link back iconOnly>
@@ -46,7 +46,7 @@
     {/snippet}
   </Navbar>
 
-  <p class="intro">{t('about.librariesIntro')}</p>
+  <p class="od-about-libraries--intro">{t('about.librariesIntro')}</p>
 
   {#each groups as group (group.title)}
     <h2 class="block-title">{t(`about.librariesGroups.${group.title}`)}</h2>
@@ -72,7 +72,7 @@
 
 <style>
   @layer od.components {
-    .intro {
+    .od-about-libraries--intro {
       margin: 8px 16px 0;
       font-size: 14px;
       line-height: 20px;

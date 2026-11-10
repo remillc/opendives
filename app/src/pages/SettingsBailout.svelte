@@ -40,7 +40,7 @@
   }
 </script>
 
-<Page>
+<Page class="od-settings-bailout">
   <Navbar title={t('settings.defaultCylinder.bailout')}>
     {#snippet left()}
       <Link back iconOnly>
@@ -50,23 +50,23 @@
     {/snippet}
   </Navbar>
 
-  <p class="intro">{t('settings.bailout.intro')}</p>
+  <p class="od-settings-bailout--intro">{t('settings.bailout.intro')}</p>
   {#if settings.defaultBailout.length}
-    <div class="surface" role="list">
+    <div class="od-settings-bailout--surface" role="list">
       {#each settings.defaultBailout as name, i (i)}
-        <div class="row" role="listitem">
-          <span class="texts">
-            <span class="label">{name}</span>
-            {#if example(name)}<span class="supporting">{example(name)}</span>{/if}
+        <div class="od-settings-bailout--row" role="listitem">
+          <span class="od-settings-bailout--texts">
+            <span class="od-settings-bailout--label">{name}</span>
+            {#if example(name)}<span class="od-settings-bailout--supporting">{example(name)}</span>{/if}
           </span>
-          <button type="button" class="change" onclick={() => choose(i)}>{t('settings.bailout.change')}</button>
-          <button type="button" class="remove" aria-label={t('settings.bailout.remove', { name })} onclick={() => save(settings.defaultBailout.filter((_, k) => k !== i))}><Icon name="close" /></button>
+          <button type="button" class="od-settings-bailout--change" onclick={() => choose(i)}>{t('settings.bailout.change')}</button>
+          <button type="button" class="od-settings-bailout--remove" aria-label={t('settings.bailout.remove', { name })} onclick={() => save(settings.defaultBailout.filter((_, k) => k !== i))}><Icon name="close" /></button>
         </div>
       {/each}
     </div>
   {/if}
-  <button type="button" class="add" onclick={() => choose(-1)}><Icon name="plus" />{t('settings.bailout.add')}</button>
-  <p class="note">{t('settings.bailout.note')}</p>
+  <button type="button" class="od-settings-bailout--add" onclick={() => choose(-1)}><Icon name="plus" />{t('settings.bailout.add')}</button>
+  <p class="od-settings-bailout--note">{t('settings.bailout.note')}</p>
 </Page>
 
 {#if editing !== null}
@@ -85,22 +85,22 @@
 
 <style>
   @layer od.components {
-    .intro,
-    .note {
+    .od-settings-bailout--intro,
+    .od-settings-bailout--note {
       margin: 8px 20px;
       font-size: 13px;
       line-height: 18px;
       color: var(--od-text-2);
     }
 
-    .surface {
+    .od-settings-bailout--surface {
       margin: 8px 16px 0;
       border-radius: 20px;
       background: var(--od-surface);
       overflow: hidden;
     }
 
-    .row {
+    .od-settings-bailout--row {
       min-height: 64px;
       padding: 6px 4px 6px 16px;
       display: flex;
@@ -108,25 +108,25 @@
       gap: 4px;
     }
 
-    .texts {
+    .od-settings-bailout--texts {
       flex: 1;
       min-width: 0;
       display: flex;
       flex-direction: column;
     }
 
-    .label {
+    .od-settings-bailout--label {
       font-size: 16px;
       line-height: 22px;
     }
 
-    .supporting {
+    .od-settings-bailout--supporting {
       font-size: 13px;
       line-height: 18px;
       color: var(--od-text-2);
     }
 
-    .change {
+    .od-settings-bailout--change {
       width: auto;
       padding: 0 8px;
       height: 40px;
@@ -139,7 +139,7 @@
       cursor: pointer;
     }
 
-    .remove {
+    .od-settings-bailout--remove {
       flex: none;
       width: 44px;
       height: 44px;
@@ -153,7 +153,7 @@
       cursor: pointer;
     }
 
-    .add {
+    .od-settings-bailout--add {
       width: auto;
       margin: 12px 16px 0;
       height: 40px;

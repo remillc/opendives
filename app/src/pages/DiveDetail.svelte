@@ -87,7 +87,7 @@
       return at >= 0 && ids[at + (dx < 0 ? 1 : -1)] !== undefined;
     };
     horizontalSwipe(content, {
-      accept: (e) => !(/** @type {HTMLElement} */ (e.target).closest('.profile')) && !document.querySelector('.modal-in'),
+      accept: (e) => !(/** @type {HTMLElement} */ (e.target).closest('.od-dive-profile--profile')) && !document.querySelector('.modal-in'),
       move(dx) {
         const shown = hasNeighbour(dx) ? dx : dx / 3;
         content.style.transition = '';
@@ -195,7 +195,7 @@
     sharing = false;
     if (!dive) return;
     // The profile chart of this page (the current one in its view).
-    const svg = /** @type {SVGSVGElement|null} */ (document.querySelector('.page-current .profile .frame svg'));
+    const svg = /** @type {SVGSVGElement|null} */ (document.querySelector('.page-current .od-dive-profile--profile .od-dive-profile--frame svg'));
     try {
       if (kind === 'pdf') await sharePdf(dive, prefs, svg);
       else await shareSummary(dive, prefs, svg);
@@ -382,7 +382,7 @@
 </script>
 
 <!-- no-swipeback: here a swipe to the right shows the previous dive. -->
-<Page onPageInit={watchSwipes} class="od-detail no-swipeback {imageShown && !scrolled ? 'od-on-image' : ''} {slide ? `od-slide-${slide}` : ''}">
+<Page onPageInit={watchSwipes} class="od-dive-detail no-swipeback {imageShown && !scrolled ? 'od-dive-detail--on-image' : ''} {slide ? `od-slide-${slide}` : ''}">
   <Navbar>
     <!-- Named back link: in MD3, Framework7 hides its text and TalkBack would read "#". -->
     {#snippet left()}
@@ -445,29 +445,29 @@
     </Block>
   {:else if !dive}
     <div class="skeleton-text" aria-busy="true" aria-label={t('detail.loading')}>
-      <div class="head" aria-hidden="true">
-        <p class="day">––––––––––––––</p>
-        <h1 class="site">––––––––</h1>
+      <div class="od-dive-detail--head" aria-hidden="true">
+        <p class="od-dive-detail--day">––––––––––––––</p>
+        <h1 class="od-dive-detail--site">––––––––</h1>
       </div>
-      <div class="skeleton-block skeleton-profile"></div>
+      <div class="skeleton-block od-dive-detail--skeleton-profile"></div>
     </div>
   {:else}
-    <div class="hero" use:watchScroll>
+    <div class="od-dive-detail--hero" use:watchScroll>
       {#if dive.siteCoordinates}
         <SiteHeaderImage latUdeg={dive.siteCoordinates.latUdeg} lonUdeg={dive.siteCoordinates.lonUdeg} onshown={(shown) => (imageShown = shown)} />
       {/if}
-    <header class="head">
-      <p class="day od-value">
+    <header class="od-dive-detail--head">
+      <p class="od-dive-detail--day od-value">
         {#if dive.number}<strong>{t('detail.number', { number: String(dive.number) })}</strong>&emsp;{/if}{formatDiveDay(dive.date)}
       </p>
-      <h1 class="site" class:not-set={!dive.site}>{dive.site || t('dive.siteNotSet')}</h1>
+      <h1 class="od-dive-detail--site" class:od-dive-detail--not-set={!dive.site}>{dive.site || t('dive.siteNotSet')}</h1>
       {#if location || trip}
-        <p class="location">
+        <p class="od-dive-detail--location">
           {location}{#if location && trip}{' · '}{/if}{#if trip}<a href="/trips/{trip.id}">{t('detail.tripLine', { name: trip.location })}</a>{/if}
         </p>
       {/if}
       {#if dive.rating > 0}
-        <p class="rating">
+        <p class="od-dive-detail--rating">
           <Stars value={dive.rating} size={18} label={t('detail.ratingLabel', { n: dive.rating })} />
         </p>
       {/if}
@@ -486,27 +486,27 @@
     />
 
     {#if facts.length}
-      <dl class="facts">
+      <dl class="od-dive-detail--facts">
         {#each facts as fact (fact.label)}
-          <div class="fact"><dt>{fact.label}</dt><dd class="od-value">{fact.value}</dd></div>
+          <div class="od-dive-detail--fact"><dt>{fact.label}</dt><dd class="od-value">{fact.value}</dd></div>
         {/each}
       </dl>
     {/if}
 
     {#if conditions.length}
       <!-- Collapsed by default, with a summary of the filled-in conditions. -->
-      <section class="section">
-        <div class="group">
-          <button type="button" class="disclosure" aria-expanded={conditionsOpen} onclick={() => (conditionsOpen = !conditionsOpen)}>
-            <span class="text">
-              <span class="title">{t('detail.conditions')}</span>
-              {#if !conditionsOpen}<span class="summary">{conditionsSummary}</span>{/if}
+      <section class="od-dive-detail--section">
+        <div class="od-dive-detail--group">
+          <button type="button" class="od-dive-detail--disclosure" aria-expanded={conditionsOpen} onclick={() => (conditionsOpen = !conditionsOpen)}>
+            <span class="od-dive-detail--text">
+              <span class="od-dive-detail--title">{t('detail.conditions')}</span>
+              {#if !conditionsOpen}<span class="od-dive-detail--summary">{conditionsSummary}</span>{/if}
             </span>
-            <span class="arrow" class:open={conditionsOpen}><Icon name="expand" size={22} weight={2} /></span>
+            <span class="od-dive-detail--arrow" class:od-dive-detail--open={conditionsOpen}><Icon name="expand" size={22} weight={2} /></span>
           </button>
           {#if conditionsOpen}
             {#each conditions as condition (condition.key)}
-              <div class="row">
+              <div class="od-dive-detail--row">
                 <span>{condition.name}</span>
                 <Stars value={condition.value} label={t('detail.starsLabel', { name: condition.name, n: condition.value })} />
               </div>
@@ -517,62 +517,62 @@
     {/if}
 
     {#if dive.guides.length || dive.buddies.length}
-      <section class="section">
-        <h2 class="section-title">{t('detail.people')}</h2>
-        <div class="group">
+      <section class="od-dive-detail--section">
+        <h2 class="od-dive-detail--section-title">{t('detail.people')}</h2>
+        <div class="od-dive-detail--group">
           {#if dive.guides.length}
-            <div class="row"><span>{t('detail.guideRow', { n: dive.guides.length })}</span><span class="tags end">{#each dive.guides as name, i (i)}<span class="tag">{name}</span>{/each}</span></div>
+            <div class="od-dive-detail--row"><span>{t('detail.guideRow', { n: dive.guides.length })}</span><span class="od-dive-detail--tags od-dive-detail--end">{#each dive.guides as name, i (i)}<span class="od-dive-detail--tag">{name}</span>{/each}</span></div>
           {/if}
           {#if dive.buddies.length}
-            <div class="row"><span>{t('detail.buddiesRow', { n: dive.buddies.length })}</span><span class="tags end">{#each dive.buddies as name, i (i)}<span class="tag">{name}</span>{/each}</span></div>
+            <div class="od-dive-detail--row"><span>{t('detail.buddiesRow', { n: dive.buddies.length })}</span><span class="od-dive-detail--tags od-dive-detail--end">{#each dive.buddies as name, i (i)}<span class="od-dive-detail--tag">{name}</span>{/each}</span></div>
           {/if}
         </div>
       </section>
     {/if}
 
     {#if dive.tags.length}
-      <section class="section">
-        <h2 class="section-title">{t('detail.tags', { n: dive.tags.length })}</h2>
-        <ul class="tags">
-          {#each dive.tags as tag (tag)}<li class="tag">{tag}</li>{/each}
+      <section class="od-dive-detail--section">
+        <h2 class="od-dive-detail--section-title">{t('detail.tags', { n: dive.tags.length })}</h2>
+        <ul class="od-dive-detail--tags">
+          {#each dive.tags as tag (tag)}<li class="od-dive-detail--tag">{tag}</li>{/each}
         </ul>
       </section>
     {/if}
 
     {#if hasEquipment}
-      <section class="section">
-        <h2 class="section-title">{t('detail.gasAndEquipment')}</h2>
-        <div class="group">
+      <section class="od-dive-detail--section">
+        <h2 class="od-dive-detail--section-title">{t('detail.gasAndEquipment')}</h2>
+        <div class="od-dive-detail--group">
           {#each cylinders as cylinder, i (i)}
-            <div class="cylinder">
-              <div class="line">
-                <span class="name"><span class="gas">{cylinder.name}</span>{#if cylinder.subtitle}<span class="type">{cylinder.subtitle}</span>{/if}</span>
-                {#if cylinder.pressures}<span class="value od-value">{cylinder.pressures}</span>{/if}
+            <div class="od-dive-detail--cylinder">
+              <div class="od-dive-detail--line">
+                <span class="od-dive-detail--name"><span class="od-dive-detail--gas">{cylinder.name}</span>{#if cylinder.subtitle}<span class="od-dive-detail--type">{cylinder.subtitle}</span>{/if}</span>
+                {#if cylinder.pressures}<span class="od-dive-detail--value od-value">{cylinder.pressures}</span>{/if}
               </div>
               {#if cylinder.bar}
-                <div class="bar" role="img" aria-label={cylinder.bar.label}>
-                  <div class="fill" style="width: {cylinder.bar.remaining}%"></div>
-                  <div class="gap"></div>
-                  <div class="used" style="width: {cylinder.bar.used}%"></div>
+                <div class="od-dive-detail--bar" role="img" aria-label={cylinder.bar.label}>
+                  <div class="od-dive-detail--fill" style="width: {cylinder.bar.remaining}%"></div>
+                  <div class="od-dive-detail--gap"></div>
+                  <div class="od-dive-detail--used" style="width: {cylinder.bar.used}%"></div>
                 </div>
               {/if}
-              {#if cylinder.details}<div class="secondary od-value"><span>{cylinder.details}</span></div>{/if}
+              {#if cylinder.details}<div class="od-dive-detail--secondary od-value"><span>{cylinder.details}</span></div>{/if}
             </div>
           {/each}
           {#if sac}
-            <div class="row"><span>{t('detail.sacFull')}</span><span class="value od-value">{sac}</span></div>
+            <div class="od-dive-detail--row"><span>{t('detail.sacFull')}</span><span class="od-dive-detail--value od-value">{sac}</span></div>
           {/if}
           {#if dive.suit}
-            <div class="row"><span>{t('detail.suitRow')}</span><span class="value">{dive.suit}</span></div>
+            <div class="od-dive-detail--row"><span>{t('detail.suitRow')}</span><span class="od-dive-detail--value">{dive.suit}</span></div>
           {/if}
           {#if weights.length === 1}
-            <div class="row">
-              <span class="stacked"><span>{t('detail.weights')}</span>{#if weights[0].place}<span class="sub">{weights[0].place}</span>{/if}</span>
-              <span class="value od-value">{weights[0].weight}</span>
+            <div class="od-dive-detail--row">
+              <span class="od-dive-detail--stacked"><span>{t('detail.weights')}</span>{#if weights[0].place}<span class="od-dive-detail--sub">{weights[0].place}</span>{/if}</span>
+              <span class="od-dive-detail--value od-value">{weights[0].weight}</span>
             </div>
           {:else if weights.length > 1}
-            <div class="weights">
-              <div class="total"><span>{t('detail.weights')}</span><span class="od-value">{weightTotal}</span></div>
+            <div class="od-dive-detail--weights">
+              <div class="od-dive-detail--total"><span>{t('detail.weights')}</span><span class="od-value">{weightTotal}</span></div>
               <ul aria-label={t('detail.weightsByPlace')}>
                 {#each weights as weight, i (i)}
                   <li class="od-value"><span>{weight.place || t('detail.weights')}</span><span>{weight.weight}</span></li>
@@ -585,35 +585,35 @@
     {/if}
 
     {#if computers.length}
-      <section class="section">
-        <h2 class="section-title">{t('detail.computers')}</h2>
-        <div class="group">
+      <section class="od-dive-detail--section">
+        <h2 class="od-dive-detail--section-title">{t('detail.computers')}</h2>
+        <div class="od-dive-detail--group">
           {#each computers as computer, i (i)}
-            <div class="row"><span class="stacked"><span>{computer.model}</span><span class="sub">{computer.role}</span></span></div>
+            <div class="od-dive-detail--row"><span class="od-dive-detail--stacked"><span>{computer.model}</span><span class="od-dive-detail--sub">{computer.role}</span></span></div>
           {/each}
         </div>
       </section>
     {/if}
 
     {#if dive.pictures > 0}
-      <section class="section">
-        <h2 class="section-title">{t('detail.photos')}</h2>
-        <div class="group">
-          <div class="row">
-            <span class="stacked"><span>{t('detail.photoCount', { n: dive.pictures })}</span><span class="sub">{t('detail.photoNote')}</span></span>
+      <section class="od-dive-detail--section">
+        <h2 class="od-dive-detail--section-title">{t('detail.photos')}</h2>
+        <div class="od-dive-detail--group">
+          <div class="od-dive-detail--row">
+            <span class="od-dive-detail--stacked"><span>{t('detail.photoCount', { n: dive.pictures })}</span><span class="od-dive-detail--sub">{t('detail.photoNote')}</span></span>
           </div>
         </div>
       </section>
     {/if}
 
     {#if dive.notes.trim()}
-      <section class="section">
-        <h2 class="section-title">{t('detail.notes')}</h2>
+      <section class="od-dive-detail--section">
+        <h2 class="od-dive-detail--section-title">{t('detail.notes')}</h2>
         <!-- Shown in full, line breaks kept: no "Read more". -->
-        <p class="group notes">{dive.notes}</p>
+        <p class="od-dive-detail--group od-dive-detail--notes">{dive.notes}</p>
       </section>
     {/if}
-    <div class="end" aria-hidden="true"></div>
+    <div class="od-dive-detail--end" aria-hidden="true"></div>
   {/if}
 </Page>
 
@@ -635,17 +635,17 @@
 
 <style>
   @layer od.components {
-    .hero {
+    .od-dive-detail--hero {
       position: relative;
     }
 
     /* 16 px under the top bar, as in the detail3 mock-ups. */
-    .head {
+    .od-dive-detail--head {
       position: relative;
       padding: 16px 20px 0;
     }
 
-    .day {
+    .od-dive-detail--day {
       margin: 0;
       font-size: 15px;
       color: var(--od-text-2);
@@ -656,7 +656,7 @@
       }
     }
 
-    .site {
+    .od-dive-detail--site {
       margin: 2px 0 0;
       font-size: 34px;
       line-height: 40px;
@@ -664,25 +664,25 @@
       letter-spacing: -0.4px;
       color: var(--od-text);
 
-      &.not-set {
+      &.od-dive-detail--not-set {
         color: var(--od-text-2);
       }
     }
 
-    .skeleton-profile {
+    .od-dive-detail--skeleton-profile {
       height: 180px;
       margin: 14px 16px 0;
       border-radius: 16px;
     }
 
-    .facts {
+    .od-dive-detail--facts {
       margin: 8px 20px 0;
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
       column-gap: 12px;
     }
 
-    .fact {
+    .od-dive-detail--fact {
       padding: 9px 0;
       border-bottom: 1px solid var(--od-separator);
       display: flex;
@@ -704,7 +704,7 @@
       }
     }
 
-    .location {
+    .od-dive-detail--location {
       --f7-theme-color: var(--od-text);
       margin: 2px 0 0;
       font-size: 15px;
@@ -715,11 +715,11 @@
       }
     }
 
-    .section {
+    .od-dive-detail--section {
       margin: 22px 16px 0;
     }
 
-    .section-title {
+    .od-dive-detail--section-title {
       margin: 0 0 8px;
       font-family: var(--od-title-font);
       font-size: 14px;
@@ -728,14 +728,14 @@
     }
 
     /* Grouped list in a rounded block, as in the mock-ups (iOS grouped list, MD3 list). */
-    .group {
+    .od-dive-detail--group {
       border-radius: 16px;
       background: var(--od-surface);
       color: var(--od-text);
       overflow: hidden;
     }
 
-    .cylinder {
+    .od-dive-detail--cylinder {
       padding: 12px 16px;
       display: flex;
       flex-direction: column;
@@ -746,38 +746,38 @@
       }
     }
 
-    .line {
+    .od-dive-detail--line {
       display: flex;
       justify-content: space-between;
       align-items: baseline;
       gap: 8px;
     }
 
-    .name {
+    .od-dive-detail--name {
       display: flex;
       align-items: baseline;
       flex-wrap: wrap;
       gap: 0 4px;
 
-      .gas {
+      .od-dive-detail--gas {
         font-size: 16px;
         font-weight: 700;
       }
 
-      .type {
+      .od-dive-detail--type {
         font-size: 14px;
         color: var(--od-text-2);
       }
     }
 
-    .cylinder .value {
+    .od-dive-detail--cylinder .od-dive-detail--value {
       font-size: 16px;
       font-weight: 700;
       white-space: nowrap;
     }
 
     /* From 0 to the working pressure: what is left, then what was used. */
-    .bar {
+    .od-dive-detail--bar {
       display: flex;
       height: 8px;
       border-radius: 4px;
@@ -788,28 +788,28 @@
         flex: none;
       }
 
-      .fill {
+      .od-dive-detail--fill {
         background: var(--od-tertiary);
       }
 
-      .gap {
+      .od-dive-detail--gap {
         width: 2px;
         background: var(--od-surface);
       }
 
-      .used {
+      .od-dive-detail--used {
         background: var(--od-gauge-used);
       }
     }
 
-    .secondary {
+    .od-dive-detail--secondary {
       display: flex;
       justify-content: space-between;
       font-size: 13px;
       color: var(--od-text-2);
     }
 
-    .row {
+    .od-dive-detail--row {
       box-sizing: border-box;
       min-height: 44px;
       padding: 0 16px;
@@ -830,7 +830,7 @@
         border-top: none;
       }
 
-      .value {
+      .od-dive-detail--value {
         font-size: 14px;
         color: var(--od-text-2);
         font-variant-numeric: tabular-nums;
@@ -840,11 +840,11 @@
 
     /* A label with a second line under it (weight location, computer role, photos). */
     /* Several weights: the total, then one line per location, no dividers. */
-    .weights {
+    .od-dive-detail--weights {
       padding: 16px 16px 14px;
       border-top: 1px solid var(--od-separator);
 
-      .total {
+      .od-dive-detail--total {
         display: flex;
         justify-content: space-between;
         align-items: baseline;
@@ -877,7 +877,7 @@
       }
     }
 
-    .stacked {
+    .od-dive-detail--stacked {
       padding: 10px 0;
       display: flex;
       flex-direction: column;
@@ -887,7 +887,7 @@
         padding: 0;
       }
 
-      .sub {
+      .od-dive-detail--sub {
         font-size: 13px;
         line-height: 18px;
         color: var(--od-text-2);
@@ -900,7 +900,7 @@
     }
 
     /* Overall rating under the title. */
-    .rating {
+    .od-dive-detail--rating {
       margin: 8px 0 0;
       display: flex;
       align-items: center;
@@ -910,7 +910,7 @@
     }
 
     /* Header of the collapsible Conditions block. */
-    .disclosure {
+    .od-dive-detail--disclosure {
       width: 100%;
       min-height: 56px;
       padding: 8px 16px;
@@ -923,40 +923,40 @@
       align-items: center;
       gap: 12px;
 
-      .text {
+      .od-dive-detail--text {
         flex: 1;
         display: flex;
         flex-direction: column;
         gap: 2px;
       }
 
-      .title {
+      .od-dive-detail--title {
         font-size: 16px;
         font-weight: 600;
       }
 
-      .summary {
+      .od-dive-detail--summary {
         font-size: 13px;
         line-height: 18px;
         color: var(--od-text-2);
       }
 
-      .arrow {
+      .od-dive-detail--arrow {
         display: block;
         color: var(--od-text-2);
 
-        &.open {
+        &.od-dive-detail--open {
           transform: rotate(180deg);
         }
       }
     }
 
-    .disclosure + .row {
+    .od-dive-detail--disclosure + .od-dive-detail--row {
       border-top: 1px solid var(--od-separator);
     }
 
     /* Tags and people: 32 px chips on the tint. */
-    .tags {
+    .od-dive-detail--tags {
       list-style: none;
       margin: 0;
       padding: 0;
@@ -964,12 +964,12 @@
       flex-wrap: wrap;
       gap: 6px;
 
-      &.end {
+      &.od-dive-detail--end {
         justify-content: flex-end;
       }
     }
 
-    .tag {
+    .od-dive-detail--tag {
       height: 32px;
       padding: 0 12px;
       border-radius: 8px;
@@ -981,11 +981,11 @@
     }
 
     /* Space after the last block, so that it never touches the bottom bar. */
-    .end {
+    .od-dive-detail--end {
       height: 32px;
     }
 
-    .notes {
+    .od-dive-detail--notes {
       margin: 0;
       padding: 12px 16px;
       font-size: 16px;
@@ -995,11 +995,11 @@
   }
 
   /* Framework7's variable, outside the layers: the top bar is the page's colour on Android. */
-  :global(.md .od-detail > .navbar) {
+  :global(.md .od-dive-detail > .navbar) {
     --f7-navbar-bg-color: var(--od-background);
   }
 
-  :global(.od-detail.od-on-image > .navbar) {
+  :global(.od-dive-detail.od-dive-detail--on-image > .navbar) {
     --f7-navbar-bg-color: transparent;
   }
 </style>

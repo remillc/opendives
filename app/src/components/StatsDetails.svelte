@@ -42,8 +42,8 @@
 </script>
 
 {#if shown.length}
-  <div class="block-title">{t('stats.details')}</div>
-  <div class="list list-strong inset list-dividers">
+  <div class="od-stats-details block-title">{t('stats.details')}</div>
+  <div class="od-stats-details list list-strong inset list-dividers">
     <ul>
       {#each shown as r (r.row)}
         <li class="item-content">

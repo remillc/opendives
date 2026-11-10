@@ -59,7 +59,7 @@
   }
 </script>
 
-<AccountStep
+<AccountStep class="od-confirm-code"
   title={t('createAccount.title')}
   step={t('createAccount.step1')}
   heading={t('confirmCode.heading')}
@@ -70,7 +70,7 @@
   actionDisabled={!code.trim()}
   onaction={confirm}
 >
-  <div class="fields">
+  <div class="od-confirm-code--fields">
     <AccountField
       label={t('confirmCode.code')}
       rowLabel={t('confirmCode.codeRow')}
@@ -80,7 +80,7 @@
       disabled={busy}
       required
     />
-    <div class="resend">
+    <div class="od-confirm-code--resend">
       <button type="button" disabled={busy} onclick={resend}><Icon name="refresh" size={18} weight={2} />{t('confirmCode.resend')}</button>
     </div>
   </div>
@@ -88,7 +88,7 @@
 
 <style>
   @layer od.components {
-    .fields {
+    .od-confirm-code--fields {
       margin: 6px 0 0;
 
       :global(.ios) & {
@@ -97,7 +97,7 @@
     }
 
     /* MD3 outlined button with a leading icon (18 dp); iOS: a grey tinted button. */
-    .resend {
+    .od-confirm-code--resend {
       margin: 8px 16px 0;
 
       button {

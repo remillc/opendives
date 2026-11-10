@@ -65,9 +65,9 @@
     {/snippet}
   </Navbar>
 
-  <p class="intro">{t('tokenHelp.intro')}</p>
+  <p class="od-token-help--intro">{t('tokenHelp.intro')}</p>
 
-  <nav class="page-menu" aria-label={t('tokenHelp.menu')}>
+  <nav class="od-token-help--page-menu" aria-label={t('tokenHelp.menu')}>
     {#each PROVIDERS as provider (provider.id)}
       <button type="button" onclick={() => jump(provider.id)}>{t(`tokenHelp.${provider.id}.name`)}</button>
     {/each}
@@ -76,21 +76,21 @@
   {#each PROVIDERS as provider (provider.id)}
     {@const name = t(`tokenHelp.${provider.id}.name`)}
     <h2 class="block-title" id="od-token-help-{provider.id}" tabindex="-1">{name}</h2>
-    <div class="surface">
-      <p class="note">{t(`tokenHelp.${provider.id}.note`)}</p>
+    <div class="od-token-help--surface">
+      <p class="od-token-help--note">{t(`tokenHelp.${provider.id}.note`)}</p>
       {#each provider.sections as section}
         {#if section.title}<h3>{t(section.title)}</h3>{/if}
         <ol>
           {#each section.steps as key (key)}<li>{t(key)}</li>{/each}
         </ol>
       {/each}
-      {#if provider.after}<p class="note">{t(provider.after)}</p>{/if}
-      <a href={provider.page} class="open external" target="_blank" rel="noopener">
+      {#if provider.after}<p class="od-token-help--note">{t(provider.after)}</p>{/if}
+      <a href={provider.page} class="od-token-help--open external" target="_blank" rel="noopener">
         <span>{t('tokenHelp.open', { name })}</span>
         <Icon name="openInNew" size={20} />
       </a>
       {#if provider.docs}
-        <a href={provider.docs} class="open external" target="_blank" rel="noopener">
+        <a href={provider.docs} class="od-token-help--open external" target="_blank" rel="noopener">
           <span>{t('tokenHelp.openDocs', { name })}</span>
           <Icon name="openInNew" size={20} />
         </a>
@@ -98,24 +98,24 @@
     </div>
   {/each}
 
-  <p class="intro afterwards">{t('tokenHelp.afterwards')}</p>
+  <p class="od-token-help--intro od-token-help--afterwards">{t('tokenHelp.afterwards')}</p>
 </Page>
 
 <style>
   @layer od.components {
-    .intro {
+    .od-token-help--intro {
       margin: 8px 24px 0;
       font-size: 14px;
       line-height: 20px;
       letter-spacing: 0.25px;
       color: var(--od-text-2);
 
-      &.afterwards {
+      &.od-token-help--afterwards {
         margin-bottom: calc(var(--f7-safe-area-bottom) + 24px);
       }
     }
 
-    .page-menu {
+    .od-token-help--page-menu {
       margin: 12px 16px 0;
       display: flex;
       flex-wrap: wrap;
@@ -142,7 +142,7 @@
       outline: none;
     }
 
-    .surface {
+    .od-token-help--surface {
       margin: 0 16px;
       padding: 16px 16px 8px;
       border-radius: 20px;
@@ -159,7 +159,7 @@
       font-weight: 600;
     }
 
-    .note {
+    .od-token-help--note {
       margin: 0 0 8px;
       font-size: 14px;
       line-height: 20px;
@@ -177,7 +177,7 @@
       color: var(--od-text);
     }
 
-    .open {
+    .od-token-help--open {
       min-height: 48px;
       display: flex;
       align-items: center;

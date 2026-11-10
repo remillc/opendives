@@ -107,7 +107,7 @@
   }
 </script>
 
-<Popup push={theme.ios} swipeToClose={theme.ios}>
+<Popup class="od-statistic-new" push={theme.ios} swipeToClose={theme.ios}>
   <View>
     <Page>
       <Navbar title={t(theme.ios ? 'stats.newTitleShort' : 'stats.newTitle')}>
@@ -119,13 +119,13 @@
           {/if}
         {/snippet}
         {#snippet right()}
-          <Link class={`save${canSave ? '' : ' disabled'}`} onClick={save}>{t('edit.save')}</Link>
+          <Link class={`od-statistic-new--save${canSave ? '' : ' disabled'}`} onClick={save}>{t('edit.save')}</Link>
         {/snippet}
       </Navbar>
 
       {#if theme.ios}
         <div class="block-title">{t('stats.name')}</div>
-        <div class="list list-strong inset list-dividers inline-labels">
+        <div class="list list-strong inset list-dividers od-statistic-new--inline-labels">
           <ul>
             <li class="item-content item-input">
               <div class="item-inner">
@@ -135,7 +135,7 @@
             </li>
           </ul>
         </div>
-        <p class="note">{t('stats.nameHint')}</p>
+        <p class="od-statistic-new--note">{t('stats.nameHint')}</p>
       {:else}
         <TextField label={t('stats.name')} bind:value={name} oninput={() => (nameTyped = true)} supporting={t('stats.nameHintShort')} />
       {/if}
@@ -147,7 +147,7 @@
           <div class="list list-strong inset list-dividers">
             <ul>
               <li>
-                <label class="item-content item-link select-row">
+                <label class="item-content item-link od-statistic-new--select-row">
                   <div class="item-inner">
                     <div class="item-title">{t('stats.criterion')}</div>
                     <div class="item-after">{t(`stats.criteria.${c.field}`)}</div>
@@ -158,25 +158,25 @@
                 </label>
               </li>
               {#if index > 0}
-                <li><button type="button" class="item-content action-row remove-row" onclick={() => removeCriterion(index)}><div class="item-inner"><div class="item-title">{t('stats.removeCriterion')}</div></div></button></li>
+                <li><button type="button" class="item-content od-statistic-new--action-row od-statistic-new--remove-row" onclick={() => removeCriterion(index)}><div class="item-inner"><div class="item-title">{t('stats.removeCriterion')}</div></div></button></li>
               {/if}
             </ul>
           </div>
-          {#if index === 0}<p class="note">{t('stats.criteriaHint')}</p>{/if}
+          {#if index === 0}<p class="od-statistic-new--note">{t('stats.criteriaHint')}</p>{/if}
         {:else}
           <!-- MD3 exposed dropdown, filled (spec, "Text fields"), opening the system's list. -->
-          <div class="filled-field">
-            <div class="filled-box filled">
-              <span class="filled-label">{t('stats.criterion')}</span>
-              <span class="dropdown-value">{t(`stats.criteria.${c.field}`)}</span>
-              <span class="dropdown-arrow"><DropdownArrow /></span>
+          <div class="od-statistic-new--filled-field">
+            <div class="od-statistic-new--filled-box od-statistic-new--filled">
+              <span class="od-statistic-new--filled-label">{t('stats.criterion')}</span>
+              <span class="od-statistic-new--dropdown-value">{t(`stats.criteria.${c.field}`)}</span>
+              <span class="od-statistic-new--dropdown-arrow"><DropdownArrow /></span>
               <select aria-label={t('stats.criterion')} value={c.field} onchange={(e) => setField(index, e.currentTarget.value)}>
                 {#each CRITERIA as f (f)}<option value={f}>{t(`stats.criteria.${f}`)}</option>{/each}
               </select>
             </div>
-            {#if index === 0}<span class="supporting">{t('stats.criteriaHint')}</span>{/if}
+            {#if index === 0}<span class="od-statistic-new--supporting">{t('stats.criteriaHint')}</span>{/if}
             {#if index > 0}
-              <button type="button" class="text-button" onclick={() => removeCriterion(index)}>
+              <button type="button" class="od-statistic-new--text-button" onclick={() => removeCriterion(index)}>
                 <Icon name="close" size={18} weight={2} />{t('stats.removeCriterion')}
               </button>
             {/if}
@@ -185,18 +185,18 @@
 
         <div class="block-title">{t('stats.values')}</div>
         {#if values?.length}
-          <div class="list list-strong inset list-dividers values">
+          <div class="list list-strong inset list-dividers od-statistic-new--values">
             <ul>
               {#each values as v (v.key)}
                 {@const on = c.values.includes(v.key)}
                 <li>
                   {#if theme.ios}
                     <!-- iOS: a check mark at the end of the selected rows (HIG). -->
-                    <button type="button" class="item-content check-row" role="checkbox" aria-checked={on} onclick={() => toggle(index, v.key, !on)}>
+                    <button type="button" class="item-content od-statistic-new--check-row" role="checkbox" aria-checked={on} onclick={() => toggle(index, v.key, !on)}>
                       <div class="item-inner">
                         <div class="item-title">{v.label}</div>
                         <div class="item-after od-value">{t('trip.dives', { n: v.dives })}</div>
-                        <span class="check" class:on><Icon name="check" size={20} weight={2.6} /></span>
+                        <span class="od-statistic-new--check" class:od-statistic-new--on={on}><Icon name="check" size={20} weight={2.6} /></span>
                       </div>
                     </button>
                   {:else}
@@ -214,18 +214,18 @@
             </ul>
           </div>
         {:else if values}
-          <p class="note">{t('stats.noValues')}</p>
+          <p class="od-statistic-new--note">{t('stats.noValues')}</p>
         {/if}
       {/each}
 
       {#if criteria.length < CRITERIA.length}
         {#if theme.ios}
-          <div class="list list-strong inset list-dividers add">
-            <ul><li><button type="button" class="item-content action-row" onclick={addCriterion}><div class="item-inner"><div class="item-title">{t('stats.addCriterionEllipsis')}</div></div></button></li></ul>
+          <div class="list list-strong inset list-dividers od-statistic-new--add">
+            <ul><li><button type="button" class="item-content od-statistic-new--action-row" onclick={addCriterion}><div class="item-inner"><div class="item-title">{t('stats.addCriterionEllipsis')}</div></div></button></li></ul>
           </div>
         {:else}
-          <div class="add">
-            <button type="button" class="text-button" onclick={addCriterion}><Icon name="plus" size={18} weight={2} />{t('stats.addCriterion')}</button>
+          <div class="od-statistic-new--add">
+            <button type="button" class="od-statistic-new--text-button" onclick={addCriterion}><Icon name="plus" size={18} weight={2} />{t('stats.addCriterion')}</button>
           </div>
         {/if}
       {/if}
@@ -234,27 +234,27 @@
       <!-- The result card opens the filtered result (in the Statistics section, behind this dialog). -->
       <KeyFigures figures={result?.total ?? null} prefs={logbook.prefs} href={canSave ? resultHref : undefined} onclick={openResult} />
 
-      <p class="note rules">{theme.ios ? '' : `${t('stats.rulesValues')} `}{t('stats.rules')}</p>
-      <div class="end"></div>
+      <p class="od-statistic-new--note od-statistic-new--rules">{theme.ios ? '' : `${t('stats.rulesValues')} `}{t('stats.rules')}</p>
+      <div class="od-statistic-new--end"></div>
     </Page>
   </View>
 </Popup>
 
 <style>
   @layer od.components {
-    .note {
+    .od-statistic-new--note {
       margin: 8px 20px 0;
       font-size: 13px;
       line-height: 18px;
       color: var(--od-text-2);
 
-      &.rules {
+      &.od-statistic-new--rules {
         margin-top: 12px;
       }
     }
 
     /* "Enregistrer" in the top bar: a text button (spec, "Text fields"). */
-    :global(.navbar .save) {
+    :global(.navbar .od-statistic-new--save) {
       font-weight: 500;
     }
 
@@ -265,13 +265,13 @@
      * moves above the value on focus or once filled. Used for the criterion
      * dropdown (a select); the name uses TextField.svelte.
      */
-    .filled-field {
+    .od-statistic-new--filled-field {
       margin: 18px 16px 0;
       display: flex;
       flex-direction: column;
     }
 
-    .filled-box {
+    .od-statistic-new--filled-box {
       position: relative;
       min-height: 56px;
       padding: 24px 12px 8px 16px;
@@ -298,7 +298,7 @@
       }
     }
 
-    .filled-label {
+    .od-statistic-new--filled-label {
       position: absolute;
       left: 16px;
       top: 16px;
@@ -308,31 +308,31 @@
       pointer-events: none;
       transition: top 0.15s, font-size 0.15s, line-height 0.15s;
 
-      .filled-box.filled &,
-      .filled-box:focus-within & {
+      .od-statistic-new--filled-box.od-statistic-new--filled &,
+      .od-statistic-new--filled-box:focus-within & {
         top: 8px;
         font-size: 12px;
         line-height: 16px;
       }
 
-      .filled-box:focus-within & {
+      .od-statistic-new--filled-box:focus-within & {
         color: var(--od-action);
       }
     }
 
-    .dropdown-value {
+    .od-statistic-new--dropdown-value {
       flex: 1;
       font-size: 16px;
       line-height: 24px;
     }
 
-    .dropdown-arrow {
+    .od-statistic-new--dropdown-arrow {
       position: absolute;
       right: 12px;
       top: 16px;
     }
 
-    .supporting {
+    .od-statistic-new--supporting {
       margin-top: 4px;
       padding-left: 16px;
       font-size: 12px;
@@ -341,7 +341,7 @@
     }
 
     /* iOS: the criterion row opens the system's picker. */
-    .select-row {
+    .od-statistic-new--select-row {
       position: relative;
 
       select {
@@ -353,7 +353,7 @@
     }
 
     /* iOS action rows: bold, in the action colour. */
-    .action-row {
+    .od-statistic-new--action-row {
       width: 100%;
       border: none;
       background: none;
@@ -366,12 +366,12 @@
         color: var(--od-action);
       }
 
-      &.remove-row .item-title {
+      &.od-statistic-new--remove-row .item-title {
         font-weight: 400;
       }
     }
 
-    .check-row {
+    .od-statistic-new--check-row {
       width: 100%;
       border: none;
       background: none;
@@ -381,18 +381,18 @@
       cursor: pointer;
     }
 
-    .check {
+    .od-statistic-new--check {
       width: 20px;
       margin-left: 10px;
       color: var(--od-action);
       visibility: hidden;
 
-      &.on {
+      &.od-statistic-new--on {
         visibility: visible;
       }
     }
 
-    .add {
+    .od-statistic-new--add {
       margin: 8px 8px 0;
 
       &.list {
@@ -401,7 +401,7 @@
     }
 
     /* MD3 text button (40 dp, 12 dp side padding); iOS, a 44 pt text button. */
-    .text-button {
+    .od-statistic-new--text-button {
       height: 40px;
       padding: 0 12px;
       border: none;
@@ -426,7 +426,7 @@
       }
     }
 
-    .end {
+    .od-statistic-new--end {
       height: 32px;
     }
   }

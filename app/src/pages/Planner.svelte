@@ -565,7 +565,7 @@
   }
 </script>
 
-<Page onPageReinit={refresh}>
+<Page class="od-planner" onPageReinit={refresh}>
   <Navbar title={t('plan.title')}>
     {#snippet left()}
       <Link iconOnly={!theme.ios} onClick={toList}>
@@ -596,14 +596,14 @@
   </Popover>
 
   <!-- Tablet (wide pane): the data on the left, the profile and the result on the right. -->
-  <div class="planner">
-    <div class="start">
-      <button type="button" class="source" onclick={() => (choosing = true)}>
+  <div class="od-planner">
+    <div class="od-planner--start">
+      <button type="button" class="od-planner--source" onclick={() => (choosing = true)}>
         {#if planner.source}
           <ProfileThumbnail profile={planner.source.profile} maxDepthMm={planner.source.maxDepthMm} {prefs} />
-          <span class="text">
-            <span class="title">{planner.source.site || t('dive.siteNotSet')}</span>
-            <span class="sub"
+          <span class="od-planner--text">
+            <span class="od-planner--title">{planner.source.site || t('dive.siteNotSet')}</span>
+            <span class="od-planner--sub"
               >{[
                 planner.source.number ? t('detail.number', { number: String(planner.source.number) }) : '',
                 formatDateTime(planner.source.date),
@@ -614,21 +614,21 @@
             >
           </span>
         {:else}
-          <span class="plus" aria-hidden="true"><Icon name="plus" /></span>
-          <span class="text">
-            <span class="title">{t('plan.newDive')}</span>
-            <span class="sub">{t('plan.noStartDive')}</span>
+          <span class="od-planner--plus" aria-hidden="true"><Icon name="plus" /></span>
+          <span class="od-planner--text">
+            <span class="od-planner--title">{t('plan.newDive')}</span>
+            <span class="od-planner--sub">{t('plan.noStartDive')}</span>
           </span>
         {/if}
-        <span class="change">{t('plan.change')}</span>
+        <span class="od-planner--change">{t('plan.change')}</span>
       </button>
     </div>
 
-    <div class="chart">
-      <h2 class="section-title">{t(planner.source ? 'plan.profileOfDive' : 'plan.profilePlanned')}</h2>
+    <div class="od-planner--chart">
+      <h2 class="od-planner--section-title">{t(planner.source ? 'plan.profileOfDive' : 'plan.profilePlanned')}</h2>
       {#if shape}
-        <div class="profile-box">
-          <svg class="profile" viewBox="0 0 {W} {H}" preserveAspectRatio="none" role="img" aria-label={profileLabel}>
+        <div class="od-planner--profile-box">
+          <svg class="od-planner--profile" viewBox="0 0 {W} {H}" preserveAspectRatio="none" role="img" aria-label={profileLabel}>
             <defs>
               <linearGradient id="plan-water-{uid}" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0" style="stop-color: var(--od-water-top)" />
@@ -636,115 +636,115 @@
               </linearGradient>
             </defs>
             <path d={shape.water} fill="url(#plan-water-{uid})" />
-            <path d={shape.line} class="line" vector-effect="non-scaling-stroke" />
+            <path d={shape.line} class="od-planner--line" vector-effect="non-scaling-stroke" />
             {#if shape.ceilingArea}
-              <path d={shape.ceilingArea} class="ceiling-area" />
-              <path d={shape.ceilingLine} class="ceiling-line" vector-effect="non-scaling-stroke" />
+              <path d={shape.ceilingArea} class="od-planner--ceiling-area" />
+              <path d={shape.ceilingLine} class="od-planner--ceiling-line" vector-effect="non-scaling-stroke" />
             {/if}
           </svg>
           {#each shape.labels as label, i (i)}
-            <span class="level-label" class:above={label.top > 70} style="left: {label.left}%; top: {label.top}%" aria-hidden="true">{label.text}</span>
+            <span class="od-planner--level-label" class:od-planner--above={label.top > 70} style="left: {label.left}%; top: {label.top}%" aria-hidden="true">{label.text}</span>
           {/each}
         </div>
         {#if shape.ceilingArea}
-          <p class="legend"><span class="swatch" aria-hidden="true"></span>{t('plan.ceilingLegend')}</p>
+          <p class="od-planner--legend"><span class="od-planner--swatch" aria-hidden="true"></span>{t('plan.ceilingLegend')}</p>
         {/if}
       {:else if !failed}
-        <div class="skeleton-block loading" aria-busy="true" aria-label={t('plan.computing')}></div>
+        <div class="skeleton-block od-planner--loading" aria-busy="true" aria-label={t('plan.computing')}></div>
       {/if}
-      {#if planner.source}<p class="helper">{t('plan.fromDiveHelper')}</p>{/if}
+      {#if planner.source}<p class="od-planner--helper">{t('plan.fromDiveHelper')}</p>{/if}
     </div>
 
-    <div class="data">
+    <div class="od-planner--data">
       {#if !planner.source}
-        <h2 class="section-title">{t('plan.date')}</h2>
-        <div class="fields">
-          <div class="pair">
-            <div class="grow"><ButtonField label={t('edit.date')} value={dateText} onclick={() => (dialog = 'date')} /></div>
-            <div class="grow"><ButtonField label={t('edit.time')} value={timeText} onclick={() => (dialog = 'time')} /></div>
+        <h2 class="od-planner--section-title">{t('plan.date')}</h2>
+        <div class="od-planner--fields">
+          <div class="od-planner--pair">
+            <div class="od-planner--grow"><ButtonField label={t('edit.date')} value={dateText} onclick={() => (dialog = 'date')} /></div>
+            <div class="od-planner--grow"><ButtonField label={t('edit.time')} value={timeText} onclick={() => (dialog = 'time')} /></div>
           </div>
-          {#if intervalHelper}<p class="helper inner">{intervalHelper}</p>{/if}
+          {#if intervalHelper}<p class="od-planner--helper od-planner--inner">{intervalHelper}</p>{/if}
         </div>
 
-        <h2 class="section-title">{t('plan.levels')}</h2>
-        <div class="fields">
+        <h2 class="od-planner--section-title">{t('plan.levels')}</h2>
+        <div class="od-planner--fields">
           {#each levelFields as level, i (level.key)}
-            <div class="pair with-remove">
+            <div class="od-planner--pair od-planner--with-remove">
               <TextField label={t('plan.depth')} bind:value={level.depth} inputmode="decimal" invalid={invalid[`depth-${level.key}`]} oninput={() => levelDepth(i)}>
-                {#snippet trailing()}<span class="unit">{depthUnit(prefs)}</span>{/snippet}
+                {#snippet trailing()}<span class="od-planner--unit">{depthUnit(prefs)}</span>{/snippet}
               </TextField>
               <TextField label={t('plan.duration')} bind:value={level.time} inputmode="numeric" invalid={invalid[`time-${level.key}`]} oninput={() => levelTime(i)}>
-                {#snippet trailing()}<span class="unit">{t('units.minutes')}</span>{/snippet}
+                {#snippet trailing()}<span class="od-planner--unit">{t('units.minutes')}</span>{/snippet}
               </TextField>
               {#if i > 0}
-                <button type="button" class="remove" aria-label={t('plan.removeLevel')} onclick={() => removeLevel(i)}><Icon name="close" /></button>
+                <button type="button" class="od-planner--remove" aria-label={t('plan.removeLevel')} onclick={() => removeLevel(i)}><Icon name="close" /></button>
               {:else}
-                <span class="remove" aria-hidden="true"></span>
+                <span class="od-planner--remove" aria-hidden="true"></span>
               {/if}
             </div>
           {/each}
           {#if levelFields.length < 20}
-            <button type="button" class="add" onclick={addLevel}><Icon name="plus" size={18} />{t('plan.addLevel')}</button>
+            <button type="button" class="od-planner--add" onclick={addLevel}><Icon name="plus" size={18} />{t('plan.addLevel')}</button>
           {/if}
-          <p class="helper inner">{t('plan.levelsHelper')}</p>
+          <p class="od-planner--helper od-planner--inner">{t('plan.levelsHelper')}</p>
         </div>
       {/if}
 
-      <h2 class="section-title">{t('plan.gas')}</h2>
-      <div class="fields">
+      <h2 class="od-planner--section-title">{t('plan.gas')}</h2>
+      <div class="od-planner--fields">
         {#each gasFields as gas, i (gas.key)}
-          <div class="gas">
-            <div class="pair with-remove">
+          <div class="od-planner--gas">
+            <div class="od-planner--pair od-planner--with-remove">
               <TextField label={t('plan.oxygenPercent')} bind:value={gas.o2} inputmode="numeric" invalid={invalid[`gas-${gas.key}`]} oninput={() => gasChanged(i)}>
-                {#snippet trailing()}<span class="unit">%</span>{/snippet}
+                {#snippet trailing()}<span class="od-planner--unit">%</span>{/snippet}
               </TextField>
               <TextField label={t('plan.heliumPercent')} bind:value={gas.he} inputmode="numeric" invalid={invalid[`gas-${gas.key}`]} oninput={() => gasChanged(i)}>
-                {#snippet trailing()}<span class="unit">%</span>{/snippet}
+                {#snippet trailing()}<span class="od-planner--unit">%</span>{/snippet}
               </TextField>
               {#if i > 0}
-                <button type="button" class="remove" aria-label={t('plan.removeGas')} onclick={() => removeGas(i)}><Icon name="close" /></button>
+                <button type="button" class="od-planner--remove" aria-label={t('plan.removeGas')} onclick={() => removeGas(i)}><Icon name="close" /></button>
               {:else}
-                <span class="remove" aria-hidden="true"></span>
+                <span class="od-planner--remove" aria-hidden="true"></span>
               {/if}
             </div>
-            <p class="helper inner">{gasHelper(i)}</p>
-            <div class="pair with-remove">
+            <p class="od-planner--helper od-planner--inner">{gasHelper(i)}</p>
+            <div class="od-planner--pair od-planner--with-remove">
               <TextField label={t('plan.carried')} bind:value={gas.carried} inputmode="decimal" invalid={invalid[`carried-${gas.key}`]} oninput={() => carriedChanged(i)}>
-                {#snippet trailing()}<span class="unit">{t(cuft ? 'units.cubicFeet' : 'units.liters')}</span>{/snippet}
+                {#snippet trailing()}<span class="od-planner--unit">{t(cuft ? 'units.cubicFeet' : 'units.liters')}</span>{/snippet}
               </TextField>
-              <span class="remove" aria-hidden="true"></span>
+              <span class="od-planner--remove" aria-hidden="true"></span>
             </div>
           </div>
         {/each}
-        <button type="button" class="add" onclick={addGas}><Icon name="plus" size={18} />{t('plan.addGas')}</button>
+        <button type="button" class="od-planner--add" onclick={addGas}><Icon name="plus" size={18} />{t('plan.addGas')}</button>
         <SelectField label={t('plan.sac')} bind:value={sacChoice} options={sacOptions.list} supporting={planner.source ? t('plan.sacMeasured') : ''} />
       </div>
 
-      <h2 class="section-title">{t('plan.conditions')}</h2>
-      <div class="fields">
-        <div class="pair">
+      <h2 class="od-planner--section-title">{t('plan.conditions')}</h2>
+      <div class="od-planner--fields">
+        <div class="od-planner--pair">
           <SelectField label={t('plan.waterType')} bind:value={water} options={waterOptions} />
           <TextField label={t('plan.altitude')} bind:value={altitudeField} inputmode="numeric" invalid={invalid.altitude} oninput={altitudeChanged}>
-            {#snippet trailing()}<span class="unit">{depthUnit(prefs)}</span>{/snippet}
+            {#snippet trailing()}<span class="od-planner--unit">{depthUnit(prefs)}</span>{/snippet}
           </TextField>
         </div>
-        <p class="helper inner">{t(planner.source ? 'plan.conditionsFromDive' : 'plan.conditionsDefault')}</p>
+        <p class="od-planner--helper od-planner--inner">{t(planner.source ? 'plan.conditionsFromDive' : 'plan.conditionsDefault')}</p>
       </div>
 
-      <button type="button" class="accordion" aria-expanded={decoOpen} onclick={() => (decoOpen = !decoOpen)}>
-        <span class="text">
-          <span class="title">{t('plan.deco')}</span>
-          <span class="sub">{decoSummary(planner.deco)}</span>
+      <button type="button" class="od-planner--accordion" aria-expanded={decoOpen} onclick={() => (decoOpen = !decoOpen)}>
+        <span class="od-planner--text">
+          <span class="od-planner--title">{t('plan.deco')}</span>
+          <span class="od-planner--sub">{decoSummary(planner.deco)}</span>
         </span>
-        <span class="arrow" class:open={decoOpen}><Icon name="expand" /></span>
+        <span class="od-planner--arrow" class:od-planner--open={decoOpen}><Icon name="expand" /></span>
       </button>
       {#if decoOpen}
-        <div class="fields">
+        <div class="od-planner--fields">
           <SelectField label={t('plan.decoModel')} bind:value={modelChoice} options={modelOptions} />
           {#if planner.deco.decoModel === 'vpmb'}
             <SelectField label={t('settings.deco.vpmbConservatism')} bind:value={conservatismChoice} options={conservatismOptions} />
           {:else}
-            <div class="pair">
+            <div class="od-planner--pair">
               <TextField label={t('settings.deco.gfLow')} bind:value={gfLowField} inputmode="numeric" invalid={invalid.gfLow}
                 oninput={() => typed('gfLow', gfLowField, 10, 150, (v) => (planner.deco.gfLow = Math.round(v)))} />
               <TextField label={t('settings.deco.gfHigh')} bind:value={gfHighField} inputmode="numeric" invalid={invalid.gfHigh}
@@ -755,80 +755,80 @@
       {/if}
     </div>
 
-    <div class="outcome">
+    <div class="od-planner--outcome">
       {#if failed}
-        <p class="note">{t('plan.failed')}</p>
+        <p class="od-planner--note">{t('plan.failed')}</p>
       {:else if result}
-        <h2 class="section-title">{t('plan.result', { time: minutes(result.runtimeSeconds) })}</h2>
-        <div class="plan">
-          {#if errorText}<p class="error" role="alert">{errorText}</p>{/if}
+        <h2 class="od-planner--section-title">{t('plan.result', { time: minutes(result.runtimeSeconds) })}</h2>
+        <div class="od-planner--plan">
+          {#if errorText}<p class="od-planner--error" role="alert">{errorText}</p>{/if}
           {#if stops.length}
             <table class="od-value">
               <thead>
                 <tr>
                   <th scope="col">{t('plan.stop')}</th>
-                  <th scope="col" class="num">{t('plan.duration')}</th>
-                  <th scope="col" class="num">{t('plan.runtime')}</th>
+                  <th scope="col" class="od-planner--num">{t('plan.duration')}</th>
+                  <th scope="col" class="od-planner--num">{t('plan.runtime')}</th>
                   <th scope="col">{t('plan.gasColumn')}</th>
                 </tr>
               </thead>
               <tbody>
                 {#each stops as stop, i (i)}
                   <tr>
-                    <td class="depth">{stop.depth}</td>
-                    <td class="num">{stop.duration}</td>
-                    <td class="num">{stop.runtime}</td>
+                    <td class="od-planner--depth">{stop.depth}</td>
+                    <td class="od-planner--num">{stop.duration}</td>
+                    <td class="od-planner--num">{stop.runtime}</td>
                     <td>{stop.gas}</td>
                   </tr>
                 {/each}
               </tbody>
             </table>
           {:else}
-            <p class="no-stop">{t('plan.noStop')}</p>
+            <p class="od-planner--no-stop">{t('plan.noStop')}</p>
           {/if}
         </div>
 
-        <h2 class="section-title">{t('plan.volumes')}</h2>
-        <div class="results" class:ios={theme.ios}>
+        <h2 class="od-planner--section-title">{t('plan.volumes')}</h2>
+        <div class="od-planner--results" class:ios={theme.ios}>
           {#each volumeRows as row (row.key)}
-            <div class="result">
-              <span class="text">
-                <span class="label">{row.label}</span>
-                <span class="hint">{row.hint}</span>
+            <div class="od-planner--result">
+              <span class="od-planner--text">
+                <span class="od-planner--label">{row.label}</span>
+                <span class="od-planner--hint">{row.hint}</span>
                 {#if row.usedPercent !== null}
-                  <span class="bar" role="img" aria-label={row.barLabel}>
-                    <span class="fill" style:width="{row.usedPercent}%"></span>
-                    {#if row.hasReserve}<span class="gap"></span><span class="reserve"></span>{/if}
+                  <span class="od-planner--bar" role="img" aria-label={row.barLabel}>
+                    <span class="od-planner--fill" style:width="{row.usedPercent}%"></span>
+                    {#if row.hasReserve}<span class="od-planner--gap"></span><span class="od-planner--reserve"></span>{/if}
                   </span>
                 {/if}
               </span>
-              <span class="value od-value" class:alarm={row.alarm}>{row.value}</span>
+              <span class="od-planner--value od-value" class:od-planner--alarm={row.alarm}>{row.value}</span>
             </div>
           {/each}
           {#if modRow}
-            <div class="result">
-              <span class="text"><span class="label">{modRow.label}</span><span class="hint">{modRow.hint}</span></span>
-              <span class="value od-value alarm">{modRow.value}</span>
+            <div class="od-planner--result">
+              <span class="od-planner--text"><span class="od-planner--label">{modRow.label}</span><span class="od-planner--hint">{modRow.hint}</span></span>
+              <span class="od-planner--value od-value od-planner--alarm">{modRow.value}</span>
             </div>
           {/if}
-          <div class="result oxygen">
-            <span class="text">
-              <span class="label">{t('plan.oxygen')}</span>
-              <span class="bar" role="img" aria-label={t('plan.cnsBar', { cns: result.cns })}>
-                <span class="fill" style:width="{Math.min(result.cns, 100)}%"></span>
+          <div class="od-planner--result od-planner--oxygen">
+            <span class="od-planner--text">
+              <span class="od-planner--label">{t('plan.oxygen')}</span>
+              <span class="od-planner--bar" role="img" aria-label={t('plan.cnsBar', { cns: result.cns })}>
+                <span class="od-planner--fill" style:width="{Math.min(result.cns, 100)}%"></span>
               </span>
-              <span class="caption">{t('plan.cnsLimit')}</span>
+              <span class="od-planner--caption">{t('plan.cnsLimit')}</span>
             </span>
-            <span class="value od-value">{t('plan.oxygenValue', { cns: result.cns, otu: result.otu })}</span>
+            <span class="od-planner--value od-value">{t('plan.oxygenValue', { cns: result.cns, otu: result.otu })}</span>
           </div>
         </div>
-        <p class="note">{t(planner.source ? 'plan.noteFromDive' : 'plan.note')}</p>
+        <p class="od-planner--note">{t(planner.source ? 'plan.noteFromDive' : 'plan.note')}</p>
       {:else}
-        <div class="skeleton-block loading" aria-busy="true" aria-label={t('plan.computing')}></div>
+        <div class="skeleton-block od-planner--loading" aria-busy="true" aria-label={t('plan.computing')}></div>
       {/if}
     </div>
   </div>
-  <div class="end" aria-hidden="true"></div>
+  <div class="od-planner--end" aria-hidden="true"></div>
 
   <Popup opened={choosing} onPopupClosed={() => (choosing = false)}>
     <Page>
@@ -888,52 +888,52 @@
   @layer od.components {
     /* One column in the order of the spec; a wide pane puts the data on the
        left, the profile and the result on the right. */
-    .planner {
+    .od-planner {
       container-type: inline-size;
     }
 
     @container (min-width: 680px) {
-      .start,
-      .data {
+      .od-planner--start,
+      .od-planner--data {
         grid-column: 1;
       }
 
-      .chart,
-      .outcome {
+      .od-planner--chart,
+      .od-planner--outcome {
         grid-column: 2;
       }
 
-      .planner > .start {
+      .od-planner > .od-planner--start {
         grid-row: 1;
       }
 
-      .planner > .chart {
+      .od-planner > .od-planner--chart {
         grid-row: 1 / span 2;
       }
 
-      .planner > .data {
+      .od-planner > .od-planner--data {
         grid-row: 2 / span 2;
       }
 
-      .planner > .outcome {
+      .od-planner > .od-planner--outcome {
         grid-row: 3;
       }
     }
 
-    .planner:has(> .start) {
+    .od-planner:has(> .od-planner--start) {
       display: grid;
       grid-template-columns: minmax(0, 1fr);
       align-items: start;
     }
 
     @media (min-width: 768px) {
-      .planner:has(> .start) {
+      .od-planner:has(> .od-planner--start) {
         grid-template-columns: minmax(280px, 380px) minmax(0, 1fr);
         column-gap: 8px;
       }
     }
 
-    .source {
+    .od-planner--source {
       width: calc(100% - 32px);
       margin: 0 16px;
       min-height: 72px;
@@ -949,7 +949,7 @@
       align-items: center;
       gap: 16px;
 
-      .plus {
+      .od-planner--plus {
         flex: none;
         width: 40px;
         height: 40px;
@@ -958,32 +958,32 @@
         justify-content: center;
       }
 
-      .text {
+      .od-planner--text {
         flex: 1;
         min-width: 0;
         display: flex;
         flex-direction: column;
       }
 
-      .title {
+      .od-planner--title {
         font-size: 16px;
         line-height: 24px;
       }
 
-      .sub {
+      .od-planner--sub {
         font-size: 14px;
         line-height: 20px;
         letter-spacing: 0.25px;
         color: var(--od-text-2);
       }
 
-      .change {
+      .od-planner--change {
         font-size: 14px;
         font-weight: 500;
       }
     }
 
-    .section-title {
+    .od-planner--section-title {
       margin: 4px 16px 0;
       min-height: 48px;
       display: flex;
@@ -1002,7 +1002,7 @@
       }
     }
 
-    .profile-box {
+    .od-planner--profile-box {
       position: relative;
       margin: 0 16px;
       border-radius: 12px;
@@ -1010,31 +1010,31 @@
       overflow: hidden;
     }
 
-    .profile {
+    .od-planner--profile {
       display: block;
       width: 100%;
       height: 120px;
 
-      .line {
+      .od-planner--line {
         fill: none;
         stroke: var(--od-trace);
         stroke-width: 1.5;
         stroke-linejoin: round;
       }
 
-      .ceiling-area {
+      .od-planner--ceiling-area {
         fill: var(--od-alarm);
         opacity: 0.25;
       }
 
-      .ceiling-line {
+      .od-planner--ceiling-line {
         fill: none;
         stroke: var(--od-alarm);
         stroke-width: 1;
       }
     }
 
-    .level-label {
+    .od-planner--level-label {
       position: absolute;
       transform: translate(-50%, 4px);
       font-size: 11px;
@@ -1043,12 +1043,12 @@
       color: var(--od-text);
 
       /* Near the bottom of the chart: over the line, in the water. */
-      &.above {
+      &.od-planner--above {
         transform: translate(-50%, calc(-100% - 4px));
       }
     }
 
-    .legend {
+    .od-planner--legend {
       margin: 8px 16px 0;
       display: flex;
       align-items: center;
@@ -1056,7 +1056,7 @@
       font-size: 12px;
       color: var(--od-text-2);
 
-      .swatch {
+      .od-planner--swatch {
         width: 16px;
         height: 10px;
         background: color-mix(in srgb, var(--od-alarm) 35%, transparent);
@@ -1065,30 +1065,30 @@
       }
     }
 
-    .helper {
+    .od-planner--helper {
       margin: 8px 16px 0;
       font-size: 12px;
       line-height: 16px;
       color: var(--od-text-2);
 
-      &.inner {
+      &.od-planner--inner {
         margin: -4px 16px 0;
       }
     }
 
-    .fields {
+    .od-planner--fields {
       display: flex;
       flex-direction: column;
       gap: 12px;
     }
 
-    .gas {
+    .od-planner--gas {
       display: flex;
       flex-direction: column;
       gap: 12px;
     }
 
-    .pair {
+    .od-planner--pair {
       display: flex;
       gap: 16px;
 
@@ -1097,11 +1097,11 @@
         min-width: 0;
       }
 
-      &.with-remove {
+      &.od-planner--with-remove {
         margin-right: 8px;
         gap: 8px;
 
-        & > .remove {
+        & > .od-planner--remove {
           flex: none;
           width: 40px;
           height: 56px;
@@ -1117,18 +1117,18 @@
       }
     }
 
-    .grow {
+    .od-planner--grow {
       flex: 1;
       min-width: 0;
     }
 
-    .unit {
+    .od-planner--unit {
       padding-inline-end: 12px;
       font-size: 14px;
       color: var(--od-text-2);
     }
 
-    .add {
+    .od-planner--add {
       align-self: flex-start;
       margin: 0 16px;
       height: 40px;
@@ -1145,7 +1145,7 @@
       cursor: pointer;
     }
 
-    .accordion {
+    .od-planner--accordion {
       width: 100%;
       margin-top: 8px;
       min-height: 72px;
@@ -1161,35 +1161,35 @@
       gap: 16px;
       cursor: pointer;
 
-      .text {
+      .od-planner--text {
         flex: 1;
         min-width: 0;
         display: flex;
         flex-direction: column;
       }
 
-      .title {
+      .od-planner--title {
         font-size: 16px;
         line-height: 24px;
       }
 
-      .sub {
+      .od-planner--sub {
         font-size: 14px;
         line-height: 20px;
         color: var(--od-text-2);
       }
 
-      .arrow {
+      .od-planner--arrow {
         display: flex;
         transition: transform 0.2s;
 
-        &.open {
+        &.od-planner--open {
           transform: rotate(180deg);
         }
       }
     }
 
-    .plan {
+    .od-planner--plan {
       margin: 0 16px;
       border-radius: 12px;
       background: var(--od-surface);
@@ -1230,28 +1230,28 @@
         }
       }
 
-      .num {
+      .od-planner--num {
         text-align: right;
       }
 
-      .depth {
+      .od-planner--depth {
         font-weight: 500;
       }
     }
 
-    .no-stop,
-    .error {
+    .od-planner--no-stop,
+    .od-planner--error {
       margin: 0;
       padding: 12px 16px;
       font-size: 14px;
     }
 
-    .error {
+    .od-planner--error {
       color: var(--od-alarm);
       font-weight: 500;
     }
 
-    .results {
+    .od-planner--results {
       display: flex;
       flex-direction: column;
 
@@ -1263,7 +1263,7 @@
       }
     }
 
-    .result {
+    .od-planner--result {
       min-height: 72px;
       padding: 8px 24px 8px 16px;
       box-sizing: border-box;
@@ -1271,44 +1271,44 @@
       align-items: center;
       gap: 16px;
 
-      &.oxygen {
+      &.od-planner--oxygen {
         min-height: 56px;
         border-top: 1px solid var(--od-separator);
       }
 
-      .text {
+      .od-planner--text {
         flex: 1;
         min-width: 0;
         display: flex;
         flex-direction: column;
       }
 
-      .label {
+      .od-planner--label {
         font-size: 16px;
         line-height: 24px;
         letter-spacing: 0.15px;
       }
 
-      .hint {
+      .od-planner--hint {
         font-size: 14px;
         line-height: 20px;
         letter-spacing: 0.25px;
         color: var(--od-text-2);
       }
 
-      .value {
+      .od-planner--value {
         font-size: 16px;
         font-weight: 600;
         text-align: right;
         color: var(--od-text);
 
-        &.alarm {
+        &.od-planner--alarm {
           color: var(--od-alarm);
         }
       }
     }
 
-    .bar {
+    .od-planner--bar {
       display: flex;
       height: 8px;
       margin-top: 8px;
@@ -1316,29 +1316,29 @@
       overflow: hidden;
       background: var(--od-tertiary-container);
 
-      .fill {
+      .od-planner--fill {
         background: var(--od-tertiary);
       }
 
-      .gap {
+      .od-planner--gap {
         width: 2px;
         background: var(--od-surface);
       }
 
-      .reserve {
+      .od-planner--reserve {
         flex: 1;
         background: repeating-linear-gradient(135deg, var(--od-tertiary-container) 0 4px, var(--od-tertiary-hatch) 4px 8px);
       }
     }
 
-    .caption {
+    .od-planner--caption {
       margin-top: 4px;
       font-size: 12px;
       line-height: 16px;
       color: var(--od-text-2);
     }
 
-    .note {
+    .od-planner--note {
       margin: 8px 16px 0;
       font-size: 12px;
       line-height: 16px;
@@ -1351,7 +1351,7 @@
       border-radius: 12px;
     }
 
-    .end {
+    .od-planner--end {
       height: 32px;
     }
   }

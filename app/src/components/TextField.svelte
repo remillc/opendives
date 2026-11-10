@@ -51,12 +51,12 @@
   const floated = $derived(focused || !!value);
 </script>
 
-<div class="field" class:focused class:invalid class:floated class:multiline class:disabled>
+<div class="od-text-field od-text-field--field" class:od-text-field--focused={focused} class:od-text-field--invalid={invalid} class:od-text-field--floated={floated} class:od-text-field--multiline={multiline} class:disabled>
   <!-- A tap anywhere in the field focuses the input. -->
   <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
-  <div class="box" onclick={() => input?.focus()}>
-    <div class="text">
-      <label class="label" for={id}>{label}</label>
+  <div class="od-text-field--box" onclick={() => input?.focus()}>
+    <div class="od-text-field--text">
+      <label class="od-text-field--label" for={id}>{label}</label>
       {#if multiline}
         <textarea {id} bind:this={input} bind:value {onchange} {oninput} onfocus={() => (focused = true)} onblur={() => (focused = false)} aria-invalid={invalid}></textarea>
       {:else}
@@ -77,21 +77,21 @@
       {/if}
     </div>
     {#if invalid && !multiline}
-      <div class="error-icon"><Icon name="error" /></div>
+      <div class="od-text-field--error-icon"><Icon name="error" /></div>
     {:else if trailing}
-      <div class="trailing">{@render trailing()}</div>
+      <div class="od-text-field--trailing">{@render trailing()}</div>
     {/if}
   </div>
-  {#if supporting}<p class="supporting">{supporting}</p>{/if}
+  {#if supporting}<p class="od-text-field--supporting">{supporting}</p>{/if}
 </div>
 
 <style>
   @layer od.components {
-    .field {
+    .od-text-field--field {
       margin: 18px var(--od-field-margin, 16px) 0;
     }
 
-    .box {
+    .od-text-field--box {
       position: relative;
       min-height: 56px;
       padding: 8px 12px 8px 16px;
@@ -114,31 +114,31 @@
         background: var(--od-text-2);
       }
 
-      .focused &::after {
+      .od-text-field--focused &::after {
         height: 2px;
         background: var(--od-primary-action);
       }
 
-      .invalid &::after {
+      .od-text-field--invalid &::after {
         height: 2px;
         background: var(--od-alarm);
       }
 
-      .multiline & {
+      .od-text-field--multiline & {
         min-height: 104px;
         align-items: flex-start;
       }
     }
 
     /* Room for the small label above the value: 16 + 24 = 40, in 56. */
-    .text {
+    .od-text-field--text {
       position: relative;
       flex: 1;
       min-width: 0;
       padding-top: 16px;
     }
 
-    .label {
+    .od-text-field--label {
       position: absolute;
       left: 0;
       top: 8px; /* at rest: centred in the 56 dp field */
@@ -155,17 +155,17 @@
         font-size 150ms,
         line-height 150ms;
 
-      .floated & {
+      .od-text-field--floated & {
         top: 0;
         font-size: 12px;
         line-height: 16px;
       }
 
-      .focused & {
+      .od-text-field--focused & {
         color: var(--od-primary-action);
       }
 
-      .invalid & {
+      .od-text-field--invalid & {
         color: var(--od-alarm);
       }
     }
@@ -198,26 +198,26 @@
       pointer-events: none;
     }
 
-    .error-icon {
+    .od-text-field--error-icon {
       flex: none;
       display: flex;
       color: var(--od-alarm);
     }
 
     /* Plain icon button at the end (spec: no filled background). */
-    .trailing {
+    .od-text-field--trailing {
       flex: none;
       margin: -8px -8px -8px 0;
     }
 
-    .supporting {
+    .od-text-field--supporting {
       margin: 4px 0 0;
       padding-left: 16px;
       font-size: 12px;
       line-height: 16px;
       color: var(--od-text-2);
 
-      .invalid & {
+      .od-text-field--invalid & {
         color: var(--od-alarm);
       }
     }

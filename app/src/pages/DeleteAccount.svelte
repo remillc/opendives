@@ -61,7 +61,7 @@
   }
 </script>
 
-<Page>
+<Page class="od-delete-account">
   <Navbar title={t('account.delete')}>
     {#snippet left()}
       <Link back iconOnly>
@@ -71,22 +71,22 @@
     {/snippet}
   </Navbar>
 
-  <div class="warning" role="note">
-    <span class="title"><Icon name="warning" size={22} />{t('deleteAccount.definitive')}</span>
+  <div class="od-delete-account--warning" role="note">
+    <span class="od-delete-account--title"><Icon name="warning" size={22} />{t('deleteAccount.definitive')}</span>
     <p>{t('deleteAccount.consequence', { email: logbook.email, n: logbook.dives.length })}</p>
   </div>
 
-  <label class="keep">
+  <label class="od-delete-account--keep">
     <span class="checkbox"><input type="checkbox" bind:checked={keepDives} /><i class="icon-checkbox"></i></span>
-    <span class="text">
-      <span class="label">{t('deleteAccount.keep')}</span>
-      <span class="hint">{t('deleteAccount.keepText')}</span>
+    <span class="od-delete-account--text">
+      <span class="od-delete-account--label">{t('deleteAccount.keep')}</span>
+      <span class="od-delete-account--hint">{t('deleteAccount.keepText')}</span>
     </span>
   </label>
 
-  <div class="export">
-    <button type="button" class="outlined" onclick={exportCopy}><Icon name="download" size={18} />{t('deleteAccount.export')}</button>
-    <span class="hint">{t('deleteAccount.exportText')}</span>
+  <div class="od-delete-account--export">
+    <button type="button" class="od-delete-account--outlined" onclick={exportCopy}><Icon name="download" size={18} />{t('deleteAccount.export')}</button>
+    <span class="od-delete-account--hint">{t('deleteAccount.exportText')}</span>
   </div>
 
     <TextField
@@ -98,25 +98,25 @@
     />
 
 
-  <p class="note">{t('deleteAccount.note')}</p>
+  <p class="od-delete-account--note">{t('deleteAccount.note')}</p>
 
-  <div class="actions">
-    <button type="button" class="danger" disabled={busy || offline || !password} onclick={deleteAccount}>
+  <div class="od-delete-account--actions">
+    <button type="button" class="od-delete-account--danger" disabled={busy || offline || !password} onclick={deleteAccount}>
       {offline ? t('deleteAccount.connectionNeeded') : t('deleteAccount.confirm')}
     </button>
-    <button type="button" class="cancel" onclick={() => f7router.back()}>{t('signOut.cancel')}</button>
+    <button type="button" class="od-delete-account--cancel" onclick={() => f7router.back()}>{t('signOut.cancel')}</button>
   </div>
 </Page>
 
 <style>
   @layer od.components {
-    .warning {
+    .od-delete-account--warning {
       margin: 16px 16px 0;
       padding: 16px;
       border-radius: 16px;
       background: var(--od-surface);
 
-      .title {
+      .od-delete-account--title {
         display: flex;
         align-items: center;
         gap: 10px;
@@ -132,7 +132,7 @@
       }
     }
 
-    .keep {
+    .od-delete-account--keep {
       margin: 20px 16px 0;
       min-height: 48px;
       box-sizing: border-box;
@@ -142,23 +142,23 @@
       align-items: flex-start;
     }
 
-    .text {
+    .od-delete-account--text {
       display: flex;
       flex-direction: column;
       gap: 2px;
     }
 
-    .label {
+    .od-delete-account--label {
       font-size: 16px;
     }
 
-    .hint {
+    .od-delete-account--hint {
       font-size: 13px;
       line-height: 18px;
       color: var(--od-text-2);
     }
 
-    .export {
+    .od-delete-account--export {
       margin: 18px 16px 0;
       display: flex;
       flex-direction: column;
@@ -166,7 +166,7 @@
       gap: 6px;
     }
 
-    .outlined {
+    .od-delete-account--outlined {
       width: auto;
       height: 40px;
       padding: 0 20px 0 16px;
@@ -182,14 +182,14 @@
       gap: 8px;
     }
 
-    .note {
+    .od-delete-account--note {
       margin: 16px 20px 0;
       font-size: 14px;
       line-height: 20px;
       color: var(--od-text-2);
     }
 
-    .actions {
+    .od-delete-account--actions {
       margin: 20px 16px 32px;
       display: flex;
       flex-direction: column;
@@ -208,7 +208,7 @@
         letter-spacing: 0.1px;
       }
 
-      .danger {
+      .od-delete-account--danger {
         background: var(--od-alarm);
         color: var(--od-on-action);
 
@@ -217,7 +217,7 @@
         }
       }
 
-      .cancel {
+      .od-delete-account--cancel {
         background: none;
         color: var(--od-text);
         font-weight: 500;

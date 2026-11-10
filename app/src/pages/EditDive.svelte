@@ -508,10 +508,10 @@
 </script>
 
 {#snippet header(/** @type {string} */ title)}
-  <span class="heading" role="heading" aria-level="2">{title}</span>
+  <span class="od-edit-dive--heading" role="heading" aria-level="2">{title}</span>
 {/snippet}
 
-{#snippet unit(/** @type {string} */ text)}<span class="unit">{text}</span>{/snippet}
+{#snippet unit(/** @type {string} */ text)}<span class="od-edit-dive--unit">{text}</span>{/snippet}
 
 {#snippet chrome()}
   <Navbar title={t('edit.title')}>
@@ -540,20 +540,20 @@
   {#if failed}
     <div class="block"><p>{t('detail.errorText')}</p></div>
   {:else if dive}
-    <div class="cards" class:two-columns={sheet}>
-    <p class="subtitle od-value">
+    <div class="od-edit-dive--cards" class:od-edit-dive--two-columns={sheet}>
+    <p class="od-edit-dive--subtitle od-value">
       {[dive.number ? t('detail.number', { number: String(dive.number) }) : '', dive.site, formatFullDate(dive.date)].filter(Boolean).join(' · ')}
     </p>
 
     <!-- La plongée -->
-    <section class="card">
+    <section class="card od-edit-dive--card">
       {@render header(t('edit.diveGroup'))}
-      <div class="row">
-        <div class="grow"><ButtonField label={t('edit.date')} value={dateText} onclick={() => (dialog = 'date')} /></div>
-        <div class="time"><ButtonField label={t('edit.time')} value={timeText} onclick={() => (dialog = 'time')} /></div>
+      <div class="od-edit-dive--row">
+        <div class="od-edit-dive--grow"><ButtonField label={t('edit.date')} value={dateText} onclick={() => (dialog = 'date')} /></div>
+        <div class="od-edit-dive--time"><ButtonField label={t('edit.time')} value={timeText} onclick={() => (dialog = 'time')} /></div>
       </div>
       <!-- Measured by the dive computer: plain text, not a field. -->
-      <dl class="measured">
+      <dl class="od-edit-dive--measured">
         <div><dt>{t('edit.duration')}</dt><dd class="od-value">{formatMinSec(dive.durationSeconds)}</dd></div>
         <div><dt>{t('edit.maxDepth')}</dt><dd class="od-value">{formatDepth(dive.maxDepthMm, prefs)}</dd></div>
       </dl>
@@ -562,40 +562,40 @@
       {#if tripName === NEW_TRIP}
         <TextField label={t('edit.tripNewName')} bind:value={newTripName} />
       {/if}
-      <div class="stars-row">
+      <div class="od-edit-dive--stars-row">
         <span>{t('edit.rating')}</span>
         <StarsInput value={stars.rating} label={t('edit.rating')} onchange={(v) => (stars.rating = v)} />
       </div>
     </section>
 
     <!-- Personnes et notes -->
-    <section class="card">
+    <section class="card od-edit-dive--card">
       {@render header(t('edit.peopleGroup'))}
       <ChipsField label={t('edit.guides')} bind:values={guides} suggestions={known.guide} supporting={t('edit.guidesHint')} />
       <ChipsField label={t('edit.buddies')} bind:values={buddies} suggestions={known.buddy} supporting={t('edit.buddiesHint')} />
       <ChipsField label={t('edit.tags')} bind:values={tags} suggestions={known.tag} supporting={t('edit.tagsHint')} />
       <TextField label={t('edit.notes')} bind:value={f.notes} multiline />
-      <div class="end"></div>
+      <div class="od-edit-dive--end"></div>
     </section>
 
     <!-- Équipement -->
-    <section class="card">
+    <section class="card od-edit-dive--card">
       {@render header(t('edit.equipmentGroup'))}
       <ComboField label={t('edit.suit')} bind:value={f.suit} options={known.suit} />
       <SelectField label={t('edit.divemode')} bind:value={f.divemode} options={modeOptions} onchange={modeChanged} />
 
       {#each cylinders as c, i (i)}
         {@const cb = cylinderBad(c)}
-        <div class="cyl-head">
-          <h4 class="cyl-title">{t('edit.cylinderTitle', { n: i + 1 })}{c.f.description ? ` · ${c.f.description}` : ''}</h4>
+        <div class="od-edit-dive--cyl-head">
+          <h4 class="od-edit-dive--cyl-title">{t('edit.cylinderTitle', { n: i + 1 })}{c.f.description ? ` · ${c.f.description}` : ''}</h4>
           {#if !c.protected}
-            <button type="button" class="remove" onclick={() => cylinders.splice(i, 1)}>
+            <button type="button" class="od-edit-dive--remove" onclick={() => cylinders.splice(i, 1)}>
               <Icon name="close" /><span class="od-sr-only">{t('edit.removeCylinder')}</span>
             </button>
           {/if}
         </div>
-        <div class="row">
-            <div class="grow">
+        <div class="od-edit-dive--row">
+            <div class="od-edit-dive--grow">
               <SelectField
                 label={t('edit.cylinderType')}
                 value={c.f.description}
@@ -603,39 +603,39 @@
                 onchange={(v) => chooseCylinderType(c, v)}
               />
             </div>
-            <div class="grow"><SelectField label={t('edit.use')} bind:value={c.f.use} options={useOptions} onchange={(v) => useChanged(c, v)} /></div>
+            <div class="od-edit-dive--grow"><SelectField label={t('edit.use')} bind:value={c.f.use} options={useOptions} onchange={(v) => useChanged(c, v)} /></div>
           </div>
-          <div class="row">
-            <div class="grow">
+          <div class="od-edit-dive--row">
+            <div class="od-edit-dive--grow">
               <TextField label={t('edit.size')} bind:value={c.f.size} inputmode="decimal" invalid={cb.size}>
                 {#snippet trailing()}{@render unit(volumeUnitText)}{/snippet}
               </TextField>
             </div>
-            <div class="grow">
+            <div class="od-edit-dive--grow">
               <TextField label={t('edit.workingPressure')} bind:value={c.f.workingPressure} inputmode="decimal" invalid={cb.workingPressure}>
                 {#snippet trailing()}{@render unit(pressureUnitText)}{/snippet}
               </TextField>
             </div>
           </div>
-          <div class="row">
-            <div class="grow">
+          <div class="od-edit-dive--row">
+            <div class="od-edit-dive--grow">
               <TextField label={t('edit.start')} bind:value={c.f.start} inputmode="decimal" invalid={cb.start}>
                 {#snippet trailing()}{@render unit(pressureUnitText)}{/snippet}
               </TextField>
             </div>
-            <div class="grow">
+            <div class="od-edit-dive--grow">
               <TextField label={t('edit.end')} bind:value={c.f.end} inputmode="decimal" invalid={cb.end}>
                 {#snippet trailing()}{@render unit(pressureUnitText)}{/snippet}
               </TextField>
             </div>
           </div>
-          <div class="row">
-            <div class="grow">
+          <div class="od-edit-dive--row">
+            <div class="od-edit-dive--grow">
               <TextField label={t('edit.o2')} bind:value={c.f.o2} inputmode="decimal" invalid={cb.gas}>
                 {#snippet trailing()}{@render unit(t('units.percent'))}{/snippet}
               </TextField>
             </div>
-            <div class="grow">
+            <div class="od-edit-dive--grow">
               <TextField label={t('edit.he')} bind:value={c.f.he} inputmode="decimal" invalid={cb.gas}>
                 {#snippet trailing()}{@render unit(t('units.percent'))}{/snippet}
               </TextField>
@@ -647,87 +647,87 @@
             </TextField>
           {/if}
       {/each}
-      <button type="button" class="add" onclick={addCylinder}><Icon name="plus" />{t('edit.addCylinder')}</button>
+      <button type="button" class="od-edit-dive--add" onclick={addCylinder}><Icon name="plus" />{t('edit.addCylinder')}</button>
 
-      <h3 class="sub">{t('edit.weightsTitle')}</h3>
+      <h3 class="od-edit-dive--sub">{t('edit.weightsTitle')}</h3>
       {#each weights as w, i (i)}
-        <div class="row weight">
-          <div class="grow">
+        <div class="od-edit-dive--row od-edit-dive--weight">
+          <div class="od-edit-dive--grow">
             <SelectField label={t('edit.weightPlace')} value={w.description} options={placeOptions(w.description)} onchange={(v) => choosePlace(i, v)} />
           </div>
-          <div class="weight-value">
+          <div class="od-edit-dive--weight-value">
             <TextField label={t('edit.weight')} bind:value={w.weight} inputmode="decimal" invalid={!optionalOk(w.weight, 0, pounds ? 400 : 200)}>
               {#snippet trailing()}{@render unit(weightUnitText)}{/snippet}
             </TextField>
           </div>
-          <button type="button" class="remove inline" onclick={() => weights.splice(i, 1)}>
+          <button type="button" class="od-edit-dive--remove od-edit-dive--inline" onclick={() => weights.splice(i, 1)}>
             <Icon name="close" /><span class="od-sr-only">{t('edit.removeWeight')}</span>
           </button>
         </div>
       {/each}
-      <button type="button" class="add" onclick={() => weights.push({ description: weightTypes[0]?.name ?? 'integrated', weight: weightText(weightTypes[0]?.grams ?? 0), grams0: -1, text0: '' })}>
+      <button type="button" class="od-edit-dive--add" onclick={() => weights.push({ description: weightTypes[0]?.name ?? 'integrated', weight: weightText(weightTypes[0]?.grams ?? 0), grams0: -1, text0: '' })}>
         <Icon name="plus" />{t('edit.addWeight')}
       </button>
     </section>
 
     <!-- Conditions -->
-    <section class="card">
+    <section class="card od-edit-dive--card">
       {@render header(t('edit.conditionsGroup'))}
       {#each starFields as field (field.key)}
-        <div class="stars-row">
+        <div class="od-edit-dive--stars-row">
           <span>{field.name}</span>
           <StarsInput value={stars[field.key]} label={field.name} onchange={(v) => (stars[field.key] = v)} />
         </div>
       {/each}
-      <div class="row">
-        <div class="grow">
+      <div class="od-edit-dive--row">
+        <div class="od-edit-dive--grow">
           <TextField label={t('edit.air')} bind:value={f.air} inputmode="decimal" invalid={bad.air}>
             {#snippet trailing()}{@render unit(temperatureUnitText)}{/snippet}
           </TextField>
         </div>
-        <div class="grow">
+        <div class="od-edit-dive--grow">
           <TextField label={t('edit.water')} bind:value={f.water} inputmode="decimal" invalid={bad.water}>
             {#snippet trailing()}{@render unit(temperatureUnitText)}{/snippet}
           </TextField>
         </div>
       </div>
-      <div class="row">
-        <div class="grow"><SelectField label={t('edit.waterType')} bind:value={f.waterType} options={waterOptions} /></div>
-        <div class="grow">
+      <div class="od-edit-dive--row">
+        <div class="od-edit-dive--grow"><SelectField label={t('edit.waterType')} bind:value={f.waterType} options={waterOptions} /></div>
+        <div class="od-edit-dive--grow">
           <TextField label={t('edit.atmPressure')} bind:value={f.atm} inputmode="numeric" invalid={bad.atm}>
             {#snippet trailing()}{@render unit('mbar')}{/snippet}
           </TextField>
         </div>
       </div>
-      <div class="end"></div>
+      <div class="od-edit-dive--end"></div>
     </section>
 
     <!-- Ordinateurs -->
     {#if dive.diveComputers.length}
-      <section class="card">
+      <section class="card od-edit-dive--card">
         {@render header(t('edit.computersGroup'))}
-        <div class="computers" role="radiogroup" aria-label={t('edit.computersGroup')}>
+        <div class="od-edit-dive--computers" role="radiogroup" aria-label={t('edit.computersGroup')}>
           {#each dive.diveComputers as computer, i (i)}
-            <label class="computer">
+            <label class="od-edit-dive--computer">
               <input type="radio" name="od-main-computer" checked={i === mainComputer} onchange={() => (mainComputer = i)} />
-              <span class="texts">
+              <span class="od-edit-dive--texts">
                 <span>{computer.nickname || computer.model || t('edit.unnamedComputer')}</span>
-                {#if i === mainComputer}<span class="role">{t('edit.mainComputer')}</span>{/if}
+                {#if i === mainComputer}<span class="od-edit-dive--role">{t('edit.mainComputer')}</span>{/if}
               </span>
             </label>
           {/each}
-          <p class="helper">{t('edit.mainComputerHelp')}</p>
+          <p class="od-edit-dive--helper">{t('edit.mainComputerHelp')}</p>
         </div>
       </section>
     {/if}
 
     <!-- Avancé -->
-    <section class="card last">
+    <section class="card od-edit-dive--card od-edit-dive--last">
       {@render header(t('edit.advancedGroup'))}
-      <label class="switch-row">
-        <span class="texts">
-          <span class="label">{t('edit.invalid')}</span>
-          <span class="helper-text">{t('edit.invalidText')}</span>
+      <label class="od-edit-dive--switch-row">
+        <span class="od-edit-dive--texts">
+          <span class="od-edit-dive--label">{t('edit.invalid')}</span>
+          <span class="od-edit-dive--helper-text">{t('edit.invalidText')}</span>
         </span>
         <span class="toggle">
           <input type="checkbox" bind:checked={invalid} />
@@ -740,7 +740,7 @@
 {/snippet}
 
 {#if sheet}
-  <Popup class="od-edit-sheet" push={false} swipeToClose={ios} style={sheetStyle}>
+  <Popup class="od-edit-dive od-edit-sheet" push={false} swipeToClose={ios} style={sheetStyle}>
     <View>
       <Page class="od-edit-dive">
         {@render chrome()}
@@ -784,40 +784,40 @@
     }
 
     /* Tablet sheet: the cards in two columns (spec, section 3). */
-    .cards.two-columns {
+    .od-edit-dive--cards.od-edit-dive--two-columns {
       columns: 2;
       column-gap: 8px;
       padding: 0 8px;
 
-      .card {
+      .od-edit-dive--card {
         break-inside: avoid;
       }
 
-      .subtitle {
+      .od-edit-dive--subtitle {
         column-span: all;
       }
     }
 
-    .subtitle {
+    .od-edit-dive--subtitle {
       margin: 4px 20px 0;
       font-size: 15px;
       color: var(--od-text-2);
     }
 
-    .card {
+    .od-edit-dive--card {
       margin: 12px 16px 0;
       border-radius: 16px;
       background: var(--od-surface);
       overflow: hidden;
       padding-bottom: 8px;
 
-      &.last {
+      &.od-edit-dive--last {
         margin-bottom: 24px;
       }
     }
 
     /* Plain section headings: the sections are always open. */
-    .heading {
+    .od-edit-dive--heading {
       min-height: 56px;
       padding: 0 16px;
       display: flex;
@@ -828,19 +828,19 @@
     }
 
     /* Two or three fields on one line. */
-    .row {
+    .od-edit-dive--row {
       display: flex;
       gap: 12px;
       padding: 0 16px;
       --od-field-margin: 0;
 
-      .grow {
+      .od-edit-dive--grow {
         flex: 1;
         min-width: 0;
       }
 
 
-      .time {
+      .od-edit-dive--time {
         flex: 0 0 auto;
         min-width: 96px;
         /* No room for the arrow, as in the mock-up. */
@@ -848,18 +848,18 @@
         --od-button-field-arrow: none;
       }
 
-      .weight-value {
+      .od-edit-dive--weight-value {
         flex: 0 0 112px;
         min-width: 0;
       }
     }
 
-    .unit {
+    .od-edit-dive--unit {
       color: var(--od-text-2);
     }
 
     /* Duration and maximum depth: plain text side by side, not fields. */
-    .measured {
+    .od-edit-dive--measured {
       display: flex;
       gap: 12px;
       margin: 14px 0 0;
@@ -885,7 +885,7 @@
       }
     }
 
-    .stars-row {
+    .od-edit-dive--stars-row {
       min-height: 56px;
       padding: 0 16px;
       margin-top: 6px;
@@ -896,17 +896,17 @@
       font-size: 16px;
     }
 
-    .end {
+    .od-edit-dive--end {
       height: 10px;
     }
 
-    .cyl-head {
+    .od-edit-dive--cyl-head {
       display: flex;
       align-items: center;
       margin: 8px 4px 0 0;
     }
 
-    .cyl-title {
+    .od-edit-dive--cyl-title {
       flex: 1;
       min-width: 0;
       margin: 0;
@@ -917,7 +917,7 @@
       font-weight: 600;
     }
 
-    .remove {
+    .od-edit-dive--remove {
       flex: none;
       width: 48px;
       height: 48px;
@@ -928,13 +928,13 @@
       align-items: center;
       justify-content: center;
 
-      &.inline {
+      &.od-edit-dive--inline {
         align-self: center;
         margin: 18px -8px 0 -4px;
       }
     }
 
-    .add {
+    .od-edit-dive--add {
       width: auto;
       margin: 12px 16px 4px;
       min-height: 40px;
@@ -951,18 +951,18 @@
       gap: 8px;
     }
 
-    .sub {
+    .od-edit-dive--sub {
       margin: 20px 16px 0;
       font-size: 14px;
       font-weight: 600;
     }
 
     /* The 8 px under the help text are those of the card. */
-    .computers {
+    .od-edit-dive--computers {
       padding: 0 16px;
     }
 
-    .computer {
+    .od-edit-dive--computer {
       min-height: 64px;
       display: flex;
       align-items: center;
@@ -993,7 +993,7 @@
         }
       }
 
-      .texts {
+      .od-edit-dive--texts {
         flex: 1;
         min-width: 0;
         display: flex;
@@ -1002,39 +1002,39 @@
         color: var(--od-text);
       }
 
-      .role {
+      .od-edit-dive--role {
         font-size: 14px;
         line-height: 20px;
         color: var(--od-text-2);
       }
     }
 
-    .helper {
+    .od-edit-dive--helper {
       margin: 0 0 8px 36px;
       font-size: 12px;
       line-height: 16px;
       color: var(--od-text-2);
     }
 
-    .switch-row {
+    .od-edit-dive--switch-row {
       min-height: 72px;
       padding: 8px 16px;
       display: flex;
       align-items: center;
       gap: 16px;
 
-      .texts {
+      .od-edit-dive--texts {
         flex: 1;
         display: flex;
         flex-direction: column;
         gap: 2px;
       }
 
-      .label {
+      .od-edit-dive--label {
         font-size: 16px;
       }
 
-      .helper-text {
+      .od-edit-dive--helper-text {
         font-size: 14px;
         line-height: 20px;
         color: var(--od-text-2);

@@ -352,57 +352,57 @@
   </Navbar>
 
   {#if phase === 'checking'}
-    <div class="state" aria-busy="true"></div>
+    <div class="od-download--state" aria-busy="true"></div>
   {:else if phase === 'none' || phase === 'permission' || phase === 'denied' || phase === 'off'}
-    <div class="state">
-      <div class="state-icon" aria-hidden="true"><Icon name="bluetooth" size={32} /></div>
+    <div class="od-download--state">
+      <div class="od-download--state-icon" aria-hidden="true"><Icon name="bluetooth" size={32} /></div>
       <h1>{t(`download.${phase}.title`)}</h1>
       <p>{t(`download.${phase}.text`)}</p>
-      <div class="state-actions">
+      <div class="od-download--state-actions">
         {#if phase === 'permission'}
-          <button type="button" class="filled" onclick={askPermission}>{t('download.permission.button')}</button>
+          <button type="button" class="od-download--filled" onclick={askPermission}>{t('download.permission.button')}</button>
         {:else if phase === 'denied'}
           <button type="button" class="od-text-button" onclick={askPermission}>{t('download.denied.again')}</button>
-          <button type="button" class="filled" onclick={() => OpenDivesCore.openAppSettings()}>{t('download.denied.button')}</button>
+          <button type="button" class="od-download--filled" onclick={() => OpenDivesCore.openAppSettings()}>{t('download.denied.button')}</button>
         {:else if phase === 'off'}
-          <button type="button" class="filled" onclick={turnOn}>{t('download.off.button')}</button>
+          <button type="button" class="od-download--filled" onclick={turnOn}>{t('download.off.button')}</button>
         {/if}
       </div>
     </div>
   {:else if phase === 'choose'}
-    <p class="intro">{t('download.intro')} {t('download.pairingNote')}</p>
+    <p class="od-download--intro">{t('download.intro')} {t('download.pairingNote')}</p>
 
     {#if remembered.length}
-      <h2 class="subheader">{t('download.remembered')}</h2>
-      <ul class="rows">
+      <h2 class="od-download--subheader">{t('download.remembered')}</h2>
+      <ul class="od-download--rows">
         {#each remembered as c (c.address)}
           <li>
-            <button type="button" class="row" onclick={() => download(c)}>
-              <span class="avatar" aria-hidden="true"><Icon name="bluetooth" size={22} /></span>
-              <span class="texts">
-                <span class="headline">{c.product}</span>
-                <span class="supporting">{subtitle(c)}</span>
+            <button type="button" class="od-download--row" onclick={() => download(c)}>
+              <span class="od-download--avatar" aria-hidden="true"><Icon name="bluetooth" size={22} /></span>
+              <span class="od-download--texts">
+                <span class="od-download--headline">{c.product}</span>
+                <span class="od-download--supporting">{subtitle(c)}</span>
               </span>
-              {#if found[macOf(c.address)]}<span class="trailing">{t('download.seen')}</span>{/if}
+              {#if found[macOf(c.address)]}<span class="od-download--trailing">{t('download.seen')}</span>{/if}
             </button>
           </li>
         {/each}
       </ul>
     {/if}
 
-    <h2 class="subheader">
+    <h2 class="od-download--subheader">
       {t('download.nearby')}
-      {#if scanning}<span class="spinner" role="status" aria-label={t('download.searching')}></span>{/if}
+      {#if scanning}<span class="od-download--spinner" role="status" aria-label={t('download.searching')}></span>{/if}
     </h2>
     {#if nearby.length}
-      <ul class="rows">
+      <ul class="od-download--rows">
         {#each nearby as d (d.mac)}
           <li>
-            <button type="button" class="row" onclick={() => pick(d)}>
-              <span class="avatar" aria-hidden="true"><Icon name="bluetooth" size={22} /></span>
-              <span class="texts">
-                <span class="headline">{d.computer ? d.computer.product : d.name}</span>
-                <span class="supporting">
+            <button type="button" class="od-download--row" onclick={() => pick(d)}>
+              <span class="od-download--avatar" aria-hidden="true"><Icon name="bluetooth" size={22} /></span>
+              <span class="od-download--texts">
+                <span class="od-download--headline">{d.computer ? d.computer.product : d.name}</span>
+                <span class="od-download--supporting">
                   {d.computer ? t('download.vendorBluetooth', { vendor: d.computer.vendor }) : t('download.unknownModel')}
                 </span>
               </span>
@@ -411,16 +411,16 @@
         {/each}
       </ul>
     {:else}
-      <p class="empty">{scanning ? t('download.searching') : t('download.noneFound')}</p>
+      <p class="od-download--empty">{scanning ? t('download.searching') : t('download.noneFound')}</p>
     {/if}
     {#if !scanning}
-      <div class="again"><button type="button" class="od-outlined-button" onclick={scan}>{t('download.searchAgain')}</button></div>
+      <div class="od-download--again"><button type="button" class="od-outlined-button" onclick={scan}>{t('download.searchAgain')}</button></div>
     {/if}
 
-    <label class="switch-row">
-      <span class="texts">
-        <span class="headline">{t('download.forceAll')}</span>
-        <span class="supporting">{t('download.forceAllText')}</span>
+    <label class="od-download--switch-row">
+      <span class="od-download--texts">
+        <span class="od-download--headline">{t('download.forceAll')}</span>
+        <span class="od-download--supporting">{t('download.forceAllText')}</span>
       </span>
       <span class="toggle">
         <input type="checkbox" bind:checked={forceDownload} />
@@ -428,57 +428,57 @@
       </span>
     </label>
   {:else if phase === 'downloading' && computer}
-    <h2 class="subheader">{t('download.computer')}</h2>
-    <div class="computer">
-      <span class="avatar" aria-hidden="true"><Icon name="bluetooth" size={22} /></span>
-      <span class="texts">
-        <span class="headline">{computer.product}</span>
-        <span class="supporting">{subtitle(computer)}</span>
+    <h2 class="od-download--subheader">{t('download.computer')}</h2>
+    <div class="od-download--computer">
+      <span class="od-download--avatar" aria-hidden="true"><Icon name="bluetooth" size={22} /></span>
+      <span class="od-download--texts">
+        <span class="od-download--headline">{computer.product}</span>
+        <span class="od-download--supporting">{subtitle(computer)}</span>
       </span>
       {#if connected}
-        <span class="connected"><Icon name="check" size={16} weight={2.4} />{t('download.connected')}</span>
+        <span class="od-download--connected"><Icon name="check" size={16} weight={2.4} />{t('download.connected')}</span>
       {:else}
-        <span class="trailing">{t('download.connecting')}</span>
+        <span class="od-download--trailing">{t('download.connecting')}</span>
       {/if}
     </div>
-    {#if retrying}<p class="retrying" role="status">{t('download.retryingClassic')}</p>{/if}
+    {#if retrying}<p class="od-download--retrying" role="status">{t('download.retryingClassic')}</p>{/if}
 
-    <div class="progress">
-      <div class="progress-head">
-        <span class="headline">{forceDownload ? t('download.readingAll') : t('download.reading')}</span>
-        {#if fraction > 0}<span class="percent">{t('download.percent', { n: percent })}</span>{/if}
+    <div class="od-download--progress">
+      <div class="od-download--progress-head">
+        <span class="od-download--headline">{forceDownload ? t('download.readingAll') : t('download.reading')}</span>
+        {#if fraction > 0}<span class="od-download--percent">{t('download.percent', { n: percent })}</span>{/if}
       </div>
       <div
-        class="bar"
-        class:indeterminate={fraction <= 0}
+        class="od-download--bar"
+        class:od-download--indeterminate={fraction <= 0}
         role="progressbar"
         aria-label={t('download.progressLabel')}
         aria-valuemin="0"
         aria-valuemax="100"
         aria-valuenow={fraction > 0 ? percent : undefined}
       >
-        <div class="fill" style:width={fraction > 0 ? `${percent}%` : undefined}></div>
+        <div class="od-download--fill" style:width={fraction > 0 ? `${percent}%` : undefined}></div>
       </div>
-      <p class="hint">{t('download.keepNear')}{forceDownload ? '' : ` ${t('download.notAgain')}`}</p>
+      <p class="od-download--hint">{t('download.keepNear')}{forceDownload ? '' : ` ${t('download.notAgain')}`}</p>
     </div>
 
-    <div class="stop">
+    <div class="od-download--stop">
       <Button outline disabled={stopping} onClick={close}>{stopping ? t('download.stopping') : t('download.stop')}</Button>
     </div>
 
     {#if received.length}
-      <h2 class="subheader">{t('download.received')}</h2>
-      <ul class="rows dives">
+      <h2 class="od-download--subheader">{t('download.received')}</h2>
+      <ul class="od-download--rows od-dive-list">
         {#each received as d, i (`${d.date}-${i}`)}
-          <li class="dive">
+          <li class="od-download--dive">
             <ProfileThumbnail profile={d.profile} maxDepthMm={d.maxDepthMm} prefs={logbook.prefs} />
-            <span class="texts">
-              <span class="headline">{t('download.newDive')}</span>
-              <span class="supporting">{formatDateTime(d.date)}</span>
+            <span class="od-download--texts">
+              <span class="od-download--headline">{t('download.newDive')}</span>
+              <span class="od-download--supporting">{formatDateTime(d.date)}</span>
             </span>
-            <span class="values">
-              <span class="depth">{formatDepth(d.maxDepthMm, logbook.prefs)}</span>
-              <span class="supporting">{formatDuration(d.durationSeconds)}</span>
+            <span class="od-download--values">
+              <span class="od-download--depth">{formatDepth(d.maxDepthMm, logbook.prefs)}</span>
+              <span class="od-download--supporting">{formatDuration(d.durationSeconds)}</span>
             </span>
           </li>
         {/each}
@@ -516,7 +516,7 @@
   @layer od.components {
     /* MD3 lists (Android): 14 sp subheaders, two-line 72 dp items with a
        40 dp leading avatar; iOS keeps the same order with its sizes. */
-    .intro {
+    .od-download--intro {
       margin: 16px 16px 8px;
       font-size: 16px;
       line-height: 24px;
@@ -528,7 +528,7 @@
       }
     }
 
-    .subheader {
+    .od-download--subheader {
       margin: 16px 0 0;
       padding: 0 16px;
       min-height: 48px;
@@ -548,7 +548,7 @@
       }
     }
 
-    .rows {
+    .od-download--rows {
       margin: 0;
       padding: 0;
       list-style: none;
@@ -561,10 +561,10 @@
       }
     }
 
-    .row,
-    .computer,
-    .dive,
-    .switch-row {
+    .od-download--row,
+    .od-download--computer,
+    .od-download--dive,
+    .od-download--switch-row {
       box-sizing: border-box;
       width: 100%;
       min-height: 72px;
@@ -579,11 +579,11 @@
       text-align: start;
     }
 
-    .row {
+    .od-download--row {
       cursor: pointer;
     }
 
-    .avatar {
+    .od-download--avatar {
       flex: none;
       width: 40px;
       height: 40px;
@@ -595,7 +595,7 @@
       justify-content: center;
     }
 
-    .texts {
+    .od-download--texts {
       flex: 1;
       min-width: 0;
       display: flex;
@@ -603,7 +603,7 @@
       gap: 2px;
     }
 
-    .headline {
+    .od-download--headline {
       font-size: 16px;
       line-height: 24px;
 
@@ -612,11 +612,11 @@
       }
     }
 
-    .computer .headline {
+    .od-download--computer .od-download--headline {
       font-weight: 600;
     }
 
-    .supporting {
+    .od-download--supporting {
       font-size: 14px;
       line-height: 20px;
       color: var(--od-text-2);
@@ -627,7 +627,7 @@
       }
     }
 
-    .trailing {
+    .od-download--trailing {
       flex: none;
       font-size: 12px;
       line-height: 16px;
@@ -635,7 +635,7 @@
       color: var(--od-text-2);
     }
 
-    .connected {
+    .od-download--connected {
       flex: none;
       display: flex;
       align-items: center;
@@ -644,7 +644,7 @@
       color: var(--od-oxygen);
     }
 
-    .computer {
+    .od-download--computer {
       :global(.ios) & {
         margin: 0 16px;
         width: auto;
@@ -653,24 +653,24 @@
       }
     }
 
-    .retrying {
+    .od-download--retrying {
       margin: 8px 16px 0;
       font-size: 14px;
       line-height: 20px;
       color: var(--od-text-2);
     }
 
-    .empty {
+    .od-download--empty {
       margin: 0 16px;
       font-size: 14px;
       color: var(--od-text-2);
     }
 
-    .again {
+    .od-download--again {
       margin: 12px 16px 0;
     }
 
-    .switch-row {
+    .od-download--switch-row {
       margin-top: 16px;
       cursor: pointer;
 
@@ -687,7 +687,7 @@
       flex: none;
     }
 
-    .spinner {
+    .od-download--spinner {
       width: 16px;
       height: 16px;
       border: 2px solid var(--od-separator);
@@ -696,31 +696,31 @@
       animation: od-download-spin 0.9s linear infinite;
     }
 
-    .progress {
+    .od-download--progress {
       margin: 24px 16px 0;
       display: flex;
       flex-direction: column;
       gap: 10px;
     }
 
-    .progress-head {
+    .od-download--progress-head {
       display: flex;
       justify-content: space-between;
       align-items: baseline;
 
-      .headline {
+      .od-download--headline {
         font-weight: 500;
       }
     }
 
-    .percent {
+    .od-download--percent {
       font-size: 16px;
       color: var(--od-text-2);
       font-variant-numeric: tabular-nums;
     }
 
     /* MD3 linear progress indicator: 4 dp track; 8 pt on iOS (mock-up). */
-    .bar {
+    .od-download--bar {
       position: relative;
       height: 4px;
       border-radius: 2px;
@@ -733,24 +733,24 @@
       }
     }
 
-    .fill {
+    .od-download--fill {
       height: 100%;
       border-radius: inherit;
       background: var(--od-action);
       transition: width 0.3s;
     }
 
-    .indeterminate .fill {
+    .od-download--indeterminate .od-download--fill {
       position: absolute;
       width: 40%;
       animation: od-download-slide 1.4s ease-in-out infinite;
     }
 
-    .stop {
+    .od-download--stop {
       margin: 16px 16px 8px;
     }
 
-    .hint {
+    .od-download--hint {
       margin: 0;
       font-size: 14px;
       line-height: 20px;
@@ -761,7 +761,7 @@
       }
     }
 
-    .values {
+    .od-download--values {
       flex: none;
       display: flex;
       flex-direction: column;
@@ -770,13 +770,13 @@
       font-variant-numeric: tabular-nums;
     }
 
-    .depth {
+    .od-download--depth {
       font-size: 16px;
       font-weight: 600;
     }
 
     /* Empty and error states (spec, section 6). */
-    .state {
+    .od-download--state {
       margin: 24px 24px 0;
 
       h1 {
@@ -800,11 +800,11 @@
       }
     }
 
-    .state-icon {
+    .od-download--state-icon {
       color: var(--od-text-2);
     }
 
-    .state-actions {
+    .od-download--state-actions {
       margin-top: 24px;
       display: flex;
       justify-content: flex-end;
@@ -812,7 +812,7 @@
     }
 
     /* MD3 filled button; iOS large filled button. */
-    .filled {
+    .od-download--filled {
       flex: none;
       width: auto;
       height: 40px;

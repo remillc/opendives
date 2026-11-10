@@ -29,6 +29,7 @@
    *   previous?: boolean,
    *   closable?: boolean,
    *   children: import('svelte').Snippet,
+   *   class?: string,
    * }}
    * No action: no main button. secondaryEnd: the text button sits next to
    * the main button (Android) instead of at the left. closable false: no
@@ -50,12 +51,13 @@
     previous = false,
     closable = true,
     children,
+    class: extraClass = '',
   } = $props();
 
   const ios = f7.theme === 'ios';
 </script>
 
-<Page class="od-account-step">
+<Page class="od-account-step {extraClass}">
   <Navbar {title}>
     {#snippet left()}
       {#if !closable}
@@ -70,42 +72,42 @@
       {/if}
     {/snippet}
     {#snippet right()}
-      {#if step && ios}<span class="bar-step">{step}</span>{/if}
+      {#if step && ios}<span class="od-account-step--bar-step">{step}</span>{/if}
     {/snippet}
   </Navbar>
 
   {#if busy && !ios}
-    <div class="linear" role="progressbar" aria-label={busyLabel || action}><span></span></div>
+    <div class="od-account-step--linear" role="progressbar" aria-label={busyLabel || action}><span></span></div>
   {/if}
 
   <form
-    class="body"
+    class="od-account-step--body"
     novalidate
     onsubmit={(e) => {
       e.preventDefault();
       if (!actionDisabled && !busy) onaction();
     }}
   >
-    <div class="heading">
-      {#if step && !ios}<p class="step">{step}</p>{/if}
+    <div class="od-account-step--heading">
+      {#if step && !ios}<p class="od-account-step--step">{step}</p>{/if}
       <h1>{heading}</h1>
-      <p class="intro">{intro}</p>
+      <p class="od-account-step--intro">{intro}</p>
     </div>
 
     {@render children()}
 
-    <div class="actions" class:end={secondaryEnd} class:previous>
+    <div class="od-account-step--actions" class:od-account-step--end={secondaryEnd} class:od-account-step--previous={previous}>
       {#if secondary}
         <button
           type="button"
-          class="od-text-button secondary"
+          class="od-text-button od-account-step--secondary"
           disabled={secondary.disabled ?? busy}
           onclick={secondary.onclick}>{secondary.label}</button
         >
       {/if}
       {#if action}
-        <button type="submit" class="filled" disabled={actionDisabled || busy} aria-busy={busy}>
-          {#if busy}<span class="spinner" aria-hidden="true"></span>{busyLabel || action}{:else}{action}{/if}
+        <button type="submit" class="od-account-step--filled" disabled={actionDisabled || busy} aria-busy={busy}>
+          {#if busy}<span class="od-account-step--spinner" aria-hidden="true"></span>{busyLabel || action}{:else}{action}{/if}
         </button>
       {/if}
     </div>
@@ -114,13 +116,13 @@
 
 <style>
   @layer od.components {
-    .body {
+    .od-account-step--body {
       min-height: 100%;
       display: flex;
       flex-direction: column;
     }
 
-    .heading {
+    .od-account-step--heading {
       padding: 8px 24px 0;
       display: flex;
       flex-direction: column;
@@ -131,7 +133,7 @@
         color: var(--od-text-2);
       }
 
-      .step {
+      .od-account-step--step {
         font-size: 12px;
         line-height: 16px;
         letter-spacing: 0.4px;
@@ -144,7 +146,7 @@
         font-weight: 400;
       }
 
-      .intro {
+      .od-account-step--intro {
         font-size: 14px;
         line-height: 20px;
         letter-spacing: 0.25px;
@@ -160,7 +162,7 @@
           font-weight: 700;
         }
 
-        .intro {
+        .od-account-step--intro {
           font-size: 15px;
           line-height: 21px;
           letter-spacing: 0;
@@ -168,7 +170,7 @@
       }
     }
 
-    .bar-step {
+    .od-account-step--bar-step {
       padding-right: 8px;
       font-size: 15px;
       color: var(--od-text-2);
@@ -176,7 +178,7 @@
     }
 
     /* MD3 linear progress indicator, indeterminate, under the top bar. */
-    .linear {
+    .od-account-step--linear {
       position: absolute;
       z-index: 600;
       left: 0;
@@ -208,21 +210,21 @@
     }
 
     /* The action stays at the bottom of the screen, above the content when it is long. */
-    .actions {
+    .od-account-step--actions {
       margin-top: auto;
       padding: 24px 24px calc(var(--f7-safe-area-bottom) + 32px);
       display: flex;
       align-items: center;
       justify-content: flex-end;
 
-      .secondary {
+      .od-account-step--secondary {
         margin: 0 auto 0 -12px;
       }
 
-      &.end {
+      &.od-account-step--end {
         gap: 8px;
 
-        .secondary {
+        .od-account-step--secondary {
           margin: 0;
         }
       }
@@ -233,22 +235,22 @@
         align-items: stretch;
         gap: 8px;
 
-        .secondary {
+        .od-account-step--secondary {
           margin: 0;
           justify-content: center;
         }
 
         /* iOS: the main button first, the text button under it. */
-        &.end .secondary {
+        &.od-account-step--end .od-account-step--secondary {
           order: 1;
         }
 
         /* iOS: "Précédent", a tonal button beside the main one. */
-        &.previous {
+        &.od-account-step--previous {
           flex-direction: row;
           gap: 12px;
 
-          .secondary {
+          .od-account-step--secondary {
             flex: none;
             width: 128px;
             height: 52px;
@@ -258,7 +260,7 @@
             font-weight: 600;
           }
 
-          .filled {
+          .od-account-step--filled {
             flex: 1;
             width: auto;
           }
@@ -266,7 +268,7 @@
       }
     }
 
-    .filled {
+    .od-account-step--filled {
       width: auto;
       height: 40px;
       padding: 0 24px;
@@ -309,7 +311,7 @@
       }
     }
 
-    .spinner {
+    .od-account-step--spinner {
       width: 14px;
       height: 14px;
       border: 2px solid currentColor;

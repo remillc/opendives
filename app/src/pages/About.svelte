@@ -112,14 +112,14 @@
     {/snippet}
   </Navbar>
 
-  <header class="head">
+  <header class="od-about--head">
     <!-- The large standalone logo, without the grey arc of the small sizes (spec, "Logo"). -->
-    <img class="logo light" src="logo-light.svg" alt="" width="112" height="112" />
-    <img class="logo dark" src="logo-dark.svg" alt="" width="112" height="112" />
+    <img class="od-about--logo od-about--light" src="logo-light.svg" alt="" width="112" height="112" />
+    <img class="od-about--logo dark" src="logo-dark.svg" alt="" width="112" height="112" />
     <h1>OpenDives</h1>
-    {#if version}<p class="version od-value">{version}</p>{/if}
-    <p class="tagline">{t('about.tagline')}</p>
-    <p class="author">{t('about.author', { name: AUTHOR })}</p>
+    {#if version}<p class="od-about--version od-value">{version}</p>{/if}
+    <p class="od-about--tagline">{t('about.tagline')}</p>
+    <p class="od-about--author">{t('about.author', { name: AUTHOR })}</p>
   </header>
 
   {#each groups as group (group.title)}
@@ -158,12 +158,12 @@
     </nav>
   {/each}
 
-  <p class="credit">{t('about.copyright', { year: '2026', name: AUTHOR })} {t('about.credit')}</p>
+  <p class="od-about--credit">{t('about.copyright', { year: '2026', name: AUTHOR })} {t('about.credit')}</p>
 </Page>
 
 <style>
   @layer od.components {
-    .head {
+    .od-about--head {
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -178,28 +178,28 @@
       }
     }
 
-    .logo.dark,
-    :global(html.dark) .logo.light {
+    .od-about--logo.dark,
+    :global(html.dark) .od-about--logo.od-about--light {
       display: none;
     }
 
-    :global(html.dark) .logo.dark {
+    :global(html.dark) .od-about--logo.dark {
       display: block;
     }
 
-    .author {
+    .od-about--author {
       margin: 4px 0 0;
       font-size: 14px;
       color: var(--od-text-2);
     }
 
-    .version {
+    .od-about--version {
       margin: 0;
       font-size: 14px;
       color: var(--od-text-2);
     }
 
-    .tagline {
+    .od-about--tagline {
       margin: 8px 0 0;
       max-width: 320px;
       font-size: 15px;
@@ -230,7 +230,7 @@
       color: var(--od-text-2);
     }
 
-    .credit {
+    .od-about--credit {
       margin: 24px 24px 40px;
       font-size: 13px;
       line-height: 18px;

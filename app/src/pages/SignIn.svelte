@@ -43,7 +43,7 @@
   }
 </script>
 
-<AccountStep
+<AccountStep class="od-sign-in"
   title={t('signIn.title')}
   heading={t('signIn.heading')}
   intro={t('signIn.intro')}
@@ -53,7 +53,7 @@
   actionDisabled={!email.trim() || !password}
   onaction={signIn}
 >
-  <div class="fields">
+  <div class="od-sign-in--fields">
     <AccountField
       label={t('signIn.email')}
       rowLabel={t('accountStep.emailRow')}
@@ -82,7 +82,7 @@
 
 <style>
   @layer od.components {
-    .fields {
+    .od-sign-in--fields {
       margin: 6px 0 0;
 
       :global(.ios) & {

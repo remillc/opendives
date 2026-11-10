@@ -91,7 +91,7 @@
   });
 </script>
 
-<Page>
+<Page class="od-gas-best-mix">
   <Navbar title={t('tools.bestMixTool')}>
     {#snippet left()}
       <Link back iconOnly>
@@ -101,33 +101,33 @@
     {/snippet}
   </Navbar>
 
-  <div class="pair">
+  <div class="od-gas-best-mix--pair">
     <TextField label={t('tools.depth')} bind:value={depth} inputmode="decimal" invalid={depthInvalid} supporting={depthInvalid ? t('tools.depthInvalid') : ''}>
-      {#snippet trailing()}<span class="unit">{depthUnit(logbook.prefs)}</span>{/snippet}
+      {#snippet trailing()}<span class="od-gas-best-mix--unit">{depthUnit(logbook.prefs)}</span>{/snippet}
     </TextField>
     <SelectField label={t('tools.waterType')} bind:value={water} options={WATER_TYPES.map((w) => ({ value: w.id, label: waterTypeName(w.id) }))} />
   </div>
 
-  <div class="gap"></div>
+  <div class="od-gas-best-mix--gap"></div>
   <Po2Wheel bind:value={po2} />
 
   <TextField label={t('tools.maxEnd')} bind:value={maxEnd} inputmode="decimal" invalid={endInvalid} supporting={endInvalid ? t('tools.depthInvalid') : t('tools.maxEndHelp')}>
-    {#snippet trailing()}<span class="unit">{depthUnit(logbook.prefs)}</span>{/snippet}
+    {#snippet trailing()}<span class="od-gas-best-mix--unit">{depthUnit(logbook.prefs)}</span>{/snippet}
   </TextField>
 
   <GasResults title={t('tools.bestMixResults')} {rows} />
-  <p class="caption">{t(logbook.prefs.o2narcotic ? 'tools.bestMixNoteNarcotic' : 'tools.bestMixNoteNotNarcotic')}</p>
+  <p class="od-gas-best-mix--caption">{t(logbook.prefs.o2narcotic ? 'tools.bestMixNoteNarcotic' : 'tools.bestMixNoteNotNarcotic')}</p>
 </Page>
 
 <style>
   @layer od.components {
-    .pair {
+    .od-gas-best-mix--pair {
       display: flex;
       gap: 12px;
       margin: 0 16px;
       align-items: flex-start;
 
-      :global(.field) {
+      :global(.od-text-field--field) {
         flex: 1;
         min-width: 0;
         margin-left: 0;
@@ -135,23 +135,23 @@
       }
     }
 
-    .gap {
+    .od-gas-best-mix--gap {
       height: 16px;
     }
 
-    .unit {
+    .od-gas-best-mix--unit {
       display: block;
       padding: 24px 8px 0 0;
       font-size: 16px;
       line-height: 24px;
       color: var(--od-text-2);
 
-      :global(.field:not(.floated)) & {
+      :global(.od-text-field--field:not(.od-text-field--floated)) & {
         visibility: hidden;
       }
     }
 
-    .caption {
+    .od-gas-best-mix--caption {
       margin: 8px 20px 32px;
       font-size: 12px;
       line-height: 16px;

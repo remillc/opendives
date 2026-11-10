@@ -21,7 +21,7 @@
 
 <div class="od-dive-figures od-value">
   {#each figures as figure (figure.label)}
-    <span class="od-dive-figure"><span class="od-figure-value">{figure.value}</span><span class="od-figure-label">{figure.label}</span></span>
+    <span class="od-dive-figures--figure"><span class="od-dive-figures--value">{figure.value}</span><span class="od-dive-figures--label">{figure.label}</span></span>
   {/each}
 </div>
 
@@ -33,13 +33,13 @@
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
-    .od-dive-figure {
+    .od-dive-figures--figure {
       display: flex;
       flex-direction: column;
     }
 
     /* Large key figures: the system font, as the titles (spec, "Fonts"). */
-    .od-figure-value {
+    .od-dive-figures--value {
       font-family: var(--od-title-font);
       font-size: 28px;
       line-height: normal;
@@ -47,7 +47,7 @@
       color: var(--od-text);
     }
 
-    .od-figure-label {
+    .od-dive-figures--label {
       font-size: 13px;
       color: var(--od-text-2);
     }

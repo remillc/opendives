@@ -52,7 +52,7 @@
 
 </script>
 
-<li class="trip-row" data-trip={dives[0].trip?.id} data-virtual-list-index={index} style:top={top === undefined ? undefined : `${top}px`}>
+<li class="od-trip-row" data-trip={dives[0].trip?.id} data-virtual-list-index={index} style:top={top === undefined ? undefined : `${top}px`}>
   <!-- The row opens the trip screen (spec, section 4, "Trip"); the arrow expands the trip in place. -->
   <a
     href="/trips/{dives[0].trip?.id}"
@@ -65,7 +65,7 @@
       <span class="checkbox" aria-hidden="true"><input type="checkbox" {checked} tabindex="-1" /><i class="icon-checkbox"></i></span>
     {/if}
     <div class="item-media">
-      <div class="grid" aria-hidden="true">
+      <div class="od-trip-row--grid" aria-hidden="true">
         {#each preview as d (d.id)}
           <ProfileThumbnail profile={d.profile} maxDepthMm={d.maxDepthMm} {prefs} small />
         {/each}
@@ -79,12 +79,12 @@
       </div>
       <button
         type="button"
-        class="expand"
+        class="od-trip-row--expand"
         aria-expanded={expanded}
         aria-label={t(expanded ? 'trip.collapse' : 'trip.expand')}
         onclick={toggle}
       >
-        <span class="arrow" class:expanded><Icon name="expand" /></span>
+        <span class="od-trip-row--arrow" class:od-trip-row--expanded={expanded}><Icon name="expand" /></span>
       </button>
     </div>
   </a>
@@ -92,7 +92,7 @@
 
 <style>
   @layer od.components {
-    .grid {
+    .od-trip-row--grid {
       width: 56px;
       height: 40px;
       display: grid;
@@ -113,7 +113,7 @@
     }
 
     /* 48 px touch target for the arrow, separate from the row's link. */
-    .expand {
+    .od-trip-row--expand {
       width: 48px;
       height: 48px;
       margin-right: -12px;
@@ -126,11 +126,11 @@
       flex: none;
     }
 
-    .arrow {
+    .od-trip-row--arrow {
       display: block;
       transition: transform 200ms;
 
-      &.expanded {
+      &.od-trip-row--expanded {
         transform: rotate(180deg);
       }
     }

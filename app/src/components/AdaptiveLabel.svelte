@@ -28,15 +28,15 @@
   });
 </script>
 
-<span class="tabbar-label label" class:shortened bind:this={label}>
-  <span class="full">{full}</span>
-  <span class="short" aria-hidden="true">{short}</span>
-  <span class="measure" aria-hidden="true" bind:this={measure}>{full}</span>
+<span class="od-adaptive-label tabbar-label od-adaptive-label--label" class:od-adaptive-label--shortened={shortened} bind:this={label}>
+  <span class="od-adaptive-label--full">{full}</span>
+  <span class="od-adaptive-label--short" aria-hidden="true">{short}</span>
+  <span class="od-adaptive-label--measure" aria-hidden="true" bind:this={measure}>{full}</span>
 </span>
 
 <style>
   @layer od.components {
-    .label {
+    .od-adaptive-label--label {
       position: relative;
       display: block;
       width: 100%;
@@ -44,7 +44,7 @@
       white-space: nowrap;
       text-align: center;
 
-      &.shortened .full {
+      &.od-adaptive-label--shortened .od-adaptive-label--full {
         position: absolute;
         width: 1px;
         height: 1px;
@@ -52,12 +52,12 @@
         clip-path: inset(50%);
       }
 
-      &:not(.shortened) .short {
+      &:not(.od-adaptive-label--shortened) .od-adaptive-label--short {
         display: none;
       }
     }
 
-    .measure {
+    .od-adaptive-label--measure {
       position: absolute;
       left: 0;
       top: 0;

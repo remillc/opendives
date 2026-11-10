@@ -210,20 +210,20 @@
       {/if}
     {/snippet}
     {#snippet right()}
-      <button type="button" class="od-text-button connect" disabled={!canConnect} aria-busy={busy} onclick={connect}>
+      <button type="button" class="od-text-button od-git-repository--connect" disabled={!canConnect} aria-busy={busy} onclick={connect}>
         {busy ? t('gitRepo.connecting') : t('gitRepo.connect')}
       </button>
     {/snippet}
   </Navbar>
 
   {#if busy && !ios}
-    <div class="linear" role="progressbar" aria-label={t('gitRepo.connecting')}><span></span></div>
+    <div class="od-git-repository--linear" role="progressbar" aria-label={t('gitRepo.connecting')}><span></span></div>
   {/if}
 
-  <form class="body" novalidate onsubmit={(e) => e.preventDefault()}>
-    <p class="intro">{t('gitRepo.intro')}</p>
+  <form class="od-git-repository--body" novalidate onsubmit={(e) => e.preventDefault()}>
+    <p class="od-git-repository--intro">{t('gitRepo.intro')}</p>
 
-    <div class="fields">
+    <div class="od-git-repository--fields">
       <AccountField
         label={t('gitRepo.address')}
         rowLabel={t('gitRepo.address')}
@@ -234,11 +234,11 @@
         onchange={checkAddress}
       />
       {#if addressState === 'checking'}
-        <p class="status">{t('gitRepo.addressChecking')}</p>
+        <p class="od-git-repository--status">{t('gitRepo.addressChecking')}</p>
       {:else if addressState === 'public' || addressState === 'publicEmpty'}
-        <p class="status ok"><Icon name="check" size={16} />{t(addressState === 'public' ? 'gitRepo.addressPublic' : 'gitRepo.addressPublicEmpty')}</p>
+        <p class="od-git-repository--status od-git-repository--ok"><Icon name="check" size={16} />{t(addressState === 'public' ? 'gitRepo.addressPublic' : 'gitRepo.addressPublicEmpty')}</p>
       {:else if addressState === 'private'}
-        <p class="status"><Icon name="info" size={16} />{t('gitRepo.addressPrivate')}</p>
+        <p class="od-git-repository--status"><Icon name="info" size={16} />{t('gitRepo.addressPrivate')}</p>
       {/if}
 
       <AccountField
@@ -263,7 +263,7 @@
         position="last"
         onchange={checkAccess}
       />
-      <a href="/git/token" class="help" onclick={openHelp}>{t('gitRepo.tokenHow')}</a>
+      <a href="/git/token" class="od-git-repository--help" onclick={openHelp}>{t('gitRepo.tokenHow')}</a>
 
       <SelectField
         label={t('gitRepo.branch')}
@@ -274,22 +274,22 @@
       />
     </div>
 
-    {#if formError}<p class="form-error" role="alert"><Icon name="error" size={18} />{formError}</p>{/if}
+    {#if formError}<p class="od-git-repository--form-error" role="alert"><Icon name="error" size={18} />{formError}</p>{/if}
 
-    <p class="note">{t('gitRepo.note')}</p>
+    <p class="od-git-repository--note">{t('gitRepo.note')}</p>
   </form>
 </Page>
 
 <style>
   @layer od.components {
-    .body {
+    .od-git-repository--body {
       min-height: 100%;
       display: flex;
       flex-direction: column;
       padding-bottom: calc(var(--f7-safe-area-bottom) + 24px);
     }
 
-    .intro {
+    .od-git-repository--intro {
       margin: 8px 24px 0;
       font-size: 14px;
       line-height: 20px;
@@ -304,20 +304,20 @@
       }
     }
 
-    .fields {
+    .od-git-repository--fields {
       margin-top: 6px;
     }
 
     /* "Connecter" in the top bar, at the end. */
-    .connect {
+    .od-git-repository--connect {
       margin-right: 4px;
     }
 
-    .connect:disabled {
+    .od-git-repository--connect:disabled {
       color: color-mix(in srgb, var(--od-text) 38%, transparent);
     }
 
-    .status {
+    .od-git-repository--status {
       margin: 4px 32px 0;
       font-size: 12px;
       line-height: 16px;
@@ -328,12 +328,12 @@
       gap: 6px;
 
       /* The one green of the theme (the check mark of a found repository). */
-      &.ok :global(svg) {
+      &.od-git-repository--ok :global(svg) {
         color: var(--od-oxygen);
       }
     }
 
-    .help {
+    .od-git-repository--help {
       margin: 8px 16px 0;
       padding: 8px 0;
       display: inline-block;
@@ -343,7 +343,7 @@
       text-decoration: underline;
     }
 
-    .form-error {
+    .od-git-repository--form-error {
       margin: 16px 24px 0;
       font-size: 14px;
       line-height: 20px;
@@ -353,7 +353,7 @@
       gap: 8px;
     }
 
-    .note {
+    .od-git-repository--note {
       margin: 24px 24px 0;
       font-size: 13px;
       line-height: 18px;
@@ -361,7 +361,7 @@
     }
 
     /* MD3 linear progress indicator, indeterminate, under the top bar. */
-    .linear {
+    .od-git-repository--linear {
       position: absolute;
       z-index: 600;
       left: 0;

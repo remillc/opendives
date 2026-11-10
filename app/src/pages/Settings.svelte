@@ -715,7 +715,7 @@
     e.preventDefault();
     const next = order[(order.indexOf(system) + step + order.length) % order.length];
     setUnitSystem(next);
-    /** @type {HTMLElement|null} */ (document.querySelector(`.od-segmented [data-system="${next}"]`))?.focus();
+    /** @type {HTMLElement|null} */ (document.querySelector(`.od-settings--segmented [data-system="${next}"]`))?.focus();
   }
 
   /** @param {{ vendor: string, product: string }} c */
@@ -798,10 +798,10 @@
 
 {#snippet rowView(/** @type {Row} */ row)}
   {#if row.kind === 'switch'}
-    <label class="row" class:dimmed={row.dimmed}>
-      <span class="texts">
-        <span class="label">{row.label}</span>
-        {#if row.text}<span class="supporting">{row.text}</span>{/if}
+    <label class="od-settings--row" class:od-settings--dimmed={row.dimmed}>
+      <span class="od-settings--texts">
+        <span class="od-settings--label">{row.label}</span>
+        {#if row.text}<span class="od-settings--supporting">{row.text}</span>{/if}
       </span>
       <span class="toggle">
         <input type="checkbox" checked={row.checked} disabled={row.dimmed} onchange={(e) => row.set(e.currentTarget.checked)} />
@@ -809,26 +809,26 @@
       </span>
     </label>
   {:else if row.kind === 'info'}
-    <div class="row">
-      <span class="texts"><span class="label">{row.label}</span></span>
-      <span class="value">{row.value}</span>
+    <div class="od-settings--row">
+      <span class="od-settings--texts"><span class="od-settings--label">{row.label}</span></span>
+      <span class="od-settings--value">{row.value}</span>
     </div>
   {:else}
     <button
       type="button"
-      class="row"
-      class:dimmed={'dimmed' in row && row.dimmed}
+      class="od-settings--row"
+      class:od-settings--dimmed={'dimmed' in row && row.dimmed}
       disabled={row.kind === 'link' && row.disabled}
       aria-haspopup={row.kind === 'link' ? undefined : 'dialog'}
       onclick={() => open(row)}
     >
-      <span class="texts">
-        <span class="label">{row.label}</span>
-        {#if row.text}<span class="supporting">{row.text}</span>{/if}
+      <span class="od-settings--texts">
+        <span class="od-settings--label">{row.label}</span>
+        {#if row.text}<span class="od-settings--supporting">{row.text}</span>{/if}
       </span>
       {#if row.kind === 'link' && row.badge}<span class="badge">{row.badge}</span>{/if}
-      {#if row.kind !== 'link' || row.value}<span class="value">{row.value}</span>{/if}
-      <svg class="chevron" class:large={row.kind === 'link'} viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"></path></svg>
+      {#if row.kind !== 'link' || row.value}<span class="od-settings--value">{row.value}</span>{/if}
+      <svg class="od-settings--chevron" class:od-settings--large={row.kind === 'link'} viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"></path></svg>
     </button>
   {/if}
 {/snippet}
@@ -836,8 +836,8 @@
 {#snippet groupView(/** @type {string} */ id)}
   {@const g = group(id)}
   {#if g.rows.length}
-    <h2 class="title">{g.title}</h2>
-    <div class="surface" role="list">
+    <h2 class="od-settings--title">{g.title}</h2>
+    <div class="od-settings--surface" role="list">
       {#each g.rows as row (row.id)}<div role="listitem">{@render rowView(row)}</div>{/each}
     </div>
   {/if}
@@ -857,7 +857,7 @@
     {/snippet}
   </Navbar>
 
-  <div class="search">
+  <div class="od-settings--search">
     <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6"></circle><path d="M15 15l5 5"></path></svg>
     <input type="search" bind:value={search} placeholder={t('settings.search')} aria-label={t('settings.search')} />
   </div>
@@ -866,9 +866,9 @@
 
   <!-- Units: the system, the five units, then speeds, duration and coordinates. -->
   {#if unitsShown || group('units').rows.length || group('units2').rows.length}
-    <h2 class="title">{t('settings.groups.units')}</h2>
+    <h2 class="od-settings--title">{t('settings.groups.units')}</h2>
     {#if unitsShown}
-      <div class="od-segmented" role="radiogroup" aria-label={t('settings.unitSystem.label')}>
+      <div class="od-settings--segmented" role="radiogroup" aria-label={t('settings.unitSystem.label')}>
         {#each UNIT_SYSTEMS as system (system)}
           <button
             type="button"
@@ -888,13 +888,13 @@
       </div>
     {/if}
     {#if group('units').rows.length}
-      <div class="surface spaced" role="list">
+      <div class="od-settings--surface od-settings--spaced" role="list">
         {#each group('units').rows as row (row.id)}<div role="listitem">{@render rowView(row)}</div>{/each}
       </div>
     {/if}
-    {#if unitsShown}<p class="note">{t('settings.unitSystem.note')}</p>{/if}
+    {#if unitsShown}<p class="od-settings--note">{t('settings.unitSystem.note')}</p>{/if}
     {#if group('units2').rows.length}
-      <div class="surface spaced" role="list">
+      <div class="od-settings--surface od-settings--spaced" role="list">
         {#each group('units2').rows as row (row.id)}<div role="listitem">{@render rowView(row)}</div>{/each}
       </div>
     {/if}
@@ -902,7 +902,7 @@
 
   {#if group('conditions').rows.length}
     {@render groupView('conditions')}
-    <p class="note">{t('settings.conditions.note')}</p>
+    <p class="od-settings--note">{t('settings.conditions.note')}</p>
   {/if}
 
   {@render groupView('logbook')}
@@ -910,38 +910,38 @@
   {@render groupView('profile')}
 
   {#if decoWarningShown}
-    <h2 class="title">{t('settings.groups.deco')}</h2>
-    <div class="warning" role="note">
+    <h2 class="od-settings--title">{t('settings.groups.deco')}</h2>
+    <div class="od-settings--warning" role="note">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l9.5 17h-19z M12 10v4.5 M12 17.5v.01"></path></svg>
       <span>{t('settings.deco.warning')}</span>
     </div>
-    <div class="surface" role="list">
+    <div class="od-settings--surface" role="list">
       {#each group('deco').rows as row (row.id)}<div role="listitem">{@render rowView(row)}</div>{/each}
     </div>
-    <p class="note">{t('settings.deco.note')}</p>
+    <p class="od-settings--note">{t('settings.deco.note')}</p>
   {/if}
 
   {@render groupView('partialPressures')}
   {@render groupView('rebreather')}
 
   {#if computersShown || group('computers').rows.length}
-    <h2 class="title">{t('settings.groups.computers')}</h2>
-    <div class="surface" role="list">
+    <h2 class="od-settings--title">{t('settings.groups.computers')}</h2>
+    <div class="od-settings--surface" role="list">
       {#each computers as computer (computer.slot)}
-        <div role="listitem" class="row">
-          <span class="texts">
-            <span class="label">{computerName(computer)}</span>
-            <span class="supporting">{computer.name || t('settings.computers.remembered')}</span>
+        <div role="listitem" class="od-settings--row">
+          <span class="od-settings--texts">
+            <span class="od-settings--label">{computerName(computer)}</span>
+            <span class="od-settings--supporting">{computer.name || t('settings.computers.remembered')}</span>
           </span>
-          <button type="button" class="more" aria-label={t('settings.computers.more', { name: computerName(computer) })} onclick={(e) => computerMenu(e, computer)}>
+          <button type="button" class="od-settings--more" aria-label={t('settings.computers.more', { name: computerName(computer) })} onclick={(e) => computerMenu(e, computer)}>
             <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5.5" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="12" cy="18.5" r="2"></circle></svg>
           </button>
         </div>
       {:else}
-        <div role="listitem" class="row"><span class="texts"><span class="supporting">{t('settings.computers.none')}</span></span></div>
+        <div role="listitem" class="od-settings--row"><span class="od-settings--texts"><span class="od-settings--supporting">{t('settings.computers.none')}</span></span></div>
       {/each}
       {#each group('computers').rows as row (row.id)}<div role="listitem">{@render rowView(row)}</div>{/each}
-      <div class="action">
+      <div class="od-settings--action">
         <button type="button" class="od-outlined-button" disabled={!computers.length} onclick={confirmForgetAll}>{t('settings.computers.forgetAll')}</button>
       </div>
     </div>
@@ -951,18 +951,18 @@
   {@render groupView('maps')}
 
   {#if advancedShown}
-    <h2 class="title">{t('settings.groups.advanced')}</h2>
-    <div class="surface">
-      <p class="action-text">{t('settings.advanced.resetText')}</p>
-      <div class="action">
+    <h2 class="od-settings--title">{t('settings.groups.advanced')}</h2>
+    <div class="od-settings--surface">
+      <p class="od-settings--action-text">{t('settings.advanced.resetText')}</p>
+      <div class="od-settings--action">
         <button type="button" class="od-outlined-button" onclick={confirmReset}>{t('settings.advanced.reset')}</button>
       </div>
     </div>
-    <p class="note">{t('settings.advanced.note')}</p>
+    <p class="od-settings--note">{t('settings.advanced.note')}</p>
   {/if}
 
-  {#if nothingShown}<p class="note empty">{t('settings.noResult', { text: search.trim() })}</p>{/if}
-  <div class="bottom"></div>
+  {#if nothingShown}<p class="od-settings--note od-settings--empty">{t('settings.noResult', { text: search.trim() })}</p>{/if}
+  <div class="od-settings--bottom"></div>
 </Page>
 
 {#if renumbering}
@@ -1006,7 +1006,7 @@
       --od-settings-margin: 16px;
     }
 
-    .search {
+    .od-settings--search {
       margin: 4px var(--od-settings-margin);
       height: 56px;
       padding: 0 16px;
@@ -1038,7 +1038,7 @@
       }
     }
 
-    .title {
+    .od-settings--title {
       margin: 0;
       padding: 22px 20px 8px;
       font-size: 18px;
@@ -1047,18 +1047,18 @@
       color: var(--od-text);
     }
 
-    .surface {
+    .od-settings--surface {
       margin: 0 var(--od-settings-margin);
       border-radius: 20px;
       background: var(--od-surface);
       overflow: hidden;
 
-      &.spaced {
+      &.od-settings--spaced {
         margin-top: 10px;
       }
     }
 
-    .row {
+    .od-settings--row {
       box-sizing: border-box;
       width: 100%;
       min-height: 56px;
@@ -1078,27 +1078,27 @@
         opacity: 0.45;
       }
 
-      &.dimmed .texts,
-      &.dimmed .value {
+      &.od-settings--dimmed .od-settings--texts,
+      &.od-settings--dimmed .od-settings--value {
         opacity: 0.55;
       }
     }
 
-    div.row {
+    div.od-settings--row {
       cursor: default;
     }
 
     /* MD3: two-line item, 72 dp. */
-    :global(.md) .row:has(.supporting) {
+    :global(.md) .od-settings--row:has(.od-settings--supporting) {
       min-height: 72px;
     }
 
-    :global(.md) .supporting {
+    :global(.md) .od-settings--supporting {
       font-size: 14px;
       line-height: 20px;
     }
 
-    .texts {
+    .od-settings--texts {
       flex: 1;
       min-width: 0;
       display: flex;
@@ -1106,18 +1106,18 @@
       gap: 2px;
     }
 
-    .label {
+    .od-settings--label {
       font-size: 16px;
       line-height: 22px;
     }
 
-    .supporting {
+    .od-settings--supporting {
       font-size: 13px;
       line-height: 18px;
       color: var(--od-text-2);
     }
 
-    .value {
+    .od-settings--value {
       flex: none;
       max-width: 45%;
       font-size: 14px;
@@ -1138,7 +1138,7 @@
       font-weight: 600;
     }
 
-    .chevron {
+    .od-settings--chevron {
       flex: none;
       width: 18px;
       height: 18px;
@@ -1148,7 +1148,7 @@
       stroke-linecap: round;
       stroke-linejoin: round;
 
-      &.large {
+      &.od-settings--large {
         width: 20px;
         height: 20px;
       }
@@ -1158,7 +1158,7 @@
       flex: none;
     }
 
-    .more {
+    .od-settings--more {
       flex: none;
       width: 48px;
       height: 48px;
@@ -1178,7 +1178,7 @@
       }
     }
 
-    .od-segmented {
+    .od-settings--segmented {
       margin: 4px var(--od-settings-margin) 0;
       display: flex;
       border: 1px solid var(--od-text-2);
@@ -1222,19 +1222,19 @@
       }
     }
 
-    .note {
+    .od-settings--note {
       margin: 8px 20px 0;
       font-size: 13px;
       line-height: 18px;
       color: var(--od-text-2);
 
-      &.empty {
+      &.od-settings--empty {
         margin-top: 24px;
         text-align: center;
       }
     }
 
-    .warning {
+    .od-settings--warning {
       margin: 0 var(--od-settings-margin) 10px;
       padding: 12px 16px;
       border-radius: 12px;
@@ -1257,13 +1257,13 @@
       }
     }
 
-    .action {
+    .od-settings--action {
       padding: 12px 16px 14px;
       display: flex;
       justify-content: center;
     }
 
-    .action-text {
+    .od-settings--action-text {
       margin: 0;
       padding: 14px 16px 0;
       font-size: 13px;
@@ -1277,7 +1277,7 @@
       cursor: default;
     }
 
-    .bottom {
+    .od-settings--bottom {
       height: 32px;
     }
 
@@ -1287,23 +1287,23 @@
         --od-settings-margin: max(16px, calc((100% - 600px) / 2));
       }
 
-      .title,
-      .note {
+      .od-settings--title,
+      .od-settings--note {
         padding-inline: max(20px, calc((100% - 600px) / 2 + 4px));
       }
 
-      .note {
+      .od-settings--note {
         margin-inline: 0;
       }
     }
 
     /* iOS: the same groups with the system's sizes. */
-    :global(.ios) .row {
+    :global(.ios) .od-settings--row {
       min-height: 44px;
       padding-right: 16px;
     }
 
-    :global(.ios) .label {
+    :global(.ios) .od-settings--label {
       font-size: 17px;
     }
   }

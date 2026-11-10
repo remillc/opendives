@@ -61,7 +61,7 @@
   }
 </script>
 
-<AccountStep
+<AccountStep class="od-create-account"
   title={t('createAccount.title')}
   step={t('createAccount.step1')}
   heading={confirmed ? t('createAccount.createdHeading') : t('createAccount.heading')}
@@ -72,7 +72,7 @@
   actionDisabled={!confirmed && (!email.trim() || !password)}
   onaction={create}
 >
-  <div class="fields">
+  <div class="od-create-account--fields">
     <AccountField
       label={t('createAccount.email')}
       rowLabel={t('accountStep.emailRow')}
@@ -100,7 +100,7 @@
 
 <style>
   @layer od.components {
-    .fields {
+    .od-create-account--fields {
       margin: 6px 0 0;
 
       :global(.ios) & {

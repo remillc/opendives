@@ -41,24 +41,24 @@
   const state = $derived(states[sync]);
 </script>
 
-<div class="sync-status" class:pending={state.pending} class:steady role={live ? 'status' : undefined}>
-  <div class="line">
+<div class="od-sync-status" class:od-sync-status--pending={state.pending} class:od-sync-status--steady={steady} role={live ? 'status' : undefined}>
+  <div class="od-sync-status--line">
     <Icon name={state.icon} size={18} />
     <!-- The stage is announced, not each percent: the bar carries the value. -->
     <span>{showProgress && progress ? t(`sync.stages.${progress.stage}${progress.stage === 'connect' && logbook.mode === 'git' ? 'Git' : ''}`) : state.text}</span>
-    {#if showProgress}<span class="percent od-value" aria-hidden="true">{percent}&nbsp;%</span>{/if}
+    {#if showProgress}<span class="od-sync-status--percent od-value" aria-hidden="true">{percent}&nbsp;%</span>{/if}
   </div>
   {#if showProgress}
     <!-- MD3 linear progress indicator, determinate: 4 dp, rounded. -->
-    <div class="bar" role="progressbar" aria-label={t('sync.syncing')} aria-valuemin="0" aria-valuemax="100" aria-valuenow={percent}>
-      <div class="fill" style:width="{percent}%"></div>
+    <div class="od-sync-status--bar" role="progressbar" aria-label={t('sync.syncing')} aria-valuemin="0" aria-valuemax="100" aria-valuenow={percent}>
+      <div class="od-sync-status--fill" style:width="{percent}%"></div>
     </div>
   {/if}
 </div>
 
 <style>
   @layer od.components {
-    .sync-status {
+    .od-sync-status {
       position: relative;
       padding: 8px 16px;
       font-size: 14px;
@@ -70,28 +70,28 @@
         color: var(--f7-list-item-text-text-color);
       }
 
-      &.pending {
+      &.od-sync-status--pending {
         color: var(--od-pending);
       }
     }
 
-    .line {
+    .od-sync-status--line {
       display: flex;
       align-items: center;
       gap: 8px;
     }
 
     /* Two lines of text in any state: nothing under it moves. */
-    .steady .line {
+    .od-sync-status--steady .od-sync-status--line {
       min-height: 40px;
     }
 
-    .percent {
+    .od-sync-status--percent {
       margin-left: auto;
     }
 
     /* In the bottom padding, under the text: the line keeps its height. */
-    .bar {
+    .od-sync-status--bar {
       position: absolute;
       left: 16px;
       right: 16px;
@@ -102,7 +102,7 @@
       overflow: hidden;
     }
 
-    .fill {
+    .od-sync-status--fill {
       height: 100%;
       border-radius: 2px;
       background: var(--od-action);

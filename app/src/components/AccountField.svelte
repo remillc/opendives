@@ -54,7 +54,7 @@
 </script>
 
 {#if ios}
-  <div class="ios-row {position}" class:invalid={!!error} class:disabled>
+  <div class="od-account-field od-account-field--ios-row {position}" class:od-account-field--invalid={!!error} class:disabled>
     <label for={id}>{rowLabel}</label>
     <input
       {id}
@@ -68,10 +68,10 @@
       autocapitalize="off"
       spellcheck="false"
     />
-    {#if error}<span class="icon"><Icon name="error" size={20} /></span>{/if}
+    {#if error}<span class="od-account-field--icon"><Icon name="error" size={20} /></span>{/if}
   </div>
   {#if position !== 'first' && footerText}
-    <p class="ios-footer" class:error={footerIsError}>{footerText}</p>
+    <p class="od-account-field od-account-field--ios-footer" class:od-account-field--error={footerIsError}>{footerText}</p>
   {/if}
 {:else}
   <TextField
@@ -106,7 +106,7 @@
 <style>
   @layer od.components {
     /* iOS: a row of an inset group (44 pt, label column of 112 pt). */
-    .ios-row {
+    .od-account-field--ios-row {
       margin: 0 16px;
       min-height: 44px;
       padding: 0 16px;
@@ -115,17 +115,17 @@
       gap: 12px;
       background: var(--od-surface);
 
-      &.single {
+      &.od-account-field--single {
         margin-top: 20px;
         border-radius: 10px;
       }
 
-      &.first {
+      &.od-account-field--first {
         margin-top: 20px;
         border-radius: 10px 10px 0 0;
       }
 
-      &.last {
+      &.od-account-field--last {
         border-radius: 0 0 10px 10px;
         box-shadow: inset 0 0.5px 0 var(--od-separator);
       }
@@ -154,25 +154,25 @@
         color: var(--od-text);
       }
 
-      &.invalid input {
+      &.od-account-field--invalid input {
         color: var(--od-alarm);
         -webkit-text-fill-color: var(--od-alarm);
       }
 
-      .icon {
+      .od-account-field--icon {
         flex: none;
         display: flex;
         color: var(--od-alarm);
       }
     }
 
-    .ios-footer {
+    .od-account-field--ios-footer {
       margin: 6px 32px 0;
       font-size: 13px;
       line-height: 18px;
       color: var(--od-text-2);
 
-      &.error {
+      &.od-account-field--error {
         color: var(--od-alarm);
       }
     }

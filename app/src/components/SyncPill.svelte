@@ -17,21 +17,21 @@
 
 {#snippet content()}
   <Icon name={icon} size={18} weight={2} />
-  <span class="text">{text}</span>
+  <span class="od-sync-pill--text">{text}</span>
 {/snippet}
 
 {#if onclick}
-  <button type="button" class="pill" aria-haspopup="dialog" {onclick}>
+  <button type="button" class="od-sync-pill od-sync-pill--pill" aria-haspopup="dialog" {onclick}>
     {@render content()}
     <Icon name="chevron" size={18} weight={2} />
   </button>
 {:else}
-  <p class="pill" role="status">{@render content()}</p>
+  <p class="od-sync-pill od-sync-pill--pill" role="status">{@render content()}</p>
 {/if}
 
 <style>
   @layer od.components {
-    .pill {
+    .od-sync-pill--pill {
       position: relative;
       box-sizing: border-box;
       display: flex;
@@ -52,11 +52,11 @@
       text-align: left;
     }
 
-    button.pill {
+    button.od-sync-pill--pill {
       cursor: pointer;
     }
 
-    .text {
+    .od-sync-pill--text {
       flex: 1;
       min-width: 0;
     }

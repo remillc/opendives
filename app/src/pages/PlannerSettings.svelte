@@ -220,10 +220,10 @@
 
 {#snippet rowView(/** @type {Row} */ row)}
   {#if row.kind === 'switch'}
-    <label class="row">
-      <span class="texts">
-        <span class="label">{row.label}</span>
-        {#if row.text}<span class="supporting">{row.text}</span>{/if}
+    <label class="od-planner-settings--row">
+      <span class="od-planner-settings--texts">
+        <span class="od-planner-settings--label">{row.label}</span>
+        {#if row.text}<span class="od-planner-settings--supporting">{row.text}</span>{/if}
       </span>
       <span class="toggle">
         <input type="checkbox" checked={row.checked} onchange={(e) => Promise.resolve(row.set(e.currentTarget.checked)).catch(failed)} />
@@ -231,18 +231,18 @@
       </span>
     </label>
   {:else}
-    <button type="button" class="row" aria-haspopup="dialog" onclick={() => (dialog = row.kind === 'number' ? { kind: 'number', row } : { kind: 'choice', row })}>
-      <span class="texts">
-        <span class="label">{row.label}</span>
-        {#if row.kind === 'number' && row.text}<span class="supporting">{row.text}</span>{/if}
+    <button type="button" class="od-planner-settings--row" aria-haspopup="dialog" onclick={() => (dialog = row.kind === 'number' ? { kind: 'number', row } : { kind: 'choice', row })}>
+      <span class="od-planner-settings--texts">
+        <span class="od-planner-settings--label">{row.label}</span>
+        {#if row.kind === 'number' && row.text}<span class="od-planner-settings--supporting">{row.text}</span>{/if}
       </span>
-      <span class="value od-value">{row.kind === 'number' ? shown(row) : row.value}</span>
-      <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"></path></svg>
+      <span class="od-planner-settings--value od-value">{row.kind === 'number' ? shown(row) : row.value}</span>
+      <svg class="od-planner-settings--chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"></path></svg>
     </button>
   {/if}
 {/snippet}
 
-<Page class="od-planner-settings {theme.ios ? 'ios-list' : ''}">
+<Page class="od-planner-settings {theme.ios ? 'od-planner-settings--ios-list' : ''}">
   <Navbar title={t('plannerSettings.title')}>
     {#snippet left()}
       <Link back iconOnly>
@@ -254,13 +254,13 @@
 
   {#if planner.setup}
     {#each groups as g (g.id)}
-      <h2 class="title">{g.title}</h2>
-      <div class="surface" role="list">
+      <h2 class="od-planner-settings--title">{g.title}</h2>
+      <div class="od-planner-settings--surface" role="list">
         {#each g.rows as row (row.id)}<div role="listitem">{@render rowView(row)}</div>{/each}
       </div>
     {/each}
   {/if}
-  <div class="end" aria-hidden="true"></div>
+  <div class="od-planner-settings--end" aria-hidden="true"></div>
 </Page>
 
 {#if dialog?.kind === 'choice'}
@@ -302,7 +302,7 @@
     /* As Settings (spec, section 4, layout): titles on the page background,
        groups as rounded white surfaces, no dividers, 48 dp rows. The first
        group title follows the top bar directly. */
-    .title {
+    .od-planner-settings--title {
       margin: 0;
       padding: 22px 20px 8px;
       font-size: 18px;
@@ -311,18 +311,18 @@
       color: var(--od-text);
     }
 
-    .surface {
+    .od-planner-settings--surface {
       margin: 0 16px;
       border-radius: 20px;
       background: var(--od-surface);
       overflow: hidden;
 
-      :global(.ios-list) & {
+      :global(.od-planner-settings--ios-list) & {
         border-radius: 10px;
       }
     }
 
-    .row {
+    .od-planner-settings--row {
       box-sizing: border-box;
       width: 100%;
       min-height: 48px;
@@ -338,7 +338,7 @@
       cursor: pointer;
     }
 
-    .texts {
+    .od-planner-settings--texts {
       flex: 1;
       min-width: 0;
       display: flex;
@@ -346,25 +346,25 @@
       gap: 2px;
     }
 
-    .label {
+    .od-planner-settings--label {
       font-size: 16px;
       line-height: 24px;
     }
 
-    .supporting {
+    .od-planner-settings--supporting {
       font-size: 14px;
       line-height: 20px;
       color: var(--od-text-2);
     }
 
-    .value {
+    .od-planner-settings--value {
       flex: none;
       font-size: 14px;
       color: var(--od-text-2);
       text-align: end;
     }
 
-    .chevron {
+    .od-planner-settings--chevron {
       flex: none;
       width: 18px;
       height: 18px;
@@ -380,7 +380,7 @@
       flex: none;
     }
 
-    .end {
+    .od-planner-settings--end {
       height: 32px;
     }
   }

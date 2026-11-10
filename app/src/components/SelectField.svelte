@@ -28,31 +28,31 @@
   const id = `od-select-${Math.random().toString(36).slice(2, 9)}`;
 </script>
 
-<div class="field" class:disabled>
-  <div class="box">
-    <label class="label" for={id}>{label}</label>
-    <select {id} {disabled} class:clearable={clearLabel && value} bind:value onchange={() => onchange?.(value)}>
+<div class="od-select-field od-select-field--field" class:disabled>
+  <div class="od-select-field--box">
+    <label class="od-select-field--label" for={id}>{label}</label>
+    <select {id} {disabled} class:od-select-field--clearable={clearLabel && value} bind:value onchange={() => onchange?.(value)}>
       {#each options as option (option.value)}<option value={option.value}>{option.label}</option>{/each}
     </select>
     {#if clearLabel && value}
-      <button type="button" class="clear" aria-label={clearLabel} onclick={clear}><Icon name="close" size={20} /></button>
+      <button type="button" class="od-select-field--clear" aria-label={clearLabel} onclick={clear}><Icon name="close" size={20} /></button>
     {/if}
-    <span class="arrow"><DropdownArrow /></span>
+    <span class="od-select-field--arrow"><DropdownArrow /></span>
   </div>
-  {#if supporting}<p class="supporting">{supporting}</p>{/if}
+  {#if supporting}<p class="od-select-field--supporting">{supporting}</p>{/if}
 </div>
 
 <style>
   @layer od.components {
-    .field {
+    .od-select-field--field {
       margin: 18px var(--od-field-margin, 16px) 0;
     }
 
-    .field.disabled {
+    .od-select-field--field.disabled {
       opacity: 0.38;
     }
 
-    .box {
+    .od-select-field--box {
       position: relative;
       height: 56px;
       box-sizing: border-box;
@@ -84,7 +84,7 @@
       }
     }
 
-    .label {
+    .od-select-field--label {
       position: absolute;
       left: 16px;
       top: 8px;
@@ -108,13 +108,13 @@
       font-size: 16px;
       line-height: 24px;
 
-      &.clearable {
+      &.od-select-field--clearable {
         padding-right: 92px;
       }
     }
 
     /* 48 dp target, 20 dp icon, before the arrow. */
-    .clear {
+    .od-select-field--clear {
       position: absolute;
       right: 40px;
       top: 4px;
@@ -130,7 +130,7 @@
       justify-content: center;
     }
 
-    .arrow {
+    .od-select-field--arrow {
       position: absolute;
       right: 12px;
       top: 50%;
@@ -140,7 +140,7 @@
       color: var(--od-text-2);
     }
 
-    .supporting {
+    .od-select-field--supporting {
       margin: 4px 16px 0;
       font-size: 12px;
       line-height: 16px;

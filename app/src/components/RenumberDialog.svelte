@@ -46,12 +46,12 @@
   }
 </script>
 
-<Md3Dialog
+<Md3Dialog class="od-renumber-dialog"
   title={t(ids ? 'renumber.titleChecked' : 'renumber.title')}
   text={t(ids ? 'renumber.dialogTextChecked' : 'renumber.dialogText', { count: ids ? ids.length : logbook.dives.length })}
   {oncancel}
 >
-  <div class="field">
+  <div class="od-renumber-dialog--field">
     <TextField
       label={t('renumber.start')}
       bind:value={start}
@@ -68,7 +68,7 @@
 
 <style>
   @layer od.components {
-    .field {
+    .od-renumber-dialog--field {
       --od-field-margin: 24px;
     }
   }

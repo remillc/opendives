@@ -26,26 +26,26 @@
 
 {#snippet content()}
   {#each items as item (item.label)}
-    <span class="figure">
-      <span class="label">{item.label}</span>
+    <span class="od-key-figures--figure">
+      <span class="od-key-figures--label">{item.label}</span>
       {#if item.value}
-        <span class="value od-value">{item.value}</span>
+        <span class="od-key-figures--value od-value">{item.value}</span>
       {:else}
-        <span class="value" aria-hidden="true">—</span><span class="od-sr-only">{t('stats.pendingValue')}</span>
+        <span class="od-key-figures--value" aria-hidden="true">—</span><span class="od-sr-only">{t('stats.pendingValue')}</span>
       {/if}
     </span>
   {/each}
 {/snippet}
 
 {#if href}
-  <a {href} class={['figures', onclick && 'external']} {onclick}>{@render content()}</a>
+  <a {href} class={['od-key-figures', 'od-key-figures--figures', onclick && 'external']} {onclick}>{@render content()}</a>
 {:else}
-  <div class="figures">{@render content()}</div>
+  <div class="od-key-figures od-key-figures--figures">{@render content()}</div>
 {/if}
 
 <style>
   @layer od.components {
-    .figures {
+    .od-key-figures--figures {
       margin: 8px 16px 0;
       padding: 16px;
       border-radius: 12px;
@@ -64,14 +64,14 @@
       }
     }
 
-    .figure {
+    .od-key-figures--figure {
       display: flex;
       flex-direction: column;
       gap: 2px;
       min-width: 0;
     }
 
-    .label {
+    .od-key-figures--label {
       font-size: 12px;
       line-height: 16px;
       color: var(--od-text-2);
@@ -83,7 +83,7 @@
     }
 
     /* Highlighted value (spec, section 2): 24 px on Android, 22 px semibold on iOS. */
-    .value {
+    .od-key-figures--value {
       font-size: 24px;
       line-height: 32px;
       overflow-wrap: anywhere;

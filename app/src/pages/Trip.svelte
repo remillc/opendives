@@ -174,7 +174,7 @@
   }
 </script>
 
-<Page>
+<Page class="od-trip">
   <Navbar>
     {#snippet left()}
       <Link back iconOnly>
@@ -193,10 +193,10 @@
   </Navbar>
 
   {#if trip && trip.tripId}
-    <header class="head">
-      <p class="kicker od-value">{t('tripScreen.kicker', { range })}</p>
-      <h1 class:not-set={!trip.location}>{trip.location || t('tripScreen.placeToSpecify')}</h1>
-      <p class="sub">{t(trip.autogen ? 'tripScreen.divesAuto' : 'tripScreen.dives', { n: trip.dives.length })}</p>
+    <header class="od-trip--head">
+      <p class="od-trip--kicker od-value">{t('tripScreen.kicker', { range })}</p>
+      <h1 class:od-trip--not-set={!trip.location}>{trip.location || t('tripScreen.placeToSpecify')}</h1>
+      <p class="od-trip--sub">{t(trip.autogen ? 'tripScreen.divesAuto' : 'tripScreen.dives', { n: trip.dives.length })}</p>
     </header>
 
     <div class="block-title">{t('tripScreen.trip')}</div>
@@ -217,7 +217,7 @@
             <div class="item-inner">
               <div class="item-title">
                 {t('tripScreen.notes')}
-                <div class="item-footer notes">{trip.notes || t('tripScreen.addNotes')}</div>
+                <div class="item-footer od-trip--notes">{trip.notes || t('tripScreen.addNotes')}</div>
               </div>
             </div>
           </a>
@@ -236,7 +236,7 @@
                 <div class="item-footer">{formatDuration(dive.durationSeconds)} · {dive.site || t('dive.siteNotSet')}</div>
               </div>
               <div class="item-after">
-                <button type="button" class="more" onclick={(e) => diveMenu(e, dive, i)}>
+                <button type="button" class="od-trip--more" onclick={(e) => diveMenu(e, dive, i)}>
                   <Icon name="more" weight={4} /><span class="od-sr-only">{t('detail.moreOptions')}</span>
                 </button>
               </div>
@@ -271,7 +271,7 @@
 
 <style>
   @layer od.components {
-    .head {
+    .od-trip--head {
       padding: 16px 20px 0;
 
       h1 {
@@ -280,32 +280,32 @@
         line-height: 34px;
         font-weight: 800;
 
-        &.not-set {
+        &.od-trip--not-set {
           color: var(--od-text-2);
         }
       }
     }
 
-    .kicker,
-    .sub {
+    .od-trip--kicker,
+    .od-trip--sub {
       margin: 0;
       font-size: 15px;
       color: var(--od-text-2);
     }
 
-    .sub {
+    .od-trip--sub {
       margin-top: 4px;
     }
 
     .item-footer {
       white-space: normal;
 
-      &.notes {
+      &.od-trip--notes {
         white-space: pre-line;
       }
     }
 
-    .more {
+    .od-trip--more {
       width: 48px;
       height: 48px;
       margin-right: -12px;

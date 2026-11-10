@@ -29,7 +29,7 @@ export function enableBackButton() {
     }
     if (modal) {
       // OpenDives' own dialogs (components/Md3Dialog.svelte) cancel themselves.
-      if (modal.classList.contains('od-dialog')) modal.dispatchEvent(new CustomEvent('od-cancel'));
+      if (modal.classList.contains('od-md3-dialog')) modal.dispatchEvent(new CustomEvent('od-cancel'));
       else if (modal.classList.contains('actions-modal')) f7.actions.close();
       else if (modal.classList.contains('dialog')) f7.dialog.close();
       else if (modal.classList.contains('sheet-modal')) f7.sheet.close();
@@ -38,13 +38,13 @@ export function enableBackButton() {
       return;
     }
     // 4. The logbook's selection mode is left.
-    const selection = document.querySelector('.selection-bar');
+    const selection = document.querySelector('.od-logbook--selection-bar');
     if (selection) {
       selection.dispatchEvent(new CustomEvent('od-cancel'));
       return;
     }
     // 4b. The Sites search closes (pages/Sites.svelte).
-    const sitesSearch = document.querySelector('.od-sites-search.od-open');
+    const sitesSearch = document.querySelector('.od-sites--search.od-sites--open');
     if (sitesSearch) {
       sitesSearch.dispatchEvent(new CustomEvent('od-cancel'));
       return;

@@ -195,12 +195,12 @@
 </script>
 
 {#snippet criterionRow(/** @type {string} */ row, /** @type {string} */ title, /** @type {string} */ value, /** @type {boolean} */ active, nested = false)}
-  <a href="/filter/{row}" class="od-filter-row" class:od-filter-row-set={active} class:od-filter-row-nested={nested}>
-    <span class="od-filter-row-text">
-      <span class="od-filter-row-title">{title}</span>
-      <span class="od-filter-row-value">{value}</span>
+  <a href="/filter/{row}" class="od-filter--row" class:od-filter--row-set={active} class:od-filter--row-nested={nested}>
+    <span class="od-filter--row-text">
+      <span class="od-filter--row-title">{title}</span>
+      <span class="od-filter--row-value">{value}</span>
     </span>
-    <span class="od-filter-row-icon"><Icon name="chevron" size={20} /></span>
+    <span class="od-filter--row-icon"><Icon name="chevron" size={20} /></span>
   </a>
 {/snippet}
 
@@ -214,7 +214,7 @@
       {/if}
     {/snippet}
     {#snippet right()}
-      <Link class="od-filter-clear" onClick={clearAll}>{t('filter.clearAll')}</Link>
+      <Link class="od-filter--clear" onClick={clearAll}>{t('filter.clearAll')}</Link>
     {/snippet}
   </Navbar>
 
@@ -228,21 +228,21 @@
       onSearchbarClear={() => (search = '')}
     />
   {:else}
-    <label class="od-filter-search">
+    <label class="od-filter--search">
       <Icon name="search" />
       <input type="search" aria-label={t('filter.searchCriterion')} placeholder={t('filter.searchCriterion')} bind:value={search} />
     </label>
   {/if}
 
   {#if filter.presets.length && !search.trim()}
-    <h2 class="group-title">{t('filter.savedFilters')}</h2>
+    <h2 class="od-filter--group-title">{t('filter.savedFilters')}</h2>
     {#if theme.ios}
-      <List inset strong dividers class="criteria">
+      <List inset strong dividers class="od-filter--criteria">
         {#each filter.presets as p (p.name)}
-          <li class:set={appliedPreset === p.name}>
-            <div class="item-content preset-row">
-              <button type="button" class="preset" aria-pressed={appliedPreset === p.name} onclick={() => applyPreset(p)}>
-                <span class="preset-name">{p.name}</span>
+          <li class:od-filter--set={appliedPreset === p.name}>
+            <div class="item-content od-filter--preset-row">
+              <button type="button" class="od-filter--preset-ios" aria-pressed={appliedPreset === p.name} onclick={() => applyPreset(p)}>
+                <span class="od-filter--preset-name-ios">{p.name}</span>
                 {#if appliedPreset === p.name}<Icon name="check" size={20} weight={2} />{/if}
               </button>
               <button type="button" class="od-icon-button" aria-label={t('filter.deleteNamed', { name: p.name })} onclick={() => removePreset(p)}>
@@ -253,15 +253,15 @@
         {/each}
       </List>
     {:else}
-      <div class="od-filter-card">
+      <div class="od-filter--card">
         {#each filter.presets as p (p.name)}
           {@const on = appliedPreset === p.name}
-          <div class="od-filter-preset" class:od-filter-preset-on={on}>
-            <button type="button" class="od-filter-preset-apply" aria-pressed={on} onclick={() => applyPreset(p)}>
+          <div class="od-filter--preset" class:od-filter--preset-on={on}>
+            <button type="button" class="od-filter--preset-apply" aria-pressed={on} onclick={() => applyPreset(p)}>
               {#if on}<Icon name="check" size={20} weight={2.2} />{/if}
-              <span class="od-filter-preset-name">{p.name}</span>
+              <span class="od-filter--preset-name">{p.name}</span>
             </button>
-            <button type="button" class="od-filter-preset-delete" aria-label={t('filter.deleteNamed', { name: p.name })} onclick={() => removePreset(p)}>
+            <button type="button" class="od-filter--preset-delete" aria-label={t('filter.deleteNamed', { name: p.name })} onclick={() => removePreset(p)}>
               <Icon name="close" size={20} />
             </button>
           </div>
@@ -271,15 +271,15 @@
   {/if}
 
   {#if showMode && !search.trim()}
-    <h2 class="group-title" id="od-filter-mode">{t('filter.mode')}</h2>
-    <div class="mode">
+    <h2 class="od-filter--group-title" id="od-filter-mode">{t('filter.mode')}</h2>
+    <div class="od-filter--mode">
       <!-- iOS segmented control; Android, MD3 segmented buttons (check mark on the selected one). -->
-      <div class="segmented-choice" role="radiogroup" aria-labelledby="od-filter-mode">
+      <div class="od-filter--segmented-choice" role="radiogroup" aria-labelledby="od-filter-mode">
         {#each modes as mode (mode)}
           <button
             type="button"
             role="radio"
-            class:selected={filter.draft.mode === mode}
+            class:od-filter--selected={filter.draft.mode === mode}
             aria-checked={filter.draft.mode === mode}
             onclick={() => setMode(mode)}
           >
@@ -295,8 +295,8 @@
     {@const gear = shown.find((g) => g.group === 'gear')}
     {@const others = shown.filter((g) => g.group !== 'gear' && g.keys.length)}
     {#if gear?.keys.length}
-      <h2 class="group-title">{t('filter.groups.gear')}</h2>
-      <div class="od-filter-card">
+      <h2 class="od-filter--group-title">{t('filter.groups.gear')}</h2>
+      <div class="od-filter--card">
         {#each gearRows(gear.keys) as row (row)}
           {@render criterionRow(
             row,
@@ -308,20 +308,20 @@
       </div>
     {/if}
     {#if others.length}
-      <h2 class="group-title">{t('filter.otherCriteria')}</h2>
-      <div class="od-filter-card">
+      <h2 class="od-filter--group-title">{t('filter.otherCriteria')}</h2>
+      <div class="od-filter--card">
         {#each others as g (g.group)}
           {@const open = opened[g.group] || !!search.trim()}
-          <div class="od-filter-group">
-            <button type="button" class="od-filter-row" aria-expanded={open} onclick={() => (opened[g.group] = !opened[g.group])}>
-              <span class="od-filter-row-text">
-                <span class="od-filter-row-title">
+          <div class="od-filter--group">
+            <button type="button" class="od-filter--row" aria-expanded={open} onclick={() => (opened[g.group] = !opened[g.group])}>
+              <span class="od-filter--row-text">
+                <span class="od-filter--row-title">
                   {t(`filter.groups.${g.group}`)}
-                  {#if setInGroup(g.group)}<span class="group-count">{t('filter.setCount', { n: setInGroup(g.group) })}</span>{/if}
+                  {#if setInGroup(g.group)}<span class="od-filter--group-count">{t('filter.setCount', { n: setInGroup(g.group) })}</span>{/if}
                 </span>
-                <span class="od-filter-row-value">{hint(g.group)}</span>
+                <span class="od-filter--row-value">{hint(g.group)}</span>
               </span>
-              <span class="od-filter-row-icon" class:od-filter-row-icon-up={open}><Icon name="expand" size={20} /></span>
+              <span class="od-filter--row-icon" class:od-filter--row-icon-up={open}><Icon name="expand" size={20} /></span>
             </button>
             {#if open}
               {#each g.keys as k (k.key)}
@@ -337,35 +337,35 @@
   {#each theme.ios ? shown : [] as g (g.group)}
     {#if g.keys.length}
       {#if g.group === 'gear'}
-        <h2 class="group-title">{t('filter.groups.gear')}</h2>
-        <List inset={theme.ios} strong={theme.ios} dividers={theme.ios} class="criteria">
+        <h2 class="od-filter--group-title">{t('filter.groups.gear')}</h2>
+        <List inset={theme.ios} strong={theme.ios} dividers={theme.ios} class="od-filter--criteria">
           {#each g.keys as k (k.key)}
             <ListItem
               link="/filter/{k.key}"
               title={label(k.key)}
               after={valueText(k.key, filter.draft, logbook.prefs, (id) => tripNames.get(id) ?? id)}
-              class={isSet(k.key, filter.draft) ? 'set' : ''}
+              class={isSet(k.key, filter.draft) ? 'od-filter--set' : ''}
             />
           {/each}
         </List>
       {:else}
-        {#if g.group === 'when'}<h2 class="group-title">{t('filter.otherCriteria')}</h2>{/if}
-        <List inset={theme.ios} strong={theme.ios} dividers={theme.ios} class="criteria groups">
-          <li class="group" class:open={opened[g.group] || !!search.trim()}>
+        {#if g.group === 'when'}<h2 class="od-filter--group-title">{t('filter.otherCriteria')}</h2>{/if}
+        <List inset={theme.ios} strong={theme.ios} dividers={theme.ios} class="od-filter--criteria od-filter--groups">
+          <li class="od-filter--group-ios" class:od-filter--open={opened[g.group] || !!search.trim()}>
             <button
               type="button"
-              class="group-button"
+              class="od-filter--group-button"
               aria-expanded={opened[g.group] || !!search.trim()}
               onclick={() => (opened[g.group] = !opened[g.group])}
             >
-              <span class="group-text">
-                <span class="group-label">
+              <span class="od-filter--group-text">
+                <span class="od-filter--group-label">
                   {t(`filter.groups.${g.group}`)}
-                  {#if setInGroup(g.group)}<span class="group-count">{t('filter.setCount', { n: setInGroup(g.group) })}</span>{/if}
+                  {#if setInGroup(g.group)}<span class="od-filter--group-count">{t('filter.setCount', { n: setInGroup(g.group) })}</span>{/if}
                 </span>
-                <span class="group-hint">{hint(g.group)}</span>
+                <span class="od-filter--group-hint">{hint(g.group)}</span>
               </span>
-              <span class="expand"><Icon name="expand" size={20} /></span>
+              <span class="od-filter--expand"><Icon name="expand" size={20} /></span>
             </button>
           </li>
           {#if opened[g.group] || search.trim()}
@@ -374,7 +374,7 @@
                 link="/filter/{k.key}"
                 title={label(k.key)}
                 after={valueText(k.key, filter.draft, logbook.prefs, (id) => tripNames.get(id) ?? id)}
-                class={isSet(k.key, filter.draft) ? 'set in-group' : 'in-group'}
+                class={isSet(k.key, filter.draft) ? 'od-filter--set od-filter--in-group' : 'od-filter--in-group'}
               />
             {/each}
           {/if}
@@ -384,16 +384,16 @@
   {/each}
 
   {#snippet fixedContent()}
-    <div class="bottom">
-      <button type="button" class="show" onclick={show} disabled={filter.draftCount === 0}>{showText}</button>
-      <button type="button" class="od-text-button save" onclick={startSaving} disabled={isEmpty(filter.draft)}>{t('filter.save')}</button>
+    <div class="od-filter--bottom">
+      <button type="button" class="od-filter--show" onclick={show} disabled={filter.draftCount === 0}>{showText}</button>
+      <button type="button" class="od-text-button od-filter--save" onclick={startSaving} disabled={isEmpty(filter.draft)}>{t('filter.save')}</button>
     </div>
   {/snippet}
 </Page>
 
 {#if naming}
-  <Md3Dialog title={t('filter.saveTitle')} text={t('filter.saveText')} oncancel={() => (naming = false)}>
-    <div class="name-field">
+  <Md3Dialog class="od-filter" title={t('filter.saveTitle')} text={t('filter.saveText')} oncancel={() => (naming = false)}>
+    <div class="od-filter--name-field">
       <TextField label={t('filter.name')} bind:value={presetName} invalid={!!saveError} supporting={saveError} />
     </div>
     {#snippet actions()}
@@ -409,7 +409,7 @@
       padding-bottom: 160px;
     }
 
-    .group-title {
+    .od-filter--group-title {
       margin: 20px 16px 8px;
       font-size: 14px;
       font-weight: 500;
@@ -422,7 +422,7 @@
       }
     }
 
-    .od-filter-search {
+    .od-filter--search {
       margin: 8px 16px 0;
       height: 56px;
       padding: 0 16px;
@@ -447,7 +447,7 @@
       }
     }
 
-    .od-filter-card {
+    .od-filter--card {
       margin: 0 16px;
       border-radius: 16px;
       background: var(--od-surface);
@@ -458,11 +458,11 @@
       }
     }
 
-    .od-filter-group > :global(* + *) {
+    .od-filter--group > :global(* + *) {
       border-top: 1px solid var(--od-separator);
     }
 
-    .od-filter-row {
+    .od-filter--row {
       width: 100%;
       min-height: 56px;
       padding: 8px 20px 8px 16px;
@@ -478,20 +478,20 @@
       cursor: pointer;
     }
 
-    button.od-filter-row {
+    button.od-filter--row {
       border: none;
     }
 
-    :global(.md .od-filter-clear) {
+    :global(.md .od-filter--clear) {
       font-size: 14px;
       font-weight: 600;
     }
 
-    .od-filter-row-nested {
+    .od-filter--row-nested {
       padding-inline-start: 32px;
     }
 
-    .od-filter-row-text {
+    .od-filter--row-text {
       flex: 1;
       min-width: 0;
       display: flex;
@@ -499,38 +499,38 @@
       gap: 2px;
     }
 
-    .od-filter-row-title {
+    .od-filter--row-title {
       font-size: 16px;
       line-height: 24px;
     }
 
-    .od-filter-row-value {
+    .od-filter--row-value {
       font-size: 14px;
       line-height: 20px;
       color: var(--od-text-2);
     }
 
-    .od-filter-row-set {
+    .od-filter--row-set {
       background: var(--od-surface-2);
 
-      .od-filter-row-value {
+      .od-filter--row-value {
         color: var(--od-text);
         font-weight: 600;
       }
     }
 
-    .od-filter-row-icon {
+    .od-filter--row-icon {
       flex: none;
       display: flex;
       color: var(--od-text-2);
       transition: transform 0.2s;
     }
 
-    .od-filter-row-icon-up {
+    .od-filter--row-icon-up {
       transform: rotate(180deg);
     }
 
-    .od-filter-preset {
+    .od-filter--preset {
       min-height: 56px;
       padding: 4px 8px 4px 16px;
       box-sizing: border-box;
@@ -539,15 +539,15 @@
       gap: 8px;
     }
 
-    .od-filter-preset-on {
+    .od-filter--preset-on {
       background: var(--od-surface-2);
 
-      .od-filter-preset-name {
+      .od-filter--preset-name {
         font-weight: 600;
       }
     }
 
-    .od-filter-preset-apply {
+    .od-filter--preset-apply {
       flex: 1;
       min-width: 0;
       min-height: 48px;
@@ -563,13 +563,13 @@
       cursor: pointer;
     }
 
-    .od-filter-preset-name {
+    .od-filter--preset-name {
       flex: 1;
       font-size: 16px;
       line-height: 24px;
     }
 
-    .od-filter-preset-delete {
+    .od-filter--preset-delete {
       flex: none;
       width: 48px;
       height: 48px;
@@ -583,11 +583,11 @@
       cursor: pointer;
     }
 
-    .mode {
+    .od-filter--mode {
       margin: 0 16px;
     }
 
-    .segmented-choice {
+    .od-filter--segmented-choice {
       display: grid;
       grid-template-columns: 1fr 1.4fr 1.2fr;
       border: 1px solid var(--od-chip-outline);
@@ -615,7 +615,7 @@
           border-inline-start: 1px solid var(--od-chip-outline);
         }
 
-        &.selected {
+        &.od-filter--selected {
           background: var(--od-tint);
           color: var(--od-on-tint);
         }
@@ -637,7 +637,7 @@
           font-weight: 400;
           letter-spacing: 0;
 
-          &.selected {
+          &.od-filter--selected {
             background: var(--od-surface);
             font-weight: 600;
             box-shadow: 0 1px 2px rgb(0 0 0 / 0.12);
@@ -647,22 +647,22 @@
     }
 
     /* A set criterion: its value in ink and bold (iOS board), on a tint. */
-    :global(.od-filter .criteria .set .item-after) {
+    :global(.od-filter .od-filter--criteria .od-filter--set .item-after) {
       color: var(--od-text);
       font-weight: 600;
     }
 
-    :global(.od-filter .criteria .item-after) {
+    :global(.od-filter .od-filter--criteria .item-after) {
       max-width: 55%;
       white-space: normal;
       text-align: end;
     }
 
-    :global(.od-filter .criteria .in-group .item-content) {
+    :global(.od-filter .od-filter--criteria .od-filter--in-group .item-content) {
       padding-inline-start: 32px;
     }
 
-    .group-button {
+    .od-filter--group-button {
       width: 100%;
       min-height: 56px;
       padding: 6px 12px 6px 16px;
@@ -677,14 +677,14 @@
       cursor: pointer;
     }
 
-    .group-text {
+    .od-filter--group-text {
       flex: 1;
       display: flex;
       flex-direction: column;
       gap: 2px;
     }
 
-    .group-label {
+    .od-filter--group-label {
       font-size: 16px;
       line-height: 24px;
 
@@ -693,13 +693,13 @@
       }
     }
 
-    .group-count {
+    .od-filter--group-count {
       margin-inline-start: 8px;
       font-size: 14px;
       font-weight: 600;
     }
 
-    .group-hint {
+    .od-filter--group-hint {
       font-size: 14px;
       line-height: 20px;
       color: var(--od-text-2);
@@ -709,21 +709,21 @@
       }
     }
 
-    .expand {
+    .od-filter--expand {
       color: var(--od-text-2);
       transition: transform 0.2s;
     }
 
-    .open .expand {
+    .od-filter--open .od-filter--expand {
       transform: rotate(180deg);
     }
 
-    .preset-row {
+    .od-filter--preset-row {
       padding-inline-end: 4px;
       gap: 4px;
     }
 
-    .preset {
+    .od-filter--preset-ios {
       flex: 1;
       min-height: 56px;
       border: none;
@@ -742,11 +742,11 @@
       }
     }
 
-    .preset-name {
+    .od-filter--preset-name-ios {
       flex: 1;
     }
 
-    .save {
+    .od-filter--save {
       display: flex;
       margin: 4px auto 0;
 
@@ -756,11 +756,11 @@
       }
     }
 
-    .name-field {
+    .od-filter--name-field {
       --od-field-margin: 24px;
     }
 
-    .bottom {
+    .od-filter--bottom {
       position: absolute;
       inset-inline: 0;
       bottom: 0;
@@ -775,7 +775,7 @@
     }
 
     /* The screen's main action: MD3 filled button, iOS large filled button. */
-    .show {
+    .od-filter--show {
       width: 100%;
       height: 48px;
       border: none;

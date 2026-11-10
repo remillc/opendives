@@ -94,21 +94,21 @@
   const rx = $derived(rects.length && rects[0].w >= 8 ? 3 : 0);
 </script>
 
-<div class="chart" style:height="{height}px" bind:clientWidth={width}>
+<div class="od-bar-chart od-bar-chart--chart" style:height="{height}px" bind:clientWidth={width}>
   {#if width}
     <svg {width} {height} viewBox="0 0 {width} {height}" role="img" aria-label={label}>
       <!-- The y axis: a thin line and the value at each round step. -->
       {#if withAxis}
         {#each axis.ticks as tick (tick)}
           {@const y = plot - (tick * scale / axis.max) * (plot - 6)}
-          <line x1={AXIS_WIDTH} x2={width} y1={y} y2={y} class="grid" />
-          <text x={AXIS_WIDTH - 4} {y} class="tick">{tickText(tick)}</text>
+          <line x1={AXIS_WIDTH} x2={width} y1={y} y2={y} class="od-bar-chart--grid" />
+          <text x={AXIS_WIDTH - 4} {y} class="od-bar-chart--tick">{tickText(tick)}</text>
         {/each}
       {/if}
       {#each rects as r, i (i)}
         <rect x={r.x} y={r.y} width={r.w} height={r.h} {rx} style:fill={r.fill} />
         {#if showLabels}
-          <text x={r.x + r.w / 2} y={height - 3} class="label" style:font-size="{labelSize}px">{r.label}</text>
+          <text x={r.x + r.w / 2} y={height - 3} class="od-bar-chart--label" style:font-size="{labelSize}px">{r.label}</text>
         {/if}
       {/each}
     </svg>
@@ -117,7 +117,7 @@
 
 <style>
   @layer od.components {
-    .chart {
+    .od-bar-chart--chart {
       width: 100%;
     }
 
@@ -125,12 +125,12 @@
       display: block;
     }
 
-    .grid {
+    .od-bar-chart--grid {
       stroke: var(--od-separator);
       stroke-width: 1;
     }
 
-    .tick {
+    .od-bar-chart--tick {
       font-size: 10px;
       fill: var(--od-text-2);
       text-anchor: end;
@@ -138,7 +138,7 @@
       font-variant-numeric: tabular-nums;
     }
 
-    .label {
+    .od-bar-chart--label {
       font-size: 10px;
       fill: var(--od-text-2);
       text-anchor: middle;

@@ -176,7 +176,7 @@ export async function setCorePrefs(changes) {
   if (['length', 'temperature', 'pressure', 'volume', 'weight'].some((k) => k in changes)) storedCore.unitSystem = prefs.unitSystem;
   writeJson(CORE_KEY, storedCore);
   if ('extraEnvironmental' in changes) settings.extraConditions = changes.extraEnvironmental === true;
-  if (changes.duration) settings.duration = changes.duration;
+  if (changes.duration) settings.duration = changes.duration === 'minutes' ? 'minutes' : 'mixed';
   return prefs;
 }
 

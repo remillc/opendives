@@ -24,8 +24,8 @@
   let indexes = $state(wheels.map((w) => w.index));
 </script>
 
-<Md3Dialog {title} {text} {oncancel}>
-  <div class="wheels">
+<Md3Dialog class="od-wheel-dialog" {title} {text} {oncancel}>
+  <div class="od-wheel-dialog--wheels">
     {#each wheels as wheel, i (i)}
       <WheelPicker
         label={wheel.label}
@@ -36,7 +36,7 @@
     {/each}
   </div>
   {#snippet actions()}
-    <button type="button" class="start" onclick={() => (indexes = wheels.map((w) => w.defaultIndex))}>
+    <button type="button" class="od-md3-dialog--start" onclick={() => (indexes = wheels.map((w) => w.defaultIndex))}>
       {t('settings.defaults')}
     </button>
     <button type="button" onclick={oncancel}>{t('dialog.cancel')}</button>
@@ -46,7 +46,7 @@
 
 <style>
   @layer od.components {
-    .wheels {
+    .od-wheel-dialog--wheels {
       padding: 0 24px;
       display: flex;
       gap: 16px;

@@ -156,32 +156,32 @@
 
   <div class="od-form-surface">
     <TextField label={t('settings.cylinders.name')} bind:value={name} supporting={error || t('settings.cylinders.nameHelp')} invalid={!!error} />
-    <div class="pair">
+    <div class="od-cylinder-type--pair">
       <TextField label={t('settings.cylinders.volume')} bind:value={volume} inputmode="decimal">
-        {#snippet trailing()}<span class="unit">{t(cuft ? 'units.cubicFeet' : 'units.liters')}</span>{/snippet}
+        {#snippet trailing()}<span class="od-cylinder-type--unit">{t(cuft ? 'units.cubicFeet' : 'units.liters')}</span>{/snippet}
       </TextField>
       <TextField label={t('settings.cylinders.pressure')} bind:value={pressure} inputmode="decimal">
-        {#snippet trailing()}<span class="unit">{t(psi ? 'units.psi' : 'units.bar')}</span>{/snippet}
+        {#snippet trailing()}<span class="od-cylinder-type--unit">{t(psi ? 'units.psi' : 'units.bar')}</span>{/snippet}
       </TextField>
     </div>
   </div>
-  <p class="note first">{t(cuft ? 'settings.cylinders.volumeNoteCuft' : 'settings.cylinders.volumeNoteLitres')}</p>
-  {#if usageNote}<p class="note">{usageNote}</p>{/if}
+  <p class="od-cylinder-type--note od-cylinder-type--first">{t(cuft ? 'settings.cylinders.volumeNoteCuft' : 'settings.cylinders.volumeNoteLitres')}</p>
+  {#if usageNote}<p class="od-cylinder-type--note">{usageNote}</p>{/if}
 
   {#if editing && type}
     {#if type.library}
-      <div class="action">
-        <button type="button" class="od-outlined-button danger" onclick={remove}>{t('settings.cylinders.delete')}</button>
+      <div class="od-cylinder-type--action">
+        <button type="button" class="od-outlined-button od-danger" onclick={remove}>{t('settings.cylinders.delete')}</button>
       </div>
     {:else}
-      <p class="note">{t('settings.cylinders.fromLogbook')}</p>
+      <p class="od-cylinder-type--note">{t('settings.cylinders.fromLogbook')}</p>
     {/if}
   {/if}
 </Page>
 
 <style>
   @layer od.components {
-    .pair {
+    .od-cylinder-type--pair {
       display: flex;
       gap: 16px;
 
@@ -191,23 +191,23 @@
       }
     }
 
-    .unit {
+    .od-cylinder-type--unit {
       padding-inline-end: 12px;
       font-size: 14px;
       color: var(--od-text-2);
     }
 
-    .action {
+    .od-cylinder-type--action {
       margin-top: 24px;
       display: flex;
       justify-content: center;
     }
 
-    .note.first {
+    .od-cylinder-type--note.od-cylinder-type--first {
       margin-top: 12px;
     }
 
-    .note {
+    .od-cylinder-type--note {
       margin: 8px 20px 0;
       font-size: 13px;
       line-height: 18px;

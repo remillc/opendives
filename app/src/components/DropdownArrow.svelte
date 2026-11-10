@@ -9,5 +9,5 @@
 {#if ios}
   <Icon name="expand" />
 {:else}
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 10l5 5 5-5z" /></svg>
+  <svg class="od-dropdown-arrow" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 10l5 5 5-5z" /></svg>
 {/if}

@@ -18,14 +18,14 @@
   });
 </script>
 
-<Page>
+<Page class="od-sites-unplaced">
   <Navbar title={t('sites.unplacedTitle')}>
     {#snippet left()}
       <Link back iconOnly><i class="icon icon-back"></i><span class="od-sr-only">{t('common.back')}</span></Link>
     {/snippet}
   </Navbar>
 
-  <p class="intro">{t('sites.unplacedIntro')}</p>
+  <p class="od-sites-unplaced--intro">{t('sites.unplacedIntro')}</p>
 
   <div class="list media-list">
     <ul>
@@ -45,7 +45,7 @@
 
 <style>
   @layer od.components {
-    .intro {
+    .od-sites-unplaced--intro {
       margin: 12px 16px;
       font-size: 14px;
       line-height: 20px;

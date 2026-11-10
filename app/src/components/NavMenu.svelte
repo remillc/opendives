@@ -66,7 +66,7 @@
 
 <Panel
   id="od-menu"
-  class="od-menu"
+  class="od-nav-menu od-menu"
   left
   cover
   swipe
@@ -79,48 +79,48 @@
   onPanelClose={onClose}
   onPanelClosed={restoreFocus}
 >
-  <nav class="menu" aria-label={t('menu.sections')} bind:this={menu}>
-    <div class="band">
-      <svg class="profile" viewBox="0 0 300 140" preserveAspectRatio="none" aria-hidden="true">
-        <path d="{PROFILE} V140 H0 Z" class="area" />
-        <path d={PROFILE} class="line" />
+  <nav class="od-nav-menu--menu" aria-label={t('menu.sections')} bind:this={menu}>
+    <div class="od-nav-menu--band">
+      <svg class="od-nav-menu--profile" viewBox="0 0 300 140" preserveAspectRatio="none" aria-hidden="true">
+        <path d="{PROFILE} V140 H0 Z" class="od-nav-menu--area" />
+        <path d={PROFILE} class="od-sync-status--line" />
       </svg>
-      <div class="brand">
+      <div class="od-nav-menu--brand">
         <img src="logo-small-light.svg" alt="" width="44" height="44" />
-        <span class="name">{t('menu.title')}</span>
+        <span class="od-nav-menu--name">{t('menu.title')}</span>
       </div>
-      <a href="#account" class="account" aria-label={t('menu.accountLabel', { name: accountName })} onclick={(e) => choose(e, () => showSection('account'))}>
+      <a href="#account" class="od-nav-menu--account" aria-label={t('menu.accountLabel', { name: accountName })} onclick={(e) => choose(e, () => showSection('account'))}>
         <Icon name="account" />
-        <span class="texts">
-          <span class="address">{accountName}</span>
-          <span class="line-2">{accountLine}</span>
+        <span class="od-nav-menu--texts">
+          <span class="od-nav-menu--address">{accountName}</span>
+          <span class="od-nav-menu--line-2">{accountLine}</span>
         </span>
         <Icon name="chevron" size={20} />
       </a>
-      <svg class="wave" viewBox="0 0 300 18" preserveAspectRatio="none" aria-hidden="true"><path d="M0 11 Q37.5 2 75 11 T150 11 T225 11 T300 11 V18 H0 Z" /></svg>
+      <svg class="od-nav-menu--wave" viewBox="0 0 300 18" preserveAspectRatio="none" aria-hidden="true"><path d="M0 11 Q37.5 2 75 11 T150 11 T225 11 T300 11 V18 H0 Z" /></svg>
     </div>
 
     {#each sections as section (section)}
-      <a href="#{section}" class="item" aria-current={current === section ? 'page' : undefined} onclick={(e) => choose(e, () => showSection(section))}>
+      <a href="#{section}" class="od-nav-menu--item" aria-current={current === section ? 'page' : undefined} onclick={(e) => choose(e, () => showSection(section))}>
         <Icon name={icons[section]} />
         <span>{t(`tabs.${section}`)}</span>
       </a>
     {/each}
-    <div class="separator" role="separator"></div>
-    <a href="#settings" class="item" aria-current={current === 'settings' ? 'page' : undefined} onclick={(e) => choose(e, openSettings)}>
+    <div class="od-nav-menu--separator" role="separator"></div>
+    <a href="#settings" class="od-nav-menu--item" aria-current={current === 'settings' ? 'page' : undefined} onclick={(e) => choose(e, openSettings)}>
       <Icon name="settings" />
-      <span class="label">{t('settings.title')}</span>
+      <span class="od-nav-menu--label">{t('settings.title')}</span>
       {#if mapUpdates > 0}
         <span class="badge" aria-label={t('settings.maps.updates', { n: mapUpdates })}>{mapUpdates}</span>
       {/if}
     </a>
-    <a href="#about" class="item" aria-current={current === 'about' ? 'page' : undefined} onclick={(e) => choose(e, openAbout)}>
+    <a href="#about" class="od-nav-menu--item" aria-current={current === 'about' ? 'page' : undefined} onclick={(e) => choose(e, openAbout)}>
       <Icon name="info" />
       <span>{t('about.title')}</span>
     </a>
-    <div class="spacer"></div>
+    <div class="od-nav-menu--spacer"></div>
     {#if !logbook.loading && !logbook.error}
-      <div class="status">
+      <div class="od-nav-menu--status">
         <!-- The button stays in place while it runs and shows its progress (to-do #2). -->
         {#if logbook.email}<SyncButton />{/if}
         {#if logbook.syncFailure}
@@ -148,7 +148,7 @@
       --f7-panel-bg-color: var(--od-surface);
     }
 
-    .menu {
+    .od-nav-menu--menu {
       min-height: 100%;
       box-sizing: border-box;
       display: flex;
@@ -158,7 +158,7 @@
       color: var(--od-text);
     }
 
-    .band {
+    .od-nav-menu--band {
       position: relative;
       overflow: hidden;
       margin-bottom: 12px;
@@ -171,18 +171,18 @@
       color: var(--od-on-band);
     }
 
-    .profile {
+    .od-nav-menu--profile {
       position: absolute;
       left: 0;
       bottom: 2px;
       width: 100%;
       height: 34px;
 
-      .area {
+      .od-nav-menu--area {
         fill: rgb(255 255 255 / 0.1);
       }
 
-      .line {
+      .od-sync-status--line {
         fill: none;
         stroke: rgb(31 33 36 / 0.22);
         stroke-width: 1.5;
@@ -190,7 +190,7 @@
       }
     }
 
-    .wave {
+    .od-nav-menu--wave {
       position: absolute;
       left: 0;
       bottom: -1px;
@@ -203,20 +203,20 @@
       }
     }
 
-    .brand {
+    .od-nav-menu--brand {
       position: relative;
       display: flex;
       align-items: center;
       gap: 12px;
 
-      .name {
+      .od-nav-menu--name {
         font-size: 22px;
         line-height: 28px;
         font-weight: 500;
       }
     }
 
-    .account {
+    .od-nav-menu--account {
       position: relative;
       padding: 10px 10px 10px 12px;
       border-radius: 16px;
@@ -227,14 +227,14 @@
       color: var(--od-on-band);
       text-decoration: none;
 
-      .texts {
+      .od-nav-menu--texts {
         flex: 1;
         min-width: 0;
         display: flex;
         flex-direction: column;
       }
 
-      .address {
+      .od-nav-menu--address {
         font-size: 14px;
         line-height: 20px;
         font-weight: 500;
@@ -244,7 +244,7 @@
         text-overflow: ellipsis;
       }
 
-      .line-2 {
+      .od-nav-menu--line-2 {
         font-size: 12px;
         line-height: 16px;
         letter-spacing: 0.4px;
@@ -253,7 +253,7 @@
     }
 
     /* Android: MD3 drawer item, 56 dp pill. */
-    .item {
+    .od-nav-menu--item {
       margin: 0 12px;
       min-height: 56px;
       padding: 0 16px;
@@ -278,7 +278,7 @@
       }
     }
 
-    .item .label {
+    .od-nav-menu--item .od-nav-menu--label {
       flex: 1;
     }
 
@@ -297,19 +297,19 @@
       text-align: center;
     }
 
-    .separator {
+    .od-nav-menu--separator {
       height: 1px;
       margin: 8px 28px;
       background: var(--od-separator);
     }
 
-    .spacer {
+    .od-nav-menu--spacer {
       flex: 1;
       min-height: 12px;
     }
 
     /* The sync card: the button and the state, centred. */
-    .status {
+    .od-nav-menu--status {
       margin: 0 12px;
       padding: 12px;
       border-radius: 16px;
@@ -319,8 +319,8 @@
       align-items: center;
       gap: 6px;
 
-      :global(.sync-status),
-      :global(.sync-status .line) {
+      :global(.od-sync-status),
+      :global(.od-sync-status .od-sync-status--line) {
         justify-content: center;
         text-align: center;
       }
@@ -328,7 +328,7 @@
 
     /* iOS: 48 pt rows with a rounded highlight. */
     :global(.ios) {
-      .item {
+      .od-nav-menu--item {
         margin: 0 10px;
         min-height: 48px;
         padding: 0 12px;
@@ -343,7 +343,7 @@
         }
       }
 
-      .separator {
+      .od-nav-menu--separator {
         margin: 8px 16px;
       }
     }

@@ -118,7 +118,7 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
     query = '';
     siteMap?.setView(viewBeforeSearch);
     viewBeforeSearch = null;
-    fadeIn([searchEl?.closest('.view')?.querySelector('.od-sites-bar .navbar-inner') ?? null, todoEl, fabEl]);
+    fadeIn([searchEl?.closest('.view')?.querySelector('.od-sites--bar .navbar-inner') ?? null, todoEl, fabEl]);
   }
 
   function clearSearch() {
@@ -155,14 +155,14 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
     let startY = 0;
     let pressed = false;
     /** @param {Event} e */
-    const rowOf = (e) => /** @type {HTMLElement|null} */ (/** @type {HTMLElement} */ (e.target).closest('.od-site-row'));
+    const rowOf = (e) => /** @type {HTMLElement|null} */ (/** @type {HTMLElement} */ (e.target).closest('.od-sites--site-row'));
     const cancel = () => clearTimeout(timer);
 
     /** @param {PointerEvent} e */
     function down(e) {
       const row = rowOf(e);
       pressed = false;
-      if (!row || /** @type {HTMLElement} */ (e.target).closest('.od-site-check')) return;
+      if (!row || /** @type {HTMLElement} */ (e.target).closest('.od-sites--site-check')) return;
       startX = e.clientX;
       startY = e.clientY;
       timer = setTimeout(() => {
@@ -182,7 +182,7 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
     function click(e) {
       if (!el.contains(/** @type {Node} */ (e.target))) return;
       const row = rowOf(e);
-      if (!row || /** @type {HTMLElement} */ (e.target).closest('.od-site-check')) return;
+      if (!row || /** @type {HTMLElement} */ (e.target).closest('.od-sites--site-check')) return;
       if (pressed) {
         pressed = false;
       } else if (selection.length) {
@@ -318,14 +318,14 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
 
 {#snippet mapBlock(/** @type {string} */ height)}
   {#if located.length}
-    <div class="map">
+    <div class="od-sites--map">
       <!-- 5:4 landscape, full width (task 2026-11-07-24). -->
       <SiteMap bind:this={siteMap} sites={located} onselect={open} {onview} {height} {matching} />
       <!-- Tablet: no header band, the pill sits on the map. -->
       {#if !layout.phone && !connection.online}
-        <p class="offline-chip over-map" role="status"><Icon name="offline" size={16} weight={2} />{t('sites.offline')}</p>
+        <p class="od-sites--offline-chip od-sites--over-map" role="status"><Icon name="offline" size={16} weight={2} />{t('sites.offline')}</p>
       {/if}
-      <button type="button" class="locate" onclick={centreOnDevice}>
+      <button type="button" class="od-sites--locate" onclick={centreOnDevice}>
         <Icon name="locate" size={20} />
         <span class="od-sr-only">{t('sites.centreOnMe')}</span>
       </button>
@@ -334,14 +334,14 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
 {/snippet}
 
 {#snippet panel()}
-  <section class="sites-panel" aria-label={t('sites.listLabel')}>
+  <section class="od-sites--panel" aria-label={t('sites.listLabel')}>
     <!-- On a phone, the band says it. -->
-    {#if !layout.phone}<p class="count od-value">{searchCount || `${t('sites.siteCount', { n: used.length })}, ${t('sites.diveCount', { n: diveCount })}`}</p>{/if}
+    {#if !layout.phone}<p class="od-sites--count od-value">{searchCount || `${t('sites.siteCount', { n: used.length })}, ${t('sites.diveCount', { n: diveCount })}`}</p>{/if}
 
     {#if withoutSite || unplaced || duplicates}
-     <div class="od-sites-todo" class:od-hidden={searching} bind:this={todoEl}>
-      <div class="od-sites-todo-inner">
-      <div class="list links surface">
+     <div class="od-sites--todo" class:od-sites--hidden={searching} bind:this={todoEl}>
+      <div class="od-sites--todo-inner">
+      <div class="list od-sites--links od-sites--surface">
         <ul>
           {#if withoutSite}
             <li><a href="/sites/without/" class="item-link item-content"><div class="item-inner"><div class="item-title">{t('sites.withoutLink', { n: withoutSite })}</div></div></a></li>
@@ -360,27 +360,27 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
 
     {#if results.length}
       <!-- No chevron on the site rows (android-sites.dc.html). -->
-      <div class="list no-chevron surface od-sites-list" use:selectable>
+      <div class="list no-chevron od-sites--surface od-sites--list" use:selectable>
         <ul>
           {#each results as site (site.uuid)}
-            <li class="od-site-row" data-uuid={site.uuid}>
+            <li class="od-sites--site-row" data-uuid={site.uuid}>
               {#if selection.length}
-                <label class="checkbox od-site-check">
+                <label class="checkbox od-sites--site-check">
                   <input type="checkbox" bind:checked={checked[site.uuid]} aria-label={t('sites.selectSite', { name: site.name || t('sites.noName') })} />
                   <i class="icon-checkbox"></i>
                 </label>
               {/if}
               <a href="/sites/{site.uuid}" class="item-link item-content">
                 <div class="item-inner">
-                  <div class="text">
-                    <div class="item-title od-site-name">{#if site.name}{#each highlightParts(site.name, typed ? query : '') as part}{#if part.match}<mark class="od-match">{part.text}</mark>{:else}{part.text}{/if}{/each}{:else}{t('sites.noName')}{/if}</div>
+                  <div class="od-sites--text">
+                    <div class="item-title od-site-name">{#if site.name}{#each highlightParts(site.name, typed ? query : '') as part}{#if part.match}<mark class="od-sites--match">{part.text}</mark>{:else}{part.text}{/if}{/each}{:else}{t('sites.noName')}{/if}</div>
                     <div class="item-text">
                       {site.hasLocation
                         ? t('sites.rowDives', { n: site.dives, date: formatLongDate(site.lastDate) })
                         : t('sites.rowNoGps', { n: site.dives })}
                     </div>
                   </div>
-                  {#if site.maxDepthMm}<div class="depth od-value">{formatDepth(site.maxDepthMm, logbook.prefs)}</div>{/if}
+                  {#if site.maxDepthMm}<div class="od-sites--depth od-value">{formatDepth(site.maxDepthMm, logbook.prefs)}</div>{/if}
                 </div>
               </a>
             </li>
@@ -396,24 +396,24 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
 
 {#snippet fab()}
     <!-- MD3 FAB, 56 dp, over the list panel: a new site. -->
-    <div class="fab fab-right-bottom od-fab-add od-sites-fab" class:od-hidden={searching} bind:this={fabEl}>
+    <div class="fab fab-right-bottom od-fab-add od-sites--fab" class:od-sites--hidden={searching} bind:this={fabEl}>
       <a href="/sites/new" aria-label={t('sites.newSite')}><i class="icon"><Icon name="plus" /></i></a>
     </div>
 {/snippet}
 
-<Page onPageReinit={load}>
+<Page class="od-sites" onPageReinit={load}>
   {#snippet fixedContent()}
     <!-- The open search: ← and the field take the place of the top bar's items. -->
-    <div class="od-sites-search" class:od-open={searching} inert={!searching} bind:this={searchEl} role="search">
-      <button type="button" class="od-icon-button od-sites-search-back" onclick={closeSearch}>
+    <div class="od-sites--search" class:od-sites--open={searching} inert={!searching} bind:this={searchEl} role="search">
+      <button type="button" class="od-icon-button od-sites--search-back" onclick={closeSearch}>
         <Icon name="arrowBack" /><span class="od-sr-only">{t('sites.closeSearch')}</span>
       </button>
-      <div class="od-sites-search-field">
+      <div class="od-sites--search-field">
         <input
           bind:this={searchInput}
           bind:value={query}
           type="search"
-          class="od-sites-search-input"
+          class="od-sites--search-input"
           placeholder={t('sites.searchPlaceholder')}
           aria-label={t('sites.search')}
           enterkeyhint="search"
@@ -421,7 +421,7 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
           onkeydown={(e) => e.key === 'Enter' && searchInput?.blur()}
         />
         {#if query}
-          <button type="button" class="od-sites-search-clear" onclick={clearSearch}>
+          <button type="button" class="od-sites--search-clear" onclick={clearSearch}>
             <Icon name="close" /><span class="od-sr-only">{t('sites.clearSearch')}</span>
           </button>
         {/if}
@@ -429,13 +429,13 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
     </div>
     {#if selection.length}
       <!-- While sites are checked, the top bar gives way to their number. -->
-      <div class="od-sites-selection">
+      <div class="od-sites--selection">
         <button type="button" class="od-icon-button" onclick={() => (checked = {})}>
           <Icon name="close" /><span class="od-sr-only">{t('logbook.selectionClose')}</span>
         </button>
-        <span class="od-sites-selection-count od-value" role="status">{t('sites.selected', { n: selection.length })}</span>
+        <span class="od-sites--selection-count od-value" role="status">{t('sites.selected', { n: selection.length })}</span>
         {#if selection.length >= 2}
-          <a href="#menu" class="link icon-only popover-open od-sites-selection-more" data-popover=".od-sites-menu" role="button">
+          <a href="#menu" class="link icon-only od-sites--popover-open od-sites--selection-more" data-popover=".od-sites-menu" role="button">
             {#if theme.ios}<Icon name="moreCircle" />{:else}<Icon name="more" weight={4} />{/if}
             <span class="od-sr-only">{t('detail.moreOptions')}</span>
           </a>
@@ -448,12 +448,12 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
       <!-- Selecting: no FAB. -->
     {:else}
       <!-- Tablet (spec, section 3): the list on the left, the map on the right. -->
-      <div class="split" class:ios>
-        <div class="list-pane" style="width: {listWidth + (ios ? 0 : 20)}px">
-          <div class="scroll">{@render panel()}</div>
+      <div class="od-sites--split" class:ios>
+        <div class="od-sites--list-pane" style="width: {listWidth + (ios ? 0 : 20)}px">
+          <div class="od-sites--scroll">{@render panel()}</div>
           {@render fab()}
         </div>
-        <div class="map-pane">{@render mapBlock('100%')}</div>
+        <div class="od-sites--map-pane">{@render mapBlock('100%')}</div>
       </div>
     {/if}
   {/snippet}
@@ -481,7 +481,7 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
     />
   {/if}
 
-  <Navbar class="od-band-bar od-sites-bar{searching ? ' od-sites-searching' : ''}" title={t('sites.title')}>
+  <Navbar class="od-band-bar od-sites--bar{searching ? ' od-sites--searching' : ''}" title={t('sites.title')}>
     {#snippet left()}<MenuButton />{/snippet}
     <NavRight>
       <Link iconOnly onClick={openSearch}><Icon name="search" /><span class="od-sr-only">{t('sites.search')}</span></Link>
@@ -500,7 +500,7 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
       summary={searchCount || (used.length ? [t('band.sites', { n: used.length }), t('band.dives', { n: diveCount })].join(' · ') : '')}
     >
       {#if !connection.online}
-        <p class="offline-chip" role="status"><Icon name="offline" size={16} weight={2} />{t('sites.offline')}</p>
+        <p class="od-sites--offline-chip" role="status"><Icon name="offline" size={16} weight={2} />{t('sites.offline')}</p>
       {/if}
     </SectionBand>
     {@render mapBlock('calc(100vw * 4 / 5)')}
@@ -511,13 +511,13 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
 <style>
   @layer od.components {
     /* Tablet: below the navigation bar, two panes side by side. */
-    .split {
+    .od-sites--split {
       position: absolute;
       inset: calc(var(--f7-navbar-height) + var(--f7-safe-area-top)) 0 0 0;
       display: flex;
     }
 
-    .list-pane {
+    .od-sites--list-pane {
       position: relative;
       flex: none;
       display: flex;
@@ -525,38 +525,38 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
       border-right: 0.5px solid var(--od-separator);
     }
 
-    .scroll {
+    .od-sites--scroll {
       flex: 1;
       overflow-y: auto;
     }
 
-    .map-pane {
+    .od-sites--map-pane {
       position: relative;
       flex: 1;
       min-width: 0;
     }
 
     /* Android: the map is a rounded pane, 16 px from the edges. */
-    .split:not(.ios) .map-pane {
+    .od-sites--split:not(.ios) .od-sites--map-pane {
       margin: 16px 16px 16px 0;
       border-radius: 28px;
       overflow: hidden;
     }
 
     /* iPad: 44 pt button at the top right of the map. */
-    .split.ios .locate {
+    .od-sites--split.ios .od-sites--locate {
       top: 24px;
       bottom: auto;
       width: 44px;
       height: 44px;
     }
 
-    .split :global(.od-fab-add) {
+    .od-sites--split :global(.od-fab-add) {
       position: absolute;
     }
 
     /* "Offline" (android-sites-hors-ligne.dc.html): 28 dp, translucent white, under the summary. */
-    .offline-chip {
+    .od-sites--offline-chip {
       position: relative;
       display: inline-flex;
       align-items: center;
@@ -570,7 +570,7 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
       font-size: 13px;
       font-weight: 600;
 
-      &.over-map {
+      &.od-sites--over-map {
         position: absolute;
         z-index: 2;
         top: 16px;
@@ -583,7 +583,7 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
        animation"). Closed, the field is clipped to the size of the magnifier
        button, at its place on the right: opening grows it to full width from
        there, closing shrinks it back. Closing is quicker and accelerates. */
-    .od-sites-search {
+    .od-sites--search {
       --od-search-from-right: 44px;
       --od-search-open-ease: cubic-bezier(0.05, 0.7, 0.1, 1);
       --od-search-close-ease: cubic-bezier(0.3, 0, 0.8, 0.15);
@@ -601,24 +601,24 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
       pointer-events: none;
       color: var(--od-on-band);
 
-      &.od-open > * {
+      &.od-sites--open > * {
         pointer-events: auto;
       }
     }
 
-    .od-sites-search-back {
+    .od-sites--search-back {
       flex: none;
       color: inherit;
       opacity: 0;
       transition: opacity 100ms linear 100ms;
 
-      .od-open & {
+      .od-sites--open & {
         opacity: 1;
         transition-delay: 0s;
       }
     }
 
-    .od-sites-search-field {
+    .od-sites--search-field {
       flex: 1;
       min-width: 0;
       height: 48px;
@@ -634,7 +634,7 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
         clip-path 200ms var(--od-search-close-ease),
         background-color 200ms var(--od-search-close-ease);
 
-      .od-open & {
+      .od-sites--open & {
         background: var(--od-band-control);
         clip-path: inset(0 0 0 0 round 24px);
         transition-duration: 300ms;
@@ -642,7 +642,7 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
       }
     }
 
-    .od-sites-search-input {
+    .od-sites--search-input {
       flex: 1;
       min-width: 0;
       height: 100%;
@@ -657,7 +657,7 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
       opacity: 0;
       transition: opacity 100ms linear;
 
-      .od-open & {
+      .od-sites--open & {
         opacity: 1;
         transition-delay: 100ms;
       }
@@ -671,7 +671,7 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
       }
     }
 
-    .od-sites-search-clear {
+    .od-sites--search-clear {
       flex: none;
       width: 40px;
       height: 40px;
@@ -687,11 +687,11 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
 
     /* The top bar's own items give way: out in the first 100 ms of opening,
        back in the last 100 ms of closing. */
-    :global(.navbar.od-sites-bar .navbar-inner > *) {
+    :global(.navbar.od-sites--bar .navbar-inner > *) {
       transition: opacity 100ms linear 100ms;
     }
 
-    :global(.navbar.od-sites-searching .navbar-inner > *) {
+    :global(.navbar.od-sites--searching .navbar-inner > *) {
       opacity: 0;
       visibility: hidden;
       transition:
@@ -701,7 +701,7 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
 
     /* The "à faire" card and the + button: fade and slide, 150 ms, and the
        card's room closes so the results rise under the map. */
-    .od-sites-todo {
+    .od-sites--todo {
       display: grid;
       grid-template-rows: 1fr;
       transition:
@@ -710,7 +710,7 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
         transform 150ms linear,
         visibility 0s;
 
-      &.od-hidden {
+      &.od-sites--hidden {
         grid-template-rows: 0fr;
         opacity: 0;
         transform: translateY(8px);
@@ -723,18 +723,18 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
       }
     }
 
-    .od-sites-todo-inner {
+    .od-sites--todo-inner {
       min-height: 0;
       overflow: hidden;
     }
 
-    .od-sites-fab {
+    .od-sites--fab {
       transition:
         opacity 150ms linear,
         transform 150ms linear,
         visibility 0s;
 
-      &.od-hidden {
+      &.od-sites--hidden {
         opacity: 0;
         transform: translateY(8px);
         visibility: hidden;
@@ -746,23 +746,23 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
     }
 
     /* The matched part of a name. */
-    .od-match {
+    .od-sites--match {
       background: var(--od-secondary-container);
       color: inherit;
       border-radius: 2px;
     }
 
-    .map-pane .map {
+    .od-sites--map-pane .od-sites--map {
       height: 100%;
     }
 
-    .map {
+    .od-sites--map {
       position: relative;
     }
 
     /* 40 dp, white surface, 12 dp corners, elevation 1, 16 dp from the right
        of the map, above its credits. */
-    .locate {
+    .od-sites--locate {
       position: absolute;
       right: 16px;
       bottom: 32px;
@@ -778,7 +778,7 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
       box-shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 1px 3px 1px rgb(0 0 0 / 0.15);
     }
 
-    .od-sites-selection {
+    .od-sites--selection {
       position: absolute;
       top: 0;
       left: 0;
@@ -793,18 +793,18 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
       background: var(--od-surface-2);
     }
 
-    .od-sites-selection-count {
+    .od-sites--selection-count {
       font-size: 22px;
       line-height: 28px;
       color: var(--od-text);
     }
 
-    .od-sites-selection-more {
+    .od-sites--selection-more {
       margin-left: auto;
     }
 
     /* The box sits beside the row's link: touching it never opens the site. */
-    .od-site-row {
+    .od-sites--site-row {
       display: flex;
       align-items: center;
       user-select: none;
@@ -816,7 +816,7 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
       }
     }
 
-    .od-site-check {
+    .od-sites--site-check {
       flex: none;
       display: flex;
       align-items: center;
@@ -826,7 +826,7 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
       margin-left: 4px;
     }
 
-    .sites-panel {
+    .od-sites--panel {
       border-top: 1px solid var(--od-separator);
       /* On a phone, the first group sits under the map without the count line. */
       padding-top: 12px;
@@ -834,7 +834,7 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
       padding-bottom: 88px;
     }
 
-    .count {
+    .od-sites--count {
       margin: 0;
       padding: 16px 24px 4px 16px;
       font-size: 14px;
@@ -844,7 +844,7 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
 
     /* White surfaces, 20 dp corners, 16 dp side margins, 12 dp apart, light
        dividers between the rows (task 2026-11-07-24). */
-    .surface {
+    .od-sites--surface {
       margin: 0 16px 12px;
       border-radius: 20px;
       overflow: hidden;
@@ -860,7 +860,7 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
     }
 
     /* Maintenance rows: 48 dp, 14/20 ink, 24 dp chevron. */
-    .links {
+    .od-sites--links {
       .item-content,
       .item-inner {
         min-height: 48px;
@@ -881,14 +881,14 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
 
     /* Site rows: 72 dp, name 16/24, supporting 14/20, trailing depth 16/24
        medium ink, no chevron. */
-    .od-sites-list {
+    .od-sites--list {
       .item-inner {
         min-height: 72px;
         padding: 8px 20px 8px 0;
         gap: 16px;
       }
 
-      .text {
+      .od-sites--text {
         flex: 1;
         min-width: 0;
         display: flex;
@@ -910,7 +910,7 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
         color: var(--od-text-2);
       }
 
-      .depth {
+      .od-sites--depth {
         flex: none;
         font-size: 16px;
         line-height: 24px;

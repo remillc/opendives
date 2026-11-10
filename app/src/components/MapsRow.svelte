@@ -23,17 +23,17 @@
   };
 </script>
 
-<div class="maps-row">
-  <span class="icon-box" aria-hidden="true">
+<div class="od-maps-row">
+  <span class="od-maps-row--icon-box" aria-hidden="true">
     <svg width="24" height="24" viewBox="0 0 24 24"><path d={paths[icon]} /></svg>
   </span>
-  <span class="body">{@render body()}</span>
+  <span class="od-maps-row--body">{@render body()}</span>
   {#if trailing}{@render trailing()}{/if}
 </div>
 
 <style>
   @layer od.components {
-    .maps-row {
+    .od-maps-row {
       box-sizing: border-box;
       min-height: 72px;
       padding: 12px 24px 12px 16px;
@@ -43,19 +43,19 @@
       color: var(--od-text);
     }
 
-    :global(.maps-surface > [role='listitem'] + [role='listitem']) .maps-row {
+    :global(.od-maps-row--surface > [role='listitem'] + [role='listitem']) .od-maps-row {
       border-top: 1px solid var(--od-separator);
     }
 
     /* The rounded surface of a group of rows, and the title above it (shared by the maps screens). */
-    :global(.maps-surface) {
+    :global(.od-maps-row--surface) {
       margin: 0 16px;
       border-radius: 20px;
       background: var(--od-surface);
       overflow: hidden;
     }
 
-    :global(.maps-title) {
+    :global(.od-maps-row--maps-title) {
       margin: 0;
       padding: 20px 20px 8px;
       font-size: 18px;
@@ -64,14 +64,14 @@
       color: var(--od-text);
     }
 
-    :global(.maps-note) {
+    :global(.od-maps-row--maps-note) {
       margin: 8px 20px 0;
       font-size: 13px;
       line-height: 18px;
       color: var(--od-text-2);
     }
 
-    .icon-box {
+    .od-maps-row--icon-box {
       flex: none;
       width: 40px;
       height: 40px;
@@ -91,7 +91,7 @@
       }
     }
 
-    .body {
+    .od-maps-row--body {
       flex: 1;
       min-width: 0;
       display: flex;
@@ -102,20 +102,20 @@
     }
 
     /* The lines the screens put in the body. */
-    .body :global(.supporting) {
+    .od-maps-row--body :global(.od-maps-row--supporting) {
       font-size: 14px;
       line-height: 20px;
       color: var(--od-text-2);
       font-variant-numeric: tabular-nums;
     }
 
-    .body :global(.note) {
+    .od-maps-row--body :global(.od-maps-row--note) {
       font-size: 13px;
       line-height: 18px;
       color: var(--od-text-2);
     }
 
-    .body :global(.status) {
+    .od-maps-row--body :global(.od-maps-row--status) {
       margin-top: 4px;
       display: flex;
       align-items: center;
@@ -126,7 +126,7 @@
       color: var(--od-secondary);
     }
 
-    .body :global(.status svg) {
+    .od-maps-row--body :global(.od-maps-row--status svg) {
       flex: none;
       fill: none;
       stroke: currentColor;
@@ -135,16 +135,16 @@
       stroke-linejoin: round;
     }
 
-    .body :global(.status.error) {
+    .od-maps-row--body :global(.od-maps-row--status.od-maps-row--error) {
       color: var(--od-error);
     }
 
-    .body :global(.status.muted) {
+    .od-maps-row--body :global(.od-maps-row--status.od-maps-row--muted) {
       font-weight: 500;
       color: var(--od-text-2);
     }
 
-    .body :global(.progress) {
+    .od-maps-row--body :global(.od-maps-row--progress) {
       margin-top: 8px;
       height: 4px;
       border-radius: 2px;
@@ -152,7 +152,7 @@
       overflow: hidden;
     }
 
-    .body :global(.progress > span) {
+    .od-maps-row--body :global(.od-maps-row--progress > span) {
       display: block;
       height: 100%;
       border-radius: 2px;
@@ -160,14 +160,14 @@
     }
 
     /* Text buttons under the texts: Framework7 stretches buttons, these keep their width. */
-    .body :global(.actions) {
+    .od-maps-row--body :global(.od-maps-row--actions) {
       margin: 4px 0 -8px -12px;
       display: flex;
       flex-wrap: wrap;
       gap: 0;
     }
 
-    .body :global(.actions button) {
+    .od-maps-row--body :global(.od-maps-row--actions button) {
       width: auto;
       flex: none;
       height: 40px;
@@ -184,7 +184,7 @@
     }
 
     /* A 48 dp icon button at the end of the row (the ⋮ menu, the download icon, ✕). */
-    :global(.maps-icon-button) {
+    :global(.od-maps-row--icon-button) {
       flex: none;
       width: 48px;
       height: 48px;

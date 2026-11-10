@@ -80,15 +80,15 @@
   }
 </script>
 
-<div class="field" class:focused class:floated class:menu-open={proposals.length || isNew}>
+<div class="od-chips-field od-chips-field--field" class:od-chips-field--focused={focused} class:od-chips-field--floated={floated} class:od-chips-field--menu-open={proposals.length || isNew}>
   <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
-  <div class="box" onclick={() => input?.focus()}>
-    <label class="label" for={id}>{label}</label>
-    <div class="chips">
+  <div class="od-chips-field--box" onclick={() => input?.focus()}>
+    <label class="od-chips-field--label" for={id}>{label}</label>
+    <div class="od-chips-field--chips">
       {#each values as value, i (value)}
-        <span class="chip">
+        <span class="chip od-chips-field--chip">
           {value}
-          <button type="button" class="remove" onclick={(e) => { e.stopPropagation(); remove(i); }}>
+          <button type="button" class="od-chips-field--remove" onclick={(e) => { e.stopPropagation(); remove(i); }}>
             <Icon name="close" size={18} weight={2} />
             <span class="od-sr-only">{t('chips.remove', { value })}</span>
           </button>
@@ -109,38 +109,38 @@
     </div>
   </div>
   {#if proposals.length || isNew}
-    <ul class="proposals" role="listbox" aria-label={label}>
+    <ul class="od-chips-field--proposals" role="listbox" aria-label={label}>
       {#each proposals as p (p)}
         <li><button type="button" onmousedown={(e) => e.preventDefault()} onclick={() => add(p)}>{p}</button></li>
       {/each}
       {#if isNew}
-        <li><button type="button" class="new" onmousedown={(e) => e.preventDefault()} onclick={() => add(typed)}>{t('chips.add', { value: typed.trim() })}</button></li>
+        <li><button type="button" class="od-chips-field--new" onmousedown={(e) => e.preventDefault()} onclick={() => add(typed)}>{t('chips.add', { value: typed.trim() })}</button></li>
       {/if}
     </ul>
   {/if}
-  {#if supporting}<p class="supporting">{supporting}</p>{/if}
+  {#if supporting}<p class="od-chips-field--supporting">{supporting}</p>{/if}
 </div>
 
 <style>
   @layer od.components {
-    .field {
+    .od-chips-field--field {
       position: relative;
       margin: 18px var(--od-field-margin, 16px) 0;
 
       /* The open menu passes over what follows. */
-      &.menu-open {
+      &.od-chips-field--menu-open {
         z-index: 30;
       }
     }
 
     /* Framework7 gives each list its own stacking level: the list holding an
        open menu comes to the front, above the next cards. */
-    :global(:is(.list, .od-form-surface):has(.menu-open)) {
+    :global(:is(.list, .od-form-surface):has(.od-chips-field--menu-open)) {
       position: relative;
       z-index: 30;
     }
 
-    .box {
+    .od-chips-field--box {
       position: relative;
       min-height: 56px;
       padding: 8px 12px 8px 16px;
@@ -159,13 +159,13 @@
         background: var(--od-text-2);
       }
 
-      .focused &::after {
+      .od-chips-field--focused &::after {
         height: 2px;
         background: var(--od-primary-action);
       }
     }
 
-    .label {
+    .od-chips-field--label {
       display: block;
       font-size: 16px;
       line-height: 24px;
@@ -177,18 +177,18 @@
         line-height 150ms;
       pointer-events: none;
 
-      .floated & {
+      .od-chips-field--floated & {
         transform: none;
         font-size: 12px;
         line-height: 16px;
       }
 
-      .focused & {
+      .od-chips-field--focused & {
         color: var(--od-primary-action);
       }
     }
 
-    .chips {
+    .od-chips-field--chips {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
@@ -196,13 +196,13 @@
       padding: 4px 0 0;
 
       /* At rest and empty, the label sits on the input line. */
-      .field:not(.floated) & {
+      .od-chips-field--field:not(.od-chips-field--floated) & {
         margin-top: -24px;
       }
     }
 
     /* MD3 input chip: 32 dp, 8 dp corners, outlined, with a remove ×. */
-    .chip {
+    .od-chips-field--chip {
       height: 32px;
       padding: 0 4px 0 12px;
       box-sizing: border-box;
@@ -217,7 +217,7 @@
       color: var(--od-text);
     }
 
-    .remove {
+    .od-chips-field--remove {
       position: relative;
       width: 24px;
       height: 24px;
@@ -250,7 +250,7 @@
       font-size: 16px;
     }
 
-    .proposals {
+    .od-chips-field--proposals {
       position: absolute;
       left: 0;
       right: 0;
@@ -274,12 +274,12 @@
         text-align: start;
       }
 
-      .new {
+      .od-chips-field--new {
         color: var(--od-text-2);
       }
     }
 
-    .supporting {
+    .od-chips-field--supporting {
       margin: 4px 0 0;
       padding-left: 16px;
       font-size: 12px;

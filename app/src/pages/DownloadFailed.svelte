@@ -57,12 +57,12 @@
     {/snippet}
   </Navbar>
 
-  <div class="content">
+  <div class="od-download-failed--content">
     <h1>{computer ? t(`downloadFailed.${reason}.title`, { computer }) : t(`downloadFailed.${reason}.titleNoName`)}</h1>
-    <p class="text">{t(`downloadFailed.${reason}.text`)} {t('downloadFailed.nothingChanged')}</p>
+    <p class="od-download-failed--text">{t(`downloadFailed.${reason}.text`)} {t('downloadFailed.nothingChanged')}</p>
     {#if received}
-      <div class="received">
-        <p class="text">{t('downloadFailed.received', { n: received })}</p>
+      <div class="od-download-failed--received">
+        <p class="od-download-failed--text">{t('downloadFailed.received', { n: received })}</p>
         <button type="button" class="od-outlined-button" disabled={keeping} onclick={keep}>
           {t('download.keepReceived', { n: received })}
         </button>
@@ -71,22 +71,22 @@
     <h2>{t('downloadFailed.check')}</h2>
     <ol>
       {#each checks as c, i (c)}
-        <li><span class="number" aria-hidden="true">{i + 1}</span><span>{t(`downloadFailed.checks.${c}`)}</span></li>
+        <li><span class="od-download-failed--number" aria-hidden="true">{i + 1}</span><span>{t(`downloadFailed.checks.${c}`)}</span></li>
       {/each}
     </ol>
   </div>
 
   {#snippet fixedContent()}
-    <div class="actions">
+    <div class="od-download-failed--actions">
       <button type="button" class="od-text-button" onclick={() => again(false)}>{t('downloadFailed.otherComputer')}</button>
-      <button type="button" class="retry" onclick={() => again(true)}>{t('downloadFailed.retry')}</button>
+      <button type="button" class="od-download-failed--retry" onclick={() => again(true)}>{t('downloadFailed.retry')}</button>
     </div>
   {/snippet}
 </Page>
 
 <style>
   @layer od.components {
-    .content {
+    .od-download-failed--content {
       margin: 16px 24px 0;
     }
 
@@ -103,7 +103,7 @@
       }
     }
 
-    .text {
+    .od-download-failed--text {
       margin: 0;
       font-size: 16px;
       line-height: 24px;
@@ -148,7 +148,7 @@
       }
     }
 
-    .number {
+    .od-download-failed--number {
       flex: none;
       width: 24px;
       height: 24px;
@@ -162,7 +162,7 @@
       justify-content: center;
     }
 
-    .received {
+    .od-download-failed--received {
       margin-top: 16px;
       display: flex;
       flex-direction: column;
@@ -170,7 +170,7 @@
       gap: 12px;
     }
 
-    .actions {
+    .od-download-failed--actions {
       position: absolute;
       inset-inline: 24px;
       bottom: calc(32px + var(--f7-safe-area-bottom, 0px));
@@ -182,7 +182,7 @@
     }
 
     /* MD3 filled button; iOS large filled button. */
-    .retry {
+    .od-download-failed--retry {
       height: 40px;
       padding: 0 24px;
       border: none;

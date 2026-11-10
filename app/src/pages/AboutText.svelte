@@ -44,7 +44,7 @@
   }
 </script>
 
-<Page>
+<Page class="od-about-text">
   <Navbar title={which === 'notes' ? t('about.notes') : which === 'privacy' ? t('about.privacyPolicy') : t('about.licence')}>
     {#snippet left()}
       <Link back iconOnly>
@@ -55,7 +55,7 @@
   </Navbar>
 
   {#if which === 'notes'}
-    <div class="text">
+    <div class="od-about-text--text">
       <!-- The version of app/package.json, the one source of the version; its date from CHANGELOG.md. -->
       <h2>
         {__APP_RELEASE_DATE__
@@ -68,15 +68,15 @@
     </div>
   {:else if which === 'privacy'}
     <!-- The app's own file (public/privacy), not text from elsewhere. -->
-    <div class="text policy">{@html policy}</div>
+    <div class="od-about-text--text od-about-text--policy">{@html policy}</div>
   {:else}
-    <pre class="licence">{licence}</pre>
+    <pre class="od-about-text--licence">{licence}</pre>
   {/if}
 </Page>
 
 <style>
   @layer od.components {
-    .text {
+    .od-about-text--text {
       padding: 8px 24px 32px;
       font-size: 16px;
       line-height: 24px;
@@ -91,7 +91,7 @@
       }
     }
 
-    .policy {
+    .od-about-text--policy {
       :global(a[href]) {
         text-decoration: underline;
       }
@@ -116,13 +116,13 @@
         padding-left: 20px;
       }
 
-      :global(.updated) {
+      :global(.od-about-text--updated) {
         font-size: 14px;
         color: var(--od-text-2);
       }
     }
 
-    .licence {
+    .od-about-text--licence {
       margin: 0;
       padding: 16px 16px 40px;
       font-family: ui-monospace, monospace;

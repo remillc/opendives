@@ -45,15 +45,15 @@
 </script>
 
 {#snippet list(/** @type {import('opendives-core').CylinderType[]} */ items, /** @type {boolean} */ usage)}
-  <div class="surface" role="list">
+  <div class="od-cylinder-types--surface" role="list">
     {#each items as type (type.name)}
       <div role="listitem">
-        <button type="button" class="row" onclick={() => open(type.name)}>
-          <span class="texts">
-            <span class="label">{type.name}{#if usage && !type.dives}<span class="unused">{t('settings.cylinders.unused')}</span>{/if}</span>
-            {#if usage}<span class="supporting">{inDives(type.dives)}</span>{/if}
+        <button type="button" class="od-cylinder-types--row" onclick={() => open(type.name)}>
+          <span class="od-cylinder-types--texts">
+            <span class="od-cylinder-types--label">{type.name}{#if usage && !type.dives}<span class="od-cylinder-types--unused">{t('settings.cylinders.unused')}</span>{/if}</span>
+            {#if usage}<span class="od-cylinder-types--supporting">{inDives(type.dives)}</span>{/if}
           </span>
-          <span class="value">{size(type)}</span>
+          <span class="od-cylinder-types--value">{size(type)}</span>
         </button>
       </div>
     {/each}
@@ -70,21 +70,21 @@
     {/snippet}
   </Navbar>
 
-  <p class="intro">{t('settings.cylinders.intro')}</p>
+  <p class="od-cylinder-types--intro">{t('settings.cylinders.intro')}</p>
 
   {#if yours.length}
-    <h2 class="title">{t('settings.cylinders.yours')}</h2>
+    <h2 class="od-cylinder-types--title">{t('settings.cylinders.yours')}</h2>
     {@render list(yours, true)}
   {/if}
 
-  <h2 class="title">{t('settings.cylinders.standard')}</h2>
+  <h2 class="od-cylinder-types--title">{t('settings.cylinders.standard')}</h2>
   {#if standard.length}
     {@render list(standard, false)}
-    <p class="note">{t('settings.cylinders.standardNote')}</p>
+    <p class="od-cylinder-types--note">{t('settings.cylinders.standardNote')}</p>
   {:else}
-    <p class="note">{t('settings.cylinders.hidden')}</p>
+    <p class="od-cylinder-types--note">{t('settings.cylinders.hidden')}</p>
   {/if}
-  <div class="bottom"></div>
+  <div class="od-cylinder-types--bottom"></div>
 
   {#snippet fixedContent()}
     <!-- Extended floating button, written by hand as in the Logbook. -->
@@ -99,14 +99,14 @@
 
 <style>
   @layer od.components {
-    .intro {
+    .od-cylinder-types--intro {
       margin: 8px 20px 0;
       font-size: 14px;
       line-height: 20px;
       color: var(--od-text-2);
     }
 
-    .title {
+    .od-cylinder-types--title {
       margin: 0;
       padding: 22px 20px 8px;
       font-size: 18px;
@@ -114,14 +114,14 @@
       font-weight: 700;
     }
 
-    .surface {
+    .od-cylinder-types--surface {
       margin: 0 16px;
       border-radius: 20px;
       background: var(--od-surface);
       overflow: hidden;
     }
 
-    .row {
+    .od-cylinder-types--row {
       box-sizing: border-box;
       width: 100%;
       min-height: 56px;
@@ -137,25 +137,25 @@
       cursor: pointer;
     }
 
-    .texts {
+    .od-cylinder-types--texts {
       flex: 1;
       min-width: 0;
       display: flex;
       flex-direction: column;
     }
 
-    .label {
+    .od-cylinder-types--label {
       font-size: 16px;
     }
 
-    .supporting {
+    .od-cylinder-types--supporting {
       font-size: 13px;
       line-height: 18px;
       color: var(--od-text-2);
     }
 
     /* An outlined label after the name of a type no dive uses. */
-    .unused {
+    .od-cylinder-types--unused {
       margin-inline-start: 8px;
       padding: 0 6px;
       border: 1px solid var(--od-text-2);
@@ -165,14 +165,14 @@
       color: var(--od-text-2);
     }
 
-    .value {
+    .od-cylinder-types--value {
       flex: none;
       font-size: 14px;
       color: var(--od-text-2);
       font-variant-numeric: tabular-nums;
     }
 
-    .note {
+    .od-cylinder-types--note {
       margin: 10px 20px 0;
       font-size: 13px;
       line-height: 18px;
@@ -180,7 +180,7 @@
     }
 
     /* The floating button must not hide the last row. */
-    .bottom {
+    .od-cylinder-types--bottom {
       height: 96px;
     }
   }
