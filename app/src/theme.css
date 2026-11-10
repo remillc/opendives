@@ -1054,7 +1054,9 @@ html.ios {
     }
 
     .toast-text {
-      padding: 6px 0;
+      /* A margin, not a padding: a clamped box shows its third line in its padding. */
+      margin: 6px 0;
+      padding: 0;
       font-size: 14px;
       line-height: 20px;
       /* Up to two lines. */

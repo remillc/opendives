@@ -21,7 +21,7 @@ import { snackbarClasses, snackbarTimeout } from './snackbar-logic.js';
  * @param {SnackbarOptions} [options]
  */
 export function showSnackbar(text, { action, onAction, onClosed, timeout, undoable } = {}) {
-  const hasFab = typeof document !== 'undefined' && !!document.querySelector('.page-current .fab');
+  const hasFab = typeof document !== 'undefined' && !!document.querySelector('.view.tab-active .page-current .fab');
   /** @type {Record<string, () => void>} */
   const on = {};
   if (action && onAction) on.closeButtonClick = onAction;
