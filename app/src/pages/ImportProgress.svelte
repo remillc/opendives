@@ -15,7 +15,7 @@
   import { onDestroy } from 'svelte';
   import { f7 } from 'framework7-svelte';
   import { OpenDivesCore } from 'opendives-core';
-  import AccountStep from '../components/AccountStep.svelte';
+  import EditorialPage from '../components/EditorialPage.svelte';
   import Icon from '../components/Icon.svelte';
   import { errorCode, finishAccount, showFailure } from '../lib/account.js';
   import { t } from '../lib/i18n.js';
@@ -147,7 +147,7 @@
   run();
 </script>
 
-<AccountStep class="od-import-progress"
+<EditorialPage class="od-import-progress"
   title={t('createAccount.title')}
   step={t('createAccount.step2')}
   heading={phase === 'failed' ? t('importProgress.failedTitle') : t('importProgress.title')}
@@ -190,7 +190,7 @@
       </li>
     {/each}
   </ol>
-</AccountStep>
+</EditorialPage>
 
 <style>
   @layer od.components {

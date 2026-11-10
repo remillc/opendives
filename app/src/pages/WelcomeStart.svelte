@@ -7,6 +7,7 @@
   // iOS: an inset grouped list with chevrons.
   import { Page, theme } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
+  import DecorativeProfile from '../components/DecorativeProfile.svelte';
   import { startWithoutAccount } from '../lib/logbook.svelte.js';
   import { t } from '../lib/i18n.js';
 
@@ -25,11 +26,6 @@
   const line = 'M' + POINTS.map(([s, d]) => `${((s / 6240) * WIDTH).toFixed(1)} ${(40 + (d / 60.2) * 160).toFixed(1)}`).join(' L');
   // The water column lies between the surface and the profile line.
   const area = `${line} L${WIDTH} 0 L0 0 Z`;
-
-  // Android: the profile alone across the page, its water under the surface line.
-  const PROFILE_HEIGHT = 190;
-  const androidLine =
-    'M' + POINTS.map(([s, d]) => `${((s / 6240) * WIDTH).toFixed(1)} ${(8 + (d / 60.2) * 174).toFixed(1)}`).join(' L');
 
   /** @param {MouseEvent} e @param {string} url */
   function go(e, url) {
@@ -52,16 +48,7 @@
         <span>OpenDives</span>
       </div>
       <h1 class="od-welcome-start--headline">{t('welcome.headline')}</h1>
-      <svg class="od-welcome-start--wide-profile" viewBox="0 0 {WIDTH} {PROFILE_HEIGHT}" preserveAspectRatio="none" aria-hidden="true">
-        <defs>
-          <linearGradient id="od-welcome-start-water" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" class="od-welcome-start--water-top"></stop>
-            <stop offset="1" class="od-welcome-start--water-bottom"></stop>
-          </linearGradient>
-        </defs>
-        <path class="od-welcome-start--wide-water" d="{androidLine} Z"></path>
-        <path class="od-welcome-start--wide-line" d={androidLine}></path>
-      </svg>
+      <DecorativeProfile class="od-welcome-start--wide-profile" />
       <div class="od-welcome-start--space"></div>
       <nav class="od-welcome-start--buttons" aria-label={t('welcome.choicesLabel')}>
         <div class="od-welcome-start--option">
@@ -185,24 +172,9 @@
       white-space: pre-line;
     }
 
-    .od-welcome-start--wide-profile {
-      display: block;
-      width: 100%;
+    :global(.od-welcome-start--wide-profile) {
       height: 190px;
       margin-top: 28px;
-    }
-
-    .od-welcome-start--wide-water {
-      fill: url(#od-welcome-start-water);
-      opacity: 0.9;
-    }
-
-    .od-welcome-start--wide-line {
-      fill: none;
-      stroke: var(--od-text);
-      stroke-width: 1.5;
-      stroke-linejoin: round;
-      vector-effect: non-scaling-stroke;
     }
 
     .od-welcome-start--space {
@@ -275,7 +247,7 @@
         margin-top: 16px;
       }
 
-      .od-welcome-start--wide-profile {
+      :global(.od-welcome-start--wide-profile) {
         height: 56px;
         margin-top: 12px;
       }
