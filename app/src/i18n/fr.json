@@ -1335,7 +1335,10 @@
     "asOf": "Au {date}",
     "beforeFlying": "Avant de prendre l’avion",
     "noWait": "Aucune attente",
-    "waitOver": "Attente écoulée",
+    "canFly": "Vous pouvez prendre l’avion",
+    "waitOverAt": "Attente terminée {when}",
+    "surfacedAgo": "Sortie de l’eau il y a {time}",
+    "surfacedLong": "Sortie de l’eau {ago}",
     "lastDive": "Dernière plongée",
     "noRecentDive": "Plus de 48 h",
     "ago": "Il y a {time}",
@@ -1504,7 +1507,8 @@
       "Carnet : le mois affiché dans le bandeau est plus discret.",
       "Les boutons de navigation réagissent tout de suite au toucher.",
       "Les durées d’une heure ou plus suivent la langue : « 1 h 11 » en français, « 1:11 » en anglais.",
-      "Réglages : l’option de durée « Toujours en heures et minutes » est retirée."
+      "Réglages : l’option de durée « Toujours en heures et minutes » est retirée.",
+      "Désaturation : la dernière plongée du carnet, et « Vous pouvez prendre l’avion » quand l’attente est terminée."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",

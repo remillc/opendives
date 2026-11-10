@@ -9,7 +9,15 @@
   import { OpenDivesCore } from 'opendives-core';
   import Icon from '../components/Icon.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
-  import { formatDateTime, formatDepth, formatDuration, formatFullDate } from '../lib/format.js';
+  import {
+    formatDateTime,
+    formatDepth,
+    formatDuration,
+    formatFullDate,
+    formatLongDuration,
+    formatRelativeDateTime,
+    formatTimeAgo,
+  } from '../lib/format.js';
   import { flightWait, formatHoursMinutes } from '../lib/tools.js';
   import { t } from '../lib/i18n.js';
   import { ALARM_PERCENT, tissueColor as barColor } from '../lib/tissues.js';
@@ -34,6 +42,24 @@
   });
 
   const wait = $derived(desat ? flightWait(desat.dives, desat.now) : null);
+
+  /** The last dive of the logbook before now, used or not by the calculation. */
+  const lastDive = $derived.by(() => {
+    const now = desat?.now;
+    if (!now) return null;
+    let last = null;
+    for (const d of logbook.dives) if (d.date <= now && (!last || d.date > last.date)) last = d;
+    return last;
+  });
+
+  /** "Sortie de l'eau il y a 55 min"; in days, months or years after 48 hours. */
+  const surfaced = $derived.by(() => {
+    if (!desat || !lastDive) return '';
+    const end = Date.parse(`${lastDive.date}Z`) + lastDive.durationSeconds * 1000;
+    const seconds = Math.max(0, Math.round((Date.parse(`${desat.now}Z`) - end) / 1000));
+    if (seconds <= 48 * 3600) return t('desaturation.surfacedAgo', { time: formatLongDuration(seconds) });
+    return t('desaturation.surfacedLong', { ago: formatTimeAgo(new Date(end).toISOString().slice(0, 19)) });
+  });
 
   // Chart geometry, as in the mock-up: 16 bars under the limit line (100 %).
   const WIDTH = 326;
@@ -76,27 +102,52 @@
   {:else if desat}
     <p class="lead od-value">{t('desaturation.asOf', { date: formatFullDate(desat.now) })}</p>
 
-    <div class="tiles">
-      <div class="tile">
-        <span class="tile-label">{t('desaturation.beforeFlying')}</span>
-        <span class="tile-value od-value">
-          {#if !wait}{t('desaturation.noWait')}
-          {:else if wait.remainingSeconds === 0}{t('desaturation.waitOver')}
-          {:else}{formatHoursMinutes(wait.remainingSeconds)}{/if}
+    {#if wait && wait.remainingSeconds === 0}
+      <!-- The wait is over (docs/mockups/outils-desaturation-terminee-android.dc.html). -->
+      <div class="od-desat-over">
+        <span class="od-desat-over-icon"><Icon name="checkCircle" size={24} weight={2.2} /></span>
+        <span class="od-desat-over-text">
+          <span class="od-desat-over-title">{t('desaturation.canFly')}</span>
+          <span class="od-desat-over-when od-value">{t('desaturation.waitOverAt', { when: formatRelativeDateTime(wait.endsAt, desat.now, false) })}</span>
         </span>
       </div>
-      <div class="tile">
-        <span class="tile-label">{t('desaturation.lastDive')}</span>
-        <span class="tile-value od-value">
-          {desat.surfaceSeconds < 0 ? t('desaturation.noRecentDive') : t('desaturation.ago', { time: formatHoursMinutes(desat.surfaceSeconds) })}
-        </span>
+    {:else}
+      <div class="tiles">
+        <div class="tile">
+          <span class="tile-label">{t('desaturation.beforeFlying')}</span>
+          <span class="tile-value od-value">
+            {#if !wait}{t('desaturation.noWait')}{:else}{formatHoursMinutes(wait.remainingSeconds)}{/if}
+          </span>
+        </div>
+        <div class="tile">
+          <span class="tile-label">{t('desaturation.lastDive')}</span>
+          <span class="tile-value od-value">
+            {desat.surfaceSeconds < 0 ? t('desaturation.noRecentDive') : t('desaturation.ago', { time: formatHoursMinutes(desat.surfaceSeconds) })}
+          </span>
+        </div>
       </div>
-    </div>
+    {/if}
     <p class="caption">
       {wait
         ? t(wait.several ? 'desaturation.ruleSeveral' : 'desaturation.ruleSingle', { hours: wait.hours })
         : t('desaturation.atRest')}
     </p>
+
+    {#if lastDive}
+      <h2 class="section">{t('desaturation.lastDive')}</h2>
+      <div class="od-desat-last-card">
+        <a href="/dives/{lastDive.id}" class="od-desat-last ripple">
+          <span class="od-desat-last-text">
+            <span class="od-desat-last-date od-value">{formatRelativeDateTime(lastDive.date, desat.now)}</span>
+            <span class="od-desat-last-line">
+              {lastDive.site || t('dive.siteNotSet')} · {formatDepth(lastDive.maxDepthMm, logbook.prefs)} · {formatDuration(lastDive.durationSeconds)}
+            </span>
+            <span class="od-desat-last-line od-value">{surfaced}</span>
+          </span>
+          <span class="od-desat-last-chevron"><Icon name="chevron" size={20} /></span>
+        </a>
+      </div>
+    {/if}
 
     <h2 class="section">{t('desaturation.tissues')}</h2>
     <div class="card chart">
@@ -166,6 +217,84 @@
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 12px;
+    }
+
+    .od-desat-over {
+      margin: 8px 16px 0;
+      padding: 16px;
+      border-radius: 12px;
+      background: var(--od-surface);
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .od-desat-over-icon {
+      flex: none;
+      display: flex;
+      color: var(--od-text);
+    }
+
+    .od-desat-over-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .od-desat-over-title {
+      font-size: 22px;
+      line-height: 28px;
+    }
+
+    .od-desat-over-when {
+      font-size: 14px;
+      line-height: 20px;
+      color: var(--od-text-2);
+    }
+
+    .od-desat-last-card {
+      margin: 0 16px;
+      border-radius: 16px;
+      background: var(--od-surface);
+      overflow: hidden;
+    }
+
+    .od-desat-last {
+      position: relative;
+      overflow: hidden;
+      min-height: 72px;
+      padding: 8px 20px 8px 16px;
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--od-text);
+      text-decoration: none;
+    }
+
+    .od-desat-last-text {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .od-desat-last-date {
+      font-size: 16px;
+      line-height: 24px;
+    }
+
+    .od-desat-last-line {
+      font-size: 14px;
+      line-height: 20px;
+      color: var(--od-text-2);
+    }
+
+    .od-desat-last-chevron {
+      flex: none;
+      display: flex;
+      color: var(--od-text-2);
     }
 
     .tile {

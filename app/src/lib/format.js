@@ -364,6 +364,22 @@ export function formatTimeAgo(iso) {
 }
 
 /**
+ * Date and time with relative days: "Aujourd'hui, 13:40", "Hier, 13:40"; older
+ * dates as usual.
+ * @param {string} iso
+ * @param {string} [now]
+ * @param {boolean} [capital] false in the middle of a sentence
+ */
+export function formatRelativeDateTime(iso, now = localNowIso(), capital = true) {
+  const DAY = 86400000;
+  const days = Math.floor(toDate(now).getTime() / DAY) - Math.floor(toDate(iso).getTime() / DAY);
+  if (days !== 0 && days !== 1) return formatDateTime(iso);
+  const day = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' }).format(-days, 'day');
+  const text = capital ? day.charAt(0).toLocaleUpperCase(locale) + day.slice(1) : day;
+  return `${text}, ${formatTimeChoice(toDate(iso), settings.timeFormat)}`;
+}
+
+/**
  * A range of days, e.g. "2–4 février 2013" (device format, Intl.formatRange);
  * a single day when both are the same.
  * @param {string} isoStart
