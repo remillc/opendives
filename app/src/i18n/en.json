@@ -1419,8 +1419,10 @@
       "Offline maps: choose an area on the map from Settings to download it (a frame of at most about 3,000 tiles); a space limit and a free-space floor protect the device, and updates are offered with a badge.",
       "Privacy: the policy mentions searching for places on the map.",
       "Offline maps: a search field on \"Choose on the map\" finds a site of your logbook as you type, or a place when you press search, and puts the rectangle around it.",
-      "Settings: the water type written on downloaded dives that have none can be chosen (Not specified by default).",
       "Offline maps: frame an area on the map from Settings to download it; a space limit and a free-space floor protect the device, and updates are offered with a badge.",
+      "Logbook: while scrolling, the current month shows at the top under the bar.",
+      "Settings: the water type written on downloaded dives that have none can be chosen (Not specified by default).",
+      "Offline maps: download regions (dive areas, countries or a rectangle of your choice) from Settings; a space limit and a free-space floor protect the device, and updates are offered with a badge.",
       "Sites: without a network, the map reads the downloaded regions, else a simplified world map; an \"Offline\" pill says so and a message offers to download the area.",
       "Desaturation: the text under the chart is shorter.",
       "Settings: the app language can be Français (Canada), which says \"nuage\" and \"courriel\"; a phone set to French (Canada) picks it by itself.",
@@ -2317,11 +2319,11 @@
       "text": "Your maps take {used}. OpenDives also always keeps at least {floor} free on the device."
     },
     "region": {
+      "sizeDate": "{size} · {date}",
       "updateAvailable": "Update available",
       "update": "Update",
       "options": "Options for {name}",
-      "swipeHint": "Swipe a region to the left to delete it.",
-      "sizeDate": "{size} · {date}"
+      "swipeHint": "Swipe a region to the left to delete it."
     },
     "menu": {
       "update": "Update",
@@ -2395,6 +2397,7 @@
       "nameHelp": "Suggested from the nearest site",
       "around": "Around {site}",
       "aroundHere": "Chosen area",
+      "estimate": "about {size} to download (estimate)",
       "needNetwork": "Choosing on the map needs the network.",
       "download": "Download",
       "unavailable": "The map server could not be reached. Try again with a network.",
@@ -2413,8 +2416,7 @@
         "error": "Search is not possible right now. Try again.",
         "attribution": "Places: data © OpenStreetMap contributors, via Nominatim"
       },
-      "mapLabel": "Map under a fixed frame. Move and zoom the map to choose the area to download.",
-      "estimate": "about {size} to download (estimate)"
+      "mapLabel": "Map under a fixed frame. Move and zoom the map to choose the area to download."
     }
   }
 }

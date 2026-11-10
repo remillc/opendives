@@ -11,6 +11,7 @@
   import SyncPill from '../components/SyncPill.svelte';
   import DiveRow from '../components/DiveRow.svelte';
   import TripRow from '../components/TripRow.svelte';
+  import BandBackdrop from '../components/BandBackdrop.svelte';
   import Icon from '../components/Icon.svelte';
   import MenuItem from '../components/MenuItem.svelte';
   import MenuButton from '../components/MenuButton.svelte';
@@ -27,6 +28,7 @@
   import { navigation } from '../lib/navigation.svelte.js';
   import { formatDateTime, formatLongDate, formatTimeAgo, localNowIso } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
+  import { groupByMonth, stickyMonth } from '../lib/carnet-months.js';
   import { mark } from '../lib/perf.js';
   import { buildSnapshot, saveSnapshot } from '../lib/snapshot.js';
   import { offerUndo } from '../lib/undo.js';
@@ -41,8 +43,8 @@
   /**
    * A row of the virtual list. `kind` groups rows of the same layout, hence of
    * the same probable height.
-   * @typedef {{ kind: 'dive'|'inTrip', key: string, index: number, dive: Dive, tripFirst?: boolean, tripLast?: boolean }
-   *   | { kind: 'trip', key: string, index: number, id: number, location: string, dives: Dive[] }} Row
+   * @typedef {{ kind: 'dive'|'inTrip', key: string, index: number, month: string, dive: Dive, tripFirst?: boolean, tripLast?: boolean }
+   *   | { kind: 'trip', key: string, index: number, month: string, id: number, location: string, dives: Dive[] }} Row
    */
 
   /** @type {{ f7router: any }} */
@@ -732,28 +734,10 @@
     });
   });
 
-  /** Dives outside trips and trips, from the most recent to the oldest. */
-  const entries = $derived.by(() => {
-    /** @type {Entry[]} */
-    const list = [];
-    /** @type {Map<number, Extract<Entry, {type: 'trip'}>>} */
-    const trips = new Map();
-    for (const dive of sorted) {
-      if (!dive.trip) {
-        list.push({ type: 'dive', key: `d${dive.id}`, dive });
-        continue;
-      }
-      let trip = trips.get(dive.trip.id);
-      if (!trip) {
-        trip = { type: 'trip', key: `t${dive.trip.id}`, location: dive.trip.location, dives: [] };
-        trips.set(dive.trip.id, trip);
-        list.push(trip);
-      }
-      trip.dives.push(dive);
-    }
-    // A trip of one dive (automatic grouping makes many) is drawn as that dive.
-    return list.map((e) => (e.type === 'trip' && e.dives.length === 1 ? { type: /** @type {const} */ ('dive'), key: `d${e.dives[0].id}`, dive: e.dives[0] } : e));
-  });
+  /** The dives by month, newest first; a trip is one group under the month of its first dive. */
+  const groups = $derived(groupByMonth(sorted));
+  /** Dives outside trips and trips, month after month. */
+  const entries = $derived(groups.flatMap((g) => g.entries));
 
   // Tablet: with nothing in the detail pane, the first dive of the list. Not
   // over another screen shown there (a trip, the filter).
@@ -809,26 +793,27 @@
         formatDateTime(d.date).toLocaleLowerCase().includes(q),
     );
   });
+  /** The months of the list on screen; the search results are flat, without trip rows. */
+  const monthGroups = $derived(results ? groupByMonth(results, true) : groups);
 
   /** Rows shown: the search results, or the dives and trips with the expanded trips' dives. */
   const rows = $derived.by(() => {
     /** @type {Row[]} */
     const list = [];
-    if (results) {
-      for (const dive of results) list.push({ kind: 'dive', key: `d${dive.id}`, index: list.length, dive });
-      return list;
-    }
-    for (const entry of entries) {
-      if (entry.type === 'dive') {
-        list.push({ kind: 'dive', key: entry.key, index: list.length, dive: entry.dive });
-        continue;
-      }
-      const id = entry.dives[0].trip?.id ?? 0;
-      list.push({ kind: 'trip', key: entry.key, index: list.length, id, location: entry.location, dives: entry.dives });
-      if (expanded[id]) {
-        entry.dives.forEach((dive, i) =>
-          list.push({ kind: 'inTrip', key: `d${dive.id}`, index: list.length, dive, tripFirst: i === 0, tripLast: i === entry.dives.length - 1 }),
-        );
+    for (const group of monthGroups) {
+      const month = group.key;
+      for (const entry of group.entries) {
+        if (entry.type === 'dive') {
+          list.push({ kind: 'dive', key: entry.key, index: list.length, month, dive: entry.dive });
+          continue;
+        }
+        const id = entry.dives[0].trip?.id ?? 0;
+        list.push({ kind: 'trip', key: entry.key, index: list.length, month, id, location: entry.location, dives: entry.dives });
+        if (expanded[id]) {
+          entry.dives.forEach((dive, i) =>
+            list.push({ kind: 'inTrip', key: `d${dive.id}`, index: list.length, month, dive, tripFirst: i === 0, tripLast: i === entry.dives.length - 1 }),
+          );
+        }
       }
     }
     return list;
@@ -886,7 +871,57 @@
       changed = true;
     }
     if (changed) vl.update();
+    scheduleSticky();
   }
+
+  // --- The month at the top of the list, shown under the top bar only: the
+  // list has no month rows. The header is a single element outside the
+  // scrolling area (<BandBackdrop>). On each frame of a scroll, the rows in the
+  // document (about twenty) are read to find the month at the top: no reflow
+  // of the list, the cost does not grow with the size of the logbook.
+
+  /** Height of the collapsed band (px), as in <BandBackdrop>. */
+  const STICKY_HEIGHT = 64;
+  /** The month shown under the top bar, null while the band is fully visible. */
+  let sticky = $state(/** @type {string|null} */ (null));
+  let stickyFrame = 0;
+  const stickyGroup = $derived(sticky ? monthGroups.find((g) => g.key === sticky) : undefined);
+
+  function scheduleSticky() {
+    if (!stickyFrame) stickyFrame = requestAnimationFrame(updateSticky);
+  }
+
+  function updateSticky() {
+    stickyFrame = 0;
+    if (theme.ios || !vl || !listEl) return;
+    const bar = listEl.closest('.page')?.querySelector('.navbar');
+    if (!bar) return;
+    const edge = bar.getBoundingClientRect().bottom;
+    /** @type {{ month: string, top: number, bottom: number }[]} */
+    const seen = [];
+    for (const li of listEl.querySelectorAll('ul > li[data-virtual-list-index]')) {
+      const row = /** @type {Row|undefined} */ (vl.items[Number(li.getAttribute('data-virtual-list-index'))]);
+      if (!row) continue;
+      const rect = li.getBoundingClientRect();
+      seen.push({ month: row.month, top: rect.top, bottom: rect.bottom });
+    }
+    // Rows not drawn yet after a fast scroll: the header stays as it was.
+    if (!seen.some((r) => r.bottom > edge)) return;
+    const month = stickyMonth(seen, edge, STICKY_HEIGHT);
+    if (month !== sticky) sticky = month;
+  }
+
+  $effect(() => {
+    const content = listEl?.closest('.page-content');
+    if (!content) return;
+    content.addEventListener('scroll', scheduleSticky, { passive: true });
+    scheduleSticky();
+    return () => {
+      content.removeEventListener('scroll', scheduleSticky);
+      cancelAnimationFrame(stickyFrame);
+      stickyFrame = 0;
+    };
+  });
 
   function forgetHeights() {
     measured.clear();
@@ -1064,7 +1099,8 @@
     </NavRight>
   </Navbar>
 
-  <SectionBand tall pill={showPill} summary={bandSummary}>
+  {#if !theme.ios}<BandBackdrop pill={showPill} group={stickyGroup} />{/if}
+  <SectionBand tall pill={showPill} bare={!theme.ios} summary={bandSummary}>
     {#if showPill}
       {#if conflictWaits}
         <SyncPill icon="sync" text={stoppedText} onclick={reopenConflict} />

@@ -1053,7 +1053,9 @@ Christian approved. Spec: "Default water type for downloaded dives". Mock-ups: `
 - Row in Settings › Carnet after "Choisir le type d’eau dans l’éditeur", with supporting text and current value; the choice dialog has the intro sentence from the spec. fr and en keys.
 - The planner's "Type d’eau" in "Conditions par défaut" is unchanged.
 
-## [ ] 2026-11-09-36 Carnet: month headers that stay on top (to-do #25), on a branch kept for review
+## [x] 2026-11-09-36 Carnet: month headers that stay on top (to-do #25), on a branch kept for review
+
+Done in Carnet: month under the top bar, one band and one wave (kept after review; no month rows in the list, at Christian's request)
 
 Christian wants to try this before deciding. **Work on the branch `feature/carnet-month-headers`, push it, and do not merge it into main and do not delete it, even when done: Christian will review it and decide whether to keep it.** Say in your reply which commit to test.
 
