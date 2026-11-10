@@ -106,7 +106,7 @@ All text pairs reach 4.5:1 and all graphic marks 3:1 (ratios in the reference). 
 | Measurement | Displayed precision |
 | --- | --- |
 | Depth | 1 decimal in metres, whole number in feet |
-| Dive duration | whole minutes; min:s in the profile |
+| Dive duration | whole minutes; from one hour, hours and minutes in the format of the display language, defined per language in the translation files ("1 h 11" in French, "1:11" in English); min:s in the profile (decided on 10 November 2026) |
 | Pressure | whole number |
 | Temperature | 1 decimal |
 | Volume, SAC | 1 decimal |
@@ -244,7 +244,7 @@ Layout: titles sit on the page background, 18 px bold; each group is a white sur
 | Unit system | segmented | Metric, Imperial, Personalised (set when one unit is changed) | `unit_system` |
 | Depth, pressure, volume, temperature, weight | choice | m / ft; bar / psi; L / cuft; °C / °F; kg / lb | `units` |
 | Vitesses de remontée et de descente | choice | per minute, per second | `units.vertical_speed_time` |
-| Durée | choice | automatic (mm under one hour, else h:mm), always h:mm, always mm | `units.duration_units` |
+| Durée | choice | automatic (mm under one hour, else hours and minutes in the format of the display language), always mm | `units.duration_units` |
 | Coordonnées GPS | choice | decimal (-35.4485, default, unlike the core), degrees and decimal minutes (35° 26.9′ S), degrees, minutes and seconds (35° 26′ 54.6″ S) | `coordinates_traditional` covers only seconds (true) and decimal (false) in `printGPSCoords`: OpenDives formats coordinates itself, in all three forms |
 | Regrouper les plongées en voyages | switch, no helper | on | logbook `autogroup` |
 | Afficher les plongées invalides | switch | off | `display_invalid_dives` |
