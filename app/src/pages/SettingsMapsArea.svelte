@@ -157,7 +157,11 @@
     busy = true;
     try {
       const label = name.trim() || proposal(bbox);
-      if (await addRegion(label, normalizeBbox(bbox), maxZoom)) f7router.back('/settings/maps/', { force: true });
+      if (await addRegion(label, normalizeBbox(bbox), maxZoom)) {
+        // This screen also opens from the Sites map, without the list behind it.
+        if (f7router.history[f7router.history.length - 2] === '/settings/maps/') f7router.back();
+        else f7router.navigate('/settings/maps/', { reloadCurrent: true });
+      }
     } finally {
       busy = false;
     }

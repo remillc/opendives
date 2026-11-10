@@ -549,7 +549,9 @@ function applyDownload(d) {
       r.sizeBytes = d.bytesReceived;
       r.status = 'ready';
       r.transfer = undefined;
-      r.downloadedAt = new Date().toISOString();
+      // Local time without a zone, the form of the app's other dates.
+      const now = new Date();
+      r.downloadedAt = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 19);
       r.error = '';
       r.pausedReason = '';
       refreshSpace();
