@@ -1255,3 +1255,11 @@ Spec: UI specification, section 4, "First launch, redesigned" (new). Mock-up: `d
 - Android only; iPhone unchanged for now. Check it on a landscape tablet: all choices visible without scrolling (to-do #31).
 - A line in the release notes.
 
+## [ ] 2026-11-10-19 Token help page: tabs per host
+
+Spec: UI specification, section 4, item "Help page \"Comment créer un jeton d'accès\"", paragraph "Tabs" (new). Mock-up: `docs/mockups/git-jeton-aide-android.dc.html` (updated). Page: `app/src/pages/TokenHelp.svelte`.
+- Replace the page menu (outlined buttons) and the per-host block titles by fixed Material 3 primary tabs under the top bar: GitHub, GitLab, Codeberg, equal widths, 48 dp, indicator under the active label.
+- The page then shows the introduction, the card of the selected host only (note, steps, links), and the closing sentence. GitHub is selected on opening. Swiping sideways changes tab.
+- Accessibility: `role="tablist"`, `role="tab"` with `aria-selected`, the card as `role="tabpanel"` labelled by its tab.
+- Remove `tokenHelp.menu` if it is no longer used. A line in the release notes.
+
