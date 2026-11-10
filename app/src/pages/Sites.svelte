@@ -321,10 +321,6 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
     <div class="od-sites--map">
       <!-- 5:4 landscape, full width (task 2026-11-07-24). -->
       <SiteMap bind:this={siteMap} sites={located} onselect={open} {onview} {height} {matching} />
-      <!-- Tablet: no header band, the pill sits on the map. -->
-      {#if !layout.phone && !connection.online}
-        <p class="od-sites--offline-chip od-sites--over-map" role="status"><Icon name="offline" size={16} weight={2} />{t('sites.offline')}</p>
-      {/if}
       <button type="button" class="od-sites--locate" onclick={centreOnDevice}>
         <Icon name="locate" size={20} />
         <span class="od-sr-only">{t('sites.centreOnMe')}</span>
@@ -333,11 +329,21 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
   {/if}
 {/snippet}
 
+{#snippet band(/** @type {boolean} */ overMap)}
+  <SectionBand
+    {overMap}
+    chip={!connection.online}
+    summaryKey={searching}
+    summary={searchCount || (used.length ? [t('band.sites', { n: used.length }), t('band.dives', { n: diveCount })].join(' · ') : '')}
+  >
+    {#if !connection.online}
+      <p class="od-sites--offline-chip" role="status"><Icon name="offline" size={16} weight={2} />{t('sites.offline')}</p>
+    {/if}
+  </SectionBand>
+{/snippet}
+
 {#snippet panel()}
   <section class="od-sites--panel" aria-label={t('sites.listLabel')}>
-    <!-- On a phone, the band says it. -->
-    {#if !layout.phone}<p class="od-sites--count od-value">{searchCount || `${t('sites.siteCount', { n: used.length })}, ${t('sites.diveCount', { n: diveCount })}`}</p>{/if}
-
     {#if withoutSite || unplaced || duplicates}
      <div class="od-sites--todo" class:od-sites--hidden={searching} bind:this={todoEl}>
       <div class="od-sites--todo-inner">
@@ -401,7 +407,7 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
     </div>
 {/snippet}
 
-<Page class="od-sites" onPageReinit={load}>
+<Page class="od-sites{layout.phone ? '' : ' od-sites--tablet'}" style="--od-sites-pane: {listWidth + (ios ? 0 : 20)}px" onPageReinit={load}>
   {#snippet fixedContent()}
     <!-- The open search: ← and the field take the place of the top bar's items. -->
     <div class="od-sites--search" class:od-sites--open={searching} inert={!searching} bind:this={searchEl} role="search">
@@ -450,7 +456,8 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
       <!-- Tablet (spec, section 3): the list on the left, the map on the right. -->
       <div class="od-sites--split" class:ios>
         <div class="od-sites--list-pane" style="width: {listWidth + (ios ? 0 : 20)}px">
-          <div class="od-sites--scroll">{@render panel()}</div>
+          <!-- Like the Carnet: the band tops the list pane, the map stays beside it. -->
+          <div class="od-sites--scroll">{@render band(false)}{@render panel()}</div>
           {@render fab()}
         </div>
         <div class="od-sites--map-pane">{@render mapBlock('100%')}</div>
@@ -493,16 +500,7 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
   </Navbar>
 
   {#if layout.phone}
-    <SectionBand
-      overMap
-      chip={!connection.online}
-      summaryKey={searching}
-      summary={searchCount || (used.length ? [t('band.sites', { n: used.length }), t('band.dives', { n: diveCount })].join(' · ') : '')}
-    >
-      {#if !connection.online}
-        <p class="od-sites--offline-chip" role="status"><Icon name="offline" size={16} weight={2} />{t('sites.offline')}</p>
-      {/if}
-    </SectionBand>
+    {@render band(true)}
     {@render mapBlock('calc(100vw * 4 / 5)')}
     {@render panel()}
   {/if}
@@ -513,8 +511,17 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
     /* Tablet: below the navigation bar, two panes side by side. */
     .od-sites--split {
       position: absolute;
-      inset: calc(var(--f7-navbar-height) + var(--f7-safe-area-top)) 0 0 0;
+      inset: 0;
       display: flex;
+    }
+
+    /* The top bar and the open search or selection belong to the list pane only:
+       the map runs up to the top, beside them. */
+    :global(.od-sites--tablet .navbar.od-sites--bar),
+    :global(.od-sites--tablet .od-sites--search),
+    :global(.od-sites--tablet .od-sites--selection) {
+      right: auto;
+      width: var(--od-sites-pane);
     }
 
     .od-sites--list-pane {
@@ -527,6 +534,7 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
 
     .od-sites--scroll {
       flex: 1;
+      padding-top: calc(var(--f7-navbar-height) + var(--f7-safe-area-top));
       overflow-y: auto;
     }
 
@@ -569,14 +577,6 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
       color: var(--od-on-band);
       font-size: 13px;
       font-weight: 600;
-
-      &.od-sites--over-map {
-        position: absolute;
-        z-index: 2;
-        top: 16px;
-        left: 16px;
-        margin: 0;
-      }
     }
 
     /* The open search, in the top bar's place (spec, "Sites, search open and its
@@ -834,12 +834,9 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
       padding-bottom: 88px;
     }
 
-    .od-sites--count {
-      margin: 0;
-      padding: 16px 24px 4px 16px;
-      font-size: 14px;
-      line-height: 20px;
-      color: var(--od-text-2);
+    /* Tablet: the band's wave already ends the header, no line under it. */
+    .od-sites--list-pane .od-sites--panel {
+      border-top: 0;
     }
 
     /* White surfaces, 20 dp corners, 16 dp side margins, 12 dp apart, light
