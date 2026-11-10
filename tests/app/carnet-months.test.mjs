@@ -1,7 +1,7 @@
 // Carnet: month grouping and the header kept on top (spec, "Carnet, month headers that stay on top").
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { monthKey, groupByMonth, monthName, yearText, stickyHeader } from '../../app/src/lib/carnet-months.js';
+import { monthKey, groupByMonth, monthName, yearText, stickyMonth } from '../../app/src/lib/carnet-months.js';
 
 /** @param {number} id @param {string} date @param {number} [trip] */
 const dive = (id, date, trip) => ({ id, date, trip: trip ? { id: trip, location: `Trip ${trip}` } : null });
@@ -71,40 +71,22 @@ test('month names and years follow the locale', () => {
 /** @param {[string, boolean, number, number][]} spec */
 const rows = (spec) => spec.map(([month, header, top, h]) => ({ month, header, top, bottom: top + h }));
 
-test('nothing is kept while the first header is still below the band', () => {
-  const r = rows([['2014-04', true, 200, 44], ['2014-04', false, 244, 72]]);
-  assert.deepEqual(stickyHeader(r, 100, 50), { month: null, shift: 0 });
+const at = (month, top, bottom) => ({ month, top, bottom });
+
+test('no month while the first row of the list is below the line', () => {
+  assert.equal(stickyMonth([at('2014-04', 300, 370), at('2014-04', 370, 440)], 100, 50), null);
 });
 
-test('the first header scrolled under the bar is kept', () => {
-  const r = rows([['2014-04', true, 90, 44], ['2014-04', false, 134, 72]]);
-  assert.deepEqual(stickyHeader(r, 100, 50), { month: '2014-04', shift: 0 });
+test('the month is the one of the row at the bottom of the line', () => {
+  assert.equal(stickyMonth([at('2014-04', 20, 90), at('2014-04', 90, 160), at('2014-03', 160, 230)], 100, 50), '2014-04');
+  assert.equal(stickyMonth([at('2014-04', 20, 140), at('2014-03', 140, 230)], 100, 50), '2014-03');
 });
 
-test('the kept month is the one of the row at the bar, inside a month', () => {
-  const r = rows([['2014-04', false, 60, 72], ['2014-04', false, 132, 72], ['2014-04', false, 204, 72]]);
-  assert.deepEqual(stickyHeader(r, 100, 50), { month: '2014-04', shift: 0 });
+test('the first row of the list passing the line shows its month', () => {
+  assert.equal(stickyMonth([at('2014-04', 120, 190)], 100, 50), '2014-04');
 });
 
-test('the next header pushes the kept one out, then replaces it', () => {
-  // Header top at 160, kept header ends at 150: not touching yet.
-  const pushing = rows([['2014-04', false, 60, 72], ['2014-03', true, 160, 44]]);
-  assert.deepEqual(stickyHeader(pushing, 100, 50), { month: '2014-04', shift: 0 });
-  const touching = rows([['2014-04', false, 40, 72], ['2014-03', true, 130, 44]]);
-  assert.deepEqual(stickyHeader(touching, 100, 50), { month: '2014-04', shift: -20 });
-  // Header just under the bar: the kept one is almost out and the next is about to take over.
-  const gone = rows([['2014-04', false, 30, 72], ['2014-03', true, 102, 44]]);
-  assert.deepEqual(stickyHeader(gone, 100, 50), { month: '2014-04', shift: -48 });
-  const replaced = rows([['2014-04', false, -50, 72], ['2014-03', true, 99, 44]]);
-  assert.deepEqual(stickyHeader(replaced, 100, 50), { month: '2014-03', shift: 0 });
-});
-
-test("inside a long open trip the band keeps the trip's month", () => {
-  const r = rows([['2014-03', false, 60, 72], ['2014-03', false, 132, 72], ['2014-03', false, 204, 72]]);
-  assert.equal(stickyHeader(r, 100, 50).month, '2014-03');
-});
-
-test('no rows below the bar, nothing is kept', () => {
-  assert.deepEqual(stickyHeader([], 100, 50), { month: null, shift: 0 });
-  assert.deepEqual(stickyHeader(rows([['2014-04', false, 0, 50]]), 100, 50), { month: null, shift: 0 });
+test('no rows below the line, no month', () => {
+  assert.equal(stickyMonth([], 100, 50), null);
+  assert.equal(stickyMonth([at('2014-04', 0, 50)], 100, 50), null);
 });

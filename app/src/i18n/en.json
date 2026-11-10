@@ -1420,7 +1420,7 @@
       "Privacy: the policy mentions searching for places on the map.",
       "Offline maps: a search field on \"Choose on the map\" finds a site of your logbook as you type, or a place when you press search, and puts the rectangle around it.",
       "Offline maps: frame an area on the map from Settings to download it; a space limit and a free-space floor protect the device, and updates are offered with a badge.",
-      "Logbook: the list is split by month; the header of the current month stays at the top under the bar while you scroll. A trip stays grouped under the month of its first dive.",
+      "Logbook: while scrolling, the current month shows at the top under the bar.",
       "Settings: the water type written on downloaded dives that have none can be chosen (Not specified by default).",
       "Offline maps: download regions (dive areas, countries or a rectangle of your choice) from Settings; a space limit and a free-space floor protect the device, and updates are offered with a badge.",
       "Sites: without a network, the map reads the downloaded regions, else a simplified world map; an \"Offline\" pill says so and a message offers to download the area.",

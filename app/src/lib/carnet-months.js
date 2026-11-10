@@ -1,7 +1,6 @@
 // @ts-check
-// Carnet: the list split by month (spec, "Carnet, month headers that stay on
-// top"). Plain functions, no framework: the grouping, the month names and the
-// choice of the header to keep on top are tested in tests/app.
+// Carnet: the month shown above the list. Plain functions, no framework: the
+// grouping, the month names and the choice of the month are tested in tests/app.
 
 /**
  * @typedef {{ id: number, date: string, trip?: { id: number, location: string }|null }} MonthDive
@@ -127,31 +126,19 @@ export function yearText(year, locale) {
 }
 
 /**
- * The header to keep on top, from the rendered rows' positions.
- *
- * `rows` are the rows on screen, in order: their month, whether the row is
- * a month header, and the top and bottom of the row. `edge` is the bottom of
- * the top bar; `height` the height of the kept header. The kept month is the
- * one of the first row that ends below `edge`. The next header pushes it out
- * when its top comes within `height` of the edge: `shift` (0 or negative)
- * is how far the kept header has gone up under the top bar.
- *
- * Nothing is kept (`month` null) while the first month's header is still
- * below the kept header's place: the band shows it itself.
- * @param {{ month: string, header: boolean, top: number, bottom: number }[]} rows
+ * The month to show under the top bar, from the rendered rows' positions.
+ * `rows` are in order; `edge` is the bottom of the top bar and `height` the
+ * height of the month line. The month is the one of the row at the bottom of
+ * that line. Null while the first row of the list is still below it: the band
+ * is fully visible.
+ * @param {{ month: string, top: number, bottom: number }[]} rows
  * @param {number} edge
  * @param {number} height
- * @returns {{ month: string|null, shift: number }}
+ * @returns {string|null}
  */
-export function stickyHeader(rows, edge, height) {
-  const first = rows.findIndex((r) => r.bottom > edge);
-  if (first < 0) return { month: null, shift: 0 };
-  const row = rows[first];
-  // The header of the month the row belongs to is not above the screen yet:
-  // before it, nothing is kept.
-  if (row.header && row.top >= edge + height) return { month: null, shift: 0 };
-  const month = row.month;
-  const next = rows.find((r, i) => i > first && r.header && r.month !== month);
-  const shift = next ? Math.min(0, next.top - (edge + height)) : 0;
-  return { month, shift: Math.max(shift, -height) };
+export function stickyMonth(rows, edge, height) {
+  const line = edge + height;
+  const row = rows.find((r) => r.bottom > line);
+  if (!row || (row === rows[0] && row.top >= line)) return null;
+  return row.month;
 }

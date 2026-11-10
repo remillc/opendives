@@ -11,7 +11,6 @@
   import SyncPill from '../components/SyncPill.svelte';
   import DiveRow from '../components/DiveRow.svelte';
   import TripRow from '../components/TripRow.svelte';
-  import MonthHeader from '../components/MonthHeader.svelte';
   import MonthSticky from '../components/MonthSticky.svelte';
   import Icon from '../components/Icon.svelte';
   import MenuItem from '../components/MenuItem.svelte';
@@ -29,7 +28,7 @@
   import { navigation } from '../lib/navigation.svelte.js';
   import { formatDateTime, formatLongDate, formatTimeAgo, localNowIso } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
-  import { groupByMonth, stickyHeader } from '../lib/carnet-months.js';
+  import { groupByMonth, stickyMonth } from '../lib/carnet-months.js';
   import { mark } from '../lib/perf.js';
   import { buildSnapshot, saveSnapshot } from '../lib/snapshot.js';
   import { offerUndo } from '../lib/undo.js';
@@ -45,8 +44,7 @@
    * A row of the virtual list. `kind` groups rows of the same layout, hence of
    * the same probable height.
    * @typedef {{ kind: 'dive'|'inTrip', key: string, index: number, month: string, dive: Dive, tripFirst?: boolean, tripLast?: boolean }
-   *   | { kind: 'trip', key: string, index: number, month: string, id: number, location: string, dives: Dive[] }
-   *   | { kind: 'month', key: string, index: number, month: string, year: number, monthNumber: number, count: number }} Row
+   *   | { kind: 'trip', key: string, index: number, month: string, id: number, location: string, dives: Dive[] }} Row
    */
 
   /** @type {{ f7router: any }} */
@@ -568,7 +566,7 @@
       el?.querySelectorAll('.od-drop-target').forEach((n) => n.classList.remove('od-drop-target'));
       target = null;
       const under = document.elementFromPoint(touchX, touchY);
-      const li = /** @type {HTMLElement|null} */ (under?.closest('li:not(.month-header)'));
+      const li = /** @type {HTMLElement|null} */ (under?.closest('li'));
       const dragged = (dragIds ?? []).map(diveById).filter((d) => d !== undefined);
       if (li && el?.contains(li) && dragged.length) {
         const tripId = Number(li.dataset.trip) || 0;
@@ -795,15 +793,15 @@
         formatDateTime(d.date).toLocaleLowerCase().includes(q),
     );
   });
+  /** The months of the list on screen; the search results are flat, without trip rows. */
+  const monthGroups = $derived(results ? groupByMonth(results, true) : groups);
 
   /** Rows shown: the search results, or the dives and trips with the expanded trips' dives. */
   const rows = $derived.by(() => {
     /** @type {Row[]} */
     const list = [];
-    // The search results are flat (no trip rows) but sit under their months too.
-    for (const group of results ? groupByMonth(results, true) : groups) {
+    for (const group of monthGroups) {
       const month = group.key;
-      list.push({ kind: 'month', key: `m${month}`, index: list.length, month, year: group.year, monthNumber: group.month, count: group.count });
       for (const entry of group.entries) {
         if (entry.type === 'dive') {
           list.push({ kind: 'dive', key: entry.key, index: list.length, month, dive: entry.dive });
@@ -853,7 +851,7 @@
   /** @type {Map<string, number>} */
   const measured = new Map();
   /** Height of a row not measured yet: the last one measured of the same kind. */
-  const typical = { dive: 72, inTrip: 72, trip: 96, month: 44 };
+  const typical = { dive: 72, inTrip: 72, trip: 96 };
 
   /** @param {Row} row */
   function rowHeight(row) {
@@ -876,26 +874,18 @@
     scheduleSticky();
   }
 
-  // --- Month header kept under the top bar (spec, "Carnet, month headers that
-  // stay on top"). A virtual list renders only the rows near the screen and
-  // positions them itself, so a CSS `position: sticky` header cannot work: it
-  // would leave the document with its month's rows. The header is a single
-  // element outside the scrolling area (<MonthSticky>). On each frame of a
-  // scroll, the rows in the document (about twenty) are read to find the month
-  // at the top, and the element is moved by a transform when the next
-  // header pushes it out: no reflow of the list, the cost does not grow with
-  // the size of the logbook. The list's own month headers stay in it, for
-  // the moment the header comes from below; the kept one covers them.
+  // --- The month at the top of the list, shown under the top bar only: the
+  // list has no month rows. The header is a single element outside the
+  // scrolling area (<MonthSticky>). On each frame of a scroll, the rows in the
+  // document (about twenty) are read to find the month at the top: no reflow
+  // of the list, the cost does not grow with the size of the logbook.
 
   /** Height of <MonthSticky> (px): the title line and the wave. */
   const STICKY_HEIGHT = 50;
-  /** The month kept under the top bar, null when the band itself shows the first one. */
+  /** The month shown under the top bar, null while the band is fully visible. */
   let sticky = $state(/** @type {string|null} */ (null));
-  /** @type {HTMLElement|undefined} */
-  let stickyEl = $state();
-  let stickyShift = 0;
   let stickyFrame = 0;
-  const stickyRow = $derived(sticky ? rows.find((r) => r.kind === 'month' && r.month === sticky) : undefined);
+  const stickyGroup = $derived(sticky ? monthGroups.find((g) => g.key === sticky) : undefined);
 
   function scheduleSticky() {
     if (!stickyFrame) stickyFrame = requestAnimationFrame(updateSticky);
@@ -907,26 +897,19 @@
     const bar = listEl.closest('.page')?.querySelector('.navbar');
     if (!bar) return;
     const edge = bar.getBoundingClientRect().bottom;
-    /** @type {{ month: string, header: boolean, top: number, bottom: number }[]} */
+    /** @type {{ month: string, top: number, bottom: number }[]} */
     const seen = [];
     for (const li of listEl.querySelectorAll('ul > li[data-virtual-list-index]')) {
       const row = /** @type {Row|undefined} */ (vl.items[Number(li.getAttribute('data-virtual-list-index'))]);
       if (!row) continue;
       const rect = li.getBoundingClientRect();
-      seen.push({ month: row.month, header: row.kind === 'month', top: rect.top, bottom: rect.bottom });
+      seen.push({ month: row.month, top: rect.top, bottom: rect.bottom });
     }
     // Rows not drawn yet after a fast scroll: the header stays as it was.
     if (!seen.some((r) => r.bottom > edge)) return;
-    const { month, shift } = stickyHeader(seen, edge, STICKY_HEIGHT);
-    stickyShift = shift;
+    const month = stickyMonth(seen, edge, STICKY_HEIGHT);
     if (month !== sticky) sticky = month;
-    if (stickyEl) stickyEl.style.transform = shift ? `translate3d(0, ${shift}px, 0)` : '';
   }
-
-  // The element appears when a month is kept: it takes the shift at once.
-  $effect(() => {
-    if (stickyEl) stickyEl.style.transform = stickyShift ? `translate3d(0, ${stickyShift}px, 0)` : '';
-  });
 
   $effect(() => {
     const content = listEl?.closest('.page-content');
@@ -1312,9 +1295,7 @@
     <div class="list media-list {theme.ios ? 'chevron-center dividers' : ''} virtual-list dives" bind:this={listEl}>
       <ul>
         {#each visible.items as row (row.key)}
-          {#if row.kind === 'month'}
-            <MonthHeader year={row.year} month={row.monthNumber} count={row.count} index={row.index} top={visible.topPosition} />
-          {:else if row.kind === 'trip'}
+          {#if row.kind === 'trip'}
             <TripRow
               dives={row.dives}
               location={row.location}
@@ -1362,8 +1343,8 @@
   {#if importing}<p class="od-sr-only" role="status">{t('logbook.importing')}</p>{/if}
 
   {#snippet fixedContent()}
-    {#if stickyRow && stickyRow.kind === 'month' && listEl && !theme.ios}
-      <MonthSticky year={stickyRow.year} month={stickyRow.monthNumber} count={stickyRow.count} pill={showPill} bind:el={stickyEl} />
+    {#if stickyGroup && listEl && !theme.ios}
+      <MonthSticky year={stickyGroup.year} month={stickyGroup.month} count={stickyGroup.count} pill={showPill} />
     {/if}
     {#if selecting}
       <!-- Selection mode: the top bar gives way to the number of dives checked. -->
