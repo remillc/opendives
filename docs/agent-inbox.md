@@ -1386,4 +1386,5 @@ Changes:
 - **Failure header** ("… introuvable"): a 56 dp circle in a pale alarm tint (#FBE9E7 light; pick the dark equivalent from the alarm colour) with a 30 dp crossed-out Bluetooth icon in `--od-alarm`, then, to its right, the title and the sentence grouped, 4 dp apart, the icon vertically centred on the group. The sentence goes from 16 to 18 sp (line height 26).
 - **Tablet:** the download pane has the ✕ close button, like on the phone (it currently has none). The "+" floating button is hidden while the download pane is shown: we are already in the task it opened, and it covered "Réessayer".
 - The progress bar stays the standard linear one.
+- **Computer icon in tertiary** (addendum): the round Bluetooth avatar of each computer card uses `--od-tertiary-container` as background and `--od-tertiary` for the icon, in the choice and during the download.
 - A line in the release notes.
