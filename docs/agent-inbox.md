@@ -1190,3 +1190,12 @@ Christian reversed the "no accordion" part of task 2026-11-10-09. Spec: "Statist
 - The rows inside stay plain content, as in task 09: no link, no chevron, no ripple, no maximum depth.
 - The chart cards, the filter and "Nouvelle statistique" do not change.
 
+## [ ] 2026-11-10-13 Statistics: each row opens the list of its dives
+
+Christian changed his mind on the rows of task 2026-11-10-09: they become clickable. Spec: "Statistics, a row opens its dives" (new) and "Statistics, items are not clickable" (updated). Mock-ups: `docs/mockups/android-stats.dc.html`, `docs/mockups/android-stats-plongees.dc.html` (new). Pages: `app/src/pages/Statistics.svelte`, plus a new page.
+- Every row of "Mes statistiques" and of every "Par …" section becomes a link: chevron right (20 dp, `--od-on-surface-variant`), standard ripple. The chart cards stay plain. The accordions of task 12 do not change.
+- New page for the dives of a row, a collection under `/statistics/` (for example `/statistics/dives/?…` carrying the section and value; choose the parameters). Top bar on the page background: ← "Retour" (back to `/statistics/`, keeping scroll position and open sections), title = the row title, supporting line "{section} · {n} plongées · {durée}".
+- Content: the dives of the row, newest first, as flat Carnet rows (reuse the Carnet row component: thumbnail, site or "Site à préciser", "N° {n} · {date}", depth, duration). No trips, no month headers, no search, no + button. A row opens `/dive/:id`.
+- The list uses the statistics filter in force, so its count matches the row.
+- New texts in `fr.json` and `en.json`; a line in the release notes.
+
