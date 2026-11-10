@@ -29,17 +29,30 @@ export const listWidth = 340;
  */
 export const splitBreakpoint = 768;
 
+/**
+ * The navigation rail (Android) shows from 1000 dp only (spec, section 7,
+ * "Android tablet in portrait: no rail"): below it, a tablet in portrait uses
+ * the phone's side menu and floating "+". The iPad sidebar stays from 768.
+ */
+export const railBreakpoint = ios ? splitBreakpoint : 1000;
+
 const query = typeof matchMedia === 'function' ? matchMedia('(max-width: 767.98px)') : null;
+const railQuery = typeof matchMedia === 'function' ? matchMedia(`(min-width: ${railBreakpoint}px)`) : null;
 const splitQuery = typeof matchMedia === 'function' ? matchMedia(`(min-width: ${splitBreakpoint}px)`) : null;
 
 export const layout = $state({
   phone: query ? query.matches : true,
+  /** Rail (Android) or sidebar (iPad) on screen; otherwise the ☰ button and the side menu. */
+  rail: railQuery ? railQuery.matches : false,
   /** Tablet layout with room for the list and the detail side by side. */
   split: splitQuery ? splitQuery.matches : false,
 });
 
 query?.addEventListener('change', (e) => {
   layout.phone = e.matches;
+});
+railQuery?.addEventListener('change', (e) => {
+  layout.rail = e.matches;
 });
 splitQuery?.addEventListener('change', (e) => {
   layout.split = e.matches;

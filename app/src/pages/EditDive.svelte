@@ -37,7 +37,7 @@
   // On a tablet the route opens this screen as a popup (App.svelte): an iPad
   // sheet of 780 px in two columns, or an Android pane beside the rail. The
   // fields and the behaviour are the same as full screen on a phone.
-  const sheet = !layout.phone;
+  const sheet = layout.rail;
   const leave = () => (sheet ? f7.popup.close() : f7router.back());
   // iOS: 780 x 740 centred; Android: the content pane, 16 px from the edges.
   const sheetStyle = ios

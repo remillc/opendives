@@ -1,7 +1,7 @@
 <script>
   // @ts-check
-  // ☰ button on the left of a section's top bar, phone layout only (spec,
-  // section 3). Pushed screens keep their Back button instead. Goes in the
+  // ☰ button on the left of a section's top bar, wherever there is no rail or sidebar (spec,
+  // sections 3 and 7). Pushed screens keep their Back button instead. Goes in the
   // Navbar's `left` snippet: Framework7 only places that one on the left.
   import Icon from './Icon.svelte';
   import { layout } from '../lib/layout.svelte.js';
@@ -9,7 +9,7 @@
   import { t } from '../lib/i18n.js';
 </script>
 
-{#if layout.phone}
+{#if !layout.rail}
   <!-- Written by hand, like the "+" button: a real button name and state for screen readers. -->
   <a
     href="#menu"
