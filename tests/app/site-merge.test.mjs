@@ -1,7 +1,7 @@
 // The list of sites and the site kept by a merge.
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { defaultKeeper, sortSitesByName } from '../../app/src/lib/site-merge.js';
+import { defaultKeeper, sortSitesByName, sortSitesByRecent } from '../../app/src/lib/site-merge.js';
 
 const names = (list) => list.map((s) => s.name);
 
@@ -18,6 +18,11 @@ test('the list given is not changed', () => {
   const list = [{ name: 'B' }, { name: 'A' }];
   sortSitesByName(list, 'fr');
   assert.deepEqual(names(list), ['B', 'A']);
+});
+
+test('the most recent dive comes first', () => {
+  const list = [{ name: 'old', lastDate: '2010-01-01T10:00:00' }, { name: 'new', lastDate: '2026-01-01T10:00:00' }];
+  assert.deepEqual(names(sortSitesByRecent(list)), ['new', 'old']);
 });
 
 test('the site kept has the most dives, then a position', () => {
