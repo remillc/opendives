@@ -4,7 +4,8 @@
   // reglages-ordinateur-fusion-android.dc.html; spec, "Settings, logbook dive
   // computers"). Only the name can be changed here; a computer's data stays.
   import { onMount } from 'svelte';
-  import { Page, Navbar, Link, f7 } from 'framework7-svelte';
+  import { Page, Navbar, Link } from 'framework7-svelte';
+  import { showSnackbar } from '../lib/snackbar.js';
   import { OpenDivesCore } from 'opendives-core';
   import Icon from '../components/Icon.svelte';
   import TextField from '../components/TextField.svelte';
@@ -55,7 +56,7 @@
     } catch (e) {
       const code = String(/** @type {any} */ (e)?.message ?? '');
       console.error('Logbook computer', code);
-      f7.toast.show({ text: code.startsWith('WRITE_LOCKED') ? t('edit.writeLocked') : t('edit.failed'), closeTimeout: 4000 });
+      showSnackbar(code.startsWith('WRITE_LOCKED') ? t('edit.writeLocked') : t('edit.failed'));
     } finally {
       busy = false;
     }

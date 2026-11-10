@@ -1422,6 +1422,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Messages: one style for every snackbar, dark on light and light on dark, floating above the bottom of the screen (above the + button when there is one), with one action in blue.",
       "Settings: resetting keeps your list of cylinders.",
       "Clean up sites: \"Not duplicates\" removes the group from the list and stops suggesting it (on this device); \"Undo\" puts it back. Renaming or moving one of the two sites makes it suggestible again.",
       "Settings: \"Reset all settings\" asks for confirmation first, then says \"Settings reset\". It no longer touches the planner settings.",

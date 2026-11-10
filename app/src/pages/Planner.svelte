@@ -6,6 +6,7 @@
   // come from the core (Subsurface's planner). Saved, a plan is a planned dive
   // of the logbook, listed by "Plongées planifiées" only.
   import { Page, Navbar, Link, List, ListItem, Popup, Popover, f7, theme } from 'framework7-svelte';
+  import { showSnackbar } from '../lib/snackbar.js';
   import { OpenDivesCore } from 'opendives-core';
   import Icon from '../components/Icon.svelte';
   import MenuItem from '../components/MenuItem.svelte';
@@ -543,7 +544,7 @@
       toList();
     } catch (e) {
       console.error('Saving the plan', e);
-      f7.toast.show({ text: t('plan.saveFailed'), closeTimeout: 4000 });
+      showSnackbar(t('plan.saveFailed'));
     } finally {
       saving = false;
     }
@@ -559,7 +560,7 @@
       else await sharePlanSummary(result, planRequest(), prefs, title);
     } catch (e) {
       console.error('Sharing the plan', e);
-      f7.toast.show({ text: t('plan.shareFailed'), closeTimeout: 4000 });
+      showSnackbar(t('plan.shareFailed'));
     }
   }
 </script>

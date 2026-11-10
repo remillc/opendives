@@ -4,6 +4,7 @@
   // dive with "Choose a site" and "New site", and a suggestion from the site
   // of the other dives of the same trip.
   import { Page, Navbar, Link, f7 } from 'framework7-svelte';
+  import { showSnackbar } from '../lib/snackbar.js';
   import { OpenDivesCore } from 'opendives-core';
   import { logbook, saveDiveChanges } from '../lib/logbook.svelte.js';
   import { formatDateTime } from '../lib/format.js';
@@ -53,7 +54,7 @@
       logbook.sitesVersion++;
     } catch (e) {
       console.error('Set site', e);
-      f7.toast.create({ text: t('edit.failed'), closeTimeout: 4000 }).open();
+      showSnackbar(t('edit.failed'));
     }
   }
 

@@ -6,6 +6,7 @@
   // Change password is shown but not wired yet. Create and sign in open the
   // screens of first launch, whose actions are not built yet.
   import { Page, Navbar, f7 } from 'framework7-svelte';
+  import { showSnackbar } from '../lib/snackbar.js';
   import Icon from '../components/Icon.svelte';
   import SyncButton from '../components/SyncButton.svelte';
   import MenuButton from '../components/MenuButton.svelte';
@@ -100,14 +101,14 @@
       showSection('logbook');
     } catch (err) {
       console.error('Signing out', err);
-      f7.toast.create({ text: t('signOut.failed'), closeTimeout: 4000, position: 'center' }).open();
+      showSnackbar(t('signOut.failed'));
     }
   }
 
   async function syncThenSignOut() {
     await syncNow();
     if (logbook.pending > 0) {
-      f7.toast.create({ text: t('signOut.syncFailed'), closeTimeout: 4000, position: 'center' }).open();
+      showSnackbar(t('signOut.syncFailed'));
       return;
     }
     await runSignOut(false);
@@ -116,7 +117,7 @@
   /** Actions whose behaviour in Subsurface is still to be checked. */
   function notAvailable(/** @type {MouseEvent} */ e) {
     e.preventDefault();
-    f7.toast.create({ text: t('account.notAvailable'), closeTimeout: 4000, position: 'center' }).open();
+    showSnackbar(t('account.notAvailable'));
   }
 </script>
 

@@ -4,7 +4,8 @@
   // duplicates in pairs, "These are not duplicates" or "Merge" (one site keeps
   // all the dives; undoable); unused sites with check boxes and "Delete the
   // selection". Each change of the logbook is confirmed first.
-  import { Page, Navbar, Link, f7 } from 'framework7-svelte';
+  import { Page, Navbar, Link } from 'framework7-svelte';
+  import { showSnackbar } from '../lib/snackbar.js';
   import { OpenDivesCore } from 'opendives-core';
   import { logbook } from '../lib/logbook.svelte.js';
   import { dismissPair, pairKey, possibleDuplicates, restorePair, siteChange } from '../lib/sites.svelte.js';
@@ -72,7 +73,7 @@
           offerSiteUndo();
         } catch (e) {
           console.error('Merge sites', e);
-          f7.toast.create({ text: t('edit.failed'), closeTimeout: 4000 }).open();
+          showSnackbar(t('edit.failed'));
         }
       },
     });
@@ -81,16 +82,11 @@
   /** @param {(typeof pairs)[number]} pair */
   function notDuplicates(pair) {
     dismissPair(pair.a, pair.b);
-    f7.toast
-      .create({
-        text: t('sites.notDuplicatesDone', { a: pair.a.name || t('sites.noName'), b: pair.b.name || t('sites.noName') }),
-        closeButton: true,
-        closeButtonText: t('edit.undo'),
-        closeTimeout: 6000,
-        position: 'bottom',
-        on: { closeButtonClick: () => restorePair(pair.a, pair.b) },
-      })
-      .open();
+    showSnackbar(t('sites.notDuplicatesDone', { a: pair.a.name || t('sites.noName'), b: pair.b.name || t('sites.noName') }), {
+      action: t('edit.undo'),
+      timeout: 6000,
+      onAction: () => restorePair(pair.a, pair.b),
+    });
   }
 
   function deleteSelection() {
@@ -107,7 +103,7 @@
           offerSiteUndo();
         } catch (e) {
           console.error('Delete sites', e);
-          f7.toast.create({ text: t('edit.failed'), closeTimeout: 4000 }).open();
+          showSnackbar(t('edit.failed'));
         }
       },
     });

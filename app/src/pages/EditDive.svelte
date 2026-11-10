@@ -10,6 +10,7 @@
   // locally and closes; Undo is offered.
   import { onMount } from 'svelte';
   import { Page, Navbar, Link, Popup, View, f7 } from 'framework7-svelte';
+  import { showSnackbar } from '../lib/snackbar.js';
   import { OpenDivesCore } from 'opendives-core';
   import Icon from '../components/Icon.svelte';
   import TextField from '../components/TextField.svelte';
@@ -426,7 +427,7 @@
 
   /** @param {string} text */
   function toast(text) {
-    f7.toast.create({ text, closeTimeout: 4000, position: 'center' }).open();
+    showSnackbar(text);
   }
 
   async function save() {

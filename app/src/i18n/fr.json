@@ -1422,6 +1422,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Messages : un seul style pour toutes les barres de message, sombre en mode clair et clair en mode sombre, flottant au-dessus du bas de l’écran (au-dessus du bouton + s’il y en a un), avec une seule action en bleu.",
       "Réglages : la réinitialisation garde votre liste de bouteilles.",
       "Nettoyer les sites : « Pas des doublons » retire le groupe de la liste et ne le propose plus (sur cet appareil) ; « Annuler » le remet. Renommer ou déplacer un des deux sites le rend de nouveau proposable.",
       "Réglages : « Réinitialiser tous les réglages » demande d’abord confirmation, puis annonce « Réglages réinitialisés ». Il ne touche plus aux paramètres du planificateur.",

@@ -6,6 +6,7 @@
   // the list is virtual, only the rows near the screen are in the document.
   import { onDestroy, tick, untrack } from 'svelte';
   import { Page, Navbar, NavRight, Link, Searchbar, List, ListItem, Block, Button, Popover, f7, theme } from 'framework7-svelte';
+  import { showSnackbar } from '../lib/snackbar.js';
   import SyncStatus from '../components/SyncStatus.svelte';
   import SyncFailureRow from '../components/SyncFailureRow.svelte';
   import SyncPill from '../components/SyncPill.svelte';
@@ -320,7 +321,7 @@
   async function undoRedo(redo) {
     try {
       await undoLastChange(redo);
-      f7.toast.create({ text: t(redo ? 'edit.redone' : 'edit.undone'), closeTimeout: 4000, position: 'bottom' }).open();
+      showSnackbar(t(redo ? 'edit.redone' : 'edit.undone'));
     } catch (e) {
       changeFailed(e);
     }
@@ -351,7 +352,7 @@
       // Closing the system's share sheet without choosing is not an error.
       if (/cancel/i.test(String(/** @type {any} */ (e)?.message ?? ''))) return;
       console.error('Export dives', e);
-      f7.toast.create({ text: t('export.failed'), closeTimeout: 4000 }).open();
+      showSnackbar(t('export.failed'));
     }
   }
 
@@ -1011,7 +1012,7 @@
 
   /** @param {string} text */
   function toast(text) {
-    f7.toast.create({ text, closeTimeout: 4000, position: 'bottom' }).open();
+    showSnackbar(text);
   }
 
   async function fileChosen() {

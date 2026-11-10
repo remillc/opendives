@@ -3,7 +3,8 @@
   // Settings, "Secours (bailout), recycleur" (spec, Settings table;
   // docs/mockups/reglages-secours-android.dc.html): the cylinder types added
   // as open-circuit cylinders when a dive becomes CCR or pSCR.
-  import { Page, Navbar, Link, f7 } from 'framework7-svelte';
+  import { Page, Navbar, Link } from 'framework7-svelte';
+  import { showSnackbar } from '../lib/snackbar.js';
   import Icon from '../components/Icon.svelte';
   import ChoiceDialog from '../components/ChoiceDialog.svelte';
   import { settings, setAppSetting } from '../lib/settings.svelte.js';
@@ -23,7 +24,7 @@
   /** @param {number} index */
   function choose(index) {
     if (options.length) editing = index;
-    else f7.toast.show({ text: t('settings.error'), closeTimeout: 4000 });
+    else showSnackbar(t('settings.error'));
   }
 
   /** @param {string[]} list */

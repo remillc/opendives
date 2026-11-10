@@ -8,7 +8,8 @@
   // within 100 m is offered instead of a duplicate. With ?dive=<id>, the new
   // site is set on that dive (dives without a site).
   import { onMount } from 'svelte';
-  import { Page, Navbar, Link, f7 } from 'framework7-svelte';
+  import { Page, Navbar, Link } from 'framework7-svelte';
+  import { showSnackbar } from '../lib/snackbar.js';
   import { OpenDivesCore } from 'opendives-core';
   import Icon from '../components/Icon.svelte';
   import TextField from '../components/TextField.svelte';
@@ -96,7 +97,7 @@
   }
 
   function useDevicePosition() {
-    const failed = () => f7.toast.create({ text: t('sites.noDevicePosition'), closeTimeout: 4000 }).open();
+    const failed = () => showSnackbar(t('sites.noDevicePosition'));
     if (!navigator.geolocation) return failed();
     navigator.geolocation.getCurrentPosition(
       (pos) => setPosition({ latUdeg: Math.round(pos.coords.latitude * 1e6), lonUdeg: Math.round(pos.coords.longitude * 1e6) }),
@@ -141,7 +142,7 @@
     } catch (e) {
       const code = String(/** @type {any} */ (e)?.message ?? '');
       console.error('Save site', code);
-      f7.toast.create({ text: code.startsWith('WRITE_LOCKED') ? t('edit.writeLocked') : t('edit.failed'), closeTimeout: 4000 }).open();
+      showSnackbar(code.startsWith('WRITE_LOCKED') ? t('edit.writeLocked') : t('edit.failed'));
     } finally {
       saving = false;
     }
@@ -165,7 +166,7 @@
         } catch (e) {
           const code = String(/** @type {any} */ (e)?.message ?? '');
           console.error('Delete site', code);
-          f7.toast.create({ text: code.startsWith('WRITE_LOCKED') ? t('edit.writeLocked') : t('edit.failed'), closeTimeout: 4000 }).open();
+          showSnackbar(code.startsWith('WRITE_LOCKED') ? t('edit.writeLocked') : t('edit.failed'));
         }
       },
     });
