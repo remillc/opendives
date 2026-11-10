@@ -2,6 +2,7 @@
   // @ts-check
   // <DiveRow> (spec, section 4, "LignePlongee"): thumbnail, site (or "site not
   // set"), date and time; on the right the maximum depth, then the duration.
+  import { theme } from 'framework7-svelte';
   import ProfileThumbnail from './ProfileThumbnail.svelte';
   import { formatDateTime, formatDepth, formatDuration } from '../lib/format.js';
   import { layout } from '../lib/layout.svelte.js';
@@ -85,8 +86,14 @@
         {#if pendingText}<div class="item-text pending">{pendingText}</div>{/if}
       </div>
       <div class="values od-value">
-        {#if dive.maxDepthMm}<strong>{formatDepth(dive.maxDepthMm, prefs)}</strong>{/if}
-        <span>{formatDuration(dive.durationSeconds)}</span>
+        {#if theme.ios}
+          {#if dive.maxDepthMm}<strong>{formatDepth(dive.maxDepthMm, prefs)}</strong>{/if}
+          <span>{formatDuration(dive.durationSeconds)}</span>
+        {:else}
+          <!-- Android: the duration above the depth (spec, "Dive rows, duration above depth"). -->
+          <strong>{formatDuration(dive.durationSeconds)}</strong>
+          {#if dive.maxDepthMm}<span>{formatDepth(dive.maxDepthMm, prefs)}</span>{/if}
+        {/if}
       </div>
     </div>
   </a>
@@ -149,7 +156,7 @@
       font-weight: normal;
     }
 
-    /* Depth first, the duration small under it; both centred on the row. */
+    /* The first value strong, the second small under it; both centred on the row. */
     .values {
       display: flex;
       flex-direction: column;

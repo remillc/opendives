@@ -14,7 +14,7 @@ export const FLIGHT_WAIT_HOURS = { single: 12, several: 18 };
  * hours. A recommendation, never a guarantee.
  * @param {{date: string, endDate: string}[]} dives the dives the core used, oldest first
  * @param {string} now local time of the calculation (ISO, no time zone)
- * @returns {{hours: number, several: boolean, remainingSeconds: number}|null} null without dives
+ * @returns {{hours: number, several: boolean, remainingSeconds: number, endsAt: string}|null} null without dives
  */
 export function flightWait(dives, now) {
   if (!dives.length) return null;
@@ -24,8 +24,9 @@ export function flightWait(dives, now) {
   const hours = several ? FLIGHT_WAIT_HOURS.several : FLIGHT_WAIT_HOURS.single;
   // Dive times are local wall-clock times: compare them as UTC, never shifted.
   const end = Date.parse(`${last.endDate}Z`);
-  const remaining = (end + hours * 3600_000 - Date.parse(`${now}Z`)) / 1000;
-  return { hours, several, remainingSeconds: Math.max(0, Math.round(remaining)) };
+  const endsAt = end + hours * 3600_000;
+  const remaining = (endsAt - Date.parse(`${now}Z`)) / 1000;
+  return { hours, several, remainingSeconds: Math.max(0, Math.round(remaining)), endsAt: new Date(endsAt).toISOString().slice(0, 19) };
 }
 
 /** A wait such as "17 h 05". @param {number} seconds */
