@@ -5,15 +5,19 @@
   // with a position and "centre on my position", then the list panel: the
   // count, the list items that apply (dives without a site, sites without
   // coordinates, possible duplicates), a divider and the sites.
-  import { Page, Navbar, NavRight, Link, Searchbar, f7 } from 'framework7-svelte';
+  import { Page, Navbar, NavRight, Link, Searchbar, List, Popover, f7, theme } from 'framework7-svelte';
   import { OpenDivesCore } from 'opendives-core';
   import Icon from '../components/Icon.svelte';
   import MenuButton from '../components/MenuButton.svelte';
   import SectionBand from '../components/SectionBand.svelte';
   import SiteMap from '../components/SiteMap.svelte';
+  import MenuItem from '../components/MenuItem.svelte';
+  import ChoiceDialog from '../components/ChoiceDialog.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
-  import { possibleDuplicates } from '../lib/sites.svelte.js';
-  import { formatDepth, formatLongDate } from '../lib/format.js';
+  import { possibleDuplicates, siteChange } from '../lib/sites.svelte.js';
+  import { defaultKeeper, sortSitesByName } from '../lib/site-merge.js';
+  import { offerUndo } from '../lib/undo.js';
+  import { formatDepth, formatLongDate, locale } from '../lib/format.js';
   import { layout, ios, listWidth } from '../lib/layout.svelte.js';
   import { t } from '../lib/i18n.js';
 import { connection } from '../lib/online.svelte.js';
@@ -34,11 +38,36 @@ import { inBbox } from '../lib/maps-logic.js';
     offlineMaps.viewBbox = null;
   });
 
-  /** Sites used by dives, the latest dive first. */
-  const used = $derived(sites.filter((s) => s.dives > 0).sort((a, b) => b.lastDate.localeCompare(a.lastDate)));
+  /** Sites used by dives, by name. */
+  const used = $derived(sortSitesByName(sites.filter((s) => s.dives > 0), locale));
   const located = $derived(used.filter((s) => s.hasLocation));
   const unplaced = $derived(used.length - located.length);
   const diveCount = $derived(used.reduce((n, s) => n + s.dives, 0));
+
+  /** The sites checked, by uuid. */
+  /** @type {Record<number, boolean>} */
+  let checked = $state({});
+  const selection = $derived(used.filter((s) => checked[s.uuid]));
+  let choosingKeeper = $state(false);
+
+  /** Merges every other selected site into the one kept: one undoable step each. @param {string} value */
+  async function mergeSelection(value) {
+    choosingKeeper = false;
+    const keep = Number(value);
+    const others = selection.filter((s) => s.uuid !== keep);
+    let done = 0;
+    try {
+      for (const other of others) {
+        await siteChange({ action: 'merge', uuid: keep, other: other.uuid });
+        done++;
+      }
+      checked = {};
+    } catch (e) {
+      console.error('Merge sites', e);
+      f7.toast.create({ text: t('edit.failed'), closeTimeout: 4000 }).open();
+    }
+    if (done) offerUndo(t('sites.done'), undefined, 6000, done);
+  }
 
   // Offline, a hint when the map looks mostly outside the downloaded regions
   // (spec, "Sites map offline"): once per area, an area being a tile of zoom 7.
@@ -169,7 +198,11 @@ import { inBbox } from '../lib/maps-logic.js';
       <div class="list no-chevron surface od-sites-list">
         <ul>
           {#each used as site (site.uuid)}
-            <li>
+            <li class="od-site-row">
+              <label class="checkbox od-site-check">
+                <input type="checkbox" bind:checked={checked[site.uuid]} aria-label={t('sites.selectSite', { name: site.name || t('sites.noName') })} />
+                <i class="icon-checkbox"></i>
+              </label>
               <a href="/sites/{site.uuid}" class="item-link item-content">
                 <div class="item-inner">
                   <div class="text">
@@ -201,8 +234,25 @@ import { inBbox } from '../lib/maps-logic.js';
 
 <Page onPageReinit={load}>
   {#snippet fixedContent()}
-    {#if layout.phone}
+    {#if selection.length}
+      <!-- While sites are checked, the top bar gives way to their number. -->
+      <div class="od-sites-selection">
+        <button type="button" class="od-icon-button" onclick={() => (checked = {})}>
+          <Icon name="close" /><span class="od-sr-only">{t('logbook.selectionClose')}</span>
+        </button>
+        <span class="od-sites-selection-count od-value" role="status">{t('sites.selected', { n: selection.length })}</span>
+        {#if selection.length >= 2}
+          <a href="#menu" class="link icon-only popover-open od-sites-selection-more" data-popover=".od-sites-menu" role="button">
+            {#if theme.ios}<Icon name="moreCircle" />{:else}<Icon name="more" weight={4} />{/if}
+            <span class="od-sr-only">{t('detail.moreOptions')}</span>
+          </a>
+        {/if}
+      </div>
+    {/if}
+    {#if layout.phone && !selection.length}
       {@render fab()}
+    {:else if layout.phone}
+      <!-- Selecting: no FAB. -->
     {:else}
       <!-- Tablet (spec, section 3): the list on the left, the map on the right. -->
       <div class="split" class:ios>
@@ -214,6 +264,23 @@ import { inBbox } from '../lib/maps-logic.js';
       </div>
     {/if}
   {/snippet}
+  <Popover class="od-menu od-sites-menu" backdrop={false}>
+    <List noChevron>
+      <MenuItem icon="merge" text={t('sites.mergeSites')} onclick={() => (choosingKeeper = true)} />
+    </List>
+  </Popover>
+
+  {#if choosingKeeper && selection.length >= 2}
+    <ChoiceDialog
+      title={t('sites.keepTitle')}
+      note={t('sites.keepNote')}
+      options={selection.map((s) => ({ value: String(s.uuid), label: s.name || t('sites.noName'), example: t('sites.diveCount', { n: s.dives }) }))}
+      value={String(defaultKeeper(selection).uuid)}
+      onselect={mergeSelection}
+      oncancel={() => (choosingKeeper = false)}
+    />
+  {/if}
+
   <Navbar class="od-band-bar" title={t('sites.title')}>
     {#snippet left()}<MenuButton />{/snippet}
     <NavRight>
@@ -335,6 +402,52 @@ import { inBbox } from '../lib/maps-logic.js';
       align-items: center;
       justify-content: center;
       box-shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 1px 3px 1px rgb(0 0 0 / 0.15);
+    }
+
+    .od-sites-selection {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 600;
+      height: calc(var(--f7-navbar-height) + var(--f7-safe-area-top));
+      padding: var(--f7-safe-area-top) 8px 0 4px;
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--od-surface-2);
+    }
+
+    .od-sites-selection-count {
+      font-size: 22px;
+      line-height: 28px;
+      color: var(--od-text);
+    }
+
+    .od-sites-selection-more {
+      margin-left: auto;
+    }
+
+    /* The box sits beside the row's link: touching it never opens the site. */
+    .od-site-row {
+      display: flex;
+      align-items: center;
+
+      > a {
+        flex: 1;
+        min-width: 0;
+      }
+    }
+
+    .od-site-check {
+      flex: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      margin-left: 4px;
     }
 
     .sites-panel {

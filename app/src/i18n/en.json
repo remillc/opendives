@@ -1100,7 +1100,15 @@
     "deleteSiteTextUnused": "No dive uses it. It can be undone.",
     "offline": "Offline",
     "areaNotDownloaded": "This area is not downloaded",
-    "downloadArea": "Download"
+    "downloadArea": "Download",
+    "selected": {
+      "one": "{n} site selected",
+      "other": "{n} sites selected"
+    },
+    "selectSite": "Select {name}",
+    "mergeSites": "Merge sites",
+    "keepTitle": "Which site to keep?",
+    "keepNote": "The dives of the other sites move to this one, and those sites disappear. This can be undone."
   },
   "renumber": {
     "titleChecked": "Renumber the checked dives?",
@@ -1410,6 +1418,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Sites: the list is sorted by name; checkboxes let you merge several sites.",
       "Conflict on several dives: a full-screen dialog with a \"Same choice for all\" switch and one card per dive, where you touch the version to keep.",
       "Sync conflict: \"Later\" closes the dialog and leaves you where you were; the Carnet sync status and the side menu sync card reopen it, and it comes back at the next sync attempt.",
       "Offline maps: choosing an area opens on your current position.",
