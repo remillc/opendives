@@ -147,14 +147,7 @@ export function chronological(dives) {
   return [...dives].sort((a, b) => a.date.localeCompare(b.date));
 }
 
-const monthFormat = new Intl.DateTimeFormat(locale, { month: 'long', timeZone: 'UTC' });
 const monthYearFormat = new Intl.DateTimeFormat(locale, { month: 'long', year: 'numeric', timeZone: 'UTC' });
-
-/** Month name, capitalised for a row: "Février". @param {number} month 1 to 12 */
-export function monthName(month) {
-  const text = monthFormat.format(new Date(Date.UTC(2000, month - 1, 1)));
-  return text.charAt(0).toLocaleUpperCase(locale) + text.slice(1);
-}
 
 /** @param {number} year @param {number} month */
 function monthYearName(year, month) {

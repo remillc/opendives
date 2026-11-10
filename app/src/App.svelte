@@ -29,7 +29,6 @@
   import SitesCleanup from './pages/SitesCleanup.svelte';
   import SitesUnplaced from './pages/SitesUnplaced.svelte';
   import Statistics from './pages/Statistics.svelte';
-  import StatisticsYear from './pages/StatisticsYear.svelte';
   import StatisticsResult from './pages/StatisticsResult.svelte';
   import StatisticNew from './pages/StatisticNew.svelte';
   import Tools from './pages/Tools.svelte';
@@ -148,7 +147,6 @@
     { path: '/sites/:uuid', component: SiteSheet },
     { path: '/sites/:uuid/edit', component: SiteEdit },
     { path: '/statistics/', component: Statistics },
-    { path: '/statistics/year/:year', component: StatisticsYear },
     { path: '/statistics/result', component: StatisticsResult },
     // Android: a full-screen dialog; iPhone: a sheet (the popup pushes the view back).
     { path: '/statistics/new', popup: { component: StatisticNew } },
@@ -173,7 +171,7 @@
 
   /**
    * The Statistics view's routes (tablet): the list of statistics is the
-   * master, a result or a year opens beside it (as the Logbook, above).
+   * master, a result opens beside it (as the Logbook, above).
    */
   const statisticsRoutes = [
     {
@@ -181,7 +179,6 @@
       component: Statistics,
       master: true,
       detailRoutes: [
-        { path: '/statistics/year/:year', component: StatisticsYear },
         { path: '/statistics/result', component: StatisticsResult },
       ],
     },

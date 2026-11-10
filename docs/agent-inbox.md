@@ -1143,7 +1143,7 @@ Christian approved (canvas comments). Spec: "Sites, search open and its animatio
 - Closing (←, back gesture, back on empty field): 200 ms, emphasized accelerate; keyboard first, field shrinks into 🔍, title and ☰ back, card and + back, pins back to 100 %, map back to its previous view. ✕ only clears.
 - Reduced motion: 150 ms cross-fade only.
 
-## [ ] 2026-11-10-09 Statistics: nothing clickable, remove the one-year view
+## [x] 2026-11-10-09 Statistics: nothing clickable, remove the one-year view
 
 Christian approved (canvas comment). Spec: "Statistics, items are not clickable". Mock-up: `docs/mockups/android-stats.dc.html`.
 - On `/statistics/`, the chart cards and the result rows are not links: no chevron, no ripple, no focus stop.
@@ -1153,3 +1153,5 @@ Christian approved (canvas comment). Spec: "Statistics, items are not clickable"
   - The "Par …" sections are not accordions: always open, with a plain section title (14 sp, medium, `--od-on-surface-variant`), as in `android-stats.dc.html`.
   - Rows are plain two-line list items, 72 dp min height, in a rounded white card with 1 dp dividers: title 16 sp (`od-value` for years), supporting line 14 sp `--od-on-surface-variant`. Not the Framework7 media-list style.
   - "Par année" rows: title = year, supporting line = "{n} plongées · {durée} · max {profondeur}". "Par mode", "Par combinaison", "Par compagnon": title = value, supporting line = "{n} plongées", total time on the right (14 sp, tabular figures).
+
+Done in Statistics: plain sections and rows, no one-year view

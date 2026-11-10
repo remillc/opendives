@@ -5,10 +5,10 @@
   // "Free filter" in the top bar (the same filter as the Logbook: the figures
   // follow it); the three key figures; two ready-made charts on cards scrolled
   // sideways, dives per year and dive durations (no chart builder; the maximum
-  // depth chart is only on the year and filtered screens); My statistics with
-  // "New statistic"; By year (opening the year), By mode, By suit, By buddy.
-  // No totals by dive computer. Every figure comes from the core
-  // (lib/statistics.svelte.js).
+  // depth chart is only on the filtered screens); My statistics with "New
+  // statistic"; By year, By mode, By suit, By buddy. The charts and the rows
+  // of the always open "By …" sections are plain content: none has a detail view. No totals
+  // by dive computer. Every figure comes from the core (lib/statistics.svelte.js).
   import { Page, Navbar, NavRight, Link, theme } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
   import MenuButton from '../components/MenuButton.svelte';
@@ -63,10 +63,6 @@
         })
       : '',
   );
-  /** The "By …" groups that are open (all closed at first). */
-  let open = $state(
-    /** @type {Record<string, boolean>} */ (layout.split ? { year: true, mode: true, suit: true, buddy: true } : {}),
-  );
   /** Tablet: the address of the row whose result is shown beside the list. */
   let selected = $state('');
   /** @param {MouseEvent} e */
@@ -80,8 +76,20 @@
     [...(result?.yearly ?? [])].sort((a, b) => a.year - b.year).map((y) => ({ value: y.dives, label: String(y.year) })),
   );
 
-  /** @param {string} field @param {string} value */
-  const resultHref = (field, value) => `/statistics/result?c=${encodeCriteria([{ field, values: [value] }])}`;
+  /** @typedef {{key: string, title: string, numeric?: boolean, support: string, after?: string}} StatRow */
+
+  /**
+   * A row of By mode, By suit, By buddy: the number of dives, the total time on the right.
+   * @param {string} key @param {string} title
+   * @param {import('../lib/statistics.svelte.js').StatsFigures} figures
+   * @returns {StatRow}
+   */
+  const totalRow = (key, title, figures) => ({
+    key,
+    title,
+    support: t('trip.dives', { n: figures.dives }),
+    after: formatHours(figures.totalSeconds),
+  });
 
   /** "9 plongées sur 6 années, de 2013 à 2026" (the band). */
   const bandSummary = $derived.by(() => {
@@ -158,103 +166,91 @@
       </div>
     {/if}
 
-    <!-- Each "By …" group is an accordion, closed at first. -->
-    {#snippet accordion(/** @type {string} */ id, /** @type {string} */ title)}
-      <button type="button" class="block-title accordion" aria-expanded={!!open[id]} onclick={() => (open[id] = !open[id])}>
-        <span>{title}</span>
-        <span class="arrow" class:up={open[id]}><Icon name="expand" /></span>
-      </button>
-    {/snippet}
-
-    {@render accordion('year', t('stats.byYear'))}
-    {#if open.year}
-    <div class="list list-strong inset list-dividers media-list chevron-center">
-      <ul>
-        {#each yearly as y (y.year)}
-          <li class:selected={selected === `/statistics/year/${y.year}`}>
-            <a href="/statistics/year/{y.year}" data-reload-detail="true" class="item-link item-content" onclick={select}>
-              <div class="item-inner">
-                <div class="item-title-row"><div class="item-title od-value">{y.year}</div></div>
-                <div class="item-text od-value">{summaryLine(y, logbook.prefs)}</div>
-              </div>
-            </a>
-          </li>
-        {/each}
-      </ul>
-    </div>
-    {/if}
-
-    {#snippet group(/** @type {string} */ title, /** @type {{key: string, label: string, figures: import('../lib/statistics.svelte.js').StatsFigures}[]|null} */ rows, /** @type {string} */ field)}
+    <!-- The "By …" sections: always open, plain two-line rows (no detail view). -->
+    {#snippet section(/** @type {string} */ title, /** @type {StatRow[]|null} */ rows)}
       {#if rows?.length}
-        {@render accordion(field, title)}
-        {#if open[field]}
-        <div class="list list-strong inset list-dividers media-list chevron-center">
-          <ul>
-            {#each rows as row (row.key)}
-              <li class:selected={selected === resultHref(field, row.key)}>
-                <a href={resultHref(field, row.key)} data-reload-detail="true" class="item-link item-content" onclick={select}>
-                  <div class="item-inner">
-                    <div class="item-title-row">
-                      <div class="item-title">{row.label}</div>
-                      <div class="item-after od-value">{formatHours(row.figures.totalSeconds)}</div>
-                    </div>
-                    <div class="item-text od-value">{t('trip.dives', { n: row.figures.dives })}</div>
-                  </div>
-                </a>
-              </li>
-            {/each}
-          </ul>
-        </div>
-        {/if}
+        <div class="block-title">{title}</div>
+        <ul class="od-stat-rows">
+          {#each rows as row (row.key)}
+            <li class="od-stat-row">
+              <div class="od-stat-text">
+                <span class="od-stat-title" class:od-value={row.numeric}>{row.title}</span>
+                <span class="od-stat-support od-value">{row.support}</span>
+              </div>
+              {#if row.after}<span class="od-stat-after od-value">{row.after}</span>{/if}
+            </li>
+          {/each}
+        </ul>
       {/if}
     {/snippet}
 
-    {@render group(
-      t('stats.byMode'),
-      result ? result.byMode.filter((m) => m.dives).map((m) => ({ key: m.mode, label: t(`detail.modes.${m.mode}`), figures: m })) : null,
-      'mode',
+    {@render section(
+      t('stats.byYear'),
+      yearly.map((y) => ({ key: String(y.year), title: String(y.year), numeric: true, support: summaryLine(y, logbook.prefs) })),
     )}
-    {@render group(
-      t('stats.bySuit'),
-      result ? result.bySuit.map((s) => ({ key: s.value, label: s.value || notSetLabel('suit'), figures: s })) : null,
-      'suit',
-    )}
-    {@render group(
-      t('stats.byBuddy'),
-      result ? result.byBuddy.map((b) => ({ key: b.value, label: b.value || notSetLabel('buddy'), figures: b })) : null,
-      'buddy',
-    )}
+    {@render section(t('stats.byMode'), result ? result.byMode.filter((m) => m.dives).map((m) => totalRow(m.mode, t(`detail.modes.${m.mode}`), m)) : null)}
+    {@render section(t('stats.bySuit'), result ? result.bySuit.map((v) => totalRow(v.value, v.value || notSetLabel('suit'), v)) : null)}
+    {@render section(t('stats.byBuddy'), result ? result.byBuddy.map((v) => totalRow(v.value, v.value || notSetLabel('buddy'), v)) : null)}
     <div class="end"></div>
   {/if}
 </Page>
 
 <style>
   @layer od.components {
-    /* A "By …" title that opens its group: the title row, an arrow at the end. */
-    .accordion.block-title {
+    /* The section titles (mock-up android-stats). */
+    .block-title {
+      margin: 22px 16px 8px;
+      color: var(--od-text-2);
+    }
+
+    /* The "By …" sections: a rounded card of plain rows (mock-up android-stats). */
+    .od-stat-rows {
+      margin: 0 16px;
+      padding: 0;
+      list-style: none;
+      border-radius: 16px;
+      background: var(--od-surface);
+      overflow: hidden;
+
+      :global(.ios) & {
+        border-radius: 10px;
+      }
+    }
+
+    .od-stat-row {
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      gap: 12px;
       box-sizing: border-box;
-      width: calc(100% - 32px);
-      min-height: 48px;
-      margin: 0 16px;
-      padding: 0 4px;
-      border: none;
-      background: none;
-      font: inherit;
-      text-align: start;
-      cursor: pointer;
+      min-height: 72px;
+      padding: 8px 24px 8px 16px;
 
-      .arrow {
-        display: flex;
-        color: var(--od-text-2);
-        transition: transform 200ms;
-
-        &.up {
-          transform: rotate(180deg);
-        }
+      & + & {
+        border-top: 1px solid var(--od-separator);
       }
+    }
+
+    .od-stat-text {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .od-stat-title {
+      font-size: 16px;
+      line-height: 24px;
+    }
+
+    .od-stat-support,
+    .od-stat-after {
+      font-size: 14px;
+      line-height: 20px;
+    }
+
+    .od-stat-support {
+      color: var(--od-text-2);
     }
 
     /* Tablet: the row whose result is shown beside the list. */
