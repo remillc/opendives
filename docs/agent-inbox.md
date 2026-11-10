@@ -1083,3 +1083,4 @@ Christian approved these changes from canvas comments. Mock-up: `docs/mockups/an
 - The search field from 2026-11-10-01 floats on the map just under the top bar (surface card, light shadow).
 - Bottom sheet: the area size ("Environ 180 × 165 km") and estimated download size update as the zoom changes. Set a minimum and maximum zoom so the area stays between about 20 km and the size of the largest catalogue zone.
 - *Added at 06:09 on 10 November 2026:* the "Télécharger" button of the bottom sheet takes the full width of the sheet, 48 dp high (approved by Christian).
+- *Added at 06:21 on 10 November 2026:* the bottom panel is fixed: square corners, no drag handle, no shadow, a 1 dp divider on top. It is not a bottom sheet (approved by Christian).
