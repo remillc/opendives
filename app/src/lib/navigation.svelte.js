@@ -19,8 +19,6 @@ export const navigation = $state({
   menuOpen: false,
   /** Settings or About when shown over a section, else empty: the row lit in the menu. */
   page: /** @type {''|'settings'|'about'} */ (''),
-  /** Counts the presses of the rail's "+" button; the Logbook offers its choices on each. */
-  addRequests: 0,
   /** Identifier of the dive shown beside the list (tablet), or null. */
   dive: /** @type {string|null} */ (null),
 });
@@ -58,12 +56,6 @@ export function openSettings() {
 /** About opens over the current section, from the side menu or the tablet navigation. */
 export function openAbout() {
   openOver('/about');
-}
-
-/** The "+" button of the Android rail: shows the Logbook, which offers the choices. */
-export function requestAdd() {
-  showSection('logbook');
-  navigation.addRequests += 1;
 }
 
 /** Follows the visible tab, whatever showed it (menu, Back key, tablet bar). */

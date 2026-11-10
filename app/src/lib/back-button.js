@@ -13,6 +13,11 @@ export function enableBackButton() {
       return;
     }
     // 2. The choices of the "+" button close.
+    const fabMenu = document.querySelector('.od-fab-menu--open');
+    if (fabMenu) {
+      fabMenu.dispatchEvent(new CustomEvent('od-cancel'));
+      return;
+    }
     if (document.querySelector('.fab-opened')) {
       f7.fab.close();
       return;

@@ -111,6 +111,9 @@
     /* Divider between groups of a ⋮ menu. */
     --od-menu-divider: #C9C9C5;
     --od-scrim: rgb(0 0 0 / 0.32);
+    /* Android tablet FAB menu (spec, section 8): its light scrim and its tonal choices. */
+    --od-fab-scrim: rgb(0 0 0 / 0.16);
+    --od-fab-tonal: #E3E1DC;
     /* "Choisir sur la carte": the fixed frame and the 40 % veil outside it. */
     --od-area-frame: #1F2124;
     --od-area-veil: rgb(31 33 36 / 0.4);
@@ -146,6 +149,7 @@
     --od-background: #121314;
     --od-surface: #1C1D1F;
     --od-surface-2: #2E3033;
+    --od-fab-tonal: #3A3C40;
     --od-text: #F4F4F2;
     --od-text-2: #B5B8BC;
     --od-separator: #3A3C40;
@@ -781,7 +785,7 @@ html.ios {
   }
 
   /* The floating button must not hide the last row of the logbook. */
-  .md .page:has(.od-fab-add) .list:last-of-type {
+  .md .page:has(.od-fab-add, .od-fab-menu) .list:last-of-type {
     margin-bottom: 96px;
   }
 
