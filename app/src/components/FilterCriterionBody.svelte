@@ -95,7 +95,6 @@
         {/if}
       {/each}
     </List>
-    {#if kind === 'list'}<p class="od-criterion-hint">{t('filter.listHint')}</p>{/if}
   {:else}
     <p class="od-criterion-hint">{t('filter.noValues')}</p>
   {/if}
@@ -116,7 +115,6 @@
       supporting={!validBound(key, range.max, logbook.prefs) ? t('filter.invalid') : rangeHint}
     />
   </div>
-  <p class="od-criterion-hint">{t(key === 'cylinderSize' ? 'filter.cylinderSizeHint' : 'filter.rangeHint')}</p>
 {:else if kind === 'stars'}
   <div class="od-form-surface od-criterion-stars">
     <p class="od-criterion-stars-label">{t('filter.atLeast')}</p>
@@ -126,13 +124,11 @@
       onchange={(n) => ((/** @type {any} */ (filter.draft))[key] = n)}
     />
   </div>
-  <p class="od-criterion-hint">{t('filter.starsHint')}</p>
 {:else}
   <div class="od-form-surface">
     <TextField
       label={t(`filter.criteria.${key}`)}
       bind:value={text}
-      supporting={t(key === 'fulltext' ? 'filter.fulltextHint' : 'filter.notesHint')}
     />
   </div>
 {/if}

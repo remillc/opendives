@@ -1497,7 +1497,8 @@
       "Logbook: “Logbook dive computers” in the ⋮ menu.",
       "New “Trois vagues” logo: app icon, launch screen, menu and About.",
       "Sync conflict: new dialog, readable differences, “Later”, and “Undo” before anything is sent.",
-      "Filter (Android): new page, cylinder and gas criteria grouped, a saved filter fills the page, and deleting one offers “Undo”."
+      "Filter (Android): new page, cylinder and gas criteria grouped, a saved filter fills the page, and deleting one offers “Undo”.",
+      "Filter: the explanatory sentences under the criteria are gone."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
@@ -1784,13 +1785,7 @@
     "dateHint": "For example 2025-06-30",
     "timeHint": "For example 9:30",
     "invalid": "Value not recognised",
-    "rangeHint": "Leave a field empty to set no limit.",
-    "cylinderSizeHint": "Water capacity of the cylinder, in litres. Leave a field empty to set no limit.",
     "atLeast": "At least",
-    "starsHint": "Tap the chosen star again to remove the criterion.",
-    "fulltextHint": "Dives with a word that starts with this text, anywhere in the dive.",
-    "notesHint": "Dives whose notes contain this text.",
-    "listHint": "A dive matches if it has one of the chosen values.",
     "noValues": "No dive of the logbook has a value for this criterion.",
     "chip": "{name}: {value}",
     "activeLabel": "Filter applied",
