@@ -65,6 +65,8 @@
   );
   /** Tablet: the address of the row whose result is shown beside the list. */
   let selected = $state('');
+  /** The "By …" sections opened, by title: all closed at first. */
+  let openSections = $state(/** @type {Record<string, boolean>} */ ({}));
   /** @param {MouseEvent} e */
   function select(e) {
     if (!layout.split) return;
@@ -166,21 +168,29 @@
       </div>
     {/if}
 
-    <!-- The "By …" sections: always open, plain two-line rows (no detail view). -->
+    <!-- The "By …" sections: accordions, closed at first; plain two-line rows (no detail view). -->
     {#snippet section(/** @type {string} */ title, /** @type {StatRow[]|null} */ rows)}
       {#if rows?.length}
-        <div class="block-title">{title}</div>
-        <ul class="od-stat-rows">
-          {#each rows as row (row.key)}
-            <li class="od-stat-row">
-              <div class="od-stat-text">
-                <span class="od-stat-title" class:od-value={row.numeric}>{row.title}</span>
-                <span class="od-stat-support od-value">{row.support}</span>
-              </div>
-              {#if row.after}<span class="od-stat-after od-value">{row.after}</span>{/if}
-            </li>
-          {/each}
-        </ul>
+        {@const open = !!openSections[title]}
+        <h2 class="od-stat-heading">
+          <button type="button" class="od-stat-toggle" aria-expanded={open} onclick={() => (openSections[title] = !open)}>
+            <span class="od-stat-toggle-text">{title}</span>
+            <span class="od-stat-chevron" class:od-stat-chevron-up={open}><Icon name="expand" size={24} /></span>
+          </button>
+        </h2>
+        {#if open}
+          <ul class="od-stat-rows">
+            {#each rows as row (row.key)}
+              <li class="od-stat-row">
+                <div class="od-stat-text">
+                  <span class="od-stat-title" class:od-value={row.numeric}>{row.title}</span>
+                  <span class="od-stat-support od-value">{row.support}</span>
+                </div>
+                {#if row.after}<span class="od-stat-after od-value">{row.after}</span>{/if}
+              </li>
+            {/each}
+          </ul>
+        {/if}
       {/if}
     {/snippet}
 
@@ -201,6 +211,42 @@
     .block-title {
       margin: 22px 16px 8px;
       color: var(--od-text-2);
+    }
+
+    /* The title of a "By …" section: a 48 dp button (mock-up android-stats). */
+    .od-stat-heading {
+      margin: 14px 8px 0;
+      font: inherit;
+    }
+
+    .od-stat-toggle {
+      width: 100%;
+      min-height: 48px;
+      padding: 0 12px 0 8px;
+      border: none;
+      background: none;
+      color: var(--od-text-2);
+      font: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      text-align: start;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+
+    .od-stat-toggle-text {
+      flex: 1;
+    }
+
+    .od-stat-chevron {
+      display: flex;
+      transition: transform 0.2s;
+    }
+
+    .od-stat-chevron-up {
+      transform: rotate(180deg);
     }
 
     /* The "By …" sections: a rounded card of plain rows (mock-up android-stats). */
