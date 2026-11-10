@@ -1410,6 +1410,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Cartes hors ligne : le choix d’une zone s’ouvre sur votre position actuelle.",
       "Cartes hors ligne : une zone sans site du carnet prend le nom du lieu.",
       "Cartes hors ligne : « Choisir sur la carte » montre maintenant un cadre fixe ; déplacez et zoomez la carte dessous, la zone qu’il couvre est celle qui sera téléchargée. Le niveau de détail est choisi pour vous, et la taille affichée est une estimation.",
       "Cartes hors ligne : un champ de recherche sur « Choisir sur la carte » trouve un site de votre carnet pendant la frappe, ou un lieu quand vous lancez la recherche, et y amène la carte.",

@@ -1410,6 +1410,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Offline maps: choosing an area opens on your current position.",
       "Offline maps: an area with no logbook site takes the name of the place.",
       "Offline maps: \"Choose on the map\" now shows a fixed frame; move and zoom the map under it and the area it covers is what you download. The detail is chosen for you, and the size shown is an estimate.",
       "Offline maps: a search field on \"Choose on the map\" finds a site of your logbook as you type, or a place when you press search, and moves the map there.",
