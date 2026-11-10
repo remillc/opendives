@@ -271,7 +271,7 @@
         <div class="results card">
           {#if siteResults.length}
             <p class="group">{t('maps.area.search.sites')}</p>
-            {#each siteResults as hit (hit.name + hit.lng + hit.lat)}
+            {#each siteResults as hit, i (i)}
               <button type="button" class="hit" onclick={() => choose(hit, true)}>
                 <span class="hit-name">{hit.name}</span>
                 {#if hit.detail}<span class="hit-detail">{hit.detail}</span>{/if}
@@ -288,7 +288,7 @@
           {:else if placesState === 'error'}
             <p class="note over" role="alert">{t('maps.area.search.error')}</p>
           {:else}
-            {#each places as hit (hit.name + hit.lng + hit.lat)}
+            {#each places as hit, i (i)}
               <button type="button" class="hit" onclick={() => choose(hit, false)}>
                 <span class="hit-name">{hit.name}</span>
                 {#if hit.detail}<span class="hit-detail">{hit.detail}</span>{/if}
