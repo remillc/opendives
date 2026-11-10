@@ -6,7 +6,7 @@ All notable changes to OpenDives are listed here, newest first. The format follo
 each release; the app's own "What's new" list (About) describes the current version
 in fewer words.
 
-## [Unreleased]
+## [0.3.0] - Unreleased
 
 ### Added
 
