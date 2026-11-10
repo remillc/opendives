@@ -10,7 +10,7 @@ Rules (agreed between the design agent and the code agent, see `docs/agent-inbox
 - **Tag:** every item starts with `[design]` or `[code]` right after its number, set by the agent that adds it (`#4 [design] …`). `[design]` = mock-ups, visuals, screen texts, specification; `[code]` = everything else. When unsure, the agent asks Christian. The tag says who handles the item and lets Christian list one kind only.
 - No other content in this file: no history, no checked boxes, no notes from agents.
 
-Next number: 29
+Next number: 32
 
 ## List
 
@@ -24,3 +24,4 @@ Next number: 29
 - #21 [design] ajouter une vue carte des plongées
 - #23 [design] idée : ajouter une section Explorer, une carte qui affiche les sites de plongée des environs
 - #27 [design] Se débarrasser de tout workflow lié à l'état invalide d'une plongée : menus contextuels, recherche, paramétrage. S'assurer au préalable que cette feature n'est pas utilisée.
+- #31 [design] tablette en paysage : s'assurer que l'écran de démarrage affiche toutes les options, quitte à mettre des options côte à côte
