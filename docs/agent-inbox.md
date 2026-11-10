@@ -1297,6 +1297,8 @@ Spec: System design, section 8, "Editorial pages (account flow)" (new). Mock-ups
 - No text or field changes otherwise. Android only; iPhone follows in a later task.
 - A line in the release notes.
 
+Done in `EditorialPage.svelte` (it replaces `AccountStep.svelte`) and `DecorativeProfile.svelte` (the profile, shared with first launch). One text added: the git page had no title, it takes the mock-up's "Votre propre dépôt." (`gitRepo.heading`). The full stop after a title is added by the layout; the texts are unchanged. Checked in the browser at phone and tablet sizes; iOS keeps its previous look until task 22.
+
 ## [ ] 2026-11-10-22 Account flow in the editorial layout (iPhone)
 
 Follows task 2026-11-10-21 (Android). Spec: System design, section 8, "Editorial pages (account flow)", item "iPhone" (new). Mock-ups: the 10 iPhone mock-ups it lists (`docs/mockups/`, updated).
