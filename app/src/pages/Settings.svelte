@@ -846,7 +846,7 @@
 <Page class="od-settings" onPageBeforeIn={() => (navigation.page = 'settings')} onPageBeforeOut={() => (navigation.page = '')}>
   <Navbar title={t('settings.title')}>
     {#snippet left()}
-      {#if layout.phone}
+      {#if !layout.rail}
         <MenuButton />
       {:else}
         <Link back iconOnly>

@@ -1365,7 +1365,7 @@
         </a>
       </div>
     {/if}
-    {#if !theme.ios && layout.phone && logbook.dives.length && !selecting}
+    {#if !theme.ios && !layout.rail && logbook.dives.length && !selecting}
       <!--
         Written by hand: the Fab component of framework7-svelte 9 calls onclick
         twice and leaves the link without a name for screen readers.

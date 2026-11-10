@@ -127,7 +127,7 @@
     // list and the dive, chosen when the screen opens (EditDive.svelte).
     {
       path: '/dives/:id/edit',
-      async: (/** @type {{ resolve: Function }} */ { resolve }) => resolve(layout.phone ? { component: EditDive } : { popup: { component: EditDive } }),
+      async: (/** @type {{ resolve: Function }} */ { resolve }) => resolve(!layout.rail ? { component: EditDive } : { popup: { component: EditDive } }),
     },
     // A dive opened from another section (site, tools) or from a trip: the
     // same screen, without the master-detail routing of the Logbook, which
@@ -268,13 +268,13 @@
 </script>
 
 <App {...f7params}>
-  {#if layout.phone}<NavMenu />{:else}<NavRail />{/if}
+  {#if layout.rail}<NavRail />{:else}<NavMenu />{/if}
   <SyncFailureSheet />
   <ConflictHost />
   <MapsDialogs />
   {#if showRoute}<RouteBadge />{/if}
   <Welcome />
-  <Views tabs class="safe-areas {layout.phone ? '' : 'od-tablet'}" style="--f7-page-master-width: {listWidth}px; --od-no-dive: '{t('tablet.noDive')}'">
+  <Views tabs class="safe-areas {layout.rail ? 'od-tablet' : ''}" style="--f7-page-master-width: {listWidth}px; --od-no-dive: '{t('tablet.noDive')}'">
     <View id="view-logbook" main tab tabActive url="/" routes={logbookRoutes} masterDetailBreakpoint={splitBreakpoint} />
     <View id="view-sites" tab url="/sites/" />
     <View

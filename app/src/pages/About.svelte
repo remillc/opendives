@@ -101,7 +101,7 @@
 <Page class="od-about" onPageBeforeIn={() => (navigation.page = 'about')} onPageBeforeOut={() => (navigation.page = '')}>
   <Navbar title={t('about.title')}>
     {#snippet left()}
-      {#if layout.phone}
+      {#if !layout.rail}
         <MenuButton />
       {:else}
         <Link back iconOnly>

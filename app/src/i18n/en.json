@@ -1435,6 +1435,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Android, tablet in portrait: no more navigation rail; the ☰ button opens the side menu and the Logbook’s “+” is the floating button again, as on a phone. The rail stays in landscape.",
       "Units: after “Imperial” (or “Metric”) and then a change to a single unit, the other units are kept when the app restarts; before, they went back to metric.",
       "Planner (tablet in portrait): opened beside the tools list, it fits in one column instead of adding one at the right of the screen.",
       "About: the app’s description no longer says “free”.",
