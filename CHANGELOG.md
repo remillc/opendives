@@ -10,7 +10,105 @@ in fewer words.
 
 ### Added
 
-- **Release check for the planner's calculations** (`tests/release-check.sh`, no tag without a green report for the commit): the 17 cases of Subsurface's planner tests through the façade, an independent ZH-L16C checker over 360 plans, the app chain (units, request, displayed values, alarms), proof that wrong inputs make each fail, the same tests compiled with the NDK and run on the emulator, and planner scenarios in the real app. A GitHub Actions workflow runs the checks that need no device on each push to `main`.
+- **Offline maps (Android).** From Settings, choose an area on the map with a fixed
+  frame and download it. A search field finds a site of your logbook as you type, or a
+  place when you press search. Without a network, the Sites map and the site maps read
+  what was downloaded, then fall back on a simplified world map; an "Offline" pill says
+  so. A space limit and a free-space floor protect the device, and updates are offered
+  with a badge.
+- **Your own git repository.** The logbook can live in your own git repository (GitHub,
+  GitLab, Codeberg or your server) instead of the Subsurface cloud: "Use my own git
+  repository" on the first page, with a help page to create an access token. The token
+  stays encrypted on the device.
+- **Planned dives.** The planner is rebuilt: plans are saved in the logbook as planned
+  dives and synced, with several levels and gases, volumes per gas with a bar for the
+  consumed part and the reserve, a CNS bar, a decompression model for each plan, and
+  sharing. A plan can start from a logbook dive; from a rebreather dive it starts on the
+  diluent.
+- **The dives of a statistic.** Each row of My statistics and of the "By …" sections
+  opens the list of its dives, newest first, under the filter in force.
+- **Logbook dive computers.** In Settings and the logbook's ⋮ menu: rename, remove or
+  merge duplicates, found by serial number, then by comparing the profiles. When editing
+  a dive with several computers, choose the main one.
+- **Site map on the dive page.** When the site has GPS coordinates, a map of the site
+  sits behind the header, prepared ahead on Wi-Fi.
+- **Desaturation.** A "Last dive" section with the time since surfacing, and "You can
+  fly" once the wait is over.
+- **Sync failures explained.** When a sync fails while the network works, the Logbook
+  says why (password refused, cloud not answering, git repository refused) and offers
+  what to do. The sync state shows in a pill in the header.
+- **Trips in the Logbook.** A trip can be selected, and "Delete this trip" removes the
+  trip and keeps its dives. "Remove from trip" is in the dive's ⋮ menu. While dragging a
+  dive, a bar shows where it would be dropped.
+- **Sites.** The search opens from the magnifier with an animation, dims the sites that
+  do not match and highlights the match in the list. A menu sets the order of the list,
+  alphabetical or most recent first, and a long press selects sites to merge them. Dives
+  without a site show a thumbnail of their profile and open it in full.
+- **Clean up sites.** A pencil on each site of a duplicate group opens its editor. "Not
+  duplicates" stops suggesting a pair on this device, with "Undo".
+- **French (Canada).** The app language can be Français (Canada), which says "nuage" and
+  "courriel"; a phone set to French (Canada) picks it by itself.
+- **Settings.** A "Default conditions" group (water type and altitude) for the planner
+  and the gas tools; the water type written on downloaded dives that have none; default
+  cylinders for open circuit and rebreather (diluent, oxygen, bailout); the number of
+  dives for each cylinder type.
+- **About.** Each open source library opens its website, and the privacy policy's links
+  can be tapped.
+- **Logbook month.** While scrolling, the band shows the month of the first visible dive
+  and its number of dives, written as the display language writes it.
+- **Release check for the planner's calculations** (`tests/release-check.sh`, no tag
+  without a green report for the commit): the 17 cases of Subsurface's planner tests
+  through the façade, an independent ZH-L16C checker over 360 plans, the app chain
+  (units, request, displayed values, alarms), proof that wrong inputs make each fail, the
+  same tests compiled with the NDK and run on the emulator, and planner scenarios in the
+  real app.
+
+### Changed
+
+- **New look.** The "Trois vagues" logo for the app icon, the launch screen, the menu
+  and About; a band with a wave and a summary at the top of each section; the account at
+  the top of the side menu; a search bar in the Logbook. Settings and About use the ☰
+  menu.
+- **Dive page.** Follows the mock-up: top bar, trip as a link, people and tags as chips,
+  full-width profile, cylinder pressure bars from 0 to the working pressure.
+- **Dive rows.** No dividers; on Android, the duration above and the depth below. The
+  dive number comes before the date, and the dives of an open trip are indented on a
+  white surface and can be checked in selection mode.
+- **Durations.** From one hour, they follow the display language: "1 h 11" in French,
+  "1:11" in English. The "Always in hours and minutes" option is gone.
+- **Filter (Android).** The page is rebuilt: cylinder and gas criteria grouped, a saved
+  filter fills the page and can be deleted at once with "Undo". The explanatory sentences
+  under the criteria are gone.
+- **Statistics.** The "By …" sections fold and are closed at first, rows no longer show
+  the maximum depth, and the one-year view is gone. Charts that do not measure depth are
+  blue.
+- **Edit a dive.** Sections and cylinders are always open, the trip is chosen from a
+  list, and a rebreather dive has no gas switch depth for its diluent and oxygen.
+- **Sync conflict.** A new dialog with readable differences, "Later" and "Undo" before
+  anything is sent. With several dives, a full-screen dialog with a "Same choice for all"
+  switch.
+- **Messages.** One style for every snackbar, above the + button when there is one.
+- **Settings.** "Reset all settings" asks first, then keeps the planner settings and
+  your list of cylinders.
+- **Planner.** The SAC factor under stress is 2.0 by default.
+- **Secure connections.** The OpenSSL library is replaced by Mbed TLS, compatible with
+  the app's licence.
+- **What's new.** The version date next to its number.
+
+### Fixed
+
+- **Slow buttons.** Navigation buttons reacted a fraction of a second late, because each
+  touch restyled the hidden sections too.
+- **Units.** The units chosen on the device no longer go back to the logbook's at
+  restart, and a chosen unit system stays after a restart.
+- **Saved plans.** A plan keeps its rates, reserve and other settings, and gives the
+  same result when reopened.
+- **Sharing.** The app no longer stays stuck under a grey veil after sharing a dive or a
+  plan.
+- **Trips.** A trip of one dive is shown as a dive, and a dive on its own no longer
+  shows a trip.
+- **Tablet.** The Logbook opens the first dive when none is shown.
+- **What's new.** The list stopped after 20 entries.
 
 ## [0.2.0] - 2026-11-08
 
