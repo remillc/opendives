@@ -1216,7 +1216,9 @@ Christian changed task 2026-11-09-36. Work on branch `feature/carnet-month-heade
 
 Addendum (2026-11-10 10:55): the month label follows the display language. Build it with `Intl.DateTimeFormat(locale, { month: 'long', year: 'numeric' })` and capitalise the first letter: "Avril 2014" in French, "April 2014" in English. No bold: month and year in regular weight, 14 sp. Mock-ups updated.
 
-## [ ] 2026-11-10-15 Desaturation: last dive block, and the "flying allowed" state
+## [x] 2026-11-10-15 Desaturation: last dive block, and the "flying allowed" state
+
+Done in "Desaturation: last dive section and the flying allowed state" (no "Désaturation restante" or "Désaturation terminée": Subsurface has no criterion for it, Christian agreed).
 
 Spec: "Tools", item "Desaturation, last dive and flying allowed" (new). Mock-ups: `docs/mockups/outils-desaturation-android.dc.html` (updated), `docs/mockups/outils-desaturation-terminee-android.dc.html` (new). Page: `app/src/pages/Desaturation.svelte`.
 - New section "Dernière plongée" under the summary card: one row (date and time, "{site} · {depth} · {duration}", "Sortie de l’eau il y a {durée}"), chevron, opens `/dive/:id`. The time since surfacing uses the end of the dive and updates with the screen.
