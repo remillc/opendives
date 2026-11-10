@@ -34,7 +34,7 @@ OpenDives is a full dive log app for mobile. It improves on Subsurface-mobile, b
 
 ## User interface
 
-- **Reference for coding the UI:** `docs/system-design.md` (principles, CSS naming, colours, type, layout, shared components, states) and `docs/ui-specification.md` (each screen, core data). They take precedence over the mock-ups. The design documents in `docs/` are in English; their French originals are kept on claude.ai, and a change there must be carried over here in English.
+- **Reference for coding the UI:** `docs/system-design.md` (principles, CSS naming, colours, type, layout, shared components, states) and `docs/ui-specification.md` (each screen, core data). They take precedence over the mock-ups. These UI documents exist only here, in English (their old French versions on claude.ai were abandoned on 10 November 2026).
 - **iPhone and iPad:** iOS conventions (Human Interface Guidelines).
 - **Android:** **standard Material Design 3**, not Expressive.
 - **Tablets:** an iOS variant and an Android variant.
