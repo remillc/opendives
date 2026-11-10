@@ -1410,6 +1410,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Offline maps: a search field on \"Choose on the map\" finds a site of your logbook as you type, or a place when you press search, and puts the rectangle around it.",
       "Settings: the water type written on downloaded dives that have none can be chosen (Not specified by default).",
       "Offline maps: draw a rectangle on the map from Settings to download it (up to 3,000 tiles; less detail allows a larger area); a space limit and a free-space floor protect the device, and updates are offered with a badge.",
       "Sites: without a network, the map reads the downloaded regions, else a simplified world map; an \"Offline\" pill says so and a message offers to download the area.",
@@ -2394,7 +2395,19 @@
       "size": "About {width} × {height} km",
       "tiles": "{count} tiles of {limit}",
       "tooBig": "This area is too large: a download is limited to 3,000 tiles. Make the rectangle smaller.",
-      "suggestLess": "Too many tiles at full detail. Choose less detail to download this area."
+      "suggestLess": "Too many tiles at full detail. Choose less detail to download this area.",
+      "search": {
+        "label": "Search for a place or a site",
+        "offline": "Search unavailable without a network",
+        "clear": "Clear the search",
+        "sites": "From your logbook",
+        "places": "Places",
+        "searchPlaces": "Search places for \"{query}\"",
+        "searching": "Searching…",
+        "none": "No place found.",
+        "error": "Search is not possible right now. Try again.",
+        "attribution": "Places: data © OpenStreetMap contributors, via Nominatim"
+      }
     }
   }
 }
