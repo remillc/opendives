@@ -1236,3 +1236,13 @@ Spec: "Dive rows, duration above depth" (new). Mock-ups: `docs/mockups/android-c
 - Includes the branch `feature/carnet-month-headers` (task 14): apply it there too, without merging that branch.
 - A line in the release notes.
 
+## [ ] 2026-11-10-17 Android tablet: screenshots of every screen, portrait and landscape (no code change)
+
+Christian wants the Android tablet mock-ups redrawn to match what the app shows today, in portrait and in landscape. The canvas only has 7 old tablet boards. This task changes no code: it collects screenshots and facts for the design session.
+- Use an Android tablet emulator (Pixel Tablet or similar, about 1280 × 800 dp), light theme, French, with the bundled sample log (never a personal log). Take each screen in landscape and in portrait.
+- **Home screen first** (Carnet with its first dive open beside it), then every other screen of the tablet layout: Carnet search, selection and trip, dive detail (and its menu), edit, download and add, filter; Sites (list, site, map); Statistics (list and a result beside it); Tools (list and each tool beside it), planner; Account (signed in, no account); Settings and each sub-page; About; the sync states (offline, failure, conflict); the empty logbook.
+- Save the images as PNG in `docs/screenshots/android-tablet/`, named `<nn>-<screen>-<landscape|portrait>.png` (`01-carnet-landscape.png`), at 1 dp = 1 px if possible (otherwise say the scale).
+- Add `docs/screenshots/android-tablet/README.md`: one line per screen with its route, the layout in each orientation (rail width, list pane width, what the detail pane shows, any sheet or dialog), and anything that differs from the phone screen or from `docs/ui-specification.md` and `docs/system-design.md`.
+- Commit the home screen pair first, in its own commit and push, so the design work can start; then the rest.
+- Mark this task done when all screens are in.
+
