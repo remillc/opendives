@@ -173,6 +173,8 @@ export async function setCorePrefs(changes) {
   // Changing one unit makes the system "personalize" in the core: kept too.
   const prefs = await OpenDivesCore.getPrefs();
   Object.assign(storedCore, changes);
+  // A chosen system replaces the units kept one by one: restored later, they would override it.
+  if (changes.unitSystem && changes.unitSystem !== 'personalize') for (const key of /** @type {const} */ (['length', 'temperature', 'pressure', 'volume', 'weight'])) if (!(key in changes)) delete storedCore[key];
   if (['length', 'temperature', 'pressure', 'volume', 'weight'].some((k) => k in changes)) storedCore.unitSystem = prefs.unitSystem;
   writeJson(CORE_KEY, storedCore);
   if ('extraEnvironmental' in changes) settings.extraConditions = changes.extraEnvironmental === true;
