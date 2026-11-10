@@ -1269,7 +1269,7 @@ Spec: UI specification, section 4, item "Help page \"Comment créer un jeton d'a
 - Accessibility: `role="tablist"`, `role="tab"` with `aria-selected`, the card as `role="tabpanel"` labelled by its tab.
 - Remove `tokenHelp.menu` if it is no longer used. A line in the release notes.
 
-## [ ] 2026-11-10-20 Android tablet: the screens not yet captured (no code change)
+## [x] 2026-11-10-20 Android tablet: the screens not yet captured (no code change)
 
 Follow-up to task 2026-11-10-17, same rules: tablet emulator, light theme, French, 1 dp = 1 px, PNG in `docs/screenshots/android-tablet/`, a line per screen in its README. This task changes no code.
 
@@ -1287,6 +1287,8 @@ If a state needs a broken network or a conflicting change, describe how you prod
 **2. Phone screenshots for the screens that have no phone mock-up yet** (Pixel phone size, portrait only, `docs/screenshots/android-phone/`, same naming and a README): 08 download, 10 new dive by hand, 12 a filter criterion (Combinaison), 25 sites without coordinates, 71 release notes, 72 licence, 73 privacy policy. The design session will draw the phone and tablet mock-ups from them.
 
 Mark this task done when both parts are in.
+
+Done: `docs/screenshots/android-tablet/` (README, section "States": every screen exists; how each state was produced) and `docs/screenshots/android-phone/` (README). Four bugs found while capturing were fixed and merged; two small ones remain, listed in the tablet README.
 
 ## [x] 2026-11-10-21 Account flow in the editorial layout (Android phone and tablet)
 
