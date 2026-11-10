@@ -21,6 +21,8 @@ export const navigation = $state({
   page: /** @type {''|'settings'|'about'} */ (''),
   /** Identifier of the dive shown beside the list (tablet), or null. */
   dive: /** @type {string|null} */ (null),
+  /** Download pages open (Download, Download failed): the Logbook's floating + steps aside while one shows. */
+  downloadPanes: 0,
 });
 
 /** Element that opened the menu; it gets the focus back on close. */

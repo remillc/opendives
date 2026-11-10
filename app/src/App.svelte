@@ -313,20 +313,21 @@
       background: var(--od-surface);
     }
 
-    /* Beside the list, the dive has no Back button: the list stays on screen. */
-    :global(.view-master-detail .page-master-detail .navbar .left .back) {
+    /* Beside the list, the dive has no Back button: the list stays on screen.
+       The download pages keep their ✕: it closes the task (back to the previous pane). */
+    :global(.view-master-detail .page-master-detail:not(.od-download, .od-download-failed) .navbar .left .back) {
       display: none;
     }
 
     /* No ☰ button on a tablet and no Back button beside the list: no empty button bubble (iOS). */
     :global(.views.od-tablet .navbar .left:not(:has(a, button))),
-    :global(.view-master-detail .page-master-detail .navbar .left) {
+    :global(.view-master-detail .page-master-detail:not(.od-download, .od-download-failed) .navbar .left) {
       display: none;
     }
 
     /* Without a button before it, the title keeps the side margin of the pane. */
     :global(.views.od-tablet .navbar .left:not(:has(a, button)) + .title),
-    :global(.view-master-detail .page-master-detail .navbar .left + .title) {
+    :global(.view-master-detail .page-master-detail:not(.od-download, .od-download-failed) .navbar .left + .title) {
       margin-left: 16px;
     }
 

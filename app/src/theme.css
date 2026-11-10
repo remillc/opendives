@@ -23,6 +23,8 @@
   :root {
     /* Meaning colors. */
     --od-alarm: #C62828;
+    /* Pale tint behind an alarm icon; the icon in --od-alarm on it: 4.8:1 (AA non-text 3:1). */
+    --od-alarm-tint: #FBE9E7;
     /* MD3 colour roles (spec, section 1, "Colour roles"), light. */
     --od-primary-container: #E8E8E5;
     --od-on-primary-container: #1F2124;
@@ -127,6 +129,8 @@
   html.dark {
     /* Meaning colours, lighter to keep their contrast on the dark background (spec, section 1). */
     --od-alarm: #FF8A80;
+    /* Dark counterpart: alarm colour at about 18 % over the dark surface; the icon on it: 6.2:1. */
+    --od-alarm-tint: #3F2423;
     --od-primary-container: #2E3033;
     --od-on-primary-container: #F4F4F2;
     --od-secondary: #F0A66B;

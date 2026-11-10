@@ -333,6 +333,8 @@
   const productOptions = $derived(
     (models.find((m) => m.vendor === chosenVendor)?.products ?? []).map((p) => ({ value: p.name, label: p.name })),
   );
+  /** Android: each computer is a card (the iOS look keeps its grouped rows). */
+  const card = $derived(!theme.ios);
   const percent = $derived(Math.round(fraction * 100));
   /** @param {Computer} c */
   const subtitle = (c) => t('download.vendorBluetooth', { vendor: c.vendor });
@@ -374,10 +376,10 @@
 
     {#if remembered.length}
       <h2 class="od-download--subheader">{t('download.remembered')}</h2>
-      <ul class="od-download--rows">
+      <ul class="od-download--rows od-download--cards" class:od-download--card-list={card}>
         {#each remembered as c (c.address)}
           <li>
-            <button type="button" class="od-download--row" onclick={() => download(c)}>
+            <button type="button" class="od-download--row" class:od-download--card={card} onclick={() => download(c)}>
               <span class="od-download--avatar" aria-hidden="true"><Icon name="bluetooth" size={22} /></span>
               <span class="od-download--texts">
                 <span class="od-download--headline">{c.product}</span>
@@ -395,10 +397,10 @@
       {#if scanning}<span class="od-download--spinner" role="status" aria-label={t('download.searching')}></span>{/if}
     </h2>
     {#if nearby.length}
-      <ul class="od-download--rows">
+      <ul class="od-download--rows od-download--cards" class:od-download--card-list={card}>
         {#each nearby as d (d.mac)}
           <li>
-            <button type="button" class="od-download--row" onclick={() => pick(d)}>
+            <button type="button" class="od-download--row" class:od-download--card={card} onclick={() => pick(d)}>
               <span class="od-download--avatar" aria-hidden="true"><Icon name="bluetooth" size={22} /></span>
               <span class="od-download--texts">
                 <span class="od-download--headline">{d.computer ? d.computer.product : d.name}</span>
@@ -429,7 +431,7 @@
     </label>
   {:else if phase === 'downloading' && computer}
     <h2 class="od-download--subheader">{t('download.computer')}</h2>
-    <div class="od-download--computer">
+    <div class="od-download--computer" class:od-download--card={card}>
       <span class="od-download--avatar" aria-hidden="true"><Icon name="bluetooth" size={22} /></span>
       <span class="od-download--texts">
         <span class="od-download--headline">{computer.product}</span>
@@ -477,8 +479,14 @@
               <span class="od-download--supporting">{formatDateTime(d.date)}</span>
             </span>
             <span class="od-download--values">
-              <span class="od-download--depth">{formatDepth(d.maxDepthMm, logbook.prefs)}</span>
-              <span class="od-download--supporting">{formatDuration(d.durationSeconds)}</span>
+              {#if theme.ios}
+                <span class="od-download--depth">{formatDepth(d.maxDepthMm, logbook.prefs)}</span>
+                <span class="od-download--supporting">{formatDuration(d.durationSeconds)}</span>
+              {:else}
+                <!-- Android: the duration above the depth, as in the dive rows. -->
+                <span class="od-download--depth">{formatDuration(d.durationSeconds)}</span>
+                {#if d.maxDepthMm}<span class="od-download--supporting">{formatDepth(d.maxDepthMm, logbook.prefs)}</span>{/if}
+              {/if}
             </span>
           </li>
         {/each}
@@ -642,6 +650,45 @@
       gap: 4px;
       font-size: 14px;
       color: var(--od-oxygen);
+    }
+
+    /* Android: a computer is a card, remembered, nearby or connected. */
+    .od-download--card {
+      width: auto;
+      margin: 0 16px;
+      padding: 12px 16px;
+      border-radius: 16px;
+      background: var(--od-surface);
+    }
+
+    /* 8 dp between cards. Two columns when the pane itself is wide (container
+       query below), one column on a phone and in portrait. */
+    .od-download--card-list {
+      margin: 0 16px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 8px;
+
+      > li {
+        display: flex;
+      }
+
+      .od-download--card {
+        width: auto;
+        flex: 1;
+        margin: 0;
+      }
+    }
+
+    /* The page is the container: the width left beside the list decides, not the orientation. */
+    :global(.od-download .page-content) {
+      container-type: inline-size;
+    }
+
+    @container (min-width: 720px) {
+      .od-download--card-list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
     }
 
     .od-download--computer {
