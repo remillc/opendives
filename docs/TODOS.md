@@ -25,3 +25,4 @@ Next number: 29
 - #23 [design] idée : ajouter une section Explorer, une carte qui affiche les sites de plongée des environs
 - #27 [design] Se débarrasser de tout workflow lié à l'état invalide d'une plongée : menus contextuels, recherche, paramétrage. S'assurer au préalable que cette feature n'est pas utilisée.
 - #29 [code] s'assurer que toutes les classes css et propriétés css aient le préfix "od"
+- #30 [code] tous les boutons de navigation sont laggy: ils prennent une fraction de seconde à se mettre en animation après un touch.

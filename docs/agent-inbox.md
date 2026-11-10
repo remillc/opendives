@@ -1166,7 +1166,9 @@ Christian approved all four. Spec: "Small changes of 10 November 2026" and "Stat
 
 Done in Four small changes from canvas comments
 
-## [ ] 2026-11-10-11 Filter (Android): rework the page to match the mock-up
+## [x] 2026-11-10-11 Filter (Android): rework the page to match the mock-up
+
+Done in "Rework the Android filter page to match the mock-up".
 
 Christian asked to review the filter page against the new Android mock-up. Spec: "Filter, Android". Mock-up: `docs/mockups/filtre-android.dc.html`. Pages: `app/src/pages/Filter.svelte`, `FilterCriterion.svelte`.
 - Full-screen dialog: ✕ (abandon), "Filtrer", text button "Tout effacer".
@@ -1182,7 +1184,9 @@ Addendum (2026-11-10 10:10): saved filters. Spec: "Filter, Android" (updated). M
 - Each row has an ✕ icon button on the right, `aria-label` "Supprimer le filtre {nom}": deletes at once, snackbar "Filtre {nom} supprimé" with "Annuler" for 6 s (snackbar style of ui-foundations section 8).
 - Hidden while the search field has text; absent when no filter is saved.
 
-## [ ] 2026-11-10-12 Statistics: "Par …" sections become accordions again, closed by default
+## [x] 2026-11-10-12 Statistics: "Par …" sections become accordions again, closed by default
+
+Done in "Make the statistics By sections accordions, closed by default".
 
 Christian reversed the "no accordion" part of task 2026-11-10-09. Spec: "Statistics, items are not clickable" (updated). Mock-up: `docs/mockups/android-stats.dc.html` ("Par année" drawn open, the others closed). Page: `app/src/pages/Statistics.svelte`.
 - Each "Par …" section ("Par année", "Par mode", "Par combinaison", "Par compagnon" and the others) has its title as a 48 dp button: title text (14 sp, medium, `--od-on-surface-variant`) and a chevron on the right, pointing down when closed, up when open. `aria-expanded` on the button, inside the `h2`.
