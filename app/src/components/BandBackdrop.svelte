@@ -150,8 +150,8 @@
       display: flex;
       align-items: baseline;
       gap: 8px;
-      font-size: 20px;
-      line-height: 28px;
+      font-size: 18px;
+      line-height: 24px;
       opacity: var(--od-band-month-opacity, 0);
     }
 
