@@ -1410,6 +1410,8 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Conflict on several dives: a full-screen dialog with a \"Same choice for all\" switch and one card per dive, where you touch the version to keep.",
+      "Sync conflict: \"Later\" closes the dialog and leaves you where you were; the Carnet sync status and the side menu sync card reopen it, and it comes back at the next sync attempt.",
       "Offline maps: choosing an area opens on your current position.",
       "Offline maps: an area with no logbook site takes the name of the place.",
       "Offline maps: \"Choose on the map\" now shows a fixed frame; move and zoom the map under it and the area it covers is what you download. The detail is chosen for you, and the size shown is an estimate.",
@@ -2000,7 +2002,16 @@
     "empty": "(empty)",
     "failed": "The choice could not be saved. Nothing changed.",
     "unknownDive": "Dive without a date",
-    "forAll": "Apply this choice to all the dives"
+    "titleMany": "{n} dives in conflict",
+    "introMany": "Changed here and in the cloud, from another device. For each one, touch the version to keep. Nothing is lost until you choose. ✕ closes without changing anything: you will choose later.",
+    "allSame": "Same choice for all",
+    "allSameText": "All this phone, or all the cloud",
+    "phoneShort": "This phone",
+    "cloudShort": "Cloud",
+    "differs": "differs: {fields}",
+    "choiceFor": "Version to keep for {name}",
+    "details": "See details: {name}",
+    "back": "Back"
   },
   "confirmCode": {
     "heading": "Confirm your address",
