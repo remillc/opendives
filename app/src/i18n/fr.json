@@ -1418,6 +1418,7 @@
   "about": {
     "title": "À propos",
     "version": "Version {version}",
+    "versionDated": "Version {version} · {date}",
     "author": "Par {name}",
     "copyright": "© {year} {name}.",
     "tagline": "Carnet de plongée libre et gratuit, compatible avec les carnets Subsurface.",
@@ -1498,7 +1499,8 @@
       "Nouveau logo « Trois vagues » : icône de l’app, écran de démarrage, menu et À propos.",
       "Conflit de synchronisation : dialogue refait, différences lisibles, « Plus tard », et « Annuler » avant l’envoi.",
       "Filtrer (Android) : page refaite, critères de bouteille et de gaz regroupés, un filtre enregistré remplit la page, et sa suppression propose « Annuler ».",
-      "Filtrer : les phrases d’explication sous les critères disparaissent."
+      "Filtrer : les phrases d’explication sous les critères disparaissent.",
+      "Nouveautés : la date de la version à côté de son numéro, et la liste complète."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
