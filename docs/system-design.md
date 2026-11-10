@@ -133,6 +133,8 @@ Files: [`docs/brand/`](brand/).
 | Temperature | 1 decimal |
 | Volume, SAC | 1 decimal |
 
+**Long totals of time (decided on 10 November 2026).** A total of time under water (statistics key figures, "Par …" and "Mes statistiques" rows, any sum of dive durations) under 24 hours keeps hours and minutes ("11 h 26"). From 24 hours it is written in days and hours, without minutes: "80 j 16 h" in French, "80 d 16 h" in English (keys in the translation files), never "1936 h 02". A single dive duration does not change (see the dive duration format above).
+
 ## 7. Layout and navigation
 
 Width decides the layout, not the type of device: below 768 px wide, phone layout; from 768 px, tablet layout. A phone that is folded or unfolded therefore changes layout without restarting.
