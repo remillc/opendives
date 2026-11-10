@@ -1063,7 +1063,9 @@ Spec: "Carnet, month headers that stay on top". Mock-ups: `docs/mockups/android-
 - A trip stays one group under the month of its first dive; inside an open trip the band keeps that month.
 - Keep search, selection mode and the filter working with the headers (a filtered list still shows its month headers, with filtered counts).
 
-## [ ] 2026-11-10-01 Offline maps: search field on "Choisir sur la carte" (addendum to 2026-11-09-33)
+## [x] 2026-11-10-01 Offline maps: search field on "Choisir sur la carte" (addendum to 2026-11-09-33)
+
+Done in Add a search field to "Choose on the map"
 
 **Approved by Christian on 10 November 2026: go ahead.**
 

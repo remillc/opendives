@@ -11,9 +11,10 @@
   import { Page, Navbar, Link } from 'framework7-svelte';
   import { OpenDivesCore } from 'opendives-core';
   import TextField from '../components/TextField.svelte';
-  import { t } from '../lib/i18n.js';
+  import { t, language } from '../lib/i18n.js';
   import { MAP_STYLE, showLabelsInLanguage } from '../lib/map-style.js';
   import { rectAround, nearestSite, bboxSizeKm, checkTiles, normalizeBbox, MAX_TILES } from '../lib/maps-logic.js';
+  import { filterSites, rectForPoint, searchPlaces } from '../lib/area-search.js';
   import { formatNumber } from '../lib/format.js';
   import { offlineMaps, addRegion } from '../lib/offline-maps.svelte.js';
 
@@ -105,9 +106,65 @@
     handles[corner] = marker;
   }
 
+  // --- Search ---------------------------------------------------------------------
+  // Sites of the logbook filter as the diver types (local, no network). Places
+  // go to Nominatim only on an explicit submit: its policy forbids client-side
+  // autocomplete.
+  /** @type {any[]} */
+  let allSites = $state([]);
+  let query = $state('');
+  /** @type {{ name: string, detail: string, lng: number, lat: number }[]} */
+  let places = $state([]);
+  /** @type {'idle'|'loading'|'done'|'error'} */
+  let placesState = $state('idle');
+  /** The query the shown places answer; typing again hides them. */
+  let placesFor = $state('');
+  const siteResults = $derived(filterSites(query, allSites));
+  const showPlaces = $derived(placesState !== 'idle' && placesFor === query.trim());
+  const panelOpen = $derived(offlineMaps.online && query.trim() !== '');
+
+  async function submitSearch() {
+    const q = query.trim();
+    if (!q || !offlineMaps.online || placesState === 'loading') return;
+    placesFor = q;
+    placesState = 'loading';
+    try {
+      const found = await searchPlaces(q, language);
+      if (placesFor !== q) return;
+      places = found;
+      placesState = 'done';
+    } catch (e) {
+      console.error('Place search', e);
+      if (placesFor !== q) return;
+      places = [];
+      placesState = 'error';
+    }
+  }
+
+  /** @param {{ name: string, lng: number, lat: number }} hit @param {boolean} isSite */
+  function choose(hit, isSite) {
+    bbox = rectForPoint(hit.lng, hit.lat);
+    if (isSite) {
+      name = t('maps.area.around', { site: hit.name });
+      named = true; // the diver's choice: dragging a corner does not rename it
+    } else {
+      named = false;
+      name = proposal(bbox);
+    }
+    if (map) {
+      draw(bbox);
+      map.fitBounds(bbox, { padding: { top: 120, bottom: 300, left: 60, right: 60 }, duration: 600 });
+    }
+    query = '';
+    placesState = 'idle';
+    places = [];
+    /** @type {HTMLElement|null} */ (document.activeElement)?.blur?.();
+  }
+
   onMount(async () => {
     try {
       const list = await OpenDivesCore.siteQuery({ kind: 'list' });
+      allSites = list;
       located = list
         .filter((/** @type {any} */ s) => s.hasLocation && s.dives > 0)
         .map((/** @type {any} */ s) => ({ name: s.name, lng: s.lonUdeg / 1e6, lat: s.latUdeg / 1e6 }));
@@ -186,6 +243,65 @@
       <p class="offline" role="status">{t('maps.area.needNetwork')}</p>
     {/if}
 
+    <div class="search">
+      <form
+        class="searchbar"
+        role="search"
+        onsubmit={(e) => {
+          e.preventDefault();
+          submitSearch();
+        }}
+      >
+        <input
+          type="search"
+          enterkeyhint="search"
+          autocomplete="off"
+          autocapitalize="off"
+          spellcheck="false"
+          bind:value={query}
+          disabled={!offlineMaps.online}
+          placeholder={offlineMaps.online ? t('maps.area.search.label') : t('maps.area.search.offline')}
+          aria-label={offlineMaps.online ? t('maps.area.search.label') : t('maps.area.search.offline')}
+        />
+        {#if query}
+          <button type="button" class="clear" aria-label={t('maps.area.search.clear')} onclick={() => (query = '')}>×</button>
+        {/if}
+      </form>
+      {#if panelOpen}
+        <div class="results card">
+          {#if siteResults.length}
+            <p class="group">{t('maps.area.search.sites')}</p>
+            {#each siteResults as hit, i (i)}
+              <button type="button" class="hit" onclick={() => choose(hit, true)}>
+                <span class="hit-name">{hit.name}</span>
+                {#if hit.detail}<span class="hit-detail">{hit.detail}</span>{/if}
+              </button>
+            {/each}
+          {/if}
+          <p class="group">{t('maps.area.search.places')}</p>
+          {#if !showPlaces}
+            <button type="button" class="hit" onclick={submitSearch}>
+              <span class="hit-name">{t('maps.area.search.searchPlaces', { query: query.trim() })}</span>
+            </button>
+          {:else if placesState === 'loading'}
+            <p class="note" role="status">{t('maps.area.search.searching')}</p>
+          {:else if placesState === 'error'}
+            <p class="note over" role="alert">{t('maps.area.search.error')}</p>
+          {:else}
+            {#each places as hit, i (i)}
+              <button type="button" class="hit" onclick={() => choose(hit, false)}>
+                <span class="hit-name">{hit.name}</span>
+                {#if hit.detail}<span class="hit-detail">{hit.detail}</span>{/if}
+              </button>
+            {:else}
+              <p class="note" role="status">{t('maps.area.search.none')}</p>
+            {/each}
+            <p class="note small">{t('maps.area.search.attribution')}</p>
+          {/if}
+        </div>
+      {/if}
+    </div>
+
     <div class="sheet">
       <div class="handle" aria-hidden="true"></div>
       <p class="help">{t('maps.area.help')}</p>
@@ -244,6 +360,119 @@
       font-size: 11px;
       line-height: 14px;
       pointer-events: none;
+    }
+
+    .search {
+      position: absolute;
+      z-index: 2;
+      top: calc(var(--f7-navbar-height, 56px) + var(--f7-safe-area-top, 0px) + 8px);
+      left: 16px;
+      right: 16px;
+    }
+
+    .searchbar {
+      position: relative;
+      height: 56px;
+      border-radius: 28px;
+      background: var(--od-surface);
+      box-shadow: 0 1px 6px rgb(0 0 0 / 0.25);
+
+      input {
+        width: 100%;
+        height: 100%;
+        box-sizing: border-box;
+        padding: 0 52px 0 20px;
+        border: none;
+        border-radius: 28px;
+        background: transparent;
+        color: var(--od-text);
+        font: inherit;
+        font-size: 16px;
+
+        &::placeholder {
+          color: var(--od-text-2);
+        }
+
+        &:disabled {
+          opacity: 0.6;
+        }
+      }
+    }
+
+    .clear {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 48px;
+      height: 48px;
+      padding: 0;
+      border: none;
+      border-radius: 50%;
+      background: transparent;
+      color: var(--od-text);
+      font-size: 24px;
+      line-height: 48px;
+      cursor: pointer;
+    }
+
+    .results {
+      margin: 8px 0 0;
+      max-height: 45vh;
+      overflow-y: auto;
+      border-radius: 16px;
+      background: var(--od-surface);
+      box-shadow: 0 2px 10px rgb(0 0 0 / 0.25);
+      padding: 4px 0 8px;
+    }
+
+    .group {
+      margin: 8px 20px 0;
+      font-size: 12px;
+      line-height: 16px;
+      font-weight: 600;
+      color: var(--od-text-2);
+    }
+
+    .hit {
+      width: 100%;
+      min-height: 48px;
+      padding: 6px 20px;
+      border: none;
+      background: transparent;
+      color: var(--od-text);
+      font: inherit;
+      text-align: start;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .hit-name {
+      font-size: 16px;
+      line-height: 22px;
+    }
+
+    .hit-detail {
+      font-size: 13px;
+      line-height: 18px;
+      color: var(--od-text-2);
+    }
+
+    .note {
+      margin: 8px 20px 0;
+      font-size: 14px;
+      line-height: 20px;
+      color: var(--od-text-2);
+
+      &.over {
+        color: var(--od-alarm);
+      }
+
+      &.small {
+        font-size: 12px;
+        line-height: 16px;
+      }
     }
 
     .sheet {
