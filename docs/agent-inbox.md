@@ -1236,7 +1236,9 @@ Spec: "Dive rows, duration above depth" (new). Mock-ups: `docs/mockups/android-c
 - Includes the branch `feature/carnet-month-headers` (task 14): apply it there too, without merging that branch.
 - A line in the release notes.
 
-## [ ] 2026-11-10-17 Android tablet: screenshots of every screen, portrait and landscape (no code change)
+## [x] 2026-11-10-17 Android tablet: screenshots of every screen, portrait and landscape (no code change)
+
+Done in "docs: Android tablet screenshots, every screen in landscape and portrait" (test account logbook at Christian's request; sync states, empty logbook and no-account screen not captured, see the README).
 
 Christian wants the Android tablet mock-ups redrawn to match what the app shows today, in portrait and in landscape. The canvas only has 7 old tablet boards. This task changes no code: it collects screenshots and facts for the design session.
 - Use an Android tablet emulator (Pixel Tablet or similar, about 1280 × 800 dp), light theme, French, with the bundled sample log (never a personal log). Take each screen in landscape and in portrait.
