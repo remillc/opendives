@@ -1224,3 +1224,11 @@ Spec: "Tools", item "Desaturation, last dive and flying allowed" (new). Mock-ups
 - If desaturation is over but flying is not yet allowed, keep the two figures ("0 h 00" for desaturation).
 - New texts in `fr.json` and `en.json`; a line in the release notes.
 
+## [ ] 2026-11-10-16 Dive rows: duration above, depth below
+
+Spec: "Dive rows, duration above depth" (new). Mock-ups: `docs/mockups/android-carnet.dc.html` and the other Carnet-row mock-ups (updated).
+- In the shared dive row component (Carnet, trip contents, selection, export, the dives of a statistic, tablet list), swap the right column: duration on top (16 sp, weight 500), maximum depth below (14 sp, `--od-on-surface-variant`).
+- Same order in the accessible label of the row.
+- Includes the branch `feature/carnet-month-headers` (task 14): apply it there too, without merging that branch.
+- A line in the release notes.
+
