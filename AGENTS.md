@@ -34,14 +34,15 @@ OpenDives is a full dive log app for mobile. It improves on Subsurface-mobile, b
 
 ## User interface
 
-- **Reference for coding the UI:** `docs/ui-specification.md` (colours, texts, components, screens, core data). It takes precedence over the mock-ups. The design documents in `docs/` are in English; their French originals are kept on claude.ai, and a change there must be carried over here in English.
+- **Reference for coding the UI:** `docs/system-design.md` (principles, CSS naming, colours, type, layout, shared components, states) and `docs/ui-specification.md` (each screen, core data). They take precedence over the mock-ups. The design documents in `docs/` are in English; their French originals are kept on claude.ai, and a change there must be carried over here in English.
 - **iPhone and iPad:** iOS conventions (Human Interface Guidelines).
 - **Android:** **standard Material Design 3**, not Expressive.
 - **Tablets:** an iOS variant and an Android variant.
 - **No UI patterns or features typical of AI agents:** no chat assistant, no "magic" summary, no sparkle button, etc.
 - **Do not copy Subsurface-mobile's screens:** they are its main weakness.
 - **Languages:** multilingual from the start, French and English. No hard-coded visible text: one key per text, translations in `app/src/i18n/fr.json` and `en.json`; the language follows the device, English is the fallback. The diver's own data is never translated.
-- **Colours:** declared as `--od-*` variables, never hard-coded in a component. The chosen theme is finalist 3: black and white, colour allowed sparingly within WCAG 2.2 AA contrast and never as the only carrier of meaning (neutral light UI, ink #1F2124, strong contrast, sans-serif titles; the dive profile's water column goes from sand #FBE3B2 to rust #B4530F by depth; in dark mode honey #E5B961 to amber #EF7625). Values for light and dark are in docs/ui-specification.md, section 1. The debug theme picker can be removed. Meaning colours stay common: alarm, oxygen, pending.
+- **CSS names:** every component carries a class that names it, prefixed `od-`, in kebab case (`od-coordinate-field`); a part adds a `--` suffix (`od-coordinate-field--drag-handle`). See docs/system-design.md, section 2.
+- **Colours:** declared as `--od-*` variables, never hard-coded in a component. The chosen theme is finalist 3: black and white, colour allowed sparingly within WCAG 2.2 AA contrast and never as the only carrier of meaning (neutral light UI, ink #1F2124, strong contrast, sans-serif titles; the dive profile's water column goes from sand #FBE3B2 to rust #B4530F by depth; in dark mode honey #E5B961 to amber #EF7625). Values for light and dark are in docs/system-design.md, section 3. The debug theme picker can be removed. Meaning colours stay common: alarm, oxygen, pending.
 - **Filters:** on almost every field of a dive, gear included (full list in the specification).
   - Dive mode (open circuit or rebreather) is shown first.
   - Never offered: weight and weight type, start and end pressures, water density, nitrogen percentage.
@@ -53,7 +54,7 @@ OpenDives is a full dive log app for mobile. It improves on Subsurface-mobile, b
 - **Planner:** can start from a dive in the log (gases, measured SAC). Results are volumes per gas; when the diver gives the volume carried for a gas and it is too little, the total is shown in the alarm colour. Saved plans are planned dives of the logbook, listed by the planner only.
 - **States to build:** empty log, failed download, offline with pending changes, sync conflict (version choice: to be confirmed, an OpenDives addition).
 - **Log screen:** no permanent Download button; a "+" button opens download, import or manual entry.
-- **Navigation (decided on 6 November 2026):** no bottom bar on phones, on iOS or Android. A top bar with a ☰ button opens a side menu (Logbook, Sites, Statistics, Tools, then Account and Settings); see docs/ui-specification.md, section 3. Tablets keep the iPad sidebar and the Android navigation rail.
+- **Navigation (decided on 6 November 2026):** no bottom bar on phones, on iOS or Android. A top bar with a ☰ button opens a side menu (Logbook, Sites, Statistics, Tools, then Account and Settings); see docs/system-design.md, section 7. Tablets keep the iPad sidebar and the Android navigation rail.
 - **divelogs.de:** one-off import of the log when creating an account; divelogs.de credentials are never stored.
 - **Scope of v1:** every function rated "essential" and "adapted", plus every mobile novelty (rating in the reverse-engineering document).
 

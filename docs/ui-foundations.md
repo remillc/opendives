@@ -36,23 +36,7 @@ The same diver does not use the app the same way on the boat, in the evening and
 
 ## 3. Design principles
 
-Eight principles guide every screen. When two principles conflict, the higher one in the list wins.
-
-1. **The dive first.** The profile and the dive's figures are the main content, not decoration around menus. Each dive is recognisable by the shape of its profile.
-2. **Usable on the boat.** Touch targets of at least 48 points, text readable in full sunlight, choices in lists (nearby sites, usual buddies) rather than typing. No essential feature depends on the network.
-3. **Native above all.** iOS and Android components and gestures (through Framework7) are used as they are. A custom component is created only where none exists, for example for the profile.
-4. **Simple by default, technical on demand.** Technical data (ceiling, tissues, ppO2, helium) appears when the dive contains it or when the diver turns it on. A recreational diver does not see empty trimix fields.
-5. **Undo rather than confirm.** Actions apply immediately and can be undone in one gesture. A confirmation is reserved for irreversible actions (deleting the account, overwriting cloud data).
-6. **Synchronisation stays in the background.** The state is shown discreetly (synced, waiting for network, conflict resolved). It interrupts the diver only when they must act.
-7. **The diver's vocabulary.** Stop, ceiling, SAC, MOD, gas, dive computer: the words of the trade, with the units the diver chose. Buttons say what they do ("Download dives") and the result repeats the same word ("3 dives downloaded").
-8. **No typical AI patterns.** OpenDives has no AI feature, and nothing in its look should suggest one:
-   - no conversational assistant, "suggest" button or generated summary;
-   - no sparkle icons or emoji, no decorative gradients, no identical cards with big shadows, no number tiles on every screen;
-   - no all-caps labels above titles, no single word coloured in a title, no "A · B · C" strings, no "→" arrow added to buttons;
-   - no entrance animations on every element: motion only answers a gesture from the diver;
-   - no filler text: mock-ups and empty screens use real data and useful instructions ("Pair your dive computer to download your dives").
-
-Accessibility is not a separate principle: it is a floor. Screen readers (VoiceOver, TalkBack), system text sizes, sufficient contrast, reduced motion respected, and colours that never carry information alone.
+Moved to System design, section 1.
 
 ## 4. App organisation and navigation
 
@@ -74,19 +58,7 @@ The app opens on the **Logbook**, where most things happen: download, complete, 
 
 ## 5. Visual identity direction
 
-OpenDives' identity lies in **the dive profile**, not in decoration. Around it, the interface stays native and plain.
-
-**The idea: the water column.** In the profile, the area between the surface and the curve fills with water whose colour changes with depth, on the same scale for every dive. This gradient is not decorative: it encodes depth. A 40 m dive is recognisable at a glance next to a 12 m dive. In the list, each dive is represented by the thumbnail of its profile, instead of an icon.
-
-**Colours.** The first "water and buoy" direction (blues and buoy orange) was dropped on 5 November 2026: colours should not evoke water or the sky, but the diver's state of mind, the urge to dive again, with confidence and control. A "fir green and tangerine on cream" palette followed and was dropped the same day. The chosen theme is **black and white**: neutral light interface, ink #1F2124, strong contrast, sans-serif titles; in dive data, the water column goes from sand to rust with depth (honey to amber in dark mode). The earlier rule "colour reserved for data" was dropped on 9 November 2026. Its values are in the [UI specification](ui-specification.md), section 1.
-
-**Android reference (decided on 5 November 2026).** We follow Material Design 3 in its standard version, not the "Expressive" variant: square floating action button with rounded corners, pill-shaped regular buttons, navigation bar on phones and navigation rail on tablets. On iPhone and iPad, we follow Apple's conventions (Human Interface Guidelines).
-
-**Typography.** The system fonts: SF Pro on iOS, Roboto on Android. It is the native choice, and it keeps text readable at every accessibility size. One rule specific to OpenDives: dive figures (depth, duration, pressure) use **tabular figures**, so columns of values stay aligned from one row to the next.
-
-**Layout.** Native full-width lists rather than cards, left alignment, numeric values aligned in columns. In a list row, metadata sits in columns, not chained with middle dots.
-
-**What was set aside and why.** The first reflex was the "ocean" look: blue gradient background, a wave in the header, rounded cards with soft shadows. It is the default look of almost every diving app and of generated interfaces. It was replaced by a gradient reserved for data (the water column). The interface around it stays the system's.
+Moved to System design, sections 4, 5 and 11.
 
 ## 6. Key screens to mock up first
 
@@ -122,12 +94,4 @@ The values in the planner mock-ups come from Subsurface's real planner, compiled
 
 ## 8. Snackbar style (decided on 10 November 2026)
 
-Every snackbar in the app uses one style, the one of `docs/mockups/sites-nettoyer-pas-doublons-android.dc.html`:
-
-- Container: inverse surface, `--od-inverse-surface` #2E3033 in light mode (#E8E8E5 in dark mode), 4 dp corners, shadow 0 2 6 rgba(0, 0, 0, 0.25). Floating 16 dp from the left and right edges and 24 dp above the bottom of the screen, or above the FAB when there is one.
-- Height at least 48 dp; padding 8 dp top and bottom, 16 dp left, 8 dp right. Text on up to two lines.
-- Text: 14 sp, line height 20 sp, `--od-inverse-on-surface` #F4F4F2 (dark mode #1F2124).
-- Action: a text button, 40 dp high, 12 dp side padding, 14 sp semibold, in `--od-inverse-primary` #8AB4F8 (dark mode #2F6DB5). At most one action, usually "Annuler".
-- Duration: at least 4 s, 6 s when there is an action. One snackbar at a time; a new one replaces the old.
-- `role="status"` so screen readers announce it; the action stays reachable with the keyboard and TalkBack until the snackbar closes.
-
+Moved to System design, section 8.

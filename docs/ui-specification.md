@@ -2,52 +2,14 @@
 
 2026-11-05 · Christian Rémillard
 
-This document turns the mock-ups into rules the code applies as they are: colours, text, measurements, components, screens and the data requested from the core. It is written first for the coding agent that builds the app (Svelte 5, Framework7 v9, JavaScript with JSDoc), and for Christian to validate.
+This document turns the mock-ups into rules for each screen, and for the data requested from the core. The rules every screen shares are in the [System design](system-design.md). It is written first for the coding agent that builds the app (Svelte 5, Framework7 v9, JavaScript with JSDoc), and for Christian to validate.
 
-- **Order of precedence:** this document, then the [mock-ups](https://claude.ai/artifact/Jpuj8pGER3xz8n383JvYep), then the [UI foundations](ui-foundations.md). When they disagree, this document wins; a mock-up that contradicts it must be reported.
-- **Native first:** everything Framework7 provides (bars, lists, sheets, buttons, fields) is used as is, with its iOS or MD3 theme. Only the components in section 4 are specific to OpenDives.
-- **Not frozen yet:** colours must still be checked on a real phone, in full sunlight and at night; open points are marked **To decide**.
+- **Order of precedence:** this document and the [System design](system-design.md), then the [mock-ups](https://claude.ai/artifact/Jpuj8pGER3xz8n383JvYep), then the [UI foundations](ui-foundations.md). When they disagree, these two documents win; a mock-up that contradicts them must be reported.
 - **Language:** this is the English copy of the French original kept on claude.ai ([online](https://claude.ai/artifact/TJU7voFbP6zeNaSUci5p7i)). UI strings are quoted in English; French is the reference language for writing them (`app/src/i18n/fr.json`).
 
-## 1. Colours
+## 1. Statistics, tools and About
 
-The theme is **black and white**: a neutral light background, actions without a bright colour (#1F2124), strong contrast and sans-serif titles. In dive data, the water column of the profile and of the thumbnails goes from sand to rust with depth. Colour may also appear elsewhere in the interface, and we can play with it, but sparingly and always within the accessibility rules (WCAG 2.2 AA): text at least 4.5:1 against its background (3:1 for large text, 18 sp, or 14 sp bold), and 3:1 for icons, borders, selection marks and other meaningful graphics. Colour never carries meaning alone: a selection, a state or an alert also has a shape, an icon or a word. The code declares each colour once, as a CSS variable `--od-*`, and never hard-codes a value in a component.
-
-| Token | Light | Dark | Use, and only this one |
-| --- | --- | --- | --- |
-| `--od-text` | #1F2124 (14.7:1 on the background) | #F4F4F2 | Main text, links, buttons, active tab, profile cursor; a filled button carries #FFFFFF text (16.1:1), #1F2124 in dark mode |
-| `--od-text-2` | #4A4D52 (7.7:1) | #B5B8BC (9.3:1) | Secondary text, labels |
-| `--od-background` | #F4F4F2 | #121314 | Screen background |
-| `--od-surface` | #FFFFFF | #1C1D1F | Cell, block, profile |
-| `--od-tint` | #E8E8E5 | #2E3033 | Pills (gases, buddies, tags), secondary button, selected item |
-| `--od-separator` | #DADAD6 | #3A3C40 | Separators and outlines |
-| `--od-water-top` | #FBE3B2 | #E5B961 | Top of the water column |
-| `--od-water-bottom` | #B4530F | #EF7625 (tempered amber) | Water column at 60 m and deeper; in between, the colour is mixed according to the maximum depth |
-| `--od-trace` | #1F2124 (3.2:1 on the bottom of the water) | #F4F4F2, 2 px, over a 4.5 px #121314 outline | Profile line |
-| `--od-alarm` | #C62828 (5.1:1) | #FF8A80 (8.1:1) | Ceiling violated, fast ascent, insufficient gas reserve, errors; never anywhere else |
-| `--od-oxygen` | #2E7D32 (4.7:1) | #7FD283 | ppO2 curve, nitrox and oxygen mixes |
-| `--od-pending` | #8A4B00 (6.2:1) | #F2B84B (10.4:1) | "Offline, waiting to be sent" state; text only, always with an icon |
-
-**Colour roles (decided on 9 November 2026).** Besides the water of the dive data, the interface has four MD3 colour roles, each with a colour, an on-colour, a container and an on-container. Each becomes a `--od-*` token and the matching Framework7/MD3 variable.
-
-| Role | Light: colour / on / container / on-container | Dark: colour / on / container / on-container | Use, and only this one |
-| --- | --- | --- | --- |
-| Primary (ink) | #1F2124 / #FFFFFF / #E8E8E5 / #1F2124 | #F4F4F2 / #1F2124 / #2E3033 / #F4F4F2 | Main actions, links, text (unchanged) |
-| Secondary (rust and sand) | #B4530F / #FFFFFF / #FBE3B2 / #3D2200 | #F0A66B / #3D2200 / #4A3216 / #FBE3B2 | Selection and active state (check badge, selected card, active row of the side menu), tonal buttons, small accents; never an alert. Rust text on the light background is 4.6:1: short bold labels only |
-| Tertiary (blue) | #2F6DB5 / #FFFFFF / #DCE8F7 / #0F2F55 | #8AB4F8 / #0F2F55 / #1E3A5F / #DCE8F7 | Data series other than the water: temperature, charts of the logbook and of the statistics; sparingly |
-| Error (red) | #C62828 / #FFFFFF / #FDE2E0 / #5F1010 | #FF8A80 / #3A0A08 / #5C1A16 / #FDE2E0 | Alarms and errors only (unchanged, `--od-alarm`) |
-
-All text pairs reach 4.5:1 and all graphic marks 3:1 (ratios in the reference). Reference: `docs/mockups/palette-roles.dc.html`.
-
-**Dark mode.** Backgrounds are neutral and almost black; the ink becomes #F4F4F2. The water is a tempered amber gradient, from light honey at the surface (#E5B961) to a strong orange at depth (#EF7625), chosen on 5 November 2026: rust looked dull on a dark background, an amber starting from brown was too flat, saturated gradients were too bright. The gradient must stay visible: a shallow dive stays light, a deep dive goes down to the orange. The light profile line has a dark outline, which keeps it readable on the amber and on the background.
-
-**Framework7.** The theme is set with `colors: { primary: '#1F2124' }` when the app is created; in dark mode, the primary colour must be overridden to #F4F4F2, because the one Framework7 derives from a near-black is not readable on a dark background. The Android mock-ups use these MD3 roles (light / dark): primary #1F2124 / #F4F4F2; surface #F4F4F2 / #121314; surface-container #EEEEEC / #1C1D1F; outline-variant #DADAD6 / #3A3C40; secondary, tertiary and error as in "Colour roles" above (the former grey secondary-container #E8E8E5 / #3A3C40 becomes the primary container). On iOS, `--f7-ios-primary` is the ink; secondary text stays the system one (#3C3C43).
-
-**Warning:** Framework7 re-injects its variables at initialisation, which can override an override placed in the CSS. The `--od-*` tokens do not have this problem; an override of `--f7-*` must be checked on screen, in light and dark mode.
-
-**Contrast:** all text at least 4.5:1 on its background, 3:1 for text of 24 px and more and for chart lines. A colour never carries information alone: the alarm and pending states always have text that says what the problem is.
-
-**Android follows Material 3 (decided on 6 November 2026).** Every Android screen uses MD3 components with their sizes and spacing; when a mock-up disagrees with MD3, MD3 wins and Christian is told. Reference values: touch targets at least 48 dp; top app bar 64 dp, 24 dp icons in 48 dp icon buttons; buttons 40 dp high, fully rounded, 24 dp side padding (12 dp for text buttons), labels 14 sp medium on one line; FAB 56 dp with 16 dp corners, small FAB 40 dp; list items 56 dp (one line) or 72 dp (two lines), 16 dp start and 24 dp end padding; switches 52 × 32 dp; radio buttons and checkboxes 20 / 18 dp in 48 dp targets, never shrunk by their layout; dialogs 28 dp corners and 24 dp padding, actions as text buttons at the bottom right (stacked and right-aligned when long); search bar 56 dp, fully rounded, with the leading icon (menu or back) inside the bar and trailing icons inside it too; navigation drawer items 56 dp with a full-pill active indicator; chips 32 dp with 8 dp corners. Menus (⋮): 16 dp corners (more rounded than the MD3 baseline of 4 dp, decided on 7 November 2026), surface-container background, elevation level 2, 8 dp vertical padding, items 48 dp high with 12 dp side padding, a 24 dp leading icon and a 12 dp gap, labels 14 sp medium on one line, width between 112 and 280 dp. A navigation entry in a bottom sheet or list is a list item with a trailing chevron, not a bare text link.
+Colours are in System design, section 3; the logo in System design, section 4; Material 3 in System design, section 5; text fields in System design, section 8.
 
 **Statistics (decided on 6 November 2026).** Four Android screens, `docs/mockups/android-stats.dc.html`, `stats-annee-android.dc.html`, `stats-filtre-android.dc.html`, `stats-nouvelle-android.dc.html`:
 - *Main screen:* "Free filter" in the top bar; the three key figures (dives, time under water, deepest); *Charts*: two ready-made charts on cards scrolled sideways (dives per year; dive durations). Each bar is coloured with the water gradient by its value within the chart: the tallest bar is `--od-water-bottom` (#B4530F), the shortest stops at 70 % of the gradient (#C97E40) so every bar keeps 3:1 on white; in between, mixed linearly. The maximum depth chart was removed from this screen on 6 November 2026; maximum depth per dive stays on the year and filtered result screens. Users cannot create their own charts. *My statistics*: the user's saved statistics, each a two-line row (name, then dives · time · max depth) opening the filtered result, and a tonal "New statistic" button. Then *By year* (one row per year: dives · time · max depth, opening the year), *By mode*, *By suit*, *By buddy* (rows: value, number of dives, time). No totals by dive computer.
@@ -70,97 +32,17 @@ All text pairs reach 4.5:1 and all graphic marks 3:1 (ratios in the reference). 
 - *Meilleur mélange:* depth, maximum ppO₂ (same wheel), maximum END (prefilled from Settings, Décompression, "END max meilleur mélange", changeable for this calculation only). Results, in this order: the nitrox with its END, flagged when it exceeds the limit, then the best trimix (O₂ rounded down, He rounded up, `gas_best_mix`).
 - *Mélangeur de gaz:* partial pressure blending of nitrox and trimix, in one tool with a segmented control "Nitrox | Trimix" at the top (decided on 7 November 2026). The app remembers the last mode on the device. In Nitrox mode the helium fields and the helium step are hidden: the fill is oxygen, then the top-up gas. Inputs: wanted mix (O₂ %, He %), final pressure, cylinder size; what is in the cylinder (pressure, then its oxygen % and, in Trimix mode, its helium % as two separate dropdowns, any combination allowed; in Nitrox mode a single oxygen dropdown); top-up gas (Air by default, or a nitrox). Result: the fill in order. In Trimix mode a segmented control "Hélium d’abord | Oxygène d’abord" (default helium first, remembered on the device) sets whether helium or oxygen goes in first; the top-up gas is always last. Each step shows the pressure to reach, the pressure added and the volume of helium and oxygen used. Use the core's real-gas compressibility (`gas_compressibility_factor`), so the figures may differ slightly from an ideal-gas calculation. When the wanted mix cannot be reached (too much residual pressure, top-up gas too rich), say so and give the pressure to bleed down to. Warnings: pressures to read on a cooled cylinder; above 40 % oxygen, the cylinder and valve must be oxygen clean (in `--od-alarm`); analyse the mix before diving.
 
-**Text fields (decided on 6 November 2026, updated the same day).** Every text field of the app on Android uses the MD3 **filled** variant (Framework7 MD inputs without the outline style): surface-container-highest background (#E8E8E5 light), 4 dp top corners, a 1 dp bottom indicator that becomes 2 dp in the primary colour on focus, the label inside the field: full size when the field is empty and not focused, with no placeholder; small above the value on focus or once the field has a value. Helper text sits under the field. A trailing icon (for example "use my position") is a plain 24 dp icon button, without a filled background. In a full-screen form, the save action is a text button at the right of the top bar ("Enregistrer"), the close action an X at the left. Reference: `docs/mockups/sites-edition-android.dc.html`.
-
-**Logo (decided on 9 November 2026): "Trois vagues".** A porthole seen from the front on the 108 grid: a disc of radius 30 centred on the icon, white (#FFFFFF) in light mode and #1E2023 in dark mode, on the icon background (#F4F4F2 light, #121314 dark). The water fills half of the disc in three layers of waves, the same wave for all three (wavelength 22, amplitude 9 units), each layer slightly shifted to the left of the one above, so the crests are off centre. The layers start at y 52, 60.5 and 69 and each has its own short vertical gradient, in its own colour range so that the top of a layer is always darker than the bottom of the layer above; this keeps the three layers apart at small sizes (decided on 10 November 2026, "dégradés courts"): light mode #FBE3B2 to #F4C98C, #E5A661 to #D88A45, #C76A25 to #A9490C; dark mode #F5E2B0 to #EFD08F, #EBAD60 to #E3923C, #D9702A to #C2550F. The ring exists only under the water: an arc 3 units thick, rounded ends, from (24, 54) to (84, 54) through the bottom, in ink (#1F2124) in light mode and paper (#F4F4F2) in dark mode. Two filled bubbles above the water in the same colour as the arc, at (62, 39) radius 3.6 and (56.5, 30.8) radius 2.6. **Size rule (unchanged):** at 64 px and below (app icons on every platform, notification marks, the logo next to the name in a header), the top half of the circle is completed by a grey arc of the same thickness (#A3A5A8 light, #6B6E72 dark). Above 64 px, when the logo stands alone (splash screen, About screen, first launch, website), there is no grey arc. Files: `docs/brand/opendives-icon-{light,dark}-{fullbleed,round,squircle}.svg` (icons, with the grey arc), `docs/brand/opendives-logo-{light,dark}.svg` (large standalone logo, transparent background, without the grey arc), `app/public/favicon.svg`, `app/public/logo-{light,dark}.svg`. Reference: `docs/mockups/logo-petit-degrades-courts.dc.html`. For the record: the first gradients (overlapping ranges) in `docs/mockups/logo-variante-trois.dc.html`, and the flat-colour trial in `docs/mockups/logo-petit-aplats.dc.html`. The previous logo ("Hublot", one wave, two-colour gradient) is kept for the record in `docs/mockups/logo-anneau-adaptatif.dc.html`.
-
 ## 2. Text, numbers and units
 
-**Fonts (decided on 7 November 2026, replacing "system fonts only").** Body text uses **Source Sans 3** (SIL Open Font License) on Android and iOS: list rows, values, captions and helper text, fields, buttons, chips, menus, notes, tables. Titles keep the system font: screen and section titles, top bar titles, and the large key figures at the top of a dive (depth, duration, temperature), in Roboto on Android and SF Pro on iOS. The font is bundled with the app (weights 400 to 900, with the Latin Extended range so that ₂, ‰ and the other symbols render), registered as the app's body font, and scaled with the text size chosen in the phone's settings (Android `sp`, iOS Dynamic Type through `UIFontMetrics`). Tabular figures stay on for every dive value. **Sizes: unchanged with Source Sans 3 (decided on 7 November 2026).** Source Sans 3 draws smaller than Roboto at the same size (x-height 0.486 em against 0.528 em). So that body text keeps the same perceived size as with the system font, the font is registered with `size-adjust: 108%`, `ascent-override: 85.9%`, `descent-override: 22.6%` and `line-gap-override: 0%` (Roboto's line metrics after the adjustment). Every size in this specification (14/20, 16/24 and so on) stays as written and applies to Source Sans 3 through this adjustment: never raise the numbers instead. Reference: `docs/mockups/police-source-android.dc.html`; the Latin files used for the mock-up and the licence are in `docs/brand/fonts/`. Every Android and iOS mock-up uses it, with the same `@font-face` rules (files in `docs/brand/fonts/`).
-
-| Role | iOS | Android (MD3) |
-| --- | --- | --- |
-| Large screen title | Large Title, 34 px bold | Headline small, 24 px |
-| Bar title | 17 px semibold | Title large, 22 px |
-| Section title in a list | 13 px, secondary text | Title small, 14 px medium, primary colour |
-| List row | 17 px | Body large, 16 px |
-| Supporting text of a row | 13 px, secondary text | Body medium, 14 px, on-surface-variant |
-| Highlighted value (calculator, totals) | 22 px semibold | 24 px |
-| Caption, note under a block | 13 px | Body small, 12 px |
-
-**Numbers.** Every dive value (depth, duration, pressure, temperature, volume, weight, percentages) uses tabular figures (`font-variant-numeric: tabular-nums`) and is right-aligned in lists and tables.
-
-**Languages (decided on 5 November 2026).** The app is multilingual from the start, in French and English; other languages will be added without touching the code.
-
-- No visible text is hard-coded in a component: each text has a key, and its translations live in one file per language (`app/src/i18n/fr.json`, `en.json`). French is the reference language for writing texts.
-- The language follows the device; an untranslated language falls back to English. A setting lets the diver choose it.
-- Plurals and numbers go through `Intl.PluralRules` and `Intl.NumberFormat` ("1 dive", "3 dives").
-- Messages from the Subsurface core arrive in English (`trGettext` returns the text as is): the facade turns them into codes, and the app translates them like its own texts.
-- The diver's data (site names, notes, tags such as "boat") is never translated.
-- The English diving vocabulary follows Subsurface's (dive computer, buddy, ceiling, SAC, MOD), so both apps speak the same language.
-
-**Formats.** They follow the device language, through `Intl.NumberFormat` and `Intl.DateTimeFormat`; in French: decimal comma ("27,6 m"), non-breaking space before units and colons, thin space as thousands separator ("1 013 mbar"). The skeleton currently shows "4.1 m" in French: to be fixed.
-
-**Units.** Each measurement follows its own setting, read from the Subsurface logbook preferences: depth (m or ft), temperature (°C or °F), pressure (bar or psi), volume (litres or cubic feet), weight (kg or lb). The core stores whole SI units (mm, mK, mbar, ml, g); conversion happens at display time, never in the data.
-
-| Measurement | Displayed precision |
-| --- | --- |
-| Depth | 1 decimal in metres, whole number in feet |
-| Dive duration | whole minutes; from one hour, hours and minutes in the format of the display language, defined per language in the translation files ("1 h 11" in French, "1:11" in English); min:s in the profile (decided on 10 November 2026) |
-| Pressure | whole number |
-| Temperature | 1 decimal |
-| Volume, SAC | 1 decimal |
+Moved to System design, section 6.
 
 ## 3. Layout and navigation
 
-Width decides the layout, not the type of device: below 768 px wide, phone layout; from 768 px, tablet layout. A phone that is folded or unfolded therefore changes layout without restarting.
+Moved to System design, section 7.
 
-|  | Phone | Tablet |
-| --- | --- | --- |
-| Main navigation | Top bar with a ☰ button on the left that opens a side menu (iOS and Android, decided on 6 November 2026); no bar at the bottom | iOS: 220 px sidebar; Android: 96 px navigation rail with the "+" button at the top |
-| Sections | Logbook, Sites, Statistics, Tools, then Account and Settings after a separator, in the side menu; the synchronisation state at the bottom of the menu. Account is a section (☰ in its top bar): the cloud account, its synchronisation and the server in use, or, without an account, the choices to create one or sign in | The same, plus Account and Settings at the bottom of the bar |
-| Logbook | List, then full-screen detail | List (340 px) and detail side by side |
-| Sites | Map at the top, list in a fixed panel below it (not a draggable bottom sheet: no handle, the panel scrolls on its own) | List on the left, map on the right |
-| Tools | List of tools, then full-screen planner | Parameters on the left, computed plan on the right |
-| Edit a dive | Full screen | iOS: 780 px sheet in two columns; Android: content pane in two columns |
-| Settings | Scrolling list | 600 px centred column; two columns on Android |
+## 4. Account, dive detail, editing, settings, trip and sites
 
-**Touch targets:** at least 44 × 44 pt on iOS, 48 × 48 dp on Android; 56 px for list rows used on the boat (site choice, buddies).
-
-**Side menu (decided on 6 November 2026, replacing the bottom bar):** the ☰ button appears on every screen listed in the menu (the four sections, Réglages and À propos, decided on 9 November 2026); a screen opened from another screen (detail, planner, editing, a settings sub-screen) has a Back button instead. The menu is 300 px wide and opens over a dark scrim; it closes by tapping the scrim, swiping it to the left or with the system back. Rows of 56 px on Android, 48 px on iOS, labels that follow the system text size; the active section is highlighted in `--od-tint` and announced as the current page. On Android, it is Material 3's modal navigation drawer. On iOS, Apple recommends the tab bar and has no native side menu: OpenDives draws it, and must take care of its accessibility (VoiceOver inside the menu, focus returned to the ☰ button on closing, the edge back gesture must not open it).
-
-**Side menu and section headers, identity (decided on 9 November 2026).** The drawer opens with a header band: a diagonal gradient from sand to copper (#FBE3B2, #EFB677, #C97A35), a faint dive profile at the bottom (white 10 % fill, `#1F2124` 22 % line), and a wave that joins the menu surface. In the band: the logo (44 dp) and "OpenDives" in Title Large; under it, the account in a translucent white card (72 %, 16 dp corners): account icon, the cloud address, "Cloud · N plongées", chevron, opening Compte. "Compte" leaves the list. The active row uses #FBE3B2 with a filled icon; drawer title and labels follow MD3 (Title Small, Label Large). At the bottom, a white card with "Synchroniser maintenant" (tonal button) and, centred under it, the sync state with its icon (manual mode: "N modifications non envoyées" in #8A4B00). References: `appbar-tiroir-android-ouvert.dc.html`, `appbar-tiroir-android-ouvert-manuel.dc.html`.
-The four sections use the same band as their header, MD3 Small top app bar (☰, title in 22 sp weight 500, actions) then one summary line in #3D3A33: Carnet "9 plongées · 4 sites · dernière plongée il y a 9 mois" (relative time in days, weeks, months or years), Sites "3 sites · 9 plongées", Statistiques "9 plongées sur 6 années, de 2013 à 2026", Outils "Planifier, vérifier la désaturation, préparer les gaz". The wave joins the content; on Sites, whose map runs under the bar, the band has the same wave and the same faint profile, but the wave cuts the band (a mask on its bottom edge) instead of being painted in the page colour, so the map shows under the curve; no rounded corners, no shadow (decided on 9 November 2026). Carnet: the search icon becomes an MD3 search bar under the summary (56 dp, translucent white, "Rechercher dans le carnet"), and the bar gets a ⋮ menu with "Filtrer" and "Renuméroter les plongées". References: `android-carnet.dc.html`, `android-carnet-menu.dc.html`, `android-etat-vide.dc.html`, `android-etat-horsligne.dc.html`, `android-etat-conflit.dc.html`, `android-sites.dc.html`, `android-stats.dc.html`, `android-outils.dc.html`.
-
-**Spacing:** that of Framework7 lists and blocks; 16 px side margins on phones, 24 to 32 px in tablet panes. No cards with shadows: native full-width lists, or iOS grouped lists.
-
-**Back:** the native gesture (swipe from the edge on iOS, system back on Android) works everywhere; a sheet also closes by dragging it down.
-
-**Add (decided on 5 November 2026):** the Logbook no longer has a permanent Download button, which was of little use. Instead, a "+" button (navigation bar on iOS, floating action button in `secondary-container` on Android, at the top of the rail on tablets) opens three choices: download from the dive computer, import a file, log a dive by hand. The empty logbook offers the same choices directly.
-
-## 4. Components specific to OpenDives
-
-Six components do not exist in Framework7; each is a single Svelte component, shared by iOS and Android, which only changes its colours and sizes with the theme.
-
-**`<DiveProfile>`: the dive profile and its water column.**
-
-- **Line:** depth over time, from the samples of the first dive computer; the surface at the top, depth downwards.
-- **Water column:** the area between the surface and the curve is filled with a vertical gradient, from `--od-water-top` at the top to a bottom colour that depends on the maximum depth: a mix of `--od-water-top` and `--od-water-bottom` in the proportion maximum depth / 60 m, capped at 1. The same scale applies to all dives: a 40 m dive is visibly more rust-coloured than a 12 m one.
-- **Exploring:** a finger on the profile places a vertical cursor in `--od-text` and shows the time and depth at that moment, above the graph.
-- **Axes (decided on 8 November 2026):** the depth axis on the left has major graduations with labels (every 40 ft or 10 m, the first one carrying the unit, "0 ft") and a light grid line across the chart, plus minor tick marks without labels (every 10 ft or 2 m); the time axis at the bottom has major ticks with labels every 20 minutes (the last one carrying the unit, "80 min") and minor ticks every 10 minutes. Labels 11/14 `#4A4D52`, tabular figures.
-- **Temperature curve:** a "Température" filter chip shows the water temperature recorded by the dive computer as a 2 dp blue line (`#2F6DB5`, dark `#8AB4F8`) on its own scale, labelled on the right in the same blue ("10°C", "7°", "4°"). It is on by default when the dive has temperature samples.
-- **Technical layers:** Gas, Ceiling, ppO2, Tissues, as toggle chips (MD3 filter chips, iOS buttons); a layer is offered only if the dive has the data for it. Gas shows one band per mix under the profile; ppO2 uses `--od-oxygen`; a violated ceiling uses `--od-alarm`.
-- **Landscape:** on phones, turning to landscape opens the profile full screen.
-
-**`<ProfileThumbnail>`: the profile thumbnail**, instead of an icon in each row. 56 × 36 px on iOS (4 px corners), 56 × 40 px on Android (8 px corners). The curve uses the full height (scale specific to the dive); the background colour follows the water column rule, so depth stays readable. It has alternative text: "Profile, 27.6 m at the deepest".
-
-**`<DiveRow>`: a dive in a list.** Thumbnail; site on the first line ("Site to be specified" in tertiary text when missing, never an invented name); date and time on the second; on the right, the maximum depth in bold, then the duration. A dive edited offline replaces the date with what is waiting to be sent ("Notes edited, waiting to be sent"), in `--od-pending`.
-
-**`<TripRow>`: a collapsed trip.** Four reduced thumbnails in a 2 × 2 grid, "Trip of 2 February 2013", then "4 dives, from 21.8 to 28.7 m"; a tap expands the trip. The core's automatic trips are named like the others; their identifier changes at each load and is never stored.
-
-**`<ActiveFilter>`: the active filter row.** While a filter is applied, a row at the top of the Logbook, the Statistics and the map recalls it with the number of matching dives ("Suit: dry suit, 12 dives") and a button to remove it. The filter is the same in all three sections.
-
-**`<SyncStatus>`: the synchronisation state.** A row under the Logbook title, never a dialog: "Synced with the Subsurface cloud" (secondary text, check mark), "Offline: 2 changes will be sent when the network is back" or "Synchronisation stopped for one dive" (`--od-pending`, with an icon). It interrupts the diver only when a choice is needed (conflict, section 6).
+The shared components are in System design, section 8.
 
 **Manual synchronisation (decided on 6 November 2026).** When "Sync automatically" is turned off in Account, the app behaves like Subsurface-mobile: changes are saved in the local copy, nothing is sent or fetched, and the full exchange (fetch, merge, send) only happens on "Sync now". The setting belongs to the device. In this mode, `<SyncStatus>` says so at all times, at the top of the Logbook and at the bottom of the side menu: "Manual sync: 3 changes not sent", in `--od-pending`; the side menu then offers the "Sync now" button; the Account screen adds a "Changes not sent" row, and the explanation under the switch becomes "Off: changes stay on this device, and those from other devices do not arrive, until you sync".
 
@@ -334,48 +216,11 @@ All these functions run on the core's single thread and return JSON; none blocks
 
 ## 6. States and messages
 
-Each screen has five states to build, besides the normal one: loading, empty, error, offline and conflict. They are drawn for phones in the mock-ups.
-
-| State | Rule |
-| --- | --- |
-| Loading | Rows keep their place (greyed thumbnails and texts); never a blank screen or a lone spinner in the middle |
-| Empty | A title that states the situation ("No dives yet"), a sentence that says what to do, then the possible actions: pair a dive computer, import a file, download from divelogs.de, log by hand |
-| Error | What happened, what did not change ("No dive was changed"), what to check, as a numbered list, then Retry; never the raw text of a core error |
-| Offline | Everything works; `<SyncStatus>` counts the pending changes and each affected dive says so; sending starts by itself when the network is back |
-| Conflict | Only when Subsurface cannot merge ("Remote storage and local data diverged"): a sheet (iOS) or a dialog (Android) offers to keep the device version or the cloud version, after comparing them; nothing is lost before the choice. **To validate**: an OpenDives addition |
-
-**Core messages.** The facade turns them into codes, then the app into sentences in the diver's language. Some messages are never shown: `origin lookup failed` for a local logbook, for example, is normal in no-account mode.
-
-**Writing.**
-
-- The diver's words: stop, ceiling, SAC, MOD, gas, dive computer, buddy.
-- A button says what it does ("Download dives"), and the result repeats the same word ("3 dives downloaded").
-- A choice states its consequence under its label, as on first launch.
-- No exclamation marks, no "Oops", no capitals for emphasis; in French, "vous" everywhere.
-- Missing data is shown as missing ("Site to be specified"), never as an invented value.
+Moved to System design, section 9.
 
 ## 7. Never in OpenDives, and checks before delivering a screen
 
-**Never in OpenDives:**
-
-- conversational assistant, "suggest" button, generated summary;
-- sparkle icons or emoji, decorative gradients (the only gradient is the water column, which encodes depth), identical cards with big shadows, number tiles on every screen;
-- all-caps labels above titles, a single word coloured in a title, "A · B · C" strings, an "→" arrow added to buttons;
-- entrance animations: motion only answers a gesture;
-- filler text or invented data, including in screenshots and tests.
-
-**To check on a real phone, for each screen:**
-
-- [ ] iOS and MD3 rendering, in light and dark mode
-- [ ] Largest system text size: nothing is cut off or overlapping
-- [ ] VoiceOver and TalkBack: every button has a name, every profile and thumbnail has alternative text, the reading order follows the screen
-- [ ] Contrast as in section 1, and readability in full sunlight
-- [ ] Reduced motion respected
-- [ ] Mixed units (feet and °C, for example) and French number format
-- [ ] The five states of section 6
-- [ ] A real logbook read from the cloud (Christian's), and the Subsurface sample logbook
-
-**Open points to decide:** telling the pending colour apart from the colour of the water, to check on screen (in dark mode, the amber of the pending state is close to the honey of the water; chosen knowingly on 6 November 2026); version choice in case of conflict.
+Moved to System design, section 10.
 
 **Logbook selection and export (decided on 8 November 2026).** The ⋮ menu of the logbook's selection mode holds, in this order: Filtrer; Renuméroter les plongées cochées; Créer un voyage; "Ajouter les plongées au voyage au-dessus" (only when a trip is right above the checked dives); "Ajouter les plongées au voyage en dessous" (only when a trip is right below); "Exporter au format…"; a divider; Supprimer. "Exporter au format…" opens an MD3 modal bottom sheet titled "Exporter N plongées", with the line "Choisissez un format. Le fichier s’ouvre ensuite dans le partage du téléphone.", a single-choice list of formats with a one-line description each ("Fichier de carnet (.ssrf)", described "Format Subsurface, lisible aussi par OpenDives", the core's XML export of the checked dives (decided on 9 November 2026); UDDF (.uddf); CSV, liste des plongées; CSV, profils; Fiches PDF, one page per dive as in "Partager"), an "Anonymiser" switch (off by default; removes people's names, notes and GPS positions, as Subsurface's anonymize option), and "Annuler" and "Exporter". The last format chosen is remembered on the device. "Exporter" writes the file with the core's export functions and opens the system share sheet. Mock-ups: `docs/mockups/carnet-selection-menu-android.dc.html`, `carnet-export-android.dc.html`.
 
@@ -428,8 +273,6 @@ Retries are automatic for the unreachable server (every 5 minutes, then less oft
 
 **Edit dive form, rebreather cylinders (decided on 9 November 2026).** In a rebreather dive (CCR), the cylinders used as Diluant and Oxygène have no "Changement de gaz à" field and no MOD helper: the gas switch depth only applies to open-circuit and bailout cylinders. Choosing the use "Oxygène" sets O₂ to 100 % and He to 0; choosing "Diluant" sets O₂ to 21 % and He to 0 as a starting value. Both stay editable. Mock-up: `android-edition.dc.html`.
 
-**Statistics charts in blue (decided on 9 November 2026).** Charts that do not measure depth (dives per year, dive durations, and any count or time) use the tertiary role: a ramp from #5B8BCB for the smallest value to #24589A for the largest (3.5:1 to 7.2:1 on the white card; dark mode from #8AB4F8 down to #5B8BCB on the dark card, to be checked on screen). Charts of depth keep the water colours. The Carnet keeps no blue: its only charts are the profile thumbnails, which are water. Mock-up: `android-stats.dc.html`.
-
 **Planner result bars in blue (decided on 9 November 2026).** In the planner result, each gas row under "Volume nécessaire par gaz" gets an 8 dp bar under its text: the consumed part in tertiary #2F6DB5, a 2 dp white gap, then the reserve as hatching (#DCE8F7 and #B9D0EE stripes at 135°) on a #DCE8F7 track. The bar length is consumed over consumed plus reserve, for that gas only. "Exposition à l'oxygène" gets the same 8 dp track with CNS filled in #2F6DB5, and a "Limite CNS 100 %" caption under it. The text keeps the numbers, so the bars never carry meaning alone. The dive profile keeps the water colours. Mock-ups: `android-planificateur.dc.html`, `android-planificateur-menu.dc.html`, `android-planificateur-nouveau.dc.html`.
 
 **Filter, Android (decided on 10 November 2026).** Mock-up: `filtre-android.dc.html` (iPhone: `ios-filtre.dc.html`). A full-screen dialog: ✕ "Fermer" (abandons the changes), title "Filtrer", text button "Tout effacer". Then a search field "Chercher un critère" (rounded, 56 dp); "Filtres enregistrés", a card with one 56 dp row per saved filter showing its name only (no description line); tapping a row applies that filter (its criteria fill the page); the applied filter has a grey row and a check icon on the left; each row has an ✕ icon button on the right ("Supprimer le filtre {nom}") that deletes it at once with a snackbar "Filtre {nom} supprimé" and "Annuler" (6 s); the section is hidden while the search field has text, and absent when no filter is saved; "Mode de plongée" as a three-way segmented button (Tous, Circuit ouvert, Recycleur); "Matériel" as a card of rows (Combinaison, Ordinateur, Bouteille type et taille, Gaz, Autre matériel), each with its current value and a chevron to the right that opens the criterion; a row with an active criterion has a grey background and its value in semibold; "Autres critères" as a card of groups (Quand, Où, Avec qui, La plongée, Conditions, Texte) with what each contains, each with a chevron pointing down: it opens in place to list its criteria. A fixed bottom bar: filled full-width "Afficher les {n} plongées", text button "Enregistrer ce filtre". ✕ versus ←: ✕ closes a full-screen task whose choices are not applied yet; ← goes back in a navigation.
@@ -440,8 +283,6 @@ Retries are automatic for the unreachable server (every 5 minutes, then less oft
 - *New statistic* (`stats-nouvelle-android.dc.html`): the "Nom" field comes first, before "Critère".
 
 **Statistics, items are not clickable (decided on 10 November 2026; rows changed the same day, see below).** On `/statistics/`, the chart cards are plain content: no link, no ripple. The "one year" view (`/statistics/year/:year`) is removed. The "Par …" sections are accordions, closed by default: the section title (14 sp, medium, `--od-on-surface-variant`) is a 48 dp button with a chevron on the right that points down when closed and up when open (`aria-expanded`); tapping it opens or closes the section. Open, a section shows a card of two-line rows (16 sp title, 14 sp supporting line, 72 dp); year rows and saved-statistic rows read "{n} plongées · {durée}" (no maximum depth), the other sections show "{n} plongées" with the total time on the right. The filter and "Nouvelle statistique" stay. Mock-up: `android-stats.dc.html`.
-
-**Dive rows, duration above depth (decided on 10 November 2026).** In every dive row on Android (Carnet, its trips and selection, export, the states, the dives of a statistic, dives in the Carnet with month headers, tablet Carnet), the right-hand column shows the duration first (16 sp, weight 500, "55 min") and the maximum depth under it (14 sp, `--od-on-surface-variant`, "91 ft"). Both stay right-aligned with tabular figures.
 
 **Statistics, a row opens its dives (decided on 10 November 2026).** Every row of "Mes statistiques" and of every "Par …" section is a link, with a chevron to the right (20 dp, `--od-on-surface-variant`) and the standard ripple. It opens "Statistiques, plongées d’une ligne" (`android-stats-plongees.dc.html`): a top bar on the page background with ← "Retour" (back to `/statistics/`, same scroll position and open sections), the row title as the page title ("2013", "Combinaison : dry suit"), and under it a supporting line "{section} · {n} plongées · {durée}" ("Par année · 4 plongées · 4 h 07"; for a saved statistic the section is "Mes statistiques"). Then the dives of that row, newest first, as flat Carnet rows (profile thumbnail 56 × 40, site or "Site à préciser", "N° {n} · {date, heure}", duration and maximum depth on the right); no trip grouping, no month headers, no search, no + button. A dive row opens the dive detail; back returns to this list. The list respects the statistics filter in force (the same dives the row counts).
 
@@ -482,5 +323,3 @@ Retries are automatic for the unreachable server (every 5 minutes, then less oft
 - *Texts.* Every visible text is a translation key (fr, en). Sizes, dates and zone names in the mock-ups are examples: the real package sizes are not known yet.
 
 **Dive detail, cylinder pressure bars (decided on 9 November 2026).** Each cylinder row of "Gaz et équipement" keeps its text ("Dil2 16 cuft · trimix 16/45", "2 683 → 1 885 psi") and gets an 8 dp bar whose scale runs from 0 to the working pressure: the remaining pressure (end) in tertiary (#2F6DB5, dark #8AB4F8), a 2 dp gap in the card colour, the pressure used (start minus end) in a lighter blue (#B9D0EE, dark #456A9C), then the empty track (#DCE8F7, dark #2E3033). The supporting text reads "Service 3 365 psi · 798 psi utilisés", with "· changement à 222 ft" when the cylinder has a switch depth. The bar has `role="img"` and an aria-label with the remaining, working and used pressures. Figures follow the pressure unit set in Settings. A dial gauge was tried and dropped: harder to read at small sizes and with many cylinders. This replaces the old bar, which showed end over start. Mock-ups: `detail3-android.dc.html`, `detail3-android-sombre.dc.html`, `detail3-android-curseur.dc.html`.
-
-
