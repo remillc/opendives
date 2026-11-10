@@ -138,5 +138,6 @@ Example values (decided on 8 November 2026): the mock-ups show depths in feet, p
 | `carnet-export-android.dc.html` | Téléphone Android, exporter les plongées cochées : choix du format |
 | `compte-git-android.dc.html` | Téléphone Android, Compte en mode dépôt git (#11) |
 | `git-config-android.dc.html` | Téléphone Android, Dépôt git : configuration, dépôt trouvé, branches lues |
+| `git-jeton-aide-android.dc.html` | Téléphone Android, Créer un jeton d’accès (aide du dépôt git) |
 | `git-config-erreur-android.dc.html` | Téléphone Android, Dépôt git : accès refusé |
 | `git-config-adresse-android.dc.html` | Téléphone Android, Dépôt git : aucun dépôt à cette adresse |
