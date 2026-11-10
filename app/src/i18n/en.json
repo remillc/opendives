@@ -1518,7 +1518,8 @@
       "Dive rows: the duration above, the depth below.",
       "Settings: the chosen unit system stays after a restart.",
       "First launch (Android): a simpler page, with three buttons and their consequence on one line.",
-      "Access token help: one tab per host (GitHub, GitLab, Codeberg)."
+      "Access token help: one tab per host (GitHub, GitLab, Codeberg).",
+      "First launch: full screen on tablets, every choice in view."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",

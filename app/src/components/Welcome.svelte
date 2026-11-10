@@ -5,6 +5,7 @@
   // its own view: the three choices, then signing in or creating an account
   // (routes /welcome/… in App.svelte). Shown on a first launch and after
   // signing out; nothing is loaded until a choice is made.
+  // Full screen on tablets too: a centred popup cut off the choices.
   import { Popup, View, f7 } from 'framework7-svelte';
   import { logbook } from '../lib/logbook.svelte.js';
   import { accountFlow } from '../lib/account.js';
@@ -18,6 +19,6 @@
   }
 </script>
 
-<Popup class="od-welcome" opened={logbook.welcome} swipeToClose={false} closeByBackdropClick={false} onPopupClosed={reset}>
+<Popup class="od-welcome" tabletFullscreen opened={logbook.welcome} swipeToClose={false} closeByBackdropClick={false} onPopupClosed={reset}>
   <View name="welcome" url="/welcome" />
 </Popup>
