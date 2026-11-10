@@ -1335,10 +1335,11 @@ Spec: System design, section 6, "Long totals of time" (new). Canvas note beside 
 
 Done in `feature/long-time-totals`: `formatTotalTime` in `app/src/lib/format.js` (hours rounded down), used by every sum of durations; tests in `tests/app/total-time-format.test.mjs`.
 
-## [ ] 2026-11-10-26 About: tagline without "gratuit"
+## [x] 2026-11-10-26 About: tagline without "gratuit"
 
 Spec: UI specification, section 1, "About" (updated). Mock-up: `docs/mockups/apropos-android.dc.html` (updated).
 - `about.tagline`: French "Carnet de plongée libre, compatible avec les carnets Subsurface.", English "Open-source dive logbook, compatible with Subsurface logbooks.".
 - Nothing else in the app mentions where free builds are found (to-do #34 decides it, outside the app).
 - A line in the release notes.
 
+Done in `about.tagline` (fr, en) and a release-notes line.
