@@ -888,7 +888,8 @@
   @layer od.components {
     /* One column in the order of the spec; a wide pane puts the data on the
        left, the profile and the result on the right. */
-    .od-planner {
+    .od-planner,
+    :global(.page.od-planner > .page-content) {
       container-type: inline-size;
     }
 
@@ -926,7 +927,10 @@
       align-items: start;
     }
 
-    @media (min-width: 768px) {
+    /* Two columns when the pane is wide, not the screen: in portrait on a
+       tablet the planner has only the pane beside the tools list. The page's
+       content is the container this asks about. */
+    @container (min-width: 680px) {
       .od-planner:has(> .od-planner--start) {
         grid-template-columns: minmax(280px, 380px) minmax(0, 1fr);
         column-gap: 8px;

@@ -1435,6 +1435,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Planificateur (tablette en portrait) : ouvert à côté de la liste des outils, il tient en une colonne au lieu d’en ajouter une à droite de l’écran.",
       "À propos : la description de l’app ne dit plus « gratuit ».",
       "Premier lancement (tablette Android) : en paysage, le titre et le profil de plongée à gauche, les trois choix à droite ; en portrait, le titre, le profil sur toute la largeur puis les choix, centrés. Sans défilement, même sur une petite tablette.",
       "Statistiques : un total de temps sous l’eau à partir de 24 h s’écrit en jours et heures, sans minutes (« 80 j 16 h »), dans les chiffres clés, les lignes « Par … » et « Mes statistiques » et les plongées d’une ligne ; en dessous de 24 h, il reste en heures et minutes.",
