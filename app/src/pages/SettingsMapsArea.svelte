@@ -3,18 +3,19 @@
   // /settings/maps/area: "Choisir sur la carte" (docs/mockups/android-cartes-choix-carte.dc.html).
   // A full-screen map, a rectangle with four handles, and a bottom sheet with
   // the name of the region (proposed from the nearest site of the logbook),
-  // the estimated size and "Télécharger". Needs the network (the map of the
-  // place is drawn from the online tiles); sizes say "environ".
+  // the live tile count against OpenFreeMap's limit of 3,000, the "less
+  // detail" choice (zoom 12 instead of 14, for a larger area) and
+  // "Télécharger", blocked above the limit. Needs the network (the map of the
+  // place is drawn from the online tiles). The final look comes later.
   import { onMount, onDestroy } from 'svelte';
   import { Page, Navbar, Link } from 'framework7-svelte';
   import { OpenDivesCore } from 'opendives-core';
   import TextField from '../components/TextField.svelte';
   import { t } from '../lib/i18n.js';
   import { MAP_STYLE, showLabelsInLanguage } from '../lib/map-style.js';
-  import { rectAround, nearestSite, estimateBytes, bboxSizeKm } from '../lib/maps-logic.js';
-  import { formatMapSize } from '../lib/maps-format.js';
+  import { rectAround, nearestSite, bboxSizeKm, checkTiles, normalizeBbox, MAX_TILES } from '../lib/maps-logic.js';
   import { formatNumber } from '../lib/format.js';
-  import { offlineMaps, addDrawnRegion } from '../lib/offline-maps.svelte.js';
+  import { offlineMaps, addRegion } from '../lib/offline-maps.svelte.js';
 
   /** @type {{ f7route: { query: Record<string, string> }, f7router: any }} */
   let { f7route, f7router } = $props();
@@ -39,7 +40,13 @@
 
   const MIN_SIDE = 0.02; // degrees
 
-  const size = $derived(bbox ? estimateBytes(bbox) : 0);
+  /** "Moins de détails": zoom 12 instead of 14. */
+  let lessDetail = $state(false);
+
+  const tiles = $derived(bbox ? checkTiles(bbox) : null);
+  const maxZoom = $derived(lessDetail ? 12 : 14);
+  const count = $derived(tiles ? (lessDetail ? tiles.count12 : tiles.count14) : 0);
+  const fits = $derived(count <= MAX_TILES);
   const km = $derived(bbox ? bboxSizeKm(bbox) : [0, 0]);
 
   /** @param {number} km */
@@ -146,11 +153,11 @@
   onDestroy(() => map?.remove());
 
   async function download() {
-    if (!bbox || busy) return;
+    if (!bbox || busy || !fits) return;
     busy = true;
     try {
       const label = name.trim() || proposal(bbox);
-      if (await addDrawnRegion(label, bbox, size)) f7router.back('/settings/maps/', { force: true });
+      if (await addRegion(label, normalizeBbox(bbox), maxZoom)) f7router.back('/settings/maps/', { force: true });
     } finally {
       busy = false;
     }
@@ -179,10 +186,19 @@
       <div class="handle" aria-hidden="true"></div>
       <p class="help">{t('maps.area.help')}</p>
       <div class="field"><TextField label={t('maps.area.name')} bind:value={name} supporting={t('maps.area.nameHelp')} oninput={() => (named = true)} /></div>
-      <p class="estimate">
-        {t('maps.area.estimate', { width: formatNumber(roundKm(km[0]), 0), height: formatNumber(roundKm(km[1]), 0), size: formatMapSize(size) })}
+      <label class="detail">
+        <input type="checkbox" bind:checked={lessDetail} />
+        <span>{t('maps.area.lessDetail')}</span>
+      </label>
+      <p class="estimate" class:over={!fits}>
+        {t('maps.area.size', { width: formatNumber(roundKm(km[0]), 0), height: formatNumber(roundKm(km[1]), 0) })}
+        {' · '}
+        {t('maps.area.tiles', { count: formatNumber(count, 0), limit: formatNumber(MAX_TILES, 0) })}
       </p>
-      <button type="button" class="download" disabled={!bbox || !offlineMaps.online || busy} onclick={download}>{t('maps.area.download')}</button>
+      {#if !fits}
+        <p class="estimate over" role="alert">{tiles?.lessDetail && !lessDetail ? t('maps.area.suggestLess') : t('maps.area.tooBig')}</p>
+      {/if}
+      <button type="button" class="download" disabled={!bbox || !offlineMaps.online || busy || !fits} onclick={download}>{t('maps.area.download')}</button>
     </div>
   </div>
 </Page>
@@ -259,6 +275,26 @@
     .estimate {
       margin: 8px 24px 12px;
       font-variant-numeric: tabular-nums;
+    }
+
+    .estimate.over {
+      color: var(--od-alarm);
+    }
+
+    .detail {
+      margin: 0 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      line-height: 20px;
+      color: var(--od-text);
+
+      input {
+        width: 20px;
+        height: 20px;
+        margin: 0;
+      }
     }
 
     .download {

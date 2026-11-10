@@ -7,7 +7,7 @@
   import Md3Dialog from './Md3Dialog.svelte';
   import ChoiceDialog from './ChoiceDialog.svelte';
   import { t } from '../lib/i18n.js';
-  import { CAP_CHOICES } from '../lib/maps-logic.js';
+  import { CAP_CHOICES, MAX_REGION_BYTES } from '../lib/maps-logic.js';
   import { formatMapSize } from '../lib/maps-format.js';
   import { offlineMaps, findRegion, regionName, usedBytes, floor, downloadOverCellular, updateRegion, deleteRegion, setCap, go } from '../lib/offline-maps.svelte.js';
 
@@ -21,7 +21,7 @@
 {#if dialog?.kind === 'cellular'}
   {@const r = regionOf(dialog.id)}
   {@const id = dialog.id}
-  <Md3Dialog title={t('maps.dialogs.cellular.title')} text={t('maps.dialogs.cellular.text', { name: r ? regionName(r) : '', size: formatMapSize(r?.sizeBytes ?? 0) })} oncancel={close}>
+  <Md3Dialog title={t('maps.dialogs.cellular.title')} text={t('maps.dialogs.cellular.text', { name: r ? regionName(r) : '', size: formatMapSize(MAX_REGION_BYTES) })} oncancel={close}>
     {#snippet children()}{/snippet}
     {#snippet actions()}
       <button type="button" onclick={close}>{t('maps.dialogs.cellular.wait')}</button>
@@ -73,7 +73,7 @@
   {@const id = dialog.id}
   <Md3Dialog
     title={t('maps.dialogs.replace.title')}
-    text={t('maps.dialogs.replace.text', { name: r ? regionName(r) : '', size: formatMapSize(r?.update?.sizeBytes ?? 0) })}
+    text={t('maps.dialogs.replace.text', { name: r ? regionName(r) : '', size: formatMapSize(MAX_REGION_BYTES) })}
     oncancel={close}
   >
     {#snippet children()}{/snippet}

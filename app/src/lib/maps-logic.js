@@ -1,8 +1,8 @@
 // @ts-check
 // Offline maps: the rules that need no screen and no device (spec, section 4,
-// "Offline maps"). Storage guards, the zones that contain the diver's sites,
-// the update check, the estimate of a drawn region. offline-maps.svelte.js
-// applies them to the device; tests/app/maps-logic.test.mjs checks them.
+// "Offline maps"). Storage guards, the update check, the tile count of a drawn
+// rectangle against OpenFreeMap's limits. offline-maps.svelte.js applies them
+// to the device; tests/app/maps-logic.test.mjs checks them.
 
 export const MB = 1_000_000;
 export const GB = 1_000_000_000;
@@ -17,27 +17,14 @@ export const FLOOR_MIN = 1 * GB;
 export const RESUME_MARGIN = 64 * MB;
 /** Partial files of failed downloads are deleted after 7 days. */
 export const PARTIAL_DAYS = 7;
-/**
- * Estimate for a region drawn on the map: bytes per km2. From the first
- * mock-up (150 x 140 km, about 24 Mo); to be replaced by a measure on real
- * packages.
- */
-export const BYTES_PER_KM2 = 1143;
-/** Half size of the rectangle first drawn around a point, km (150 x 140 km). */
-export const DEFAULT_HALF_KM = /** @type {[number, number]} */ ([75, 70]);
-
-/**
- * @typedef {Object} CataloguePackage
- * @property {string} id
- * @property {'zone'|'country'} kind
- * @property {{fr?: string, en?: string}} names
- * @property {string} country country code
- * @property {[number, number, number, number]} bbox [west, south, east, north]
- * @property {number} sizeBytes
- * @property {string|number} version
- * @property {string} sha256
- * @property {string} url
- */
+/** OpenFreeMap's terms (https://openfreemap.org/tos/): at most 3,000 tiles and 50 MB for an offline download. */
+export const MAX_TILES = 3000;
+export const MAX_REGION_BYTES = 50 * 1024 * 1024;
+/** Full detail, and the "less detail" choice that allows a larger area. */
+export const MAX_ZOOM_FULL = 14;
+export const MAX_ZOOM_LESS = 12;
+/** Half size of the rectangle first drawn around a point, km. */
+export const DEFAULT_HALF_KM = /** @type {[number, number]} */ ([20, 20]);
 
 /** @param {number} totalBytes storage of the device */
 export function floorBytes(totalBytes) {
@@ -109,17 +96,18 @@ export function stalePartials(regions, nowMs) {
 }
 
 /**
- * Bytes the maps take, or will take: a ready package at its size; a download
- * at its final size (reserved); an update on top of the old package.
- * @param {{ status: string, sizeBytes: number, bytesReceived?: number, update?: { sizeBytes: number }|null }[]} regions
+ * Bytes the maps take, or will take: a ready region at its size; a running
+ * download at the most it can take (50 MB: the download stops there); an
+ * update on top of the old region.
+ * @param {{ status: string, sizeBytes: number, bytesReceived?: number, transfer?: string }[]} regions
  */
 export function usedBytes(regions) {
   let sum = 0;
   for (const r of regions) {
     if (r.status === 'ready') sum += r.sizeBytes;
-    else if (r.status === 'updating') sum += r.sizeBytes + (r.update?.sizeBytes ?? 0);
+    else if (r.status === 'updating') sum += r.sizeBytes + (r.transfer === 'failed' ? 0 : MAX_REGION_BYTES);
     else if (r.status === 'failed') sum += r.bytesReceived ?? 0;
-    else sum += r.sizeBytes;
+    else sum += MAX_REGION_BYTES;
   }
   return sum;
 }
@@ -133,23 +121,11 @@ export function inBbox(lng, lat, bbox) {
   return w <= e ? lng >= w && lng <= e : lng >= w || lng <= e; // crosses the antimeridian
 }
 
-/** Approximate area of a box, km2. @param {number[]} bbox */
-export function bboxAreaKm2(bbox) {
-  const [w, s, e, n] = bbox;
-  const width = (w <= e ? e - w : e - w + 360) * 111.32 * Math.cos((((s + n) / 2) * Math.PI) / 180);
-  return Math.abs(width) * (n - s) * 110.57;
-}
-
 /** Width and height of a box, km. @param {number[]} bbox @returns {[number, number]} */
 export function bboxSizeKm(bbox) {
   const [w, s, e, n] = bbox;
   const midLat = (s + n) / 2;
   return [(w <= e ? e - w : e - w + 360) * 111.32 * Math.cos((midLat * Math.PI) / 180), (n - s) * 110.57];
-}
-
-/** Estimated size of a drawn region, bytes. @param {number[]} bbox */
-export function estimateBytes(bbox) {
-  return Math.round(bboxAreaKm2(bbox) * BYTES_PER_KM2);
 }
 
 /**
@@ -190,77 +166,95 @@ export function nearestSite(lng, lat, sites) {
   return best;
 }
 
-/**
- * What contains a point: the smallest dive zone, else the smallest country.
- * @param {number} lng @param {number} lat @param {CataloguePackage[]} catalogue
- */
-export function packageForPoint(lng, lat, catalogue) {
-  for (const kind of /** @type {const} */ (['zone', 'country'])) {
-    const found = catalogue.filter((p) => p.kind === kind && inBbox(lng, lat, p.bbox)).sort((a, b) => bboxAreaKm2(a.bbox) - bboxAreaKm2(b.bbox));
-    if (found.length) return found[0];
-  }
-  return null;
+// --- Tiles of a rectangle ------------------------------------------------------------
+
+const MAX_LAT = 85.0511287798066;
+const clampLat = (/** @type {number} */ lat) => Math.max(-MAX_LAT, Math.min(MAX_LAT, lat));
+
+/** Column of a longitude at zoom z (Web Mercator, XYZ scheme), not clamped. @param {number} lng @param {number} z */
+const tileX = (lng, z) => Math.floor(((lng + 180) / 360) * 2 ** z);
+
+/** Row of a latitude at zoom z (row 0 at the north), not clamped. @param {number} lat @param {number} z */
+function tileY(lat, z) {
+  const rad = (clampLat(lat) * Math.PI) / 180;
+  return Math.floor(((1 - Math.asinh(Math.tan(rad)) / Math.PI) / 2) * 2 ** z);
 }
 
 /**
- * "Depuis votre carnet": the dive zones that contain sites of the logbook.
- * Zones of a trip come first (most recent trip first, as `trips` is given),
- * then the others by number of sites.
- * @param {{
- *   sites: { name: string, lng: number, lat: number, dives?: number }[],
- *   trips: { name: string, date?: string, sites: { name: string, lng: number, lat: number }[] }[],
- *   catalogue: CataloguePackage[],
- * }} o
- * @returns {{ pkg: CataloguePackage, trips: { name: string, date?: string }[], sites: { name: string, dives: number }[] }[]}
+ * Longitudes brought into [-180, 180] (a map dragged past the antimeridian
+ * gives 190). A box whose west is then east of its east crosses the antimeridian.
+ * @param {number[]} bbox [west, south, east, north]
+ * @returns {[number, number, number, number]}
  */
-export function suggestZones({ sites, trips, catalogue }) {
-  const zones = catalogue.filter((p) => p.kind === 'zone');
-  /** @type {Map<string, { pkg: CataloguePackage, trips: { name: string, date?: string }[], sites: Map<string, number>, firstTrip: number }>} */
-  const found = new Map();
-  /** @param {CataloguePackage} pkg */
-  const entry = (pkg) => {
-    let e = found.get(pkg.id);
-    if (!e) found.set(pkg.id, (e = { pkg, trips: [], sites: new Map(), firstTrip: Infinity }));
-    return e;
-  };
-  /** The smallest zone containing the point. @param {number} lng @param {number} lat */
-  const zoneAt = (lng, lat) => zones.filter((z) => inBbox(lng, lat, z.bbox)).sort((a, b) => bboxAreaKm2(a.bbox) - bboxAreaKm2(b.bbox))[0];
-
-  for (const s of sites) {
-    const zone = zoneAt(s.lng, s.lat);
-    if (zone) entry(zone).sites.set(s.name, s.dives ?? 0);
-  }
-  trips.forEach((trip, index) => {
-    for (const s of trip.sites) {
-      const zone = zoneAt(s.lng, s.lat);
-      if (!zone) continue;
-      const e = entry(zone);
-      if (!e.sites.has(s.name)) e.sites.set(s.name, 0);
-      if (!e.trips.some((x) => x.name === trip.name && x.date === trip.date)) e.trips.push({ name: trip.name, date: trip.date });
-      e.firstTrip = Math.min(e.firstTrip, index);
-    }
-  });
-  return [...found.values()]
-    .sort((a, b) => a.firstTrip - b.firstTrip || b.sites.size - a.sites.size || a.pkg.id.localeCompare(b.pkg.id))
-    .map((e) => ({ pkg: e.pkg, trips: e.trips, sites: [...e.sites].map(([name, dives]) => ({ name, dives })) }));
+export function normalizeBbox([w, s, e, n]) {
+  if (e - w >= 360) return [-180, s, 180, n];
+  const wrap = (/** @type {number} */ lng) => ((((lng + 180) % 360) + 360) % 360) - 180;
+  const east = e === 180 ? 180 : wrap(e);
+  return [wrap(w), s, east, n];
 }
 
 /**
- * Name of a package in the language, else English, else the first one.
- * @param {{ names?: { fr?: string, en?: string } }} pkg @param {string} language
+ * The tiles of a rectangle at one zoom: columns (one or two runs when it
+ * crosses the antimeridian) and rows, edges included.
+ * @param {number[]} bbox [west, south, east, north] @param {number} z
+ * @returns {{ columns: [number, number][], rowMin: number, rowMax: number, count: number }}
  */
-export function packageName(pkg, language) {
-  const names = /** @type {Record<string, string|undefined>} */ (pkg.names ?? {});
-  return names[language] || names.en || Object.values(names).find(Boolean) || '';
+export function tileRange(bbox, z) {
+  const [w, s, e, n] = normalizeBbox(bbox);
+  const last = 2 ** z - 1;
+  const clamp = (/** @type {number} */ v) => Math.max(0, Math.min(last, v));
+  const x0 = clamp(tileX(w, z));
+  const x1 = clamp(tileX(e, z));
+  /** @type {[number, number][]} */
+  const columns = w <= e ? [[x0, x1]] : x0 <= x1 + 1 ? [[0, last]] : [[x0, last], [0, x1]];
+  const rowMin = clamp(tileY(n, z));
+  const rowMax = clamp(tileY(s, z));
+  const cols = columns.reduce((sum, [a, b]) => sum + (b - a + 1), 0);
+  return { columns, rowMin, rowMax, count: cols * Math.max(0, rowMax - rowMin + 1) };
 }
 
 /**
- * The text typed in the search field matches the name (any language) or the country code.
- * @param {CataloguePackage} pkg @param {string} query
+ * Number of tiles of a rectangle for zooms 0 to maxZoom.
+ * @param {number[]} bbox [west, south, east, north] @param {number} maxZoom
  */
-export function matchesSearch(pkg, query) {
-  const fold = (/** @type {string} */ s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
-  const q = fold(query.trim());
-  if (!q) return true;
-  return [...Object.values(pkg.names ?? {}), pkg.country].filter(Boolean).some((n) => fold(String(n)).includes(q));
+export function countTiles(bbox, maxZoom) {
+  let total = 0;
+  for (let z = 0; z <= maxZoom; z++) total += tileRange(bbox, z).count;
+  return total;
+}
+
+/**
+ * Whether a region holds the tile (z, x, y): inside the rectangle's tiles, at a
+ * zoom up to the region's maxZoom.
+ * @param {{ bbox: number[], maxZoom?: number }} region @param {number} z @param {number} x @param {number} y
+ */
+export function regionHasTile(region, z, x, y) {
+  if (z > (region.maxZoom ?? MAX_ZOOM_FULL)) return false;
+  const { columns, rowMin, rowMax } = tileRange(region.bbox, z);
+  return y >= rowMin && y <= rowMax && columns.some(([a, b]) => x >= a && x <= b);
+}
+
+/**
+ * The tile check of a drawn rectangle, for the area screen.
+ * - `maxZoom`: the detail to use (14 when it fits, else 12 when that fits, else null)
+ * - `lessDetail`: it does not fit at 14 but fits at 12, so "less detail" can be offered
+ * @param {number[]} bbox
+ * @returns {{ count14: number, count12: number, fits14: boolean, fits12: boolean, maxZoom: 14|12|null, lessDetail: boolean }}
+ */
+export function checkTiles(bbox) {
+  const count14 = countTiles(bbox, MAX_ZOOM_FULL);
+  const count12 = countTiles(bbox, MAX_ZOOM_LESS);
+  const fits14 = count14 <= MAX_TILES;
+  const fits12 = count12 <= MAX_TILES;
+  return { count14, count12, fits14, fits12, maxZoom: fits14 ? 14 : fits12 ? 12 : null, lessDetail: !fits14 && fits12 };
+}
+
+/** Whether two rectangles share some area, across the antimeridian too. @param {number[]} a @param {number[]} b */
+export function bboxesOverlap(a, b) {
+  const [aw, as, ae, an] = normalizeBbox(a);
+  const [bw, bs, be, bn] = normalizeBbox(b);
+  if (as >= bn || bs >= an) return false;
+  /** @param {number} w @param {number} e @returns {[number, number][]} */
+  const spans = (w, e) => (w <= e ? [[w, e]] : [[w, 180], [-180, e]]);
+  return spans(aw, ae).some(([x0, x1]) => spans(bw, be).some(([y0, y1]) => x0 < y1 && y0 < x1));
 }
