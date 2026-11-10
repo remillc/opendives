@@ -1344,7 +1344,7 @@ Spec: UI specification, section 1, "About" (updated). Mock-up: `docs/mockups/apr
 
 Done in `about.tagline` (fr, en) and a release-notes line.
 
-## [ ] 2026-11-10-27 Android tablet in portrait: side menu instead of the rail
+## [x] 2026-11-10-27 Android tablet in portrait: side menu instead of the rail
 
 Spec: System design, section 7, "Android tablet in portrait: no rail" (new). Mock-ups: `docs/mockups/android-tablette-accueil-portrait.dc.html`, `docs/mockups/android-tablette-accueil-portrait-menu.dc.html` (new). Code: `app/src/lib/layout.svelte.js`, `App.svelte`, `NavRail.svelte`, `NavMenu.svelte`.
 - New breakpoint for the rail: shown from about 1000 dp wide only. Below it (tablet in portrait), use the phone's ☰ and modal side menu, and the Carnet's floating "+" button.
@@ -1352,8 +1352,12 @@ Spec: System design, section 7, "Android tablet in portrait: no rail" (new). Moc
 - Check a foldable and window resizing: the navigation switches without restarting.
 - A line in the release notes.
 
-## [ ] 2026-11-10-28 Android tablet in portrait: "+" at the bottom right of the screen
+Done in feature/tablet-portrait-menu: `layout.rail` (from 1000 dp on Android, 768 dp on iPad), used by App.svelte, MenuButton, About, Settings, EditDive and the Carnet's floating "+".
+
+## [x] 2026-11-10-28 Android tablet in portrait: "+" at the bottom right of the screen
 
 Addition to task 2026-11-10-27. Spec: System design, section 7, "Android tablet in portrait: no rail" (updated). Mock-ups: the `android-tablette-*-portrait.dc.html` of the Carnet section (updated).
 - In portrait, the Carnet's floating "+" sits at the bottom right of the whole screen, 24 dp from the edges, over the detail pane; scrims of sheets and dialogs cover it.
+
+Done in feature/tablet-portrait-menu: the Carnet's floating "+" is fixed 24 dp from the bottom right of the screen when the list and detail are split and there is no rail.
 

@@ -1371,7 +1371,7 @@
         twice and leaves the link without a name for screen readers.
       -->
       <div class="fab-backdrop"></div>
-      <div class="fab fab-right-bottom od-fab-add" bind:this={fabEl}>
+      <div class="fab fab-right-bottom od-fab-add" class:od-logbook--fab-screen={layout.split} bind:this={fabEl}>
         <a
           href="#add"
           class="external"
@@ -1424,6 +1424,16 @@
   :global(.md .od-logbook .title-large),
   :global(.md .od-logbook .subnavbar) {
     align-items: flex-start;
+  }
+
+  /* Outside the layers, over Framework7's .fab-right-bottom. Tablet in portrait,
+     no rail (spec, section 7): the "+" sits at the bottom right of the whole
+     screen, over the detail pane, not of the list pane. Scrims of sheets and
+     dialogs cover it. */
+  :global(.fab.od-logbook--fab-screen) {
+    position: fixed;
+    right: calc(24px + var(--f7-safe-area-right, 0px));
+    bottom: calc(24px + var(--f7-safe-area-bottom, 0px));
   }
 
   @layer od.components {
