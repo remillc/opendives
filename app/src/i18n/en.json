@@ -1496,7 +1496,8 @@
       "Settings: Logbook dive computers, to rename, remove or merge duplicates, found by serial number, then by comparing the profiles.",
       "Logbook: “Logbook dive computers” in the ⋮ menu.",
       "New “Trois vagues” logo: app icon, launch screen, menu and About.",
-      "Sync conflict: new dialog, readable differences, “Later”, and “Undo” before anything is sent."
+      "Sync conflict: new dialog, readable differences, “Later”, and “Undo” before anything is sent.",
+      "Filter (Android): new page, cylinder and gas criteria grouped, a saved filter fills the page, and deleting one offers “Undo”."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
@@ -1813,8 +1814,24 @@
     "deleteTitle": "Delete the filter “{name}”",
     "deleteText": "The dives do not change.",
     "delete": "Delete",
-    "deleted": "Filter “{name}” deleted",
-    "deleteNamed": "Delete the filter {name}"
+    "deleted": "Filter {name} deleted",
+    "deleteNamed": "Delete the filter {name}",
+    "deleteFailed": "The filter could not be deleted.",
+    "anyRow": {
+      "suits": "All",
+      "computers": "All",
+      "cylinder": "All",
+      "gas": "All",
+      "tags": "All"
+    },
+    "combined": {
+      "cylinder": "Cylinder, type and size",
+      "gas": "Gas (oxygen, helium)"
+    },
+    "gasShort": {
+      "o2": "O₂",
+      "he": "He"
+    }
   },
   "addUnavailable": {
     "heading": "Not available yet",

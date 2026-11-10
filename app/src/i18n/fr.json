@@ -1496,7 +1496,8 @@
       "Réglages : Ordinateurs du carnet, pour renommer, retirer ou fusionner les doublons, détectés par le numéro de série, puis en comparant les profils.",
       "Carnet : « Ordinateurs du carnet » dans le menu ⋮.",
       "Nouveau logo « Trois vagues » : icône de l’app, écran de démarrage, menu et À propos.",
-      "Conflit de synchronisation : dialogue refait, différences lisibles, « Plus tard », et « Annuler » avant l’envoi."
+      "Conflit de synchronisation : dialogue refait, différences lisibles, « Plus tard », et « Annuler » avant l’envoi.",
+      "Filtrer (Android) : page refaite, critères de bouteille et de gaz regroupés, un filtre enregistré remplit la page, et sa suppression propose « Annuler »."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
@@ -1813,8 +1814,24 @@
     "deleteTitle": "Supprimer le filtre « {name} »",
     "deleteText": "Les plongées ne changent pas.",
     "delete": "Supprimer",
-    "deleted": "Filtre « {name} » supprimé",
-    "deleteNamed": "Supprimer le filtre {name}"
+    "deleted": "Filtre {name} supprimé",
+    "deleteNamed": "Supprimer le filtre {name}",
+    "deleteFailed": "Le filtre n'a pas pu être supprimé.",
+    "anyRow": {
+      "suits": "Toutes",
+      "computers": "Tous",
+      "cylinder": "Toutes",
+      "gas": "Tous",
+      "tags": "Tout"
+    },
+    "combined": {
+      "cylinder": "Bouteille, type et taille",
+      "gas": "Gaz (oxygène, hélium)"
+    },
+    "gasShort": {
+      "o2": "O₂",
+      "he": "He"
+    }
   },
   "addUnavailable": {
     "heading": "Pas encore disponible",

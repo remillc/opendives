@@ -1166,7 +1166,9 @@ Christian approved all four. Spec: "Small changes of 10 November 2026" and "Stat
 
 Done in Four small changes from canvas comments
 
-## [ ] 2026-11-10-11 Filter (Android): rework the page to match the mock-up
+## [x] 2026-11-10-11 Filter (Android): rework the page to match the mock-up
+
+Done in "Rework the Android filter page to match the mock-up".
 
 Christian asked to review the filter page against the new Android mock-up. Spec: "Filter, Android". Mock-up: `docs/mockups/filtre-android.dc.html`. Pages: `app/src/pages/Filter.svelte`, `FilterCriterion.svelte`.
 - Full-screen dialog: ✕ (abandon), "Filtrer", text button "Tout effacer".
