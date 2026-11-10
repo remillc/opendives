@@ -1155,3 +1155,11 @@ Christian approved (canvas comment). Spec: "Statistics, items are not clickable"
   - "Par année" rows: title = year, supporting line = "{n} plongées · {durée} · max {profondeur}". "Par mode", "Par combinaison", "Par compagnon": title = value, supporting line = "{n} plongées", total time on the right (14 sp, tabular figures).
 
 Done in Statistics: plain sections and rows, no one-year view
+
+## [ ] 2026-11-10-10 Four small changes from canvas comments
+
+Christian approved all four. Spec: "Small changes of 10 November 2026" and "Statistics, items are not clickable".
+1. Site sheet (`docs/mockups/sites-fiche-android.dc.html`): each dive of "Plongées sur ce site" shows "N° {number} · {date}, {heure}".
+2. Dives without a site (`docs/mockups/sites-sans-site-android.dc.html`): profile thumbnail (56 × 40, same component as the Carnet) before the date; thumbnail + text are one tappable area with a chevron, apart from the two buttons. It opens a new screen `/sites/without-site/:diveId` (`docs/mockups/sites-sans-site-profil-android.dc.html`): ← and date in the top bar with "Plongée sans site · {mode}", the three key figures, the full profile card (same component as the dive detail, curves toggles included), computer and GPS line, and a fixed bottom bar "Choisir un site" (filled) and "Nouveau site" (outlined) that do the same as the row buttons, then return to the list.
+3. Statistics (`docs/mockups/android-stats.dc.html`): drop "· max {profondeur}" from every row; rows read "{n} plongées · {durée}".
+4. New statistic (`docs/mockups/stats-nouvelle-android.dc.html`): move "Nom" to the top, before "Critère".
