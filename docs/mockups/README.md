@@ -32,6 +32,7 @@ When a mock-up and `docs/ui-specification.md` disagree, the specification wins. 
 | `android-carnet.dc.html` | Téléphone Android, Carnet |
 | `android-carnet-menu.dc.html` | Téléphone Android, Carnet, menu ⋮ ouvert (Filtrer, Renuméroter les plongées) |
 | `android-stats.dc.html` | Téléphone Android, Statistiques précompilées |
+| `android-stats-plongees.dc.html` | Téléphone Android, Statistiques, plongées d’une ligne |
 | `android-accueil.dc.html` | Téléphone Android, Premier lancement |
 | `android-sites.dc.html` | Téléphone Android, Sites (carte hors ligne) |
 | `android-outils.dc.html` | Téléphone Android, Outils et calculateur de gaz |
