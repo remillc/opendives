@@ -1065,7 +1065,7 @@ Spec: "Carnet, month headers that stay on top". Mock-ups: `docs/mockups/android-
 
 ## [ ] 2026-11-10-01 Offline maps: search field on "Choisir sur la carte" (addendum to 2026-11-09-33)
 
-**On hold: do not start until Christian approves (a line "Approved" will be added here).**
+**Approved by Christian on 10 November 2026: go ahead.**
 
 Christian asked for it in a canvas comment. Mock-up: `docs/mockups/android-cartes-choix-carte.dc.html`. Spec: "Offline maps", *Adding*.
 - Under the top bar of `/settings/maps/area`, a search field "Rechercher un lieu ou un site" (surface card, 56 dp, rounded). Results: logbook sites first (name, region), then places from Nominatim (OpenStreetMap geocoder; follow its usage policy: debounce, at most one request per second, a generic app identifier with no personal data).
