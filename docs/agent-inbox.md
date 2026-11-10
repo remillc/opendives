@@ -1321,10 +1321,12 @@ Spec: UI specification, section 4, "Dive profile, cursor and curve buttons" (new
 - Curve buttons, selected: text and check in the colour of their curve (Température: `--od-tertiary` #2F6DB5 in light, #8AB4F8 in dark). Light mode: white background and a 1 dp border in that colour, for contrast. Dark mode: usual selected background. Unselected: unchanged.
 - Colours as `--od-*` variables. A line in the release notes.
 
-## [ ] 2026-11-10-25 Long totals of time in days and hours
+## [x] 2026-11-10-25 Long totals of time in days and hours
 
 Spec: System design, section 6, "Long totals of time" (new). Canvas note beside "30 · Statistiques · tablette Android".
 - In `app/src/lib/format.js` (or wherever totals are formatted), a total of time under water from 24 h is shown as days and hours without minutes: "80 j 16 h" in French, "80 d 16 h" in English, from translation keys. Under 24 h: unchanged ("11 h 26").
 - Applies to the statistics key figures, the "Par …" and "Mes statistiques" rows, the dives of a row (task 13 supporting line) and any other sum of durations. Single dive durations stay as they are.
 - Unit tests for 23 h 59, 24 h, and a large total. A line in the release notes.
+
+Done in `feature/long-time-totals`: `formatTotalTime` in `app/src/lib/format.js` (hours rounded down), used by every sum of durations; tests in `tests/app/total-time-format.test.mjs`.
 

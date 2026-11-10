@@ -22,7 +22,7 @@
     notSetLabel,
     valueLabel,
   } from '../lib/statistics.svelte.js';
-  import { formatHours } from '../lib/format.js';
+  import { formatTotalTime } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
 
   /** @type {{ f7route: { query: { c?: string, saved?: string } } }} */
@@ -123,7 +123,7 @@
               <div class="item-inner">
                 <div class="item-title-row">
                   <div class="item-title">{s.value || notSetLabel('suit')}</div>
-                  <div class="item-after od-value">{formatHours(s.totalSeconds)}</div>
+                  <div class="item-after od-value">{formatTotalTime(s.totalSeconds)}</div>
                 </div>
                 <div class="item-text od-value">{t('trip.dives', { n: s.dives })}</div>
               </div>

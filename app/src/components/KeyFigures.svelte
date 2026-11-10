@@ -3,7 +3,7 @@
   // The three key figures of a set of dives (spec, section 1, "Statistics"):
   // dives, time under water, deepest. Computed by the core; "—" while pending.
   // With `href`, the whole card opens the filtered result.
-  import { formatDepth, formatHours, formatNumber } from '../lib/format.js';
+  import { formatDepth, formatTotalTime, formatNumber } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
 
   /**
@@ -19,7 +19,7 @@
 
   const items = $derived([
     { label: t('stats.figureDives'), value: figures ? formatNumber(figures.dives) : null },
-    { label: t('stats.figureTime'), value: figures ? formatHours(figures.totalSeconds) : null },
+    { label: t('stats.figureTime'), value: figures ? formatTotalTime(figures.totalSeconds) : null },
     { label: t('stats.figureDeepest'), value: figures?.maxDepthMm ? formatDepth(figures.maxDepthMm, prefs) : null },
   ]);
 </script>
