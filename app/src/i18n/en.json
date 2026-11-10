@@ -1435,6 +1435,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Units: after “Imperial” (or “Metric”) and then a change to a single unit, the other units are kept when the app restarts; before, they went back to metric.",
       "Planner (tablet in portrait): opened beside the tools list, it fits in one column instead of adding one at the right of the screen.",
       "About: the app’s description no longer says “free”.",
       "First launch (Android tablet): in landscape, the title and the dive profile on the left and the three choices on the right; in portrait, the title, the profile across the width, then the choices, centred. No scrolling, even on a small tablet.",

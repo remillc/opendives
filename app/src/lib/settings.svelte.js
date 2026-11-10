@@ -17,6 +17,9 @@ const APP_KEY = 'od.appSettings';
 /** The last dive computer used and the four remembered ones (setPrefs diveComputerList). */
 const COMPUTERS_KEY = 'od.diveComputers';
 
+/** The units set one by one (Subsurface's "personalize" system). */
+const UNIT_KEYS = /** @type {const} */ (['length', 'temperature', 'pressure', 'volume', 'weight']);
+
 /** SAC factor under stress, x100: 2.0, the planner's default. */
 export const DEFAULT_SAC_FACTOR = 200;
 
@@ -174,8 +177,14 @@ export async function setCorePrefs(changes) {
   const prefs = await OpenDivesCore.getPrefs();
   Object.assign(storedCore, changes);
   // A chosen system replaces the units kept one by one: restored later, they would override it.
-  if (changes.unitSystem && changes.unitSystem !== 'personalize') for (const key of /** @type {const} */ (['length', 'temperature', 'pressure', 'volume', 'weight'])) if (!(key in changes)) delete storedCore[key];
-  if (['length', 'temperature', 'pressure', 'volume', 'weight'].some((k) => k in changes)) storedCore.unitSystem = prefs.unitSystem;
+  if (changes.unitSystem && changes.unitSystem !== 'personalize') for (const key of UNIT_KEYS) if (!(key in changes)) delete storedCore[key];
+  // One unit changed: the system becomes "personalize", and the other units
+  // are those of the system before (Impérial, say). All five are kept, or the
+  // others would come back as the core's defaults (metric) at the next start.
+  if (UNIT_KEYS.some((k) => k in changes)) {
+    storedCore.unitSystem = prefs.unitSystem;
+    if (prefs.unitSystem === 'personalize') for (const key of UNIT_KEYS) storedCore[key] = /** @type {any} */ (prefs[key]);
+  }
   writeJson(CORE_KEY, storedCore);
   if ('extraEnvironmental' in changes) settings.extraConditions = changes.extraEnvironmental === true;
   if (changes.duration) settings.duration = changes.duration === 'minutes' ? 'minutes' : 'mixed';
