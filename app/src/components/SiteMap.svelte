@@ -24,15 +24,16 @@
    *   onselect?: (uuid: number) => void,
    *   onview?: (view: { center: [number, number], bounds: [number, number, number, number], zoom: number }) => void,
    *   height?: string,
+   *   matching?: Set<number>|null,
    * }}
    */
-  let { sites = [], pin = null, editable = false, onmove, onselect, onview, height = '240px' } = $props();
+  let { sites = [], pin = null, editable = false, onmove, onselect, onview, height = '240px', matching = null } = $props();
 
   /** @type {HTMLElement|undefined} */
   let container = $state();
   /** Reactive (not deeply): the pin's effect runs again once it exists. */
   let map = $state.raw(/** @type {import('maplibre-gl').Map|undefined} */ (undefined));
-  /** @type {import('maplibre-gl').Marker[]} */
+  /** @type {{ uuid: number, marker: import('maplibre-gl').Marker }[]} */
   let markers = [];
   /** @type {import('maplibre-gl').Marker|undefined} */
   let pinMarker;
@@ -42,15 +43,37 @@
 
   function drawSites() {
     if (!map) return;
-    for (const m of markers) m.remove();
+    for (const m of markers) m.marker.remove();
     markers = sites.map((site) => {
       const el = document.createElement('button');
       el.type = 'button';
       el.className = 'od-site-marker';
       el.setAttribute('aria-label', site.name || t('sites.noName'));
       el.addEventListener('click', () => onselect?.(site.uuid));
-      return new maplibregl.Marker({ element: el }).setLngLat(lngLat(site)).addTo(/** @type {import('maplibre-gl').Map} */ (map));
+      const marker = new maplibregl.Marker({ element: el }).setLngLat(lngLat(site)).addTo(/** @type {import('maplibre-gl').Map} */ (map));
+      return { uuid: site.uuid, marker };
     });
+    dim();
+  }
+
+  /** During a search, the markers that do not match fade to 30 %. */
+  function dim() {
+    for (const { uuid, marker } of markers) marker.getElement().classList.toggle('od-dim', !!matching && !matching.has(uuid));
+  }
+
+  $effect(() => {
+    matching;
+    dim();
+  });
+
+  /** The place the map looks at, to come back to it. */
+  export function getView() {
+    return map ? { center: map.getCenter(), zoom: map.getZoom() } : null;
+  }
+
+  /** @param {{ center: import('maplibre-gl').LngLat, zoom: number }|null} v */
+  export function setView(v) {
+    if (map && v) map.easeTo({ center: v.center, zoom: v.zoom, duration: 200 }, { programmatic: true });
   }
 
   function fit() {
@@ -238,6 +261,11 @@
       background: var(--od-text);
       box-shadow: 0 1px 3px rgb(0 0 0 / 0.3);
       cursor: pointer;
+      transition: opacity 150ms linear;
+
+      &.od-dim {
+        opacity: 0.3;
+      }
 
       /* 16 dp dot, 48 dp touch target, around the dot: MapLibre places the
          marker with position: absolute, which also holds the target (no

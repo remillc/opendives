@@ -6,8 +6,8 @@
   // search bar follows the summary. `overMap`, on Sites, whose map runs under
   // the band: the wave cuts the band, so the map shows under the curve.
 
-  /** @type {{ summary?: string, tall?: boolean, overMap?: boolean, pill?: boolean, chip?: boolean, bare?: boolean, children?: import('svelte').Snippet }} */
-  let { summary = '', tall = false, overMap = false, pill = false, chip = false, bare = false, children } = $props();
+  /** @type {{ summary?: string, tall?: boolean, overMap?: boolean, pill?: boolean, chip?: boolean, bare?: boolean, summaryKey?: unknown, children?: import('svelte').Snippet }} */
+  let { summary = '', tall = false, overMap = false, pill = false, chip = false, bare = false, summaryKey = undefined, children } = $props();
 
   const PROFILE = 'M0 30 L20 38 L45 70 L70 92 L95 96 L120 88 L140 94 L165 80 L185 62 L210 58 L235 50 L255 46 L275 40 L300 36';
 </script>
@@ -22,7 +22,10 @@
   {#if !overMap && !bare}
     <svg class="wave" viewBox="0 0 300 18" preserveAspectRatio="none" aria-hidden="true"><path d="M0 11 Q37.5 2 75 11 T150 11 T225 11 T300 11 V18 H0 Z" /></svg>
   {/if}
-  {#if summary}<p class="summary od-value">{summary}</p>{/if}
+  <!-- A new summaryKey cross-fades to the new summary (Sites: the search count). -->
+  {#key summaryKey}
+    {#if summary}<p class="summary od-value">{summary}</p>{/if}
+  {/key}
   {@render children?.()}
 </div>
 
@@ -101,8 +104,15 @@
       }
     }
 
+    @keyframes od-summary-in {
+      from {
+        opacity: 0;
+      }
+    }
+
     .summary {
       position: relative;
+      animation: od-summary-in 150ms linear;
       margin: 0;
       font-size: 14px;
       line-height: 20px;
