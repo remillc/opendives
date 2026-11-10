@@ -644,9 +644,10 @@
       "resetText": "Revient aux valeurs par défaut pour tous les réglages de cet appareil",
       "reset": "Réinitialiser tous les réglages",
       "resetTitle": "Réinitialiser tous les réglages ?",
-      "resetConfirm": "Tous les réglages de cet appareil reviennent aux valeurs par défaut de Subsurface. Les plongées ne changent pas.",
+      "resetConfirm": "Les réglages de cet appareil reviennent à leurs valeurs par défaut : unités, affichage, carnet. Vos plongées, vos sites, votre compte et vos cartes téléchargées ne changent pas, ni les paramètres du planificateur et le regroupement en voyages.",
       "resetAction": "Réinitialiser",
-      "note": "Les paramètres de planification (vitesses, réserve, SAC, ppO₂, déco) ainsi que le regroupement en voyages ne sont pas modifiés."
+      "note": "Les paramètres de planification (vitesses, réserve, SAC, ppO₂, déco) ainsi que le regroupement en voyages ne sont pas modifiés.",
+      "resetDone": "Réglages réinitialisés"
     },
     "cylinders": {
       "title": "Types de bouteilles",
@@ -1420,6 +1421,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Réglages : « Réinitialiser tous les réglages » demande d’abord confirmation, puis annonce « Réglages réinitialisés ». Il ne touche plus aux paramètres du planificateur.",
       "Logo : les trois vagues ont des dégradés plus courts, pour que les couches restent distinctes en petit.",
       "Sites : un menu change l’ordre de la liste (alphabétique ou plus récent en premier) ; un appui long sur un site le sélectionne, pour fusionner plusieurs sites.",
       "Conflit sur plusieurs plongées : une boîte en plein écran avec un interrupteur « Même choix pour toutes » et une carte par plongée, où vous touchez la version à garder.",

@@ -15,6 +15,7 @@
 //   keeps its own copy, so that reopening it gives the same result.
 import { OpenDivesCore } from 'opendives-core';
 import { DEFAULT_SAC_FACTOR, settings, setCorePrefs, resetCorePrefs } from './settings.svelte.js';
+import { SETTING_KEYS } from './settings-reset.js';
 import { altitudeToPressureMbar, salinityOfWaterType } from './tools.js';
 import { bottomCylinder } from './plan-gases.js';
 
@@ -23,27 +24,7 @@ import { bottomCylinder } from './plan-gases.js';
 /** @typedef {import('opendives-core').PlanRequest} PlanRequest */
 /** @typedef {import('opendives-core').PlannedDive} PlannedDive */
 
-/** Planner-only settings: core preferences, set from the planner screen. */
-export const SETTING_KEYS = /** @type {const} */ ([
-  'bottomPo2Mbar',
-  'decoPo2Mbar',
-  'descentMmMin',
-  'ascent75MmMin',
-  'ascent50MmMin',
-  'ascentStopsMmMin',
-  'ascentLast6mMmMin',
-  'lastStop6m',
-  'safetyStop',
-  'switchAtRequiredStop',
-  'minSwitchSeconds',
-  'o2Breaks',
-  'dropStone',
-  'reserveMbar',
-  'problemSolvingMinutes',
-  'sacFactor',
-  'decoSacMlMin',
-  'bottomSacMlMin',
-]);
+export { SETTING_KEYS };
 
 /** The settings a saved plan keeps; its bottom SAC is already one of its fields. */
 const KEPT_KEYS = SETTING_KEYS.filter((k) => k !== 'bottomSacMlMin');
