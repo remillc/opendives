@@ -26,7 +26,7 @@
     notSetLabel,
     summaryLine,
   } from '../lib/statistics.svelte.js';
-  import { formatHours, formatLongDuration } from '../lib/format.js';
+  import { formatTotalTime, formatLongDuration } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
   import { layout } from '../lib/layout.svelte.js';
   import { keepInSvelteRange } from '../lib/master-detail.js';
@@ -102,7 +102,7 @@
     key,
     title,
     support: t('trip.dives', { n: figures.dives }),
-    after: formatHours(figures.totalSeconds),
+    after: formatTotalTime(figures.totalSeconds),
     criteria: [{ field, values: [key] }],
   });
 

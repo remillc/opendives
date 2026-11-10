@@ -9,7 +9,7 @@
 // are passed as an "id" criterion.
 import { OpenDivesCore } from 'opendives-core';
 import { t, tIfExists } from './i18n.js';
-import { formatGasLong, formatHours, formatLongDate, locale } from './format.js';
+import { formatGasLong, formatTotalTime, formatLongDate, locale } from './format.js';
 import { filter } from './filter.svelte.js';
 
 /** @typedef {import('opendives-core').Dive} Dive */
@@ -86,7 +86,7 @@ export async function computeStatistics(criteria, options = {}) {
  */
 export function summaryLine(figures) {
   if (!figures) return '';
-  return t('stats.rowSummary', { dives: t('trip.dives', { n: figures.dives }), time: formatHours(figures.totalSeconds) });
+  return t('stats.rowSummary', { dives: t('trip.dives', { n: figures.dives }), time: formatTotalTime(figures.totalSeconds) });
 }
 
 /**

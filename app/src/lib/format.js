@@ -82,6 +82,21 @@ export function formatHours(seconds) {
   });
 }
 
+/**
+ * A total of time under water (a sum of dive durations). Under 24 h it reads
+ * as hours and minutes ("11 h 26"); from 24 h as days and hours without
+ * minutes ("80 j 16 h"). Rounding: the total is rounded to the minute first
+ * (as formatHours does), then the hours are rounded down, so 24 h 59 min reads
+ * "1 j 0 h" and 23 h 59 min stays "23 h 59".
+ * @param {number} seconds
+ */
+export function formatTotalTime(seconds) {
+  const minutes = Math.round(seconds / 60);
+  if (minutes < 24 * 60) return formatHours(seconds);
+  const hours = Math.floor(minutes / 60);
+  return t('units.daysHours', { d: formatNumber(Math.floor(hours / 24), 0), h: formatNumber(hours % 24, 0) });
+}
+
 /** One duration of a statistic: "59 min" under an hour, else "1 h 06". @param {number} seconds */
 export function formatLongDuration(seconds) {
   return seconds < 3570 ? formatDuration(seconds, 'minutes') : formatHours(seconds);

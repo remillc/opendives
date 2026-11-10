@@ -4,7 +4,7 @@
   // statistics (yearlystatisticsmodel.cpp), as the core computes them. The mean
   // duration is total / number of dives, as Subsurface shows it. A row without
   // a value is not shown; nothing while the core computes.
-  import { formatDepth, formatHours, formatLongDuration, formatSac, formatTemperature, temperatureValue } from '../lib/format.js';
+  import { formatDepth, formatTotalTime, formatLongDuration, formatSac, formatTemperature, temperatureValue } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
 
   /**
@@ -19,7 +19,7 @@
   /** @param {string} row @param {import('../lib/statistics.svelte.js').StatsFigures} f @returns {string|null} */
   function value(row, f) {
     switch (row) {
-      case 'total': return formatHours(f.totalSeconds);
+      case 'total': return formatTotalTime(f.totalSeconds);
       case 'mean': return f.dives ? formatLongDuration(f.totalSeconds / f.dives) : null;
       case 'shortest': return f.shortestSeconds ? formatLongDuration(f.shortestSeconds) : null;
       case 'longest': return f.longestSeconds ? formatLongDuration(f.longestSeconds) : null;
