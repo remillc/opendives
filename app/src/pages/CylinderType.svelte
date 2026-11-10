@@ -7,7 +7,8 @@
   // removing changes the device's list only, never existing dives.
 
   import { onMount } from 'svelte';
-  import { Page, Navbar, Link, f7 } from 'framework7-svelte';
+  import { Page, Navbar, Link } from 'framework7-svelte';
+  import { showSnackbar } from '../lib/snackbar.js';
   import { OpenDivesCore } from 'opendives-core';
   import Icon from '../components/Icon.svelte';
   import TextField from '../components/TextField.svelte';
@@ -81,7 +82,7 @@
       error = t('settings.cylinders.nameInUse');
     } else {
       console.error('Saving the cylinder type', e);
-      f7.toast.show({ text: t('settings.error'), closeTimeout: 4000 });
+      showSnackbar(t('settings.error'));
     }
   }
 

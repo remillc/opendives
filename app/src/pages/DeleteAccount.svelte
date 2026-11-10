@@ -4,7 +4,8 @@
   // spec, section 4, "Delete the account"). Unsent changes are synced first;
   // the account is reported deleted only if the server confirms it. The
   // request is never sent by automated tests.
-  import { Page, Navbar, Link, f7 } from 'framework7-svelte';
+  import { Page, Navbar, Link } from 'framework7-svelte';
+  import { showSnackbar } from '../lib/snackbar.js';
   import Icon from '../components/Icon.svelte';
   import TextField from '../components/TextField.svelte';
   import { logbook, accountDeleted, syncNow } from '../lib/logbook.svelte.js';
@@ -21,7 +22,7 @@
 
   /** @param {string} text */
   function toast(text) {
-    f7.toast.create({ text, closeTimeout: 4000, position: 'center' }).open();
+    showSnackbar(text);
   }
 
   /** "Export a copy of the logbook" (.ssrf): file export does not exist yet. */

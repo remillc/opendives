@@ -7,11 +7,12 @@
 // "od-undo-cleared" event, and every message still open closes at once, so
 // that none offers an undo that would do nothing.
 import { f7 } from 'framework7-svelte';
+import { showSnackbar } from './snackbar.js';
 import { t } from './i18n.js';
 
 /** @param {string} text */
 function toast(text) {
-  f7.toast.create({ text, closeTimeout: 4000, position: 'bottom' }).open();
+  showSnackbar(text);
 }
 
 /**
@@ -23,29 +24,22 @@ function toast(text) {
  */
 export async function offerUndo(text, after, timeout = 6000, steps = 1) {
   const { undoLastChange } = await import('./logbook.svelte.js');
-  f7.toast
-    .create({
-      text,
-      cssClass: 'od-undo-toast',
-      closeButton: true,
-      closeButtonText: t('edit.undo'),
-      closeTimeout: timeout,
-      position: 'bottom',
-      on: {
-        closeButtonClick: async () => {
-          try {
-            let result = await undoLastChange();
-            for (let i = 1; i < steps; i++) result = await undoLastChange();
-            if (after) await after(result);
-            toast(t('edit.undone'));
-          } catch (e) {
-            console.error('Undo', e);
-            toast(t('edit.undoFailed'));
-          }
-        },
-      },
-    })
-    .open();
+  showSnackbar(text, {
+    undoable: true,
+    action: t('edit.undo'),
+    timeout,
+    onAction: async () => {
+      try {
+        let result = await undoLastChange();
+        for (let i = 1; i < steps; i++) result = await undoLastChange();
+        if (after) await after(result);
+        toast(t('edit.undone'));
+      } catch (e) {
+        console.error('Undo', e);
+        toast(t('edit.undoFailed'));
+      }
+    },
+  });
 }
 
 if (typeof window !== 'undefined') {

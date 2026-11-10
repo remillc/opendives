@@ -3,6 +3,7 @@
 // same screens open from first launch (routes /welcome/…) and from Account
 // without an account (routes /account/…).
 import { f7 } from 'framework7-svelte';
+import { showSnackbar } from './snackbar.js';
 import { accountReady, deviceDiveCount, importDeviceDives, logbook } from './logbook.svelte.js';
 import { confirmAction } from './dialogs.js';
 import { offerUndo } from './undo.js';
@@ -43,7 +44,7 @@ export function validPassword(password) {
 
 /** @param {string} text */
 export function toast(text) {
-  f7.toast.create({ text, closeTimeout: 4000, position: 'center' }).open();
+  showSnackbar(text);
 }
 
 /** A failure that is not a field's: the server did not answer, or something else. */
@@ -111,5 +112,5 @@ export async function addDeviceDives() {
 
 /** @param {string} text */
 function toastText(text) {
-  f7.toast.create({ text, closeTimeout: 4000, position: 'bottom' }).open();
+  showSnackbar(text);
 }

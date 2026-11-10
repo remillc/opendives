@@ -9,6 +9,7 @@
   // never shown.
   import { onMount } from 'svelte';
   import { Page, Navbar, Link, List, ListItem, Block, Popover, f7, theme } from 'framework7-svelte';
+  import { showSnackbar } from '../lib/snackbar.js';
   import { OpenDivesCore } from 'opendives-core';
   import DiveProfile from '../components/DiveProfile.svelte';
   import Icon from '../components/Icon.svelte';
@@ -203,7 +204,7 @@
       const message = String(/** @type {any} */ (e)?.message ?? '');
       if (/cancel/i.test(message)) return;
       console.error('Share a dive', e);
-      f7.toast.create({ text: t('share.failed'), closeTimeout: 4000 }).open();
+      showSnackbar(t('share.failed'));
     }
   }
 
@@ -258,7 +259,7 @@
     } catch (e) {
       const code = String(/** @type {any} */ (e)?.message ?? '');
       console.error('Remove from trip', code);
-      f7.toast.show({ text: code.startsWith('WRITE_LOCKED') ? t('edit.writeLocked') : t('detail.removeFromTripFailed'), closeTimeout: 4000 });
+      showSnackbar(code.startsWith('WRITE_LOCKED') ? t('edit.writeLocked') : t('detail.removeFromTripFailed'));
     }
   }
 

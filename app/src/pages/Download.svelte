@@ -16,6 +16,7 @@
   //    dives downloaded" and "Annuler". A failure opens "Download failed".
   import { onDestroy, onMount } from 'svelte';
   import { Page, Navbar, Link, Button, theme, f7 } from 'framework7-svelte';
+  import { showSnackbar } from '../lib/snackbar.js';
   import { OpenDivesCore } from 'opendives-core';
   import Icon from '../components/Icon.svelte';
   import ChoiceDialog from '../components/ChoiceDialog.svelte';
@@ -261,7 +262,7 @@
 
   /** @param {string} text */
   function toast(text) {
-    f7.toast.create({ text, closeTimeout: 4000, position: 'bottom' }).open();
+    showSnackbar(text);
   }
 
   function close() {

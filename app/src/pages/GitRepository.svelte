@@ -17,6 +17,7 @@
   // kept, stored or logged here.
   import { OpenDivesCore } from 'opendives-core';
   import { Page, Navbar, Link, f7 } from 'framework7-svelte';
+  import { showSnackbar } from '../lib/snackbar.js';
   import { onMount } from 'svelte';
   import AccountField from '../components/AccountField.svelte';
   import SelectField from '../components/SelectField.svelte';
@@ -147,7 +148,7 @@
       token = '';
       // "owner/repository", from the address that was just accepted.
       const repository = new URL(url.trim()).pathname.replace(/^\/|\.git$|\/$/g, '');
-      f7.toast.create({ text: t('gitRepo.connected', { repository }), closeTimeout: 4000, position: 'bottom' }).open();
+      showSnackbar(t('gitRepo.connected', { repository }));
       if (edit) {
         f7router.back(f7router.history[0], { force: true });
         repositoryChanged();

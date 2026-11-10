@@ -8,7 +8,8 @@
   // right. Saving adds the dive as one undoable step, with the simple profile
   // Subsurface-mobile makes from the depth and the duration, then opens it.
   import { onMount } from 'svelte';
-  import { Page, Navbar, Link, f7, theme } from 'framework7-svelte';
+  import { Page, Navbar, Link, theme } from 'framework7-svelte';
+  import { showSnackbar } from '../lib/snackbar.js';
   import { OpenDivesCore } from 'opendives-core';
   import Icon from '../components/Icon.svelte';
   import TextField from '../components/TextField.svelte';
@@ -139,7 +140,7 @@
         offerUndo(t('renumber.done'), back);
       } catch (e) {
         console.error('Renumber', e);
-        f7.toast.create({ text: t('renumber.failed'), closeTimeout: 4000 }).open();
+        showSnackbar(t('renumber.failed'));
       }
     };
   }
@@ -193,9 +194,7 @@
     } catch (e) {
       const code = String(/** @type {any} */ (e)?.message ?? '');
       console.error('Log a dive', code);
-      f7.toast
-        .create({ text: code.startsWith('WRITE_LOCKED') ? t('edit.writeLocked') : t('newDive.failed'), closeTimeout: 4000 })
-        .open();
+      showSnackbar(code.startsWith('WRITE_LOCKED') ? t('edit.writeLocked') : t('newDive.failed'));
     } finally {
       saving = false;
     }

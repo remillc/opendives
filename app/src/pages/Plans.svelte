@@ -5,6 +5,7 @@
   // no other screen lists. A row reopens the plan, its ⋮ duplicates, shares or
   // deletes it.
   import { Page, Navbar, Link, List, Popover, f7, theme } from 'framework7-svelte';
+  import { showSnackbar } from '../lib/snackbar.js';
   import { OpenDivesCore } from 'opendives-core';
   import Icon from '../components/Icon.svelte';
   import MenuItem from '../components/MenuItem.svelte';
@@ -74,7 +75,7 @@
       await load();
     } catch (e) {
       console.error('Duplicating a plan', e);
-      f7.toast.show({ text: t('plan.saveFailed'), closeTimeout: 4000 });
+      showSnackbar(t('plan.saveFailed'));
     }
   }
 
@@ -94,7 +95,7 @@
           offerUndo(t('plans.deleted'), () => load(), 10000);
         } catch (e) {
           console.error('Deleting a plan', e);
-          f7.toast.show({ text: t('plans.deleteFailed'), closeTimeout: 4000 });
+          showSnackbar(t('plans.deleteFailed'));
           await load();
         }
       },
@@ -113,7 +114,7 @@
       else await sharePlanSummary(result, request, prefs, title(plan));
     } catch (e) {
       console.error('Sharing a plan', e);
-      f7.toast.show({ text: t('plan.shareFailed'), closeTimeout: 4000 });
+      showSnackbar(t('plan.shareFailed'));
     }
   }
 </script>

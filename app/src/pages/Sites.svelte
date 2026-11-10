@@ -6,6 +6,7 @@
   // count, the list items that apply (dives without a site, sites without
   // coordinates, possible duplicates), a divider and the sites.
   import { Page, Navbar, NavRight, Link, Searchbar, List, Popover, f7, theme } from 'framework7-svelte';
+  import { showSnackbar } from '../lib/snackbar.js';
   import { OpenDivesCore } from 'opendives-core';
   import Icon from '../components/Icon.svelte';
   import MenuButton from '../components/MenuButton.svelte';
@@ -154,7 +155,7 @@ import { inBbox } from '../lib/maps-logic.js';
       checked = {};
     } catch (e) {
       console.error('Merge sites', e);
-      f7.toast.create({ text: t('edit.failed'), closeTimeout: 4000 }).open();
+      showSnackbar(t('edit.failed'));
     }
     if (done) offerUndo(t('sites.done'), undefined, 6000, done);
   }
@@ -191,16 +192,11 @@ import { inBbox } from '../lib/maps-logic.js';
     const area = `${x}/${y}`;
     if (hinted.has(area)) return;
     hinted.add(area);
-    f7.toast
-      .create({
-        text: t('sites.areaNotDownloaded'),
-        closeButton: true,
-        closeButtonText: t('sites.downloadArea'),
-        closeTimeout: 6000,
-        position: 'bottom',
-        on: { closeButtonClick: () => downloadRegionAt(lng, lat) },
-      })
-      .open();
+    showSnackbar(t('sites.areaNotDownloaded'), {
+      action: t('sites.downloadArea'),
+      timeout: 6000,
+      onAction: () => downloadRegionAt(lng, lat),
+    });
   }
 
   /** @param {{ center: [number, number], bounds: [number, number, number, number], zoom: number }} v */
@@ -235,7 +231,7 @@ import { inBbox } from '../lib/maps-logic.js';
   const open = (uuid) => f7.views.current?.router.navigate(`/sites/${uuid}`);
 
   function centreOnDevice() {
-    const failed = () => f7.toast.create({ text: t('sites.noDevicePosition'), closeTimeout: 4000 }).open();
+    const failed = () => showSnackbar(t('sites.noDevicePosition'));
     if (!navigator.geolocation) return failed();
     navigator.geolocation.getCurrentPosition(
       (pos) => siteMap?.centreOn({ latUdeg: Math.round(pos.coords.latitude * 1e6), lonUdeg: Math.round(pos.coords.longitude * 1e6) }),

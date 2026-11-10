@@ -1115,7 +1115,9 @@ Christian approved (canvas comment). Spec: "Settings, \"Réinitialiser tous les 
 - After reset, snackbar "Réglages réinitialisés" (4 s). Downloaded offline maps, logbook data, account, planner settings and trip grouping are untouched.
 - fr and en keys.
 
-## [ ] 2026-11-10-06 One snackbar style for the whole app
+## [x] 2026-11-10-06 One snackbar style for the whole app
+
+Done in Use one snackbar style for every message of the app
 
 Christian asked (canvas comment): use the snackbar of `docs/mockups/sites-nettoyer-pas-doublons-android.dc.html` for every snackbar. Spec: `docs/ui-foundations.md`, section 8 "Snackbar style".
 - Make one shared snackbar component with that style (inverse surface, 4 dp corners, 16 dp side margins, 24 dp from the bottom or above the FAB, 14 sp text, one action in the inverse primary colour), light and dark tokens.
