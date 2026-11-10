@@ -1430,11 +1430,12 @@
     "versionDated": "Version {version} · {date}",
     "author": "Par {name}",
     "copyright": "© {year} {name}.",
-    "tagline": "Carnet de plongée libre et gratuit, compatible avec les carnets Subsurface.",
+    "tagline": "Carnet de plongée libre, compatible avec les carnets Subsurface.",
     "project": "Projet",
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "À propos : la description de l’app ne dit plus « gratuit ».",
       "Premier lancement (tablette Android) : en paysage, le titre et le profil de plongée à gauche, les trois choix à droite ; en portrait, le titre, le profil sur toute la largeur puis les choix, centrés. Sans défilement, même sur une petite tablette.",
       "Statistiques : un total de temps sous l’eau à partir de 24 h s’écrit en jours et heures, sans minutes (« 80 j 16 h »), dans les chiffres clés, les lignes « Par … » et « Mes statistiques » et les plongées d’une ligne ; en dessous de 24 h, il reste en heures et minutes.",
       "Compte (iPhone) : la connexion, la création d’un compte, le code de confirmation, la reprise du carnet, l’import et le dépôt git prennent la même mise en page que sur Android : « Annuler » ou « Retour » seuls dans la barre, grand titre, sections arrondies, grand bouton en capsule et profil de plongée.",
