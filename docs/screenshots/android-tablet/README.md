@@ -58,10 +58,41 @@ Task 2026-11-10-17. Taken on 10 November 2026 on an Android tablet emulator (Pix
 | 73 | [landscape](73-about-privacy-landscape.png), [portrait](73-about-privacy-portrait.png) | `/about/privacy` | no list pane | no list pane | Whole area. |
 | 74 | [landscape](74-about-libraries-landscape.png), [portrait](74-about-libraries-portrait.png) | `/about/libraries` | no list pane | no list pane | Whole area. |
 
+## States (task 2026-11-10-20)
+
+Same emulator, same settings. Every screen asked for exists in the app.
+
+| No. | Exists | Images | Route | How the state was produced | Notes |
+| --- | --- | --- | --- | --- | --- |
+| 13 | yes | [landscape](13-carnet-offline-landscape.png), [portrait](13-carnet-offline-portrait.png) | `/` | Real: airplane mode on the emulator, then the rating of dive no. 1386 changed in the editor. With the network back, the change was sent to the test account. | The band's pill says "Hors ligne : 1 modification sera envoyée au retour du réseau"; the dive's row says "Note modifiée, en attente d'envoi". |
+| 14 | yes | [password, landscape](14-sync-failure-password-landscape.png), [portrait](14-sync-failure-password-portrait.png) | `/` + sheet | Simulated: in the running app (DevTools), the core's answer to the sync was replaced by "offline, server refuses the credentials". The saved password was not changed, and nothing reached the cloud. | On tablet the failure is a pill in the Carnet band; touching it opens the sheet shown. |
+| 14 | yes | [unreachable, landscape](14-sync-failure-unreachable-landscape.png), [portrait](14-sync-failure-unreachable-portrait.png) | `/` + sheet | Simulated the same way: "offline, server does not answer". | |
+| 14 | yes | [git refused, landscape](14-sync-failure-git-landscape.png), [portrait](14-sync-failure-git-portrait.png) | `/` + sheet | Simulated: the account answer made git mode (see 57), then a refused sync. | |
+| 15 | yes | [one dive, landscape](15-sync-conflict-one-landscape.png), [portrait](15-sync-conflict-one-portrait.png) | `/` + popup | Simulated: the sync answered "merged" with conflicts on the first dives of the list (made-up notes, rating and buddy). The dialog was cancelled; nothing was written. | |
+| 15 | yes | [several dives, landscape](15-sync-conflict-several-landscape.png), [portrait](15-sync-conflict-several-portrait.png) | `/` + popup | Same, three dives. | |
+| 16 | yes | [landscape](16-carnet-empty-landscape.png), [portrait](16-carnet-empty-portrait.png) | `/` | Real: Christian signed out on the emulator (the cloud is untouched); first launch was then closed and the Carnet shown. | |
+| 55 | yes | [landscape](55-account-no-account-landscape.png), [portrait](55-account-no-account-portrait.png) | `/account` | Same session without an account. | |
+| 56 | yes | [sign out, landscape](56-account-sign-out-landscape.png), [portrait](56-account-sign-out-portrait.png) | `/account` + dialog | The dialog opened from "Se déconnecter", then closed without confirming. | |
+| 56 | yes | [delete account, landscape](56-account-delete-landscape.png), [portrait](56-account-delete-portrait.png) | `/account/delete` | The page opened, nothing submitted. | |
+| 57 | yes | [landscape](57-account-git-landscape.png), [portrait](57-account-git-portrait.png) | `/account` | Simulated: the account answer replaced by a git account (`github.com/remillc/opendives-test`), the dives still those of the test account. | "github.com · branche" has no branch name because the simulated answer gave none. |
+| 75 | yes | [landscape](75-first-launch-landscape.png), [portrait](75-first-launch-portrait.png) | `/welcome` | After the sign-out of 16. | Full screen on tablet (changed during this task, see below). |
+
+### Bugs found while capturing
+
+Fixed during this task (each in its own branch, merged):
+
+- The first launch was a 630 dp popup, cut off on a real Samsung tablet; it is now full screen on tablet.
+- After signing out, the account's last dive stayed beside the empty list.
+- Settings and About opened beside the Carnet list; they now open over the whole area.
+- The Carnet band had no wavy edge on tablet.
+
+Still open:
+
+- The failure sheets say "Vos plongées restent sur ce téléphone" on a tablet.
+- The pill says "Synchronisation impossible : mot de passe refusé" but "Synchro impossible : dépôt git refusé".
+
 ## Not captured
 
-- The sync states (offline with changes waiting, failure, conflict): they need a broken network or a conflicting change on the test account.
-- The empty logbook and the Account screen without an account: the emulator is signed in to the test account.
 - iPad: no iOS build here.
 
 ## Differences noticed
