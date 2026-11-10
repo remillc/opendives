@@ -1503,7 +1503,8 @@
       "Filtrer : les phrases d’explication sous les critères disparaissent.",
       "Nouveautés : la date de la version à côté de son numéro, et la liste complète.",
       "Statistiques : chaque ligne ouvre la liste de ses plongées.",
-      "Carnet : le mois affiché dans le bandeau est plus discret."
+      "Carnet : le mois affiché dans le bandeau est plus discret.",
+      "Les boutons de navigation réagissent tout de suite au toucher."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
