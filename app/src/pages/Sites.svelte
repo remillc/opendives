@@ -5,7 +5,8 @@
   // with a position and "centre on my position", then the list panel: the
   // count, the list items that apply (dives without a site, sites without
   // coordinates, possible duplicates), a divider and the sites.
-  import { Page, Navbar, NavRight, Link, Searchbar, List, Popover, f7, theme } from 'framework7-svelte';
+  import { tick } from 'svelte';
+  import { Page, Navbar, NavRight, Link, List, Popover, f7, theme } from 'framework7-svelte';
   import { showSnackbar } from '../lib/snackbar.js';
   import { OpenDivesCore } from 'opendives-core';
   import Icon from '../components/Icon.svelte';
@@ -24,6 +25,7 @@
 import { connection } from '../lib/online.svelte.js';
 import { offlineMaps, downloadRegionAt } from '../lib/offline-maps.svelte.js';
 import { inBbox } from '../lib/maps-logic.js';
+import { matchesSite, highlightParts } from '../lib/site-search.js';
 
   /** @type {import('opendives-core').SiteSummary[]} */
   let sites = $state([]);
@@ -57,6 +59,79 @@ import { inBbox } from '../lib/maps-logic.js';
   const located = $derived(used.filter((s) => s.hasLocation));
   const unplaced = $derived(used.length - located.length);
   const diveCount = $derived(used.reduce((n, s) => n + s.dives, 0));
+
+  // The search (spec, "Sites, search open and its animation"): open, it takes
+  // the top bar; the sites that match stay on the map and in the list.
+  let searching = $state(false);
+  let query = $state('');
+  /** @type {HTMLElement|undefined} */
+  let searchEl = $state();
+  /** @type {HTMLInputElement|undefined} */
+  let searchInput = $state();
+  /** @type {HTMLElement|undefined} */
+  let todoEl = $state();
+  /** @type {HTMLElement|undefined} */
+  let fabEl = $state();
+  /** The map's view before the search, which Close brings back. @type {{ center: import('maplibre-gl').LngLat, zoom: number }|null} */
+  let viewBeforeSearch = null;
+  /** @type {ReturnType<typeof setTimeout>|undefined} */
+  let focusTimer;
+  const GROW_MS = 300;
+  const FADE_MS = 150;
+
+  const typed = $derived(searching && query.trim() !== '');
+  const results = $derived(typed ? used.filter((s) => matchesSite(s, query)) : used);
+  const matching = $derived(typed ? new Set(results.map((s) => s.uuid)) : null);
+  const searchCount = $derived(
+    !typed ? '' : results.length ? t('sites.searchCount', { n: results.length, text: query.trim() }) : t('sites.noMatch'),
+  );
+
+  const reducedMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /**
+   * Reduced motion: the states change at once, with a 150 ms cross-fade in.
+   * (The global rule of theme.css stops every CSS transition; this is not one.)
+   * @param {(HTMLElement|null|undefined)[]} els
+   */
+  async function fadeIn(els) {
+    if (!reducedMotion()) return;
+    await tick();
+    for (const el of els) el?.animate?.({ opacity: [0, 1] }, { duration: FADE_MS });
+  }
+
+  function openSearch() {
+    if (searching) return;
+    viewBeforeSearch = siteMap?.getView() ?? null;
+    searching = true;
+    fadeIn([searchEl]);
+    // The keyboard opens when the field has grown.
+    clearTimeout(focusTimer);
+    focusTimer = setTimeout(() => searchInput?.focus(), reducedMotion() ? FADE_MS : GROW_MS);
+  }
+
+  function closeSearch() {
+    if (!searching) return;
+    clearTimeout(focusTimer);
+    // The keyboard goes first.
+    searchInput?.blur();
+    searching = false;
+    query = '';
+    siteMap?.setView(viewBeforeSearch);
+    viewBeforeSearch = null;
+    fadeIn([searchEl?.closest('.view')?.querySelector('.od-sites-bar .navbar-inner') ?? null, todoEl, fabEl]);
+  }
+
+  function clearSearch() {
+    query = '';
+    searchInput?.focus();
+  }
+
+  // The system Back (lib/back-button.js) asks the open search to close.
+  $effect(() => {
+    const el = searchEl;
+    el?.addEventListener('od-cancel', closeSearch);
+    return () => el?.removeEventListener('od-cancel', closeSearch);
+  });
 
   /** The sites checked, by uuid. */
   /** @type {Record<number, boolean>} */
@@ -245,7 +320,7 @@ import { inBbox } from '../lib/maps-logic.js';
   {#if located.length}
     <div class="map">
       <!-- 5:4 landscape, full width (task 2026-11-07-24). -->
-      <SiteMap bind:this={siteMap} sites={located} onselect={open} {onview} {height} />
+      <SiteMap bind:this={siteMap} sites={located} onselect={open} {onview} {height} {matching} />
       <!-- Tablet: no header band, the pill sits on the map. -->
       {#if !layout.phone && !connection.online}
         <p class="offline-chip over-map" role="status"><Icon name="offline" size={16} weight={2} />{t('sites.offline')}</p>
@@ -261,9 +336,11 @@ import { inBbox } from '../lib/maps-logic.js';
 {#snippet panel()}
   <section class="sites-panel" aria-label={t('sites.listLabel')}>
     <!-- On a phone, the band says it. -->
-    {#if !layout.phone}<p class="count od-value">{t('sites.siteCount', { n: used.length })}, {t('sites.diveCount', { n: diveCount })}</p>{/if}
+    {#if !layout.phone}<p class="count od-value">{searchCount || `${t('sites.siteCount', { n: used.length })}, ${t('sites.diveCount', { n: diveCount })}`}</p>{/if}
 
     {#if withoutSite || unplaced || duplicates}
+     <div class="od-sites-todo" class:od-hidden={searching} bind:this={todoEl}>
+      <div class="od-sites-todo-inner">
       <div class="list links surface">
         <ul>
           {#if withoutSite}
@@ -277,13 +354,15 @@ import { inBbox } from '../lib/maps-logic.js';
           {/if}
         </ul>
       </div>
+      </div>
+     </div>
     {/if}
 
-    {#if used.length}
+    {#if results.length}
       <!-- No chevron on the site rows (android-sites.dc.html). -->
       <div class="list no-chevron surface od-sites-list" use:selectable>
         <ul>
-          {#each used as site (site.uuid)}
+          {#each results as site (site.uuid)}
             <li class="od-site-row" data-uuid={site.uuid}>
               {#if selection.length}
                 <label class="checkbox od-site-check">
@@ -294,7 +373,7 @@ import { inBbox } from '../lib/maps-logic.js';
               <a href="/sites/{site.uuid}" class="item-link item-content">
                 <div class="item-inner">
                   <div class="text">
-                    <div class="item-title od-site-name">{site.name || t('sites.noName')}</div>
+                    <div class="item-title od-site-name">{#if site.name}{#each highlightParts(site.name, typed ? query : '') as part}{#if part.match}<mark class="od-match">{part.text}</mark>{:else}{part.text}{/if}{/each}{:else}{t('sites.noName')}{/if}</div>
                     <div class="item-text">
                       {site.hasLocation
                         ? t('sites.rowDives', { n: site.dives, date: formatLongDate(site.lastDate) })
@@ -309,19 +388,45 @@ import { inBbox } from '../lib/maps-logic.js';
         </ul>
       </div>
     {/if}
-    <div class="list searchbar-not-found"><ul><li class="item-content"><div class="item-inner">{t('sites.noMatch')}</div></li></ul></div>
+    {#if typed && !results.length}
+      <div class="list"><ul><li class="item-content"><div class="item-inner">{t('sites.noMatch')}</div></li></ul></div>
+    {/if}
   </section>
 {/snippet}
 
 {#snippet fab()}
     <!-- MD3 FAB, 56 dp, over the list panel: a new site. -->
-    <div class="fab fab-right-bottom od-fab-add">
+    <div class="fab fab-right-bottom od-fab-add od-sites-fab" class:od-hidden={searching} bind:this={fabEl}>
       <a href="/sites/new" aria-label={t('sites.newSite')}><i class="icon"><Icon name="plus" /></i></a>
     </div>
 {/snippet}
 
 <Page onPageReinit={load}>
   {#snippet fixedContent()}
+    <!-- The open search: ← and the field take the place of the top bar's items. -->
+    <div class="od-sites-search" class:od-open={searching} inert={!searching} bind:this={searchEl} role="search">
+      <button type="button" class="od-icon-button od-sites-search-back" onclick={closeSearch}>
+        <Icon name="arrowBack" /><span class="od-sr-only">{t('sites.closeSearch')}</span>
+      </button>
+      <div class="od-sites-search-field">
+        <input
+          bind:this={searchInput}
+          bind:value={query}
+          type="search"
+          class="od-sites-search-input"
+          placeholder={t('sites.searchPlaceholder')}
+          aria-label={t('sites.search')}
+          enterkeyhint="search"
+          autocomplete="off"
+          onkeydown={(e) => e.key === 'Enter' && searchInput?.blur()}
+        />
+        {#if query}
+          <button type="button" class="od-sites-search-clear" onclick={clearSearch}>
+            <Icon name="close" /><span class="od-sr-only">{t('sites.clearSearch')}</span>
+          </button>
+        {/if}
+      </div>
+    </div>
     {#if selection.length}
       <!-- While sites are checked, the top bar gives way to their number. -->
       <div class="od-sites-selection">
@@ -376,27 +481,24 @@ import { inBbox } from '../lib/maps-logic.js';
     />
   {/if}
 
-  <Navbar class="od-band-bar" title={t('sites.title')}>
+  <Navbar class="od-band-bar od-sites-bar{searching ? ' od-sites-searching' : ''}" title={t('sites.title')}>
     {#snippet left()}<MenuButton />{/snippet}
     <NavRight>
-      <Link iconOnly searchbarEnable=".od-sites-search"><Icon name="search" /><span class="od-sr-only">{t('sites.search')}</span></Link>
+      <Link iconOnly onClick={openSearch}><Icon name="search" /><span class="od-sr-only">{t('sites.search')}</span></Link>
       <Link iconOnly popoverOpen=".od-sites-sort-menu">
         {#if theme.ios}<Icon name="moreCircle" />{:else}<Icon name="more" weight={4} />{/if}
         <span class="od-sr-only">{t('detail.moreOptions')}</span>
       </Link>
     </NavRight>
-    <Searchbar
-      class="od-sites-search"
-      expandable
-      searchContainer=".od-sites-list"
-      searchIn=".od-site-name"
-      placeholder={t('sites.searchPlaceholder')}
-      disableButtonText={t('logbook.cancel')}
-    />
   </Navbar>
 
   {#if layout.phone}
-    <SectionBand overMap chip={!connection.online} summary={used.length ? [t('band.sites', { n: used.length }), t('band.dives', { n: diveCount })].join(' · ') : ''}>
+    <SectionBand
+      overMap
+      chip={!connection.online}
+      summaryKey={searching}
+      summary={searchCount || (used.length ? [t('band.sites', { n: used.length }), t('band.dives', { n: diveCount })].join(' · ') : '')}
+    >
       {#if !connection.online}
         <p class="offline-chip" role="status"><Icon name="offline" size={16} weight={2} />{t('sites.offline')}</p>
       {/if}
@@ -475,6 +577,179 @@ import { inBbox } from '../lib/maps-logic.js';
         left: 16px;
         margin: 0;
       }
+    }
+
+    /* The open search, in the top bar's place (spec, "Sites, search open and its
+       animation"). Closed, the field is clipped to the size of the magnifier
+       button, at its place on the right: opening grows it to full width from
+       there, closing shrinks it back. Closing is quicker and accelerates. */
+    .od-sites-search {
+      --od-search-from-right: 44px;
+      --od-search-open-ease: cubic-bezier(0.05, 0.7, 0.1, 1);
+      --od-search-close-ease: cubic-bezier(0.3, 0, 0.8, 0.15);
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 600;
+      height: calc(var(--f7-navbar-height) + var(--f7-safe-area-top));
+      padding: var(--f7-safe-area-top) 12px 0 4px;
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      pointer-events: none;
+      color: var(--od-on-band);
+
+      &.od-open > * {
+        pointer-events: auto;
+      }
+    }
+
+    .od-sites-search-back {
+      flex: none;
+      color: inherit;
+      opacity: 0;
+      transition: opacity 100ms linear 100ms;
+
+      .od-open & {
+        opacity: 1;
+        transition-delay: 0s;
+      }
+    }
+
+    .od-sites-search-field {
+      flex: 1;
+      min-width: 0;
+      height: 48px;
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 4px 0 16px;
+      border-radius: 24px;
+      background: transparent;
+      clip-path: inset(0 var(--od-search-from-right) 0 calc(100% - var(--od-search-from-right) - 48px) round 24px);
+      transition:
+        clip-path 200ms var(--od-search-close-ease),
+        background-color 200ms var(--od-search-close-ease);
+
+      .od-open & {
+        background: var(--od-band-control);
+        clip-path: inset(0 0 0 0 round 24px);
+        transition-duration: 300ms;
+        transition-timing-function: var(--od-search-open-ease);
+      }
+    }
+
+    .od-sites-search-input {
+      flex: 1;
+      min-width: 0;
+      height: 100%;
+      padding: 0;
+      border: none;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      font-size: 16px;
+      outline: none;
+      appearance: none;
+      opacity: 0;
+      transition: opacity 100ms linear;
+
+      .od-open & {
+        opacity: 1;
+        transition-delay: 100ms;
+      }
+
+      &::-webkit-search-cancel-button {
+        display: none;
+      }
+
+      &::placeholder {
+        color: var(--od-on-band-2);
+      }
+    }
+
+    .od-sites-search-clear {
+      flex: none;
+      width: 40px;
+      height: 40px;
+      padding: 0;
+      border: none;
+      border-radius: 50%;
+      background: none;
+      color: var(--od-on-band-2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* The top bar's own items give way: out in the first 100 ms of opening,
+       back in the last 100 ms of closing. */
+    :global(.navbar.od-sites-bar .navbar-inner > *) {
+      transition: opacity 100ms linear 100ms;
+    }
+
+    :global(.navbar.od-sites-searching .navbar-inner > *) {
+      opacity: 0;
+      visibility: hidden;
+      transition:
+        opacity 100ms linear,
+        visibility 0s linear 100ms;
+    }
+
+    /* The "à faire" card and the + button: fade and slide, 150 ms, and the
+       card's room closes so the results rise under the map. */
+    .od-sites-todo {
+      display: grid;
+      grid-template-rows: 1fr;
+      transition:
+        grid-template-rows 150ms linear,
+        opacity 150ms linear,
+        transform 150ms linear,
+        visibility 0s;
+
+      &.od-hidden {
+        grid-template-rows: 0fr;
+        opacity: 0;
+        transform: translateY(8px);
+        visibility: hidden;
+        transition:
+          grid-template-rows 150ms linear,
+          opacity 150ms linear,
+          transform 150ms linear,
+          visibility 0s linear 150ms;
+      }
+    }
+
+    .od-sites-todo-inner {
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .od-sites-fab {
+      transition:
+        opacity 150ms linear,
+        transform 150ms linear,
+        visibility 0s;
+
+      &.od-hidden {
+        opacity: 0;
+        transform: translateY(8px);
+        visibility: hidden;
+        transition:
+          opacity 150ms linear,
+          transform 150ms linear,
+          visibility 0s linear 150ms;
+      }
+    }
+
+    /* The matched part of a name. */
+    .od-match {
+      background: var(--od-secondary-container);
+      color: inherit;
+      border-radius: 2px;
     }
 
     .map-pane .map {

@@ -1080,6 +1080,12 @@
     "useNearby": "Use this site",
     "search": "Search for a site",
     "searchPlaceholder": "Search",
+    "closeSearch": "Close the search",
+    "clearSearch": "Clear",
+    "searchCount": {
+      "one": "{n} site matches “{text}”",
+      "other": "{n} sites match “{text}”"
+    },
     "noMatch": "No site matches",
     "centreOnMe": "Centre on my position",
     "mapCredits": "© OpenFreeMap, OpenMapTiles, OpenStreetMap contributors",
@@ -1424,6 +1430,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Sites: the search opens from the magnifier with an animation. The field grows in the top bar, the count of matches sits under it, sites that do not match fade on the map, and the list shows only the results with the match highlighted. The back arrow, the back gesture or the back key closes it and brings the map back to where it was; the cross only clears the text. With reduced motion, the change is a short cross-fade.",
       "Clean up sites: a pencil on each site of a duplicate group opens its editor, then returns to the same place; a group that no longer matches disappears.",
       "Messages: one style for every snackbar, dark on light and light on dark, floating above the bottom of the screen (above the + button when there is one), with one action in blue.",
       "Settings: resetting keeps your list of cylinders.",

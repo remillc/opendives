@@ -1080,6 +1080,12 @@
     "useNearby": "Utiliser ce site",
     "search": "Rechercher un site",
     "searchPlaceholder": "Rechercher",
+    "closeSearch": "Fermer la recherche",
+    "clearSearch": "Effacer",
+    "searchCount": {
+      "one": "{n} site correspond à « {text} »",
+      "other": "{n} sites correspondent à « {text} »"
+    },
     "noMatch": "Aucun site ne correspond",
     "centreOnMe": "Centrer sur ma position",
     "mapCredits": "© OpenFreeMap, OpenMapTiles, contributeurs OpenStreetMap",
@@ -1424,6 +1430,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Sites : la recherche s’ouvre depuis la loupe avec une animation. Le champ s’agrandit dans la barre du haut, le nombre de résultats s’affiche dessous, les sites qui ne correspondent pas s’estompent sur la carte et la liste ne garde que les résultats, avec le texte trouvé surligné. La flèche, le geste retour ou la touche retour la ferment et ramènent la carte où elle était ; la croix efface seulement le texte. Avec les animations réduites, le changement est un court fondu.",
       "Nettoyer les sites : un crayon sur chaque site d’un groupe de doublons ouvre son éditeur, puis revient au même endroit ; un groupe qui ne correspond plus disparaît.",
       "Messages : un seul style pour toutes les barres de message, sombre en mode clair et clair en mode sombre, flottant au-dessus du bas de l’écran (au-dessus du bouton + s’il y en a un), avec une seule action en bleu.",
       "Réglages : la réinitialisation garde votre liste de bouteilles.",
