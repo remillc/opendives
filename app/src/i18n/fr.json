@@ -1428,7 +1428,7 @@
       "Statistiques : les lignes n’indiquent plus la profondeur maximale, et le nom d’une nouvelle statistique vient en premier.",
       "Plongées sans site : chaque plongée montre une miniature de son profil et ouvre son profil complet, avec les boutons pour lui donner un site.",
       "Fiche d’un site : chaque plongée montre son numéro.",
-      "Statistiques : les sections « Par … » sont toujours dépliées. Les graphiques et les lignes de ces sections ne s’ouvrent plus, et la vue d’une année disparaît.",
+      "Statistiques : les sections « Par … » se déplient, et sont fermées à l’ouverture. Les graphiques et les lignes de ces sections ne s’ouvrent plus, et la vue d’une année disparaît.",
       "Sites : la recherche s’ouvre depuis la loupe avec une animation. Le champ s’agrandit dans la barre du haut, le nombre de résultats s’affiche dessous, les sites qui ne correspondent pas s’estompent sur la carte et la liste ne garde que les résultats, avec le texte trouvé surligné. La flèche, le geste retour ou la touche retour la ferment et ramènent la carte où elle était ; la croix efface seulement le texte. Avec les animations réduites, le changement est un court fondu.",
       "Nettoyer les sites : un crayon sur chaque site d’un groupe de doublons ouvre son éditeur, puis revient au même endroit ; un groupe qui ne correspond plus disparaît.",
       "Messages : un seul style pour toutes les barres de message, sombre en mode clair et clair en mode sombre, flottant au-dessus du bas de l’écran (au-dessus du bouton + s’il y en a un), avec une seule action en bleu.",
