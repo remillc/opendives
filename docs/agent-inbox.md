@@ -1205,3 +1205,10 @@ Christian changed his mind on the rows of task 2026-11-10-09: they become clicka
 - The list uses the statistics filter in force, so its count matches the row.
 - New texts in `fr.json` and `en.json`; a line in the release notes.
 
+## [ ] 2026-11-10-14 Carnet month headers: band only, 14 sp
+
+Christian changed task 2026-11-09-36. Work on branch `feature/carnet-month-headers`; do not merge it into `main` and do not delete it: Christian still has to review it. Spec: "Carnet, month headers that stay on top" (rewritten). Mock-ups: `docs/mockups/android-carnet-entetes.dc.html`, `docs/mockups/android-carnet-entetes-petit.dc.html` (updated).
+- Remove the month headers from the list: no header line between months, and no push effect.
+- Keep only the month line in the collapsed band, under the title: year (bold), month, and "{n} plongées" on the right. All three in 14 sp (was 20 sp for year and month).
+- The line shows the month of the first visible dive and switches when that dive is in another month. A trip counts under the month of its first dive, as before.
+
