@@ -117,7 +117,8 @@
       position: absolute;
       inset: 0;
       background-image: var(--od-band-gradient);
-      background-size: 100% var(--od-band-h);
+      /* At least the layer: on a tablet the status bar is outside the app and the band is taller than its phone height. */
+      background-size: 100% max(var(--od-band-h), 100%);
       background-repeat: no-repeat;
       transform: translate3d(0, var(--od-band-rise, 0px), 0);
     }

@@ -37,7 +37,8 @@
       overflow: hidden;
       padding: 0 16px 32px;
       background-image: var(--od-band-gradient);
-      background-size: 100% var(--od-band-h);
+      /* At least down to the band's bottom: on a tablet the status bar is outside the app. */
+      background-size: 100% max(var(--od-band-h), calc(100% + var(--f7-navbar-height) + var(--f7-safe-area-top)));
       background-position: 0 calc(-1 * (var(--f7-navbar-height) + var(--f7-safe-area-top)));
       background-repeat: no-repeat;
       color: var(--od-on-band);
