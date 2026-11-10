@@ -1372,3 +1372,18 @@ Spec: System design, section 7, "Android tablet in landscape: '+' out of the rai
 - A line in the release notes.
 
 Done in branch `feature/tablet-fab-menu`: `FabMenu.svelte` (Android tablet, from 768 dp), floating "+" on every tablet width, "+" removed from the rail.
+
+## [ ] 2026-11-10-30 Android download: computers as cards, failure header, tablet details
+
+The download screens were drawn from the current `Download.svelte`, then changed in review. Mock-ups (new or updated in `docs/mockups/`):
+- phone: `android-telechargement-autorisation`, `-refusee`, `-desactive`, `-choix`, `-encours`, and `android-etat-echec`;
+- tablet: `android-tablette-telechargement-{paysage,portrait}` (choice), `android-tablette-telechargement-encours-{paysage,portrait}`, `android-tablette-telechargement-echoue-{paysage,portrait}`.
+
+Changes:
+- **Computers as cards.** Each computer, remembered or nearby, is its own card: `--od-surface` white background, 16 dp corners, 12 dp × 16 dp padding, 8 dp between cards, 16 dp side margins. During the download, the connected computer is a card too. The "Tout retélécharger" switch row stays as it is.
+- **Tablet in landscape:** the computer cards sit in two columns (one column in portrait and on the phone).
+- **"Reçues jusqu'ici":** duration above depth, as in every dive row (task 16). Units follow the settings.
+- **Failure header** ("… introuvable"): a 56 dp circle in a pale alarm tint (#FBE9E7 light; pick the dark equivalent from the alarm colour) with a 30 dp crossed-out Bluetooth icon in `--od-alarm`, then, to its right, the title and the sentence grouped, 4 dp apart, the icon vertically centred on the group. The sentence goes from 16 to 18 sp (line height 26).
+- **Tablet:** the download pane has the ✕ close button, like on the phone (it currently has none). The "+" floating button is hidden while the download pane is shown: we are already in the task it opened, and it covered "Réessayer".
+- The progress bar stays the standard linear one.
+- A line in the release notes.
