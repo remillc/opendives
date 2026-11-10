@@ -89,6 +89,8 @@ function writeJson(key, value) {
 
 /** The core values changed on this device: {key: value}. @type {Partial<CorePrefValues>} */
 const storedCore = readJson(CORE_KEY) ?? {};
+// "Always hours and minutes" is no longer offered: back to automatic.
+if (storedCore.duration === 'hours') delete storedCore.duration;
 // Before Settings followed Subsurface, the conditions switch had its own key.
 try {
   if (!('extraEnvironmental' in storedCore) && localStorage.getItem('od.extraConditions') === 'true')
@@ -107,7 +109,7 @@ export const settings = $state({
    */
   extraConditions: storedCore.extraEnvironmental === true,
   /** Dive durations (the core's units.duration_units), not stored in the logbook. */
-  duration: /** @type {'mixed'|'minutes'|'hours'} */ (storedCore.duration ?? 'mixed'),
+  duration: /** @type {'mixed'|'minutes'} */ (storedCore.duration ?? 'mixed'),
 });
 
 /**

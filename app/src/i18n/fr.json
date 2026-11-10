@@ -448,8 +448,6 @@
       "label": "Durée",
       "mixed": "Automatique",
       "mixedText": "En minutes sous une heure, sinon en heures et minutes",
-      "hours": "Heures et minutes",
-      "hoursText": "Toujours en heures et minutes",
       "minutes": "Minutes",
       "minutesText": "Toujours en minutes"
     },
@@ -1505,7 +1503,8 @@
       "Statistiques : chaque ligne ouvre la liste de ses plongées.",
       "Carnet : le mois affiché dans le bandeau est plus discret.",
       "Les boutons de navigation réagissent tout de suite au toucher.",
-      "Les durées d’une heure ou plus s’écrivent partout « 1 h 11 »."
+      "Les durées d’une heure ou plus s’écrivent partout « 1 h 11 ».",
+      "Réglages : l’option de durée « Toujours en heures et minutes » est retirée."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",

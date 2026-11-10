@@ -62,14 +62,14 @@ export function formatDepth(mm, prefs) {
 
 /**
  * Dive duration in whole minutes, as the Duration setting says (the core's
- * units.duration_units): automatic, "45 min" under an hour and "1:12" from an
- * hour, always hours and minutes ("0:45"), or always minutes ("72 min").
+ * units.duration_units): automatic, "45 min" under an hour and "1 h 12" from
+ * an hour, or always minutes ("72 min").
  * @param {number} seconds
- * @param {'mixed'|'minutes'|'hours'} [mode]
+ * @param {'mixed'|'minutes'} [mode]
  */
 export function formatDuration(seconds, mode = settings.duration) {
   const minutes = Math.round(seconds / 60);
-  if (mode === 'hours' || (mode === 'mixed' && minutes >= 60)) return formatHours(seconds);
+  if (mode === 'mixed' && minutes >= 60) return formatHours(seconds);
   return `${formatNumber(minutes, 0)}${NBSP}${t('units.minutes')}`;
 }
 

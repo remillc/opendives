@@ -14,10 +14,6 @@ test('under one hour, automatic stays in minutes', () => {
   assert.equal(plain(formatDuration(2700, 'mixed')), '45 min');
 });
 
-test('always hours and minutes', () => {
-  assert.equal(plain(formatDuration(2700, 'hours')), '0 h 45');
-});
-
 test('always minutes', () => {
   assert.equal(plain(formatDuration(4320, 'minutes')), '72 min');
 });
