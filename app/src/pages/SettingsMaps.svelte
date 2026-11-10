@@ -166,7 +166,7 @@
         <span class="note">{t('maps.download.oldStays')}</span>
       {:else}
         <span class="supporting">
-          {t(r.maxZoom === 12 ? 'maps.region.lessDetail' : 'maps.region.fullDetail', { size: formatMapSize(r.sizeBytes), date: formatMapDate(r.downloadedAt) })}
+          {t('maps.region.sizeDate', { size: formatMapSize(r.sizeBytes), date: formatMapDate(r.downloadedAt) })}
         </span>
         {#if r.update}
           <span class="status">{@render refreshIcon()}{t('maps.region.updateAvailable')}</span>

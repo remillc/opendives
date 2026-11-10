@@ -1410,10 +1410,14 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Cartes hors ligne : une zone sans site du carnet prend le nom du lieu.",
+      "Cartes hors ligne : « Choisir sur la carte » montre maintenant un cadre fixe ; déplacez et zoomez la carte dessous, la zone qu’il couvre est celle qui sera téléchargée. Le niveau de détail est choisi pour vous, et la taille affichée est une estimation.",
+      "Cartes hors ligne : un champ de recherche sur « Choisir sur la carte » trouve un site de votre carnet pendant la frappe, ou un lieu quand vous lancez la recherche, et y amène la carte.",
+      "Cartes hors ligne : choisissez une zone sur la carte depuis Réglages pour la télécharger (un cadre d’au plus 3 000 tuiles environ) ; une limite d’espace et un plancher d’espace libre protègent l’appareil, et les mises à jour sont proposées avec un badge.",
       "Confidentialité : la politique mentionne la recherche de lieux sur la carte.",
       "Cartes hors ligne : un champ de recherche sur « Choisir sur la carte » trouve un site de votre carnet pendant la frappe, ou un lieu quand vous lancez la recherche, et place le rectangle autour.",
       "Réglages : le type d’eau des plongées téléchargées dont l’ordinateur ne donne rien se choisit (Non précisé par défaut).",
-      "Cartes hors ligne : dessinez un rectangle sur la carte depuis Réglages pour le télécharger (jusqu’à 3 000 tuiles ; moins de détails permet une zone plus grande) ; une limite d’espace et un plancher d’espace libre protègent l’appareil, et les mises à jour sont proposées avec un badge.",
+      "Cartes hors ligne : cadrez une zone sur la carte depuis Réglages pour la télécharger ; une limite d’espace et un plancher d’espace libre protègent l’appareil, et les mises à jour sont proposées avec un badge.",
       "Sites : sans réseau, la carte lit les régions téléchargées, sinon un planisphère simplifié ; une pastille « Hors ligne » l’indique et un message propose de télécharger la zone.",
       "Désaturation : le texte sous le graphique est plus court.",
       "Réglages : la langue de l’app peut être Français (Canada), qui dit « nuage » et « courriel » ; un téléphone réglé en français (Canada) la choisit tout seul.",
@@ -2305,8 +2309,7 @@
       "update": "Mettre à jour",
       "options": "Options pour {name}",
       "swipeHint": "Balayez une région vers la gauche pour la supprimer.",
-      "fullDetail": "Détails complets · {size} · {date}",
-      "lessDetail": "Moins de détails · {size} · {date}"
+      "sizeDate": "{size} · {date}"
     },
     "menu": {
       "update": "Mettre à jour",
@@ -2376,27 +2379,16 @@
     },
     "area": {
       "title": "Choisir sur la carte",
-      "help": "Faites glisser les coins du rectangle pour couvrir la zone voulue.",
       "name": "Nom de la région",
       "nameHelp": "Proposé d’après le site le plus proche",
       "around": "Autour de {site}",
       "aroundHere": "Zone choisie",
       "needNetwork": "Choisir sur la carte demande le réseau.",
-      "handle": "Coin du rectangle, {corner}",
-      "corners": {
-        "nw": "nord-ouest",
-        "ne": "nord-est",
-        "sw": "sud-ouest",
-        "se": "sud-est"
-      },
       "download": "Télécharger",
       "unavailable": "Le serveur de cartes est injoignable. Réessayez avec un réseau.",
       "choose": "Choisir sur la carte",
-      "lessDetail": "Moins de détails (zoom 12) : une zone plus grande",
       "size": "Environ {width} × {height} km",
-      "tiles": "{count} tuiles sur {limit}",
-      "tooBig": "Cette zone est trop grande : un téléchargement est limité à 3 000 tuiles. Réduisez le rectangle.",
-      "suggestLess": "Trop de tuiles avec tous les détails. Choisissez moins de détails pour télécharger cette zone.",
+      "tooBig": "Cette zone est trop grande pour être téléchargée. Zoomez un peu.",
       "search": {
         "label": "Rechercher un lieu ou un site",
         "offline": "Recherche indisponible sans réseau",
@@ -2408,7 +2400,9 @@
         "none": "Aucun lieu trouvé.",
         "error": "Recherche impossible pour le moment. Réessayez.",
         "attribution": "Lieux : données © contributeurs OpenStreetMap, via Nominatim"
-      }
+      },
+      "mapLabel": "Carte sous un cadre fixe. Déplacez et zoomez la carte pour choisir la zone à télécharger.",
+      "estimate": "environ {size} à télécharger (estimation)"
     }
   }
 }

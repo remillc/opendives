@@ -108,6 +108,9 @@
     /* Divider between groups of a ⋮ menu. */
     --od-menu-divider: #C9C9C5;
     --od-scrim: rgb(0 0 0 / 0.32);
+    /* "Choisir sur la carte": the fixed frame and the 40 % veil outside it. */
+    --od-area-frame: #1F2124;
+    --od-area-veil: rgb(31 33 36 / 0.4);
   }
 
   /* Dark mode: system surfaces from Framework7, bright water with an outlined line. */
@@ -167,6 +170,8 @@
     --od-dialog: var(--f7-md-surface-3);
     --od-menu: var(--f7-md-surface-2);
     --od-menu-divider: var(--f7-md-outline-variant);
+    --od-area-frame: #F4F4F2;
+    --od-area-veil: rgb(0 0 0 / 0.4);
   }
 }
 

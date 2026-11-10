@@ -1,21 +1,24 @@
 <script>
   // @ts-check
   // /settings/maps/area: "Choisir sur la carte" (docs/mockups/android-cartes-choix-carte.dc.html).
-  // A full-screen map, a rectangle with four handles, and a bottom sheet with
-  // the name of the region (proposed from the nearest site of the logbook),
-  // the live tile count against OpenFreeMap's limit of 3,000, the "less
-  // detail" choice (zoom 12 instead of 14, for a larger area) and
-  // "Télécharger", blocked above the limit. Needs the network (the map of the
-  // place is drawn from the online tiles). The final look comes later.
+  // A full-screen map under a fixed square frame: the diver moves and zooms the
+  // map, and the downloaded area is what the frame covers, computed from the
+  // map (map.unproject of the frame's corners) when Download is pressed. The
+  // detail is always full (zoom 14), and the map's zoom limits
+  // keep the area between about 20 km across and the largest the limit allows
+  // (lib/area-frame.js). The search floats on the map. Needs the network (the
+  // map of the place is drawn from the online tiles).
   import { onMount, onDestroy } from 'svelte';
   import { Page, Navbar, Link } from 'framework7-svelte';
   import { OpenDivesCore } from 'opendives-core';
   import TextField from '../components/TextField.svelte';
   import { t, language } from '../lib/i18n.js';
   import { MAP_STYLE, showLabelsInLanguage } from '../lib/map-style.js';
-  import { rectAround, nearestSite, bboxSizeKm, checkTiles, normalizeBbox, MAX_TILES } from '../lib/maps-logic.js';
-  import { filterSites, rectForPoint, searchPlaces } from '../lib/area-search.js';
+  import { nearestSite } from '../lib/maps-logic.js';
+  import { frameSide, zoomLimits, clampZoom, zoomForFrameKm, frameBbox, frameDetail } from '../lib/area-frame.js';
+  import { filterSites, searchPlaces, placeNameAt } from '../lib/area-search.js';
   import { formatNumber } from '../lib/format.js';
+  import { formatMapSize } from '../lib/maps-format.js';
   import { offlineMaps, addRegion } from '../lib/offline-maps.svelte.js';
 
   /** @type {{ f7route: { query: Record<string, string> }, f7router: any }} */
@@ -24,86 +27,95 @@
   /** @type {typeof import('maplibre-gl')} */
   let maplibregl;
   /** @type {HTMLElement|undefined} */
+  let stage = $state();
+  /** @type {HTMLElement|undefined} */
   let container = $state();
+  /** @type {HTMLElement|undefined} */
+  let searchbar = $state();
+  /** @type {HTMLElement|undefined} */
+  let sheet = $state();
   /** @type {import('maplibre-gl').Map|undefined} */
   let map;
-  /** @type {Record<string, import('maplibre-gl').Marker>} */
-  let handles = {};
 
-  /** The rectangle: [west, south, east, north]. @type {[number, number, number, number]|null} */
+  /** What the frame covers: [west, south, east, north]. @type {[number, number, number, number]|null} */
   let bbox = $state(null);
   let name = $state('');
-  /** The diver typed a name: it is not replaced by the proposal any more. */
+  /** The diver typed a name, or chose a site: the proposal does not replace it any more. */
   let named = false;
   /** @type {{ name: string, lng: number, lat: number }[]} */
   let located = [];
   let busy = $state(false);
 
-  const MIN_SIDE = 0.02; // degrees
+  /** The frame on the screen, px in the stage; the map's padding matches its centre. */
+  let frame = $state({ left: 0, top: 0, side: 0 });
+  /** Height of the bottom sheet, px (the visible part of the map ends above it). */
+  let sheetHeight = $state(0);
 
-  /** "Moins de détails": zoom 12 instead of 14. */
-  let lessDetail = $state(false);
-
-  const tiles = $derived(bbox ? checkTiles(bbox) : null);
-  const maxZoom = $derived(lessDetail ? 12 : 14);
-  const count = $derived(tiles ? (lessDetail ? tiles.count12 : tiles.count14) : 0);
-  const fits = $derived(count <= MAX_TILES);
-  const km = $derived(bbox ? bboxSizeKm(bbox) : [0, 0]);
+  const info = $derived(bbox ? frameDetail(bbox) : null);
+  const fits = $derived(info?.fits ?? false);
 
   /** @param {number} km */
   const roundKm = (km) => (km >= 100 ? Math.round(km / 10) * 10 : Math.round(km));
 
-  /** The name proposed for a rectangle: after the site nearest to its centre. @param {[number, number, number, number]} b */
+  /** The centre of an area. @param {[number, number, number, number]} b @returns {[number, number]} */
+  function centreOf(b) {
+    const east = b[0] <= b[2] ? b[2] : b[2] + 360;
+    return [(((b[0] + east) / 2 + 540) % 360) - 180, (b[1] + b[3]) / 2];
+  }
+
+  /** The logbook's site nearest the centre, among those inside the area. @param {[number, number, number, number]} b */
+  function siteOf(b) {
+    const inside = located.filter((s) => s.lat >= b[1] && s.lat <= b[3] && (b[0] <= b[2] ? s.lng >= b[0] && s.lng <= b[2] : s.lng >= b[0] || s.lng <= b[2]));
+    return nearestSite(...centreOf(b), inside);
+  }
+
+  /** The name proposed for an area, after a site of the logbook inside it. @param {[number, number, number, number]} b */
   function proposal(b) {
-    const site = nearestSite((b[0] + b[2]) / 2, (b[1] + b[3]) / 2, located);
+    const site = siteOf(b);
     return site ? t('maps.area.around', { site: site.name }) : t('maps.area.aroundHere');
   }
 
-  /** @param {[number, number, number, number]} b */
-  function polygon(b) {
-    const [w, s, e, n] = b;
-    return /** @type {import('geojson').Feature} */ ({
-      type: 'Feature',
-      properties: {},
-      geometry: { type: 'Polygon', coordinates: [[[w, s], [e, s], [e, n], [w, n], [w, s]]] },
-    });
+  /** The area under the frame, from the map's own projection. @returns {[number, number, number, number]|null} */
+  function currentBbox() {
+    if (!map || !frame.side) return null;
+    const tl = map.unproject([frame.left, frame.top]);
+    const br = map.unproject([frame.left + frame.side, frame.top + frame.side]);
+    return frameBbox(tl, br);
   }
 
-  /** @param {[number, number, number, number]} b */
-  function draw(b) {
-    const source = /** @type {import('maplibre-gl').GeoJSONSource|undefined} */ (map?.getSource('region'));
-    source?.setData(polygon(b));
-    const [w, s, e, n] = b;
-    handles.nw?.setLngLat([w, n]);
-    handles.ne?.setLngLat([e, n]);
-    handles.sw?.setLngLat([w, s]);
-    handles.se?.setLngLat([e, s]);
+  /** Keeps the map's zoom limits right for the latitude at the centre of the frame. */
+  function applyLimits() {
+    if (!map || !frame.side) return;
+    const c = map.getCenter();
+    const { minZoom, maxZoom } = zoomLimits(c.lng, c.lat, frame.side);
+    if (Math.abs(map.getMinZoom() - minZoom) > 0.01) map.setMinZoom(minZoom);
+    if (Math.abs(map.getMaxZoom() - maxZoom) > 0.01) map.setMaxZoom(maxZoom);
   }
 
-  /** @param {'nw'|'ne'|'sw'|'se'} corner */
-  function addHandle(corner) {
-    if (!map || !bbox) return;
-    const el = document.createElement('button');
-    el.type = 'button';
-    el.className = 'od-area-handle';
-    el.setAttribute('aria-label', t('maps.area.handle', { corner: t(`maps.area.corners.${corner}`) }));
-    const [w, s, e, n] = bbox;
-    const marker = new maplibregl.Marker({ element: el, draggable: true })
-      .setLngLat([corner.includes('w') ? w : e, corner.includes('n') ? n : s])
-      .addTo(map);
-    marker.on('drag', () => {
-      if (!bbox) return;
-      const p = marker.getLngLat();
-      let [west, south, east, north] = bbox;
-      if (corner.includes('w')) west = Math.min(p.lng, east - MIN_SIDE);
-      else east = Math.max(p.lng, west + MIN_SIDE);
-      if (corner.includes('n')) north = Math.max(p.lat, south + MIN_SIDE);
-      else south = Math.min(p.lat, north - MIN_SIDE);
-      bbox = [west, Math.max(-85, south), east, Math.min(85, north)];
-      draw(bbox);
-      if (!named) name = proposal(bbox);
-    });
-    handles[corner] = marker;
+  function refresh() {
+    const b = currentBbox();
+    if (!b) return;
+    bbox = b;
+    if (!named) name = proposal(b);
+  }
+
+  /**
+   * Places the frame in the visible part of the map, between the search field
+   * and the bottom sheet, and gives the map the same padding so that its centre
+   * is the frame's centre.
+   */
+  function layout() {
+    if (!stage || !searchbar || !sheet) return;
+    const s = stage.getBoundingClientRect();
+    const top = searchbar.getBoundingClientRect().bottom - s.top + 8;
+    const bottom = s.bottom - sheet.getBoundingClientRect().top;
+    sheetHeight = bottom;
+    const visible = s.height - top - bottom;
+    const side = frameSide(s.width, visible);
+    frame = { left: Math.round((s.width - side) / 2), top: Math.round(top + (visible - side) / 2), side };
+    map?.setPadding({ top, bottom, left: 0, right: 0 });
+    applyLimits();
+    refresh();
   }
 
   // --- Search ---------------------------------------------------------------------
@@ -143,17 +155,18 @@
 
   /** @param {{ name: string, lng: number, lat: number }} hit @param {boolean} isSite */
   function choose(hit, isSite) {
-    bbox = rectForPoint(hit.lng, hit.lat);
     if (isSite) {
       name = t('maps.area.around', { site: hit.name });
-      named = true; // the diver's choice: dragging a corner does not rename it
+      named = true; // the diver's choice: moving the map does not rename it
     } else {
       named = false;
-      name = proposal(bbox);
     }
-    if (map) {
-      draw(bbox);
-      map.fitBounds(bbox, { padding: { top: 120, bottom: 300, left: 60, right: 60 }, duration: 600 });
+    if (map && frame.side) {
+      // A suitable zoom: about 40 km across, inside the limits at the new place.
+      const limits = zoomLimits(hit.lng, hit.lat, frame.side);
+      map.setMinZoom(limits.minZoom);
+      map.setMaxZoom(limits.maxZoom);
+      map.easeTo({ center: [hit.lng, hit.lat], zoom: clampZoom(zoomForFrameKm(hit.lat, 40, frame.side), limits), duration: 600 });
     }
     query = '';
     placesState = 'idle';
@@ -171,50 +184,61 @@
     } catch (e) {
       console.error('Sites for the area name', e);
     }
-    // The first rectangle: around the point given by the Sites map, else around the first site, else the world.
+    // The first view: around the point given by the Sites map, else around the first site, else the world.
     const qLng = Number(f7route.query?.lng);
     const qLat = Number(f7route.query?.lat);
     const centre = f7route.query?.lng && Number.isFinite(qLng) && Number.isFinite(qLat) ? { lng: qLng, lat: qLat } : located[0] ?? { lng: 0, lat: 20 };
-    bbox = rectAround(centre.lng, centre.lat);
-    name = proposal(bbox);
     if (!offlineMaps.online || !container) return;
 
     const module = await import('maplibre-gl');
     maplibregl = /** @type {any} */ (module).default ?? module;
     if (!container?.isConnected) return;
+    layout(); // measures the stage, the search field and the sheet
+    const side = frame.side || 300;
+    const limits = zoomLimits(centre.lng, centre.lat, side);
     const m = new maplibregl.Map({
       container,
       style: MAP_STYLE,
-      bounds: bbox,
-      fitBoundsOptions: { padding: { top: 60, bottom: 300, left: 60, right: 60 } },
+      center: [centre.lng, centre.lat],
+      zoom: clampZoom(zoomForFrameKm(centre.lat, 40, side), limits),
+      minZoom: limits.minZoom,
+      maxZoom: limits.maxZoom,
       attributionControl: false,
       dragRotate: false,
       pitchWithRotate: false,
     });
     map = m;
     m.touchZoomRotate.disableRotation();
-    const resize = new ResizeObserver(() => m.resize());
-    resize.observe(container);
-    m.once('remove', () => resize.disconnect());
-    m.on('load', () => {
-      showLabelsInLanguage(m);
-      const ink = getComputedStyle(container ?? document.body).getPropertyValue('--od-text').trim() || '#1F2124';
-      if (!bbox) return;
-      m.addSource('region', { type: 'geojson', data: polygon(bbox) });
-      m.addLayer({ id: 'region-fill', type: 'fill', source: 'region', paint: { 'fill-color': ink, 'fill-opacity': 0.12 } });
-      m.addLayer({ id: 'region-line', type: 'line', source: 'region', paint: { 'line-color': ink, 'line-width': 2.5 } });
-      for (const corner of /** @type {const} */ (['nw', 'ne', 'sw', 'se'])) addHandle(corner);
+    layout(); // gives the map its padding
+    m.on('move', refresh);
+    m.on('moveend', () => {
+      applyLimits();
+      refresh();
     });
+    const resize = new ResizeObserver(() => {
+      m.resize();
+      layout();
+    });
+    resize.observe(container);
+    if (sheet) resize.observe(sheet);
+    m.once('remove', () => resize.disconnect());
+    m.on('load', () => showLabelsInLanguage(m));
   });
 
   onDestroy(() => map?.remove());
 
   async function download() {
-    if (!bbox || busy || !fits) return;
+    if (busy) return;
+    // The rectangle is computed from the map at this moment, not from the last update.
+    const b = currentBbox();
+    const detail = b ? frameDetail(b) : null;
+    if (!b || !detail || detail.maxZoom === null) return;
     busy = true;
     try {
-      const label = name.trim() || proposal(bbox);
-      if (await addRegion(label, normalizeBbox(bbox), maxZoom)) {
+      let label = name.trim() || proposal(b);
+      // No site of the logbook here: the name of the place, when it can be known.
+      if (!named && !siteOf(b)) label = (await placeNameAt(...centreOf(b), language)) ?? label;
+      if (await addRegion(label, b, detail.maxZoom)) {
         // This screen also opens from the Sites map, without the list behind it.
         if (f7router.history[f7router.history.length - 2] === '/settings/maps/') f7router.back();
         else f7router.navigate('/settings/maps/', { reloadCurrent: true });
@@ -229,16 +253,19 @@
   <Navbar title={t('maps.area.title')}>
     {#snippet left()}
       <Link back iconOnly>
-        <i class="icon icon-back"></i>
+        <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" class="close"><path d="M6 6l12 12 M18 6L6 18" /></svg>
         <span class="od-sr-only">{t('detail.back')}</span>
       </Link>
     {/snippet}
   </Navbar>
 
-  <div class="stage no-swipeback">
+  <div class="stage no-swipeback" bind:this={stage}>
     {#if offlineMaps.online}
-      <div class="canvas" bind:this={container} role="region" aria-label={t('maps.area.title')}></div>
-      <p class="credits">{t('sites.mapCredits')}</p>
+      <div class="canvas" bind:this={container} role="region" aria-label={t('maps.area.mapLabel')}></div>
+      <div class="veil" aria-hidden="true" style:left="{frame.left}px" style:top="{frame.top}px" style:width="{frame.side}px" style:height="{frame.side}px">
+        <i class="mark nw"></i><i class="mark ne"></i><i class="mark sw"></i><i class="mark se"></i>
+      </div>
+      <p class="credits" style:bottom="{sheetHeight + 8}px">{t('sites.mapCredits')}</p>
     {:else}
       <p class="offline" role="status">{t('maps.area.needNetwork')}</p>
     {/if}
@@ -246,6 +273,7 @@
     <div class="search">
       <form
         class="searchbar"
+        bind:this={searchbar}
         role="search"
         onsubmit={(e) => {
           e.preventDefault();
@@ -302,21 +330,19 @@
       {/if}
     </div>
 
-    <div class="sheet">
+    <div class="sheet" bind:this={sheet}>
       <div class="handle" aria-hidden="true"></div>
-      <p class="help">{t('maps.area.help')}</p>
       <div class="field"><TextField label={t('maps.area.name')} bind:value={name} supporting={t('maps.area.nameHelp')} oninput={() => (named = true)} /></div>
-      <label class="detail">
-        <input type="checkbox" bind:checked={lessDetail} />
-        <span>{t('maps.area.lessDetail')}</span>
-      </label>
-      <p class="estimate" class:over={!fits}>
-        {t('maps.area.size', { width: formatNumber(roundKm(km[0]), 0), height: formatNumber(roundKm(km[1]), 0) })}
-        {' · '}
-        {t('maps.area.tiles', { count: formatNumber(count, 0), limit: formatNumber(MAX_TILES, 0) })}
-      </p>
-      {#if !fits}
-        <p class="estimate over" role="alert">{tiles?.lessDetail && !lessDetail ? t('maps.area.suggestLess') : t('maps.area.tooBig')}</p>
+      {#if info}
+        {#if fits}
+          <p class="estimate">
+            {t('maps.area.size', { width: formatNumber(roundKm(info.km[0]), 0), height: formatNumber(roundKm(info.km[1]), 0) })}
+            {' · '}
+            {t('maps.area.estimate', { size: formatMapSize(Math.max(1e6, info.bytes)) })}
+          </p>
+        {:else}
+          <p class="estimate over" role="alert">{t('maps.area.tooBig')}</p>
+        {/if}
       {/if}
       <button type="button" class="download" disabled={!bbox || !offlineMaps.online || busy || !fits} onclick={download}>{t('maps.area.download')}</button>
     </div>
@@ -333,6 +359,7 @@
     .stage {
       position: absolute;
       inset: 0;
+      overflow: hidden;
       background: var(--od-surface-2);
     }
 
@@ -351,7 +378,6 @@
     .credits {
       position: absolute;
       right: 8px;
-      bottom: 276px;
       margin: 0;
       padding: 2px 6px;
       border-radius: 4px;
@@ -477,6 +503,7 @@
 
     .sheet {
       position: absolute;
+      z-index: 2;
       left: 0;
       right: 0;
       bottom: 0;
@@ -497,7 +524,6 @@
       opacity: 0.4;
     }
 
-    .help,
     .estimate {
       margin: 0 24px 12px;
       font-size: 14px;
@@ -514,26 +540,10 @@
       color: var(--od-alarm);
     }
 
-    .detail {
-      margin: 0 24px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-size: 14px;
-      line-height: 20px;
-      color: var(--od-text);
-
-      input {
-        width: 20px;
-        height: 20px;
-        margin: 0;
-      }
-    }
-
     .download {
-      width: auto;
+      width: calc(100% - 48px);
       height: 48px;
-      margin: 0 24px;
+      margin: 16px 24px 0;
       padding: 0 20px;
       border: none;
       border-radius: 24px;
@@ -550,22 +560,67 @@
       }
     }
 
-    /* The corners of the rectangle: a 24 dp dot with a 48 dp touch target. */
-    :global(.od-area-handle) {
-      width: 24px;
-      height: 24px;
-      padding: 0;
-      border-radius: 50%;
-      border: 3px solid var(--od-surface);
-      background: var(--od-text);
-      box-shadow: 0 1px 4px rgb(0 0 0 / 0.4);
-      cursor: grab;
+    /* The fixed frame: its outline, its corner marks, and the veil outside it (a huge shadow). It never takes a touch: the map works under it. */
+    .veil {
+      position: absolute;
+      z-index: 1;
+      box-sizing: border-box;
+      border: 1.5px solid var(--od-area-frame);
+      box-shadow: 0 0 0 100vmax var(--od-area-veil);
+      pointer-events: none;
+    }
 
-      &::after {
-        content: '';
-        position: absolute;
-        inset: -12px;
+    .mark {
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      border: 0 solid var(--od-area-frame);
+      pointer-events: none;
+
+      &.nw {
+        top: -2px;
+        left: -2px;
+        border-top-width: 5px;
+        border-left-width: 5px;
+        border-top-left-radius: 2px;
       }
+
+      &.ne {
+        top: -2px;
+        right: -2px;
+        border-top-width: 5px;
+        border-right-width: 5px;
+        border-top-right-radius: 2px;
+      }
+
+      &.sw {
+        bottom: -2px;
+        left: -2px;
+        border-bottom-width: 5px;
+        border-left-width: 5px;
+        border-bottom-left-radius: 2px;
+      }
+
+      &.se {
+        right: -2px;
+        bottom: -2px;
+        border-bottom-width: 5px;
+        border-right-width: 5px;
+        border-bottom-right-radius: 2px;
+      }
+    }
+
+    /* The top bar: a plain surface with a 1 dp divider, a close mark instead of the back arrow. */
+    :global(.od-maps-area .navbar-bg) {
+      border-bottom: 1px solid var(--od-row-divider);
+    }
+
+    .close {
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
     }
   }
 </style>

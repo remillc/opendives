@@ -1074,7 +1074,9 @@ Christian asked for it in a canvas comment. Mock-up: `docs/mockups/android-carte
 - Choosing a result centres the map on it and places the rectangle around it; for a logbook site, the region name defaults to "Autour de {site}".
 - This screen needs the network; offline, the field is disabled with "Recherche indisponible sans réseau".
 
-## [ ] 2026-11-10-02 Offline maps: "Choisir sur la carte" with a fixed frame (replaces the rectangle with handles)
+## [x] 2026-11-10-02 Offline maps: "Choisir sur la carte" with a fixed frame (replaces the rectangle with handles)
+
+Done in Replace the draggable rectangle with a fixed frame on Choose on the map
 
 Christian approved these changes from canvas comments. Mock-up: `docs/mockups/android-cartes-choix-carte.dc.html`. Spec: "Offline maps", *Adding*. Builds on 2026-11-09-33 and 2026-11-10-01.
 - No draggable rectangle and no handles. A fixed square frame (300 dp, 1.5 dp outline, thick corner marks) stays centred in the visible part of the map (between the search field and the bottom sheet). The diver pans and zooms the map under it; the downloaded area is what the frame covers.
