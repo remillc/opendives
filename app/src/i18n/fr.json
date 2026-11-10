@@ -1112,7 +1112,9 @@
     "keepNote": "Les plongées des autres sites passent à celui-ci, et ces sites disparaissent. C’est annulable.",
     "sortName": "Ordre alphabétique",
     "sortRecent": "Plus récent en premier",
-    "notDuplicatesDone": "{a} et {b} ne seront plus proposés comme doublons"
+    "notDuplicatesDone": "{a} et {b} ne seront plus proposés comme doublons",
+    "editSite": "Modifier le site {name}",
+    "editedNoDuplicate": "{name} modifié, ce n’est plus un doublon possible"
   },
   "renumber": {
     "titleChecked": "Renuméroter les plongées cochées ?",
@@ -1422,6 +1424,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Nettoyer les sites : un crayon sur chaque site d’un groupe de doublons ouvre son éditeur, puis revient au même endroit ; un groupe qui ne correspond plus disparaît.",
       "Messages : un seul style pour toutes les barres de message, sombre en mode clair et clair en mode sombre, flottant au-dessus du bas de l’écran (au-dessus du bouton + s’il y en a un), avec une seule action en bleu.",
       "Réglages : la réinitialisation garde votre liste de bouteilles.",
       "Nettoyer les sites : « Pas des doublons » retire le groupe de la liste et ne le propose plus (sur cet appareil) ; « Annuler » le remet. Renommer ou déplacer un des deux sites le rend de nouveau proposable.",

@@ -1112,7 +1112,9 @@
     "keepNote": "The dives of the other sites move to this one, and those sites disappear. This can be undone.",
     "sortName": "Alphabetical order",
     "sortRecent": "Most recent first",
-    "notDuplicatesDone": "{a} and {b} will no longer be suggested as duplicates"
+    "notDuplicatesDone": "{a} and {b} will no longer be suggested as duplicates",
+    "editSite": "Edit the site {name}",
+    "editedNoDuplicate": "{name} edited, no longer a possible duplicate"
   },
   "renumber": {
     "titleChecked": "Renumber the checked dives?",
@@ -1422,6 +1424,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Clean up sites: a pencil on each site of a duplicate group opens its editor, then returns to the same place; a group that no longer matches disappears.",
       "Messages: one style for every snackbar, dark on light and light on dark, floating above the bottom of the screen (above the + button when there is one), with one action in blue.",
       "Settings: resetting keeps your list of cylinders.",
       "Clean up sites: \"Not duplicates\" removes the group from the list and stops suggesting it (on this device); \"Undo\" puts it back. Renaming or moving one of the two sites makes it suggestible again.",

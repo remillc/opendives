@@ -12,6 +12,11 @@
   import { t } from '../lib/i18n.js';
   import { confirmAction } from '../lib/dialogs.js';
   import { offerUndo } from '../lib/undo.js';
+  import { pairsGone } from '../lib/site-cleanup.js';
+  import Icon from '../components/Icon.svelte';
+
+  /** @type {{ f7router: any }} */
+  let { f7router } = $props();
 
   /** @type {{a: import('opendives-core').SiteSummary, b: import('opendives-core').SiteSummary, distanceM: number}[]} */
   let pairs = $state([]);
@@ -20,9 +25,36 @@
   /** @type {Record<number, boolean>} */
   let selected = $state({});
 
+  /**
+   * The pairs listed when a site editor was opened from here, and the site
+   * edited. Null otherwise; any other change of the list clears it.
+   * @type {{uuid: number, pairs: typeof pairs}|null}
+   */
+  let editing = null;
+
   async function load() {
     pairs = await possibleDuplicates();
+    const done = editing;
+    editing = null;
+    if (done) await announceGone(done);
     unused = (await OpenDivesCore.siteQuery({ kind: 'list' })).filter((/** @type {any} */ s) => s.dives === 0);
+  }
+
+  /** @param {{uuid: number, pairs: typeof pairs}} done */
+  async function announceGone(done) {
+    if (!pairsGone(done.pairs, pairs, done.uuid).length) return;
+    try {
+      const site = await OpenDivesCore.siteQuery({ kind: 'site', uuid: done.uuid });
+      showSnackbar(t('sites.editedNoDuplicate', { name: site.name || t('sites.noName') }), { timeout: 4000 });
+    } catch (e) {
+      console.error('Site edited', e);
+    }
+  }
+
+  /** @param {import('opendives-core').SiteSummary} s */
+  function edit(s) {
+    editing = { uuid: s.uuid, pairs: [...pairs] };
+    f7router.navigate(`/sites/${s.uuid}/edit`);
   }
 
   $effect(() => {
@@ -60,6 +92,7 @@
 
   /** @param {(typeof pairs)[number]} pair */
   function merge(pair) {
+    editing = null;
     const [first, second] = ordered(pair);
     const key = pairKey(pair.a.uuid, pair.b.uuid);
     const [keep, other] = (kept[key] ?? first.uuid) === first.uuid ? [first, second] : [second, first];
@@ -81,6 +114,7 @@
 
   /** @param {(typeof pairs)[number]} pair */
   function notDuplicates(pair) {
+    editing = null;
     dismissPair(pair.a, pair.b);
     showSnackbar(t('sites.notDuplicatesDone', { a: pair.a.name || t('sites.noName'), b: pair.b.name || t('sites.noName') }), {
       action: t('edit.undo'),
@@ -92,6 +126,7 @@
   function deleteSelection() {
     const n = selection.length;
     if (!n) return;
+    editing = null;
     confirmAction({
       title: t('sites.deleteTitle'),
       text: t('sites.deleteText', { n }),
@@ -138,13 +173,18 @@
         <span class="sub">{reason(pair)}</span>
       </legend>
       {#each both as s (s.uuid)}
-        <label class="row radio-row">
-          <span class="radio">
-            <input type="radio" name="keep-{key}" value={s.uuid} checked={(kept[key] ?? both[0].uuid) === s.uuid} onchange={() => (kept[key] = s.uuid)} />
-            <i class="icon-radio"></i>
-          </span>
-          <span class="text"><span class="label">{s.name || t('sites.noName')}</span><span class="sub">{describe(s)}</span></span>
-        </label>
+        <div class="od-keep-row">
+          <label class="od-keep-pick">
+            <span class="radio">
+              <input type="radio" name="keep-{key}" value={s.uuid} checked={(kept[key] ?? both[0].uuid) === s.uuid} onchange={() => (kept[key] = s.uuid)} />
+              <i class="icon-radio"></i>
+            </span>
+            <span class="text"><span class="label">{s.name || t('sites.noName')}</span><span class="sub">{describe(s)}</span></span>
+          </label>
+          <button type="button" class="od-icon-button od-keep-edit" aria-label={t('sites.editSite', { name: s.name || t('sites.noName') })} onclick={() => edit(s)}>
+            <Icon name="edit" />
+          </button>
+        </div>
       {/each}
       <div class="actions">
         <button type="button" class="od-text-button" onclick={() => notDuplicates(pair)}>{t('sites.notDuplicates')}</button>
@@ -231,8 +271,31 @@
       cursor: pointer;
     }
 
-    .radio-row {
+    /* A choice and, apart from it, the button that edits the site. */
+    .od-keep-row {
       min-height: 56px;
+      box-sizing: border-box;
+      padding-right: 4px;
+      display: flex;
+      align-items: center;
+      border-top: 1px solid var(--od-separator);
+    }
+
+    .od-keep-pick {
+      flex: 1;
+      min-width: 0;
+      min-height: 56px;
+      padding: 8px 8px 8px 16px;
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      cursor: pointer;
+    }
+
+    .od-keep-edit {
+      flex: none;
+      width: 48px;
     }
 
     .text {
