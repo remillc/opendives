@@ -1519,7 +1519,8 @@
       "Settings: the chosen unit system stays after a restart.",
       "First launch (Android): a simpler page, with three buttons and their consequence on one line.",
       "Access token help: one tab per host (GitHub, GitLab, Codeberg).",
-      "First launch: full screen on tablets, every choice in view."
+      "First launch: full screen on tablets, every choice in view.",
+      "Tablet: after signing out, the account’s last dive no longer stays beside the empty logbook."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
