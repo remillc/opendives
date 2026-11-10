@@ -263,8 +263,9 @@
       cursor: pointer;
       transition: opacity 150ms linear;
 
+      /* !important: MapLibre sets an inline opacity on every marker. */
       &.od-dim {
-        opacity: 0.3;
+        opacity: 0.3 !important;
       }
 
       /* 16 dp dot, 48 dp touch target, around the dot: MapLibre places the
