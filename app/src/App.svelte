@@ -56,6 +56,7 @@
   import Welcome from './components/Welcome.svelte';
   import { layout, ios, listWidth, splitBreakpoint } from './lib/layout.svelte.js';
   import { trackSection, enableSectionSwipes, enableFullSwipeBack } from './lib/navigation.svelte.js';
+  import { TAP_SLOP } from './lib/tap.js';
   import { enableBackButton } from './lib/back-button.js';
   import { enableAccessibility } from './lib/accessibility.js';
   import { enableDetailPageCleanup } from './lib/detail-pages.js';
@@ -221,6 +222,9 @@
     // Framework7 derives its palette from --od-action (theme.css); the mapped
     // variables in theme.css then take precedence.
     colors: { primary: getComputedStyle(document.documentElement).getPropertyValue('--od-action').trim() },
+    // A fingertip tap moves a little: past 5 px (Framework7's default) the tap
+    // was dropped, so a button or a menu entry did nothing now and then.
+    touch: { touchClicksDistanceThreshold: TAP_SLOP },
     // Framework7's own dialog buttons are in English.
     dialog: { buttonOk: t('dialog.ok'), buttonCancel: t('dialog.cancel') },
     // A screen with a back arrow goes back with a swipe to the right, from
@@ -232,6 +236,9 @@
       iosSwipeBack: true,
       mdSwipeBackActiveArea: 10000,
       iosSwipeBackActiveArea: 10000,
+      // From anywhere, the gesture must not take a tap whose finger slid a little.
+      mdSwipeBackThreshold: TAP_SLOP,
+      iosSwipeBackThreshold: TAP_SLOP,
       // On Android the pages only slide, like the sections (enableFullSwipeBack).
       mdSwipeBackAnimateOpacity: false,
       mdSwipeBackAnimateShadow: false,
