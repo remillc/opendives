@@ -938,12 +938,16 @@ html.ios {
    * On a phone the hidden sections stay laid out, invisible, so that the one
    * coming in moves with the finger at once: shown from display: none, it
    * would first take a long frame (Sites, with its map, about 150 ms).
+   * content-visibility keeps that layout but takes them out of the style
+   * recalculations: without it, the ripple of each touch restyled the whole
+   * document, about 200 ms before the button reacted.
    */
   .views:not(.od-tablet) > .view.tab:not(.tab-active, .od-tab-peek) {
     display: block;
     position: absolute;
     inset: 0;
     visibility: hidden;
+    content-visibility: hidden;
   }
 
   .views > .view.od-tab-peek {

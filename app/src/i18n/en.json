@@ -1503,7 +1503,8 @@
       "Filter: the explanatory sentences under the criteria are gone.",
       "What’s new: the version date next to its number, and the complete list.",
       "Statistics: each row opens the list of its dives.",
-      "Logbook: the month shown in the band is more discreet."
+      "Logbook: the month shown in the band is more discreet.",
+      "Navigation buttons react to a touch at once."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
