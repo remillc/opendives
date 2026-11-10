@@ -1108,7 +1108,9 @@
     "selectSite": "Sélectionner {name}",
     "mergeSites": "Fusionner les sites",
     "keepTitle": "Quel site garder ?",
-    "keepNote": "Les plongées des autres sites passent à celui-ci, et ces sites disparaissent. C’est annulable."
+    "keepNote": "Les plongées des autres sites passent à celui-ci, et ces sites disparaissent. C’est annulable.",
+    "sortName": "Ordre alphabétique",
+    "sortRecent": "Plus récent en premier"
   },
   "renumber": {
     "titleChecked": "Renuméroter les plongées cochées ?",
@@ -1418,7 +1420,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
-      "Sites : la liste est triée par nom ; des cases à cocher permettent de fusionner plusieurs sites.",
+      "Sites : un menu change l’ordre de la liste (alphabétique ou plus récent en premier) ; un appui long sur un site le sélectionne, pour fusionner plusieurs sites.",
       "Conflit sur plusieurs plongées : une boîte en plein écran avec un interrupteur « Même choix pour toutes » et une carte par plongée, où vous touchez la version à garder.",
       "Conflit de synchronisation : « Plus tard » ferme la boîte et vous laisse où vous étiez ; l’état de synchronisation du Carnet et la carte de synchronisation du menu la rouvrent, et elle revient à la prochaine tentative de synchronisation.",
       "Cartes hors ligne : le choix d’une zone s’ouvre sur votre position actuelle.",

@@ -19,6 +19,16 @@ export function sortSitesByName(sites, locale) {
 }
 
 /**
+ * Sites by their latest dive, the most recent first.
+ * @template {{ lastDate: string }} S
+ * @param {S[]} sites
+ * @returns {S[]}
+ */
+export function sortSitesByRecent(sites) {
+  return [...sites].sort((a, b) => b.lastDate.localeCompare(a.lastDate));
+}
+
+/**
  * The site kept by default: the most dives, then one with a position.
  * @template {{ dives: number, hasLocation: boolean }} S
  * @param {S[]} sites at least one

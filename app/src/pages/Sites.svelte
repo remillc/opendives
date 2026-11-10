@@ -15,7 +15,7 @@
   import ChoiceDialog from '../components/ChoiceDialog.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
   import { possibleDuplicates, siteChange } from '../lib/sites.svelte.js';
-  import { defaultKeeper, sortSitesByName } from '../lib/site-merge.js';
+  import { defaultKeeper, sortSitesByName, sortSitesByRecent } from '../lib/site-merge.js';
   import { offerUndo } from '../lib/undo.js';
   import { formatDepth, formatLongDate, locale } from '../lib/format.js';
   import { layout, ios, listWidth } from '../lib/layout.svelte.js';
@@ -38,8 +38,21 @@ import { inBbox } from '../lib/maps-logic.js';
     offlineMaps.viewBbox = null;
   });
 
-  /** Sites used by dives, by name. */
-  const used = $derived(sortSitesByName(sites.filter((s) => s.dives > 0), locale));
+  const SORT_KEY = 'od.sitesSort';
+  /** The order of the list, a setting of this device. */
+  let sortBy = $state(/** @type {'name'|'recent'} */ (localStorage.getItem(SORT_KEY) === 'recent' ? 'recent' : 'name'));
+
+  /** @param {'name'|'recent'} order */
+  function setSort(order) {
+    sortBy = order;
+    localStorage.setItem(SORT_KEY, order);
+  }
+
+  /** Sites used by dives, in the chosen order. */
+  const used = $derived.by(() => {
+    const list = sites.filter((s) => s.dives > 0);
+    return sortBy === 'recent' ? sortSitesByRecent(list) : sortSitesByName(list, locale);
+  });
   const located = $derived(used.filter((s) => s.hasLocation));
   const unplaced = $derived(used.length - located.length);
   const diveCount = $derived(used.reduce((n, s) => n + s.dives, 0));
@@ -49,6 +62,83 @@ import { inBbox } from '../lib/maps-logic.js';
   let checked = $state({});
   const selection = $derived(used.filter((s) => checked[s.uuid]));
   let choosingKeeper = $state(false);
+
+  const LONG_PRESS_MS = 500;
+  /** How far the finger may move before a press becomes a scroll, px. */
+  const PRESS_SLOP = 10;
+
+  /**
+   * The list's selection: a long press on a site checks it and shows the boxes;
+   * while sites are checked, touching a site checks or unchecks it.
+   * @param {HTMLElement} el
+   */
+  function selectable(el) {
+    /** @type {ReturnType<typeof setTimeout>|undefined} */
+    let timer;
+    let startX = 0;
+    let startY = 0;
+    let pressed = false;
+    /** @param {Event} e */
+    const rowOf = (e) => /** @type {HTMLElement|null} */ (/** @type {HTMLElement} */ (e.target).closest('.od-site-row'));
+    const cancel = () => clearTimeout(timer);
+
+    /** @param {PointerEvent} e */
+    function down(e) {
+      const row = rowOf(e);
+      pressed = false;
+      if (!row || /** @type {HTMLElement} */ (e.target).closest('.od-site-check')) return;
+      startX = e.clientX;
+      startY = e.clientY;
+      timer = setTimeout(() => {
+        pressed = true;
+        checked[Number(row.dataset.uuid)] = true;
+      }, LONG_PRESS_MS);
+    }
+    /** @param {PointerEvent} e */
+    function move(e) {
+      if (Math.abs(e.clientX - startX) > PRESS_SLOP || Math.abs(e.clientY - startY) > PRESS_SLOP) cancel();
+    }
+    /**
+     * On the window, in the capture phase: Framework7 follows the links from
+     * the document's own capture phase, which would open the site.
+     * @param {MouseEvent} e
+     */
+    function click(e) {
+      if (!el.contains(/** @type {Node} */ (e.target))) return;
+      const row = rowOf(e);
+      if (!row || /** @type {HTMLElement} */ (e.target).closest('.od-site-check')) return;
+      if (pressed) {
+        pressed = false;
+      } else if (selection.length) {
+        const uuid = Number(row.dataset.uuid);
+        checked[uuid] = !checked[uuid];
+      } else {
+        return;
+      }
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    /** @param {Event} e The WebView's own long-press menu is not wanted. */
+    const menu = (e) => rowOf(e) && e.preventDefault();
+
+    el.addEventListener('pointerdown', down);
+    el.addEventListener('pointermove', move);
+    el.addEventListener('pointerup', cancel);
+    el.addEventListener('pointercancel', cancel);
+    window.addEventListener('click', click, true);
+    el.addEventListener('contextmenu', menu);
+    return {
+      destroy() {
+        cancel();
+        el.removeEventListener('pointerdown', down);
+        el.removeEventListener('pointermove', move);
+        el.removeEventListener('pointerup', cancel);
+        el.removeEventListener('pointercancel', cancel);
+        window.removeEventListener('click', click, true);
+        el.removeEventListener('contextmenu', menu);
+      },
+    };
+  }
 
   /** Merges every other selected site into the one kept: one undoable step each. @param {string} value */
   async function mergeSelection(value) {
@@ -195,14 +285,16 @@ import { inBbox } from '../lib/maps-logic.js';
 
     {#if used.length}
       <!-- No chevron on the site rows (android-sites.dc.html). -->
-      <div class="list no-chevron surface od-sites-list">
+      <div class="list no-chevron surface od-sites-list" use:selectable>
         <ul>
           {#each used as site (site.uuid)}
-            <li class="od-site-row">
-              <label class="checkbox od-site-check">
-                <input type="checkbox" bind:checked={checked[site.uuid]} aria-label={t('sites.selectSite', { name: site.name || t('sites.noName') })} />
-                <i class="icon-checkbox"></i>
-              </label>
+            <li class="od-site-row" data-uuid={site.uuid}>
+              {#if selection.length}
+                <label class="checkbox od-site-check">
+                  <input type="checkbox" bind:checked={checked[site.uuid]} aria-label={t('sites.selectSite', { name: site.name || t('sites.noName') })} />
+                  <i class="icon-checkbox"></i>
+                </label>
+              {/if}
               <a href="/sites/{site.uuid}" class="item-link item-content">
                 <div class="item-inner">
                   <div class="text">
@@ -264,6 +356,13 @@ import { inBbox } from '../lib/maps-logic.js';
       </div>
     {/if}
   {/snippet}
+  <Popover class="od-menu od-sites-sort-menu" backdrop={false}>
+    <List noChevron>
+      <MenuItem icon={sortBy === 'name' ? 'check' : 'blank'} text={t('sites.sortName')} onclick={() => setSort('name')} />
+      <MenuItem icon={sortBy === 'recent' ? 'check' : 'blank'} text={t('sites.sortRecent')} onclick={() => setSort('recent')} />
+    </List>
+  </Popover>
+
   <Popover class="od-menu od-sites-menu" backdrop={false}>
     <List noChevron>
       <MenuItem icon="merge" text={t('sites.mergeSites')} onclick={() => (choosingKeeper = true)} />
@@ -285,6 +384,10 @@ import { inBbox } from '../lib/maps-logic.js';
     {#snippet left()}<MenuButton />{/snippet}
     <NavRight>
       <Link iconOnly searchbarEnable=".od-sites-search"><Icon name="search" /><span class="od-sr-only">{t('sites.search')}</span></Link>
+      <Link iconOnly popoverOpen=".od-sites-sort-menu">
+        {#if theme.ios}<Icon name="moreCircle" />{:else}<Icon name="more" weight={4} />{/if}
+        <span class="od-sr-only">{t('detail.moreOptions')}</span>
+      </Link>
     </NavRight>
     <Searchbar
       class="od-sites-search"
@@ -433,6 +536,8 @@ import { inBbox } from '../lib/maps-logic.js';
     .od-site-row {
       display: flex;
       align-items: center;
+      user-select: none;
+      -webkit-touch-callout: none;
 
       > a {
         flex: 1;
