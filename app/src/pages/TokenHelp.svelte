@@ -7,6 +7,8 @@
   // languages. To add a host: one entry in PROVIDERS and its texts
   // `tokenHelp.<id>.*` (name, note, then the steps).
   // The links to the hosts open in the browser, with the external-link icon.
+  // One host at a time, chosen with Material 3 primary tabs under the top bar
+  // (docs/mockups/git-jeton-aide-android.dc.html); swiping sideways changes tab.
   import { Page, Navbar, Link } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
   import { t } from '../lib/i18n.js';
@@ -47,11 +49,39 @@
     },
   ];
 
-  /** The page menu: to a host's steps, the focus following for screen readers. @param {string} id */
-  function jump(id) {
-    const heading = document.getElementById(`od-token-help-${id}`);
-    heading?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    heading?.focus({ preventScroll: true });
+  let selected = $state(0);
+  const provider = $derived(PROVIDERS[selected]);
+  const name = $derived(t(`tokenHelp.${provider.id}.name`));
+
+  /** @param {number} index @param {boolean} [focus] */
+  function choose(index, focus = false) {
+    selected = (index + PROVIDERS.length) % PROVIDERS.length;
+    if (focus) document.getElementById(`od-token-help-tab-${PROVIDERS[selected].id}`)?.focus();
+  }
+
+  /** Arrow keys, Home and End move between the tabs (WAI-ARIA tabs). @param {KeyboardEvent} e */
+  function keydown(e) {
+    const to = { ArrowRight: selected + 1, ArrowLeft: selected - 1, Home: 0, End: PROVIDERS.length - 1 }[e.key];
+    if (to === undefined) return;
+    e.preventDefault();
+    choose(to, true);
+  }
+
+  // A sideways swipe on the card changes tab.
+  let startX = 0;
+  let startY = 0;
+  /** @param {TouchEvent} e */
+  function touchstart(e) {
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+  }
+  /** @param {TouchEvent} e */
+  function touchend(e) {
+    const dx = e.changedTouches[0].clientX - startX;
+    const dy = e.changedTouches[0].clientY - startY;
+    if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+    if (dx < 0 && selected < PROVIDERS.length - 1) choose(selected + 1);
+    if (dx > 0 && selected > 0) choose(selected - 1);
   }
 </script>
 
@@ -65,18 +95,35 @@
     {/snippet}
   </Navbar>
 
+  <div class="od-token-help--tabs" role="tablist" aria-label={t('tokenHelp.hosts')}>
+    {#each PROVIDERS as p, i (p.id)}
+      <button
+        type="button"
+        role="tab"
+        id="od-token-help-tab-{p.id}"
+        class="od-token-help--tab"
+        aria-selected={i === selected}
+        aria-controls="od-token-help-panel"
+        tabindex={i === selected ? 0 : -1}
+        onclick={() => choose(i)}
+        onkeydown={keydown}
+      >
+        <span class="od-token-help--tab-label">{t(`tokenHelp.${p.id}.name`)}</span>
+      </button>
+    {/each}
+  </div>
+
   <p class="od-token-help--intro">{t('tokenHelp.intro')}</p>
 
-  <nav class="od-token-help--page-menu" aria-label={t('tokenHelp.menu')}>
-    {#each PROVIDERS as provider (provider.id)}
-      <button type="button" onclick={() => jump(provider.id)}>{t(`tokenHelp.${provider.id}.name`)}</button>
-    {/each}
-  </nav>
-
-  {#each PROVIDERS as provider (provider.id)}
-    {@const name = t(`tokenHelp.${provider.id}.name`)}
-    <h2 class="block-title" id="od-token-help-{provider.id}" tabindex="-1">{name}</h2>
-    <div class="od-token-help--surface">
+  <div
+    class="od-token-help--surface"
+    id="od-token-help-panel"
+    role="tabpanel"
+    tabindex="0"
+    aria-labelledby="od-token-help-tab-{provider.id}"
+    ontouchstart={touchstart}
+    ontouchend={touchend}
+  >
       <p class="od-token-help--note">{t(`tokenHelp.${provider.id}.note`)}</p>
       {#each provider.sections as section}
         {#if section.title}<h3>{t(section.title)}</h3>{/if}
@@ -95,8 +142,7 @@
           <Icon name="openInNew" size={20} />
         </a>
       {/if}
-    </div>
-  {/each}
+  </div>
 
   <p class="od-token-help--intro od-token-help--afterwards">{t('tokenHelp.afterwards')}</p>
 </Page>
@@ -104,7 +150,7 @@
 <style>
   @layer od.components {
     .od-token-help--intro {
-      margin: 8px 24px 0;
+      margin: 16px 24px 0;
       font-size: 14px;
       line-height: 20px;
       letter-spacing: 0.25px;
@@ -115,35 +161,53 @@
       }
     }
 
-    .od-token-help--page-menu {
-      margin: 12px 16px 0;
+    /* MD3 primary tabs, fixed under the top bar: equal widths, 48 dp, an indicator under the active label. */
+    .od-token-help--tabs {
+      position: sticky;
+      top: 0;
+      z-index: 2;
       display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
+      background: var(--od-background);
+      border-bottom: 1px solid var(--od-separator);
+    }
 
-      button {
-        width: auto;
-        min-height: 40px;
-        padding: 0 16px;
-        border: 1px solid var(--od-text-2);
-        border-radius: 20px;
-        background: none;
+    .od-token-help--tab {
+      flex: 1 1 0;
+      min-width: 0;
+      height: 48px;
+      padding: 0;
+      border: none;
+      background: none;
+      color: var(--od-text-2);
+      font: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.1px;
+      display: flex;
+      justify-content: center;
+      align-items: stretch;
+      cursor: pointer;
+
+      &[aria-selected='true'] {
         color: var(--od-text);
-        font: inherit;
-        font-size: 14px;
-        font-weight: 500;
-        cursor: pointer;
+        font-weight: 600;
+
+        .od-token-help--tab-label {
+          border-bottom: 3px solid var(--od-text);
+          border-radius: 3px 3px 0 0;
+        }
       }
     }
 
-    /* Under the top bar when the menu brings a host to the top. */
-    .block-title {
-      scroll-margin-top: calc(var(--f7-navbar-height) + var(--f7-safe-area-top) + 8px);
-      outline: none;
+    .od-token-help--tab-label {
+      box-sizing: border-box;
+      padding: 0 4px;
+      display: flex;
+      align-items: center;
     }
 
     .od-token-help--surface {
-      margin: 0 16px;
+      margin: 16px 16px 0;
       padding: 16px 16px 8px;
       border-radius: 20px;
       background: var(--od-surface);

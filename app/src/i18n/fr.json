@@ -1516,7 +1516,8 @@
       "Désaturation : la dernière plongée du carnet, et « Vous pouvez prendre l’avion » quand l’attente est terminée.",
       "Lignes de plongée : la durée au-dessus, la profondeur en dessous.",
       "Réglages : le système d’unités choisi reste en place après un redémarrage.",
-      "Premier lancement (Android) : une page plus simple, avec trois boutons et leur conséquence en une ligne."
+      "Premier lancement (Android) : une page plus simple, avec trois boutons et leur conséquence en une ligne.",
+      "Aide sur le jeton d’accès : un onglet par site (GitHub, GitLab, Codeberg)."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
@@ -2335,7 +2336,7 @@
       "s6": "Si le formulaire propose une date d’expiration, choisissez une date proche. Le guide de Codeberg n’en parle pas : sans date, supprimez le jeton depuis cette page quand vous ne l’utilisez plus.",
       "s7": "Touchez Generate Token, puis copiez le jeton."
     },
-    "menu": "Sur cette page"
+    "hosts": "Sites"
   },
   "maps": {
     "title": "Cartes hors ligne",
