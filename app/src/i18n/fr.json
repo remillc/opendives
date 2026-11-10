@@ -1502,7 +1502,8 @@
       "Filtrer (Android) : page refaite, critères de bouteille et de gaz regroupés, un filtre enregistré remplit la page, et sa suppression propose « Annuler ».",
       "Filtrer : les phrases d’explication sous les critères disparaissent.",
       "Nouveautés : la date de la version à côté de son numéro, et la liste complète.",
-      "Statistiques : chaque ligne ouvre la liste de ses plongées."
+      "Statistiques : chaque ligne ouvre la liste de ses plongées.",
+      "Carnet : le mois affiché dans le bandeau est plus discret."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",

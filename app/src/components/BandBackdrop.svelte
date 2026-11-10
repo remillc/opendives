@@ -151,8 +151,8 @@
       display: flex;
       align-items: baseline;
       gap: 8px;
-      font-size: 18px;
-      line-height: 24px;
+      font-size: 14px;
+      line-height: 20px;
       opacity: var(--od-band-month-opacity, 0);
     }
 
@@ -170,7 +170,6 @@
     }
 
     .od-band-count {
-      font-size: 14px;
       font-variant-numeric: tabular-nums;
       white-space: nowrap;
     }
