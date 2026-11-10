@@ -1149,3 +1149,7 @@ Christian approved (canvas comment). Spec: "Statistics, items are not clickable"
 - On `/statistics/`, the chart cards and the result rows are not links: no chevron, no ripple, no focus stop.
 - Remove the one-year view and its route; remove any link to it. Keep the filter and "Nouvelle statistique".
 - *Added at 09:40 on 10 November 2026:* this covers every grouped section of the page: "Par année", "Par mode", "Par combinaison", "Par compagnon" and any other "Par …" section. None has a detail view, so none of their rows is clickable (approved by Christian).
+- *Added at 09:43 on 10 November 2026 (approved by Christian), match the mock-up layout:*
+  - The "Par …" sections are not accordions: always open, with a plain section title (14 sp, medium, `--od-on-surface-variant`), as in `android-stats.dc.html`.
+  - Rows are plain two-line list items, 72 dp min height, in a rounded white card with 1 dp dividers: title 16 sp (`od-value` for years), supporting line 14 sp `--od-on-surface-variant`. Not the Framework7 media-list style.
+  - "Par année" rows: title = year, supporting line = "{n} plongées · {durée} · max {profondeur}". "Par mode", "Par combinaison", "Par compagnon": title = value, supporting line = "{n} plongées", total time on the right (14 sp, tabular figures).
