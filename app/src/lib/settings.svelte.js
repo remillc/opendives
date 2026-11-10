@@ -236,8 +236,8 @@ export function setAppSetting(key, value) {
  * "Reset all settings": every setting of the device back to Subsurface's
  * default (the core's `defaults`) and the app's own. The planner's own
  * parameters (core values of SETTING_KEYS, "Conditions par défaut") and trip
- * grouping (the logbook's) are not touched; nor are the offline maps
- * (od.offlineMaps*), the account or the logbook.
+ * grouping (the logbook's) are not touched; nor are the diver's list of
+ * cylinder types, the offline maps (od.offlineMaps*), the account or the logbook.
  * @param {Partial<CorePrefValues>} defaults
  */
 export async function resetAllSettings(defaults) {
@@ -246,9 +246,6 @@ export async function resetAllSettings(defaults) {
   for (const key of Object.keys(storedCore)) delete storedCore[/** @type {keyof CorePrefValues} */ (key)];
   Object.assign(storedCore, kept);
   writeJson(CORE_KEY, Object.keys(storedCore).length ? storedCore : null);
-  // The cylinder types too: back to Subsurface's standard list (Christian's choice).
-  await OpenDivesCore.cylinderTypes({ action: 'standard' });
-  writeJson(LIBRARY_KEY, null);
   try {
     localStorage.removeItem('od.extraConditions');
   } catch {
