@@ -1209,6 +1209,7 @@
     "failed": "The dives could not be renumbered. No dive was changed."
   },
   "dialog": {
+    "close": "Close",
     "ok": "OK",
     "cancel": "Cancel"
   },
@@ -1494,6 +1495,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "“Edit dive”: a cylinder’s sheet closes when you tap its handle or drag it down.",
       "“Edit dive”: a new Gas group before Equipment. It holds the dive mode and a drawing of each cylinder, filled to its end pressure, with its gas and pressure. Tap a cylinder to edit it in a sheet, or anywhere else on the drawing for the Gas page with every cylinder card, the gas switch depths and “Add a cylinder”. Each cylinder has its own “Delete cylinder N”, which asks first and says when the profile uses the cylinder. Nothing is saved until you tap Save.",
       "“Edit dive” (Android): each cylinder is a card with its gas in plain words (“Trimix 16/45”, “EAN32”, “Air”, “Oxygen”). Size and working pressure come from the cylinder type and show under it (“16 cuft HP”, “80 cuft”, “11.1 L LP”); “Other…” lets you type them for a cylinder outside the list, and a dive’s own values are never overwritten. Under “End”, the pressure used. A handle moves the cards (drag, or “Move up” / “Move down” for TalkBack); the gas changes of the dive follow their cylinder.",
       "“Edit dive”: the Conditions section starts collapsed; its header shows the water temperature and the average of the ratings as stars. Tap it to open it.",

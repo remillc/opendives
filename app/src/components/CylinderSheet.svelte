@@ -9,6 +9,8 @@
   // dialog; Escape, the scrim and the system Back close it (lib/back-button.js).
   import CylinderDrawing from './CylinderDrawing.svelte';
   import { t } from '../lib/i18n.js';
+  import { reducedMotion } from '../lib/reduced-motion.js';
+  import { dismissesSheet, sheetOffset } from '../lib/sheet-drag.js';
 
   /**
    * @type {{
@@ -48,17 +50,120 @@
   function keydown(e) {
     if (e.key === 'Escape') {
       e.preventDefault();
-      onclose();
+      dismiss();
     }
+  }
+
+  // Closing: the sheet slides down, then the page closes it. With "Remove
+  // animations" it closes at once.
+  /** @type {HTMLElement|undefined} */
+  let surface = $state();
+  let surfaceHeight = $state(0);
+  let offset = $state(0);
+  let dragging = $state(false);
+  let leaving = $state(false);
+  /** A drag moved the sheet: the click that ends it does not also close it. */
+  let moved = false;
+  let startY = 0;
+  let lastY = 0;
+  let lastT = 0;
+  let velocity = 0;
+
+  function dismiss() {
+    if (leaving) return;
+    if (reducedMotion() || !surface) {
+      onclose();
+      return;
+    }
+    leaving = true;
+    offset = surface.offsetHeight;
+    setTimeout(onclose, 200);
+  }
+
+  /**
+   * The handle's touches stay its own: Framework7 follows every touch on the
+   * document, and after one that moved without a click (a drag) it drops the
+   * next click anywhere, so the next tap after closing the sheet did nothing.
+   * @param {HTMLElement} node
+   */
+  function ownTouches(node) {
+    /** @param {TouchEvent} e */
+    const stop = (e) => e.stopPropagation();
+    const kinds = /** @type {const} */ (['touchstart', 'touchmove', 'touchend', 'touchcancel']);
+    for (const kind of kinds) node.addEventListener(kind, stop, { passive: true });
+    return {
+      destroy() {
+        for (const kind of kinds) node.removeEventListener(kind, stop);
+      },
+    };
+  }
+
+  /** @param {PointerEvent} e */
+  function dragStart(e) {
+    if (leaving) return;
+    /** @type {HTMLElement} */ (e.currentTarget).setPointerCapture(e.pointerId);
+    dragging = true;
+    moved = false;
+    surfaceHeight = surface?.offsetHeight ?? 0;
+    startY = lastY = e.clientY;
+    lastT = e.timeStamp;
+    velocity = 0;
+  }
+
+  /** @param {PointerEvent} e */
+  function dragMove(e) {
+    if (!dragging) return;
+    const dy = e.clientY - startY;
+    if (Math.abs(dy) > 6) moved = true;
+    const dt = e.timeStamp - lastT;
+    if (dt > 0) velocity = (e.clientY - lastY) / dt;
+    lastY = e.clientY;
+    lastT = e.timeStamp;
+    offset = sheetOffset(dy);
+  }
+
+  /** @param {PointerEvent} e */
+  function dragEnd(e) {
+    if (!dragging) return;
+    dragging = false;
+    if (moved && dismissesSheet(e.clientY - startY, velocity, surfaceHeight)) dismiss();
+    else offset = 0;
+    // The click that follows a drag is ignored; the next tap closes again.
+    setTimeout(() => (moved = false), 0);
   }
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div class="od-cylinder-sheet modal-in" use:portal onkeydown={keydown}>
   <!-- svelte-ignore a11y_click_events_have_key_events -->
-  <div class="od-cylinder-sheet--scrim" onclick={onclose}></div>
-  <div class="od-cylinder-sheet--surface" role="dialog" aria-modal="true" aria-labelledby={id} tabindex="-1">
-    <div class="od-cylinder-sheet--handle" aria-hidden="true"></div>
+  <div class="od-cylinder-sheet--scrim" onclick={dismiss} style:opacity={dragging ? 1 - Math.min(1, Math.max(0, offset) / (surfaceHeight || 1)) : undefined}></div>
+  <div
+    class="od-cylinder-sheet--surface"
+    class:od-cylinder-sheet--dragging={dragging}
+    class:od-cylinder-sheet--leaving={leaving}
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby={id}
+    tabindex="-1"
+    bind:this={surface}
+    style:transform={offset ? `translateY(${offset}px)` : undefined}
+  >
+    <!-- The M3 drag handle: a tap closes the sheet, a drag down closes it too. -->
+    <button
+      type="button"
+      class="od-cylinder-sheet--grab"
+      aria-label={t('dialog.close')}
+      onclick={() => {
+        if (!moved) dismiss();
+      }}
+      onpointerdown={dragStart}
+      onpointermove={dragMove}
+      onpointerup={dragEnd}
+      onpointercancel={dragEnd}
+      use:ownTouches
+    >
+      <span class="od-cylinder-sheet--handle" aria-hidden="true"></span>
+    </button>
     <div class="od-cylinder-sheet--body">
       <div class="od-cylinder-sheet--head">
         <CylinderDrawing {ratio} width={20} stroke={1.5} />
@@ -70,7 +175,7 @@
     <div class="od-cylinder-sheet--actions">
       <button type="button" class="od-cylinder-sheet--delete" onclick={ondelete}>{t('edit.deleteCylinder')}</button>
       <span class="od-cylinder-sheet--spacer"></span>
-      <button type="button" class="od-cylinder-sheet--ok" onclick={onclose}>{t('dialog.ok')}</button>
+      <button type="button" class="od-cylinder-sheet--ok" onclick={dismiss}>{t('dialog.ok')}</button>
     </div>
   </div>
 </div>
@@ -135,11 +240,47 @@
       }
     }
 
-    .od-cylinder-sheet--handle {
+    /* Back to its place, or down off screen when closing. */
+    .od-cylinder-sheet--surface {
+      transition: transform 0.2s var(--od-motion-spatial-fast, ease-out);
+
+      &.od-cylinder-sheet--dragging {
+        transition: none;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .od-cylinder-sheet--surface {
+        transition: none;
+      }
+    }
+
+    /* The handle's touch target: 48 dp high across the top of the sheet. */
+    .od-cylinder-sheet--grab {
       flex: none;
+      align-self: center;
+      width: 96px;
+      height: 36px;
+      margin: -8px 0 4px;
+      padding: 0;
+      border: none;
+      background: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      touch-action: none;
+      cursor: grab;
+
+      &:focus-visible {
+        outline: 2px solid var(--od-text);
+        outline-offset: -2px;
+        border-radius: 8px;
+      }
+    }
+
+    .od-cylinder-sheet--handle {
       width: 32px;
       height: 4px;
-      margin: 8px auto 16px;
       border-radius: 2px;
       background: var(--od-text-2);
       opacity: 0.4;
