@@ -21,6 +21,8 @@
   import Icon from '../components/Icon.svelte';
   import ChoiceDialog from '../components/ChoiceDialog.svelte';
   import ProfileThumbnail from '../components/ProfileThumbnail.svelte';
+  import LoadingIndicator from '../components/LoadingIndicator.svelte';
+  import LinearWavyProgress from '../components/LinearWavyProgress.svelte';
   import { navigation } from '../lib/navigation.svelte.js';
   import { afterDownload, logbook } from '../lib/logbook.svelte.js';
   import { settings } from '../lib/settings.svelte.js';
@@ -397,7 +399,7 @@
 
     <h2 class="od-download--subheader">
       {t('download.nearby')}
-      {#if scanning}<span class="od-download--spinner" role="status" aria-label={t('download.searching')}></span>{/if}
+      {#if scanning}{#if theme.ios}<span class="od-download--spinner" role="status" aria-label={t('download.searching')}></span>{:else}<LoadingIndicator size={20} label={t('download.searching')} />{/if}{/if}
     </h2>
     {#if nearby.length}
       <ul class="od-download--rows od-download--cards" class:od-download--card-list={card}>
@@ -453,6 +455,7 @@
         <span class="od-download--headline">{forceDownload ? t('download.readingAll') : t('download.reading')}</span>
         {#if fraction > 0}<span class="od-download--percent">{t('download.percent', { n: percent })}</span>{/if}
       </div>
+      {#if theme.ios}
       <div
         class="od-download--bar"
         class:od-download--indeterminate={fraction <= 0}
@@ -464,6 +467,9 @@
       >
         <div class="od-download--fill" style:width={fraction > 0 ? `${percent}%` : undefined}></div>
       </div>
+      {:else}
+        <LinearWavyProgress value={fraction} indeterminate={fraction <= 0} label={t('download.progressLabel')} />
+      {/if}
       <p class="od-download--hint">{t('download.keepNear')}{forceDownload ? '' : ` ${t('download.notAgain')}`}</p>
     </div>
 

@@ -231,6 +231,21 @@ On an Android tablet, in landscape and portrait, the Carnet's "+" opens the Mate
 - **Accessibility:** the button announces "Ajouter des plongées" and its expanded state; the items are a menu; focus goes to the first item on opening and back to the button on closing.
 Mock-ups: `android-tablette-ajout-paysage.dc.html`, `android-tablette-ajout-portrait.dc.html`.
 
+### Wavy progress and loading indicator (Android, decided on 11 November 2026)
+
+**`<LinearWavyProgress>` (`od-linear-wavy-progress`):** the Material 3 Expressive wavy linear progress indicator, for operations on Android (dive-computer download, offline maps download and update, account import, indeterminate bar under the top bar while signing in). iOS keeps its flat bar. The drawer's "Encore 1 plongée avant la 10e" gauge and the sync bar stay plain bars.
+- **Props:** `value` (0 to 1) or `indeterminate`; `label` (required).
+- **Geometry** (Compose `LinearWavyProgressIndicator` defaults): 4 dp stroke with round caps, wave amplitude 3 dp (10 dp high in all), wavelength 40 dp determinate and 20 dp indeterminate. Determinate: the wave for the done part, a 4 dp gap, the flat track, a 4 dp stop dot at its end; the amplitude flattens smoothly over the first 10 % and the last 5 %. Indeterminate: two wave segments run across, the track fills the gaps between them. The functions are in `app/src/lib/progress-geometry.js`.
+- **Colours:** wave and dot `--od-action` (ink), track `--od-separator`; a screen may override `--od-linear-wavy-progress-active` and `--od-linear-wavy-progress-track`.
+- **Accessibility:** `role="progressbar"`, `aria-label`, `aria-valuenow` (percent) unless indeterminate.
+- **Motion:** the wave travels at 40 dp/s. With "Remove animations" (`prefers-reduced-motion`) the wave stands still and the indeterminate one is a static pair of segments.
+
+**`<LoadingIndicator>` (`od-loading-indicator`):** the Material 3 Expressive loading indicator, uncontained, instead of circular spinners on Android: "À proximité" while scanning (20 dp), the running import step (24 dp), the "Connexion…" button (18 dp, hidden from TalkBack because the button text says it).
+- **Props:** `size` (dp), `label` (required; "" hides it from TalkBack).
+- **Shape:** it holds, then morphs between the Expressive polygons (soft burst, 9-sided cookie, pentagon, pill, sunny, 4-sided cookie, oval) while turning; the morph interpolates the shapes' radii.
+- **Colour:** the water gradient from top to bottom, `--od-loading-indicator-top` and `--od-loading-indicator-bottom` (light sand #F3C47A to rust #B4530F; dark honey #E5B961 to amber #EF7625).
+- **Accessibility:** `role="status"` with its `aria-label`. With "Remove animations", one static shape.
+
 ### Text fields
 
 **Text fields (decided on 6 November 2026, updated the same day).** Every text field of the app on Android uses the MD3 **filled** variant (Framework7 MD inputs without the outline style): surface-container-highest background (#E8E8E5 light), 4 dp top corners, a 1 dp bottom indicator that becomes 2 dp in the primary colour on focus, the label inside the field: full size when the field is empty and not focused, with no placeholder; small above the value on focus or once the field has a value. Helper text sits under the field. A trailing icon (for example "use my position") is a plain 24 dp icon button, without a filled background. In a full-screen form, the save action is a text button at the right of the top bar ("Enregistrer"), the close action an X at the left. Reference: `docs/mockups/sites-edition-android.dc.html`.

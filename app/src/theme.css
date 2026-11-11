@@ -85,6 +85,9 @@
     --od-on-band: #1F2124;
     --od-on-band-2: #3D3A33;
     --od-water-bottom: #B4530F;
+    /* Loading indicator (Android): the water gradient, sand to rust. */
+    --od-loading-indicator-top: #F3C47A;
+    --od-loading-indicator-bottom: #B4530F;
     --od-trace: #1F2124;
     /* Outline drawn under the profile line; only used in dark mode. */
     --od-trace-outline: transparent;
@@ -172,6 +175,8 @@
     --od-cursor: #F4F4F2;
     --od-water-top: #E5B961;
     --od-water-bottom: #EF7625;
+    --od-loading-indicator-top: #E5B961;
+    --od-loading-indicator-bottom: #EF7625;
     --od-trace: #F4F4F2;
     --od-trace-outline: #121314;
     --od-chart-grid: #3A3C40;

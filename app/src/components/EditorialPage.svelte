@@ -22,6 +22,8 @@
   // busy label, and on Android a linear progress indicator runs under the bar.
   import { Page, Navbar, Link, f7 } from 'framework7-svelte';
   import Icon from './Icon.svelte';
+  import LoadingIndicator from './LoadingIndicator.svelte';
+  import LinearWavyProgress from './LinearWavyProgress.svelte';
   import DecorativeProfile from './DecorativeProfile.svelte';
   import { layout } from '../lib/layout.svelte.js';
   import { t } from '../lib/i18n.js';
@@ -93,7 +95,7 @@
     {/if}
     {#if action}
       <button type="submit" class="od-editorial-page--filled" disabled={actionDisabled || busy} aria-busy={busy}>
-        {#if busy}<span class="od-editorial-page--spinner" aria-hidden="true"></span>{busyLabel || action}{:else}{action}{/if}
+        {#if busy}{#if ios}<span class="od-editorial-page--spinner" aria-hidden="true"></span>{:else}<LoadingIndicator size={18} label="" />{/if}{busyLabel || action}{:else}{action}{/if}
       </button>
     {/if}
   </div>
@@ -121,7 +123,7 @@
   </Navbar>
 
   {#if busy && !ios}
-    <div class="od-editorial-page--linear" role="progressbar" aria-label={busyLabel || action}><span></span></div>
+    <div class="od-editorial-page--linear"><LinearWavyProgress indeterminate label={busyLabel || action} /></div>
   {/if}
 
   <form
@@ -293,36 +295,15 @@
       flex: none;
     }
 
-    /* MD3 linear progress indicator, indeterminate, under the top bar. */
+    /* MD3 Expressive wavy linear progress indicator, indeterminate, under the top bar. */
     .od-editorial-page--linear {
       position: absolute;
       z-index: 600;
       left: 0;
       right: 0;
       top: calc(var(--f7-safe-area-top) + var(--f7-navbar-height));
-      height: 4px;
-      overflow: hidden;
-      background: var(--od-separator);
-
-      span {
-        position: absolute;
-        top: 0;
-        width: 40%;
-        height: 4px;
-        border-radius: 2px;
-        background: var(--od-primary-action);
-        animation: od-linear 1.4s linear infinite;
-      }
-    }
-
-    @keyframes od-linear {
-      from {
-        left: -40%;
-      }
-
-      to {
-        left: 100%;
-      }
+      height: 10px;
+      --od-linear-wavy-progress-active: var(--od-primary-action);
     }
 
     .od-editorial-page--spinner {
