@@ -10,7 +10,7 @@ Rules (agreed between the design agent and the code agent, see `docs/agent-inbox
 - **Tag:** every item starts with `[design]` or `[code]` right after its number, set by the agent that adds it (`#4 [design] …`). `[design]` = mock-ups, visuals, screen texts, specification; `[code]` = everything else. When unsure, the agent asks Christian. The tag says who handles the item and lets Christian list one kind only. A second tag `[hors compat. SS]` may follow it, before the title, when the item would break compatibility with Subsurface (data Subsurface cannot read or keep); such an item needs Christian's explicit go-ahead before any code.
 - No other content in this file: no history, no checked boxes, no notes from agents.
 
-Next number: 41
+Next number: 42
 
 ## List
 
@@ -32,3 +32,4 @@ Next number: 41
 - #38 [design] Redessiner la page d'une plongée en misant davantage sur les regroupements en sections qui résument les données présentes et offrent de cliquer pour ouvrir une vue des détails de cette section. La section concernant l'équipement en particulier.
 - #39 [design] Sur Détail d'une plongée, remplacer les barres par des bouteilles de plongée.
 - #40 [design] Améliorer les vues pour le workflow de download des données d'un ordinateur de plongée. Doit être plus jazzé. Ce n'est pas clair qu'il faille sélectionner l'ordinateur de plongée pour que le téléchargement démarre.
+- #41 [code] Prendre une photo des manomètres (début et fin de plongée) et en déduire les pressions par reconnaissance d'image. Observations : tout sur l'appareil (les photos ne quittent pas le téléphone) ; la valeur lue n'est qu'une proposition, affichée avec la photo en vignette, que le plongeur confirme ou corrige (« Lu : 2 680 psi », Utiliser / Reprendre) ; entrée par une icône d'appareil photo dans les champs Début et Fin de chaque bouteille, caméra avec un cadre rond à aligner sur le cadran. Affichage numérique : lecture de chiffres fiable avec la reconnaissance de texte du système (ML Kit, Vision). Manomètre à aiguille : vrai problème de vision (cadran, graduation bar ou psi, angle de l'aiguille, reflets, buée, parallaxe), à évaluer sur une vingtaine de vraies photos avant de s'engager. Pas pour la v1 : commencer par le numérique. Compatible Subsurface (seule la pression est enregistrée).
