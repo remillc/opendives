@@ -1515,7 +1515,7 @@ Christian chose the exposed dropdown menu as the single pattern for picking one 
 - **Site field of "Modifier la plongée"** (addendum, 11 November): downward chevron instead of the right arrow (`android-edition`). It opens the same dropdown menu as the other fields, with a search field at the top of the menu (the site list can be long) and "Nouveau site…" at the end.
 - A line in the release notes.
 
-## [ ] 2026-11-11-41 Android: title sizes (decision of 11 November)
+## [x] 2026-11-11-41 Android: title sizes (decision of 11 November)
 
 Answer to the question on Expressive title sizes. "Title Large" is 22 sp in Material 3; 28 and 36 sp are the titles of Expressive's flexible app bars (medium: Headline Medium 28 sp, large: Display Small 36 sp), collapsing to 22 sp on scroll. Decision:
 - **Task screens** (Modifier la plongée, new site, git configuration, every screen with ✕ and Enregistrer): small top app bar, title 22 sp (Title Large). Unchanged.
@@ -1523,6 +1523,8 @@ Answer to the question on Expressive title sizes. "Title Large" is 22 sp in Mate
 - **Sheets** (dive, site, trip): keep their editorial title inside the page (32 sp); the top bar carries only ←.
 - No 36 sp (large flexible app bar) on phones. Check the values against the Material library before coding and tell Christian if they differ.
 - Write the rule in System design, section 4 (type).
+
+Done in `feature/flexible-title-sizes`: Carnet, Statistiques and Outils show a 28/36 title (Headline Medium) above the summary in the band, cross-fading to the 22/28 bar title (Title Large) over the first 24 px of scroll (`SectionBand` `title`, `BandBackdrop` `--od-title-expanded`). The values match the M3 scale; the weight stays 500 as the mock-ups fix it for the bar title (M3 uses 400). Task screens keep a 22 sp small bar; sheets keep their in-page title (dive 34, site 32, trip 28, as built). Sites keeps its 22 sp bar title over the map and does not collapse yet. Rule in System design, section 4.
 
 ## [ ] 2026-11-11-42 Android: date and time fields with calendar and clock icons
 
