@@ -10,7 +10,7 @@ Rules (agreed between the design agent and the code agent, see `docs/agent-inbox
 - **Tag:** every item starts with `[design]` or `[code]` right after its number, set by the agent that adds it (`#4 [design] …`). `[design]` = mock-ups, visuals, screen texts, specification; `[code]` = everything else. When unsure, the agent asks Christian. The tag says who handles the item and lets Christian list one kind only. A second tag `[hors compat. SS]` may follow it, before the title, when the item would break compatibility with Subsurface (data Subsurface cannot read or keep); such an item needs Christian's explicit go-ahead before any code.
 - No other content in this file: no history, no checked boxes, no notes from agents.
 
-Next number: 40
+Next number: 41
 
 ## List
 
@@ -32,3 +32,4 @@ Next number: 40
 - #37 [design] [hors compat. SS] Signature manuscrite d'une plongée par un compagnon (buddy) ou le guide de palanquée, tracée au doigt sur l'écran. Le format de Subsurface n'a pas de champ pour une signature : décider où et comment la stocker sans casser un carnet lu par Subsurface (fichier à part dans le dépôt git, données ignorées par Subsurface, etc.).
 - #38 [design] Redessiner la page d'une plongée en misant davantage sur les regroupements en sections qui résument les données présentes et offrent de cliquer pour ouvrir une vue des détails de cette section. La section concernant l'équipement en particulier.
 - #39 [design] Sur Détail d'une plongée, remplacer les barres par des bouteilles de plongée.
+- #40 [design] Améliorer les vues pour le workflow de download des données d'un ordinateur de plongée. Doit être plus jazzé. Ce n'est pas clair qu'il faille sélectionner l'ordinateur de plongée pour que le téléchargement démarre.
