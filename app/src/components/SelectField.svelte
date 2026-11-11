@@ -2,7 +2,7 @@
   // @ts-check
   import DropdownArrow from './DropdownArrow.svelte';
   import Icon from './Icon.svelte';
-  // One value chosen in a short list: the MD3 filled field with a ▾ at the end
+  // One value chosen in a short list: the MD3 filled field with a downward chevron at the end
   // (spec, section 1, "Text fields"), on the system's own choice list. The
   // label is always small above the value.
 
@@ -16,14 +16,13 @@
    *   onchange?: (value: string) => void,
    *   clearLabel?: string,
    *   ariaLabel?: string,
-   *   chevron?: boolean,
    *   invalid?: boolean,
    * }}
    * ariaLabel: the accessible name when the label alone is not enough (the
-   * full label and the unit). chevron: a downward chevron instead of MD3's ▾.
+   * full label and the unit).
    * invalid: the label and a 2 dp indicator in the alarm colour.
    */
-  let { label, value = $bindable(), options, supporting = '', disabled = false, onchange, clearLabel = '', ariaLabel, chevron = false, invalid = false } = $props();
+  let { label, value = $bindable(), options, supporting = '', disabled = false, onchange, clearLabel = '', ariaLabel, invalid = false } = $props();
 
   /** With `clearLabel` and a value: a ✕ sets the field back to the empty choice. */
   function clear() {
@@ -43,7 +42,7 @@
     {#if clearLabel && value}
       <button type="button" class="od-select-field--clear" aria-label={clearLabel} onclick={clear}><Icon name="close" size={20} /></button>
     {/if}
-    <span class="od-select-field--arrow">{#if chevron}<Icon name="expand" />{:else}<DropdownArrow />{/if}</span>
+    <span class="od-select-field--arrow"><DropdownArrow /></span>
   </div>
   {#if supporting}<p class="od-select-field--supporting">{supporting}</p>{/if}
 </div>

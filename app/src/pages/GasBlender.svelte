@@ -28,7 +28,7 @@
   import { OpenDivesCore } from 'opendives-core';
   import TextField from '../components/TextField.svelte';
   import SelectField from '../components/SelectField.svelte';
-  import Icon from '../components/Icon.svelte';
+  import ButtonGroup from '../components/ButtonGroup.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
   import { formatCylinderSize, formatGasVolume, formatNumber } from '../lib/format.js';
   import { parseDecimal } from '../lib/tools.js';
@@ -210,13 +210,8 @@
     {/snippet}
   </Navbar>
 
-  <div class="od-gas-blender--modes" role="radiogroup" aria-label={t('tools.blendMode')}>
-    {#each MODES as choice (choice)}
-      <button type="button" role="radio" aria-checked={mode === choice} class:od-gas-blender--selected={mode === choice} onclick={() => setMode(choice)}>
-        {#if mode === choice}<Icon name="check" size={18} weight={2.4} />{/if}
-        {t(`tools.${choice}`)}
-      </button>
-    {/each}
+  <div class="od-gas-blender--modes">
+    <ButtonGroup ariaLabel={t('tools.blendMode')} value={mode} options={MODES.map((choice) => ({ value: choice, label: t(`tools.${choice}`) }))} onchange={(choice) => setMode(/** @type {any} */ (choice))} />
   </div>
 
   <h2 class="od-gas-blender--label">{t('tools.blendWanted')}</h2>
@@ -283,13 +278,8 @@
       {/if}
       <h2 class="od-gas-blender--title">{t('tools.blendFill')}</h2>
       {#if trimix}
-        <div class="od-gas-blender--modes od-gas-blender--order" role="radiogroup" aria-label={t('tools.blendOrder')}>
-          {#each ORDERS as choice (choice)}
-            <button type="button" role="radio" aria-checked={order === choice} class:od-gas-blender--selected={order === choice} onclick={() => setOrder(choice)}>
-              {#if order === choice}<Icon name="check" size={18} weight={2.4} />{/if}
-              {t(choice === 'helium' ? 'tools.blendOrderHelium' : 'tools.blendOrderOxygen')}
-            </button>
-          {/each}
+        <div class="od-gas-blender--modes od-gas-blender--order">
+          <ButtonGroup ariaLabel={t('tools.blendOrder')} value={order} options={ORDERS.map((choice) => ({ value: choice, label: t(choice === 'helium' ? 'tools.blendOrderHelium' : 'tools.blendOrderOxygen') }))} onchange={(choice) => setOrder(/** @type {any} */ (choice))} />
         </div>
       {/if}
       <ol class="od-gas-blender--steps" aria-live="polite">
@@ -317,66 +307,8 @@
 
 <style>
   @layer od.components {
-    /* Material 3 segmented buttons; on iOS, a segmented control. */
     .od-gas-blender--modes {
       margin: 8px 16px 0;
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-
-      button {
-        height: 40px;
-        padding: 0 12px;
-        border: 1px solid var(--od-text-2);
-        border-left: none;
-        background: transparent;
-        color: var(--od-text);
-        font: inherit;
-        font-size: 14px;
-        font-weight: 500;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 6px;
-
-        &:first-child {
-          border-left: 1px solid var(--od-text-2);
-          border-radius: 20px 0 0 20px;
-        }
-
-        &:last-child {
-          border-radius: 0 20px 20px 0;
-        }
-
-        &.od-gas-blender--selected {
-          background: var(--od-tint);
-          color: var(--od-on-tint);
-        }
-      }
-
-      :global(.ios) & {
-        padding: 2px;
-        border-radius: 9px;
-        background: var(--od-surface-2);
-        gap: 2px;
-
-        button,
-        button:first-child,
-        button:last-child {
-          height: 32px;
-          border: none;
-          border-radius: 7px;
-          font-size: 13px;
-        }
-
-        button.od-gas-blender--selected {
-          background: var(--od-surface);
-          color: var(--od-text);
-        }
-
-        :global(.od-gas-blender--icon) {
-          display: none;
-        }
-      }
     }
 
     .od-gas-blender--order {
