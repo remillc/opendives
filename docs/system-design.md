@@ -166,6 +166,15 @@ The four sections use the same band as their header, MD3 Small top app bar (☰,
 
 **Android tablet in portrait: no rail (decided on 10 November 2026).** The navigation rail shows only when the window is at least about 1000 dp wide (Android tablet in landscape). Below that width, in portrait on a tablet as on a phone, there is no rail: the first pane's top bar has the ☰ button that opens the modal side menu of the phone (300 dp, scrim, same content: account card, Carnet, Sites, Statistiques, Outils, Réglages, À propos, sync card), and the Carnet's "+" is the floating button at the bottom right of the screen (24 dp from the edges, over the detail pane, under any scrim), not of the list pane. The list and detail panes keep their widths (340 dp list in the Carnet, the detail takes the rest: 459 dp on an 800 dp tablet instead of 363). Landscape is unchanged. Mock-ups: `android-tablette-accueil-portrait.dc.html`, `android-tablette-accueil-portrait-menu.dc.html` (menu open), and every `android-tablette-*-portrait.dc.html`.
 
+**Back arrow in the detail pane, tablets (decided on 11 November 2026).** In the two-pane layouts (list on the left, detail on the right: Carnet, Statistiques, Outils, and Sites when it shows two panes), the detail pane has its own history.
+- **First screen of the pane** (what a row of the list opened: a dive, a trip, a statistic, a tool): no ←. The list is on screen, so there is nothing to go back to: the diver picks another row. The top bar keeps its actions (✎, ⋮), aligned right, with the ← space left empty.
+- **Deeper screens** (opened from inside the pane: dive → site, dive → buddy's dives, trip → dive, statistic → dive): ← at the top left, 48 dp target. It goes back one screen **in the detail pane only**. The list, its scroll position and its selected row do not change.
+- **Android system back** (gesture or button) does the same as ← while the pane has history. When the pane is at its first screen, system back does what it does on the list alone (in Carnet, leaves the app; in another section, goes back to Carnet), and never only clears the selection.
+- **Tasks** (edit a dive, new site, download, add): they keep ✕, never ←, as on the phone (section 7, ✕ closes a full-screen task).
+- **Same in landscape and portrait.** Landscape keeps its rail and its two panes, and follows the same rule. Portrait only differs by the ☰ in the first pane.
+- **iPad:** the same rule, in iOS form. The secondary column of the split view shows the system back button, a "‹" chevron followed by the previous screen's title (for example "‹ Lake Coleridge"), only when it has history. At its first screen it shows no back button. The edge swipe goes back in that column too.
+Mock-ups: `android-tablette-accueil-{paysage,portrait}.dc.html` (first screen, no ←), `android-tablette-carnet-site-{paysage,portrait}.dc.html` (dive → site, with ←).
+
 ## 8. Shared components
 
 Six components do not exist in Framework7; each is a single Svelte component, shared by iOS and Android, which only changes its colours and sizes with the theme.
