@@ -21,6 +21,7 @@
   import Icon from '../components/Icon.svelte';
   import ChoiceDialog from '../components/ChoiceDialog.svelte';
   import ProfileThumbnail from '../components/ProfileThumbnail.svelte';
+  import { navigation } from '../lib/navigation.svelte.js';
   import { afterDownload, logbook } from '../lib/logbook.svelte.js';
   import { settings } from '../lib/settings.svelte.js';
   import { downloadSalinity } from '../lib/tools.js';
@@ -278,6 +279,7 @@
   }
 
   onMount(async () => {
+    navigation.downloadPanes++;
     listeners.push(
       await OpenDivesCore.addListener('bluetoothDevice', (/** @type {BluetoothDevice} */ d) => {
         found = { ...found, [d.mac]: d };
@@ -322,6 +324,7 @@
   onDestroy(() => {
     // Left with Back or the menu while downloading: the download stops.
     const running = phase === 'downloading' && !leaving;
+    navigation.downloadPanes--;
     leaving = true;
     for (const l of listeners) l.remove();
     OpenDivesCore.stopBluetoothScan().catch(() => {});
@@ -601,6 +604,12 @@
       display: flex;
       align-items: center;
       justify-content: center;
+
+      /* Android: the computer icon in tertiary. */
+      :global(.md) & {
+        background: var(--od-tertiary-container);
+        color: var(--od-tertiary);
+      }
     }
 
     .od-download--texts {

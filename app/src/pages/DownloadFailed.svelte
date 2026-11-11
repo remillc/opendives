@@ -10,11 +10,12 @@
   // &received=N: dives arrived before the failure. As Subsurface-mobile, they
   // can be kept (one undoable step, as a full download); otherwise they are
   // dropped when this screen closes.
-  import { onDestroy } from 'svelte';
+  import { onDestroy, onMount } from 'svelte';
   import { Page, Navbar, Link, theme } from 'framework7-svelte';
   import { OpenDivesCore } from 'opendives-core';
   import Icon from '../components/Icon.svelte';
   import { keepReceived } from '../lib/download.js';
+  import { navigation } from '../lib/navigation.svelte.js';
   import { t } from '../lib/i18n.js';
 
   /** @type {{ f7route: { query: { computer?: string, reason?: string, received?: string } }, f7router: any }} */
@@ -36,7 +37,12 @@
     }
   }
 
+  onMount(() => {
+    navigation.downloadPanes++;
+  });
+
   onDestroy(() => {
+    navigation.downloadPanes--;
     if (received) OpenDivesCore.downloadPartial({ action: 'discard' }).catch(() => {});
   });
 
@@ -58,8 +64,15 @@
   </Navbar>
 
   <div class="od-download-failed--content">
-    <h1>{computer ? t(`downloadFailed.${reason}.title`, { computer }) : t(`downloadFailed.${reason}.titleNoName`)}</h1>
-    <p class="od-download-failed--text">{t(`downloadFailed.${reason}.text`)} {t('downloadFailed.nothingChanged')}</p>
+    <div class="od-download-failed--header" class:od-download-failed--header-md={!theme.ios}>
+      {#if !theme.ios}
+        <span class="od-download-failed--badge" aria-hidden="true"><Icon name="bluetoothOff" size={30} /></span>
+      {/if}
+      <div class="od-download-failed--header-texts">
+        <h1>{computer ? t(`downloadFailed.${reason}.title`, { computer }) : t(`downloadFailed.${reason}.titleNoName`)}</h1>
+        <p class="od-download-failed--text">{t(`downloadFailed.${reason}.text`)} {t('downloadFailed.nothingChanged')}</p>
+      </div>
+    </div>
     {#if received}
       <div class="od-download-failed--received">
         <p class="od-download-failed--text">{t('downloadFailed.received', { n: received })}</p>
@@ -88,6 +101,39 @@
   @layer od.components {
     .od-download-failed--content {
       margin: 16px 24px 0;
+    }
+
+    /* Android: a 56 dp pale alarm circle with the crossed-out Bluetooth icon, then
+       the title and the sentence 4 dp apart, the icon centred on that group. */
+    .od-download-failed--header-md {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+
+      h1 {
+        margin: 0 0 4px;
+      }
+
+      .od-download-failed--text {
+        font-size: 18px;
+        line-height: 26px;
+      }
+    }
+
+    .od-download-failed--badge {
+      flex: none;
+      width: 56px;
+      height: 56px;
+      border-radius: 28px;
+      background: var(--od-alarm-tint);
+      color: var(--od-alarm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .od-download-failed--header-texts {
+      min-width: 0;
     }
 
     h1 {
