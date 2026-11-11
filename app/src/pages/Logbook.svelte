@@ -15,6 +15,7 @@
   import BandBackdrop from '../components/BandBackdrop.svelte';
   import Icon from '../components/Icon.svelte';
   import FabMenu from '../components/FabMenu.svelte';
+  import FloatingToolbar from '../components/FloatingToolbar.svelte';
   import MenuItem from '../components/MenuItem.svelte';
   import MenuButton from '../components/MenuButton.svelte';
   import SectionBand from '../components/SectionBand.svelte';
@@ -159,7 +160,6 @@
   function startSelection(id) {
     checked = { [id]: true };
     selecting = true;
-    if (fabEl) f7.fab.close(fabEl);
     closeMenu();
   }
 
@@ -1061,26 +1061,6 @@
       })
       .open();
   }
-
-  // Android "+": a floating button that opens its choices above it. The links
-  // are "external" (no routing), which Framework7's own click handling skips:
-  // the button and the choices open and close it here; Framework7 closes it
-  // on the scrim. Its state is followed for screen readers.
-  /** @type {HTMLElement|undefined} */
-  let fabEl = $state();
-  let fabOpen = $state(false);
-  $effect(() => {
-    const el = fabEl;
-    if (!el) return;
-    const opened = () => (fabOpen = true);
-    const closed = () => (fabOpen = false);
-    el.addEventListener('fab:open', opened);
-    el.addEventListener('fab:close', closed);
-    return () => {
-      el.removeEventListener('fab:open', opened);
-      el.removeEventListener('fab:close', closed);
-    };
-  });
 </script>
 
 <Page class="od-logbook" onPageInit={keepInSvelteRange}>
@@ -1259,7 +1239,7 @@
         <MenuItem icon="renumber" text={t('logbook.menuRenumberChecked', { n: checkedCount })} onclick={() => (renumbering = true)} />
       {/if}
       {#if selecting}
-        <MenuItem icon="plus" text={t('logbook.menuCreateTrip')} onclick={createTrip} />
+        {#if theme.ios}<MenuItem icon="plus" text={t('logbook.menuCreateTrip')} onclick={createTrip} />{/if}
         {#if checkedTrips.length}
           <MenuItem icon="ungroup" text={t('logbook.menuDeleteTrip', { n: checkedTrips.length })} destructive onclick={deleteCheckedTrips} />
         {/if}
@@ -1274,16 +1254,18 @@
           {@const id = neighbourTrips.below}
           <MenuItem icon="arrowDown" text={t('logbook.menuAddBelow', { n: checkedCount })} onclick={() => addToTrip(id)} />
         {/if}
-        <MenuItem
-          icon="download"
-          text={t('logbook.menuExport')}
-          onclick={() => {
-            f7.popover.close('.od-logbook-menu');
-            exporting = true;
-          }}
-        />
-        <li class="od-menu-divider" role="separator"></li>
-        <MenuItem icon="delete" text={t('logbook.menuDelete')} destructive onclick={deleteChecked} />
+        {#if theme.ios}
+          <MenuItem
+            icon="download"
+            text={t('logbook.menuExport')}
+            onclick={() => {
+              f7.popover.close('.od-logbook-menu');
+              exporting = true;
+            }}
+          />
+          <li class="od-menu-divider" role="separator"></li>
+          <MenuItem icon="delete" text={t('logbook.menuDelete')} destructive onclick={deleteChecked} />
+        {/if}
       {/if}
     </List>
   </Popover>
@@ -1351,57 +1333,31 @@
           <Icon name="close" /><span class="od-sr-only">{t('logbook.selectionClose')}</span>
         </button>
         <span class="od-logbook--selection-count od-value" role="status">{t('logbook.selected', { n: checkedCount })}</span>
-        <a href="#" class="link icon-only od-logbook--popover-open od-logbook--selection-more" data-popover=".od-logbook-menu" role="button">
-          {#if theme.ios}<Icon name="moreCircle" />{:else}<Icon name="more" weight={4} />{/if}
-          <span class="od-sr-only">{t('detail.moreOptions')}</span>
-        </a>
+        {#if theme.ios}
+          <a href="#" class="link icon-only od-logbook--popover-open od-logbook--selection-more" data-popover=".od-logbook-menu" role="button">
+            <Icon name="moreCircle" />
+            <span class="od-sr-only">{t('detail.moreOptions')}</span>
+          </a>
+        {/if}
       </div>
+      <!-- Android: the actions of the selection in a floating toolbar (Material 3 Expressive). -->
+      {#if !theme.ios}
+        <FloatingToolbar
+          label={t('logbook.selectionActions')}
+          actions={[
+            { key: 'trip', icon: 'plus', label: t('logbook.menuCreateTrip'), text: t('logbook.menuCreateTrip'), onclick: createTrip },
+            { key: 'export', icon: 'download', label: t('logbook.toolbarExport'), onclick: () => (exporting = true) },
+            { key: 'delete', icon: 'delete', label: t('logbook.menuDelete'), onclick: deleteChecked },
+            { key: 'more', icon: 'more', label: t('logbook.selectionMore'), menu: '.od-logbook-menu' },
+          ]}
+        />
+      {/if}
     {/if}
-    {#if !theme.ios && layout.split && logbook.dives.length && !selecting}
+    {#if !theme.ios && logbook.dives.length && !selecting}
       <!-- Hidden while the download pane shows: it is the task the + opened, and it covered "Retry". -->
       {#if !navigation.downloadPanes}
         <FabMenu choices={addChoices} onchoose={choose} />
       {/if}
-    {:else if !theme.ios && logbook.dives.length && !selecting}
-      <!--
-        Written by hand: the Fab component of framework7-svelte 9 calls onclick
-        twice and leaves the link without a name for screen readers.
-      -->
-      <div class="fab-backdrop"></div>
-      <div class="fab fab-right-bottom od-fab-add" bind:this={fabEl}>
-        <a
-          href="#add"
-          class="external"
-          role="button"
-          aria-expanded={fabOpen}
-          aria-controls="od-add-choices"
-          onclick={(e) => {
-            e.preventDefault();
-            f7.fab.toggle(fabEl);
-          }}
-        >
-          <i class="icon"><Icon name="plus" /></i>
-          <i class="icon"><Icon name="close" /></i>
-          <span class="od-sr-only">{t('logbook.add')}</span>
-        </a>
-        <div class="fab-buttons fab-buttons-top" id="od-add-choices">
-          {#each addChoices as choice (choice.key)}
-            <a
-              href="#{choice.key}"
-              class="external fab-label-button"
-              role="button"
-              onclick={(e) => {
-                e.preventDefault();
-                f7.fab.close(fabEl);
-                choose(choice.key);
-              }}
-            >
-              <span><Icon name={choice.icon} /></span>
-              <span class="fab-label">{choice.text}</span>
-            </a>
-          {/each}
-        </div>
-      </div>
     {/if}
   {/snippet}
 </Page>

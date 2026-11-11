@@ -221,9 +221,9 @@ The first impression of the app continues past first launch: the pages that set 
 - **Git note:** the note under the git form reads only "Le jeton reste chiffré sur cet appareil." (13 sp, `--od-on-surface-variant`), with no background.
 Mock-ups: `compte-connexion-android.dc.html`, `compte-connexion-encours-android.dc.html`, `compte-connexion-erreur-android.dc.html`, `compte-creation-android.dc.html`, `compte-code-android.dc.html`, `compte-code-erreur-android.dc.html`, `android-compte-import.dc.html`, `compte-import-identifiants-android.dc.html`, `compte-import-encours-android.dc.html`, `compte-import-echec-android.dc.html`, `git-config-android.dc.html`, `git-config-erreur-android.dc.html`, `git-config-adresse-android.dc.html`; tablet `android-tablette-compte-connexion-{paysage,portrait}.dc.html`, `android-tablette-compte-creation-…`, `android-tablette-depot-git-…`.
 
-### FAB menu (Android tablet, decided on 10 November 2026)
+### FAB menu (Android, decided on 10 November 2026; phone too since 11 November 2026)
 
-On an Android tablet, in landscape and portrait, the Carnet's "+" opens the Material 3 Expressive FAB menu instead of a bottom sheet. The phone keeps its sheet for now.
+On Android, on phone and tablet (landscape and portrait), the Carnet's "+" opens the Material 3 Expressive FAB menu (`od-fab-menu`, `FabMenu.svelte`) instead of a bottom sheet; on the phone it is anchored at the FAB's place (`android-ajout.dc.html`). iOS keeps its action sheet.
 - **Items,** right-aligned above the button, from bottom to top: "Télécharger depuis l’ordinateur" (primary, `--od-on-surface` #1F2124 background, #F4F4F2 text), "Importer un fichier", "Noter une plongée à la main" (tonal, #E3E1DC background, #1F2124 text). Each is a 56 dp pill, 24 dp padding on both sides, 24 dp icon, 8 dp between icon and label, label 16 sp weight 500 (Title Medium).
 - **Spacing (wider than the Expressive default, so a finger cannot press two items):** 16 dp between items, 24 dp between the lowest item and the close button.
 - **Close button:** the FAB becomes a 56 dp circle in `--od-on-surface` with a ✕, in the FAB's place (24 dp from the right and bottom edges). Scrim rgba(0, 0, 0, 0.16) over the screen; tapping it, ✕ or system back closes the menu.
@@ -245,6 +245,17 @@ Mock-ups: `android-tablette-ajout-paysage.dc.html`, `android-tablette-ajout-port
 - **Shape:** it holds, then morphs between the Expressive polygons (soft burst, 9-sided cookie, pentagon, pill, sunny, 4-sided cookie, oval) while turning; the morph interpolates the shapes' radii.
 - **Colour:** the water gradient from top to bottom, `--od-loading-indicator-top` and `--od-loading-indicator-bottom` (light sand #F3C47A to rust #B4530F; dark honey #E5B961 to amber #EF7625).
 - **Accessibility:** `role="status"` with its `aria-label`. With "Remove animations", one static shape.
+### Floating toolbar (Android, decided on 11 November 2026)
+
+`FloatingToolbar.svelte`, class `od-floating-toolbar` (parts `od-floating-toolbar--button`, `--primary`, `--text`; modifiers `--hidden`, `--clear-fab`). The Material 3 Expressive vibrant floating toolbar, at the bottom centre of the page, 24 dp above the bottom edge: 64 dp high, fully rounded, 8 dp inner padding, 4 dp between actions, shadow like the FAB menu. Colours are `--od-toolbar-container` / `--od-toolbar-on-container` (ink with light icons; dark mode: light container with dark icons) and `--od-toolbar-primary` / `--od-toolbar-on-primary` for the primary pill.
+- **Actions:** the first is the primary pill (48 dp high, icon and label, 14 sp weight 500); the others are 48 dp icon buttons, each with an accessible name. The last one, ⋮, opens a menu (`aria-haspopup="menu"`, an `od-menu` popover).
+- **Dive detail:** Modifier (primary), Partager, Planifier depuis cette plongée, ⋮ (Renuméroter, Retirer du voyage, Supprimer). The top bar keeps only ←.
+- **Carnet selection:** Créer un voyage (primary), Exporter, Supprimer, ⋮ (Filtrer, Renuméroter, Ajouter au voyage…). The top bar keeps ✕ and the count.
+- **Scrolling:** it hides while the page scrolls down (it slides out and fades with the Expressive "fast spatial" spring) and comes back on scrolling up, and when the end of the content is reached. The page content gets a bottom padding of 104 dp so the last row is never covered. With "Remove animations" it appears and disappears at once.
+- **Tablets:** it sits in the page of the pane that owns the actions (the detail pane, or the list pane for the selection), centred; on a tablet in portrait, the detail's toolbar stays to the left of the "+" (`--clear-fab`).
+- **Accessibility:** `role="toolbar"` with a label; one tab stop (roving tabindex), Left and Right arrows, Home and End move inside; hidden, it is `inert`.
+- iOS does not use it.
+Mock-ups: `detail3-android.dc.html`, `detail3-android-curseur.dc.html`, `detail3-android-sombre.dc.html`, `carnet-selection-android.dc.html`, `carnet-selection-menu-android.dc.html`, `android-tablette-detail-menu-*.dc.html`, `android-tablette-carnet-selection-*.dc.html`.
 
 ### Text fields
 

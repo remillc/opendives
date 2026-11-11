@@ -91,6 +91,9 @@
     },
     "menuRenumber": "Renuméroter les plongées",
     "selectionClose": "Quitter la sélection",
+    "selectionActions": "Actions sur la sélection",
+    "selectionMore": "Plus d’options : filtrer, renuméroter, ajouter à un voyage",
+    "toolbarExport": "Exporter",
     "countFiltered": {
       "one": "{n} plongée sur {total}",
       "other": "{n} plongées sur {total}"
@@ -239,6 +242,8 @@
     "errorText": "Aucune plongée n'a été modifiée. Revenez au carnet, puis rouvrez la plongée.",
     "edit": "Modifier",
     "moreOptions": "Plus d'options",
+    "actions": "Actions de la plongée",
+    "moreOptionsList": "Plus d’options : renuméroter, retirer du voyage, supprimer",
     "plan": "Planifier depuis cette plongée",
     "number": "N° {number}",
     "figureMaxDepth": "au plus profond",
@@ -1443,6 +1448,7 @@
       "Android : les choix exclusifs (système d’unités, mode de plongée du filtre, Nitrox / Trimix et ordre de gonflage du mélangeur) sont des groupes de boutons connectés, et chaque menu déroulant montre un chevron vers le bas au lieu d’un triangle plein.",
       "Android : « Synchroniser maintenant » devient un bouton scindé quand la synchronisation est manuelle (menu du chevron : passer en synchronisation automatique, voir les modifications non envoyées) ; l’en-tête de Statistiques et d’Outils se réduit en défilant, comme celui du Carnet.",
       "Android : la progression s’affiche en ligne ondulée (téléchargement depuis l’ordinateur, téléchargement et mise à jour des cartes hors ligne, connexion), et les cercles qui tournent sont remplacés par une petite forme qui se transforme pendant l’attente (ordinateurs à proximité, étape de l’import, bouton « Connexion… »). Avec « Supprimer les animations », l’onde et la forme restent immobiles.",
+    "Android : les actions d’une plongée (Modifier, Partager, Planifier depuis cette plongée et le menu ⋮) et celles de la sélection du Carnet (Créer un voyage, Exporter, Supprimer, ⋮) sont dans une barre d’outils flottante au bas de l’écran. Elle se cache quand vous faites défiler vers le bas et revient quand vous remontez. Le « + » du Carnet ouvre le même menu de choix que sur tablette, à la place d’une feuille du bas.",
       "Planificateur : les menus Oxygène et Hélium proposent toutes les valeurs de 1 en 1 % (oxygène de 5 à 100 %, hélium de 0 à 95 %), et « Autre valeur… » disparaît. Un mélange qui dépasse 100 % est signalé en erreur sur les deux champs.",
       "Planificateur : l’oxygène, l’hélium, la consommation (SAC) et l’altitude sont des menus déroulants de valeurs usuelles (« Autre valeur… » permet d’en saisir une autre ; le clavier s’ouvre sur le même champ). Une valeur hors de la liste, comme 33 % lue sur une plongée, s’affiche dans le champ et figure en tête du menu. Une consommation mesurée sur une plongée est arrondie à 0,01 cuft/min (0,5 L/min) avant d’être affichée ou utilisée.",
       "Planificateur : « Réglages du planificateur » dans le menu ⋮ ouvre bien les réglages ; « Planifier depuis cette plongée » fonctionne aussi depuis une plongée ouverte dans Statistiques ou Sites.",
