@@ -552,6 +552,9 @@ import { registerPlugin } from '@capacitor/core';
  *   credentials are stored. "import": the downloaded file, deleted afterwards.
  * @property {(options: {id: number, changes: Record<string, string|number|string[]>}) => Promise<EditResult>} editDive
  *   One undoable step; only the fields named change (edit_dive in opendives.h).
+ *   `cylinders` is the list of JSON entries ({index, ...fields}, index -1 for a new cylinder): the order of
+ *   the entries that have an index is the new order of those cylinders, and the dive's gas changes and
+ *   tank-sensor mappings follow them (Subsurface's cylinder_renumber()). New cylinders stay at the end.
  * @property {(options?: {redo?: boolean}) => Promise<EditResult>} undo
  * @property {(options: {kind: 'list'|'site'|'nearby'|'duplicates'|'without'|'place', uuid?: number, lat?: number, lon?: number, a?: number, b?: number, text?: string}) => Promise<any>} siteQuery
  *   Read-only site queries (opendives.h): list of SiteSummary, a SiteDetail, the site

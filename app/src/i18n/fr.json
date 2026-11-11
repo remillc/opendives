@@ -935,6 +935,18 @@
     "removeCylinder": "Retirer la bouteille",
     "cylinderInUse": "Une bouteille utilisée dans le profil ne peut pas être retirée. Rien n’a changé.",
     "noType": "Sans type",
+    "otherType": "Autre…",
+    "moveCylinder": "Déplacer la bouteille {n}",
+    "moveCylinderUp": "Monter la bouteille {n}",
+    "moveCylinderDown": "Descendre la bouteille {n}",
+    "cylinderMoved": "Bouteille {n} déplacée en position {to}",
+    "consumed": "{amount} consommés",
+    "gasName": {
+      "air": "Air",
+      "oxygen": "Oxygène",
+      "nitrox": "EAN{o2}",
+      "trimix": "Trimix {o2}/{he}"
+    },
     "weightsTitle": "Lest",
     "weightPlace": "Emplacement",
     "weight": "Poids",
@@ -1459,6 +1471,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "“Modifier une plongée” (Android) : chaque bouteille est une carte avec son gaz en clair (« Trimix 16/45 », « EAN32 », « Air », « Oxygène »). Le volume et la pression de service viennent du type de bouteille et s’affichent sous lui (« 16 cuft HP », « 80 cuft », « 11,1 L LP ») ; « Autre… » permet de les saisir pour une bouteille hors de la liste, et les valeurs d’une plongée ne sont jamais écrasées. Sous « Fin », la pression consommée. Une poignée déplace les cartes (glisser, ou « Monter » / « Descendre » pour TalkBack) ; les changements de gaz de la plongée suivent leur bouteille.",
       "Android : les champs de date se terminent par une icône de calendrier et les champs d’heure par une icône d’horloge, au lieu d’un chevron (Modifier la plongée, planificateur, Nouvelle plongée) ; le champ Heure de « Modifier la plongée » est plus large, « 10:00 » n’est plus coupé.",
       "Android : chaque choix dans une liste est désormais un menu déroulant qui s’ouvre juste sous son champ (mode de plongée, type d’eau, bouteille, gaz, CAR, altitude, branche git, critère de statistique). La ppO₂ maximale des outils de gaz et les seuils de pO₂ des Réglages sont aussi des menus déroulants, à la place des roues. Dans « Modifier la plongée », le champ Site ouvre un menu avec une zone de recherche et « Nouveau site… ».",
       "Android : les titres du Carnet, des Statistiques et des Outils sont plus grands en haut de l’écran (28 sp, avec le résumé dessous) et reprennent leur taille habituelle dans la barre du haut quand vous faites défiler.",

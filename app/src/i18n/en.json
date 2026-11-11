@@ -935,6 +935,18 @@
     "removeCylinder": "Remove the cylinder",
     "cylinderInUse": "A cylinder used in the profile cannot be removed. Nothing changed.",
     "noType": "No type",
+    "otherType": "Other…",
+    "moveCylinder": "Move cylinder {n}",
+    "moveCylinderUp": "Move cylinder {n} up",
+    "moveCylinderDown": "Move cylinder {n} down",
+    "cylinderMoved": "Cylinder {n} moved to position {to}",
+    "consumed": "{amount} used",
+    "gasName": {
+      "air": "Air",
+      "oxygen": "Oxygen",
+      "nitrox": "EAN{o2}",
+      "trimix": "Trimix {o2}/{he}"
+    },
     "weightsTitle": "Weights",
     "weightPlace": "Location",
     "weight": "Weight",
@@ -1459,6 +1471,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "“Edit dive” (Android): each cylinder is a card with its gas in plain words (“Trimix 16/45”, “EAN32”, “Air”, “Oxygen”). Size and working pressure come from the cylinder type and show under it (“16 cuft HP”, “80 cuft”, “11.1 L LP”); “Other…” lets you type them for a cylinder outside the list, and a dive’s own values are never overwritten. Under “End”, the pressure used. A handle moves the cards (drag, or “Move up” / “Move down” for TalkBack); the gas changes of the dive follow their cylinder.",
       "Android: date fields end with a calendar icon and time fields with a clock icon instead of a chevron (Edit dive, the planner, New dive); the Time field of “Edit dive” is wider, so “10:00” is no longer cut off.",
       "Android: every choice from a list is now one dropdown menu that opens right under its field (dive mode, water type, cylinder, gases, SAC, altitude, git branch, statistic criterion). The maximum pO₂ of the gas tools and the pO₂ thresholds in Settings are dropdowns too, instead of wheels. In “Edit dive”, the site field opens a menu with a search box and “New site…”.",
       "Android: the Logbook, Statistics and Tools titles are bigger when you are at the top of the screen (28 sp, with the summary under them) and shrink to the usual size in the top bar as you scroll.",

@@ -50,7 +50,7 @@ FLAGS="-std=c++20 -O1 -w
   echo "$ROOT/core/libopendives/settings.cpp"; echo "$ROOT/core/libopendives/plan.cpp"
   echo "$ROOT/core/libopendives/filter.cpp"; echo "$ROOT/core/libopendives/account.cpp"
   echo "$ROOT/core/libopendives/stats.cpp"; echo "$ROOT/tests/stats_test.cpp"
-  echo "$ROOT/core/libopendives/download.cpp"; echo "$ROOT/tests/download_test.cpp"; } > "$B/sources.txt"
+  echo "$ROOT/core/libopendives/download.cpp"; echo "$ROOT/tests/download_test.cpp"; echo "$ROOT/tests/cylinder_reorder_test.cpp"; } > "$B/sources.txt"
 
 # Objects are only rebuilt when their source is newer: compiled again in full
 # when the flags change (BT_SUPPORT and BLE_SUPPORT enable Subsurface's
@@ -64,7 +64,7 @@ export FLAGS B
 xargs -P"$JOBS" -I{} bash -c 'o="$B/obj/$(basename {} .cpp).o"; [ "$o" -nt {} ] || g++ $FLAGS -c {} -o "$o"' < "$B/sources.txt"
 
 # 4. Link.
-OBJS=$(ls "$B"/obj/*.o | grep -Ev '/(roundtrip|facade|cloud|edit_roundtrip|cloud_write|regions_test|tools_test|plan_test|plan_oracle|account_test|git_remote_test|stats_test|download_test|opendives|edit|regions|tools|settings|plan|filter|account|stats|download)[.]o$')
+OBJS=$(ls "$B"/obj/*.o | grep -Ev '/(roundtrip|facade|cloud|edit_roundtrip|cloud_write|regions_test|tools_test|plan_test|plan_oracle|account_test|git_remote_test|stats_test|download_test|cylinder_reorder_test|opendives|edit|regions|tools|settings|plan|filter|account|stats|download)[.]o$')
 FACADE="$B/obj/opendives.o $B/obj/edit.o $B/obj/regions.o $B/obj/tools.o $B/obj/settings.o $B/obj/plan.o $B/obj/filter.o $B/obj/account.o $B/obj/stats.o $B/obj/download.o"
 LIBS="$B/libdc/lib/libdivecomputer.a $(pkg-config --libs libgit2 libxml-2.0 libxslt libzip sqlite3) -lssl -lcrypto -lz -lm"
 g++ $OBJS $FACADE "$B/obj/roundtrip.o" -o "$B/roundtrip" $LIBS
@@ -80,4 +80,5 @@ g++ $OBJS $FACADE "$B/obj/account_test.o" -o "$B/account" $LIBS
 g++ $OBJS $FACADE "$B/obj/git_remote_test.o" -o "$B/git-remote" $LIBS
 g++ $OBJS $FACADE "$B/obj/stats_test.o" -o "$B/stats" $LIBS
 g++ $OBJS $FACADE "$B/obj/download_test.o" -o "$B/download" $LIBS
+g++ $OBJS $FACADE "$B/obj/cylinder_reorder_test.o" -o "$B/cylinder-reorder" $LIBS
 echo "built $B/account $B/git-remote $B/stats $B/download $B/plan $B/regions $B/tools $B/roundtrip $B/facade $B/cloud $B/edit-roundtrip $B/cloud-write"
