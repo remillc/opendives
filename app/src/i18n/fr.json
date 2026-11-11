@@ -1209,6 +1209,7 @@
     "failed": "Les plongées n'ont pas pu être renumérotées. Aucune plongée n'a été modifiée."
   },
   "dialog": {
+    "close": "Fermer",
     "ok": "OK",
     "cancel": "Annuler"
   },
@@ -1494,6 +1495,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "« Modifier la plongée » : la fiche d’une bouteille se ferme en touchant sa poignée ou en la faisant glisser vers le bas.",
       "« Modifier la plongée » : un nouveau groupe Gaz avant Équipement. Il contient le mode de plongée et un dessin de chaque bouteille, remplie jusqu’à sa pression de fin, avec son gaz et sa pression. Touchez une bouteille pour la modifier dans une feuille, ou n’importe où ailleurs sur le dessin pour la page Gaz : une carte par bouteille, les profondeurs de changement de gaz et « Ajouter une bouteille ». Chaque bouteille a son « Supprimer la bouteille N », qui demande confirmation et dit quand le profil utilise la bouteille. Rien n’est enregistré avant Enregistrer.",
       "“Modifier une plongée” (Android) : chaque bouteille est une carte avec son gaz en clair (« Trimix 16/45 », « EAN32 », « Air », « Oxygène »). Le volume et la pression de service viennent du type de bouteille et s’affichent sous lui (« 16 cuft HP », « 80 cuft », « 11,1 L LP ») ; « Autre… » permet de les saisir pour une bouteille hors de la liste, et les valeurs d’une plongée ne sont jamais écrasées. Sous « Fin », la pression consommée. Une poignée déplace les cartes (glisser, ou « Monter » / « Descendre » pour TalkBack) ; les changements de gaz de la plongée suivent leur bouteille.",
       "« Modifier la plongée » : la section Conditions est repliée au départ ; son en-tête montre la température de l’eau et la moyenne des notes en étoiles. Touchez-le pour l’ouvrir.",
