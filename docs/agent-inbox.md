@@ -1425,3 +1425,11 @@ Mock-ups: `docs/mockups/android-planificateur.dc.html` (plan from a dive), `docs
 Mock-ups: `docs/mockups/android-planificateur-nouveau.dc.html` and `docs/mockups/android-tablette-planificateur-{paysage,portrait}.dc.html` (these copies also carry the gas dropdowns of task 32 and the two SAC fields of task 33).
 - In the "Nouvelle plongée · Sans plongée de départ" card, the "+" icon suggested adding something. Replace it with an empty thumbnail: in the same 56 × 36 dp slot as a starting dive's profile thumbnail, the outline of a dive profile in a dashed grey line (`--od-outline`, 1.5 dp, dashes of 3 dp). Decorative, hidden from screen readers. "Changer" stays.
 - A line in the release notes.
+
+## [ ] 2026-11-11-35 Planner: altitude as a dropdown menu
+
+Mock-ups: `docs/mockups/android-planificateur{,-nouveau,-menu}.dc.html`, `docs/mockups/android-tablette-planificateur-{paysage,portrait}.dc.html` (Conditions section).
+- The "Altitude" field becomes a filled dropdown menu like the gas fields of task 32: same 56 dp size, value with its unit ("0 ft"), downward chevron. Accessible name: "Altitude : 0 ft".
+- Menu content, in the diver's depth unit: feet 0, 1 000, 2 000, 3 000, 5 000, 7 000, 10 000; metres 0, 300, 600, 1 000, 1 500, 2 000, 3 000; then "Autre valeur…" (same key as task 32), which opens the numeric keyboard on the field. A value outside the list (for example read from a dive) shows in the field and is checked in the menu above the usual values.
+- Every planner screen, phone and tablet.
+- A line in the release notes.
