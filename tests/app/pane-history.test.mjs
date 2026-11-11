@@ -58,7 +58,8 @@ test('the pane is read from the classes of Framework7', () => {
 
 test('the first screen hides its ←, a deeper one keeps it (App.svelte)', () => {
   const css = readFileSync(new URL('../../app/src/App.svelte', import.meta.url), 'utf8');
-  assert.match(css, /\.view-master-detail \.page-master-detail-root \.navbar \.left \.back\)/);
+  // The download panes are excluded: they keep their ✕ (task 2026-11-10-30).
+  assert.match(css, /\.view-master-detail \.page-master-detail-root(:not\([^)]*\))? \.navbar \.left \.back\)/);
   assert.doesNotMatch(css, /\.view-master-detail \.page-master-detail \.navbar \.left/);
 });
 
