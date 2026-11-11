@@ -26,6 +26,7 @@
   import { logbook, deleteDive, tripChange } from '../lib/logbook.svelte.js';
   import { layout } from '../lib/layout.svelte.js';
   import { offerUndo } from '../lib/undo.js';
+  import { confirmAction } from '../lib/dialogs.js';
   import { readySiteMap } from '../lib/site-image.js';
   import { forgetDive, keepDive, preloadDives, readyDive } from '../lib/dive-preload.js';
   import {
@@ -118,11 +119,21 @@
   const menuId = `dive-menu-${uid}`;
   const diveId = $derived(f7route.params.id);
 
-  // "Delete the dive" (⋮ menu, task 2026-11-07-28): no confirmation, the
-  // core's undoable delete as in Subsurface, then back to the logbook with
-  // "Annuler" for 10 seconds; undone, the dive is back at its place. Beside
-  // the list (tablet), the next dive of the list takes its place, or the
-  // empty pane when none is left.
+  // "Delete the dive" (⋮ menu, task 2026-11-07-28, to-do #15): the same
+  // confirmation as a Logbook selection of one dive, then the core's undoable
+  // delete as in Subsurface and back to the logbook with "Annuler" for 10
+  // seconds; undone, the dive is back at its place. Beside the list (tablet),
+  // the next dive of the list takes its place, or the empty pane when none is
+  // left.
+  function confirmDelete() {
+    confirmAction({
+      title: t('logbook.deleteTitle', { n: 1 }),
+      text: t(logbook.mode === 'git' ? 'logbook.deleteTextGit' : 'logbook.deleteText', { n: 1 }),
+      action: t('logbook.deleteAction'),
+      onConfirm: deleteNow,
+    });
+  }
+
   async function deleteNow() {
     const id = Number(diveId);
     const order = [...logbook.dives].sort((a, b) => b.date.localeCompare(a.date));
@@ -458,7 +469,7 @@
       {/if}
       <li class="od-menu-divider" role="separator"></li>
       <!-- Alarm colour on Android (floating toolbar menu); iOS keeps ink. -->
-      <MenuItem icon="delete" text={t('detail.delete')} destructive={!theme.ios} onclick={deleteNow} />
+      <MenuItem icon="delete" text={t('detail.delete')} destructive={!theme.ios} onclick={confirmDelete} />
     </List>
   </Popover>
 
