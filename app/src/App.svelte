@@ -313,21 +313,31 @@
       background: var(--od-surface);
     }
 
+    /* Android download panes: the computers are white cards on the page background. */
+    :global(.md .view-master-detail .page-master-detail:is(.od-download, .od-download-failed)) {
+      background: var(--od-background);
+
+      :global(.navbar-bg) {
+        background: var(--od-background);
+      }
+    }
+
     /* First screen of the detail pane (what a row of the list opened): no Back button, the list stays on screen.
+       The download pages keep their ✕: it closes the task (back to the previous pane).
        A screen opened from inside the pane keeps its ← (lib/pane-history.js). */
-    :global(.view-master-detail .page-master-detail-root .navbar .left .back) {
+    :global(.view-master-detail .page-master-detail-root:not(.od-download, .od-download-failed) .navbar .left .back) {
       display: none;
     }
 
     /* No ☰ button on a tablet and no Back button beside the list: no empty button bubble (iOS). */
     :global(.views.od-tablet .navbar .left:not(:has(a, button))),
-    :global(.view-master-detail .page-master-detail-root .navbar .left) {
+    :global(.view-master-detail .page-master-detail-root:not(.od-download, .od-download-failed) .navbar .left) {
       display: none;
     }
 
     /* Without a button before it, the title keeps the side margin of the pane. */
     :global(.views.od-tablet .navbar .left:not(:has(a, button)) + .title),
-    :global(.view-master-detail .page-master-detail-root .navbar .left + .title) {
+    :global(.view-master-detail .page-master-detail-root:not(.od-download, .od-download-failed) .navbar .left + .title) {
       margin-left: 16px;
     }
 

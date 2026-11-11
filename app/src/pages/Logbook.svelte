@@ -1358,7 +1358,10 @@
       </div>
     {/if}
     {#if !theme.ios && layout.split && logbook.dives.length && !selecting}
-      <FabMenu choices={addChoices} onchoose={choose} />
+      <!-- Hidden while the download pane shows: it is the task the + opened, and it covered "Retry". -->
+      {#if !navigation.downloadPanes}
+        <FabMenu choices={addChoices} onchoose={choose} />
+      {/if}
     {:else if !theme.ios && logbook.dives.length && !selecting}
       <!--
         Written by hand: the Fab component of framework7-svelte 9 calls onclick

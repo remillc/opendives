@@ -1373,7 +1373,7 @@ Spec: System design, section 7, "Android tablet in landscape: '+' out of the rai
 
 Done in branch `feature/tablet-fab-menu`: `FabMenu.svelte` (Android tablet, from 768 dp), floating "+" on every tablet width, "+" removed from the rail.
 
-## [ ] 2026-11-10-30 Android download: computers as cards, failure header, tablet details
+## [x] 2026-11-10-30 Android download: computers as cards, failure header, tablet details
 
 The download screens were drawn from the current `Download.svelte`, then changed in review. Mock-ups (new or updated in `docs/mockups/`):
 - phone: `android-telechargement-autorisation`, `-refusee`, `-desactive`, `-choix`, `-encours`, and `android-etat-echec`;
@@ -1389,6 +1389,8 @@ Changes:
 - **Computer icon in tertiary** (addendum): the round Bluetooth avatar of each computer card uses `--od-tertiary-container` as background and `--od-tertiary` for the icon, in the choice and during the download.
 - **Connected computer card, tablet in landscape** (addendum, 11 November): during the download, the connected computer card is one column wide, like the cards of the choice screen (two columns), not the full pane width. Full width in portrait and on the phone. Mock-up: `android-tablette-telechargement-encours-paysage.dc.html`.
 - A line in the release notes.
+
+Done in branch `feature/download-cards`: computer cards (two columns from 720 dp of pane width, connected card one column wide), tertiary computer icon, failure header with `--od-alarm-tint`, duration above depth, tablet pane with its ✕, floating "+" hidden while the pane shows.
 
 ## [x] 2026-11-11-31 Tablets: back arrow in the detail pane only when it has history
 
