@@ -1422,12 +1422,14 @@ Mock-ups: `docs/mockups/android-planificateur.dc.html` (plan from a dive), `docs
 
 Done in `Planner.svelte` (two SAC dropdowns with chevrons, accessible names with the unit in words), `planner.svelte.js` (the plan's own `decoSacMlMin`, sent with each request and kept with a saved plan) and `SelectField` (`chevron`, `ariaLabel`). The core already took `decoSacMlMin`; `tests/plan_test.cpp` now checks that a higher deco SAC keeps the runtime and breathes more gas, and `tests/app/planner.test.mjs` that the request carries both SACs.
 
-## [ ] 2026-11-11-34 Planner, new plan: empty profile thumbnail instead of "+"
+## [x] 2026-11-11-34 Planner, new plan: empty profile thumbnail instead of "+"
 
 Mock-ups: `docs/mockups/android-planificateur-nouveau.dc.html` and `docs/mockups/android-tablette-planificateur-{paysage,portrait}.dc.html` (these copies also carry the gas dropdowns of task 32 and the two SAC fields of task 33).
 - In the "Nouvelle plongée · Sans plongée de départ" card, the "+" icon suggested adding something. Replace it with an empty thumbnail: in the same 56 × 36 dp slot as a starting dive's profile thumbnail, the outline of a dive profile in a dashed grey line (`--od-outline`, 1.5 dp, dashes of 3 dp). Decorative, hidden from screen readers. "Changer" stays.
 - **No second line** (addendum, 11 November): the card shows only "Nouvelle plongée"; remove "Sans plongée de départ", which repeated the title.
 - A line in the release notes.
+
+Done in `Planner.svelte` (`od-planner--empty-thumbnail`, 56 × 36 dp, dashed `--od-outline` outline, aria-hidden) and `theme.css` (`--od-outline`, also in System design section 3).
 
 ## [x] 2026-11-11-35 Planner: altitude as a dropdown menu — superseded by 2026-11-11-36, do not implement
 
@@ -1437,7 +1439,7 @@ Mock-ups: `docs/mockups/android-planificateur{,-nouveau,-menu}.dc.html`, `docs/m
 - Every planner screen, phone and tablet.
 - A line in the release notes.
 
-## [ ] 2026-11-11-36 Planner: gases, SAC and altitude as wheels
+## [x] 2026-11-11-36 Planner: gases, SAC and altitude as wheels
 
 Replaces tasks 32 and 35 (dropdowns, not to be built) and the dropdown form of task 33 (its two SAC values and their sources stay). Mock-up: `docs/mockups/android-planificateur-roulettes.dc.html` (plan from a dive). Apply the same fields to every planner screen: new plan, phone and tablet.
 - **Wheel field** (new shared component, `od-wheel-field`): a filled field 56 dp high, the label on the left (12 sp, `--od-on-surface-variant`, may wrap to two lines), then a narrow vertical wheel: the current value in the middle (20 sp, weight 600, tabular figures) between two thin lines, the previous and next values above and below (13 sp, variant colour), fading out at the top and bottom edges; then the unit, when it is not in the heading.
@@ -1449,3 +1451,5 @@ Replaces tasks 32 and 35 (dropdowns, not to be built) and the dropdown form of t
 - Values read from a dive that fall between steps (for example 33 % oxygen with a 1 % step is fine; 0,355 SAC) show as they are, and the next turn snaps to the nearest step.
 - Add `od-wheel-field` to System design, section 8 (shared components), in the same commit.
 - A line in the release notes.
+
+Done in `WheelField.svelte` (`od-wheel-field`), `wheel-rules.js` (steps, snapping, clamping, fling), `Planner.svelte` (gases, the two SACs and altitude as wheels; the planner's vertical rhythm set to the mock-up's) and System design sections 3 and 8. The haptic tick uses `navigator.vibrate` where it exists (Capacitor Haptics is not a dependency).

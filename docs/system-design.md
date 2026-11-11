@@ -52,6 +52,8 @@ The theme is **black and white**: a neutral light background, actions without a 
 | `--od-surface` | #FFFFFF | #1C1D1F | Cell, block, profile |
 | `--od-tint` | #E8E8E5 | #2E3033 | Pills (gases, buddies, tags), secondary button, selected item |
 | `--od-separator` | #DADAD6 | #3A3C40 | Separators and outlines |
+| `--od-outline` | #74777C | #8E9196 | Dashed outline of an empty profile thumbnail; bottom indicator of a wheel field |
+| `--od-wheel-line` | #C9C9C4 | #4A4D52 | The two thin lines around the current value of a wheel field |
 | `--od-water-top` | #FBE3B2 | #E5B961 | Top of the water column |
 | `--od-water-bottom` | #B4530F | #EF7625 (tempered amber) | Water column at 60 m and deeper; in between, the colour is mixed according to the maximum depth |
 | `--od-trace` | #1F2124 (3.2:1 on the bottom of the water) | #F4F4F2, 2 px, over a 4.5 px #121314 outline | Profile line |
@@ -177,7 +179,7 @@ Mock-ups: `android-tablette-accueil-{paysage,portrait}.dc.html` (first screen, n
 
 ## 8. Shared components
 
-Six components do not exist in Framework7; each is a single Svelte component, shared by iOS and Android, which only changes its colours and sizes with the theme.
+Seven components do not exist in Framework7; each is a single Svelte component, shared by iOS and Android, which only changes its colours and sizes with the theme.
 
 **`<DiveProfile>`: the dive profile and its water column.**
 
@@ -194,6 +196,12 @@ Six components do not exist in Framework7; each is a single Svelte component, sh
 **`<DiveRow>`: a dive in a list.** Thumbnail; site on the first line ("Site to be specified" in tertiary text when missing, never an invented name); date and time on the second; on the right, the maximum depth in bold, then the duration. A dive edited offline replaces the date with what is waiting to be sent ("Notes edited, waiting to be sent"), in `--od-pending`.
 
 **`<TripRow>`: a collapsed trip.** Four reduced thumbnails in a 2 × 2 grid, "Trip of 2 February 2013", then "4 dives, from 21.8 to 28.7 m"; a tap expands the trip. The core's automatic trips are named like the others; their identifier changes at each load and is never stored.
+
+**`<WheelField>` (`od-wheel-field`): a number on a short wheel, inside a filled field.** Used for oxygen and helium (%, steps of 1 from 5 to 100 and of 5 from 0 to 95; oxygen plus helium at most 100), the two SACs (0.01 cuft/min or 0.5 L/min a step; unit in the "Consommation (SAC)" heading) and the altitude (500 ft or 100 m a step; unit in the field). Reference: `docs/mockups/android-planificateur-roulettes.dc.html`.
+
+- **Layout:** a field 56 dp high (surface-container-highest, 4 dp top corners, 1 dp bottom indicator in `--od-outline`, 2 dp in the primary colour on focus); the label on the left (12 / 16 sp, `--od-text-2`, may wrap to two lines); a vertical wheel 44 to 52 dp wide, centred on the middle of the field: the current value (20 sp, weight 600, tabular figures) between two thin lines (`--od-wheel-line`, 24 dp apart), the previous and next values (13 sp, `--od-text-2`) above and below, fading out at the top and bottom edges; then the unit (14 sp) when it is not in the heading. Fields side by side are 12 dp apart; vertical rhythm of a planner section: title 32 dp high, 24 dp after the block before it and 8 dp before its fields, blocks 16 dp apart, helper text 4 dp under its fields and inset 16 dp.
+- **Behaviour:** a vertical drag or fling turns the wheel, one step each 24 dp, with a light haptic tick per step (`navigator.vibrate` on the web layer; no native haptics dependency); a tap on the current value opens the numeric keyboard on the same field (a valid value goes to the plan at once; Enter, Escape or leaving the field gives the wheel back). With "Remove animations" on, the wheel settles without animation and a fling does not carry on. A value that falls between two steps (a dive's 33 %, a SAC of 0.355) shows as it is; the next turn goes to the nearest step in its direction.
+- **Accessibility:** `role="spinbutton"` with `aria-valuemin`, `aria-valuemax`, `aria-valuenow` and `aria-valuetext` including the unit; the label is the accessible name; the arrow keys step it (TalkBack's swipe up and down arrive as the same key events), Page up and down take five steps, Home and End go to the ends, Enter opens the keyboard.
 
 **`<ActiveFilter>`: the active filter row.** While a filter is applied, a row at the top of the Logbook, the Statistics and the map recalls it with the number of matching dives ("Suit: dry suit, 12 dives") and a button to remove it. The filter is the same in all three sections.
 

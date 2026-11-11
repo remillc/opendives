@@ -13,6 +13,7 @@
   import ProfileThumbnail from '../components/ProfileThumbnail.svelte';
   import TextField from '../components/TextField.svelte';
   import SelectField from '../components/SelectField.svelte';
+  import WheelField from '../components/WheelField.svelte';
   import ButtonField from '../components/ButtonField.svelte';
   import WheelDialog from '../components/WheelDialog.svelte';
   import ShareSheet from '../components/ShareSheet.svelte';
@@ -23,7 +24,7 @@
   import { t } from '../lib/i18n.js';
   import { WATER_TYPES, altitudeToPressureMbar, formatHoursMinutes, pressureToAltitudeMm, waterTypeName, waterTypeOfSalinity } from '../lib/tools.js';
   import { sharePlanPdf, sharePlanSummary } from '../lib/share.js';
-  import { MM_PER_FT, ML_PER_CUFT, carriedToMl, depthToMm, gasTotalMl, isShort, mlToCarried, modAlarm, mmToDepth } from '../lib/planner-rules.js';
+  import { MM_PER_FT, ML_PER_CUFT, carriedToMl, depthToMm, gasTotalMl, gasValid, isShort, mlToCarried, modAlarm, mmToDepth } from '../lib/planner-rules.js';
 
   /**
    * `reopen`: the route /plans/<id>, a saved plan; otherwise /plan/new or /plan/<dive id>.
@@ -171,8 +172,8 @@
   const parse = (text) => (text.trim() === '' ? NaN : Number(text.trim().replace(',', '.')));
 
   let levelFields = $state(/** @type {{ key: number, depth: string, time: string }[]} */ ([]));
-  let gasFields = $state(/** @type {{ key: number, o2: string, he: string, carried: string }[]} */ ([]));
-  let altitudeField = $state('');
+  let gasFields = $state(/** @type {{ key: number, carried: string }[]} */ ([]));
+  let altitudeValue = $state(0); // in the diver's depth unit, as the wheel shows it
   let gfLowField = $state('');
   let gfHighField = $state('');
   /** @type {Record<string, boolean>} */
@@ -190,12 +191,9 @@
     }));
     gasFields = planner.gases.map((g) => ({
       key: nextKey++,
-      o2: show(g.o2Permille / 10),
-      he: show(g.hePermille / 10),
       carried: volumeValue(g.carriedMl),
     }));
-    const altitude = pressureToAltitudeMm(planner.surfacePressureMbar);
-    altitudeField = show(Math.max(0, mmToDepth(altitude, feet)));
+    altitudeValue = Math.max(0, mmToDepth(pressureToAltitudeMm(planner.surfacePressureMbar), feet));
     gfLowField = show(planner.deco.gfLow);
     gfHighField = show(planner.deco.gfHigh);
     invalid = {};
@@ -251,17 +249,20 @@
 
   // --- Gases ----------------------------------------------------------------
 
-  /** Oxygen and helium: valid each, and 100 % at most together. @param {number} i */
-  function gasChanged(i) {
-    const f = gasFields[i];
-    const o2 = parse(f.o2);
-    const he = parse(f.he);
-    const good = o2 >= 1 && o2 <= 100 && he >= 0 && he <= 99 && o2 + he <= 100;
-    invalid[`gas-${f.key}`] = !good;
-    if (!good) return;
-    planner.gases[i].o2Permille = Math.round(o2 * 10);
-    planner.gases[i].hePermille = Math.round(he * 10);
+  /**
+   * Oxygen or helium of a gas from its wheel, % : refused when oxygen and
+   * helium would not fit together (the wheel then stays where it is).
+   * @param {number} i @param {'o2'|'he'} which @param {number} percent
+   */
+  function setGasPercent(i, which, percent) {
+    const gas = planner.gases[i];
+    const o2 = which === 'o2' ? percent : gas.o2Permille / 10;
+    const he = which === 'he' ? percent : gas.hePermille / 10;
+    if (!gasValid(o2, he)) return false;
+    gas.o2Permille = Math.round(o2 * 10);
+    gas.hePermille = Math.round(he * 10);
     planner.version++;
+    return true;
   }
 
   /** The volume carried, optional: empty means not given. @param {number} i */
@@ -279,14 +280,13 @@
   function addGas() {
     const gas = nextGas();
     planner.gases.push(gas);
-    gasFields.push({ key: nextKey++, o2: show(gas.o2Permille / 10), he: show(0), carried: '' });
+    gasFields.push({ key: nextKey++, carried: '' });
     planner.version++;
   }
 
   /** @param {number} i */
   function removeGas(i) {
     planner.gases.splice(i, 1);
-    delete invalid[`gas-${gasFields[i].key}`];
     delete invalid[`carried-${gasFields[i].key}`];
     gasFields.splice(i, 1);
     planner.version++;
@@ -303,57 +303,19 @@
     return switchMm ? t('plan.gasSwitch', { name, depth: depthText(switchMm) }) : name;
   }
 
-  /**
-   * A SAC, an exposed dropdown menu: the values around the current one, in
-   * steps of 0.01 cuft/min or 0.5 L/min (20 each side), the current one
-   * selected even off the steps (a SAC measured on a dive). Values in mL/min.
-   * @param {number} current
-   */
-  function sacOptionsOf(current) {
-    const step = cuft ? 0.01 * ML_PER_CUFT : 500;
-    const min = cuft ? 0.04 * ML_PER_CUFT : 1000;
-    const max = cuft ? 3.5 * ML_PER_CUFT : 99000;
-    const base = Math.round(current / step);
-    /** @type {number[]} */
-    const values = [];
-    for (let k = base - 20; k <= base + 20; k++) {
-      const ml = Math.round(k * step);
-      if (ml >= min && ml <= max) values.push(ml);
-    }
-    // The current value: the step that shows the same, or its own entry.
-    const same = values.find((ml) => formatSac(ml, prefs) === formatSac(current, prefs));
-    if (same === undefined) values.push(current);
-    values.sort((a, b) => a - b);
-    return { selected: same ?? current, list: values.map((ml) => ({ value: String(ml), label: formatSac(ml, prefs) })) };
+  // Two SACs (Subsurface's bottom SAC and deco SAC): at the bottom, and during
+  // the ascent and the stops. Wheels in the diver's volume unit per minute:
+  // 0.01 cuft/min or 0.5 L/min a step.
+  const sacStep = $derived(cuft ? 0.01 : 0.5);
+  const sacMin = $derived(cuft ? 0.04 : 1);
+  const sacMax = $derived(cuft ? 3.5 : 99);
+  /** A SAC for screen readers: the number and the unit in words. @param {number} v in cuft/min or L/min */
+  const sacSpoken = (v) => (cuft ? t('units.cubicFeetPerMinuteLong', { n: Math.round(v * 100) / 100, v: formatNumber(v, 2) }) : t('units.litersPerMinuteLong', { n: Math.round(v * 10) / 10, v: formatNumber(v, 1) }));
+  /** @param {'bottomSacMlMin'|'decoSacMlMin'} key @param {number} v */
+  function setSac(key, v) {
+    planner[key] = carriedToMl(v, cuft);
+    planner.version++;
   }
-  /** A SAC for screen readers: the number and the unit in words. @param {number} ml */
-  const sacSpoken = (ml) =>
-    cuft
-      ? t('units.cubicFeetPerMinuteLong', { n: Math.round(ml / ML_PER_CUFT * 100) / 100, v: formatNumber(ml / ML_PER_CUFT, 2) })
-      : t('units.litersPerMinuteLong', { n: Math.round(ml / 100) / 10, v: formatNumber(ml / 1000, 1) });
-  // Two SACs (Subsurface's bottom SAC and deco SAC): at the bottom, and during the ascent and the stops.
-  const sacOptions = $derived(sacOptionsOf(planner.bottomSacMlMin));
-  const decoSacOptions = $derived(sacOptionsOf(planner.decoSacMlMin));
-  let sacChoice = $state('');
-  let decoSacChoice = $state('');
-  $effect(() => {
-    sacChoice = String(sacOptions.selected);
-  });
-  $effect(() => {
-    decoSacChoice = String(decoSacOptions.selected);
-  });
-  $effect(() => {
-    const ml = Number(sacChoice);
-    if (!ml || ml === sacOptions.selected) return;
-    planner.bottomSacMlMin = ml;
-    planner.version++;
-  });
-  $effect(() => {
-    const ml = Number(decoSacChoice);
-    if (!ml || ml === decoSacOptions.selected) return;
-    planner.decoSacMlMin = ml;
-    planner.version++;
-  });
 
   // --- Date, for a new dive --------------------------------------------------
 
@@ -406,8 +368,11 @@
   });
   const waterOptions = WATER_TYPES.map((w) => ({ value: w.id, label: waterTypeName(w.id) }));
 
-  function altitudeChanged() {
-    typed('altitude', altitudeField, 0, feet ? 16000 : 5000, (v) => (planner.surfacePressureMbar = altitudeToPressureMbar(depthToMm(v, feet))));
+  /** @param {number} v in the diver's depth unit */
+  function setAltitude(v) {
+    altitudeValue = v;
+    planner.surfacePressureMbar = altitudeToPressureMbar(depthToMm(v, feet));
+    planner.version++;
   }
 
   let modelChoice = $state('');
@@ -635,10 +600,11 @@
             >
           </span>
         {:else}
-          <span class="od-planner--plus" aria-hidden="true"><Icon name="plus" /></span>
+          <span class="od-planner--empty-thumbnail" aria-hidden="true"
+            ><svg width="44" height="24" viewBox="0 0 44 24"><path d="M2 3 L8 18 L30 18 L36 9 L42 3" /></svg></span
+          >
           <span class="od-planner--text">
             <span class="od-planner--title">{t('plan.newDive')}</span>
-            <span class="od-planner--sub">{t('plan.noStartDive')}</span>
           </span>
         {/if}
         <span class="od-planner--change">{t('plan.change')}</span>
@@ -716,12 +682,30 @@
         {#each gasFields as gas, i (gas.key)}
           <div class="od-planner--gas">
             <div class="od-planner--pair od-planner--with-remove">
-              <TextField label={t('plan.oxygenPercent')} bind:value={gas.o2} inputmode="numeric" invalid={invalid[`gas-${gas.key}`]} oninput={() => gasChanged(i)}>
-                {#snippet trailing()}<span class="od-planner--unit">%</span>{/snippet}
-              </TextField>
-              <TextField label={t('plan.heliumPercent')} bind:value={gas.he} inputmode="numeric" invalid={invalid[`gas-${gas.key}`]} oninput={() => gasChanged(i)}>
-                {#snippet trailing()}<span class="od-planner--unit">%</span>{/snippet}
-              </TextField>
+              <WheelField
+                label={t('plan.oxygenPercent')}
+                ariaLabel={t('plan.gasOxygenName', { n: String(i + 1) })}
+                value={planner.gases[i].o2Permille / 10}
+                min={5}
+                max={100}
+                step={1}
+                typeMin={1}
+                unit="%"
+                valueText={(v) => t('plan.percentSpoken', { v: formatNumber(v, 1).replace(/[,.]0$/, '') })}
+                onchange={(v) => setGasPercent(i, 'o2', v)}
+              />
+              <WheelField
+                label={t('plan.heliumPercent')}
+                ariaLabel={t('plan.gasHeliumName', { n: String(i + 1) })}
+                value={planner.gases[i].hePermille / 10}
+                min={0}
+                max={95}
+                step={5}
+                typeMax={99}
+                unit="%"
+                valueText={(v) => t('plan.percentSpoken', { v: formatNumber(v, 1).replace(/[,.]0$/, '') })}
+                onchange={(v) => setGasPercent(i, 'he', v)}
+              />
               {#if i > 0}
                 <button type="button" class="od-planner--remove" aria-label={t('plan.removeGas')} onclick={() => removeGas(i)}><Icon name="close" /></button>
               {:else}
@@ -738,10 +722,30 @@
           </div>
         {/each}
         <button type="button" class="od-planner--add" onclick={addGas}><Icon name="plus" size={18} />{t('plan.addGas')}</button>
-        <p class="od-planner--subhead">{t('plan.sac')}</p>
+        <p class="od-planner--subhead">{t('plan.sacIn', { unit: t(cuft ? 'units.cubicFeetPerMinute' : 'units.litersPerMinute') })}</p>
         <div class="od-planner--pair">
-          <SelectField label={t('plan.sacBottom')} bind:value={sacChoice} options={sacOptions.list} chevron ariaLabel={t('plan.sacBottomLong', { value: sacSpoken(sacOptions.selected) })} />
-          <SelectField label={t('plan.sacDeco')} bind:value={decoSacChoice} options={decoSacOptions.list} chevron ariaLabel={t('plan.sacDecoLong', { value: sacSpoken(decoSacOptions.selected) })} />
+          <WheelField
+            label={t('plan.sacBottom')}
+            ariaLabel={t('plan.sacBottomName')}
+            value={mlToCarried(planner.bottomSacMlMin, cuft)}
+            min={sacMin}
+            max={sacMax}
+            step={sacStep}
+            wheelWidth={52}
+            valueText={sacSpoken}
+            onchange={(v) => setSac('bottomSacMlMin', v)}
+          />
+          <WheelField
+            label={t('plan.sacDeco')}
+            ariaLabel={t('plan.sacDecoName')}
+            value={mlToCarried(planner.decoSacMlMin, cuft)}
+            min={sacMin}
+            max={sacMax}
+            step={sacStep}
+            wheelWidth={52}
+            valueText={sacSpoken}
+            onchange={(v) => setSac('decoSacMlMin', v)}
+          />
         </div>
         <p class="od-planner--helper od-planner--inner">{t(planner.source ? 'plan.sacFromDive' : 'plan.sacFromSettings')}</p>
       </div>
@@ -750,9 +754,17 @@
       <div class="od-planner--fields">
         <div class="od-planner--pair">
           <SelectField label={t('plan.waterType')} bind:value={water} options={waterOptions} />
-          <TextField label={t('plan.altitude')} bind:value={altitudeField} inputmode="numeric" invalid={invalid.altitude} oninput={altitudeChanged}>
-            {#snippet trailing()}<span class="od-planner--unit">{depthUnit(prefs)}</span>{/snippet}
-          </TextField>
+          <WheelField
+            label={t('plan.altitude')}
+            value={altitudeValue}
+            min={0}
+            max={feet ? 16000 : 5000}
+            step={feet ? 500 : 100}
+            wheelWidth={44}
+            unit={depthUnit(prefs)}
+            valueText={(v) => `${formatNumber(v)} ${depthUnit(prefs)}`}
+            onchange={setAltitude}
+          />
         </div>
         <p class="od-planner--helper od-planner--inner">{t(planner.source ? 'plan.conditionsFromDive' : 'plan.conditionsDefault')}</p>
       </div>
@@ -979,13 +991,25 @@
       align-items: center;
       gap: 16px;
 
-      .od-planner--plus {
+      /* The empty thumbnail: the 56 x 36 slot of a starting dive's profile, with the dashed outline of a profile. */
+      .od-planner--empty-thumbnail {
         flex: none;
-        width: 40px;
-        height: 40px;
+        width: 56px;
+        height: 36px;
+        border-radius: 8px;
+        background: var(--od-background);
         display: flex;
         align-items: center;
         justify-content: center;
+
+        svg {
+          fill: none;
+          stroke: var(--od-outline);
+          stroke-width: 1.5;
+          stroke-linecap: round;
+          stroke-linejoin: round;
+          stroke-dasharray: 3 3;
+        }
       }
 
       .od-planner--text {
@@ -1013,9 +1037,12 @@
       }
     }
 
+    /* Vertical rhythm of the mock-up (android-planificateur-roulettes): a title is
+       32 dp high, 24 dp under the block before it and 8 dp over its fields; the
+       blocks of a section are 16 dp apart. */
     .od-planner--section-title {
-      margin: 4px 16px 0;
-      min-height: 48px;
+      margin: 24px 16px 8px;
+      height: 32px;
       display: flex;
       align-items: center;
       font-size: 14px;
@@ -1023,9 +1050,13 @@
       letter-spacing: 0.1px;
       color: var(--od-text);
 
+      &:first-child {
+        margin-top: 16px;
+      }
+
       :global(.ios) & {
         margin: 14px 16px 6px 32px;
-        min-height: 0;
+        height: auto;
         font-size: 13px;
         font-weight: 400;
         color: var(--od-text-2);
@@ -1097,9 +1128,9 @@
 
     /* "Consommation (SAC)", over its two fields. */
     .od-planner--subhead {
-      margin: 16px 16px -10px;
-      font-size: 14px;
-      line-height: 20px;
+      margin: 0 16px -8px;
+      font-size: 12px;
+      line-height: 16px;
       font-weight: 500;
       color: var(--od-text-2);
     }
@@ -1110,39 +1141,49 @@
       line-height: 16px;
       color: var(--od-text-2);
 
+      /* Under a field row: 4 dp below it (the blocks are 16 dp apart), text inset by 16 dp. */
       &.od-planner--inner {
-        margin: -4px 16px 0;
+        margin: -12px 32px 0;
+      }
+
+      .od-planner--add + &.od-planner--inner {
+        margin-top: -16px;
       }
     }
 
     .od-planner--fields {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 16px;
     }
 
     .od-planner--gas {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 16px;
     }
 
+    /* Two fields side by side, 12 dp apart; the fields carry no margin of their own here. */
     .od-planner--pair {
       display: flex;
-      gap: 16px;
+      gap: 12px;
+      margin: 0 16px;
+      align-items: flex-start;
 
       & > :global(*) {
         flex: 1;
         min-width: 0;
       }
 
-      &.od-planner--with-remove {
-        margin-right: 8px;
-        gap: 8px;
+      &.od-planner--pair > :global(*),
+      & .od-planner--grow > :global(*) {
+        margin: 0;
+      }
 
+      &.od-planner--with-remove {
         & > .od-planner--remove {
           flex: none;
-          width: 40px;
+          width: 48px;
           height: 56px;
           padding: 0;
           border: none;
@@ -1169,9 +1210,10 @@
 
     .od-planner--add {
       align-self: flex-start;
-      margin: 0 16px;
+      width: auto;
+      margin: -4px 0 0 12px;
       height: 40px;
-      padding: 0 12px 0 8px;
+      padding: 0 16px 0 12px;
       border: none;
       background: none;
       color: var(--od-text);
@@ -1186,7 +1228,7 @@
 
     .od-planner--accordion {
       width: 100%;
-      margin-top: 8px;
+      margin-top: 16px;
       min-height: 72px;
       padding: 8px 24px 8px 16px;
       box-sizing: border-box;
