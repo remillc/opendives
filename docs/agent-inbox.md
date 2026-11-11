@@ -1498,4 +1498,5 @@ Android now follows Material 3 Expressive by default (AGENTS.md and System desig
 9. Settings, Account and About lists stay as rounded groups (already close to Expressive lists).
 10. **Motion:** the Expressive motion scheme (spatial and effects springs) for the detail, the drawer, sheets, dialogs, the FAB menu and list items. "Remove animations" turns it off.
 11. Emphasized type and FAB sizes from Expressive where they differ from our values; check with Christian before changing a size that the mock-ups fix.
+- **Floating toolbar details** (addendum, 11 November): the share button uses the standard Android share icon (three connected dots). The ⋮ of the detail toolbar opens a menu just above the toolbar, right-aligned with ⋮ (`detail2-android-menu`, `android-tablette-detail-menu-*`): "Renuméroter la plongée", "Retirer du voyage" (only when the dive is in a trip), a divider, then "Supprimer la plongée" in the alarm colour; the ⋮ shows its pressed state while the menu is open. Each icon button of the toolbar shows a plain tooltip with its name on long press.
 - A line in the release notes.
