@@ -1520,3 +1520,12 @@ Answer to the question on Expressive title sizes. "Title Large" is 22 sp in Mate
 - **Sheets** (dive, site, trip): keep their editorial title inside the page (32 sp); the top bar carries only ←.
 - No 36 sp (large flexible app bar) on phones. Check the values against the Material library before coding and tell Christian if they differ.
 - Write the rule in System design, section 4 (type).
+
+## [ ] 2026-11-11-42 Android: date and time fields with calendar and clock icons
+
+Mock-ups: `docs/mockups/android-edition.dc.html`, `android-edition-mode`, `android-planificateur-nouveau`, `android-planificateur-titre`, and the tablet `android-tablette-edition-*`, `android-tablette-planificateur-*`.
+- Every date field gets a trailing calendar icon and every time field a trailing clock icon (24 dp, `--od-on-surface-variant`), never a chevron. A tap anywhere on the field opens the Material 3 date picker or time picker (docked or modal, as the library offers on the size class), not a menu.
+- Where: "Modifier la plongée" (Date, Heure) and the planner (Date, Heure), phone and tablet; and any other date or time field.
+- The "Heure" field of "Modifier la plongée" is 120 dp wide (it truncated "10:00" at 88 dp).
+- Add the rule to System design, section 8 (text fields).
+- A line in the release notes.
