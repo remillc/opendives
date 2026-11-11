@@ -11,12 +11,14 @@
   // the import itself, with "Réessayer"; they live only in this screen, for
   // that, and are never stored.
   // The core reports no progress inside a step: the running step shows a
-  // spinner, without the "128 sur 214" bar of the mock-up.
+  // spinner (the loading indicator on Android), without the "128 sur 214" bar
+  // of the mock-up.
   import { onDestroy } from 'svelte';
   import { f7 } from 'framework7-svelte';
   import { OpenDivesCore } from 'opendives-core';
   import EditorialPage from '../components/EditorialPage.svelte';
   import Icon from '../components/Icon.svelte';
+  import LoadingIndicator from '../components/LoadingIndicator.svelte';
   import { errorCode, finishAccount, showFailure } from '../lib/account.js';
   import { t } from '../lib/i18n.js';
 
@@ -174,7 +176,7 @@
           {#if step.state === 'done'}
             <span class="od-import-progress--done"><Icon name="check" size={18} weight={2.2} /></span>
           {:else if step.state === 'running'}
-            <span class="od-import-progress--spinner"></span>
+            {#if ios}<span class="od-import-progress--spinner"></span>{:else}<LoadingIndicator size={24} label={t('importProgress.running')} />{/if}
           {:else if step.state === 'failed'}
             <span class="od-import-progress--failed"><Icon name="error" /></span>
           {:else}

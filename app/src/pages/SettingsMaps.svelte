@@ -11,6 +11,7 @@
   import { tick } from 'svelte';
   import Icon from '../components/Icon.svelte';
   import MenuItem from '../components/MenuItem.svelte';
+  import LinearWavyProgress from '../components/LinearWavyProgress.svelte';
   import MapsRow from '../components/MapsRow.svelte';
   import { t } from '../lib/i18n.js';
   import { ios, layout } from '../lib/layout.svelte.js';
@@ -124,14 +125,22 @@
         <span class="od-maps-row--supporting">{t('maps.download.queued', { total: r.tilesTotal })}</span>
       {:else}
         <span class="od-maps-row--supporting">{t('maps.download.progress', { done: r.tilesDone, total: r.tilesTotal, percent: tilesPercent(r) })}</span>
-        <span
-          class="od-maps-row--progress"
-          role="progressbar"
-          aria-label={t('maps.download.progressLabel', { name })}
-          aria-valuenow={tilesPercent(r)}
-          aria-valuemin="0"
-          aria-valuemax="100"><span style:width="{tilesPercent(r)}%"></span></span
-        >
+        {#if ios}
+          {#if ios}
+            <span
+              class="od-maps-row--progress"
+              role="progressbar"
+              aria-label={t('maps.download.progressLabel', { name })}
+              aria-valuenow={tilesPercent(r)}
+              aria-valuemin="0"
+              aria-valuemax="100"><span style:width="{tilesPercent(r)}%"></span></span
+            >
+          {:else}
+            <LinearWavyProgress class="od-maps-row--wavy" value={tilesPercent(r) / 100} label={t('maps.download.progressLabel', { name })} />
+          {/if}
+        {:else}
+          <LinearWavyProgress class="od-maps-row--wavy" value={tilesPercent(r) / 100} label={t('maps.download.progressLabel', { name })} />
+        {/if}
       {/if}
     {/snippet}
     {#snippet trailing()}
