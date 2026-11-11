@@ -434,7 +434,9 @@
        label; an iOS pull-down menu, label then icon at the end, no arrow. -->
   <Popover id={menuId} class="od-menu" backdrop={false}>
     <List noChevron>
-      <MenuItem icon="plan" text={t('detail.plan')} link="/plan/{diveId}" />
+      <!-- This page's router, not a link: the menu opens at the app's root, where a
+           link would use the Carnet's view even when the dive is shown in another section. -->
+      <MenuItem icon="plan" text={t('detail.plan')} onclick={() => f7router.navigate(`/plan/${diveId}`)} />
       <MenuItem
         icon="renumber"
         text={t('renumberDive.title')}
