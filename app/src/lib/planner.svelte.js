@@ -26,8 +26,12 @@ import { bottomCylinder } from './plan-gases.js';
 
 export { SETTING_KEYS };
 
-/** The settings a saved plan keeps; its bottom SAC is already one of its fields. */
-const KEPT_KEYS = SETTING_KEYS.filter((k) => k !== 'bottomSacMlMin');
+/** The settings a saved plan keeps; its two SACs are already fields of the plan. */
+const KEPT_KEYS = SETTING_KEYS.filter((k) => k !== 'bottomSacMlMin' && k !== 'decoSacMlMin');
+
+/** Subsurface's defaults for the two SACs, ml/min, until the planner settings are read. */
+const BOTTOM_SAC_DEFAULT = 20000;
+const DECO_SAC_DEFAULT = 17000;
 
 /**
  * @typedef {Object} PlanSource
@@ -64,7 +68,9 @@ export const planner = $state({
   salinity: 10300,
   surfacePressureMbar: 1013,
   /** SAC at the bottom, ml/min (the measured one from a dive). */
-  bottomSacMlMin: 20000,
+  bottomSacMlMin: BOTTOM_SAC_DEFAULT,
+  /** SAC during the ascent and the stops, ml/min (from the planner settings). */
+  decoSacMlMin: DECO_SAC_DEFAULT,
   deco: /** @type {PlanDeco} */ ({ decoModel: 'buehlmann', gfLow: 30, gfHigh: 75, vpmbConservatism: 3 }),
   /** The settings kept with the plan reopened; null: the core's preferences apply. */
   kept: /** @type {Record<string, number>|null} */ (null),
@@ -248,7 +254,8 @@ export function startFromDive(dive, source, prefs) {
       }))
     : [{ o2Permille: 209, hePermille: 0, carriedMl: 0 }];
   if (dive.sacMlMin > 0) planner.bottomSacMlMin = dive.sacMlMin;
-  else planner.bottomSacMlMin = planner.setup?.bottomSacMlMin ?? 20000;
+  else planner.bottomSacMlMin = planner.setup?.bottomSacMlMin ?? BOTTOM_SAC_DEFAULT;
+  planner.decoSacMlMin = planner.setup?.decoSacMlMin ?? DECO_SAC_DEFAULT;
   // The dive's water type when it has one, else sea water.
   planner.salinity = salinityOfWaterType(dive.waterType);
   planner.surfacePressureMbar = dive.surfacePressureMbar || 1013;
@@ -269,7 +276,8 @@ export function startNewDive(prefs) {
   planner.gases = [{ o2Permille: 209, hePermille: 0, carriedMl: 0 }];
   planner.salinity = salinityOfWaterType(settings.defaultWater);
   planner.surfacePressureMbar = altitudeToPressureMbar(settings.defaultAltitudeMm);
-  planner.bottomSacMlMin = planner.setup?.bottomSacMlMin ?? 20000;
+  planner.bottomSacMlMin = planner.setup?.bottomSacMlMin ?? BOTTOM_SAC_DEFAULT;
+  planner.decoSacMlMin = planner.setup?.decoSacMlMin ?? DECO_SAC_DEFAULT;
   planner.deco = decoOfSettings(prefs);
   planner.loaded++;
   planner.version++;
@@ -299,7 +307,8 @@ export function requestOfPlan(plan, prefs) {
     levels: plan.levels.length ? plan.levels : [{ depthMm: plan.maxDepthMm, durationSeconds: 20 * 60 }],
     salinity: plan.salinity || 10300,
     surfacePressureMbar: plan.surfacePressureMbar || 1013,
-    bottomSacMlMin: planner.setup?.bottomSacMlMin ?? 20000,
+    bottomSacMlMin: planner.setup?.bottomSacMlMin ?? BOTTOM_SAC_DEFAULT,
+    decoSacMlMin: planner.setup?.decoSacMlMin ?? DECO_SAC_DEFAULT,
     decoModel: deco.decoModel === 'vpmb' ? 1 : 0,
     gfLow: deco.gfLow,
     gfHigh: deco.gfHigh,
@@ -327,7 +336,8 @@ export function applyRequest(request, planId, source) {
   }));
   planner.salinity = request.salinity ?? 10300;
   planner.surfacePressureMbar = request.surfacePressureMbar ?? 1013;
-  planner.bottomSacMlMin = request.bottomSacMlMin ?? planner.setup?.bottomSacMlMin ?? 20000;
+  planner.bottomSacMlMin = request.bottomSacMlMin ?? planner.setup?.bottomSacMlMin ?? BOTTOM_SAC_DEFAULT;
+  planner.decoSacMlMin = request.decoSacMlMin ?? planner.setup?.decoSacMlMin ?? DECO_SAC_DEFAULT;
   planner.deco = {
     decoModel: request.decoModel === 1 ? 'vpmb' : 'buehlmann',
     gfLow: request.gfLow ?? 30,
@@ -362,6 +372,7 @@ export function planRequest() {
     ...(planner.when ? { when: planner.when } : {}),
     ...(planner.kept ?? {}),
     bottomSacMlMin: Math.round(planner.bottomSacMlMin),
+    decoSacMlMin: Math.round(planner.decoSacMlMin),
     salinity: planner.salinity,
     surfacePressureMbar: planner.surfacePressureMbar,
     decoModel: deco.decoModel === 'vpmb' ? 1 : 0,

@@ -15,9 +15,13 @@
    *   disabled?: boolean,
    *   onchange?: (value: string) => void,
    *   clearLabel?: string,
+   *   ariaLabel?: string,
+   *   chevron?: boolean,
    * }}
+   * ariaLabel: the accessible name when the label alone is not enough (the
+   * full label and the unit). chevron: a downward chevron instead of MD3's ▾.
    */
-  let { label, value = $bindable(), options, supporting = '', disabled = false, onchange, clearLabel = '' } = $props();
+  let { label, value = $bindable(), options, supporting = '', disabled = false, onchange, clearLabel = '', ariaLabel, chevron = false } = $props();
 
   /** With `clearLabel` and a value: a ✕ sets the field back to the empty choice. */
   function clear() {
@@ -31,13 +35,13 @@
 <div class="od-select-field od-select-field--field" class:disabled>
   <div class="od-select-field--box">
     <label class="od-select-field--label" for={id}>{label}</label>
-    <select {id} {disabled} class:od-select-field--clearable={clearLabel && value} bind:value onchange={() => onchange?.(value)}>
+    <select {id} {disabled} aria-label={ariaLabel} class:od-select-field--clearable={clearLabel && value} bind:value onchange={() => onchange?.(value)}>
       {#each options as option (option.value)}<option value={option.value}>{option.label}</option>{/each}
     </select>
     {#if clearLabel && value}
       <button type="button" class="od-select-field--clear" aria-label={clearLabel} onclick={clear}><Icon name="close" size={20} /></button>
     {/if}
-    <span class="od-select-field--arrow"><DropdownArrow /></span>
+    <span class="od-select-field--arrow">{#if chevron}<Icon name="expand" />{:else}<DropdownArrow />{/if}</span>
   </div>
   {#if supporting}<p class="od-select-field--supporting">{supporting}</p>{/if}
 </div>
