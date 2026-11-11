@@ -1402,10 +1402,9 @@ Spec: System design, section 7, "Back arrow in the detail pane, tablets" (new), 
 - iPad, when its layout is built: the secondary column shows the system back button "‹ <previous title>" only when it has history; the edge swipe goes back in that column.
 - Tests for the pane history and system back. A line in the release notes.
 
-## [x] 2026-11-11-32 Planner: oxygen and helium as dropdown menus — superseded by 2026-11-11-36, do not implement
 Done in `lib/pane-history.js` (pane state and Back decision), `lib/back-button.js`, `App.svelte` (← hidden only on the pane's first screen, `page-master-detail-root`) and `EditDive.svelte` (✕ in the pane); tests in `tests/app/pane-history.test.mjs`.
 
-## [ ] 2026-11-11-32 Planner: oxygen and helium as dropdown menus
+## [x] 2026-11-11-32 Planner: oxygen and helium as dropdown menus — superseded by 2026-11-11-36, do not implement
 
 Mock-up: `docs/mockups/android-planificateur.dc.html` (Gaz section).
 - The "Oxygène" and "Hélium" fields of each gas become filled dropdown menus (MD3 exposed dropdown, read-only field), the same 56 dp size, label on top, value with its unit ("33 %", "0 %"), downward chevron on the right. Accessible name: "Gaz 1, oxygène : 33 %".
