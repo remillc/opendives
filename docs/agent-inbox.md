@@ -1426,6 +1426,7 @@ Done in `Planner.svelte` (two SAC dropdowns with chevrons, accessible names with
 
 Mock-ups: `docs/mockups/android-planificateur-nouveau.dc.html` and `docs/mockups/android-tablette-planificateur-{paysage,portrait}.dc.html` (these copies also carry the gas dropdowns of task 32 and the two SAC fields of task 33).
 - In the "Nouvelle plongée · Sans plongée de départ" card, the "+" icon suggested adding something. Replace it with an empty thumbnail: in the same 56 × 36 dp slot as a starting dive's profile thumbnail, the outline of a dive profile in a dashed grey line (`--od-outline`, 1.5 dp, dashes of 3 dp). Decorative, hidden from screen readers. "Changer" stays.
+- **No second line** (addendum, 11 November): the card shows only "Nouvelle plongée"; remove "Sans plongée de départ", which repeated the title.
 - A line in the release notes.
 
 ## [x] 2026-11-11-35 Planner: altitude as a dropdown menu — superseded by 2026-11-11-36, do not implement
