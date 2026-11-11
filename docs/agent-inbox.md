@@ -1388,3 +1388,15 @@ Changes:
 - The progress bar stays the standard linear one.
 - **Computer icon in tertiary** (addendum): the round Bluetooth avatar of each computer card uses `--od-tertiary-container` as background and `--od-tertiary` for the icon, in the choice and during the download.
 - A line in the release notes.
+
+## [ ] 2026-11-11-31 Tablets: back arrow in the detail pane only when it has history
+
+Spec: System design, section 7, "Back arrow in the detail pane, tablets" (new), and UI specification, "Dive detail on tablets, back arrow". Mock-ups: `docs/mockups/android-tablette-accueil-{paysage,portrait}.dc.html` (first screen, no ←), `docs/mockups/android-tablette-carnet-site-{paysage,portrait}.dc.html` (dive → site, with ←, new).
+- Give the detail pane its own history, separate from the list. A row of the list replaces that history with one screen.
+- First screen of the pane (dive, trip, statistic, tool opened from the list): no ←; ✎ and ⋮ stay on the right. This is the current behaviour, keep it.
+- A screen opened from inside the pane (dive → site, trip → dive, statistic → dive, and so on): ← at the top left, 48 dp target. It goes back one screen in the pane only. The list, its scroll position and its selected row do not change.
+- Android system back: the same as ← while the pane has history. At the pane's first screen, it does what it does on the list alone (Carnet: leave the app; another section: back to Carnet), never only clearing the selection.
+- Tasks (edit, new site, download, add) keep ✕.
+- Same rule in landscape (rail) and portrait (☰).
+- iPad, when its layout is built: the secondary column shows the system back button "‹ <previous title>" only when it has history; the edge swipe goes back in that column.
+- Tests for the pane history and system back. A line in the release notes.
