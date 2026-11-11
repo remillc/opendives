@@ -313,6 +313,15 @@
       background: var(--od-surface);
     }
 
+    /* Android download panes: the computers are white cards on the page background. */
+    :global(.md .view-master-detail .page-master-detail:is(.od-download, .od-download-failed)) {
+      background: var(--od-background);
+
+      :global(.navbar-bg) {
+        background: var(--od-background);
+      }
+    }
+
     /* Beside the list, the dive has no Back button: the list stays on screen.
        The download pages keep their ✕: it closes the task (back to the previous pane). */
     :global(.view-master-detail .page-master-detail:not(.od-download, .od-download-failed) .navbar .left .back) {

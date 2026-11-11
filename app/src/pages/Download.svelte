@@ -698,6 +698,11 @@
       .od-download--card-list {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
+
+      /* The connected computer is one column wide, like the cards of the choice. */
+      .od-download--computer.od-download--card {
+        width: calc((100cqw - 40px) / 2);
+      }
     }
 
     .od-download--computer {
