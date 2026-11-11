@@ -51,7 +51,7 @@
   @layer od.components {
     .od-gas-summary {
       position: relative;
-      margin: 0 16px 16px;
+      margin: 16px 16px 16px;
       padding: 16px 8px 12px;
       border-radius: 16px;
       background: var(--od-background);
