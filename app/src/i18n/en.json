@@ -1465,6 +1465,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Deleting a dive from its ⋮ menu now asks for confirmation, as for a Logbook selection; “Undo” is still offered for a few seconds afterwards.",
       "Android: tapping a date opens the Material 3 date picker (calendar, or typed date) and tapping a time opens the Material 3 clock, in Edit dive, the planner and New dive.",
       "Android: date fields end with a calendar icon and time fields with a clock icon instead of a chevron (Edit dive, the planner, New dive); the Time field of “Edit dive” is wider, so “10:00” is no longer cut off.",
       "Android: every choice from a list is now one dropdown menu that opens right under its field (dive mode, water type, cylinder, gases, SAC, altitude, git branch, statistic criterion). The maximum pO₂ of the gas tools and the pO₂ thresholds in Settings are dropdowns too, instead of wheels. In “Edit dive”, the site field opens a menu with a search box and “New site…”.",
