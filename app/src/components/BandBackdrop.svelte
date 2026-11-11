@@ -12,17 +12,20 @@
   import { t } from '../lib/i18n.js';
 
   /**
-   * @type {{ pill?: boolean, group?: { year: number, month: number, count: number } }}
+   * @type {{ pill?: boolean, short?: boolean, group?: { year: number, month: number, count: number } }}
    * `pill`: the taller band (a sync pill), its gradient is longer.
+   * `short`: the plain band of Statistics and Tools (no search bar): its gradient is the top bar's.
    * `group`: the month at the top of the list, once the list has passed the band.
    */
-  let { pill = false, group } = $props();
+  let { pill = false, short = false, group } = $props();
 
   const PROFILE = 'M0 30 L20 38 L45 70 L70 92 L95 96 L120 88 L140 94 L165 80 L185 62 L210 58 L235 50 L255 46 L275 40 L300 36';
-  /** Height of the band once collapsed, wave included. */
-  const COLLAPSED = 64;
+  /** Height of the band once collapsed, wave included: room for the month (Carnet), or the wave alone. */
+  const COLLAPSED = $derived(short ? 18 : 64);
   /** Over how many px the texts fade out and the month fades in. */
   const FADE = 40;
+  /** Scroll over which the summary line alone fades out. */
+  const SUMMARY = 24;
 
   /** @type {HTMLElement|undefined} */
   let holder = $state();
@@ -44,7 +47,9 @@
       panel?.style.setProperty('--od-band-rise', `${rise}px`);
       // The month appears while the last of the band's texts leaves.
       panel?.style.setProperty('--od-band-month-opacity', String(Math.min(1, Math.max(0, (top - travel + FADE / 2) / FADE))));
-      if (band) band.style.opacity = String(Math.min(1, Math.max(0, (travel + FADE / 2 - top) / FADE)));
+      // The summary alone (Statistics, Tools) leaves in its own height; with the month, the texts leave as it arrives.
+      const shown = short ? 1 - top / SUMMARY : (travel + FADE / 2 - top) / FADE;
+      if (band) band.style.opacity = String(Math.min(1, Math.max(0, shown)));
     };
     const schedule = () => {
       if (!frame) frame = requestAnimationFrame(update);
@@ -63,7 +68,7 @@
 </script>
 
 <div class="od-band-backdrop od-band-backdrop--holder" bind:this={holder}>
-  <div class="od-band-backdrop--layer" class:od-band-backdrop--layer-pill={pill} bind:this={panel}>
+  <div class="od-band-backdrop--layer" class:od-band-backdrop--layer-pill={pill} class:od-band-backdrop--layer-short={short} bind:this={panel}>
     <div class="od-band-backdrop--fill"></div>
     <svg class="od-band-backdrop--profile" viewBox="0 0 300 140" preserveAspectRatio="none" aria-hidden="true">
       <path d="{PROFILE} V140 H0 Z" class="od-band-backdrop--area" />
@@ -109,6 +114,10 @@
 
       &.od-band-backdrop--layer-pill {
         --od-band-h: calc(var(--f7-safe-area-top) + 242px);
+      }
+
+      &.od-band-backdrop--layer-short {
+        --od-band-h: calc(var(--f7-safe-area-top) + 120px);
       }
     }
 

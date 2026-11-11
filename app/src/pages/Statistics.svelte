@@ -13,6 +13,7 @@
   import Icon from '../components/Icon.svelte';
   import MenuButton from '../components/MenuButton.svelte';
   import SectionBand from '../components/SectionBand.svelte';
+  import BandBackdrop from '../components/BandBackdrop.svelte';
   import KeyFigures from '../components/KeyFigures.svelte';
   import BarChart from '../components/BarChart.svelte';
   import ActiveFilter from '../components/ActiveFilter.svelte';
@@ -126,7 +127,8 @@
     </NavRight>
   </Navbar>
 
-  <SectionBand summary={bandSummary} />
+  {#if !theme.ios}<BandBackdrop short />{/if}
+  <SectionBand bare={!theme.ios} summary={bandSummary} />
 
   {#if !logbook.loading && !logbook.dives.length}
     <div class="od-statistics--empty">
