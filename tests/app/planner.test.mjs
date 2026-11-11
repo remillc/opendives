@@ -205,3 +205,65 @@ test('two SACs: the request carries the bottom SAC and the deco SAC, each its ow
   assert.equal(planRequest().decoSacMlMin, 15000, 'the field of the plan wins over a kept setting');
   planner.kept = null;
 });
+
+// --- Wheel field rules --------------------------------------------------------
+
+const wheel = await import(root + 'lib/wheel-rules.js');
+
+test('wheel: decimals of a step and on-step detection', () => {
+  assert.equal(wheel.decimalsOf(0.01), 2);
+  assert.equal(wheel.decimalsOf(0.5), 1);
+  assert.equal(wheel.decimalsOf(500), 0);
+  assert.equal(wheel.isOnStep(0.36, 0.04, 0.01), true);
+  assert.equal(wheel.isOnStep(0.355, 0.04, 0.01), false, '0.355 is between 0.35 and 0.36');
+  assert.equal(wheel.isOnStep(17.0003, 1, 0.5), true, 'millilitre rounding stays on the step');
+  assert.equal(wheel.isOnStep(33, 5, 1), true);
+  assert.equal(wheel.isOnStep(33, 0, 5), false);
+});
+
+test('wheel: a turn steps, snaps to the nearest step from between steps, clamps', () => {
+  assert.equal(wheel.turn(33, 1, 5, 100, 1), 34);
+  assert.equal(wheel.turn(33, -1, 5, 100, 1), 32);
+  assert.equal(wheel.turn(0.36, 1, 0.04, 3.5, 0.01), 0.37, 'no floating-point noise');
+  assert.equal(wheel.turn(0.29, 1, 0.04, 3.5, 0.01), 0.3);
+  assert.equal(wheel.turn(0.355, 1, 0.04, 3.5, 0.01), 0.36, 'between steps, up: the step above');
+  assert.equal(wheel.turn(0.355, -1, 0.04, 3.5, 0.01), 0.35, 'between steps, down: the step below');
+  assert.equal(wheel.turn(100, 1, 5, 100, 1), null, 'at the end: nowhere');
+  assert.equal(wheel.turn(5, -1, 5, 100, 1), null);
+  assert.equal(wheel.turn(0, -1, 0, 95, 5), null);
+  assert.equal(wheel.turn(95, 1, 0, 95, 5), null);
+  assert.equal(wheel.turn(3, -1, 5, 100, 1), 5, 'below the range: back to the range');
+  assert.equal(wheel.turn(17, 1, 1, 99, 0.5), 17.5);
+  assert.equal(wheel.turn(0, 1, 0, 16000, 500), 500);
+  assert.equal(wheel.turn(1200, 1, 0, 16000, 500), 1500);
+  assert.equal(wheel.turn(1200, -1, 0, 16000, 500), 1000);
+});
+
+test('wheel: neighbours shown above and below', () => {
+  assert.deepEqual(wheel.neighbours(33, 5, 100, 1), { before: 32, after: 34 });
+  assert.deepEqual(wheel.neighbours(0, 0, 95, 5), { before: null, after: 5 });
+  assert.deepEqual(wheel.neighbours(95, 0, 95, 5), { before: 90, after: null });
+  assert.deepEqual(wheel.neighbours(0.355, 0.04, 3.5, 0.01), { before: 0.35, after: 0.36 });
+  assert.equal(wheel.clamp(120, 5, 100), 100);
+});
+
+test('wheel: drag and fling', () => {
+  assert.equal(wheel.stepsOfDrag(-24, 24), 1, 'dragging up raises the value');
+  assert.equal(wheel.stepsOfDrag(48, 24), -2);
+  assert.equal(wheel.stepsOfDrag(10, 24), 0);
+  assert.equal(wheel.flingSteps(0.2), 0);
+  assert.equal(wheel.flingSteps(-1.2) > 0, true);
+  assert.equal(wheel.flingSteps(1.2) < 0, true);
+  assert.equal(Math.abs(wheel.flingSteps(-50)), 12, 'at most 12 steps');
+});
+
+test('gas validation: oxygen 1 to 100, helium 0 to 99, 100 % at most together', () => {
+  assert.equal(rules.gasValid(21, 0), true);
+  assert.equal(rules.gasValid(100, 0), true);
+  assert.equal(rules.gasValid(50, 50), true);
+  assert.equal(rules.gasValid(50, 55), false, 'oxygen plus helium above 100');
+  assert.equal(rules.gasValid(80, 55), false);
+  assert.equal(rules.gasValid(0, 0), false);
+  assert.equal(rules.gasValid(101, 0), false);
+  assert.equal(rules.gasValid(21, 100), false);
+});

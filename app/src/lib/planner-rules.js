@@ -74,3 +74,11 @@ export const isShort = (carriedMl, totalMl) => carriedMl > 0 && carriedMl < tota
  * @param {number} bottomModMm
  */
 export const modAlarm = (maxDepthMm, bottomModMm) => bottomModMm > 0 && maxDepthMm > bottomModMm;
+
+/**
+ * Oxygen and helium together: oxygen 1 to 100, helium 0 to 99, 100 % at most
+ * in all.
+ * @param {number} o2
+ * @param {number} he
+ */
+export const gasValid = (o2, he) => o2 >= 1 && o2 <= 100 && he >= 0 && he <= 99 && o2 + he <= 100;
