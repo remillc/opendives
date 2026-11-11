@@ -1419,3 +1419,9 @@ Mock-ups: `docs/mockups/android-planificateur.dc.html` (plan from a dive), `docs
 - Values in the diver's volume unit per minute. Downward chevrons, not triangles. Accessible names give the full label and unit.
 - Check that the plan uses the deco SAC for the ascent and stops (planner tests: a case where the two SACs differ).
 - A line in the release notes.
+
+## [ ] 2026-11-11-34 Planner, new plan: empty profile thumbnail instead of "+"
+
+Mock-ups: `docs/mockups/android-planificateur-nouveau.dc.html` and `docs/mockups/android-tablette-planificateur-{paysage,portrait}.dc.html` (these copies also carry the gas dropdowns of task 32 and the two SAC fields of task 33).
+- In the "Nouvelle plongée · Sans plongée de départ" card, the "+" icon suggested adding something. Replace it with an empty thumbnail: in the same 56 × 36 dp slot as a starting dive's profile thumbnail, the outline of a dive profile in a dashed grey line (`--od-outline`, 1.5 dp, dashes of 3 dp). Decorative, hidden from screen readers. "Changer" stays.
+- A line in the release notes.
