@@ -208,17 +208,19 @@ test('two SACs: the request carries the bottom SAC and the deco SAC, each its ow
 
 // --- Dropdown choices -----------------------------------------------------------
 
-test('dropdown choices: the usual values, the current one above them when outside the list', () => {
-  assert.deepEqual(rules.O2_PRESETS, [21, 28, 32, 36, 40, 50, 80, 100]);
-  assert.deepEqual(rules.HE_PRESETS, [0, 10, 20, 30, 35, 45, 55]);
+test('dropdown choices: every gas value, the impossible ones hidden; usual altitudes', () => {
+  const range = (a, b) => Array.from({ length: b - a + 1 }, (_, i) => a + i);
+  assert.deepEqual(rules.o2Choices(0), range(5, 100), 'oxygen: 5 to 100 by 1');
+  assert.deepEqual(rules.heChoices(21), range(0, 79), 'helium: up to what the oxygen leaves');
+  assert.deepEqual(rules.heChoices(4), range(0, 95), 'helium: 95 at most');
+  assert.deepEqual(rules.o2Choices(70), range(5, 30), 'oxygen: up to what the helium leaves');
+  assert.deepEqual(rules.o2Choices(NaN), range(5, 100), 'an empty helium hides nothing');
   assert.deepEqual(rules.altitudePresets(true), [0, 1000, 2000, 3000, 5000, 7000, 10000]);
   assert.deepEqual(rules.altitudePresets(false), [0, 300, 600, 1000, 1500, 2000, 3000]);
-  assert.deepEqual(rules.choiceValues(rules.O2_PRESETS, 33), [33, 21, 28, 32, 36, 40, 50, 80, 100], '33 % from a dive heads the menu');
-  assert.deepEqual(rules.choiceValues(rules.O2_PRESETS, 32), rules.O2_PRESETS, 'a usual value adds nothing');
+  assert.deepEqual(rules.choiceValues(rules.o2Choices(0), 20.9).slice(0, 2), [20.9, 5], '20.9 % from a dive heads the menu');
+  assert.deepEqual(rules.choiceValues(rules.o2Choices(0), 32), rules.o2Choices(0), 'a value of the list adds nothing');
   assert.deepEqual(rules.choiceValues(rules.altitudePresets(false), 450), [450, 0, 300, 600, 1000, 1500, 2000, 3000]);
-  assert.deepEqual(rules.choiceValues(rules.HE_PRESETS, NaN), rules.HE_PRESETS, 'empty or invalid entry: nothing added');
-  rules.choiceValues(rules.O2_PRESETS, 21).push(1);
-  assert.equal(rules.O2_PRESETS.length, 8, 'the presets are not modified');
+  assert.deepEqual(rules.choiceValues(rules.altitudePresets(false), NaN), rules.altitudePresets(false), 'empty or invalid entry: nothing added');
 });
 
 test('gas validation: oxygen 1 to 100, helium 0 to 99, 100 % at most together', () => {

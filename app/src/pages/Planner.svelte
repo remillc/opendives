@@ -24,7 +24,7 @@
   import { t } from '../lib/i18n.js';
   import { WATER_TYPES, altitudeToPressureMbar, formatHoursMinutes, pressureToAltitudeMm, waterTypeName, waterTypeOfSalinity } from '../lib/tools.js';
   import { sharePlanPdf, sharePlanSummary } from '../lib/share.js';
-  import { MM_PER_FT, ML_PER_CUFT, O2_PRESETS, HE_PRESETS, altitudePresets, carriedToMl, depthToMm, gasTotalMl, gasValid, isShort, mlToCarried, modAlarm, mmToDepth, roundSacMl, sacChoices } from '../lib/planner-rules.js';
+  import { MM_PER_FT, ML_PER_CUFT, o2Choices, heChoices, altitudePresets, carriedToMl, depthToMm, gasTotalMl, gasValid, isShort, mlToCarried, modAlarm, mmToDepth, roundSacMl, sacChoices } from '../lib/planner-rules.js';
 
   /**
    * `reopen`: the route /plans/<id>, a saved plan; otherwise /plan/new or /plan/<dive id>.
@@ -720,9 +720,8 @@
               <ChoiceField
                 label={t('plan.oxygenPercent')}
                 bind:value={gas.o2}
-                presets={O2_PRESETS}
+                presets={o2Choices(parse(gas.he))}
                 unit="%"
-                otherLabel={t('plan.otherValue')}
                 backLabel={t('plan.backToList')}
                 ariaLabel={t('plan.gasOxygenLong', { n: String(i + 1), value: `${formatNumber(parse(gas.o2))} %` })}
                 invalid={invalid[`gas-${gas.key}`]}
@@ -732,9 +731,8 @@
               <ChoiceField
                 label={t('plan.heliumPercent')}
                 bind:value={gas.he}
-                presets={HE_PRESETS}
+                presets={heChoices(parse(gas.o2))}
                 unit="%"
-                otherLabel={t('plan.otherValue')}
                 backLabel={t('plan.backToList')}
                 ariaLabel={t('plan.gasHeliumLong', { n: String(i + 1), value: `${formatNumber(parse(gas.he))} %` })}
                 invalid={invalid[`gas-${gas.key}`]}

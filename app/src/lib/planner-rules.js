@@ -85,10 +85,22 @@ export const gasValid = (o2, he) => o2 >= 1 && o2 <= 100 && he >= 0 && he <= 99 
 
 // --- Dropdown choices of the gas, SAC and altitude fields ----------------------
 
-/** The usual oxygen fractions, %. */
-export const O2_PRESETS = [21, 28, 32, 36, 40, 50, 80, 100];
-/** The usual helium fractions, %. */
-export const HE_PRESETS = [0, 10, 20, 30, 35, 45, 55];
+/** @param {number} from @param {number} to */
+const range = (from, to) => Array.from({ length: Math.max(0, to - from + 1) }, (_, i) => from + i);
+
+/**
+ * Every oxygen fraction the menu offers, % (Christian, 11 November 2026: every
+ * value from 5 to 100, by 1), without those the helium leaves no room for.
+ * @param {number} he the gas's helium, %
+ */
+export const o2Choices = (he) => range(5, 100 - (Number.isFinite(he) ? Math.max(0, he) : 0));
+
+/**
+ * Every helium fraction the menu offers, % (0 to 95, by 1), without those
+ * the oxygen leaves no room for.
+ * @param {number} o2 the gas's oxygen, %
+ */
+export const heChoices = (o2) => range(0, Math.min(95, 100 - (Number.isFinite(o2) ? Math.max(0, o2) : 0)));
 /** The usual altitudes, in feet or in metres (the diver's depth unit). @param {boolean} feet */
 export const altitudePresets = (feet) => (feet ? [0, 1000, 2000, 3000, 5000, 7000, 10000] : [0, 300, 600, 1000, 1500, 2000, 3000]);
 
