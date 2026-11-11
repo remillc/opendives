@@ -4,6 +4,7 @@
 // close the application.
 import { App as CapacitorApp } from '@capacitor/app';
 import { f7 } from 'framework7-svelte';
+import { backTarget, readPane } from './pane-history.js';
 
 export function enableBackButton() {
   CapacitorApp.addListener('backButton', () => {
@@ -65,17 +66,15 @@ export function enableBackButton() {
       f7.searchbar.disable(/** @type {HTMLElement} */ (search));
       return;
     }
-    // 6. Back to the previous screen of the section.
-    if (view && view.router.history.length > 1) {
-      view.router.back();
-      return;
-    }
-    // 7. From another section, back to the Logbook.
-    if (view && view.el?.id !== 'view-logbook') {
-      f7.tab.show('#view-logbook');
-      return;
-    }
-    // 8. From the Logbook: the app goes to the background, as on Android.
-    CapacitorApp.minimizeApp();
+    // 6. Back: one screen of the detail pane (tablet), one page of the section,
+    // the Logbook, or the background (lib/pane-history.js).
+    const target = backTarget({
+      ...readPane(view?.el),
+      historyLength: view?.router.history.length ?? 1,
+      logbook: view?.el?.id === 'view-logbook' || !view,
+    });
+    if (target === 'pane' || target === 'page') view.router.back();
+    else if (target === 'logbook') f7.tab.show('#view-logbook');
+    else CapacitorApp.minimizeApp();
   });
 }
