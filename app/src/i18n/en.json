@@ -91,6 +91,9 @@
     },
     "menuRenumber": "Renumber the dives",
     "selectionClose": "Leave the selection",
+    "selectionActions": "Selection actions",
+    "selectionMore": "More options: filter, renumber, add to a trip",
+    "toolbarExport": "Export",
     "countFiltered": {
       "one": "{n} dive of {total}",
       "other": "{n} dives of {total}"
@@ -239,6 +242,8 @@
     "errorText": "No dive was changed. Go back to the logbook and open the dive again.",
     "edit": "Edit",
     "moreOptions": "More options",
+    "actions": "Dive actions",
+    "moreOptionsList": "More options: renumber, remove from trip, delete",
     "plan": "Plan from this dive",
     "number": "No. {number}",
     "figureMaxDepth": "max depth",
@@ -1437,6 +1442,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+    "Android: the actions of a dive (Edit, Share, Plan from this dive, and the ⋮ menu) and of the Logbook’s selection (Create a trip, Export, Delete, ⋮) are in a floating toolbar at the bottom of the screen. It hides when you scroll down and comes back when you scroll up. The Logbook’s “+” opens the same menu of choices as on tablets, instead of a bottom sheet.",
       "Planner: the Oxygen and Helium menus offer every value by 1 % (oxygen 5 to 100 %, helium 0 to 95 %), and “Other value…” is gone. A mix above 100 % is shown as an error on both fields.",
       "Planner: oxygen, helium, consumption (SAC) and altitude are dropdown menus of the usual values (“Other value…” lets you type another one; the keyboard opens on the same field). A value that is not in the list, such as 33 % read from a dive, shows in the field and heads the menu. A SAC measured on a dive is rounded to 0.01 cu ft/min (0.5 L/min) before it is shown or used.",
       "Planner: “Planner settings” in the ⋮ menu now opens the settings; “Plan from this dive” also works from a dive opened in Statistics or Sites.",

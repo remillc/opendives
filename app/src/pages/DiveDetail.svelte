@@ -14,6 +14,7 @@
   import DiveProfile from '../components/DiveProfile.svelte';
   import DiveFigures from '../components/DiveFigures.svelte';
   import Icon from '../components/Icon.svelte';
+  import FloatingToolbar from '../components/FloatingToolbar.svelte';
   import MenuItem from '../components/MenuItem.svelte';
   import RenumberDiveDialog from '../components/RenumberDiveDialog.svelte';
   import ShareSheet from '../components/ShareSheet.svelte';
@@ -421,13 +422,6 @@
         <Link iconOnly popoverOpen="#{menuId}">
           <Icon name="moreCircle" /><span class="od-sr-only">{t('detail.moreOptions')}</span>
         </Link>
-      {:else}
-        <Link iconOnly href="/dives/{diveId}/edit">
-          <Icon name="edit" weight={2} /><span class="od-sr-only">{t('detail.edit')}</span>
-        </Link>
-        <Link iconOnly popoverOpen="#{menuId}">
-          <Icon name="more" weight={4} /><span class="od-sr-only">{t('detail.moreOptions')}</span>
-        </Link>
       {/if}
     {/snippet}
   </Navbar>
@@ -438,7 +432,9 @@
     <List noChevron>
       <!-- This page's router, not a link: the menu opens at the app's root, where a
            link would use the Carnet's view even when the dive is shown in another section. -->
-      <MenuItem icon="plan" text={t('detail.plan')} onclick={() => f7router.navigate(`/plan/${diveId}`)} />
+      {#if theme.ios}
+        <MenuItem icon="plan" text={t('detail.plan')} onclick={() => f7router.navigate(`/plan/${diveId}`)} />
+      {/if}
       <MenuItem
         icon="renumber"
         text={t('renumberDive.title')}
@@ -450,14 +446,16 @@
       {#if removableFromTrip}
         <MenuItem icon="tripRemove" text={t('detail.removeFromTrip')} onclick={removeFromTrip} />
       {/if}
-      <MenuItem
-        icon="share"
-        text={t('share.title')}
-        onclick={() => {
-          f7.popover.close(`#${menuId}`);
-          sharing = true;
-        }}
-      />
+      {#if theme.ios}
+        <MenuItem
+          icon="share"
+          text={t('share.title')}
+          onclick={() => {
+            f7.popover.close(`#${menuId}`);
+            sharing = true;
+          }}
+        />
+      {/if}
       <li class="od-menu-divider" role="separator"></li>
       <!-- In ink, not in the alarm colour: that one is for errors only. -->
       <MenuItem icon="delete" text={t('detail.delete')} onclick={deleteNow} />
@@ -641,6 +639,23 @@
     {/if}
     <div class="od-dive-detail--end" aria-hidden="true"></div>
   {/if}
+
+  {#snippet fixedContent()}
+    <!-- Android: the actions in a floating toolbar (Material 3 Expressive); iOS keeps the top bar. -->
+    {#if !theme.ios && dive && !failed}
+      <FloatingToolbar
+        label={t('detail.actions')}
+        clearFab={layout.split && !layout.rail && navigation.section === 'logbook'}
+        actions={[
+          { key: 'edit', icon: 'edit', label: t('detail.edit'), text: t('detail.edit'), onclick: () => f7router.navigate(`/dives/${diveId}/edit`) },
+          { key: 'share', icon: 'share', label: t('share.title'), onclick: () => (sharing = true) },
+          // This page's router, not a link: see the overflow menu.
+          { key: 'plan', icon: 'plan', label: t('detail.plan'), onclick: () => f7router.navigate(`/plan/${diveId}`) },
+          { key: 'more', icon: 'more', label: t('detail.moreOptionsList'), menu: `#${menuId}` },
+        ]}
+      />
+    {/if}
+  {/snippet}
 </Page>
 
 {#if sharing}

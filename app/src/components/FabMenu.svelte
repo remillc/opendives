@@ -1,7 +1,7 @@
 <script>
   // @ts-check
-  // Material 3 Expressive FAB menu (spec, section 8, "FAB menu (Android
-  // tablet)"): the Logbook's "+" on an Android tablet. The button becomes a ✕,
+  // Material 3 Expressive FAB menu (spec, section 8, "FAB menu
+  // (Android)"): the Logbook's "+" on an Android phone or tablet. The button becomes a ✕,
   // the choices unfold above it as 56 dp pills, a light scrim covers the screen.
   // Sizes follow the Material library's FloatingActionButtonMenu (56 dp
   // button, 56 dp items with a 24 dp icon and 24 dp side padding); the gaps are
