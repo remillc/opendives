@@ -36,7 +36,7 @@ OpenDives is a full dive log app for mobile. It improves on Subsurface-mobile, b
 
 - **Reference for coding the UI:** `docs/system-design.md` (principles, CSS naming, colours, type, layout, shared components, states) and `docs/ui-specification.md` (each screen, core data). They take precedence over the mock-ups. These UI documents exist only here, in English (their old French versions on claude.ai were abandoned on 10 November 2026).
 - **iPhone and iPad:** iOS conventions (Human Interface Guidelines).
-- **Android:** **Material Design 3**, standard and Expressive alike (decided on 10 November 2026): a component may come from either, for example the Expressive FAB menu.
+- **Android:** **Material 3 Expressive** is the reference (decided on 11 November 2026): its components, shapes, motion (springs) and type are used by default; a standard Material 3 component is used only where Expressive has no version of it. No dynamic colour: the OpenDives theme stays (see docs/system-design.md, sections 3 and 5).
 - **Tablets:** an iOS variant and an Android variant.
 - **No UI patterns or features typical of AI agents:** no chat assistant, no "magic" summary, no sparkle button, etc.
 - **Do not copy Subsurface-mobile's screens:** they are its main weakness.
