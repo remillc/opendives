@@ -1479,3 +1479,23 @@ Christian chose the dropdown menus after all. Undo task 36 (wheels) and build wh
 - A line in the release notes.
 
 Done in `ChoiceField.svelte` (a filled dropdown whose "Autre valeur…" turns the same field into a numeric text field, with today's validation, and back), `SelectField` (`invalid`), `TextField` (`keepTrailing`), `planner-rules.js` (option lists, outside-the-list rule, SAC rounding to its step) and `Planner.svelte`. The wheel component, its rules and its System design entry are removed.
+
+## [ ] 2026-11-11-39 Android: Material 3 Expressive pass
+
+Android now follows Material 3 Expressive by default (AGENTS.md and System design, section 5, decided on 11 November 2026). Mock-ups updated in `docs/mockups/` (phone boards and the matching `android-tablette-*` boards). Use the components of the Material library (Compose Material 3 Expressive or their Framework7 equivalents styled to match), not hand-made imitations. Add each new shared component to System design, section 8, with its `od-` class.
+
+1. **Wavy progress indicators** instead of flat linear bars: dive-computer download (`android-telechargement-encours`), offline maps download and update (`android-cartes-telechargement`, `android-cartes-mise-a-jour`), account import (`compte-import-encours-android`), and the indeterminate bar under the top bar while signing in (`compte-connexion-encours-android`). Determinate: wave for the done part, 4 dp gap, flat track, stop dot at the end. The "Encore 1 plongée avant la 10e" gauge in the drawer stays a plain bar (it is not an operation).
+2. **Loading indicator** (shape-morphing, `LoadingIndicator`) instead of circular spinners: "À proximité" while scanning (`android-telechargement-choix`), the current import step, the "Connexion…" button. Colour: the water gradient (sand #F3C47A to rust #B4530F; dark mode honey to amber), uncontained, small sizes as drawn (20, 24, 18 dp). TalkBack: role status with its label.
+3. **Connected button groups** instead of segmented buttons, for exclusive choices: Nitrox / Trimix and "Hélium d'abord / Oxygène d'abord" (mixer), dive mode in the filter, and every choice dialog of Settings (units, coordinates, water type, durations, numbers, speeds, cylinder choice, reset, menu). 2 dp gaps, 40 dp high, unselected tonal (`--od-surface-container-high`) with 8 dp inner corners and fully rounded outer ends, selected filled with the ink (`--od-primary`, text `--od-on-primary`) and fully rounded. No check mark. The curve chips of the dive profile stay filter chips (task 24).
+4. **Split button** for "Synchroniser maintenant" in the side menu and on the Account screen when sync is manual (`appbar-tiroir-android-ouvert-manuel`, `compte-android-connecte-manuel`): leading button "Synchroniser maintenant", trailing chevron button (`aria-label` "Autres options de synchronisation") opening a menu "Passer en synchronisation automatique", "Voir les modifications non envoyées".
+5. **FAB menu on the phone too**: the Carnet "+" opens the same Expressive FAB menu as on tablets (task 29), anchored at the FAB's place (`android-ajout`, new). The bottom sheet goes.
+6. **Floating toolbar** (vibrant: ink container, light icons) at the bottom centre:
+   - dive detail (`detail3-android`, `-curseur`, `-sombre`, and the tablet detail pane): "Modifier" as the toolbar's primary pill, then Partager, Planifier depuis cette plongée, ⋮ (Renuméroter, Retirer du voyage, Supprimer). The top bar keeps only ←. Dark mode: light container, dark icons.
+   - Carnet selection (`carnet-selection-android`, `-menu`, tablet selection): "Créer un voyage" as primary, then Exporter, Supprimer, ⋮ (Filtrer, Renuméroter, Ajouter au voyage au-dessus ou en dessous). The top bar keeps ✕ and the count.
+   - It hides while scrolling down and comes back on scrolling up; content gets bottom padding so the last row is never covered. On tablets in portrait it sits in the detail pane, left of the "+" FAB.
+7. **Flexible top app bar** for Carnet, Sites, Statistiques, Outils: the large title with its summary line, collapsing on scroll (the current headers are close; use the library component).
+8. **Downward chevrons** (stroke) instead of filled triangles in every exposed dropdown (planner, edit, git configuration, gas tools).
+9. Settings, Account and About lists stay as rounded groups (already close to Expressive lists).
+10. **Motion:** the Expressive motion scheme (spatial and effects springs) for the detail, the drawer, sheets, dialogs, the FAB menu and list items. "Remove animations" turns it off.
+11. Emphasized type and FAB sizes from Expressive where they differ from our values; check with Christian before changing a size that the mock-ups fix.
+- A line in the release notes.
