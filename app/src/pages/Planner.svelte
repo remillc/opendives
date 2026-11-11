@@ -682,8 +682,8 @@
         <h2 class="od-planner--section-title">{t('plan.date')}</h2>
         <div class="od-planner--fields">
           <div class="od-planner--pair">
-            <div class="od-planner--grow"><ButtonField label={t('edit.date')} value={dateText} onclick={() => (dialog = 'date')} /></div>
-            <div class="od-planner--grow"><ButtonField label={t('edit.time')} value={timeText} onclick={() => (dialog = 'time')} /></div>
+            <div class="od-planner--grow"><ButtonField label={t('edit.date')} value={dateText} icon="calendar" onclick={() => (dialog = 'date')} /></div>
+            <div class="od-planner--grow"><ButtonField label={t('edit.time')} value={timeText} icon="clock" onclick={() => (dialog = 'time')} /></div>
           </div>
           {#if intervalHelper}<p class="od-planner--helper od-planner--inner">{intervalHelper}</p>{/if}
         </div>

@@ -1459,6 +1459,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Android : les champs de date se terminent par une icône de calendrier et les champs d’heure par une icône d’horloge, au lieu d’un chevron (Modifier la plongée, planificateur, Nouvelle plongée) ; le champ Heure de « Modifier la plongée » est plus large, « 10:00 » n’est plus coupé.",
       "Android : chaque choix dans une liste est désormais un menu déroulant qui s’ouvre juste sous son champ (mode de plongée, type d’eau, bouteille, gaz, CAR, altitude, branche git, critère de statistique). La ppO₂ maximale des outils de gaz et les seuils de pO₂ des Réglages sont aussi des menus déroulants, à la place des roues. Dans « Modifier la plongée », le champ Site ouvre un menu avec une zone de recherche et « Nouveau site… ».",
       "« Modifier la plongée » : la ligne sous le titre donne la date sans le jour de la semaine ni l’heure (« N° 5 · Lake Coleridge · 2 avril 2014 »), comme les maquettes.",
       "Android : les écrans, le menu latéral, les feuilles et les boîtes de dialogue bougent maintenant avec un mouvement à ressort (un léger rebond quand il convient), et les plongées d’une sortie que vous ouvrez glissent à leur place. Avec « Supprimer les animations », plus rien ne bouge.",

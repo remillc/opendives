@@ -597,8 +597,8 @@
     <section class="card od-edit-dive--card">
       {@render header(t('edit.diveGroup'))}
       <div class="od-edit-dive--row">
-        <div class="od-edit-dive--grow"><ButtonField label={t('edit.date')} value={dateText} onclick={() => (dialog = 'date')} /></div>
-        <div class="od-edit-dive--time"><ButtonField label={t('edit.time')} value={timeText} onclick={() => (dialog = 'time')} /></div>
+        <div class="od-edit-dive--grow"><ButtonField label={t('edit.date')} value={dateText} icon="calendar" onclick={() => (dialog = 'date')} /></div>
+        <div class="od-edit-dive--time"><ButtonField label={t('edit.time')} value={timeText} icon="clock" onclick={() => (dialog = 'time')} /></div>
       </div>
       <!-- Measured by the dive computer: plain text, not a field. -->
       <dl class="od-edit-dive--measured">
@@ -927,10 +927,8 @@
 
       .od-edit-dive--time {
         flex: 0 0 auto;
-        min-width: 96px;
-        /* No room for the arrow, as in the mock-up. */
-        --od-button-field-end: 16px;
-        --od-button-field-arrow: none;
+        /* 120 dp: the clock icon at the end and "10:00" untruncated (task 2026-11-11-42). */
+        width: 120px;
       }
 
       .od-edit-dive--weight-value {

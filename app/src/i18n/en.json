@@ -1459,6 +1459,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Android: date fields end with a calendar icon and time fields with a clock icon instead of a chevron (Edit dive, the planner, New dive); the Time field of “Edit dive” is wider, so “10:00” is no longer cut off.",
       "Android: every choice from a list is now one dropdown menu that opens right under its field (dive mode, water type, cylinder, gases, SAC, altitude, git branch, statistic criterion). The maximum pO₂ of the gas tools and the pO₂ thresholds in Settings are dropdowns too, instead of wheels. In “Edit dive”, the site field opens a menu with a search box and “New site…”.",
       "“Edit dive”: the line under the title gives the date without the weekday or the time (“No. 5 · Lake Coleridge · April 2, 2014”), as in the mock-ups.",
       "Android: screens, the side menu, sheets and dialogs now move with springy motion (a slight bounce where it fits), and the dives of a trip you open slide into place. With “Remove animations” on, none of it moves.",

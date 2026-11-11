@@ -4,7 +4,9 @@
   import { ios } from '../lib/layout.svelte.js';
   // A value chosen in a dialog (date, time, site): drawn as the MD3 filled
   // field of SelectField, the label small above the value, a button that
-  // opens the dialog. Without `onclick`, a read-only field (no arrow).
+  // opens the dialog. Without `onclick`, a read-only field (no arrow). A date field
+  // ends with a calendar icon and a time field with a clock icon (Android, spec section 8),
+  // never a chevron.
 
   /**
    * @type {{
@@ -12,9 +14,11 @@
    *   value: string,
    *   onclick?: () => void,
    *   supporting?: string,
+   *   icon?: 'calendar'|'clock',
    * }}
+   * icon: the trailing icon of a date or a time field (24 dp).
    */
-  let { label, value, onclick, supporting = '' } = $props();
+  let { label, value, onclick, supporting = '', icon } = $props();
 </script>
 
 <div class="od-button-field od-button-field--field">
@@ -22,7 +26,7 @@
     <button type="button" class="od-button-field--box" {onclick}>
       <span class="od-button-field--label">{label}</span>
       <span class="od-button-field--value">{value}</span>
-      <span class="od-button-field--arrow"><Icon name={ios ? 'expand' : 'chevron'} /></span>
+      <span class="od-button-field--arrow"><Icon name={icon && !ios ? icon : ios ? 'expand' : 'chevron'} /></span>
     </button>
   {:else}
     <div class="od-button-field--box od-button-field--readonly">

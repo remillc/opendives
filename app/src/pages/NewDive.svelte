@@ -220,12 +220,12 @@
     <button type="button" class="od-new-dive--row" onclick={() => (dialog = 'date')}>
       <span class="od-new-dive--row-label">{t('newDive.date')}</span>
       <span class="od-new-dive--row-value">{dateText}</span>
-      <Icon name="chevron" size={18} />
+      {#if theme.ios}<Icon name="chevron" size={18} />{:else}<Icon name="calendar" />{/if}
     </button>
     <button type="button" class="od-new-dive--row" onclick={() => (dialog = 'time')}>
       <span class="od-new-dive--row-label">{t('newDive.time')}</span>
       <span class="od-new-dive--row-value">{timeText}</span>
-      <Icon name="chevron" size={18} />
+      {#if theme.ios}<Icon name="chevron" size={18} />{:else}<Icon name="clock" />{/if}
     </button>
     <TextField
       label={t('newDive.duration')}
