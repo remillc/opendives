@@ -2,12 +2,13 @@
   // @ts-check
   // "Sync now" as the side menu and Account offer it: the plain button while
   // sync is automatic; a split button while it is manual, whose chevron offers
-  // to switch to automatic sync and to see the changes not sent yet (they are
-  // marked on the dives of the Logbook, which opens).
+  // to switch to automatic sync and to see the changes not sent yet: the
+  // Logbook opens, filtered on the dives whose edits are not sent.
   import SyncButton from './SyncButton.svelte';
   import SplitButton from './SplitButton.svelte';
   import MenuItem from './MenuItem.svelte';
   import { logbook, setAutoSync } from '../lib/logbook.svelte.js';
+  import { showUnsent } from '../lib/filter.svelte.js';
   import { closeMenu, showSection } from '../lib/navigation.svelte.js';
   import { t } from '../lib/i18n.js';
 </script>
@@ -25,6 +26,7 @@
         onclick={() => {
           closeMenu();
           showSection('logbook');
+          showUnsent(logbook.prefs);
         }}
       />
     {/snippet}

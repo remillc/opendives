@@ -8,6 +8,7 @@
 import { OpenDivesCore } from 'opendives-core';
 import { t } from './i18n.js';
 import { formatNumber } from './format.js';
+import { logbook } from './logbook.svelte.js';
 
 /** @typedef {import('opendives-core').FilterRule} FilterRule */
 /** @typedef {import('opendives-core').FilterOptions} FilterOptions */
@@ -28,8 +29,12 @@ import { formatNumber } from './format.js';
  *   waterTemp: Range, airTemp: Range, cylinderSize: Range, o2: Range, he: Range,
  *   rating: number, visibility: number, current: number, wavesize: number, surge: number, chill: number,
  *   notes: string, fulltext: string,
+ *   unsent: boolean,
  *   preset: SavedFilter|null,
  * }} Criteria
+ * `unsent`: only the dives whose edits are not sent yet (the ones the Logbook
+ * marks), as the sync menu's "See changes not sent yet" asks; matched here,
+ * not by the core, and not on the Filter screen.
  * `preset`: a saved filter applied as the core keeps it (its rules are added
  * to the other criteria).
  */
@@ -51,6 +56,7 @@ export function emptyCriteria() {
     waterTemp: range(), airTemp: range(), cylinderSize: range(), o2: range(), he: range(),
     rating: 0, visibility: 0, current: 0, wavesize: 0, surge: 0, chill: 0,
     notes: '', fulltext: '',
+    unsent: false,
     preset: null,
   };
 }
@@ -380,9 +386,30 @@ export function isEmpty(c) {
  * @param {Prefs} prefs
  */
 async function match(c, prefs) {
+  const unsent = c.unsent ? unsentIds(logbook.dives, logbook.pendingByDive) : null;
+  if (unsent && isEmpty({ ...c, unsent: false })) return unsent;
   /** @type {number[]} */
   const ids = await OpenDivesCore.filterQuery({ kind: 'dives', ...fulltextOf(c), rules: rulesFor(c, prefs) });
-  return new Set(ids);
+  return new Set(unsent ? ids.filter((id) => unsent.has(id)) : ids);
+}
+
+/**
+ * Identifiers of the dives with edits not sent yet: those of the pending
+ * commits, by dive number (logbook.pendingByDive).
+ * @param {{ id: number, number: number }[]} dives
+ * @param {Record<number, string[]>} pendingByDive
+ */
+export function unsentIds(dives, pendingByDive) {
+  return new Set(dives.filter((d) => d.number && pendingByDive[d.number]?.length).map((d) => d.id));
+}
+
+/**
+ * "See changes not sent yet": the sections show only the dives with edits not
+ * sent, whatever filter was applied.
+ * @param {Prefs} prefs
+ */
+export function showUnsent(prefs) {
+  return applyFilter({ ...emptyCriteria(), unsent: true }, prefs);
 }
 
 /** Reads the values present in the logbook (after each load). */
@@ -701,6 +728,7 @@ export function activeKeys(c) {
   const keys = [];
   if (hasRemainder(c.preset)) keys.push('preset');
   if (c.mode !== 'all') keys.push('mode');
+  if (c.unsent) keys.push('unsent');
   for (const g of groups) for (const k of g.keys) if (isSet(k.key, c)) keys.push(k.key);
   return keys;
 }
