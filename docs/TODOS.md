@@ -10,7 +10,7 @@ Rules (agreed between the design agent and the code agent, see `docs/agent-inbox
 - **Tag:** every item starts with `[design]` or `[code]` right after its number, set by the agent that adds it (`#4 [design] …`). `[design]` = mock-ups, visuals, screen texts, specification; `[code]` = everything else. When unsure, the agent asks Christian. The tag says who handles the item and lets Christian list one kind only.
 - No other content in this file: no history, no checked boxes, no notes from agents.
 
-Next number: 37
+Next number: 38
 
 ## List
 
@@ -29,3 +29,4 @@ Next number: 37
 - #34 [design] décider où annoncer les APK gratuits (page « Télécharger » du site `site/`, README et versions GitHub, F-Droid plus tard ; la fiche du store seulement après avoir relu ses règles). Pas dans l'app.
 - #35 [design] indiquer quelque part (À propos, aide ou écran d'erreur ?) que pour les problèmes du cœur du carnet (lecture des ordinateurs de plongée, format des fichiers, calculs) on peut s'adresser au forum de Subsurface. Trouver une formulation pour l'utilisateur, sans parler de « fonctions core ».
 - #36 [idea] Modifier une plongée sur place (Material 3 Expressive) : la fiche reste affichée, ses champs deviennent modifiables et la barre d'outils flottante passe à « Annuler / Enregistrer », au lieu du dialogue plein écran actuel. À évaluer plus tard : la fiche et l'écran de modification ne groupent pas les champs de la même façon.
+- #37 [feature] Signature manuscrite d'une plongée par un compagnon (buddy) ou le guide de palanquée, tracée au doigt sur l'écran. **Déroge à la politique de compatibilité avec Subsurface** : le format de Subsurface n'a pas de champ pour une signature, il faudra décider où et comment la stocker sans casser un carnet lu par Subsurface (fichier à part dans le dépôt git, données ignorées par Subsurface, etc.), et faire valider cette exception par Christian avant tout code.
