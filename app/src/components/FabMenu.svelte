@@ -8,7 +8,7 @@
   // our own (16 dp between items, 24 dp above the close button).
   import Icon from './Icon.svelte';
   import { t } from '../lib/i18n.js';
-  import { springEasing } from '../lib/spring.js';
+  import { motionSpring } from '../lib/motion.js';
 
   /**
    * @type {{
@@ -24,11 +24,11 @@
   /** @type {HTMLButtonElement|undefined} */
   let button = $state();
 
-  // Expressive motion scheme: the "fast spatial" spring (stiffness 1400,
-  // damping ratio 0.9) for the shapes and the choices, the "fast effects"
-  // spring (stiffness 3800, damping ratio 1) for the colours and the fades.
-  const spatial = springEasing(1400, 0.9);
-  const effects = springEasing(3800, 1);
+  // Expressive motion scheme (lib/motion.js): the "fast spatial" spring for
+  // the shapes and the choices, the "fast effects" spring for the colours and
+  // the fades.
+  const spatial = motionSpring('spatial-fast');
+  const effects = motionSpring('effects-fast');
 
   /** Pause between two choices, in ms. */
   const STAGGER = 50;

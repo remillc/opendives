@@ -56,6 +56,7 @@
   import Welcome from './components/Welcome.svelte';
   import { layout, ios, listWidth, splitBreakpoint } from './lib/layout.svelte.js';
   import { trackSection, enableSectionSwipes, enableFullSwipeBack } from './lib/navigation.svelte.js';
+  import { applyMotionTokens } from './lib/motion.js';
   import { TAP_SLOP } from './lib/tap.js';
   import { enableBackButton } from './lib/back-button.js';
   import { enableAccessibility } from './lib/accessibility.js';
@@ -252,6 +253,7 @@
   });
 
   onMount(() => {
+    applyMotionTokens();
     enableBackButton();
     enableAccessibility();
     enableDetailPageCleanup();

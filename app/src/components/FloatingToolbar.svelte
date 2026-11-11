@@ -10,7 +10,7 @@
   // the toolbar stays on the left of it.
   import { f7 } from 'framework7-svelte';
   import Icon from './Icon.svelte';
-  import { springEasing } from '../lib/spring.js';
+  import { motionSpring } from '../lib/motion.js';
 
   /**
    * `menu`: selector of the popover this action opens (the button is its target).
@@ -35,7 +35,7 @@
   let current = $state(0);
 
   // Expressive "fast spatial" spring, as the FAB menu.
-  const spatial = springEasing(1400, 0.9);
+  const spatial = motionSpring('spatial-fast');
 
   // The page's scroll area: down hides the toolbar, up shows it again.
   $effect(() => {

@@ -257,6 +257,35 @@ Mock-ups: `android-tablette-ajout-paysage.dc.html`, `android-tablette-ajout-port
 - iOS does not use it.
 Mock-ups: `detail3-android.dc.html`, `detail3-android-curseur.dc.html`, `detail3-android-sombre.dc.html`, `carnet-selection-android.dc.html`, `carnet-selection-menu-android.dc.html`, `android-tablette-detail-menu-*.dc.html`, `android-tablette-carnet-selection-*.dc.html`.
 
+### Motion (Android, decided on 11 November 2026)
+
+Android uses the Material 3 Expressive motion scheme: springs, not fixed curves. A spring is a damping ratio and a stiffness; `lib/motion.js` samples each one into a CSS `linear()` easing and a duration (the time to settle within 0.5 % of the target) and declares them once on `<html>`, on Android only (the `md` class), as `--od-motion-<name>` (easing) and `--od-motion-<name>-ms` (duration). iOS keeps Framework7's curves.
+
+| Token | Damping ratio | Stiffness | Use |
+|---|---|---|---|
+| `spatial-fast` | 0.6 | 800 | small things: dialogs, FAB menu, floating toolbar, going back |
+| `spatial-default` | 0.8 | 380 | pages, swipes between dives or sections, rows sliding in |
+| `spatial-slow` | 0.8 | 200 | declared, unused for now |
+| `effects-fast` | 1 | 3800 | colour and fade of the FAB menu |
+| `effects-default` | 1 | 1600 | fades of dialogs, scrims, pages, rows |
+| `effects-slow` | 1 | 800 | declared, unused for now |
+| `anchored-default` | 1 | 380 | side drawer, sheets, popups |
+| `anchored-fast` | 1 | 800 | declared, unused for now |
+
+Spatial springs (position, size, scale) may overshoot a little; effects springs (opacity, colour) never do. The `anchored` tokens are an OpenDives addition: the spatial stiffness with a damping ratio of 1, for surfaces fixed to a screen edge, which must not leave it.
+
+Where they apply (rules in `theme.css`, layer `od.base`, and in the components):
+
+- **Page transitions** (opening a dive, Settings, any pushed page, phone): the new page and the one below use `spatial-default`; going back uses `spatial-fast` and `effects-fast` for the fade. Framework7's keyframes are kept; only their duration and easing change.
+- **Swipe between dives or sections** (`od-slide-next`, `od-slide-previous`): the slide is `spatial-default`, the fade `effects-default`.
+- **Side drawer, sheets, popups:** Framework7's `--f7-panel-*`, `--f7-sheet-*` and `--f7-popup-*` transition variables use `anchored-default`.
+- **Dialogs:** Framework7's `.dialog` and `<Md3Dialog>` grow from 90 % with `spatial-fast` and fade with `effects-default`; the scrim fades with `effects-default`. Closing is immediate for `<Md3Dialog>`.
+- **FAB menu and floating toolbar:** `spatial-fast` and `effects-fast` (see their sections).
+- **List items:** the dives of a trip just expanded slide down (`spatial-default`) and fade in (`effects-default`). Nothing animates when a list is first drawn or scrolled, so the Logbook's virtual list costs nothing; rows removed disappear at once.
+- **Tablet detail pane:** the pane swaps without animation, as before.
+
+Springs are kept short (all under 0.4 s except `spatial-slow`). "Remove animations" (`prefers-reduced-motion`) cuts every transition and animation to 0.01 ms through the rule at the end of `od.base`; the `--od-motion-*` tokens need no special case.
+
 ### Text fields
 
 **Text fields (decided on 6 November 2026, updated the same day).** Every text field of the app on Android uses the MD3 **filled** variant (Framework7 MD inputs without the outline style): surface-container-highest background (#E8E8E5 light), 4 dp top corners, a 1 dp bottom indicator that becomes 2 dp in the primary colour on focus, the label inside the field: full size when the field is empty and not focused, with no placeholder; small above the value on focus or once the field has a value. Helper text sits under the field. A trailing icon (for example "use my position") is a plain 24 dp icon button, without a filled background. In a full-screen form, the save action is a text button at the right of the top bar ("Enregistrer"), the close action an X at the left. Reference: `docs/mockups/sites-edition-android.dc.html`.

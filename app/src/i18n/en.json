@@ -1445,6 +1445,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Android: screens, the side menu, sheets and dialogs now move with springy motion (a slight bounce where it fits), and the dives of a trip you open slide into place. With “Remove animations” on, none of it moves.",
       "Android: exclusive choices (unit system, dive mode in the filter, Nitrox / Trimix and the fill order in the gas blender) are connected button groups, and every dropdown menu shows a downward chevron instead of a filled triangle.",
       "Android: “Sync now” becomes a split button when synchronisation is manual (the chevron offers to switch to automatic sync or to see the changes not sent yet, which opens the Logbook filtered on the edited dives not sent yet); the Statistics and Tools headers shrink as you scroll, like the Logbook’s.",
       "Android: progress now shows as a wavy line (dive-computer download, offline maps download and update, sign-in), and the circular spinners are replaced by a small shape that morphs while it works (nearby computers, import step, “Connecting…” button). With “Remove animations” on, the wave and the shape stand still.",
