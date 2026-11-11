@@ -247,15 +247,21 @@ Mock-ups: `android-tablette-ajout-paysage.dc.html`, `android-tablette-ajout-port
 - **Accessibility:** `role="status"` with its `aria-label`. With "Remove animations", one static shape.
 ### Floating toolbar (Android, decided on 11 November 2026)
 
+**Rule: every sheet carries its actions in the floating toolbar** (dive, trip, site, and the Carnet's selection); the top bar keeps only ← (or ✕ and the count). iOS keeps its top bar.
+
 `FloatingToolbar.svelte`, class `od-floating-toolbar` (parts `od-floating-toolbar--button`, `--primary`, `--text`; modifiers `--hidden`, `--clear-fab`). The Material 3 Expressive vibrant floating toolbar, at the bottom centre of the page, 24 dp above the bottom edge: 64 dp high, fully rounded, 8 dp inner padding, 4 dp between actions, shadow like the FAB menu. Colours are `--od-toolbar-container` / `--od-toolbar-on-container` (ink with light icons; dark mode: light container with dark icons) and `--od-toolbar-primary` / `--od-toolbar-on-primary` for the primary pill.
 - **Actions:** the first is the primary pill (48 dp high, icon and label, 14 sp weight 500); the others are 48 dp icon buttons, each with an accessible name. The last one, ⋮, opens a menu (`aria-haspopup="menu"`, an `od-menu` popover).
-- **Dive detail:** Modifier (primary), Partager, Planifier depuis cette plongée, ⋮ (Renuméroter, Retirer du voyage, Supprimer). The top bar keeps only ←.
+- **Dive detail:** Modifier (primary), Partager (the standard Android share icon: three connected dots), Planifier depuis cette plongée, ⋮ (Renuméroter la plongée, Retirer du voyage only when the dive is in a trip, a divider, then Supprimer la plongée in `--od-alarm`).
+- **Trip sheet:** Modifier (primary), "+" (Ajouter des plongées), ⋮ (Fusionner avec un autre voyage, a divider, then Défaire le voyage in `--od-alarm`). The note under the dive list says the actions are in the bottom bar; the per-dive ⋮ of the list stays.
+- **Site sheet:** Modifier (primary), map icon (Ouvrir dans Cartes; only when the site has a position), ⋮ (Fusionner avec un autre site, a divider, then Supprimer le site in `--od-alarm`).
+- **Menu of ⋮:** an `od-menu` popover just above the toolbar, its right edge aligned with the ⋮ button, no arrow. The destructive item (last, after a divider) is in the alarm colour, icon and label. While the menu is open the ⋮ shows its pressed state (a state layer, `od-floating-toolbar--pressed`, `aria-expanded`).
+- **Tooltips:** each button shows an MD3 plain tooltip (`od-floating-toolbar--tooltip`: inverse surface, 12 sp, 4 dp corners, 4 dp above the toolbar, centred on the button) with its name on long press (about 450 ms; it goes away 1.5 s after the finger lifts and the press does not trigger the action), and with a mouse on hover (700 ms) or keyboard focus.
 - **Carnet selection:** Créer un voyage (primary), Exporter, Supprimer, ⋮ (Filtrer, Renuméroter, Ajouter au voyage…). The top bar keeps ✕ and the count.
 - **Scrolling:** it hides while the page scrolls down (it slides out and fades with the Expressive "fast spatial" spring) and comes back on scrolling up, and when the end of the content is reached. The page content gets a bottom padding of 104 dp so the last row is never covered. With "Remove animations" it appears and disappears at once.
 - **Tablets:** it sits in the page of the pane that owns the actions (the detail pane, or the list pane for the selection), centred; on a tablet in portrait, the detail's toolbar stays to the left of the "+" (`--clear-fab`).
 - **Accessibility:** `role="toolbar"` with a label; one tab stop (roving tabindex), Left and Right arrows, Home and End move inside; hidden, it is `inert`.
 - iOS does not use it.
-Mock-ups: `detail3-android.dc.html`, `detail3-android-curseur.dc.html`, `detail3-android-sombre.dc.html`, `carnet-selection-android.dc.html`, `carnet-selection-menu-android.dc.html`, `android-tablette-detail-menu-*.dc.html`, `android-tablette-carnet-selection-*.dc.html`.
+Mock-ups: `detail3-android.dc.html`, `detail3-android-curseur.dc.html`, `detail3-android-sombre.dc.html`, `carnet-selection-android.dc.html`, `carnet-selection-menu-android.dc.html`, `android-tablette-detail-menu-*.dc.html`, `detail2-android-menu.dc.html`, `voyage-android.dc.html`, `android-tablette-voyage-*.dc.html`, `sites-fiche-android.dc.html`, `android-tablette-site-*.dc.html`, `android-tablette-carnet-site-*.dc.html`, `android-tablette-carnet-selection-*.dc.html`.
 
 ### Motion (Android, decided on 11 November 2026)
 

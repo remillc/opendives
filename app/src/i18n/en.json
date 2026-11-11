@@ -990,14 +990,17 @@
     "mergeWith": "Merge with",
     "addDives": "Add dives",
     "addDive": "Add to the trip",
-    "ungroup": "Delete this trip",
+    "ungroup": "Ungroup the trip",
     "ungroupTitle": "Delete this trip?",
     "ungroupText": "Its dives stay in the logbook, outside any trip.",
     "noOtherTrip": "No other trip in the logbook",
     "noLooseDive": "Every dive is already in a trip",
     "edit": "Edit the trip",
     "done": "Trip changed",
-    "ungroupConfirm": "Delete"
+    "ungroupConfirm": "Delete",
+    "actions": "Trip actions",
+    "moreOptionsList": "More options: merge with another trip, ungroup the trip",
+    "actionsNote": "A dive’s menu removes it from the trip or splits the trip there. In the bottom bar, “+” adds dives and the ⋮ menu merges this trip with another or ungroups it."
   },
   "sites": {
     "title": "Sites",
@@ -1006,6 +1009,12 @@
     "newSite": "New site",
     "editTitle": "Edit the site",
     "edit": "Edit the site",
+    "actions": "Site actions",
+    "moreOptionsList": "More options: merge with another site, delete the site",
+    "mergeWithOther": "Merge with another site",
+    "mergeOtherTitle": "Merge with which site?",
+    "mergeOtherNote": "The dives of the other site move to this one, and the other site disappears. This can be undone.",
+    "noOtherSite": "No other site in the logbook",
     "siteCount": {
       "one": "{n} site",
       "other": "{n} sites"
@@ -1449,7 +1458,7 @@
       "Android: exclusive choices (unit system, dive mode in the filter, Nitrox / Trimix and the fill order in the gas blender) are connected button groups, and every dropdown menu shows a downward chevron instead of a filled triangle.",
       "Android: “Sync now” becomes a split button when synchronisation is manual (the chevron offers to switch to automatic sync or to see the changes not sent yet, which opens the Logbook filtered on the edited dives not sent yet); the Statistics and Tools headers shrink as you scroll, like the Logbook’s.",
       "Android: progress now shows as a wavy line (dive-computer download, offline maps download and update, sign-in), and the circular spinners are replaced by a small shape that morphs while it works (nearby computers, import step, “Connecting…” button). With “Remove animations” on, the wave and the shape stand still.",
-    "Android: the actions of a dive (Edit, Share, Plan from this dive, and the ⋮ menu) and of the Logbook’s selection (Create a trip, Export, Delete, ⋮) are in a floating toolbar at the bottom of the screen. It hides when you scroll down and comes back when you scroll up. The Logbook’s “+” opens the same menu of choices as on tablets, instead of a bottom sheet.",
+    "Android: the actions of a dive (Edit, Share, Plan from this dive, and the ⋮ menu), of a trip (Edit, Add dives, ⋮), of a site (Edit, Open in Maps, ⋮) and of the Logbook’s selection (Create a trip, Export, Delete, ⋮) are in a floating toolbar at the bottom of the screen. A long press on a button shows its name. The bar hides when you scroll down and comes back when you scroll up. The Logbook’s “+” opens the same menu of choices as on tablets, instead of a bottom sheet.",
       "Planner: the Oxygen and Helium menus offer every value by 1 % (oxygen 5 to 100 %, helium 0 to 95 %), and “Other value…” is gone. A mix above 100 % is shown as an error on both fields.",
       "Planner: oxygen, helium, consumption (SAC) and altitude are dropdown menus of the usual values (“Other value…” lets you type another one; the keyboard opens on the same field). A value that is not in the list, such as 33 % read from a dive, shows in the field and heads the menu. A SAC measured on a dive is rounded to 0.01 cu ft/min (0.5 L/min) before it is shown or used.",
       "Planner: “Planner settings” in the ⋮ menu now opens the settings; “Plan from this dive” also works from a dive opened in Statistics or Sites.",

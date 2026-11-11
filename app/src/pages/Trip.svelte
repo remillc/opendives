@@ -7,7 +7,10 @@
   // change is one undoable step, as Subsurface's trip commands. The trip id is
   // that of the current load: never stored.
   import { onMount, tick } from 'svelte';
-  import { Page, Navbar, Link, List, Popover, f7 } from 'framework7-svelte';
+  import { Page, Navbar, Link, List, Popover, f7, theme } from 'framework7-svelte';
+  import FloatingToolbar from '../components/FloatingToolbar.svelte';
+  import { layout } from '../lib/layout.svelte.js';
+  import { navigation } from '../lib/navigation.svelte.js';
   import { showSnackbar } from '../lib/snackbar.js';
   import MenuItem from '../components/MenuItem.svelte';
   import { OpenDivesCore } from 'opendives-core';
@@ -182,13 +185,16 @@
         <span class="od-sr-only">{t('detail.back')}</span>
       </Link>
     {/snippet}
+    <!-- Android: the trip's actions are in the floating toolbar; the top bar keeps only ←. -->
     {#snippet right()}
-      <Link iconOnly onClick={() => editField('location')}>
-        <Icon name="edit" weight={2.2} /><span class="od-sr-only">{t('tripScreen.edit')}</span>
-      </Link>
-      <Link iconOnly popoverOpen=".od-trip-menu">
-        <Icon name="more" weight={4} /><span class="od-sr-only">{t('detail.moreOptions')}</span>
-      </Link>
+      {#if theme.ios}
+        <Link iconOnly onClick={() => editField('location')}>
+          <Icon name="edit" weight={2.2} /><span class="od-sr-only">{t('tripScreen.edit')}</span>
+        </Link>
+        <Link iconOnly popoverOpen=".od-trip-menu">
+          <Icon name="more" weight={4} /><span class="od-sr-only">{t('detail.moreOptions')}</span>
+        </Link>
+      {/if}
     {/snippet}
   </Navbar>
 
@@ -245,13 +251,20 @@
         {/each}
       </ul>
     </div>
+    {#if !theme.ios}
+      <p class="od-trip--note">{t('tripScreen.actionsNote')}</p>
+    {/if}
   {/if}
 
   <!-- The ⋮ menus (components/MenuItem.svelte): the trip's, and a dive's. -->
   <Popover class="od-menu od-trip-menu" backdrop={false}>
     <List noChevron>
       <MenuItem icon="merge" text={t('tripScreen.merge')} onclick={chooseTripToMerge} />
-      <MenuItem icon="plus" text={t('tripScreen.addDives')} onclick={chooseDiveToAdd} />
+      {#if theme.ios}
+        <MenuItem icon="plus" text={t('tripScreen.addDives')} onclick={chooseDiveToAdd} />
+      {:else}
+        <li class="od-menu-divider" role="separator"></li>
+      {/if}
       <MenuItem icon="ungroup" text={t('tripScreen.ungroup')} destructive onclick={confirmUngroup} />
     </List>
   </Popover>
@@ -267,6 +280,20 @@
       {/if}
     </List>
   </Popover>
+
+  {#snippet fixedContent()}
+    {#if !theme.ios && trip && trip.tripId}
+      <FloatingToolbar
+        label={t('tripScreen.actions')}
+        clearFab={layout.split && !layout.rail && navigation.section === 'logbook'}
+        actions={[
+          { key: 'edit', icon: 'edit', label: t('tripScreen.edit'), text: t('detail.edit'), onclick: () => editField('location') },
+          { key: 'add', icon: 'plus', label: t('tripScreen.addDives'), onclick: chooseDiveToAdd },
+          { key: 'more', icon: 'more', label: t('tripScreen.moreOptionsList'), menu: '.od-trip-menu' },
+        ]}
+      />
+    {/if}
+  {/snippet}
 </Page>
 
 <style>
@@ -303,6 +330,13 @@
       &.od-trip--notes {
         white-space: pre-line;
       }
+    }
+
+    .od-trip--note {
+      margin: 10px 20px 0;
+      font-size: 13px;
+      line-height: 18px;
+      color: var(--od-text-2);
     }
 
     .od-trip--more {

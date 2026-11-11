@@ -3,18 +3,26 @@
   // Site sheet (docs/mockups/sites-fiche-android.dc.html): name and country,
   // map, coordinates with "Open in Maps", description, notes, region and city
   // found from the position, then the dives at this site.
-  import { Page, Navbar, Link } from 'framework7-svelte';
+  import { Page, Navbar, Link, List, Popover, f7, theme } from 'framework7-svelte';
+  import FloatingToolbar from '../components/FloatingToolbar.svelte';
+  import ChoiceDialog from '../components/ChoiceDialog.svelte';
+  import MenuItem from '../components/MenuItem.svelte';
+  import { layout } from '../lib/layout.svelte.js';
+  import { navigation } from '../lib/navigation.svelte.js';
+  import { showSnackbar } from '../lib/snackbar.js';
+  import { confirmAction } from '../lib/dialogs.js';
+  import { offerUndo } from '../lib/undo.js';
   import { OpenDivesCore } from 'opendives-core';
   import Icon from '../components/Icon.svelte';
   import SiteMap from '../components/SiteMap.svelte';
   import ProfileThumbnail from '../components/ProfileThumbnail.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
-  import { diveLines, formatCoordinates, mapsLink } from '../lib/sites.svelte.js';
+  import { diveLines, formatCoordinates, mapsLink, siteChange } from '../lib/sites.svelte.js';
   import { formatLongDateTime } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
 
-  /** @type {{ f7route: { params: { uuid: string } } }} */
-  let { f7route } = $props();
+  /** @type {{ f7route: { params: { uuid: string } }, f7router: any }} */
+  let { f7route, f7router } = $props();
   const uuid = Number(f7route.params.uuid);
 
   let site = $state(/** @type {import('opendives-core').SiteDetail|null} */ (null));
@@ -29,6 +37,68 @@
     });
   });
 
+  const menuId = `od-site-menu-${Math.random().toString(36).slice(2, 9)}`;
+  /** The "Merge with another site" choice is open; `others`: the sites it offers. */
+  let choosingOther = $state(false);
+  let others = $state(/** @type {{ uuid: number, name: string, dives: number }[]} */ ([]));
+
+  function edit() {
+    f7router.navigate(`/sites/${uuid}/edit`);
+  }
+
+  /** "Open in Maps" from the toolbar: the same system link as the text button, opened by a click on it. */
+  function openInMaps() {
+    if (!site) return;
+    const a = document.createElement('a');
+    a.href = mapsLink(site.latUdeg, site.lonUdeg, site.name);
+    a.click();
+  }
+
+  // As the Sites list's "Merge sites": the other site's dives come to this one,
+  // which is kept; one undoable step.
+  async function chooseOtherSite() {
+    f7.popover.close(`#${menuId}`);
+    const list = await OpenDivesCore.siteQuery({ kind: 'list' });
+    others = list
+      .filter((/** @type {any} */ s) => s.uuid !== uuid)
+      .sort((/** @type {any} */ a, /** @type {any} */ b) => (a.name || '').localeCompare(b.name || ''));
+    if (!others.length) return showSnackbar(t('sites.noOtherSite'));
+    choosingOther = true;
+  }
+
+  /** @param {string} value uuid of the site merged into this one */
+  async function mergeOther(value) {
+    choosingOther = false;
+    try {
+      await siteChange({ action: 'merge', uuid, other: Number(value) });
+      offerUndo(t('sites.done'));
+    } catch (e) {
+      const code = String(/** @type {any} */ (e)?.message ?? '');
+      console.error('Merge sites', code);
+      showSnackbar(code.startsWith('WRITE_LOCKED') ? t('edit.writeLocked') : t('edit.failed'));
+    }
+  }
+
+  /** As the editor's "Delete the site": confirmation, undoable, its dives stay without a site. */
+  function deleteSite() {
+    const n = site?.diveList.length ?? 0;
+    confirmAction({
+      title: t('sites.deleteSiteTitle'),
+      text: n ? t('sites.deleteSiteText', { n }) : t('sites.deleteSiteTextUnused'),
+      action: t('sites.delete'),
+      onConfirm: async () => {
+        try {
+          await siteChange({ action: 'deleteSite', uuid });
+          f7router.back('/sites/', { force: true });
+        } catch (e) {
+          const code = String(/** @type {any} */ (e)?.message ?? '');
+          console.error('Delete site', code);
+          showSnackbar(code.startsWith('WRITE_LOCKED') ? t('edit.writeLocked') : t('edit.failed'));
+        }
+      },
+    });
+  }
+
   const place = $derived(site ? [site.city.value, site.region.value].filter(Boolean).join(', ') : '');
   /** The latest dive first, as in the logbook. */
   const latestFirst = $derived(site ? [...site.diveList].sort((a, b) => b.date.localeCompare(a.date)) : []);
@@ -42,10 +112,34 @@
     {#snippet left()}
       <Link back iconOnly><i class="icon icon-back"></i><span class="od-sr-only">{t('common.back')}</span></Link>
     {/snippet}
+    <!-- Android: the actions are in the floating toolbar; the top bar keeps only ←. -->
     {#snippet right()}
-      <Link iconOnly href="/sites/{uuid}/edit"><Icon name="edit" weight={2.2} /><span class="od-sr-only">{t('sites.edit')}</span></Link>
+      {#if theme.ios}
+        <Link iconOnly href="/sites/{uuid}/edit"><Icon name="edit" weight={2.2} /><span class="od-sr-only">{t('sites.edit')}</span></Link>
+      {/if}
     {/snippet}
   </Navbar>
+
+  {#if !theme.ios}
+    <Popover id={menuId} class="od-menu" backdrop={false}>
+      <List noChevron>
+        <MenuItem icon="merge" text={t('sites.mergeWithOther')} onclick={chooseOtherSite} />
+        <li class="od-menu-divider" role="separator"></li>
+        <MenuItem icon="delete" text={t('sites.deleteSite')} destructive onclick={deleteSite} />
+      </List>
+    </Popover>
+  {/if}
+
+  {#if choosingOther}
+    <ChoiceDialog
+      title={t('sites.mergeOtherTitle')}
+      note={t('sites.mergeOtherNote')}
+      options={others.map((s) => ({ value: String(s.uuid), label: s.name || t('sites.noName'), example: t('sites.diveCount', { n: s.dives }) }))}
+      value={String(others[0]?.uuid ?? '')}
+      onselect={mergeOther}
+      oncancel={() => (choosingOther = false)}
+    />
+  {/if}
 
   {#if site && site.uuid}
     <header class="od-site-sheet--head">
@@ -104,6 +198,20 @@
       </ul>
     {/if}
   {/if}
+
+  {#snippet fixedContent()}
+    {#if !theme.ios && site && site.uuid}
+      <FloatingToolbar
+        label={t('sites.actions')}
+        clearFab={layout.split && !layout.rail && navigation.section === 'logbook'}
+        actions={[
+          { key: 'edit', icon: 'edit', label: t('sites.edit'), text: t('detail.edit'), onclick: edit },
+          ...(site.hasLocation ? [{ key: 'maps', icon: /** @type {const} */ ('map'), label: t('sites.openInMaps'), onclick: openInMaps }] : []),
+          { key: 'more', icon: 'more', label: t('sites.moreOptionsList'), menu: `#${menuId}` },
+        ]}
+      />
+    {/if}
+  {/snippet}
 </Page>
 
 <style>
