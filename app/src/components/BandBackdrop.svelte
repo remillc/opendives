@@ -26,6 +26,8 @@
   const FADE = 40;
   /** Scroll over which the summary line alone fades out. */
   const SUMMARY = 24;
+  /** Scroll over which the 28 sp title leaves and the 22 sp title of the top bar arrives. */
+  const TITLE = 24;
 
   /** @type {HTMLElement|undefined} */
   let holder = $state();
@@ -36,6 +38,7 @@
     const content = holder?.closest('.page-content');
     if (!content || !panel) return;
     const band = /** @type {HTMLElement|null} */ (content.querySelector('.od-section-band--band'));
+    const page = /** @type {HTMLElement|null} */ (content.closest('.page'));
     let frame = 0;
     const update = () => {
       frame = 0;
@@ -43,6 +46,7 @@
       const travel = Math.max(0, height - COLLAPSED);
       const top = Math.max(0, content.scrollTop);
       const rise = Math.min(top, travel);
+      page?.style.setProperty('--od-title-expanded', String(Math.min(1, Math.max(0, 1 - top / TITLE))));
       panel?.style.setProperty('--od-band-height', `${height}px`);
       panel?.style.setProperty('--od-band-rise', `${rise}px`);
       // The month appears while the last of the band's texts leaves.
@@ -63,6 +67,7 @@
       sizes.disconnect();
       cancelAnimationFrame(frame);
       if (band) band.style.opacity = '';
+      page?.style.removeProperty('--od-title-expanded');
     };
   });
 </script>
@@ -98,7 +103,7 @@
 
     .od-band-backdrop--layer {
       --od-band-bar: calc(var(--f7-navbar-height) + var(--f7-safe-area-top));
-      --od-band-h: calc(var(--f7-safe-area-top) + 190px);
+      --od-band-h: calc(var(--f7-safe-area-top) + 226px);
       position: absolute;
       top: calc(-1 * var(--od-band-bar));
       left: 0;
@@ -113,11 +118,11 @@
         url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%20300%2018%27%20preserveAspectRatio%3D%27none%27%3E%3Cpath%20d%3D%27M0%200%20H300%20V11%20Q262.5%2020%20225%2011%20T150%2011%20T75%2011%20T0%2011%20Z%27%20fill%3D%27black%27/%3E%3C/svg%3E") bottom / 100% 18px no-repeat;
 
       &.od-band-backdrop--layer-pill {
-        --od-band-h: calc(var(--f7-safe-area-top) + 242px);
+        --od-band-h: calc(var(--f7-safe-area-top) + 278px);
       }
 
       &.od-band-backdrop--layer-short {
-        --od-band-h: calc(var(--f7-safe-area-top) + 120px);
+        --od-band-h: calc(var(--f7-safe-area-top) + 156px);
       }
     }
 

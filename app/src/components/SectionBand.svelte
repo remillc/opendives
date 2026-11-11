@@ -5,9 +5,12 @@
   // the one-line summary, and a wave that joins the content. `tall` when a
   // search bar follows the summary. `overMap`, on Sites, whose map runs under
   // the band: the wave cuts the band, so the map shows under the curve.
+  // `title` (Android, with `bare`): the expanded title of the flexible app bar,
+  // 28 sp over the summary; it fades while the top bar's own 22 sp title fades in
+  // (BandBackdrop sets --od-title-expanded from the scroll).
 
-  /** @type {{ summary?: string, tall?: boolean, overMap?: boolean, pill?: boolean, chip?: boolean, bare?: boolean, summaryKey?: unknown, children?: import('svelte').Snippet }} */
-  let { summary = '', tall = false, overMap = false, pill = false, chip = false, bare = false, summaryKey = undefined, children } = $props();
+  /** @type {{ summary?: string, title?: string, tall?: boolean, overMap?: boolean, pill?: boolean, chip?: boolean, bare?: boolean, summaryKey?: unknown, children?: import('svelte').Snippet }} */
+  let { summary = '', title = '', tall = false, overMap = false, pill = false, chip = false, bare = false, summaryKey = undefined, children } = $props();
 
   const PROFILE = 'M0 30 L20 38 L45 70 L70 92 L95 96 L120 88 L140 94 L165 80 L185 62 L210 58 L235 50 L255 46 L275 40 L300 36';
 </script>
@@ -22,6 +25,7 @@
   {#if !overMap && !bare}
     <svg class="od-section-band--wave" viewBox="0 0 300 18" preserveAspectRatio="none" aria-hidden="true"><path d="M0 11 Q37.5 2 75 11 T150 11 T225 11 T300 11 V18 H0 Z" /></svg>
   {/if}
+  {#if bare && title}<div class="od-section-band--title od-title-font" aria-hidden="true">{title}</div>{/if}
   <!-- A new summaryKey cross-fades to the new summary (Sites: the search count). -->
   {#key summaryKey}
     {#if summary}<p class="od-section-band--summary od-value">{summary}</p>{/if}
@@ -103,6 +107,17 @@
       path {
         fill: var(--f7-page-bg-color);
       }
+    }
+
+    /* M3 Headline Medium, 28/36; the weight is the app's title weight (500), as the 22 sp bar title. */
+    .od-section-band--title {
+      position: relative;
+      margin: 0;
+      font-size: 28px;
+      line-height: 36px;
+      font-weight: 500;
+      opacity: var(--od-title-expanded, 1);
+      color: var(--od-on-band);
     }
 
     @keyframes od-summary-in {
