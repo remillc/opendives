@@ -1454,6 +1454,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "“Edit dive”: the line under the title gives the date without the weekday or the time (“No. 5 · Lake Coleridge · April 2, 2014”), as in the mock-ups.",
       "Android: screens, the side menu, sheets and dialogs now move with springy motion (a slight bounce where it fits), and the dives of a trip you open slide into place. With “Remove animations” on, none of it moves.",
       "Android: exclusive choices (unit system, dive mode in the filter, Nitrox / Trimix and the fill order in the gas blender) are connected button groups, and every dropdown menu shows a downward chevron instead of a filled triangle.",
       "Android: “Sync now” becomes a split button when synchronisation is manual (the chevron offers to switch to automatic sync or to see the changes not sent yet, which opens the Logbook filtered on the edited dives not sent yet); the Statistics and Tools headers shrink as you scroll, like the Logbook’s.",

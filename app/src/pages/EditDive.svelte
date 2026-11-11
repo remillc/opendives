@@ -28,7 +28,7 @@
   import { offerUndo } from '../lib/undo.js';
   import { parseNumber } from '../lib/filter.svelte.js';
   import { WATER_TYPES, waterTypeName, waterTypeOfSalinity } from '../lib/tools.js';
-  import { formatDepth, formatFullDate, formatMinSec, formatNumber, formatWeight, locale } from '../lib/format.js';
+  import { formatDepth, formatLongDate, formatMinSec, formatNumber, formatWeight, locale } from '../lib/format.js';
   import { t, tIfExists } from '../lib/i18n.js';
 
   /** @type {{ f7route: { params: { id: string } }, f7router: any }} */
@@ -545,7 +545,7 @@
   {:else if dive}
     <div class="od-edit-dive--cards" class:od-edit-dive--two-columns={sheet}>
     <p class="od-edit-dive--subtitle od-value">
-      {[dive.number ? t('detail.number', { number: String(dive.number) }) : '', dive.site, formatFullDate(dive.date)].filter(Boolean).join(' · ')}
+      {[dive.number ? t('detail.number', { number: String(dive.number) }) : '', dive.site, formatLongDate(dive.date)].filter(Boolean).join(' · ')}
     </p>
 
     <!-- La plongée -->
