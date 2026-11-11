@@ -17,6 +17,8 @@
   import { logbookValues } from '../lib/people.js';
   import StarsInput from '../components/StarsInput.svelte';
   import WheelDialog from '../components/WheelDialog.svelte';
+  import DatePickerDialog from '../components/DatePickerDialog.svelte';
+  import TimePickerDialog from '../components/TimePickerDialog.svelte';
   import ChoiceDialog from '../components/ChoiceDialog.svelte';
   import SelectField from '../components/SelectField.svelte';
   import { logbook, addDive, renumberDives, renumberPlanFrom } from '../lib/logbook.svelte.js';
@@ -24,6 +26,7 @@
   import { parseNumber } from '../lib/filter.svelte.js';
   import { depthUnit, formatCylinderSize, formatLongDate, locale } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
+  import { ios } from '../lib/layout.svelte.js';
   import { offerUndo } from '../lib/undo.js';
 
   /** @type {{ f7router: any }} */
@@ -314,7 +317,32 @@
   </div>
 </Page>
 
-{#if dialog === 'date'}
+{#if dialog === 'date' && !ios}
+  <DatePickerDialog
+    {year}
+    {month}
+    {day}
+    maxYear={start.getFullYear() + 1}
+    oncancel={() => (dialog = null)}
+    onconfirm={(d) => {
+      year = d.year;
+      month = d.month;
+      day = d.day;
+      dialog = null;
+    }}
+  />
+{:else if dialog === 'time' && !ios}
+  <TimePickerDialog
+    {hour}
+    {minute}
+    oncancel={() => (dialog = null)}
+    onconfirm={(time) => {
+      hour = time.hour;
+      minute = time.minute;
+      dialog = null;
+    }}
+  />
+{:else if dialog === 'date'}
   <WheelDialog
     title={t('newDive.date')}
     wheels={dateWheels}

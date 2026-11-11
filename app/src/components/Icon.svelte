@@ -7,7 +7,7 @@
 
   /**
    * @type {{
-   *   name: 'logbook'|'sites'|'statistics'|'tools'|'plus'|'copy'|'check'|'checkCircle'|'offline'|'device'|'computer'|'expand'|'settings'|'edit'|'more'|'moreCircle'|'plan'|'menu'|'sync'|'close'|'download'|'file'|'account'|'cloud'|'warning'|'lock'|'blank'|'locate'|'fullscreen'|'exitFullscreen'|'place'|'search'|'git'|'openInNew'|'filter'|'info'|'error'|'visibility'|'visibilityOff'|'refresh'|'delete'|'chevron'|'bluetooth'|'bluetoothOff'|'merge'|'split'|'ungroup'|'remove'|'arrowRight'|'arrowBack'|'arrowUp'|'arrowDown'|'undo'|'redo'|'renumber'|'tripRemove'|'mail'|'desaturation'|'depthGauge'|'bestMix'|'blender'|'tune'|'share'|'image'|'document'|'map'|'calendar'|'clock',
+   *   name: 'logbook'|'sites'|'statistics'|'tools'|'plus'|'copy'|'check'|'checkCircle'|'offline'|'device'|'computer'|'expand'|'settings'|'edit'|'more'|'moreCircle'|'plan'|'menu'|'sync'|'close'|'download'|'file'|'account'|'cloud'|'warning'|'lock'|'blank'|'locate'|'fullscreen'|'exitFullscreen'|'place'|'search'|'git'|'openInNew'|'filter'|'info'|'error'|'visibility'|'visibilityOff'|'refresh'|'delete'|'chevron'|'bluetooth'|'bluetoothOff'|'merge'|'split'|'ungroup'|'remove'|'arrowRight'|'arrowBack'|'arrowUp'|'arrowDown'|'undo'|'redo'|'renumber'|'tripRemove'|'mail'|'desaturation'|'depthGauge'|'bestMix'|'blender'|'tune'|'share'|'image'|'document'|'map'|'calendar'|'clock'|'keyboard',
    *   size?: number,
    *   weight?: number,
    * }}
@@ -26,6 +26,7 @@
     delete: 'M4.5 7h15M10 11v6M14 11v6M6.5 7l1 13h9l1-13M9.5 7V4.5h5V7',
     chevron: 'M9 5l7 7-7 7',
     calendar: 'M5 5.5h14v14H5zM5 10h14M8.5 3.5v4M15.5 3.5v4',
+    keyboard: 'M3.5 6.5h17v11h-17zM7 10h.01M10 10h.01M14 10h.01M17 10h.01M7 14h.01M17 14h.01M9.5 14h5',
     clock: 'M12 3a9 9 0 1 0 0 18 9 9 0 1 0 0-18M12 7.5V12l3 2',
     bluetooth: 'M7 7l10 10-5 4V3l5 4L7 17',
     // The same, crossed out: no Bluetooth connection (download failed).

@@ -16,12 +16,15 @@
   import ChoiceField from '../components/ChoiceField.svelte';
   import ButtonField from '../components/ButtonField.svelte';
   import WheelDialog from '../components/WheelDialog.svelte';
+  import DatePickerDialog from '../components/DatePickerDialog.svelte';
+  import TimePickerDialog from '../components/TimePickerDialog.svelte';
   import ShareSheet from '../components/ShareSheet.svelte';
   import { logbook, savePlan } from '../lib/logbook.svelte.js';
   import { planner, loadSetup, adoptUnitDefaults, planRequest, startFromDive, startNewDive, requestOfPlan, applyRequest, nextGas, planSettings } from '../lib/planner.svelte.js';
   import { waterBottomColor } from '../lib/water-column.js';
   import { formatDateTime, formatDuration, formatGasVolume, formatMixName, formatGasLong, formatNumber, formatSac, formatTimeOfDay, decoSummary, depthUnit, locale } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
+  import { ios } from '../lib/layout.svelte.js';
   import { WATER_TYPES, altitudeToPressureMbar, formatHoursMinutes, pressureToAltitudeMm, waterTypeName, waterTypeOfSalinity } from '../lib/tools.js';
   import { sharePlanPdf, sharePlanSummary } from '../lib/share.js';
   import { MM_PER_FT, ML_PER_CUFT, O2_CHOICES, HE_CHOICES, altitudePresets, carriedToMl, depthToMm, gasTotalMl, gasValid, isShort, mlToCarried, modAlarm, mmToDepth, roundSacMl, sacChoices } from '../lib/planner-rules.js';
@@ -917,7 +920,30 @@
   <ShareSheet pdfText={t('plan.sharePdfText')} summaryLabel={t('plan.shareSummary')} summaryText={t('plan.shareSummaryText')} onpdf={() => share('pdf')} onsummary={() => share('summary')} onclose={() => (sharing = false)} />
 {/if}
 
-{#if dialog === 'date'}
+{#if dialog === 'date' && !ios}
+  <DatePickerDialog
+    year={whenDate.getUTCFullYear()}
+    month={whenDate.getUTCMonth()}
+    day={whenDate.getUTCDate()}
+    minYear={thisYear}
+    maxYear={thisYear + Math.max(0, years.length - 1)}
+    oncancel={() => (dialog = null)}
+    onconfirm={(d) => {
+      setWhen(d.year, d.month, d.day, whenDate.getUTCHours(), whenDate.getUTCMinutes());
+      dialog = null;
+    }}
+  />
+{:else if dialog === 'time' && !ios}
+  <TimePickerDialog
+    hour={whenDate.getUTCHours()}
+    minute={whenDate.getUTCMinutes()}
+    oncancel={() => (dialog = null)}
+    onconfirm={(time) => {
+      setWhen(whenDate.getUTCFullYear(), whenDate.getUTCMonth(), whenDate.getUTCDate(), time.hour, time.minute);
+      dialog = null;
+    }}
+  />
+{:else if dialog === 'date'}
   <WheelDialog
     title={t('edit.date')}
     wheels={dateWheels}
