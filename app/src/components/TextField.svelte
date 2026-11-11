@@ -27,7 +27,9 @@
    *   onchange?: () => void,
    *   oninput?: (e: Event) => void,
    *   trailing?: import('svelte').Snippet,
+   *   keepTrailing?: boolean,
    * }}
+   * keepTrailing: the trailing content stays beside the error icon.
    */
   let {
     label,
@@ -42,6 +44,7 @@
     onchange,
     oninput,
     trailing,
+    keepTrailing = false,
   } = $props();
 
   let focused = $state(false);
@@ -78,7 +81,8 @@
     </div>
     {#if invalid && !multiline}
       <div class="od-text-field--error-icon"><Icon name="error" /></div>
-    {:else if trailing}
+    {/if}
+    {#if trailing && (keepTrailing || !(invalid && !multiline))}
       <div class="od-text-field--trailing">{@render trailing()}</div>
     {/if}
   </div>

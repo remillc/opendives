@@ -17,11 +17,13 @@
    *   clearLabel?: string,
    *   ariaLabel?: string,
    *   chevron?: boolean,
+   *   invalid?: boolean,
    * }}
    * ariaLabel: the accessible name when the label alone is not enough (the
    * full label and the unit). chevron: a downward chevron instead of MD3's ▾.
+   * invalid: the label and a 2 dp indicator in the alarm colour.
    */
-  let { label, value = $bindable(), options, supporting = '', disabled = false, onchange, clearLabel = '', ariaLabel, chevron = false } = $props();
+  let { label, value = $bindable(), options, supporting = '', disabled = false, onchange, clearLabel = '', ariaLabel, chevron = false, invalid = false } = $props();
 
   /** With `clearLabel` and a value: a ✕ sets the field back to the empty choice. */
   function clear() {
@@ -32,10 +34,10 @@
   const id = `od-select-${Math.random().toString(36).slice(2, 9)}`;
 </script>
 
-<div class="od-select-field od-select-field--field" class:disabled>
+<div class="od-select-field od-select-field--field" class:disabled class:od-select-field--invalid={invalid}>
   <div class="od-select-field--box">
     <label class="od-select-field--label" for={id}>{label}</label>
-    <select {id} {disabled} aria-label={ariaLabel} class:od-select-field--clearable={clearLabel && value} bind:value onchange={() => onchange?.(value)}>
+    <select {id} {disabled} aria-label={ariaLabel} aria-invalid={invalid} class:od-select-field--clearable={clearLabel && value} bind:value onchange={() => onchange?.(value)}>
       {#each options as option (option.value)}<option value={option.value}>{option.label}</option>{/each}
     </select>
     {#if clearLabel && value}
@@ -78,6 +80,11 @@
         background: var(--od-primary-action);
       }
 
+      .od-select-field--invalid &::after {
+        height: 2px;
+        background: var(--od-alarm);
+      }
+
       :global(.ios) & {
         border-radius: 10px;
         background: var(--od-surface);
@@ -96,6 +103,10 @@
       line-height: 16px;
       color: var(--od-text-2);
       pointer-events: none;
+    }
+
+    .od-select-field--invalid .od-select-field--label {
+      color: var(--od-alarm);
     }
 
     select {
