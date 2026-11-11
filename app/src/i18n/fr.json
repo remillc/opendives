@@ -990,14 +990,17 @@
     "mergeWith": "Fusionner avec",
     "addDives": "Ajouter des plongées",
     "addDive": "Ajouter au voyage",
-    "ungroup": "Supprimer ce voyage",
+    "ungroup": "Défaire le voyage",
     "ungroupTitle": "Supprimer ce voyage ?",
     "ungroupText": "Ses plongées restent dans le carnet, hors de tout voyage.",
     "noOtherTrip": "Aucun autre voyage dans le carnet",
     "noLooseDive": "Toutes les plongées sont déjà dans un voyage",
     "edit": "Modifier le voyage",
     "done": "Voyage modifié",
-    "ungroupConfirm": "Supprimer"
+    "ungroupConfirm": "Supprimer",
+    "actions": "Actions du voyage",
+    "moreOptionsList": "Plus d’options : fusionner avec un autre voyage, défaire le voyage",
+    "actionsNote": "Le menu de chaque plongée la retire du voyage ou coupe le voyage à cet endroit. Dans la barre du bas, « + » ajoute des plongées et le menu ⋮ fusionne ce voyage avec un autre ou le défait."
   },
   "sites": {
     "title": "Sites",
@@ -1006,6 +1009,12 @@
     "newSite": "Nouveau site",
     "editTitle": "Modifier le site",
     "edit": "Modifier le site",
+    "actions": "Actions du site",
+    "moreOptionsList": "Plus d’options : fusionner avec un autre site, supprimer le site",
+    "mergeWithOther": "Fusionner avec un autre site",
+    "mergeOtherTitle": "Fusionner avec quel site ?",
+    "mergeOtherNote": "Les plongées de l’autre site passent à celui-ci, et l’autre site disparaît. Vous pouvez annuler.",
+    "noOtherSite": "Aucun autre site dans le carnet",
     "siteCount": {
       "one": "{n} site",
       "other": "{n} sites"
@@ -1448,7 +1457,7 @@
       "Android : les choix exclusifs (système d’unités, mode de plongée du filtre, Nitrox / Trimix et ordre de gonflage du mélangeur) sont des groupes de boutons connectés, et chaque menu déroulant montre un chevron vers le bas au lieu d’un triangle plein.",
       "Android : « Synchroniser maintenant » devient un bouton scindé quand la synchronisation est manuelle (menu du chevron : passer en synchronisation automatique, voir les modifications non envoyées, qui ouvre le Carnet filtré sur les plongées modifiées pas encore envoyées) ; l’en-tête de Statistiques et d’Outils se réduit en défilant, comme celui du Carnet.",
       "Android : la progression s’affiche en ligne ondulée (téléchargement depuis l’ordinateur, téléchargement et mise à jour des cartes hors ligne, connexion), et les cercles qui tournent sont remplacés par une petite forme qui se transforme pendant l’attente (ordinateurs à proximité, étape de l’import, bouton « Connexion… »). Avec « Supprimer les animations », l’onde et la forme restent immobiles.",
-    "Android : les actions d’une plongée (Modifier, Partager, Planifier depuis cette plongée et le menu ⋮) et celles de la sélection du Carnet (Créer un voyage, Exporter, Supprimer, ⋮) sont dans une barre d’outils flottante au bas de l’écran. Elle se cache quand vous faites défiler vers le bas et revient quand vous remontez. Le « + » du Carnet ouvre le même menu de choix que sur tablette, à la place d’une feuille du bas.",
+    "Android : les actions d’une plongée (Modifier, Partager, Planifier depuis cette plongée et le menu ⋮), d’un voyage (Modifier, Ajouter des plongées, ⋮), d’un site (Modifier, Ouvrir dans Cartes, ⋮) et celles de la sélection du Carnet (Créer un voyage, Exporter, Supprimer, ⋮) sont dans une barre d’outils flottante au bas de l’écran. Un appui long sur un bouton affiche son nom. La barre se cache quand vous faites défiler vers le bas et revient quand vous remontez. Le « + » du Carnet ouvre le même menu de choix que sur tablette, à la place d’une feuille du bas.",
       "Planificateur : les menus Oxygène et Hélium proposent toutes les valeurs de 1 en 1 % (oxygène de 5 à 100 %, hélium de 0 à 95 %), et « Autre valeur… » disparaît. Un mélange qui dépasse 100 % est signalé en erreur sur les deux champs.",
       "Planificateur : l’oxygène, l’hélium, la consommation (SAC) et l’altitude sont des menus déroulants de valeurs usuelles (« Autre valeur… » permet d’en saisir une autre ; le clavier s’ouvre sur le même champ). Une valeur hors de la liste, comme 33 % lue sur une plongée, s’affiche dans le champ et figure en tête du menu. Une consommation mesurée sur une plongée est arrondie à 0,01 cuft/min (0,5 L/min) avant d’être affichée ou utilisée.",
       "Planificateur : « Réglages du planificateur » dans le menu ⋮ ouvre bien les réglages ; « Planifier depuis cette plongée » fonctionne aussi depuis une plongée ouverte dans Statistiques ou Sites.",

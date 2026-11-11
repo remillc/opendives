@@ -457,8 +457,8 @@
         />
       {/if}
       <li class="od-menu-divider" role="separator"></li>
-      <!-- In ink, not in the alarm colour: that one is for errors only. -->
-      <MenuItem icon="delete" text={t('detail.delete')} onclick={deleteNow} />
+      <!-- Alarm colour on Android (floating toolbar menu); iOS keeps ink. -->
+      <MenuItem icon="delete" text={t('detail.delete')} destructive={!theme.ios} onclick={deleteNow} />
     </List>
   </Popover>
 

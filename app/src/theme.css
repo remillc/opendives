@@ -909,6 +909,12 @@ html.ios {
       font-weight: 400;
     }
 
+    /* Android: a destructive item (delete) in the alarm colour, icon and label. */
+    .md .od-menu .od-menu-item--destructive .item-title,
+    .md .od-menu .od-menu-item--destructive .item-media {
+      color: var(--od-alarm);
+    }
+
     .ios .od-menu .od-menu-item--destructive .item-title,
     .ios .od-menu .od-menu-item--destructive .item-after {
       color: var(--od-alarm);

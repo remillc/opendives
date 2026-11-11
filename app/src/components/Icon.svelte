@@ -7,7 +7,7 @@
 
   /**
    * @type {{
-   *   name: 'logbook'|'sites'|'statistics'|'tools'|'plus'|'copy'|'check'|'checkCircle'|'offline'|'device'|'computer'|'expand'|'settings'|'edit'|'more'|'moreCircle'|'plan'|'menu'|'sync'|'close'|'download'|'file'|'account'|'cloud'|'warning'|'lock'|'blank'|'locate'|'fullscreen'|'exitFullscreen'|'place'|'search'|'git'|'openInNew'|'filter'|'info'|'error'|'visibility'|'visibilityOff'|'refresh'|'delete'|'chevron'|'bluetooth'|'bluetoothOff'|'merge'|'split'|'ungroup'|'remove'|'arrowRight'|'arrowBack'|'arrowUp'|'arrowDown'|'undo'|'redo'|'renumber'|'tripRemove'|'mail'|'desaturation'|'depthGauge'|'bestMix'|'blender'|'tune'|'share'|'image'|'document',
+   *   name: 'logbook'|'sites'|'statistics'|'tools'|'plus'|'copy'|'check'|'checkCircle'|'offline'|'device'|'computer'|'expand'|'settings'|'edit'|'more'|'moreCircle'|'plan'|'menu'|'sync'|'close'|'download'|'file'|'account'|'cloud'|'warning'|'lock'|'blank'|'locate'|'fullscreen'|'exitFullscreen'|'place'|'search'|'git'|'openInNew'|'filter'|'info'|'error'|'visibility'|'visibilityOff'|'refresh'|'delete'|'chevron'|'bluetooth'|'bluetoothOff'|'merge'|'split'|'ungroup'|'remove'|'arrowRight'|'arrowBack'|'arrowUp'|'arrowDown'|'undo'|'redo'|'renumber'|'tripRemove'|'mail'|'desaturation'|'depthGauge'|'bestMix'|'blender'|'tune'|'share'|'image'|'document'|'map',
    *   size?: number,
    *   weight?: number,
    * }}
@@ -78,6 +78,8 @@
     blender: 'M9 3h6M10 3v3M14 3v3M8 8a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2zM8 12h8',
     plan: 'M3 5h4l3 10h4l2-4h5M3 19h18',
     share: 'M18 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM6 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM18 22a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM8.6 13.5l6.8 4M15.4 6.5l-6.8 4',
+    // A folded map: "Open in Maps".
+    map: 'M9 4L3 6v14l6-2 6 2 6-2V4l-6 2zM9 4v14M15 6v14',
     image: 'M4 5h16v14H4zM4 15l5-5 4 4 3-3 4 4',
     // A page with lines of text: the PDF sheet.
     document: 'M7 3h7l5 5v13H7zM14 3v5h5M10 13h6M10 17h6',
