@@ -9,7 +9,7 @@
   // statistics, on this device. No chart builder.
   import { Popup, View, Page, Navbar, Link, f7, theme } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
-  import DropdownArrow from '../components/DropdownArrow.svelte';
+  import SelectField from '../components/SelectField.svelte';
   import KeyFigures from '../components/KeyFigures.svelte';
   import TextField from '../components/TextField.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
@@ -164,17 +164,15 @@
           </div>
           {#if index === 0}<p class="od-statistic-new--note">{t('stats.criteriaHint')}</p>{/if}
         {:else}
-          <!-- MD3 exposed dropdown, filled (spec, "Text fields"), opening the system's list. -->
+          <!-- MD3 exposed dropdown menu (spec, section 8). -->
           <div class="od-statistic-new--filled-field">
-            <div class="od-statistic-new--filled-box od-statistic-new--filled">
-              <span class="od-statistic-new--filled-label">{t('stats.criterion')}</span>
-              <span class="od-statistic-new--dropdown-value">{t(`stats.criteria.${c.field}`)}</span>
-              <span class="od-statistic-new--dropdown-arrow"><DropdownArrow /></span>
-              <select aria-label={t('stats.criterion')} value={c.field} onchange={(e) => setField(index, e.currentTarget.value)}>
-                {#each CRITERIA as f (f)}<option value={f}>{t(`stats.criteria.${f}`)}</option>{/each}
-              </select>
-            </div>
-            {#if index === 0}<span class="od-statistic-new--supporting">{t('stats.criteriaHint')}</span>{/if}
+            <SelectField
+              label={t('stats.criterion')}
+              value={c.field}
+              options={CRITERIA.map((f) => ({ value: f, label: t(`stats.criteria.${f}`) }))}
+              onchange={(v) => setField(index, v)}
+              supporting={index === 0 ? t('stats.criteriaHint') : ''}
+            />
             {#if index > 0}
               <button type="button" class="od-statistic-new--text-button" onclick={() => removeCriterion(index)}>
                 <Icon name="close" size={18} weight={2} />{t('stats.removeCriterion')}
@@ -258,86 +256,18 @@
       font-weight: 500;
     }
 
-    /*
-     * MD3 filled text field and exposed dropdown (spec, "Text fields"):
-     * surface-container-highest, 4 dp top corners, 1 dp bottom indicator, 2 dp
-     * in the primary colour on focus; the label fills the empty field and
-     * moves above the value on focus or once filled. Used for the criterion
-     * dropdown (a select); the name uses TextField.svelte.
-     */
     .od-statistic-new--filled-field {
-      margin: 18px 16px 0;
       display: flex;
       flex-direction: column;
-    }
+      align-items: flex-start;
 
-    .od-statistic-new--filled-box {
-      position: relative;
-      min-height: 56px;
-      padding: 24px 12px 8px 16px;
-      box-sizing: border-box;
-      border-radius: 4px 4px 0 0;
-      border-bottom: 1px solid var(--od-text-2);
-      background: var(--od-surface-2);
-      color: var(--od-text);
-      display: flex;
-      align-items: flex-end;
-      gap: 8px;
-
-      &:focus-within {
-        box-shadow: inset 0 -1px 0 var(--od-action);
-        border-bottom-color: var(--od-action);
+      :global(.od-select-field) {
+        align-self: stretch;
       }
 
-      select {
-        position: absolute;
-        inset: 0;
-        opacity: 0;
-        width: 100%;
-        cursor: pointer;
+      .od-statistic-new--text-button {
+        margin-inline-start: 16px;
       }
-    }
-
-    .od-statistic-new--filled-label {
-      position: absolute;
-      left: 16px;
-      top: 16px;
-      font-size: 16px;
-      line-height: 24px;
-      color: var(--od-text-2);
-      pointer-events: none;
-      transition: top 0.15s, font-size 0.15s, line-height 0.15s;
-
-      .od-statistic-new--filled-box.od-statistic-new--filled &,
-      .od-statistic-new--filled-box:focus-within & {
-        top: 8px;
-        font-size: 12px;
-        line-height: 16px;
-      }
-
-      .od-statistic-new--filled-box:focus-within & {
-        color: var(--od-action);
-      }
-    }
-
-    .od-statistic-new--dropdown-value {
-      flex: 1;
-      font-size: 16px;
-      line-height: 24px;
-    }
-
-    .od-statistic-new--dropdown-arrow {
-      position: absolute;
-      right: 12px;
-      top: 16px;
-    }
-
-    .od-statistic-new--supporting {
-      margin-top: 4px;
-      padding-left: 16px;
-      font-size: 12px;
-      line-height: 16px;
-      color: var(--od-text-2);
     }
 
     /* iOS: the criterion row opens the system's picker. */

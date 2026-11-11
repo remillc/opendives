@@ -68,6 +68,8 @@
     --od-surface-2: #E8E8E5;
     /* MD3 surface-container-high: the tonal buttons of a connected button group. */
     --od-surface-container-high: #E8E8E5;
+    /* MD3 surface-container-highest: the current value of an exposed dropdown menu. */
+    --od-surface-container-highest: #E3E1DC;
     --od-text: #1F2124;
     --od-text-2: #4A4D52;
     --od-separator: #DADAD6;
@@ -165,6 +167,7 @@
     --od-surface: #1C1D1F;
     --od-surface-2: #2E3033;
     --od-surface-container-high: #2E3033;
+    --od-surface-container-highest: #3A3C40;
     --od-fab-tonal: #3A3C40;
     --od-toolbar-container: #E3E1DC;
     --od-toolbar-on-container: #1F2124;

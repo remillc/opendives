@@ -8,6 +8,12 @@ import { backTarget, readPane } from './pane-history.js';
 
 export function enableBackButton() {
   CapacitorApp.addListener('backButton', () => {
+    // 0. An open dropdown menu (components/SelectField.svelte) closes first.
+    const dropdown = document.querySelector('.od-select-field--open');
+    if (dropdown) {
+      dropdown.dispatchEvent(new CustomEvent('od-cancel'));
+      return;
+    }
     // 1. The side menu closes.
     if (document.querySelector('.panel.panel-in')) {
       f7.panel.close();
