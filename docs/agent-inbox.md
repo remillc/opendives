@@ -1409,3 +1409,13 @@ Mock-up: `docs/mockups/android-planificateur.dc.html` (Gaz section).
 - Menu content: the usual mixes first, then "Autre valeur…" (`planner.gas.otherValue`), which opens the numeric keyboard on the same field (validation as today: whole number 0–100, oxygen plus helium at most 100). Oxygen: 21, 28, 32, 36, 40, 50, 80, 100. Helium: 0, 10, 20, 30, 35, 45, 55. A value outside the list (for example 33, read from the dive) shows in the field and is checked in the menu above the usual values.
 - Wherever the planner shows these two fields: plan from a dive, new plan, phone and tablet. iOS: the same choice with a native pop-up menu when the iPhone planner is built.
 - A line in the release notes.
+
+## [ ] 2026-11-11-33 Planner: bottom SAC and deco SAC, two fields
+
+Mock-ups: `docs/mockups/android-planificateur.dc.html` (plan from a dive), `docs/mockups/android-planificateur-nouveau.dc.html` (new plan).
+- The single "Consommation (SAC)" field becomes two dropdown fields side by side, under a small "Consommation (SAC)" heading: "Au fond" and "Pendant la déco". They feed the core's bottom SAC and deco SAC (the two values the planner settings already have).
+- Plan from a dive: "Au fond" is the SAC measured on the dive (as today); "Pendant la déco" comes from the planner settings. Helper: "Au fond : mesurée pendant la plongée. Pendant la déco : d’après les réglages du planificateur."
+- New plan: both come from the planner settings. Helper: "D’après les réglages du planificateur."
+- Values in the diver's volume unit per minute. Downward chevrons, not triangles. Accessible names give the full label and unit.
+- Check that the plan uses the deco SAC for the ascent and stops (planner tests: a case where the two SACs differ).
+- A line in the release notes.
