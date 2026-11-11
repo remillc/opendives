@@ -118,10 +118,29 @@
       animation: od-row-appear 220ms ease-out;
     }
 
+    /* Android: the Expressive springs, the slide (spatial) and the fade (effects). */
+    :global(.md) .od-dive-row--appear {
+      animation:
+        od-row-slide var(--od-motion-spatial-default-ms) var(--od-motion-spatial-default) backwards,
+        od-row-fade var(--od-motion-effects-default-ms) var(--od-motion-effects-default) backwards;
+    }
+
     @keyframes od-row-appear {
       from {
         opacity: 0;
         transform: translateY(-16px);
+      }
+    }
+
+    @keyframes od-row-slide {
+      from {
+        transform: translateY(-16px);
+      }
+    }
+
+    @keyframes od-row-fade {
+      from {
+        opacity: 0;
       }
     }
 

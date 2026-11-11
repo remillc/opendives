@@ -95,6 +95,30 @@
       outline: none;
     }
 
+    /* Android: the dialog grows in from 90 % (spatial spring) while it fades in
+       (effects spring); the scrim fades in. It is removed at once on closing. */
+    :global(.md) .od-md3-dialog--surface {
+      animation:
+        od-dialog-grow var(--od-motion-spatial-fast-ms) var(--od-motion-spatial-fast) backwards,
+        od-dialog-fade var(--od-motion-effects-default-ms) var(--od-motion-effects-default) backwards;
+    }
+
+    :global(.md) .od-md3-dialog--scrim {
+      animation: od-dialog-fade var(--od-motion-effects-default-ms) var(--od-motion-effects-default) backwards;
+    }
+
+    @keyframes od-dialog-grow {
+      from {
+        transform: scale(0.9);
+      }
+    }
+
+    @keyframes od-dialog-fade {
+      from {
+        opacity: 0;
+      }
+    }
+
     h2 {
       margin: 0 24px 16px;
       font-size: 24px;

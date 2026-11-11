@@ -7,9 +7,11 @@
 /**
  * @param {number} stiffness
  * @param {number} damping damping ratio
+ * @param {number} [tolerance] distance from the target under which the spring counts as settled
+ * @param {number} [steps] number of segments of the `linear()` curve
  * @returns {{ css: string, ms: number }} a `linear()` easing and the duration to give the transition
  */
-export function springEasing(stiffness, damping) {
+export function springEasing(stiffness, damping, tolerance = 0.001, steps = 24) {
   const w0 = Math.sqrt(stiffness);
   /** Position from 0 to 1 at time t (s), released at rest. @param {number} t */
   const at = (t) => {
@@ -19,10 +21,11 @@ export function springEasing(stiffness, damping) {
     }
     return 1 - Math.exp(-w0 * t) * (1 + w0 * t);
   };
-  // Settled once it stays within 0.1 % of the target.
+  // Settled once it is within the tolerance of the target (0.1 % by default).
+  // Underdamped springs cross the tolerance band on the way up, then overshoot:
+  // the settle time is the last moment outside the band.
   let end = 0.01;
-  while (end < 3 && Math.abs(1 - at(end)) > 0.001) end += 0.005;
-  const steps = 24;
+  for (let t = 0.01; t < 3; t += 0.005) if (Math.abs(1 - at(t)) > tolerance) end = t + 0.005;
   const points = [];
   for (let i = 0; i <= steps; i++) points.push(+at((end * i) / steps).toFixed(4));
   points[steps] = 1;

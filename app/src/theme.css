@@ -932,11 +932,44 @@ html.ios {
     animation: od-slide-previous 220ms ease-out;
   }
 
+  /* Android: the slide is spatial, the fade is effects. */
+  .md .od-slide-next .page-content {
+    animation:
+      od-slide-next-move var(--od-motion-spatial-default-ms) var(--od-motion-spatial-default),
+      od-slide-fade var(--od-motion-effects-default-ms) var(--od-motion-effects-default);
+  }
+
+  .md .od-slide-previous .page-content {
+    animation:
+      od-slide-previous-move var(--od-motion-spatial-default-ms) var(--od-motion-spatial-default),
+      od-slide-fade var(--od-motion-effects-default-ms) var(--od-motion-effects-default);
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .od-slide-next .page-content,
-    .od-slide-previous .page-content {
+    .od-slide-previous .page-content,
+    .md .od-slide-next .page-content,
+    .md .od-slide-previous .page-content {
       animation: none;
     }
+  }
+}
+
+@keyframes od-slide-next-move {
+  from {
+    transform: translateX(40%);
+  }
+}
+
+@keyframes od-slide-previous-move {
+  from {
+    transform: translateX(-40%);
+  }
+}
+
+@keyframes od-slide-fade {
+  from {
+    opacity: 0;
   }
 }
 
@@ -951,6 +984,56 @@ html.ios {
   from {
     opacity: 0;
     transform: translateX(-40%);
+  }
+}
+
+/*
+ * Android: Material 3 Expressive motion (lib/motion.js declares the
+ * --od-motion-* tokens on <html>; docs/system-design.md, section 8, "Motion").
+ * Outside the framework7 layer's reach: od.base wins over Framework7's own
+ * durations and curves. "Remove animations" is handled by the
+ * prefers-reduced-motion rule at the end of od.base (all durations ~0).
+ */
+@layer od.base {
+  /* Pages: the new page comes in with the default spatial spring; going back is
+     faster (fast spatial), and the fade follows the effects spring. */
+  .md .router-transition-forward .page-next {
+    animation-duration: var(--od-motion-spatial-default-ms);
+    animation-timing-function: var(--od-motion-spatial-default);
+  }
+
+  .md .router-transition-forward .page-current {
+    animation-duration: var(--od-motion-spatial-default-ms);
+    animation-timing-function: var(--od-motion-spatial-default);
+  }
+
+  .md .router-transition-backward .page-current {
+    animation-duration: var(--od-motion-spatial-fast-ms), var(--od-motion-effects-fast-ms);
+    animation-timing-function: var(--od-motion-spatial-fast), var(--od-motion-effects-fast);
+  }
+
+  .md .router-transition-backward .page-previous {
+    animation-duration: var(--od-motion-spatial-fast-ms);
+    animation-timing-function: var(--od-motion-spatial-fast);
+  }
+}
+
+/* Panels, sheets and popups are anchored to an edge: the same springs without overshoot. */
+html.md {
+  --f7-panel-transition-duration: var(--od-motion-anchored-default-ms, 400ms);
+  --f7-panel-transition-timing-function: var(--od-motion-anchored-default, cubic-bezier(0, 0.8, 0.34, 1));
+  --f7-sheet-transition-duration: var(--od-motion-anchored-default-ms, 400ms);
+  --f7-sheet-transition-timing-function: var(--od-motion-anchored-default, cubic-bezier(0, 0.8, 0.34, 1));
+  --f7-popup-transition-duration: var(--od-motion-anchored-default-ms, 400ms);
+  --f7-popup-transition-timing-function: var(--od-motion-anchored-default, cubic-bezier(0, 0.8, 0.34, 1));
+}
+
+/* Framework7's dialogs (alerts, confirmations): grow (spatial) and fade (effects). */
+@layer od.base {
+  .md .dialog {
+    transition-property: transform, opacity;
+    transition-duration: var(--od-motion-spatial-fast-ms, 200ms), var(--od-motion-effects-default-ms, 200ms);
+    transition-timing-function: var(--od-motion-spatial-fast, ease), var(--od-motion-effects-default, ease);
   }
 }
 
