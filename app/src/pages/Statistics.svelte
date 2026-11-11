@@ -116,7 +116,7 @@
 </script>
 
 <Page class="od-statistics" onPageInit={keepInSvelteRange}>
-  <Navbar large={theme.ios} class="od-band-bar" title={t('stats.title')}>
+  <Navbar large={theme.ios} class="od-band-bar{theme.ios ? '' : ' od-band-titled'}" title={t('stats.title')}>
     {#snippet left()}<MenuButton />{/snippet}
     <NavRight>
       {#if theme.ios}
@@ -128,7 +128,7 @@
   </Navbar>
 
   {#if !theme.ios}<BandBackdrop short />{/if}
-  <SectionBand bare={!theme.ios} summary={bandSummary} />
+  <SectionBand bare={!theme.ios} title={t('stats.title')} summary={bandSummary} />
 
   {#if !logbook.loading && !logbook.dives.length}
     <div class="od-statistics--empty">

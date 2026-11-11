@@ -1075,7 +1075,7 @@
 </script>
 
 <Page class="od-logbook" onPageInit={keepInSvelteRange}>
-  <Navbar large={theme.ios} class="od-band-bar od-band-tall {showPill ? 'od-band-pill' : ''}" title={t('logbook.title')}>
+  <Navbar large={theme.ios} class="od-band-bar od-band-tall{theme.ios ? '' : ' od-band-titled'} {showPill ? 'od-band-pill' : ''}" title={t('logbook.title')}>
     {#snippet left()}<MenuButton />{/snippet}
     <NavRight>
       {#if logbook.dives.length || logbook.preview}
@@ -1091,7 +1091,7 @@
   </Navbar>
 
   {#if !theme.ios}<BandBackdrop pill={showPill} group={stickyGroup} />{/if}
-  <SectionBand tall pill={showPill} bare={!theme.ios} summary={bandSummary}>
+  <SectionBand tall pill={showPill} bare={!theme.ios} title={t('logbook.title')} summary={bandSummary}>
     {#if showPill}
       {#if conflictWaits}
         <SyncPill icon="sync" text={stoppedText} onclick={reopenConflict} />
