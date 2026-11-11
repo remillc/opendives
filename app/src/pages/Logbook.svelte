@@ -736,6 +736,17 @@
     });
   });
 
+  // "Changes not sent": the list follows the pending edits; once everything is
+  // sent, the criterion goes and the whole logbook is back.
+  $effect(() => {
+    const pending = logbook.pendingByDive;
+    untrack(() => {
+      if (!filter.applied.unsent) return;
+      const c = Object.keys(pending).length ? filter.applied : { ...filter.applied, unsent: false };
+      applyFilter(c, logbook.prefs);
+    });
+  });
+
   /** The dives by month, newest first; a trip is one group under the month of its first dive. */
   const groups = $derived(groupByMonth(sorted));
   /** Dives outside trips and trips, month after month. */

@@ -30,6 +30,7 @@
   /** @param {any} key */
   function chipText(key) {
     if (key === 'preset') return t('filter.chip', { name: t('filter.savedFilter'), value: filter.applied.preset?.name ?? '' });
+    if (key === 'unsent') return t('filter.unsentChip');
     if (key === 'mode') return t('filter.chip', { name: t('filter.mode'), value: t(`filter.modes.${filter.applied.mode}`) });
     return t('filter.chip', { name: t(`filter.criteria.${key}`), value: valueText(key, filter.applied, prefs, tripName) });
   }
