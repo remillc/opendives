@@ -359,6 +359,20 @@ int main()
 	check(reserve > 0 && std::labs(reserve - real_reserve) * 100 <= real_reserve, "volumes: reserve within 1 % of a real cylinder");
 	check(num(volumes, "gasUsedMl", item(volumes, "cylinders", 0)) == num(real, "gasUsedMl", item(real, "cylinders", 0)), "volumes: same gas used");
 
+	// Two SACs: the deco SAC is used for the ascent and the stops only. The
+	// same plan with a higher deco SAC keeps its runtime and breathes more gas;
+	// a higher bottom SAC also breathes more, at the bottom.
+	std::string sac_base = run("{\"levels\":[{\"depthMm\":40000,\"durationSeconds\":1500}],\"bottomSacMlMin\":20000,\"decoSacMlMin\":15000,\"when\":1000000000," + gases);
+	std::string sac_deco = run("{\"levels\":[{\"depthMm\":40000,\"durationSeconds\":1500}],\"bottomSacMlMin\":20000,\"decoSacMlMin\":30000,\"when\":1000000000," + gases);
+	std::string sac_bottom = run("{\"levels\":[{\"depthMm\":40000,\"durationSeconds\":1500}],\"bottomSacMlMin\":30000,\"decoSacMlMin\":15000,\"when\":1000000000," + gases);
+	long base_gas = num(sac_base, "gasUsedMl", item(sac_base, "cylinders", 0));
+	long deco_gas = num(sac_deco, "gasUsedMl", item(sac_deco, "cylinders", 0));
+	long bottom_gas = num(sac_bottom, "gasUsedMl", item(sac_bottom, "cylinders", 0));
+	printf("     SAC: bottom 20 / deco 15 %ld ml, deco 30 %ld ml, bottom 30 %ld ml\n", base_gas, deco_gas, bottom_gas);
+	check(num(sac_deco, "runtimeSeconds") == num(sac_base, "runtimeSeconds"), "two SACs: the deco SAC does not change the runtime");
+	check(deco_gas > base_gas, "two SACs: a higher deco SAC breathes more gas");
+	check(bottom_gas > base_gas, "two SACs: a higher bottom SAC breathes more gas");
+
 	std::string bad, error;
 	check(opendives::plan_dive("{\"depthMm\":0}", bad, error) == -1 && error.rfind("BAD_REQUEST", 0) == 0, "bad request refused");
 

@@ -304,15 +304,15 @@
   }
 
   /**
-   * The SAC, an exposed dropdown menu: the values around the current one, in
+   * A SAC, an exposed dropdown menu: the values around the current one, in
    * steps of 0.01 cuft/min or 0.5 L/min (20 each side), the current one
    * selected even off the steps (a SAC measured on a dive). Values in mL/min.
+   * @param {number} current
    */
-  const sacOptions = $derived.by(() => {
+  function sacOptionsOf(current) {
     const step = cuft ? 0.01 * ML_PER_CUFT : 500;
     const min = cuft ? 0.04 * ML_PER_CUFT : 1000;
     const max = cuft ? 3.5 * ML_PER_CUFT : 99000;
-    const current = planner.bottomSacMlMin;
     const base = Math.round(current / step);
     /** @type {number[]} */
     const values = [];
@@ -325,15 +325,33 @@
     if (same === undefined) values.push(current);
     values.sort((a, b) => a - b);
     return { selected: same ?? current, list: values.map((ml) => ({ value: String(ml), label: formatSac(ml, prefs) })) };
-  });
+  }
+  /** A SAC for screen readers: the number and the unit in words. @param {number} ml */
+  const sacSpoken = (ml) =>
+    cuft
+      ? t('units.cubicFeetPerMinuteLong', { n: Math.round(ml / ML_PER_CUFT * 100) / 100, v: formatNumber(ml / ML_PER_CUFT, 2) })
+      : t('units.litersPerMinuteLong', { n: Math.round(ml / 100) / 10, v: formatNumber(ml / 1000, 1) });
+  // Two SACs (Subsurface's bottom SAC and deco SAC): at the bottom, and during the ascent and the stops.
+  const sacOptions = $derived(sacOptionsOf(planner.bottomSacMlMin));
+  const decoSacOptions = $derived(sacOptionsOf(planner.decoSacMlMin));
   let sacChoice = $state('');
+  let decoSacChoice = $state('');
   $effect(() => {
     sacChoice = String(sacOptions.selected);
+  });
+  $effect(() => {
+    decoSacChoice = String(decoSacOptions.selected);
   });
   $effect(() => {
     const ml = Number(sacChoice);
     if (!ml || ml === sacOptions.selected) return;
     planner.bottomSacMlMin = ml;
+    planner.version++;
+  });
+  $effect(() => {
+    const ml = Number(decoSacChoice);
+    if (!ml || ml === decoSacOptions.selected) return;
+    planner.decoSacMlMin = ml;
     planner.version++;
   });
 
@@ -717,7 +735,12 @@
           </div>
         {/each}
         <button type="button" class="od-planner--add" onclick={addGas}><Icon name="plus" size={18} />{t('plan.addGas')}</button>
-        <SelectField label={t('plan.sac')} bind:value={sacChoice} options={sacOptions.list} supporting={planner.source ? t('plan.sacMeasured') : ''} />
+        <p class="od-planner--subhead">{t('plan.sac')}</p>
+        <div class="od-planner--pair">
+          <SelectField label={t('plan.sacBottom')} bind:value={sacChoice} options={sacOptions.list} chevron ariaLabel={t('plan.sacBottomLong', { value: sacSpoken(sacOptions.selected) })} />
+          <SelectField label={t('plan.sacDeco')} bind:value={decoSacChoice} options={decoSacOptions.list} chevron ariaLabel={t('plan.sacDecoLong', { value: sacSpoken(decoSacOptions.selected) })} />
+        </div>
+        <p class="od-planner--helper od-planner--inner">{t(planner.source ? 'plan.sacFromDive' : 'plan.sacFromSettings')}</p>
       </div>
 
       <h2 class="od-planner--section-title">{t('plan.conditions')}</h2>
@@ -1067,6 +1090,15 @@
         border: 1.5px solid var(--od-alarm);
         box-sizing: border-box;
       }
+    }
+
+    /* "Consommation (SAC)", over its two fields. */
+    .od-planner--subhead {
+      margin: 16px 16px -10px;
+      font-size: 14px;
+      line-height: 20px;
+      font-weight: 500;
+      color: var(--od-text-2);
     }
 
     .od-planner--helper {

@@ -1410,7 +1410,7 @@ Mock-up: `docs/mockups/android-planificateur.dc.html` (Gaz section).
 - Wherever the planner shows these two fields: plan from a dive, new plan, phone and tablet. iOS: the same choice with a native pop-up menu when the iPhone planner is built.
 - A line in the release notes.
 
-## [ ] 2026-11-11-33 Planner: bottom SAC and deco SAC, two fields
+## [x] 2026-11-11-33 Planner: bottom SAC and deco SAC, two fields
 
 Mock-ups: `docs/mockups/android-planificateur.dc.html` (plan from a dive), `docs/mockups/android-planificateur-nouveau.dc.html` (new plan).
 - The single "Consommation (SAC)" field becomes two dropdown fields side by side, under a small "Consommation (SAC)" heading: "Au fond" and "Pendant la déco". They feed the core's bottom SAC and deco SAC (the two values the planner settings already have).
@@ -1419,3 +1419,5 @@ Mock-ups: `docs/mockups/android-planificateur.dc.html` (plan from a dive), `docs
 - Values in the diver's volume unit per minute. Downward chevrons, not triangles. Accessible names give the full label and unit.
 - Check that the plan uses the deco SAC for the ascent and stops (planner tests: a case where the two SACs differ).
 - A line in the release notes.
+
+Done in `Planner.svelte` (two SAC dropdowns with chevrons, accessible names with the unit in words), `planner.svelte.js` (the plan's own `decoSacMlMin`, sent with each request and kept with a saved plan) and `SelectField` (`chevron`, `ariaLabel`). The core already took `decoSacMlMin`; `tests/plan_test.cpp` now checks that a higher deco SAC keeps the runtime and breathes more gas, and `tests/app/planner.test.mjs` that the request carries both SACs.
