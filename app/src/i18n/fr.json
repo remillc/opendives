@@ -897,6 +897,10 @@
     "tags": "Étiquettes",
     "notes": "Notes",
     "conditionsGroup": "Conditions",
+    "conditionsWater": "Eau {value}",
+    "conditionsWaterLabel": "eau {value}",
+    "conditionsAverage": "moyenne {average} sur 5",
+    "conditionsNoAverage": "aucune note",
     "rating": "Note",
     "summaryRating": "Note {n} sur 5",
     "summaryCondition": "{name} {n}",
@@ -1465,6 +1469,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "« Modifier la plongée » : la section Conditions est repliée au départ ; son en-tête montre la température de l’eau et la moyenne des notes en étoiles. Touchez-le pour l’ouvrir.",
       "Supprimer une plongée depuis son menu ⋮ demande maintenant confirmation, comme pour une sélection du Carnet ; « Annuler » reste offert quelques secondes après.",
       "Android : un appui sur une date ouvre le sélecteur de date Material 3 (calendrier ou saisie au clavier) et un appui sur une heure ouvre l’horloge Material 3, dans « Modifier la plongée », le planificateur et « Nouvelle plongée ».",
       "Android : les champs de date se terminent par une icône de calendrier et les champs d’heure par une icône d’horloge, au lieu d’un chevron (Modifier la plongée, planificateur, Nouvelle plongée) ; le champ Heure de « Modifier la plongée » est plus large, « 10:00 » n’est plus coupé.",

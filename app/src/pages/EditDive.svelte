@@ -19,6 +19,8 @@
   import ChipsField from '../components/ChipsField.svelte';
   import ComboField from '../components/ComboField.svelte';
   import StarsInput from '../components/StarsInput.svelte';
+  import Stars from '../components/Stars.svelte';
+  import { conditionsMean, roundHalfUp1 } from '../lib/conditions.js';
   import WheelDialog from '../components/WheelDialog.svelte';
   import DatePickerDialog from '../components/DatePickerDialog.svelte';
   import TimePickerDialog from '../components/TimePickerDialog.svelte';
@@ -552,6 +554,20 @@
       name: t(`detail.conditionNames.${key}`),
     })),
   );
+
+  // "Conditions" collapsed by default (task 2026-11-11-44): its header sums it
+  // up with the water temperature and the average of the ratings that are set.
+  let conditionsOpen = $state(false);
+  const conditionsAvg = $derived(conditionsMean(starFields.map((field) => stars[field.key] ?? 0)));
+  const conditionsAvgText = $derived(conditionsAvg === null ? '–' : formatNumber(roundHalfUp1(conditionsAvg), 1));
+  const conditionsWater = $derived(f.water.trim() && Number.isFinite(parseNumber(f.water)) ? `${f.water.trim()} ${temperatureUnitText}` : '');
+  const conditionsLabel = $derived(
+    [
+      t('edit.conditionsGroup'),
+      conditionsAvg === null ? t('edit.conditionsNoAverage') : t('edit.conditionsAverage', { average: conditionsAvgText }),
+      ...(conditionsWater ? [t('edit.conditionsWaterLabel', { value: conditionsWater })] : []),
+    ].join(', '),
+  );
 </script>
 
 {#snippet header(/** @type {string} */ title)}
@@ -745,7 +761,22 @@
 
     <!-- Conditions -->
     <section class="card od-edit-dive--card">
-      {@render header(t('edit.conditionsGroup'))}
+      <button
+        type="button"
+        class="od-edit-dive--conditions-head"
+        aria-expanded={conditionsOpen}
+        aria-label={conditionsLabel}
+        onclick={() => (conditionsOpen = !conditionsOpen)}
+      >
+        <span class="od-edit-dive--conditions-titles">
+          <span class="od-edit-dive--conditions-title" role="heading" aria-level="2">{t('edit.conditionsGroup')}</span>
+          {#if conditionsWater}<span class="od-edit-dive--conditions-water">{t('edit.conditionsWater', { value: conditionsWater })}</span>{/if}
+        </span>
+        <Stars value={conditionsAvg ?? 0} label="" size={20} decorative />
+        <span class="od-edit-dive--conditions-average">{conditionsAvgText}</span>
+        <span class="od-edit-dive--conditions-chevron" class:od-edit-dive--conditions-chevron-up={conditionsOpen}><Icon name="expand" /></span>
+      </button>
+      {#if conditionsOpen}
       {#each starFields as field (field.key)}
         <div class="od-edit-dive--stars-row">
           <span>{field.name}</span>
@@ -773,6 +804,7 @@
         </div>
       </div>
       <div class="od-edit-dive--end"></div>
+      {/if}
     </section>
 
     <!-- Ordinateurs -->
@@ -911,7 +943,61 @@
       }
     }
 
-    /* Plain section headings: the sections are always open. */
+    /* "Conditions": a header button that opens the section, with the water
+       temperature, the average of the ratings as stars and its value. */
+    .od-edit-dive--conditions-head {
+      width: 100%;
+      min-height: 56px;
+      padding: 0 12px 0 16px;
+      border: none;
+      background: transparent;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font: inherit;
+      color: var(--od-text);
+      text-align: start;
+      cursor: pointer;
+    }
+
+    .od-edit-dive--conditions-titles {
+      flex: 1;
+      min-width: 0;
+      padding: 8px 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .od-edit-dive--conditions-title {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .od-edit-dive--conditions-water {
+      font-size: 14px;
+      line-height: 20px;
+      color: var(--od-text-2);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .od-edit-dive--conditions-average {
+      min-width: 28px;
+      font-size: 14px;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      text-align: end;
+    }
+
+    .od-edit-dive--conditions-chevron {
+      display: flex;
+      transition: transform 0.2s;
+
+      &.od-edit-dive--conditions-chevron-up {
+        transform: rotate(180deg);
+      }
+    }
+
+    /* Plain section headings: the other sections are always open. */
     .od-edit-dive--heading {
       min-height: 56px;
       padding: 0 16px;

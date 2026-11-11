@@ -1549,10 +1549,13 @@ Mock-ups: `docs/mockups/android-edition.dc.html`, `android-edition-mode`, `andro
 - **Reordering:** a long press or drag on the handle moves the card; the numbers follow the new order (cylinder 2 moved first becomes cylinder 1). TalkBack: actions "Monter" and "Descendre" on the handle. **Data:** gas changes and sensors in the dive refer to cylinders by index; reorder with the core's cylinder renumbering so every reference follows (as Subsurface desktop does), and check with a dive that has gas changes that the profile is unchanged after a reorder and a round trip.
 - A line in the release notes.
 
-## [ ] 2026-11-11-44 Edit a dive: Conditions collapsed by default
+## [x] 2026-11-11-44 Edit a dive: Conditions collapsed by default
 
 Mock-up: `docs/mockups/android-edition-conditions.dc.html` (open). The collapsed state is the "Conditions" block of the canvas board "Modifier une plongée · Android"; it is not yet copied to `docs/mockups/android-edition.dc.html`, which will be updated with the gas changes still under review (do not build those yet).
 - The "Conditions" section of "Modifier la plongée" is collapsed by default to one header row: "Conditions" with "Eau 4,3 °C" (water temperature, diver's unit) on a second line in the variant colour, then five 20 dp stars showing the **average of the ratings that are set** (ratings at 0 are ignored), the average with one decimal ("2,3", round half up), and a downward chevron. When no rating is set: empty stars and "–". When the water temperature is unknown, no second line.
 - A tap anywhere on the header expands the section (chevron up): the rating rows, the helper, air and water temperatures, water type and pressure, as today. Role button with `aria-expanded`; accessible name "Conditions, moyenne 2,3 sur 5, eau 4,3 °C".
 - Partial stars: fill each star by the fraction of the average (2,25 shows two full stars and a quarter).
 - A line in the release notes.
+
+Done in `feature/edit-conditions-collapsed`: the Conditions section of Modifier la plongée (Android and iOS) starts collapsed to a header button with "Eau …" (the water field as typed, in the diver's unit; no line when empty), five 20 dp stars filled by the exact average of the ratings that are set (partial stars via a clip in `Stars.svelte`), the average rounded half up to one decimal ("–" when none) and a chevron; aria-expanded and the accessible name "Conditions, moyenne 2,3 sur 5, eau 4,3 °C". The ratings averaged are the ones the section shows (visibility and current, plus waves, surge and chill when Settings shows them). Logic in `lib/conditions.js` with tests.
+
