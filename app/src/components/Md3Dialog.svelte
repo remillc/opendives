@@ -14,9 +14,10 @@
    *   children: import('svelte').Snippet,
    *   actions: import('svelte').Snippet,
    *   class?: string,
+   *   role?: 'dialog'|'alertdialog',
    * }}
    */
-  let { title, text = '', oncancel, children, actions, class: extraClass = '' } = $props();
+  let { title, text = '', oncancel, children, actions, class: extraClass = '', role = 'dialog' } = $props();
 
   const id = `od-dialog-${Math.random().toString(36).slice(2, 9)}`;
 
@@ -32,7 +33,7 @@
     node.addEventListener('od-cancel', cancel);
     // The dialog takes the focus (a screen reader reads its title); Tab then
     // reaches the selected choice, without a focus ring drawn at opening.
-    queueMicrotask(() => /** @type {HTMLElement|null} */ (node.querySelector('[role="dialog"]'))?.focus({ preventScroll: true }));
+    queueMicrotask(() => /** @type {HTMLElement|null} */ (node.querySelector('[role="dialog"], [role="alertdialog"]'))?.focus({ preventScroll: true }));
     return {
       destroy() {
         node.removeEventListener('od-cancel', cancel);
@@ -55,7 +56,7 @@
 <div class="od-md3-dialog modal-in {extraClass}" use:portal onkeydown={keydown}>
   <!-- svelte-ignore a11y_click_events_have_key_events -->
   <div class="od-md3-dialog--scrim" onclick={oncancel}></div>
-  <div class="od-md3-dialog--surface" role="dialog" aria-modal="true" aria-labelledby={id} tabindex="-1">
+  <div class="od-md3-dialog--surface" {role} aria-modal="true" aria-labelledby={id} tabindex="-1">
     <h2 {id}>{title}</h2>
     {#if text}<p class="od-md3-dialog--text">{text}</p>{/if}
     <div class="od-md3-dialog--content">{@render children()}</div>

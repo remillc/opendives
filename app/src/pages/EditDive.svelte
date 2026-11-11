@@ -19,6 +19,9 @@
   import ChipsField from '../components/ChipsField.svelte';
   import ComboField from '../components/ComboField.svelte';
   import CylinderCard from '../components/CylinderCard.svelte';
+  import CylinderSheet from '../components/CylinderSheet.svelte';
+  import CylinderDeleteDialog from '../components/CylinderDeleteDialog.svelte';
+  import GasSummary from '../components/GasSummary.svelte';
   import StarsInput from '../components/StarsInput.svelte';
   import Stars from '../components/Stars.svelte';
   import { conditionsMean, roundHalfUp1 } from '../lib/conditions.js';
@@ -35,6 +38,7 @@
   import { WATER_TYPES, waterTypeName, waterTypeOfSalinity } from '../lib/tools.js';
   import { formatCylinderSize, formatDepth, formatLongDate, formatMinSec, formatNumber, formatPressure, formatWeight, locale } from '../lib/format.js';
   import { canMove, dropIndex, gasName, moveItem, OTHER_TYPE, pressureUsed, typeHelper } from '../lib/cylinder-card.js';
+  import { deletionOutcome, fillRatio, gasChangeMoments, typeLine } from '../lib/gas-group.js';
   import { t, tIfExists } from '../lib/i18n.js';
 
   /** @type {{ f7route: { params: { id: string } }, f7router: any }} */
@@ -250,6 +254,8 @@
   ]);
 
   // --- Choices -------------------------------------------------------------------
+  /** @param {string} mode */
+  const formatDiveMode = (mode) => tIfExists(`detail.modes.${mode}`) ?? mode;
   const modeOptions = MODES.map((m) => ({ value: m, label: tIfExists(`detail.modes.${m}`) ?? m }));
   const useOptions = USES.map((u) => ({ value: u, label: t(`edit.uses.${u}`) }));
   const waterOptions = $derived([{ value: '', label: t('edit.notSet') }, ...WATER_TYPES.map((w) => ({ value: w.id, label: waterTypeName(w.id) }))]);
@@ -426,11 +432,84 @@
     const sizeMlValue = c.f.size.trim() ? sizeMl(parseNumber(c.f.size), workingPressureMbar) : 0;
     const start = c.f.start.trim() ? pressureMbar(parseNumber(c.f.start)) : 0;
     const end = c.f.end.trim() ? pressureMbar(parseNumber(c.f.end)) : 0;
-    return { o2, he, sizeMl: sizeMlValue, workingPressureMbar, used: pressureUsed(start, end) };
+    return { o2, he, sizeMl: sizeMlValue, workingPressureMbar, startMbar: start, endMbar: end, used: pressureUsed(start, end) };
   }
 
   /** What the screen reader says after a card moved. */
   let moved = $state('');
+
+  // --- The Gas group: summary, Gas page, cylinder sheet, deletion -------------------
+  /** The Gas page (every cylinder and the gas changes) replaces the form until ← or Back. */
+  let gasPage = $state(false);
+  /** The cylinder shown in its sheet, and the one asked about in the delete dialog, by key. */
+  let sheetKey = $state(/** @type {number|null} */ (null));
+  let deleteKey = $state(/** @type {number|null} */ (null));
+  let savedScroll = 0;
+
+  /** @param {EditedCylinder} c */
+  const cylinderGas = (c) => {
+    const own = cylinderValues(c);
+    return gasName(own.o2, own.he, gasWords);
+  };
+  /** @param {EditedCylinder} c */
+  const cylinderRatio = (c) => {
+    const own = cylinderValues(c);
+    return fillRatio(own.endMbar, own.workingPressureMbar, own.startMbar);
+  };
+  const gasItems = $derived(
+    cylinders.map((c, i) => {
+      const own = cylinderValues(c);
+      return {
+        key: c.key,
+        n: i + 1,
+        gas: gasName(own.o2, own.he, gasWords),
+        pressure: own.endMbar ? formatPressure(own.endMbar, prefs) : '',
+        ratio: fillRatio(own.endMbar, own.workingPressureMbar, own.startMbar),
+      };
+    }),
+  );
+  const sheetIndex = $derived(sheetKey === null ? -1 : cylinders.findIndex((c) => c.key === sheetKey));
+  const deleteIndex = $derived(deleteKey === null ? -1 : cylinders.findIndex((c) => c.key === deleteKey));
+
+  /** @returns {HTMLElement|null} */
+  const scroller = () => /** @type {HTMLElement|null} */ (document.querySelector('.od-edit-dive .page-content'));
+
+  function openGas() {
+    savedScroll = scroller()?.scrollTop ?? 0;
+    gasPage = true;
+    tick().then(() => scroller()?.scrollTo({ top: 0 }));
+  }
+
+  function closeGas() {
+    gasPage = false;
+    sheetKey = null;
+    tick().then(() => scroller()?.scrollTo({ top: savedScroll }));
+  }
+
+  /** The system Back button closes the Gas page (lib/back-button.js). @param {HTMLElement} node */
+  function backClosesGas(node) {
+    const cancel = () => closeGas();
+    node.addEventListener('od-cancel', cancel);
+    return { destroy: () => node.removeEventListener('od-cancel', cancel) };
+  }
+
+  /** What the delete dialog says about a cylinder: the type and size line, the gas changes that use it. @param {EditedCylinder} c */
+  function deleteDetails(c) {
+    const own = cylinderValues(c);
+    const size = formatCylinderSize(own.sizeMl, own.workingPressureMbar, prefs);
+    const moments = gasChangeMoments(dive?.events ?? [], c.index);
+    return {
+      line: typeLine(c.f.description, typeHelper(size, own.workingPressureMbar), c.f.use ? t(`edit.uses.${c.f.use}`) : ''),
+      moments,
+      outcome: deletionOutcome({ protected: c.protected, moments }),
+    };
+  }
+
+  function confirmDelete() {
+    if (deleteIndex >= 0) cylinders.splice(deleteIndex, 1);
+    deleteKey = null;
+    sheetKey = null;
+  }
 
   /** The card elements, by key. @type {Record<number, HTMLElement>} */
   let cardEls = $state({});
@@ -731,10 +810,79 @@
 
 {#snippet unit(/** @type {string} */ text)}<span class="od-edit-dive--unit">{text}</span>{/snippet}
 
+{#snippet cylinderFields(/** @type {EditedCylinder} */ c)}
+  {@const cb = cylinderBad(c)}
+  {@const own = cylinderValues(c)}
+  <SelectField
+    label={t('edit.cylinderType')}
+    value={c.custom ? OTHER_TYPE : c.f.description}
+    options={cylinderTypeOptions(c.initial.description)}
+    onchange={(v) => chooseCylinderType(c, v)}
+    supporting={c.custom ? '' : typeHelper(formatCylinderSize(own.sizeMl, own.workingPressureMbar, prefs), own.workingPressureMbar)}
+  />
+  {#if c.custom}
+    <div class="od-edit-dive--row od-edit-dive--card-row">
+      <div class="od-edit-dive--grow">
+        <TextField label={t('edit.size')} bind:value={c.f.size} inputmode="decimal" invalid={cb.size}>
+          {#snippet trailing()}{@render unit(volumeUnitText)}{/snippet}
+        </TextField>
+      </div>
+      <div class="od-edit-dive--grow">
+        <TextField label={t('edit.workingPressure')} bind:value={c.f.workingPressure} inputmode="decimal" invalid={cb.workingPressure}>
+          {#snippet trailing()}{@render unit(pressureUnitText)}{/snippet}
+        </TextField>
+      </div>
+    </div>
+  {/if}
+  <SelectField label={t('edit.use')} bind:value={c.f.use} options={useOptions} onchange={(v) => useChanged(c, v)} />
+  <div class="od-edit-dive--row od-edit-dive--card-row">
+    <div class="od-edit-dive--grow">
+      <TextField label={t('edit.o2')} bind:value={c.f.o2} inputmode="decimal" invalid={cb.gas}>
+        {#snippet trailing()}{@render unit(t('units.percent'))}{/snippet}
+      </TextField>
+    </div>
+    <div class="od-edit-dive--grow">
+      <TextField label={t('edit.he')} bind:value={c.f.he} inputmode="decimal" invalid={cb.gas}>
+        {#snippet trailing()}{@render unit(t('units.percent'))}{/snippet}
+      </TextField>
+    </div>
+  </div>
+  <div class="od-edit-dive--row od-edit-dive--card-row">
+    <div class="od-edit-dive--grow">
+      <TextField label={t('edit.start')} bind:value={c.f.start} inputmode="decimal" invalid={cb.start}>
+        {#snippet trailing()}{@render unit(pressureUnitText)}{/snippet}
+      </TextField>
+    </div>
+    <div class="od-edit-dive--grow">
+      <TextField
+        label={t('edit.end')}
+        bind:value={c.f.end}
+        inputmode="decimal"
+        invalid={cb.end}
+        supporting={own.used ? t('edit.consumed', { amount: formatPressure(own.used, prefs) }) : ''}
+      >
+        {#snippet trailing()}{@render unit(pressureUnitText)}{/snippet}
+      </TextField>
+    </div>
+  </div>
+  {#if hasSwitchDepth(c)}
+    <TextField label={t('edit.switchDepth')} bind:value={c.f.depth} inputmode="decimal" invalid={cb.depth} supporting={modText(c)}>
+      {#snippet trailing()}{@render unit(depthUnitText)}{/snippet}
+    </TextField>
+  {/if}
+{/snippet}
+
 {#snippet chrome()}
-  <Navbar title={t('edit.title')}>
+  <Navbar title={gasPage ? t('edit.gasGroup') : t('edit.title')}>
     {#snippet left()}
-      {#if sheet}
+      {#if gasPage}
+        <!-- The Gas page: ← returns to the form with every change kept (it has no Save of its own). -->
+        {#if ios}
+          <Link onClick={closeGas}><i class="icon icon-back"></i><span class="od-sr-only">{t('detail.back')}</span></Link>
+        {:else}
+          <Link iconOnly onClick={closeGas}><Icon name="arrowBack" /><span class="od-sr-only">{t('detail.back')}</span></Link>
+        {/if}
+      {:else if sheet}
         {#if ios}
           <Link onClick={leave}>{t('dialog.cancel')}</Link>
         {:else}
@@ -751,7 +899,7 @@
       {/if}
     {/snippet}
     {#snippet right()}
-      <Link onClick={save} class={saving ? 'disabled' : ''}>{t('edit.save')}</Link>
+      {#if !gasPage}<Link onClick={save} class={saving ? 'disabled' : ''}>{t('edit.save')}</Link>{/if}
     {/snippet}
   </Navbar>
 {/snippet}
@@ -761,7 +909,37 @@
   {#if failed}
     <div class="block"><p>{t('detail.errorText')}</p></div>
   {:else if dive}
-    <div class="od-edit-dive--cards" class:od-edit-dive--two-columns={sheet}>
+    {#if gasPage}
+      <div class="od-edit-dive--gas-page od-edit-gas--open" use:backClosesGas>
+        <p class="od-edit-dive--subtitle od-value">
+          {[dive.number ? t('detail.number', { number: String(dive.number) }) : '', dive.site, formatDiveMode(f.divemode)].filter(Boolean).join(' · ')}
+        </p>
+        <section class="card od-edit-dive--card">
+          <div class="od-sr-only" aria-live="polite">{moved}</div>
+          {#each cylinders as c, i (c.key)}
+            <CylinderCard
+              n={i + 1}
+              gas={cylinderGas(c)}
+              ratio={cylinderRatio(c)}
+              canUp={canMove(cylinders, i, i - 1)}
+              canDown={canMove(cylinders, i, i + 1)}
+              dragging={drag?.key === c.key}
+              offset={dragOffset(i, c.key)}
+              bind:el={cardEls[c.key]}
+              onhandledown={(e) => startDrag(e, i)}
+              onmove={(direction) => moveCylinder(i, direction)}
+              removeLabel={t('edit.deleteCylinderN', { n: i + 1 })}
+              onremove={() => (deleteKey = c.key)}
+            >
+              {@render cylinderFields(c)}
+            </CylinderCard>
+          {/each}
+          <button type="button" class="od-edit-dive--add" onclick={addCylinder}><Icon name="plus" />{t('edit.addCylinder')}</button>
+          <div class="od-edit-dive--end"></div>
+        </section>
+      </div>
+    {/if}
+    <div class="od-edit-dive--cards" class:od-edit-dive--two-columns={sheet} class:od-edit-dive--hidden={gasPage}>
     <p class="od-edit-dive--subtitle od-value">
       {[dive.number ? t('detail.number', { number: String(dive.number) }) : '', dive.site, formatLongDate(dive.date)].filter(Boolean).join(' · ')}
     </p>
@@ -822,92 +1000,17 @@
       <div class="od-edit-dive--end"></div>
     </section>
 
+    <!-- Gaz -->
+    <section class="card od-edit-dive--card">
+      {@render header(t('edit.gasGroup'))}
+      <SelectField label={t('edit.divemode')} bind:value={f.divemode} options={modeOptions} onchange={modeChanged} />
+      <GasSummary items={gasItems} onopen={openGas} onedit={(key) => (sheetKey = key)} />
+    </section>
+
     <!-- Équipement -->
     <section class="card od-edit-dive--card">
       {@render header(t('edit.equipmentGroup'))}
       <ComboField label={t('edit.suit')} bind:value={f.suit} options={known.suit} />
-      <SelectField label={t('edit.divemode')} bind:value={f.divemode} options={modeOptions} onchange={modeChanged} />
-
-      <div class="od-sr-only" aria-live="polite">{moved}</div>
-      {#each cylinders as c, i (c.key)}
-        {@const cb = cylinderBad(c)}
-        {@const own = cylinderValues(c)}
-        <CylinderCard
-          n={i + 1}
-          gas={gasName(own.o2, own.he, gasWords)}
-          canUp={canMove(cylinders, i, i - 1)}
-          canDown={canMove(cylinders, i, i + 1)}
-          dragging={drag?.key === c.key}
-          offset={dragOffset(i, c.key)}
-          bind:el={cardEls[c.key]}
-          onhandledown={(e) => startDrag(e, i)}
-          onmove={(direction) => moveCylinder(i, direction)}
-        >
-          <SelectField
-            label={t('edit.cylinderType')}
-            value={c.custom ? OTHER_TYPE : c.f.description}
-            options={cylinderTypeOptions(c.initial.description)}
-            onchange={(v) => chooseCylinderType(c, v)}
-            supporting={c.custom ? '' : typeHelper(formatCylinderSize(own.sizeMl, own.workingPressureMbar, prefs), own.workingPressureMbar)}
-          />
-          {#if c.custom}
-            <div class="od-edit-dive--row od-edit-dive--card-row">
-              <div class="od-edit-dive--grow">
-                <TextField label={t('edit.size')} bind:value={c.f.size} inputmode="decimal" invalid={cb.size}>
-                  {#snippet trailing()}{@render unit(volumeUnitText)}{/snippet}
-                </TextField>
-              </div>
-              <div class="od-edit-dive--grow">
-                <TextField label={t('edit.workingPressure')} bind:value={c.f.workingPressure} inputmode="decimal" invalid={cb.workingPressure}>
-                  {#snippet trailing()}{@render unit(pressureUnitText)}{/snippet}
-                </TextField>
-              </div>
-            </div>
-          {/if}
-          <SelectField label={t('edit.use')} bind:value={c.f.use} options={useOptions} onchange={(v) => useChanged(c, v)} />
-          <div class="od-edit-dive--row od-edit-dive--card-row">
-            <div class="od-edit-dive--grow">
-              <TextField label={t('edit.o2')} bind:value={c.f.o2} inputmode="decimal" invalid={cb.gas}>
-                {#snippet trailing()}{@render unit(t('units.percent'))}{/snippet}
-              </TextField>
-            </div>
-            <div class="od-edit-dive--grow">
-              <TextField label={t('edit.he')} bind:value={c.f.he} inputmode="decimal" invalid={cb.gas}>
-                {#snippet trailing()}{@render unit(t('units.percent'))}{/snippet}
-              </TextField>
-            </div>
-          </div>
-          <div class="od-edit-dive--row od-edit-dive--card-row">
-            <div class="od-edit-dive--grow">
-              <TextField label={t('edit.start')} bind:value={c.f.start} inputmode="decimal" invalid={cb.start}>
-                {#snippet trailing()}{@render unit(pressureUnitText)}{/snippet}
-              </TextField>
-            </div>
-            <div class="od-edit-dive--grow">
-              <TextField
-                label={t('edit.end')}
-                bind:value={c.f.end}
-                inputmode="decimal"
-                invalid={cb.end}
-                supporting={own.used ? t('edit.consumed', { amount: formatPressure(own.used, prefs) }) : ''}
-              >
-                {#snippet trailing()}{@render unit(pressureUnitText)}{/snippet}
-              </TextField>
-            </div>
-          </div>
-          {#if hasSwitchDepth(c)}
-            <TextField label={t('edit.switchDepth')} bind:value={c.f.depth} inputmode="decimal" invalid={cb.depth} supporting={modText(c)}>
-              {#snippet trailing()}{@render unit(depthUnitText)}{/snippet}
-            </TextField>
-          {/if}
-          {#snippet footer()}
-            {#if !c.protected}
-              <button type="button" class="od-edit-dive--remove-cylinder" onclick={() => cylinders.splice(i, 1)}>{t('edit.removeCylinder')}</button>
-            {/if}
-          {/snippet}
-        </CylinderCard>
-      {/each}
-      <button type="button" class="od-edit-dive--add" onclick={addCylinder}><Icon name="plus" />{t('edit.addCylinder')}</button>
 
       <h3 class="od-edit-dive--sub">{t('edit.weightsTitle')}</h3>
       {#each weights as w, i (i)}
@@ -1075,10 +1178,48 @@
   />
 {/if}
 
+{#if sheetIndex >= 0}
+  {@const c = cylinders[sheetIndex]}
+  <CylinderSheet
+    n={sheetIndex + 1}
+    gas={cylinderGas(c)}
+    ratio={cylinderRatio(c)}
+    onclose={() => (sheetKey = null)}
+    ondelete={() => (deleteKey = c.key)}
+  >
+    {@render cylinderFields(c)}
+  </CylinderSheet>
+{/if}
+
+{#if deleteIndex >= 0}
+  {@const c = cylinders[deleteIndex]}
+  {@const details = deleteDetails(c)}
+  <CylinderDeleteDialog
+    n={deleteIndex + 1}
+    gas={cylinderGas(c)}
+    line={details.line}
+    ratio={cylinderRatio(c)}
+    outcome={details.outcome}
+    moments={details.moments}
+    oncancel={() => (deleteKey = null)}
+    onconfirm={confirmDelete}
+  />
+{/if}
+
 <style>
   @layer od.components {
     :global(.od-edit-dive .page-content) {
       padding-bottom: 32px;
+    }
+
+    .od-edit-dive--hidden {
+      display: none;
+    }
+
+    /* The Gas page: one column of cylinder cards. */
+    .od-edit-dive--gas-page {
+      max-width: 720px;
+      margin: 0 auto;
     }
 
     /* Tablet sheet: the cards in two columns (spec, section 3). */
@@ -1285,19 +1426,6 @@
     /* In a cylinder card the rows have no side padding: the card has its own. */
     .od-edit-dive--row.od-edit-dive--card-row {
       padding: 0;
-    }
-
-    .od-edit-dive--remove-cylinder {
-      margin: 12px 0 0 -12px;
-      min-height: 40px;
-      padding: 0 12px;
-      border: none;
-      border-radius: 20px;
-      background: none;
-      color: var(--od-text);
-      font: inherit;
-      font-size: 14px;
-      font-weight: 600;
     }
 
     .od-edit-dive--add {
