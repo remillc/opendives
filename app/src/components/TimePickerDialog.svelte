@@ -414,6 +414,7 @@
 
     .od-time-picker--period-button.od-time-picker--on {
       background: var(--od-primary-container);
+      box-shadow: inset 0 0 0 2px var(--od-primary);
       color: var(--od-text);
       font-weight: 600;
     }

@@ -262,7 +262,7 @@
 
     /* The dialog title is the small "Select date" label of the header. */
     :global(.od-date-picker .od-md3-dialog--surface h2) {
-      margin: 0 24px 36px 24px;
+      margin: 0 24px 16px 24px;
       font-size: 14px;
       line-height: 20px;
       font-weight: 500;
@@ -274,13 +274,16 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin: -20px 12px 12px 24px;
-      min-height: 40px;
+      margin: 0 12px 12px 24px;
+      min-height: 48px;
     }
 
     .od-date-picker--headline {
-      font-size: 28px;
-      line-height: 36px;
+      font-family: var(--od-title-font);
+      font-size: 32px;
+      line-height: 40px;
+      font-weight: 400;
+      overflow: visible;
       color: var(--od-text);
     }
 
