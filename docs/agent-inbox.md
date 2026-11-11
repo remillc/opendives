@@ -1402,7 +1402,7 @@ Spec: System design, section 7, "Back arrow in the detail pane, tablets" (new), 
 - iPad, when its layout is built: the secondary column shows the system back button "‹ <previous title>" only when it has history; the edge swipe goes back in that column.
 - Tests for the pane history and system back. A line in the release notes.
 
-## [ ] 2026-11-11-32 Planner: oxygen and helium as dropdown menus
+## [x] 2026-11-11-32 Planner: oxygen and helium as dropdown menus — superseded by 2026-11-11-36, do not implement
 
 Mock-up: `docs/mockups/android-planificateur.dc.html` (Gaz section).
 - The "Oxygène" and "Hélium" fields of each gas become filled dropdown menus (MD3 exposed dropdown, read-only field), the same 56 dp size, label on top, value with its unit ("33 %", "0 %"), downward chevron on the right. Accessible name: "Gaz 1, oxygène : 33 %".
@@ -1428,10 +1428,23 @@ Mock-ups: `docs/mockups/android-planificateur-nouveau.dc.html` and `docs/mockups
 - In the "Nouvelle plongée · Sans plongée de départ" card, the "+" icon suggested adding something. Replace it with an empty thumbnail: in the same 56 × 36 dp slot as a starting dive's profile thumbnail, the outline of a dive profile in a dashed grey line (`--od-outline`, 1.5 dp, dashes of 3 dp). Decorative, hidden from screen readers. "Changer" stays.
 - A line in the release notes.
 
-## [ ] 2026-11-11-35 Planner: altitude as a dropdown menu
+## [x] 2026-11-11-35 Planner: altitude as a dropdown menu — superseded by 2026-11-11-36, do not implement
 
 Mock-ups: `docs/mockups/android-planificateur{,-nouveau,-menu}.dc.html`, `docs/mockups/android-tablette-planificateur-{paysage,portrait}.dc.html` (Conditions section).
 - The "Altitude" field becomes a filled dropdown menu like the gas fields of task 32: same 56 dp size, value with its unit ("0 ft"), downward chevron. Accessible name: "Altitude : 0 ft".
 - Menu content, in the diver's depth unit: feet 0, 1 000, 2 000, 3 000, 5 000, 7 000, 10 000; metres 0, 300, 600, 1 000, 1 500, 2 000, 3 000; then "Autre valeur…" (same key as task 32), which opens the numeric keyboard on the field. A value outside the list (for example read from a dive) shows in the field and is checked in the menu above the usual values.
 - Every planner screen, phone and tablet.
+- A line in the release notes.
+
+## [ ] 2026-11-11-36 Planner: gases, SAC and altitude as wheels
+
+Replaces tasks 32 and 35 (dropdowns, not to be built) and the dropdown form of task 33 (its two SAC values and their sources stay). Mock-up: `docs/mockups/android-planificateur-roulettes.dc.html` (plan from a dive). Apply the same fields to every planner screen: new plan, phone and tablet.
+- **Wheel field** (new shared component, `od-wheel-field`): a filled field 56 dp high, the label on the left (12 sp, `--od-on-surface-variant`, may wrap to two lines), then a narrow vertical wheel: the current value in the middle (20 sp, weight 600, tabular figures) between two thin lines, the previous and next values above and below (13 sp, variant colour), fading out at the top and bottom edges; then the unit, when it is not in the heading.
+- **Behaviour:** a vertical drag or fling turns the wheel and snaps to a value, with a light haptic tick per step. A tap on the current value opens the numeric keyboard to type a value directly (same validation as today). Accessibility: role spinbutton with min, max and value text including the unit; TalkBack swipe up/down and volume keys step the value; the label is the accessible name.
+- **Fields and steps:**
+  - Oxygène and Hélium, side by side, unit %: oxygen step 1 (5 to 100), helium step 5 (0 to 95); oxygen plus helium at most 100.
+  - "Consommation (SAC), en cuft/min" heading (or the diver's volume unit per minute), then "Au fond" and "Pendant la déco" side by side, step 0.01 cuft/min (or 0.5 l/min). Helper text unchanged.
+  - Altitude, next to the water type, unit ft or m: step 500 ft (or 100 m), 0 to the core's maximum.
+- Values read from a dive that fall between steps (for example 33 % oxygen with a 1 % step is fine; 0,355 SAC) show as they are, and the next turn snaps to the nearest step.
+- Add `od-wheel-field` to System design, section 8 (shared components), in the same commit.
 - A line in the release notes.
