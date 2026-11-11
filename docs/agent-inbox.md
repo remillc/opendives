@@ -1528,7 +1528,7 @@ Done in `feature/flexible-title-sizes`: Carnet, Statistiques and Outils show a 2
 
 Done in `feature/dropdowns-and-pickers`: `SelectField` opens the MD3 exposed dropdown menu on Android (ink underline and label, chevron up, menu drawn at the field's width outside any clipping card or dialog, opens upward when there is no room below, 48 dp items, current value on `--od-surface-container-highest` with `aria-selected`, role listbox, closes on choice, outside tap, Escape and Back; arrows, Home, End, Enter). Every list choice uses it: dive mode, water type, cylinder use and type, weight location, trip, planner gases, SAC, altitude, deco model and conservatism, statistic criterion, gas blender, git branch. ppO₂ maximale in EAD/MOD and Best mix (`Po2Field`, 1,0 to 1,6) and the Settings pO₂ thresholds (two dropdowns with their defaults) replace the wheels. Site field of Modifier la plongée: dropdown with a search field and Nouveau site… at the end. Values outside the list head the menu. Choice dialogs that act at once and the Settings choice rows stay radio dialogs (decision of task 39). iOS keeps its native selects. Rule in System design, section 8. The menu uses `--od-surface` as the task says (the mock-up draws #F4F4F2).
 
-## [ ] 2026-11-11-42 Android: date and time fields with calendar and clock icons
+## [x] 2026-11-11-42 Android: date and time fields with calendar and clock icons
 
 Mock-ups: `docs/mockups/android-edition.dc.html`, `android-edition-mode`, `android-planificateur-nouveau`, `android-planificateur-titre`, and the tablet `android-tablette-edition-*`, `android-tablette-planificateur-*`.
 - Every date field gets a trailing calendar icon and every time field a trailing clock icon (24 dp, `--od-on-surface-variant`), never a chevron. A tap anywhere on the field opens the Material 3 date picker or time picker (docked or modal, as the library offers on the size class), not a menu.
@@ -1536,6 +1536,8 @@ Mock-ups: `docs/mockups/android-edition.dc.html`, `android-edition-mode`, `andro
 - The "Heure" field of "Modifier la plongée" is 120 dp wide (it truncated "10:00" at 88 dp).
 - Add the rule to System design, section 8 (text fields).
 - A line in the release notes.
+
+Done in `feature/dropdowns-and-pickers` (fields: `ButtonField` with a trailing calendar or clock icon, never a chevron; Heure of Modifier la plongée at least 120 dp, growing to fit "12:44 PM") and `feature/md3-date-time-pickers` (M3 modal date picker with calendar and typed-date modes, year grid, month arrows and swipe; M3 dial time picker with hour/minute boxes, AM/PM in 12-hour format, inner ring in 24-hour format, typed-time mode). Used for Date and Heure in Modifier la plongée, the planner and Nouvelle plongée on Android; iOS keeps its wheels. Pure logic in `lib/date-time-picker.js` with tests. The modal variant is used on tablets too (no docked picker). Rule in System design, section 8.
 
 ## [ ] 2026-11-11-43 Edit a dive: cylinders as cards, derived size, reordering
 
