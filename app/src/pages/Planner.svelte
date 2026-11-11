@@ -13,7 +13,7 @@
   import ProfileThumbnail from '../components/ProfileThumbnail.svelte';
   import TextField from '../components/TextField.svelte';
   import SelectField from '../components/SelectField.svelte';
-  import WheelField from '../components/WheelField.svelte';
+  import ChoiceField from '../components/ChoiceField.svelte';
   import ButtonField from '../components/ButtonField.svelte';
   import WheelDialog from '../components/WheelDialog.svelte';
   import ShareSheet from '../components/ShareSheet.svelte';
@@ -24,7 +24,7 @@
   import { t } from '../lib/i18n.js';
   import { WATER_TYPES, altitudeToPressureMbar, formatHoursMinutes, pressureToAltitudeMm, waterTypeName, waterTypeOfSalinity } from '../lib/tools.js';
   import { sharePlanPdf, sharePlanSummary } from '../lib/share.js';
-  import { MM_PER_FT, ML_PER_CUFT, carriedToMl, depthToMm, gasTotalMl, gasValid, isShort, mlToCarried, modAlarm, mmToDepth } from '../lib/planner-rules.js';
+  import { MM_PER_FT, ML_PER_CUFT, O2_PRESETS, HE_PRESETS, altitudePresets, carriedToMl, depthToMm, gasTotalMl, gasValid, isShort, mlToCarried, modAlarm, mmToDepth, roundSacMl, sacChoices } from '../lib/planner-rules.js';
 
   /**
    * `reopen`: the route /plans/<id>, a saved plan; otherwise /plan/new or /plan/<dive id>.
@@ -172,8 +172,8 @@
   const parse = (text) => (text.trim() === '' ? NaN : Number(text.trim().replace(',', '.')));
 
   let levelFields = $state(/** @type {{ key: number, depth: string, time: string }[]} */ ([]));
-  let gasFields = $state(/** @type {{ key: number, carried: string }[]} */ ([]));
-  let altitudeValue = $state(0); // in the diver's depth unit, as the wheel shows it
+  let gasFields = $state(/** @type {{ key: number, o2: string, he: string, carried: string }[]} */ ([]));
+  let altitudeField = $state('');
   let gfLowField = $state('');
   let gfHighField = $state('');
   /** @type {Record<string, boolean>} */
@@ -182,8 +182,14 @@
 
   const volumeValue = (/** @type {number} */ ml) => (ml > 0 ? show(mlToCarried(ml, cuft), 1) : '');
 
+  /** The altitude of the plan as typed: a whole foot or metre (read from a dive's surface pressure it has no useful decimal). */
+  const altitudeText = () => show(Math.max(0, Math.round(mmToDepth(pressureToAltitudeMm(planner.surfacePressureMbar), feet))));
+
   /** The fields from the plan: on opening, and when "Changer" brings another dive. */
   function fillFields() {
+    // A SAC measured on a dive is rounded to its step (two decimals in cuft/min) before it is shown or used.
+    planner.bottomSacMlMin = roundSacMl(planner.bottomSacMlMin, cuft);
+    planner.decoSacMlMin = roundSacMl(planner.decoSacMlMin, cuft);
     levelFields = planner.levels.map((l) => ({
       key: nextKey++,
       depth: show(mmToDepth(l.depthMm, feet)),
@@ -191,10 +197,11 @@
     }));
     gasFields = planner.gases.map((g) => ({
       key: nextKey++,
+      o2: show(g.o2Permille / 10),
+      he: show(g.hePermille / 10),
       carried: volumeValue(g.carriedMl),
     }));
-    // A whole foot or metre: an altitude read from a dive's surface pressure has no useful decimal.
-    altitudeValue = Math.max(0, Math.round(mmToDepth(pressureToAltitudeMm(planner.surfacePressureMbar), feet)));
+    altitudeField = altitudeText();
     gfLowField = show(planner.deco.gfLow);
     gfHighField = show(planner.deco.gfHigh);
     invalid = {};
@@ -250,20 +257,25 @@
 
   // --- Gases ----------------------------------------------------------------
 
-  /**
-   * Oxygen or helium of a gas from its wheel, % : refused when oxygen and
-   * helium would not fit together (the wheel then stays where it is).
-   * @param {number} i @param {'o2'|'he'} which @param {number} percent
-   */
-  function setGasPercent(i, which, percent) {
-    const gas = planner.gases[i];
-    const o2 = which === 'o2' ? percent : gas.o2Permille / 10;
-    const he = which === 'he' ? percent : gas.hePermille / 10;
-    if (!gasValid(o2, he)) return false;
-    gas.o2Permille = Math.round(o2 * 10);
-    gas.hePermille = Math.round(he * 10);
+  /** Oxygen and helium: valid each, and 100 % at most together. @param {number} i */
+  function gasChanged(i) {
+    const f = gasFields[i];
+    const o2 = parse(f.o2);
+    const he = parse(f.he);
+    const good = gasValid(o2, he);
+    invalid[`gas-${f.key}`] = !good;
+    if (!good) return;
+    planner.gases[i].o2Permille = Math.round(o2 * 10);
+    planner.gases[i].hePermille = Math.round(he * 10);
     planner.version++;
-    return true;
+  }
+
+  /** The last valid oxygen and helium of a gas, back in its fields. @param {number} i */
+  function gasReverted(i) {
+    const f = gasFields[i];
+    f.o2 = show(planner.gases[i].o2Permille / 10);
+    f.he = show(planner.gases[i].hePermille / 10);
+    invalid[`gas-${f.key}`] = false;
   }
 
   /** The volume carried, optional: empty means not given. @param {number} i */
@@ -281,13 +293,14 @@
   function addGas() {
     const gas = nextGas();
     planner.gases.push(gas);
-    gasFields.push({ key: nextKey++, carried: '' });
+    gasFields.push({ key: nextKey++, o2: show(gas.o2Permille / 10), he: show(0), carried: '' });
     planner.version++;
   }
 
   /** @param {number} i */
   function removeGas(i) {
     planner.gases.splice(i, 1);
+    delete invalid[`gas-${gasFields[i].key}`];
     delete invalid[`carried-${gasFields[i].key}`];
     gasFields.splice(i, 1);
     planner.version++;
@@ -304,19 +317,43 @@
     return switchMm ? t('plan.gasSwitch', { name, depth: depthText(switchMm) }) : name;
   }
 
-  // Two SACs (Subsurface's bottom SAC and deco SAC): at the bottom, and during
-  // the ascent and the stops. Wheels in the diver's volume unit per minute:
-  // 0.01 cuft/min or 0.5 L/min a step.
-  const sacStep = $derived(cuft ? 0.01 : 0.5);
-  const sacMin = $derived(cuft ? 0.04 : 1);
-  const sacMax = $derived(cuft ? 3.5 : 99);
-  /** A SAC for screen readers: the number and the unit in words. @param {number} v in cuft/min or L/min */
-  const sacSpoken = (v) => (cuft ? t('units.cubicFeetPerMinuteLong', { n: Math.round(v * 100) / 100, v: formatNumber(v, 2) }) : t('units.litersPerMinuteLong', { n: Math.round(v * 10) / 10, v: formatNumber(v, 1) }));
-  /** @param {'bottomSacMlMin'|'decoSacMlMin'} key @param {number} v */
-  function setSac(key, v) {
-    planner[key] = carriedToMl(v, cuft);
-    planner.version++;
+  /**
+   * A SAC, an exposed dropdown menu: the steps around the current value (0.01
+   * cuft/min or 0.5 L/min), always shown with the unit's own decimals (two in
+   * cuft/min). The current value was rounded to its step on loading. In ml/min.
+   * @param {number} current
+   */
+  function sacOptionsOf(current) {
+    return { selected: current, list: sacChoices(current, cuft).map((ml) => ({ value: String(ml), label: formatSac(ml, prefs) })) };
   }
+  /** A SAC for screen readers: the number and the unit in words. @param {number} ml */
+  const sacSpoken = (ml) =>
+    cuft
+      ? t('units.cubicFeetPerMinuteLong', { n: Math.round((ml / ML_PER_CUFT) * 100) / 100, v: formatNumber(ml / ML_PER_CUFT, 2) })
+      : t('units.litersPerMinuteLong', { n: Math.round(ml / 100) / 10, v: formatNumber(ml / 1000, 1) });
+  // Two SACs (Subsurface's bottom SAC and deco SAC): at the bottom, and during the ascent and the stops.
+  const sacOptions = $derived(sacOptionsOf(planner.bottomSacMlMin));
+  const decoSacOptions = $derived(sacOptionsOf(planner.decoSacMlMin));
+  let sacChoice = $state('');
+  let decoSacChoice = $state('');
+  $effect(() => {
+    sacChoice = String(sacOptions.selected);
+  });
+  $effect(() => {
+    decoSacChoice = String(decoSacOptions.selected);
+  });
+  $effect(() => {
+    const ml = Number(sacChoice);
+    if (!ml || ml === sacOptions.selected) return;
+    planner.bottomSacMlMin = ml;
+    planner.version++;
+  });
+  $effect(() => {
+    const ml = Number(decoSacChoice);
+    if (!ml || ml === decoSacOptions.selected) return;
+    planner.decoSacMlMin = ml;
+    planner.version++;
+  });
 
   // --- Date, for a new dive --------------------------------------------------
 
@@ -369,11 +406,8 @@
   });
   const waterOptions = WATER_TYPES.map((w) => ({ value: w.id, label: waterTypeName(w.id) }));
 
-  /** @param {number} v in the diver's depth unit */
-  function setAltitude(v) {
-    altitudeValue = v;
-    planner.surfacePressureMbar = altitudeToPressureMbar(depthToMm(v, feet));
-    planner.version++;
+  function altitudeChanged() {
+    typed('altitude', altitudeField, 0, feet ? 16000 : 5000, (v) => (planner.surfacePressureMbar = altitudeToPressureMbar(depthToMm(v, feet))));
   }
 
   let modelChoice = $state('');
@@ -683,29 +717,29 @@
         {#each gasFields as gas, i (gas.key)}
           <div class="od-planner--gas">
             <div class="od-planner--pair od-planner--with-remove">
-              <WheelField
+              <ChoiceField
                 label={t('plan.oxygenPercent')}
-                ariaLabel={t('plan.gasOxygenName', { n: String(i + 1) })}
-                value={planner.gases[i].o2Permille / 10}
-                min={5}
-                max={100}
-                step={1}
-                typeMin={1}
+                bind:value={gas.o2}
+                presets={O2_PRESETS}
                 unit="%"
-                valueText={(v) => t('plan.percentSpoken', { v: formatNumber(v, 1).replace(/[,.]0$/, '') })}
-                onchange={(v) => setGasPercent(i, 'o2', v)}
+                otherLabel={t('plan.otherValue')}
+                backLabel={t('plan.backToList')}
+                ariaLabel={t('plan.gasOxygenLong', { n: String(i + 1), value: `${formatNumber(parse(gas.o2))} %` })}
+                invalid={invalid[`gas-${gas.key}`]}
+                oninput={() => gasChanged(i)}
+                onrevert={() => gasReverted(i)}
               />
-              <WheelField
+              <ChoiceField
                 label={t('plan.heliumPercent')}
-                ariaLabel={t('plan.gasHeliumName', { n: String(i + 1) })}
-                value={planner.gases[i].hePermille / 10}
-                min={0}
-                max={95}
-                step={5}
-                typeMax={99}
+                bind:value={gas.he}
+                presets={HE_PRESETS}
                 unit="%"
-                valueText={(v) => t('plan.percentSpoken', { v: formatNumber(v, 1).replace(/[,.]0$/, '') })}
-                onchange={(v) => setGasPercent(i, 'he', v)}
+                otherLabel={t('plan.otherValue')}
+                backLabel={t('plan.backToList')}
+                ariaLabel={t('plan.gasHeliumLong', { n: String(i + 1), value: `${formatNumber(parse(gas.he))} %` })}
+                invalid={invalid[`gas-${gas.key}`]}
+                oninput={() => gasChanged(i)}
+                onrevert={() => gasReverted(i)}
               />
               {#if i > 0}
                 <button type="button" class="od-planner--remove" aria-label={t('plan.removeGas')} onclick={() => removeGas(i)}><Icon name="close" /></button>
@@ -723,30 +757,10 @@
           </div>
         {/each}
         <button type="button" class="od-planner--add" onclick={addGas}><Icon name="plus" size={18} />{t('plan.addGas')}</button>
-        <p class="od-planner--subhead">{t('plan.sacIn', { unit: t(cuft ? 'units.cubicFeetPerMinute' : 'units.litersPerMinute') })}</p>
+        <p class="od-planner--subhead">{t('plan.sac')}</p>
         <div class="od-planner--pair">
-          <WheelField
-            label={t('plan.sacBottom')}
-            ariaLabel={t('plan.sacBottomName')}
-            value={mlToCarried(planner.bottomSacMlMin, cuft)}
-            min={sacMin}
-            max={sacMax}
-            step={sacStep}
-            wheelWidth={52}
-            valueText={sacSpoken}
-            onchange={(v) => setSac('bottomSacMlMin', v)}
-          />
-          <WheelField
-            label={t('plan.sacDeco')}
-            ariaLabel={t('plan.sacDecoName')}
-            value={mlToCarried(planner.decoSacMlMin, cuft)}
-            min={sacMin}
-            max={sacMax}
-            step={sacStep}
-            wheelWidth={52}
-            valueText={sacSpoken}
-            onchange={(v) => setSac('decoSacMlMin', v)}
-          />
+          <SelectField label={t('plan.sacBottom')} bind:value={sacChoice} options={sacOptions.list} chevron ariaLabel={t('plan.sacBottomLong', { value: sacSpoken(sacOptions.selected) })} />
+          <SelectField label={t('plan.sacDeco')} bind:value={decoSacChoice} options={decoSacOptions.list} chevron ariaLabel={t('plan.sacDecoLong', { value: sacSpoken(decoSacOptions.selected) })} />
         </div>
         <p class="od-planner--helper od-planner--inner">{t(planner.source ? 'plan.sacFromDive' : 'plan.sacFromSettings')}</p>
       </div>
@@ -755,16 +769,20 @@
       <div class="od-planner--fields">
         <div class="od-planner--pair">
           <SelectField label={t('plan.waterType')} bind:value={water} options={waterOptions} />
-          <WheelField
+          <ChoiceField
             label={t('plan.altitude')}
-            value={altitudeValue}
-            min={0}
-            max={feet ? 16000 : 5000}
-            step={feet ? 500 : 100}
-            wheelWidth={44}
+            bind:value={altitudeField}
+            presets={altitudePresets(feet)}
             unit={depthUnit(prefs)}
-            valueText={(v) => `${formatNumber(v)} ${depthUnit(prefs)}`}
-            onchange={setAltitude}
+            otherLabel={t('plan.otherValue')}
+            backLabel={t('plan.backToList')}
+            ariaLabel={t('plan.altitudeLong', { value: `${formatNumber(parse(altitudeField))} ${depthUnit(prefs)}` })}
+            invalid={invalid.altitude}
+            oninput={altitudeChanged}
+            onrevert={() => {
+              altitudeField = altitudeText();
+              invalid.altitude = false;
+            }}
           />
         </div>
         <p class="od-planner--helper od-planner--inner">{t(planner.source ? 'plan.conditionsFromDive' : 'plan.conditionsDefault')}</p>

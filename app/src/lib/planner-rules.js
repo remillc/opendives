@@ -82,3 +82,67 @@ export const modAlarm = (maxDepthMm, bottomModMm) => bottomModMm > 0 && maxDepth
  * @param {number} he
  */
 export const gasValid = (o2, he) => o2 >= 1 && o2 <= 100 && he >= 0 && he <= 99 && o2 + he <= 100;
+
+// --- Dropdown choices of the gas, SAC and altitude fields ----------------------
+
+/** The usual oxygen fractions, %. */
+export const O2_PRESETS = [21, 28, 32, 36, 40, 50, 80, 100];
+/** The usual helium fractions, %. */
+export const HE_PRESETS = [0, 10, 20, 30, 35, 45, 55];
+/** The usual altitudes, in feet or in metres (the diver's depth unit). @param {boolean} feet */
+export const altitudePresets = (feet) => (feet ? [0, 1000, 2000, 3000, 5000, 7000, 10000] : [0, 300, 600, 1000, 1500, 2000, 3000]);
+
+/**
+ * A typed number: "12,5" or "12.5"; NaN when empty or not a number.
+ * @param {string} text
+ */
+export const parseNumber = (text) => (String(text).trim() === '' ? NaN : Number(String(text).trim().replace(',', '.')));
+
+/**
+ * The values of a dropdown: the usual ones, and above them the current value
+ * when it is not one of them (33 % read from a dive), so that it shows in the
+ * field and is checked in the menu. Nothing is added for an empty or invalid
+ * entry.
+ * @param {number[]} presets
+ * @param {number} current
+ * @returns {number[]}
+ */
+export function choiceValues(presets, current) {
+  return Number.isFinite(current) && !presets.includes(current) ? [current, ...presets] : [...presets];
+}
+
+/** The SAC step: 0.01 cuft/min or 0.5 L/min, in ml/min. @param {boolean} cuft */
+export const sacStepMl = (cuft) => (cuft ? 0.01 * ML_PER_CUFT : 500);
+
+/**
+ * A SAC rounded to its step (two decimals in cuft/min, 0.5 L/min), in ml/min:
+ * what a dive measured is shown and used, never "0.355".
+ * @param {number} ml
+ * @param {boolean} cuft
+ */
+export function roundSacMl(ml, cuft) {
+  if (cuft) return Math.round((Math.round((ml / ML_PER_CUFT) * 100) / 100) * ML_PER_CUFT);
+  return Math.round(ml / 500) * 500;
+}
+
+/**
+ * The SAC values of a menu, in ml/min: the steps around the current value (20
+ * each side), within 0.04 to 3.5 cuft/min or 1 to 99 L/min, and the current
+ * value itself when it is off them.
+ * @param {number} currentMl
+ * @param {boolean} cuft
+ */
+export function sacChoices(currentMl, cuft) {
+  const step = sacStepMl(cuft);
+  const min = cuft ? 0.04 * ML_PER_CUFT : 1000;
+  const max = cuft ? 3.5 * ML_PER_CUFT : 99000;
+  const base = Math.round(currentMl / step);
+  /** @type {number[]} */
+  const values = [];
+  for (let k = base - 20; k <= base + 20; k++) {
+    const ml = Math.round(k * step);
+    if (ml >= min && ml <= max) values.push(ml);
+  }
+  if (!values.includes(currentMl)) values.push(currentMl);
+  return values.sort((a, b) => a - b);
+}

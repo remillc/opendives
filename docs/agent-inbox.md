@@ -1467,7 +1467,7 @@ Mock-ups: `docs/mockups/android-planificateur-titre.dc.html` (dialog), `docs/moc
 - **Storage: Wait.** The core has no title field on a dive. Before writing anything, check what Subsurface desktop shows and keeps for a planned dive, and report the options to Christian in the chat with what each one does in Subsurface: (a) the dive's location / site (creates a site), (b) the first line of the notes (Subsurface's planner already writes its plan into the notes), (c) a tag, (d) anything better you find. The design session leans towards the notes, without certainty. Never break a log read by Subsurface.
 - Release notes line once built.
 
-## [ ] 2026-11-11-38 Planner: back to dropdown menus instead of wheels
+## [x] 2026-11-11-38 Planner: back to dropdown menus instead of wheels
 
 Christian chose the dropdown menus after all. Undo task 36 (wheels) and build what tasks 32, 33 and 35 describe, on every planner screen, phone and tablet. Mock-ups: `docs/mockups/android-planificateur{,-nouveau,-menu}.dc.html`, `docs/mockups/android-tablette-planificateur-{paysage,portrait}.dc.html`.
 - **Oxygène and Hélium:** dropdown menus as in task 32 (usual mixes, then "Autre valeur…").
@@ -1475,3 +1475,5 @@ Christian chose the dropdown menus after all. Undo task 36 (wheels) and build wh
 - **Altitude:** dropdown menu as in task 35 (usual altitudes, then "Autre valeur…").
 - Remove the `od-wheel-field` component, its tests and its entry in System design, section 8, unless something else uses it.
 - A line in the release notes.
+
+Done in `ChoiceField.svelte` (a filled dropdown whose "Autre valeur…" turns the same field into a numeric text field, with today's validation, and back), `SelectField` (`invalid`), `TextField` (`keepTrailing`), `planner-rules.js` (option lists, outside-the-list rule, SAC rounding to its step) and `Planner.svelte`. The wheel component, its rules and its System design entry are removed.
