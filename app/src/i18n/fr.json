@@ -765,6 +765,9 @@
     "todayAt": "aujourd’hui, {time}",
     "cloudDives": "Plongées dans le cloud",
     "syncNow": "Synchroniser maintenant",
+    "syncOptions": "Autres options de synchronisation",
+    "syncGoAuto": "Passer en synchronisation automatique",
+    "syncShowPending": "Voir les modifications non envoyées",
     "subsurfaceGroup": "Compte Subsurface",
     "changePassword": "Changer le mot de passe",
     "changePasswordText": "Un lien est envoyé à votre courriel",
@@ -1437,6 +1440,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Android : « Synchroniser maintenant » devient un bouton scindé quand la synchronisation est manuelle (menu du chevron : passer en synchronisation automatique, voir les modifications non envoyées) ; l’en-tête de Statistiques et d’Outils se réduit en défilant, comme celui du Carnet.",
       "Planificateur : les menus Oxygène et Hélium proposent toutes les valeurs de 1 en 1 % (oxygène de 5 à 100 %, hélium de 0 à 95 %), et « Autre valeur… » disparaît. Un mélange qui dépasse 100 % est signalé en erreur sur les deux champs.",
       "Planificateur : l’oxygène, l’hélium, la consommation (SAC) et l’altitude sont des menus déroulants de valeurs usuelles (« Autre valeur… » permet d’en saisir une autre ; le clavier s’ouvre sur le même champ). Une valeur hors de la liste, comme 33 % lue sur une plongée, s’affiche dans le champ et figure en tête du menu. Une consommation mesurée sur une plongée est arrondie à 0,01 cuft/min (0,5 L/min) avant d’être affichée ou utilisée.",
       "Planificateur : « Réglages du planificateur » dans le menu ⋮ ouvre bien les réglages ; « Planifier depuis cette plongée » fonctionne aussi depuis une plongée ouverte dans Statistiques ou Sites.",

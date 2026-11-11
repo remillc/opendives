@@ -765,6 +765,9 @@
     "todayAt": "today, {time}",
     "cloudDives": "Dives in the cloud",
     "syncNow": "Sync now",
+    "syncOptions": "More sync options",
+    "syncGoAuto": "Switch to automatic sync",
+    "syncShowPending": "See changes not sent yet",
     "subsurfaceGroup": "Subsurface account",
     "changePassword": "Change password",
     "changePasswordText": "A link is sent to your email",
@@ -1437,6 +1440,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Android: “Sync now” becomes a split button when synchronisation is manual (the chevron offers to switch to automatic sync or to see the changes not sent yet); the Statistics and Tools headers shrink as you scroll, like the Logbook’s.",
       "Planner: the Oxygen and Helium menus offer every value by 1 % (oxygen 5 to 100 %, helium 0 to 95 %), and “Other value…” is gone. A mix above 100 % is shown as an error on both fields.",
       "Planner: oxygen, helium, consumption (SAC) and altitude are dropdown menus of the usual values (“Other value…” lets you type another one; the keyboard opens on the same field). A value that is not in the list, such as 33 % read from a dive, shows in the field and heads the menu. A SAC measured on a dive is rounded to 0.01 cu ft/min (0.5 L/min) before it is shown or used.",
       "Planner: “Planner settings” in the ⋮ menu now opens the settings; “Plan from this dive” also works from a dive opened in Statistics or Sites.",

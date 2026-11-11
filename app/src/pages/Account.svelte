@@ -8,7 +8,7 @@
   import { Page, Navbar, f7 } from 'framework7-svelte';
   import { showSnackbar } from '../lib/snackbar.js';
   import Icon from '../components/Icon.svelte';
-  import SyncButton from '../components/SyncButton.svelte';
+  import SyncControl from '../components/SyncControl.svelte';
   import MenuButton from '../components/MenuButton.svelte';
   import SectionBand from '../components/SectionBand.svelte';
   import { OpenDivesCore } from 'opendives-core';
@@ -203,7 +203,7 @@
           </li>
         {/if}
         <li class="od-account--sync-now">
-          <SyncButton />
+          <SyncControl />
         </li>
       </ul>
     </div>

@@ -11,7 +11,7 @@
   import Icon from './Icon.svelte';
   import SyncStatus from './SyncStatus.svelte';
   import SyncFailureRow from './SyncFailureRow.svelte';
-  import SyncButton from './SyncButton.svelte';
+  import SyncControl from './SyncControl.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
   import { navigation, sections, showSection, closeMenu, restoreFocus, openSettings, openAbout } from '../lib/navigation.svelte.js';
   import { t } from '../lib/i18n.js';
@@ -123,7 +123,7 @@
     {#if !logbook.loading && !logbook.error}
       <div class="od-nav-menu--status">
         <!-- The button stays in place while it runs and shows its progress (to-do #2). -->
-        {#if logbook.email}<SyncButton />{/if}
+        {#if logbook.email}<SyncControl />{/if}
         {#if logbook.syncFailure}
           <SyncFailureRow />
         {:else if logbook.conflict && logbook.conflictLater}
