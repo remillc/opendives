@@ -609,7 +609,10 @@
           sharing = true;
         }}
       />
-      <MenuItem icon="tune" text={t('plannerSettings.open')} link="/settings/planner" />
+      <!-- Opened by this page's router: the menu is moved to the app's root when it
+           opens, where a plain link would open the settings in the main view
+           (the Carnet), hidden behind the Tools section. -->
+      <MenuItem icon="tune" text={t('plannerSettings.open')} onclick={() => f7router.navigate('/settings/planner')} />
     </List>
   </Popover>
 
