@@ -1437,7 +1437,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
-      "Planner, new plan: the card “No starting dive” shows an empty profile thumbnail (a dashed outline) instead of a “+”.",
+      "Planner, new plan: the “New dive” card shows an empty profile thumbnail (a dashed outline) instead of a “+”, and no longer repeats “No starting dive” on a second line.",
       "Planner: consumption (SAC) has two fields, “At the bottom” and “During deco”. The second one is used for the ascent and the stops; it comes from the planner settings.",
       "Android, tablet: the Logbook's “+” is now the floating button at the bottom right in landscape too (the navigation rail no longer has one), and it opens a menu of three choices above it (download, import a file, log a dive manually) that unfolds over a light veil; the button turns into a ✕, and Back or a tap outside closes the menu. With “Remove animations” on, it appears without motion.",
       "Android, tablet in portrait: no more navigation rail; the ☰ button opens the side menu and the Logbook’s “+” is the floating button again, as on a phone. The rail stays in landscape.",

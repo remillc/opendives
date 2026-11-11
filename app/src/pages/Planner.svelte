@@ -637,7 +637,6 @@
           >
           <span class="od-planner--text">
             <span class="od-planner--title">{t('plan.newDive')}</span>
-            <span class="od-planner--sub">{t('plan.noStartDive')}</span>
           </span>
         {/if}
         <span class="od-planner--change">{t('plan.change')}</span>
