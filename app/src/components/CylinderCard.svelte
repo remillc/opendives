@@ -1,9 +1,11 @@
 <script>
   // @ts-check
   import { t } from '../lib/i18n.js';
+  import CylinderDrawing from './CylinderDrawing.svelte';
   // One cylinder of "Edit dive" as a card (docs/ui-specification.md, "Modifier une plongée",
-  // Équipement): a small cylinder drawing, "Cylinder N", the gas in plain words in a white
-  // chip and a drag handle; the fields are the card's content. The handle moves the card:
+  // Équipement): a small cylinder drawing (filled to the end pressure), "Cylinder N" with its
+  // gas in plain words under it in the variant colour, and the drag handle on the
+  // right; a text button at the bottom right deletes it; the fields are the card's content. The handle moves the card:
   // a drag with a finger or the mouse (the page runs it, see EditDive), the arrow keys, or
   // the two "Move up" and "Move down" buttons for TalkBack and keyboards.
 
@@ -11,6 +13,9 @@
    * @type {{
    *   n: number,
    *   gas: string,
+   *   ratio?: number,
+   *   removeLabel?: string,
+   *   onremove?: () => void,
    *   canUp?: boolean,
    *   canDown?: boolean,
    *   dragging?: boolean,
@@ -19,11 +24,10 @@
    *   onhandledown?: (event: PointerEvent) => void,
    *   onmove?: (direction: -1|1) => void,
    *   children: import('svelte').Snippet,
-   *   footer?: import('svelte').Snippet,
    * }}
    * offset: the card's shift in px while a card is dragged (its own, or making room).
    */
-  let { n, gas, canUp = false, canDown = false, dragging = false, offset = 0, el = $bindable(), onhandledown, onmove, children, footer } = $props();
+  let { n, gas, ratio = 0, removeLabel = '', onremove, canUp = false, canDown = false, dragging = false, offset = 0, el = $bindable(), onhandledown, onmove, children } = $props();
 
   /** @param {KeyboardEvent} event */
   function key(event) {
@@ -42,12 +46,11 @@
   bind:this={el}
 >
   <div class="od-cylinder-card--head">
-    <svg class="od-cylinder-card--drawing" width="20" height="32" viewBox="0 0 20 32" aria-hidden="true">
-      <rect x="7" y="1" width="6" height="4" rx="1" class="od-cylinder-card--valve" />
-      <rect x="2" y="5" width="16" height="26" rx="7" class="od-cylinder-card--body" />
-    </svg>
-    <h4 class="od-cylinder-card--title">{t('edit.cylinderTitle', { n })}</h4>
-    <span class="od-cylinder-card--gas od-value">{gas}</span>
+    <CylinderDrawing {ratio} width={20} stroke={1.5} />
+    <span class="od-cylinder-card--titles">
+      <h4 class="od-cylinder-card--title">{t('edit.cylinderTitle', { n })}</h4>
+      <span class="od-cylinder-card--gas od-value">{gas}</span>
+    </span>
     <button
       type="button"
       class="od-cylinder-card--handle"
@@ -67,7 +70,11 @@
     </span>
   </div>
   <div class="od-cylinder-card--fields">{@render children()}</div>
-  {#if footer}{@render footer()}{/if}
+  {#if onremove}
+    <div class="od-cylinder-card--footer">
+      <button type="button" class="od-cylinder-card--remove" onclick={onremove}>{removeLabel}</button>
+    </div>
+  {/if}
 </div>
 
 <style>
@@ -105,23 +112,14 @@
       gap: 12px;
     }
 
-    .od-cylinder-card--drawing {
-      flex: none;
-    }
-
-    .od-cylinder-card--valve {
-      fill: var(--od-text);
-    }
-
-    .od-cylinder-card--body {
-      fill: var(--od-water-top);
-      stroke: var(--od-text);
-      stroke-width: 1.5;
+    .od-cylinder-card--titles {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
     }
 
     .od-cylinder-card--title {
-      flex: 1;
-      min-width: 0;
       margin: 0;
       color: var(--od-text);
       font-size: 16px;
@@ -130,13 +128,9 @@
     }
 
     .od-cylinder-card--gas {
-      padding: 4px 12px;
-      border-radius: 8px;
-      background: var(--od-surface);
-      color: var(--od-text);
+      color: var(--od-text-2);
       font-size: 14px;
       line-height: 20px;
-      font-weight: 600;
       white-space: nowrap;
     }
 
@@ -159,6 +153,26 @@
       svg {
         fill: currentColor;
       }
+    }
+
+    .od-cylinder-card--footer {
+      margin-top: 8px;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .od-cylinder-card--remove {
+      width: auto;
+      min-height: 40px;
+      padding: 0 12px;
+      border: none;
+      border-radius: 20px;
+      background: none;
+      color: var(--od-alarm);
+      font: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
     }
 
     .od-cylinder-card--fields {

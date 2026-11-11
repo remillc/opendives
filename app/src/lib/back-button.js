@@ -30,7 +30,9 @@ export function enableBackButton() {
       return;
     }
     // 3. An open sheet or dialog closes.
-    const modal = document.querySelector('.modal-in');
+    // The topmost one: a dialog or a sheet opened over a popup comes later in the page.
+    const modals = document.querySelectorAll('.modal-in');
+    const modal = modals.length ? modals[modals.length - 1] : null;
     // First launch waits for a choice: Back returns to the three choices,
     // then sends the app to the background.
     if (modal?.classList.contains('od-welcome')) {
@@ -39,9 +41,15 @@ export function enableBackButton() {
       else CapacitorApp.minimizeApp();
       return;
     }
+    // 3b. The Gas page of Edit dive (in the page, or in the tablet's popup) returns to the form.
+    const gasPage = document.querySelector('.od-edit-gas--open');
+    if (gasPage && (!modal || modal.classList.contains('popup'))) {
+      gasPage.dispatchEvent(new CustomEvent('od-cancel'));
+      return;
+    }
     if (modal) {
       // OpenDives' own dialogs (components/Md3Dialog.svelte) cancel themselves.
-      if (modal.classList.contains('od-md3-dialog')) modal.dispatchEvent(new CustomEvent('od-cancel'));
+      if (modal.classList.contains('od-md3-dialog') || modal.classList.contains('od-cylinder-sheet')) modal.dispatchEvent(new CustomEvent('od-cancel'));
       else if (modal.classList.contains('actions-modal')) f7.actions.close();
       else if (modal.classList.contains('dialog')) f7.dialog.close();
       else if (modal.classList.contains('sheet-modal')) f7.sheet.close();
