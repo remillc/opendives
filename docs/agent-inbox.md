@@ -1422,11 +1422,13 @@ Mock-ups: `docs/mockups/android-planificateur.dc.html` (plan from a dive), `docs
 
 Done in `Planner.svelte` (two SAC dropdowns with chevrons, accessible names with the unit in words), `planner.svelte.js` (the plan's own `decoSacMlMin`, sent with each request and kept with a saved plan) and `SelectField` (`chevron`, `ariaLabel`). The core already took `decoSacMlMin`; `tests/plan_test.cpp` now checks that a higher deco SAC keeps the runtime and breathes more gas, and `tests/app/planner.test.mjs` that the request carries both SACs.
 
-## [ ] 2026-11-11-34 Planner, new plan: empty profile thumbnail instead of "+"
+## [x] 2026-11-11-34 Planner, new plan: empty profile thumbnail instead of "+"
 
 Mock-ups: `docs/mockups/android-planificateur-nouveau.dc.html` and `docs/mockups/android-tablette-planificateur-{paysage,portrait}.dc.html` (these copies also carry the gas dropdowns of task 32 and the two SAC fields of task 33).
 - In the "Nouvelle plongée · Sans plongée de départ" card, the "+" icon suggested adding something. Replace it with an empty thumbnail: in the same 56 × 36 dp slot as a starting dive's profile thumbnail, the outline of a dive profile in a dashed grey line (`--od-outline`, 1.5 dp, dashes of 3 dp). Decorative, hidden from screen readers. "Changer" stays.
 - A line in the release notes.
+
+Done in `Planner.svelte` (`od-planner--empty-thumbnail`, 56 × 36 dp, dashed `--od-outline` outline, aria-hidden) and `theme.css` (`--od-outline`, also in System design section 3).
 
 ## [x] 2026-11-11-35 Planner: altitude as a dropdown menu — superseded by 2026-11-11-36, do not implement
 

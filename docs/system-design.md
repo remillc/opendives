@@ -52,6 +52,7 @@ The theme is **black and white**: a neutral light background, actions without a 
 | `--od-surface` | #FFFFFF | #1C1D1F | Cell, block, profile |
 | `--od-tint` | #E8E8E5 | #2E3033 | Pills (gases, buddies, tags), secondary button, selected item |
 | `--od-separator` | #DADAD6 | #3A3C40 | Separators and outlines |
+| `--od-outline` | #74777C | #8E9196 | Dashed outline of an empty profile thumbnail |
 | `--od-water-top` | #FBE3B2 | #E5B961 | Top of the water column |
 | `--od-water-bottom` | #B4530F | #EF7625 (tempered amber) | Water column at 60 m and deeper; in between, the colour is mixed according to the maximum depth |
 | `--od-trace` | #1F2124 (3.2:1 on the bottom of the water) | #F4F4F2, 2 px, over a 4.5 px #121314 outline | Profile line |

@@ -632,7 +632,9 @@
             >
           </span>
         {:else}
-          <span class="od-planner--plus" aria-hidden="true"><Icon name="plus" /></span>
+          <span class="od-planner--empty-thumbnail" aria-hidden="true"
+            ><svg width="44" height="24" viewBox="0 0 44 24"><path d="M2 3 L8 18 L30 18 L36 9 L42 3" /></svg></span
+          >
           <span class="od-planner--text">
             <span class="od-planner--title">{t('plan.newDive')}</span>
             <span class="od-planner--sub">{t('plan.noStartDive')}</span>
@@ -976,13 +978,25 @@
       align-items: center;
       gap: 16px;
 
-      .od-planner--plus {
+      /* The empty thumbnail: the 56 x 36 slot of a starting dive's profile, with the dashed outline of a profile. */
+      .od-planner--empty-thumbnail {
         flex: none;
-        width: 40px;
-        height: 40px;
+        width: 56px;
+        height: 36px;
+        border-radius: 8px;
+        background: var(--od-background);
         display: flex;
         align-items: center;
         justify-content: center;
+
+        svg {
+          fill: none;
+          stroke: var(--od-outline);
+          stroke-width: 1.5;
+          stroke-linecap: round;
+          stroke-linejoin: round;
+          stroke-dasharray: 3 3;
+        }
       }
 
       .od-planner--text {
