@@ -1437,6 +1437,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Planner: the Oxygen and Helium menus offer every value by 1 % (oxygen 5 to 100 %, helium 0 to 95 %); those that would exceed 100 % with the other gas are hidden, and “Other value…” is gone.",
       "Planner: oxygen, helium, consumption (SAC) and altitude are dropdown menus of the usual values (“Other value…” lets you type another one; the keyboard opens on the same field). A value that is not in the list, such as 33 % read from a dive, shows in the field and heads the menu. A SAC measured on a dive is rounded to 0.01 cu ft/min (0.5 L/min) before it is shown or used.",
       "Planner: “Planner settings” in the ⋮ menu now opens the settings; “Plan from this dive” also works from a dive opened in Statistics or Sites.",
       "Planner, new plan: the “New dive” card shows an empty profile thumbnail (a dashed outline) instead of a “+”, and no longer repeats “No starting dive” on a second line.",

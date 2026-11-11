@@ -22,18 +22,19 @@
    *   value: string,
    *   presets: number[],
    *   unit: string,
-   *   otherLabel: string,
+   *   otherLabel?: string,
    *   backLabel: string,
    *   ariaLabel: string,
    *   invalid?: boolean,
    *   oninput: () => void,
    *   onrevert: () => void,
    * }}
-   * unit: shown after the number ("%", "ft"). ariaLabel: the accessible name of
+   * unit: shown after the number ("%", "ft"). otherLabel: the "Other value…"
+   * choice; without it the list holds every value and nothing is typed. ariaLabel: the accessible name of
    * the menu, with the value. backLabel: the accessible name of the button that
    * goes back to the menu.
    */
-  let { label, value = $bindable(), presets, unit, otherLabel, backLabel, ariaLabel, invalid = false, oninput, onrevert } = $props();
+  let { label, value = $bindable(), presets, unit, otherLabel = '', backLabel, ariaLabel, invalid = false, oninput, onrevert } = $props();
 
   const OTHER = 'other';
   let editing = $state(false);
@@ -47,7 +48,7 @@
   const options = $derived([
     ...numbers.map((n) => ({ value: String(n), label: `${formatNumber(n)} ${unit}` })),
     ...(value !== '' && !Number.isFinite(current) ? [{ value, label: value }] : []),
-    { value: OTHER, label: otherLabel },
+    ...(otherLabel ? [{ value: OTHER, label: otherLabel }] : []),
   ]);
   $effect(() => {
     choice = Number.isFinite(current) ? String(current) : value;
