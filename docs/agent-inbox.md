@@ -1453,3 +1453,14 @@ Replaces tasks 32 and 35 (dropdowns, not to be built) and the dropdown form of t
 - A line in the release notes.
 
 Done in `WheelField.svelte` (`od-wheel-field`), `wheel-rules.js` (steps, snapping, clamping, fling), `Planner.svelte` (gases, the two SACs and altitude as wheels; the planner's vertical rhythm set to the mock-up's) and System design sections 3 and 8. The haptic tick uses `navigator.vibrate` where it exists (Capacitor Haptics is not a dependency).
+
+## [ ] 2026-11-11-37 Planner: a title when saving a new plan, then back to the list
+
+Mock-ups: `docs/mockups/android-planificateur-titre.dc.html` (dialog), `docs/mockups/android-plans-enregistre.dc.html` (list after saving).
+- **Title dialog.** On a new plan, "Enregistrer" opens an MD3 basic dialog "Enregistrer le plan" with one filled text field "Titre", focused with the keyboard open, and the buttons "Annuler" (closes, nothing saved) and "Enregistrer". No helper text. A reopened plan saves without the dialog, as today (it keeps its title).
+- **Default value:** a plan started from a logbook dive pre-fills the title with that dive's site name (editable). A plan without a starting dive starts empty.
+- **Empty title:** allowed. The list then shows "Plan du <date>" (for example "Plan du 9 nov. 2026"), in the variant text colour.
+- **After saving:** back to "Plongées planifiées". The new plan's row is highlighted with `--od-surface-container-high` for about 2 s, then fades; the list scrolls to it if needed. Snackbar "Plan enregistré" (no action); the "Nouveau plan" FAB moves up above the snackbar while it shows.
+- **List rows** show the title in place of the site ("Sans plongée de départ" is no longer shown).
+- **Storage: Wait.** The core has no title field on a dive. Before writing anything, check what Subsurface desktop shows and keeps for a planned dive, and report the options to Christian in the chat with what each one does in Subsurface: (a) the dive's location / site (creates a site), (b) the first line of the notes (Subsurface's planner already writes its plan into the notes), (c) a tag, (d) anything better you find. The design session leans towards the notes, without certainty. Never break a log read by Subsurface.
+- Release notes line once built.
