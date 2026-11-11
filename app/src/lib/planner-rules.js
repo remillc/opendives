@@ -90,17 +90,13 @@ const range = (from, to) => Array.from({ length: Math.max(0, to - from + 1) }, (
 
 /**
  * Every oxygen fraction the menu offers, % (Christian, 11 November 2026: every
- * value from 5 to 100, by 1), without those the helium leaves no room for.
- * @param {number} he the gas's helium, %
+ * value from 5 to 100, by 1, all of them; a mix above 100 % with the helium is
+ * shown as an error on the fields, not hidden).
  */
-export const o2Choices = (he) => range(5, 100 - (Number.isFinite(he) ? Math.max(0, he) : 0));
+export const O2_CHOICES = range(5, 100);
 
-/**
- * Every helium fraction the menu offers, % (0 to 95, by 1), without those
- * the oxygen leaves no room for.
- * @param {number} o2 the gas's oxygen, %
- */
-export const heChoices = (o2) => range(0, Math.min(95, 100 - (Number.isFinite(o2) ? Math.max(0, o2) : 0)));
+/** Every helium fraction the menu offers, %: 0 to 95, by 1, all of them. */
+export const HE_CHOICES = range(0, 95);
 /** The usual altitudes, in feet or in metres (the diver's depth unit). @param {boolean} feet */
 export const altitudePresets = (feet) => (feet ? [0, 1000, 2000, 3000, 5000, 7000, 10000] : [0, 300, 600, 1000, 1500, 2000, 3000]);
 
