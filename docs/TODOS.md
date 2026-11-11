@@ -10,7 +10,7 @@ Rules (agreed between the design agent and the code agent, see `docs/agent-inbox
 - **Tag:** every item starts with `[design]` or `[code]` right after its number, set by the agent that adds it (`#4 [design] …`). `[design]` = mock-ups, visuals, screen texts, specification; `[code]` = everything else. When unsure, the agent asks Christian. The tag says who handles the item and lets Christian list one kind only. A second tag `[hors compat. SS]` may follow it, before the title, when the item would break compatibility with Subsurface (data Subsurface cannot read or keep); such an item needs Christian's explicit go-ahead before any code.
 - No other content in this file: no history, no checked boxes, no notes from agents.
 
-Next number: 38
+Next number: 39
 
 ## List
 
@@ -30,3 +30,4 @@ Next number: 38
 - #35 [design] indiquer quelque part (À propos, aide ou écran d'erreur ?) que pour les problèmes du cœur du carnet (lecture des ordinateurs de plongée, format des fichiers, calculs) on peut s'adresser au forum de Subsurface. Trouver une formulation pour l'utilisateur, sans parler de « fonctions core ».
 - #36 [design] Idée : Modifier une plongée sur place (Material 3 Expressive) : la fiche reste affichée, ses champs deviennent modifiables et la barre d'outils flottante passe à « Annuler / Enregistrer », au lieu du dialogue plein écran actuel. À évaluer plus tard : la fiche et l'écran de modification ne groupent pas les champs de la même façon.
 - #37 [design] [hors compat. SS] Signature manuscrite d'une plongée par un compagnon (buddy) ou le guide de palanquée, tracée au doigt sur l'écran. Le format de Subsurface n'a pas de champ pour une signature : décider où et comment la stocker sans casser un carnet lu par Subsurface (fichier à part dans le dépôt git, données ignorées par Subsurface, etc.).
+- #38 [design] Redessiner la page d'une plongée en misant davantage sur les regroupements en sections qui résument les données présentes et offrent de cliquer pour ouvrir une vue des détails de cette section. La section concernant l'équipement en particulier.
