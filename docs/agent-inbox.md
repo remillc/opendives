@@ -1511,3 +1511,12 @@ Christian chose the exposed dropdown menu as the single pattern for picking one 
 - Values outside the list (read from a dive or typed earlier) still show in the field and are listed at the top of the menu.
 - Add the rule to System design, section 8 (text fields and menus).
 - A line in the release notes.
+
+## [ ] 2026-11-11-41 Android: title sizes (decision of 11 November)
+
+Answer to the question on Expressive title sizes. "Title Large" is 22 sp in Material 3; 28 and 36 sp are the titles of Expressive's flexible app bars (medium: Headline Medium 28 sp, large: Display Small 36 sp), collapsing to 22 sp on scroll. Decision:
+- **Task screens** (Modifier la plongée, new site, git configuration, every screen with ✕ and Enregistrer): small top app bar, title 22 sp (Title Large). Unchanged.
+- **Main screens** (Carnet, Sites, Statistiques, Outils): medium flexible app bar, title 28 sp (Headline Medium) with the summary line as subtitle, collapsing to 22 sp on scroll (task 39, point 7).
+- **Sheets** (dive, site, trip): keep their editorial title inside the page (32 sp); the top bar carries only ←.
+- No 36 sp (large flexible app bar) on phones. Check the values against the Material library before coding and tell Christian if they differ.
+- Write the rule in System design, section 4 (type).
