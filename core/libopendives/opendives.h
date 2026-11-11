@@ -288,6 +288,9 @@ void set_git_any_scheme_for_tests(bool allowed);
 // is kept as loaded. Like Subsurface, lists keep their order: removed entries
 // go, new ones are added at the end. Writes the updated dive, as get_dive()
 // does. Nothing changes and no step is added when the values are the same.
+// "cylinders": the cylinders of the dive, one JSON entry each; the order of the
+// entries that carry an index is the new order of those cylinders, and gas
+// changes and tank-sensor mappings follow them (see set_cylinders in edit.cpp).
 // FORMAT_NEWER when the log was written by a newer format than this core's.
 int edit_dive(int id, const std::string &changes_json, std::string &result_json, std::string &error);
 

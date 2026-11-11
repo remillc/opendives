@@ -945,6 +945,18 @@
     "removeCylinder": "Retirer la bouteille",
     "cylinderInUse": "Une bouteille utilisée dans le profil ne peut pas être retirée. Rien n’a changé.",
     "noType": "Sans type",
+    "otherType": "Autre…",
+    "moveCylinder": "Déplacer la bouteille {n}",
+    "moveCylinderUp": "Monter la bouteille {n}",
+    "moveCylinderDown": "Descendre la bouteille {n}",
+    "cylinderMoved": "Bouteille {n} déplacée en position {to}",
+    "consumed": "{amount} consommés",
+    "gasName": {
+      "air": "Air",
+      "oxygen": "Oxygène",
+      "nitrox": "EAN{o2}",
+      "trimix": "Trimix {o2}/{he}"
+    },
     "weightsTitle": "Lest",
     "weightPlace": "Emplacement",
     "weight": "Poids",
@@ -1469,6 +1481,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "“Modifier une plongée” (Android) : chaque bouteille est une carte avec son gaz en clair (« Trimix 16/45 », « EAN32 », « Air », « Oxygène »). Le volume et la pression de service viennent du type de bouteille et s’affichent sous lui (« 16 cuft HP », « 80 cuft », « 11,1 L LP ») ; « Autre… » permet de les saisir pour une bouteille hors de la liste, et les valeurs d’une plongée ne sont jamais écrasées. Sous « Fin », la pression consommée. Une poignée déplace les cartes (glisser, ou « Monter » / « Descendre » pour TalkBack) ; les changements de gaz de la plongée suivent leur bouteille.",
       "« Modifier la plongée » : la section Conditions est repliée au départ ; son en-tête montre la température de l’eau et la moyenne des notes en étoiles. Touchez-le pour l’ouvrir.",
       "Supprimer une plongée depuis son menu ⋮ demande maintenant confirmation, comme pour une sélection du Carnet ; « Annuler » reste offert quelques secondes après.",
       "Android : un appui sur une date ouvre le sélecteur de date Material 3 (calendrier ou saisie au clavier) et un appui sur une heure ouvre l’horloge Material 3, dans « Modifier la plongée », le planificateur et « Nouvelle plongée ».",

@@ -945,6 +945,18 @@
     "removeCylinder": "Remove the cylinder",
     "cylinderInUse": "A cylinder used in the profile cannot be removed. Nothing changed.",
     "noType": "No type",
+    "otherType": "Other…",
+    "moveCylinder": "Move cylinder {n}",
+    "moveCylinderUp": "Move cylinder {n} up",
+    "moveCylinderDown": "Move cylinder {n} down",
+    "cylinderMoved": "Cylinder {n} moved to position {to}",
+    "consumed": "{amount} used",
+    "gasName": {
+      "air": "Air",
+      "oxygen": "Oxygen",
+      "nitrox": "EAN{o2}",
+      "trimix": "Trimix {o2}/{he}"
+    },
     "weightsTitle": "Weights",
     "weightPlace": "Location",
     "weight": "Weight",
@@ -1469,6 +1481,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "“Edit dive” (Android): each cylinder is a card with its gas in plain words (“Trimix 16/45”, “EAN32”, “Air”, “Oxygen”). Size and working pressure come from the cylinder type and show under it (“16 cuft HP”, “80 cuft”, “11.1 L LP”); “Other…” lets you type them for a cylinder outside the list, and a dive’s own values are never overwritten. Under “End”, the pressure used. A handle moves the cards (drag, or “Move up” / “Move down” for TalkBack); the gas changes of the dive follow their cylinder.",
       "“Edit dive”: the Conditions section starts collapsed; its header shows the water temperature and the average of the ratings as stars. Tap it to open it.",
       "Deleting a dive from its ⋮ menu now asks for confirmation, as for a Logbook selection; “Undo” is still offered for a few seconds afterwards.",
       "Android: tapping a date opens the Material 3 date picker (calendar, or typed date) and tapping a time opens the Material 3 clock, in Edit dive, the planner and New dive.",

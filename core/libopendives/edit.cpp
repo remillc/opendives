@@ -785,6 +785,11 @@ static bool same_edited_fields(const cylinder_t &a, const cylinder_t &b)
 // for a new one (create_new_manual_cylinder(), added at
 // first_hidden_cylinder()); a cylinder of the dive left out of the list is
 // removed, unless it is protected (used by the profile: CYLINDER_IN_USE).
+// The order of the entries with an index is the new order of those cylinders:
+// when it differs from the dive's, the cylinders are moved and renumbered with
+// cylinder_renumber(), as Subsurface's planner does (CylindersModel::moveAtFirst),
+// so that gas changes and tank-sensor mappings follow; new cylinders always
+// stay at the end of the visible ones.
 // Fields, all optional: "description", "sizeMl", "workingPressureMbar"
 // (EditCylinderType::TYPE, with "use": OC-gas, diluent, oxygen, not used),
 // "startMbar", "endMbar" (PRESSURE), "o2Permille", "hePermille", "depthMm"
@@ -875,9 +880,61 @@ static int set_cylinders(dive &d, const JsonValue &value, bool &changed, std::st
 	for (const Entry &e: entries) {
 		if (e.index < 0 || same_edited_fields(e.cyl, d.cylinders[e.index]))
 			continue;
-		set_tank_info_data(tank_info_table, e.cyl.type.description, e.cyl.type.size, e.cyl.type.workingpressure);
+		if (!e.cyl.type.description.empty()) // a cylinder outside the table ("Other") has no type to record
+			set_tank_info_data(tank_info_table, e.cyl.type.description, e.cyl.type.size, e.cyl.type.workingpressure);
 		d.cylinders[e.index] = e.cyl;
 		changed = true;
+	}
+	// Reordered: the kept cylinders in the order of the list, then those to be
+	// removed. mapping[old] = new position, the table cylinder_renumber() takes.
+	{
+		const int count = static_cast<int>(d.cylinders.size());
+		std::vector<int> order; // old indexes, in the new order
+		for (const Entry &e: entries)
+			if (e.index >= 0)
+				order.push_back(e.index);
+		const int keptCount = static_cast<int>(order.size());
+		for (int i = 0; i < count; i++)
+			if (!kept.count(i))
+				order.push_back(i);
+		std::vector<int> mapping(count);
+		bool moved = false;
+		for (int pos = 0; pos < count; pos++) {
+			mapping[order[pos]] = pos;
+			moved = moved || order[pos] != pos;
+		}
+		if (moved) {
+			// cylinder_renumber() assumes a dive starts on cylinder 0 and adds a gas
+			// change to it; but the start gas of a computer is the one of its
+			// first gas change (at 0:00), or else cylinder 0, or on a rebreather
+			// the diluent. So the events are kept as they were (renumbered here)
+			// and a gas change to the start cylinder, in its new place, is added
+			// only where the start gas would otherwise change.
+			std::vector<std::vector<event>> saved;
+			std::vector<int> start;
+			for (const auto &dc: d.dcs) {
+				saved.push_back(dc.events);
+				start.push_back(gasmix_loop(d, dc).next_cylinder_index().first);
+			}
+			std::vector<cylinder_t> old(d.cylinders.begin(), d.cylinders.end());
+			for (int pos = 0; pos < count; pos++)
+				d.cylinders[pos] = old[order[pos]];
+			cylinder_renumber(d, mapping.data());
+			for (size_t n = 0; n < d.dcs.size(); n++) {
+				divecomputer &dc = d.dcs[n];
+				dc.events = std::move(saved[n]);
+				for (event &ev: dc.events)
+					if (ev.is_gaschange() && ev.gas.index >= 0 && ev.gas.index < count)
+						ev.gas.index = mapping[ev.gas.index];
+				if (start[n] >= 0 && gasmix_loop(d, dc).next_cylinder_index().first != mapping[start[n]])
+					add_gas_switch_event(&d, &dc, 0, mapping[start[n]]);
+			}
+			changed = true;
+		}
+		// From here on the kept cylinders are at 0..keptCount-1.
+		kept.clear();
+		for (int i = 0; i < keptCount; i++)
+			kept.insert(i);
 	}
 	for (int i = static_cast<int>(d.cylinders.size()) - 1; i >= 0; i--) {
 		if (kept.count(i))
@@ -891,7 +948,8 @@ static int set_cylinders(dive &d, const JsonValue &value, bool &changed, std::st
 	for (const Entry &e: entries) {
 		if (e.index >= 0)
 			continue;
-		set_tank_info_data(tank_info_table, e.cyl.type.description, e.cyl.type.size, e.cyl.type.workingpressure);
+		if (!e.cyl.type.description.empty()) // a cylinder outside the table ("Other") has no type to record
+			set_tank_info_data(tank_info_table, e.cyl.type.description, e.cyl.type.size, e.cyl.type.workingpressure);
 		d.cylinders.add(first_hidden_cylinder(&d), e.cyl);
 		changed = true;
 	}

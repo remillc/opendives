@@ -18,6 +18,7 @@
   import ButtonField from '../components/ButtonField.svelte';
   import ChipsField from '../components/ChipsField.svelte';
   import ComboField from '../components/ComboField.svelte';
+  import CylinderCard from '../components/CylinderCard.svelte';
   import StarsInput from '../components/StarsInput.svelte';
   import Stars from '../components/Stars.svelte';
   import { conditionsMean, roundHalfUp1 } from '../lib/conditions.js';
@@ -32,7 +33,8 @@
   import { offerUndo } from '../lib/undo.js';
   import { parseNumber } from '../lib/filter.svelte.js';
   import { WATER_TYPES, waterTypeName, waterTypeOfSalinity } from '../lib/tools.js';
-  import { formatDepth, formatLongDate, formatMinSec, formatNumber, formatWeight, locale } from '../lib/format.js';
+  import { formatCylinderSize, formatDepth, formatLongDate, formatMinSec, formatNumber, formatPressure, formatWeight, locale } from '../lib/format.js';
+  import { canMove, dropIndex, gasName, moveItem, OTHER_TYPE, pressureUsed, typeHelper } from '../lib/cylinder-card.js';
   import { t, tIfExists } from '../lib/i18n.js';
 
   /** @type {{ f7route: { params: { id: string } }, f7router: any }} */
@@ -126,11 +128,23 @@
 
   /**
    * One cylinder of the editor: its index in the dive (-1 for a new one), its
-   * texts and those it opened with.
-   * @typedef {{ index: number, protected: boolean, f: Record<string, string>, initial: Record<string, string> }} EditedCylinder
+   * texts and those it opened with; `key` identifies its card while the cards
+   * are reordered, `custom` shows the Size and Working pressure fields (a
+   * cylinder outside the table of types, "Other…").
+   * @typedef {{ key: number, index: number, protected: boolean, custom: boolean, f: Record<string, string>, initial: Record<string, string> }} EditedCylinder
    */
   /** @type {EditedCylinder[]} */
   let cylinders = $state([]);
+  let cylinderKeys = 0;
+  /** @param {number} index @param {boolean} isProtected @param {Record<string, string>} texts @returns {EditedCylinder} */
+  const editedCylinder = (index, isProtected, texts) => ({
+    key: cylinderKeys++,
+    index,
+    protected: isProtected,
+    custom: !texts.description && !!texts.size,
+    f: { ...texts },
+    initial: texts,
+  });
   /** Each weight: its location, its text, and the grams and text it opened with (kept exactly when the text is unchanged). @type {{ description: string, weight: string, grams0: number, text0: string }[]} */
   let weights = $state([]);
   let initialWeights = '';
@@ -192,10 +206,7 @@
         chill: d.conditions?.chill ?? 0,
       };
       invalid = d.invalid;
-      cylinders = d.cylinders.map((c, index) => {
-        const texts = cylinderTexts(c);
-        return { index, protected: c.protected, f: { ...texts }, initial: texts };
-      });
+      cylinders = d.cylinders.map((c, index) => editedCylinder(index, c.protected, cylinderTexts(c)));
       weights = d.weights.map((w) => ({ description: w.description, weight: weightText(w.grams), grams0: w.grams, text0: weightText(w.grams) }));
       initialWeights = JSON.stringify(weights);
       const [guide, buddy, tag, suitList] = await Promise.all([logbookValues('guide'), logbookValues('buddy'), logbookValues('tag'), logbookValues('suit')]);
@@ -247,6 +258,7 @@
     const list = cylinderTypes.map((c) => ({ value: c.name, label: c.name }));
     if (own && !list.some((o) => o.value === own)) list.unshift({ value: own, label: own });
     if (!own) list.unshift({ value: '', label: t('edit.noType') });
+    list.push({ value: OTHER_TYPE, label: t('edit.otherType') });
     return list;
   };
   /** A weight location's name, translated when it is one of Subsurface's. @param {string} name */
@@ -338,6 +350,13 @@
 
   /** A cylinder type chosen: its size and working pressure, as EditCylinder (TYPE). @param {EditedCylinder} c @param {string} name */
   function chooseCylinderType(c, name) {
+    if (name === OTHER_TYPE) {
+      // A cylinder outside the table: no type name, the size and pressure are typed.
+      c.custom = true;
+      c.f.description = '';
+      return;
+    }
+    c.custom = false;
     c.f.description = name;
     const type = cylinderTypes.find((x) => x.name === name);
     if (!type) return;
@@ -352,7 +371,7 @@
   function addConfiguredCylinder(use, name, o2) {
     if (!name || cylinders.some((c) => c.f.use === use && c.f.description === name)) return;
     const texts = { description: name, use, size: '', workingPressure: '', start: '', end: '', o2: show(o2), he: show(0), depth: '' };
-    cylinders.push({ index: -1, protected: false, f: { ...texts }, initial: texts });
+    cylinders.push(editedCylinder(-1, false, texts));
     chooseCylinderType(cylinders[cylinders.length - 1], name);
   }
 
@@ -376,7 +395,7 @@
 
   function addCylinder() {
     const texts = { description: '', use: 'OC-gas', size: '', workingPressure: '', start: '', end: '', o2: show(21), he: show(0), depth: '' };
-    cylinders.push({ index: -1, protected: false, f: { ...texts }, initial: texts });
+    cylinders.push(editedCylinder(-1, false, texts));
   }
 
   /** MOD of a cylinder's mix at the bottom ppO₂ of 1.6 bar, in the dive's water. @param {EditedCylinder} c */
@@ -389,6 +408,141 @@
     const mm = ((1.6 / (o2 / 100) - surface) * 1e8) / ((salinity / 10) * 9.80665);
     if (!(mm > 0)) return '';
     return t('edit.mod', { depth: `${depthText(mm)} ${depthUnitText}`, po2: formatNumber(1.6, 1) });
+  }
+
+  // --- Cylinder cards: values, gas name, reordering ---------------------------
+  const gasWords = $derived({ air: t('edit.gasName.air'), oxygen: t('edit.gasName.oxygen'), nitrox: t('edit.gasName.nitrox'), trimix: t('edit.gasName.trimix') });
+
+  /**
+   * What a card shows, from its texts: the gas, the size and working pressure
+   * (the type's, or the cylinder's own when they differ from it: never
+   * overwritten), the pressure used.
+   * @param {EditedCylinder} c
+   */
+  function cylinderValues(c) {
+    const o2 = Math.round((parseNumber(c.f.o2) || 21) * 10);
+    const he = Math.round((parseNumber(c.f.he) || 0) * 10);
+    const workingPressureMbar = c.f.workingPressure.trim() ? pressureMbar(parseNumber(c.f.workingPressure)) : 0;
+    const sizeMlValue = c.f.size.trim() ? sizeMl(parseNumber(c.f.size), workingPressureMbar) : 0;
+    const start = c.f.start.trim() ? pressureMbar(parseNumber(c.f.start)) : 0;
+    const end = c.f.end.trim() ? pressureMbar(parseNumber(c.f.end)) : 0;
+    return { o2, he, sizeMl: sizeMlValue, workingPressureMbar, used: pressureUsed(start, end) };
+  }
+
+  /** What the screen reader says after a card moved. */
+  let moved = $state('');
+
+  /** The card elements, by key. @type {Record<number, HTMLElement>} */
+  let cardEls = $state({});
+
+  /** Moves a card one place (the buttons and the arrow keys). @param {number} from @param {-1|1} direction */
+  function moveCylinder(from, direction) {
+    const to = from + direction;
+    if (!canMove(cylinders, from, to)) return;
+    const key = cylinders[from].key;
+    cylinders = moveItem(cylinders, from, to);
+    moved = t('edit.cylinderMoved', { n: from + 1, to: to + 1 });
+    // The focus stays on the handle of the card that moved.
+    tick().then(() => /** @type {HTMLElement|null|undefined} */ (cardEls[key]?.querySelector('.od-cylinder-card--handle'))?.focus());
+  }
+
+  /**
+   * A drag in progress: the dragged card, where it would land, how far the
+   * finger moved (the page's scrolling included) and the geometry of the cards
+   * when it began.
+   * @type {{ key: number, from: number, to: number, dy: number, height: number, centers: number[], scroller: HTMLElement|null, startY: number, startScroll: number, lastY: number, frame: number } | null}
+   */
+  let drag = $state(null);
+
+  /** The centre line of a card, in the scroller's content. @param {HTMLElement} card @param {HTMLElement|null} scroller */
+  const centerOf = (card, scroller) => {
+    const r = card.getBoundingClientRect();
+    return r.top + r.height / 2 + (scroller?.scrollTop ?? 0);
+  };
+
+  /** @param {PointerEvent} event @param {number} from */
+  function startDrag(event, from) {
+    if (event.button > 0 || drag) return;
+    const card = cardEls[cylinders[from].key];
+    if (!card || cylinders.length < 2) return;
+    event.preventDefault();
+    const scroller = /** @type {HTMLElement|null} */ (card.closest('.page-content'));
+    const handle = /** @type {HTMLElement} */ (event.currentTarget);
+    handle.setPointerCapture(event.pointerId);
+    drag = {
+      key: cylinders[from].key,
+      from,
+      to: from,
+      dy: 0,
+      height: card.offsetHeight + 16,
+      centers: cylinders.map((c) => centerOf(cardEls[c.key], scroller)),
+      scroller,
+      startY: event.clientY,
+      startScroll: scroller?.scrollTop ?? 0,
+      lastY: event.clientY,
+      frame: 0,
+    };
+    const move = (/** @type {PointerEvent} */ e) => {
+      if (drag) drag.lastY = e.clientY;
+      follow();
+    };
+    const end = (/** @type {PointerEvent} */ e) => {
+      handle.removeEventListener('pointermove', move);
+      handle.removeEventListener('pointerup', end);
+      handle.removeEventListener('pointercancel', end);
+      if (handle.hasPointerCapture(e.pointerId)) handle.releasePointerCapture(e.pointerId);
+      finishDrag(e.type === 'pointerup');
+    };
+    handle.addEventListener('pointermove', move);
+    handle.addEventListener('pointerup', end);
+    handle.addEventListener('pointercancel', end);
+    scrollLoop();
+  }
+
+  /** The dragged card follows the finger and the others make room. */
+  function follow() {
+    if (!drag) return;
+    const scrolled = (drag.scroller?.scrollTop ?? 0) - drag.startScroll;
+    drag.dy = drag.lastY - drag.startY + scrolled;
+    let to = dropIndex(drag.centers, drag.from, drag.centers[drag.from] + drag.dy);
+    // Never past where the core allows (a new cylinder stays after the others).
+    while (to !== drag.from && !canMove(cylinders, drag.from, to)) to += to > drag.from ? -1 : 1;
+    drag.to = to;
+  }
+
+  /** The page scrolls while a card is held near its top or bottom edge. */
+  function scrollLoop() {
+    if (!drag) return;
+    const scroller = drag.scroller;
+    const area = scroller?.getBoundingClientRect();
+    if (scroller && area) {
+      const edge = 72;
+      if (drag.lastY < area.top + edge) scroller.scrollTop -= 10;
+      else if (drag.lastY > area.bottom - edge) scroller.scrollTop += 10;
+      follow();
+    }
+    drag.frame = requestAnimationFrame(scrollLoop);
+  }
+
+  /** @param {boolean} drop */
+  function finishDrag(drop) {
+    if (!drag) return;
+    cancelAnimationFrame(drag.frame);
+    const { from, to } = drag;
+    drag = null;
+    if (drop && from !== to) {
+      cylinders = moveItem(cylinders, from, to);
+      moved = t('edit.cylinderMoved', { n: from + 1, to: to + 1 });
+    }
+  }
+
+  /** The shift of a card while one is dragged. @param {number} i @param {number} key */
+  function dragOffset(i, key) {
+    if (!drag) return 0;
+    if (key === drag.key) return drag.dy;
+    if (drag.from < drag.to && i > drag.from && i <= drag.to) return -drag.height;
+    if (drag.to < drag.from && i >= drag.to && i < drag.from) return drag.height;
+    return 0;
   }
 
   // --- Checks and changes ------------------------------------------------------
@@ -470,7 +624,8 @@
       if (ch('depth') && hasSwitchDepth(c)) item.depthMm = c.f.depth.trim() ? depthMm(parseNumber(c.f.depth)) : 0;
       return item;
     });
-    if (removed || cylinderItems.some((item) => Object.keys(item).length > 1)) out.cylinders = cylinderItems.map((item) => JSON.stringify(item));
+    const reordered = cylinders.filter((c) => c.index >= 0).some((c, i, list) => i > 0 && list[i - 1].index > c.index);
+    if (removed || reordered || cylinderItems.some((item) => Object.keys(item).length > 1)) out.cylinders = cylinderItems.map((item) => JSON.stringify(item));
     return out;
   }
 
@@ -673,52 +828,44 @@
       <ComboField label={t('edit.suit')} bind:value={f.suit} options={known.suit} />
       <SelectField label={t('edit.divemode')} bind:value={f.divemode} options={modeOptions} onchange={modeChanged} />
 
-      {#each cylinders as c, i (i)}
+      <div class="od-sr-only" aria-live="polite">{moved}</div>
+      {#each cylinders as c, i (c.key)}
         {@const cb = cylinderBad(c)}
-        <div class="od-edit-dive--cyl-head">
-          <h4 class="od-edit-dive--cyl-title">{t('edit.cylinderTitle', { n: i + 1 })}{c.f.description ? ` · ${c.f.description}` : ''}</h4>
-          {#if !c.protected}
-            <button type="button" class="od-edit-dive--remove" onclick={() => cylinders.splice(i, 1)}>
-              <Icon name="close" /><span class="od-sr-only">{t('edit.removeCylinder')}</span>
-            </button>
+        {@const own = cylinderValues(c)}
+        <CylinderCard
+          n={i + 1}
+          gas={gasName(own.o2, own.he, gasWords)}
+          canUp={canMove(cylinders, i, i - 1)}
+          canDown={canMove(cylinders, i, i + 1)}
+          dragging={drag?.key === c.key}
+          offset={dragOffset(i, c.key)}
+          bind:el={cardEls[c.key]}
+          onhandledown={(e) => startDrag(e, i)}
+          onmove={(direction) => moveCylinder(i, direction)}
+        >
+          <SelectField
+            label={t('edit.cylinderType')}
+            value={c.custom ? OTHER_TYPE : c.f.description}
+            options={cylinderTypeOptions(c.initial.description)}
+            onchange={(v) => chooseCylinderType(c, v)}
+            supporting={c.custom ? '' : typeHelper(formatCylinderSize(own.sizeMl, own.workingPressureMbar, prefs), own.workingPressureMbar)}
+          />
+          {#if c.custom}
+            <div class="od-edit-dive--row od-edit-dive--card-row">
+              <div class="od-edit-dive--grow">
+                <TextField label={t('edit.size')} bind:value={c.f.size} inputmode="decimal" invalid={cb.size}>
+                  {#snippet trailing()}{@render unit(volumeUnitText)}{/snippet}
+                </TextField>
+              </div>
+              <div class="od-edit-dive--grow">
+                <TextField label={t('edit.workingPressure')} bind:value={c.f.workingPressure} inputmode="decimal" invalid={cb.workingPressure}>
+                  {#snippet trailing()}{@render unit(pressureUnitText)}{/snippet}
+                </TextField>
+              </div>
+            </div>
           {/if}
-        </div>
-        <div class="od-edit-dive--row">
-            <div class="od-edit-dive--grow">
-              <SelectField
-                label={t('edit.cylinderType')}
-                value={c.f.description}
-                options={cylinderTypeOptions(c.initial.description)}
-                onchange={(v) => chooseCylinderType(c, v)}
-              />
-            </div>
-            <div class="od-edit-dive--grow"><SelectField label={t('edit.use')} bind:value={c.f.use} options={useOptions} onchange={(v) => useChanged(c, v)} /></div>
-          </div>
-          <div class="od-edit-dive--row">
-            <div class="od-edit-dive--grow">
-              <TextField label={t('edit.size')} bind:value={c.f.size} inputmode="decimal" invalid={cb.size}>
-                {#snippet trailing()}{@render unit(volumeUnitText)}{/snippet}
-              </TextField>
-            </div>
-            <div class="od-edit-dive--grow">
-              <TextField label={t('edit.workingPressure')} bind:value={c.f.workingPressure} inputmode="decimal" invalid={cb.workingPressure}>
-                {#snippet trailing()}{@render unit(pressureUnitText)}{/snippet}
-              </TextField>
-            </div>
-          </div>
-          <div class="od-edit-dive--row">
-            <div class="od-edit-dive--grow">
-              <TextField label={t('edit.start')} bind:value={c.f.start} inputmode="decimal" invalid={cb.start}>
-                {#snippet trailing()}{@render unit(pressureUnitText)}{/snippet}
-              </TextField>
-            </div>
-            <div class="od-edit-dive--grow">
-              <TextField label={t('edit.end')} bind:value={c.f.end} inputmode="decimal" invalid={cb.end}>
-                {#snippet trailing()}{@render unit(pressureUnitText)}{/snippet}
-              </TextField>
-            </div>
-          </div>
-          <div class="od-edit-dive--row">
+          <SelectField label={t('edit.use')} bind:value={c.f.use} options={useOptions} onchange={(v) => useChanged(c, v)} />
+          <div class="od-edit-dive--row od-edit-dive--card-row">
             <div class="od-edit-dive--grow">
               <TextField label={t('edit.o2')} bind:value={c.f.o2} inputmode="decimal" invalid={cb.gas}>
                 {#snippet trailing()}{@render unit(t('units.percent'))}{/snippet}
@@ -730,11 +877,35 @@
               </TextField>
             </div>
           </div>
+          <div class="od-edit-dive--row od-edit-dive--card-row">
+            <div class="od-edit-dive--grow">
+              <TextField label={t('edit.start')} bind:value={c.f.start} inputmode="decimal" invalid={cb.start}>
+                {#snippet trailing()}{@render unit(pressureUnitText)}{/snippet}
+              </TextField>
+            </div>
+            <div class="od-edit-dive--grow">
+              <TextField
+                label={t('edit.end')}
+                bind:value={c.f.end}
+                inputmode="decimal"
+                invalid={cb.end}
+                supporting={own.used ? t('edit.consumed', { amount: formatPressure(own.used, prefs) }) : ''}
+              >
+                {#snippet trailing()}{@render unit(pressureUnitText)}{/snippet}
+              </TextField>
+            </div>
+          </div>
           {#if hasSwitchDepth(c)}
             <TextField label={t('edit.switchDepth')} bind:value={c.f.depth} inputmode="decimal" invalid={cb.depth} supporting={modText(c)}>
               {#snippet trailing()}{@render unit(depthUnitText)}{/snippet}
             </TextField>
           {/if}
+          {#snippet footer()}
+            {#if !c.protected}
+              <button type="button" class="od-edit-dive--remove-cylinder" onclick={() => cylinders.splice(i, 1)}>{t('edit.removeCylinder')}</button>
+            {/if}
+          {/snippet}
+        </CylinderCard>
       {/each}
       <button type="button" class="od-edit-dive--add" onclick={addCylinder}><Icon name="plus" />{t('edit.addCylinder')}</button>
 
@@ -1094,23 +1265,6 @@
       height: 10px;
     }
 
-    .od-edit-dive--cyl-head {
-      display: flex;
-      align-items: center;
-      margin: 8px 4px 0 0;
-    }
-
-    .od-edit-dive--cyl-title {
-      flex: 1;
-      min-width: 0;
-      margin: 0;
-      padding: 14px 8px 14px 16px;
-      color: var(--od-text);
-      font-size: 14px;
-      line-height: 20px;
-      font-weight: 600;
-    }
-
     .od-edit-dive--remove {
       flex: none;
       width: 48px;
@@ -1126,6 +1280,24 @@
         align-self: center;
         margin: 18px -8px 0 -4px;
       }
+    }
+
+    /* In a cylinder card the rows have no side padding: the card has its own. */
+    .od-edit-dive--row.od-edit-dive--card-row {
+      padding: 0;
+    }
+
+    .od-edit-dive--remove-cylinder {
+      margin: 12px 0 0 -12px;
+      min-height: 40px;
+      padding: 0 12px;
+      border: none;
+      border-radius: 20px;
+      background: none;
+      color: var(--od-text);
+      font: inherit;
+      font-size: 14px;
+      font-weight: 600;
     }
 
     .od-edit-dive--add {
