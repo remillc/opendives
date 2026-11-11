@@ -1464,3 +1464,12 @@ Mock-ups: `docs/mockups/android-planificateur-titre.dc.html` (dialog), `docs/moc
 - **List rows** show the title in place of the site ("Sans plongée de départ" is no longer shown).
 - **Storage: Wait.** The core has no title field on a dive. Before writing anything, check what Subsurface desktop shows and keeps for a planned dive, and report the options to Christian in the chat with what each one does in Subsurface: (a) the dive's location / site (creates a site), (b) the first line of the notes (Subsurface's planner already writes its plan into the notes), (c) a tag, (d) anything better you find. The design session leans towards the notes, without certainty. Never break a log read by Subsurface.
 - Release notes line once built.
+
+## [ ] 2026-11-11-38 Planner: back to dropdown menus instead of wheels
+
+Christian chose the dropdown menus after all. Undo task 36 (wheels) and build what tasks 32, 33 and 35 describe, on every planner screen, phone and tablet. Mock-ups: `docs/mockups/android-planificateur{,-nouveau,-menu}.dc.html`, `docs/mockups/android-tablette-planificateur-{paysage,portrait}.dc.html`.
+- **Oxygène and Hélium:** dropdown menus as in task 32 (usual mixes, then "Autre valeur…").
+- **Consommation (SAC), "Au fond" and "Pendant la déco":** two dropdown menus side by side, as in task 33, in steps of 0.01 cuft/min (or 0.5 l/min). **Always two decimals** ("0,36 cuft/min"): a value measured on a dive is rounded to two decimals before it is shown or used, never "0,355".
+- **Altitude:** dropdown menu as in task 35 (usual altitudes, then "Autre valeur…").
+- Remove the `od-wheel-field` component, its tests and its entry in System design, section 8, unless something else uses it.
+- A line in the release notes.
