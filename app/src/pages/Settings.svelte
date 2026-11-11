@@ -13,6 +13,7 @@
   import { showSnackbar } from '../lib/snackbar.js';
   import { OpenDivesCore } from 'opendives-core';
   import ChoiceDialog from '../components/ChoiceDialog.svelte';
+  import ButtonGroup from '../components/ButtonGroup.svelte';
   import MenuButton from '../components/MenuButton.svelte';
   import { layout } from '../lib/layout.svelte.js';
   import { navigation } from '../lib/navigation.svelte.js';
@@ -707,17 +708,6 @@
     if (system !== p.unitSystem) setCore({ unitSystem: system });
   }
 
-  /** @param {KeyboardEvent} e @param {'metric'|'imperial'|'personalize'} system */
-  function unitSystemKey(e, system) {
-    const order = /** @type {const} */ (['metric', 'imperial', 'personalize']);
-    const step = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : 0;
-    if (!step) return;
-    e.preventDefault();
-    const next = order[(order.indexOf(system) + step + order.length) % order.length];
-    setUnitSystem(next);
-    /** @type {HTMLElement|null} */ (document.querySelector(`.od-settings--segmented [data-system="${next}"]`))?.focus();
-  }
-
   /** @param {{ vendor: string, product: string }} c */
   const computerName = (c) => [c.vendor, c.product].filter(Boolean).join(' ');
 
@@ -868,23 +858,8 @@
   {#if unitsShown || group('units').rows.length || group('units2').rows.length}
     <h2 class="od-settings--title">{t('settings.groups.units')}</h2>
     {#if unitsShown}
-      <div class="od-settings--segmented" role="radiogroup" aria-label={t('settings.unitSystem.label')}>
-        {#each UNIT_SYSTEMS as system (system)}
-          <button
-            type="button"
-            role="radio"
-            data-system={system}
-            aria-checked={p.unitSystem === system}
-            tabindex={p.unitSystem === system ? 0 : -1}
-            onclick={() => setUnitSystem(system)}
-            onkeydown={(e) => unitSystemKey(e, system)}
-          >
-            {#if p.unitSystem === system}
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>
-            {/if}
-            {t(`settings.unitSystem.${system}`)}
-          </button>
-        {/each}
+      <div class="od-settings--segmented">
+        <ButtonGroup ariaLabel={t('settings.unitSystem.label')} value={p.unitSystem} options={UNIT_SYSTEMS.map((system) => ({ value: system, label: t(`settings.unitSystem.${system}`) }))} onchange={(system) => setUnitSystem(/** @type {any} */ (system))} />
       </div>
     {/if}
     {#if group('units').rows.length}
@@ -1180,46 +1155,6 @@
 
     .od-settings--segmented {
       margin: 4px var(--od-settings-margin) 0;
-      display: flex;
-      border: 1px solid var(--od-text-2);
-      border-radius: 20px;
-      overflow: hidden;
-
-      button {
-        flex: 1;
-        min-width: 0;
-        height: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 6px;
-        border: none;
-        background: none;
-        color: var(--od-text);
-        font: inherit;
-        font-size: 14px;
-        font-weight: 500;
-        cursor: pointer;
-
-        & + button {
-          border-left: 1px solid var(--od-text-2);
-        }
-
-        &[aria-checked='true'] {
-          background: var(--od-surface-2);
-        }
-
-        svg {
-          flex: none;
-          width: 18px;
-          height: 18px;
-          fill: none;
-          stroke: currentColor;
-          stroke-width: 2.4;
-          stroke-linecap: round;
-          stroke-linejoin: round;
-        }
-      }
     }
 
     .od-settings--note {

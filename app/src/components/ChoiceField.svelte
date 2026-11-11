@@ -109,7 +109,7 @@
     </TextField>
   </div>
 {:else}
-  <SelectField {label} bind:value={choice} {options} chevron {ariaLabel} {invalid} onchange={picked} />
+  <SelectField {label} bind:value={choice} {options} {ariaLabel} {invalid} onchange={picked} />
 {/if}
 
 <style>

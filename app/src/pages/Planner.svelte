@@ -757,8 +757,8 @@
         <button type="button" class="od-planner--add" onclick={addGas}><Icon name="plus" size={18} />{t('plan.addGas')}</button>
         <p class="od-planner--subhead">{t('plan.sac')}</p>
         <div class="od-planner--pair">
-          <SelectField label={t('plan.sacBottom')} bind:value={sacChoice} options={sacOptions.list} chevron ariaLabel={t('plan.sacBottomLong', { value: sacSpoken(sacOptions.selected) })} />
-          <SelectField label={t('plan.sacDeco')} bind:value={decoSacChoice} options={decoSacOptions.list} chevron ariaLabel={t('plan.sacDecoLong', { value: sacSpoken(decoSacOptions.selected) })} />
+          <SelectField label={t('plan.sacBottom')} bind:value={sacChoice} options={sacOptions.list} ariaLabel={t('plan.sacBottomLong', { value: sacSpoken(sacOptions.selected) })} />
+          <SelectField label={t('plan.sacDeco')} bind:value={decoSacChoice} options={decoSacOptions.list} ariaLabel={t('plan.sacDecoLong', { value: sacSpoken(decoSacOptions.selected) })} />
         </div>
         <p class="od-planner--helper od-planner--inner">{t(planner.source ? 'plan.sacFromDive' : 'plan.sacFromSettings')}</p>
       </div>

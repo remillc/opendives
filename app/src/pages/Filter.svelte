@@ -14,6 +14,7 @@
   import { onMount } from 'svelte';
   import { Page, Navbar, Link, List, ListItem, Searchbar, f7, theme } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
+  import ButtonGroup from '../components/ButtonGroup.svelte';
   import Md3Dialog from '../components/Md3Dialog.svelte';
   import TextField from '../components/TextField.svelte';
   import { logbook, undoLastChange } from '../lib/logbook.svelte.js';
@@ -273,21 +274,7 @@
   {#if showMode && !search.trim()}
     <h2 class="od-filter--group-title" id="od-filter-mode">{t('filter.mode')}</h2>
     <div class="od-filter--mode">
-      <!-- iOS segmented control; Android, MD3 segmented buttons (check mark on the selected one). -->
-      <div class="od-filter--segmented-choice" role="radiogroup" aria-labelledby="od-filter-mode">
-        {#each modes as mode (mode)}
-          <button
-            type="button"
-            role="radio"
-            class:od-filter--selected={filter.draft.mode === mode}
-            aria-checked={filter.draft.mode === mode}
-            onclick={() => setMode(mode)}
-          >
-            {#if !theme.ios && filter.draft.mode === mode}<Icon name="check" size={18} weight={2} />{/if}
-            {t(`filter.modes.${mode}`)}
-          </button>
-        {/each}
-      </div>
+      <ButtonGroup ariaLabelledby="od-filter-mode" value={filter.draft.mode} options={modes.map((mode) => ({ value: mode, label: t(`filter.modes.${mode}`) }))} onchange={(mode) => setMode(/** @type {any} */ (mode))} />
     </div>
   {/if}
 
@@ -585,65 +572,6 @@
 
     .od-filter--mode {
       margin: 0 16px;
-    }
-
-    .od-filter--segmented-choice {
-      display: grid;
-      grid-template-columns: 1fr 1.4fr 1.2fr;
-      border: 1px solid var(--od-chip-outline);
-      border-radius: 20px;
-      overflow: hidden;
-
-      button {
-        min-height: 40px;
-        padding: 0 8px;
-        border: none;
-        border-radius: 0;
-        background: none;
-        color: var(--od-text);
-        font: inherit;
-        font-size: 14px;
-        font-weight: 500;
-        letter-spacing: 0.1px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 6px;
-        cursor: pointer;
-
-        & + button {
-          border-inline-start: 1px solid var(--od-chip-outline);
-        }
-
-        &.od-filter--selected {
-          background: var(--od-tint);
-          color: var(--od-on-tint);
-        }
-      }
-
-      :global(.ios) & {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        padding: 2px;
-        border: none;
-        border-radius: 9px;
-        background: var(--od-surface-2);
-
-        button {
-          min-height: 40px;
-          border: none;
-          border-inline-start: none;
-          border-radius: 7px;
-          font-size: 15px;
-          font-weight: 400;
-          letter-spacing: 0;
-
-          &.od-filter--selected {
-            background: var(--od-surface);
-            font-weight: 600;
-            box-shadow: 0 1px 2px rgb(0 0 0 / 0.12);
-          }
-        }
-      }
     }
 
     /* A set criterion: its value in ink and bold (iOS board), on a tint. */
