@@ -379,10 +379,16 @@
     "minutes": "min",
     "liters": "L",
     "litersPerMinute": "L/min",
-    "litersPerMinuteLong": { "one": "{v} liter per minute", "other": "{v} liters per minute" },
+    "litersPerMinuteLong": {
+      "one": "{v} liter per minute",
+      "other": "{v} liters per minute"
+    },
     "cubicFeet": "cu ft",
     "cubicFeetPerMinute": "cu ft/min",
-    "cubicFeetPerMinuteLong": { "one": "{v} cubic foot per minute", "other": "{v} cubic feet per minute" },
+    "cubicFeetPerMinuteLong": {
+      "one": "{v} cubic foot per minute",
+      "other": "{v} cubic feet per minute"
+    },
     "celsius": "°C",
     "fahrenheit": "°F",
     "bar": "bar",
@@ -1459,6 +1465,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Android: tapping a date opens the Material 3 date picker (calendar, or typed date) and tapping a time opens the Material 3 clock, in Edit dive, the planner and New dive.",
       "Android: date fields end with a calendar icon and time fields with a clock icon instead of a chevron (Edit dive, the planner, New dive); the Time field of “Edit dive” is wider, so “10:00” is no longer cut off.",
       "Android: every choice from a list is now one dropdown menu that opens right under its field (dive mode, water type, cylinder, gases, SAC, altitude, git branch, statistic criterion). The maximum pO₂ of the gas tools and the pO₂ thresholds in Settings are dropdowns too, instead of wheels. In “Edit dive”, the site field opens a menu with a search box and “New site…”.",
       "Android: the Logbook, Statistics and Tools titles are bigger when you are at the top of the screen (28 sp, with the summary under them) and shrink to the usual size in the top bar as you scroll.",
@@ -1467,7 +1474,7 @@
       "Android: exclusive choices (unit system, dive mode in the filter, Nitrox / Trimix and the fill order in the gas blender) are connected button groups, and every dropdown menu shows a downward chevron instead of a filled triangle.",
       "Android: “Sync now” becomes a split button when synchronisation is manual (the chevron offers to switch to automatic sync or to see the changes not sent yet, which opens the Logbook filtered on the edited dives not sent yet); the Statistics and Tools headers shrink as you scroll, like the Logbook’s.",
       "Android: progress now shows as a wavy line (dive-computer download, offline maps download and update, sign-in), and the circular spinners are replaced by a small shape that morphs while it works (nearby computers, import step, “Connecting…” button). With “Remove animations” on, the wave and the shape stand still.",
-    "Android: the actions of a dive (Edit, Share, Plan from this dive, and the ⋮ menu), of a trip (Edit, Add dives, ⋮), of a site (Edit, Open in Maps, ⋮) and of the Logbook’s selection (Create a trip, Export, Delete, ⋮) are in a floating toolbar at the bottom of the screen. A long press on a button shows its name. The bar hides when you scroll down and comes back when you scroll up. The Logbook’s “+” opens the same menu of choices as on tablets, instead of a bottom sheet.",
+      "Android: the actions of a dive (Edit, Share, Plan from this dive, and the ⋮ menu), of a trip (Edit, Add dives, ⋮), of a site (Edit, Open in Maps, ⋮) and of the Logbook’s selection (Create a trip, Export, Delete, ⋮) are in a floating toolbar at the bottom of the screen. A long press on a button shows its name. The bar hides when you scroll down and comes back when you scroll up. The Logbook’s “+” opens the same menu of choices as on tablets, instead of a bottom sheet.",
       "Planner: the Oxygen and Helium menus offer every value by 1 % (oxygen 5 to 100 %, helium 0 to 95 %), and “Other value…” is gone. A mix above 100 % is shown as an error on both fields.",
       "Planner: oxygen, helium, consumption (SAC) and altitude are dropdown menus of the usual values (“Other value…” lets you type another one; the keyboard opens on the same field). A value that is not in the list, such as 33 % read from a dive, shows in the field and heads the menu. A SAC measured on a dive is rounded to 0.01 cu ft/min (0.5 L/min) before it is shown or used.",
       "Planner: “Planner settings” in the ⋮ menu now opens the settings; “Plan from this dive” also works from a dive opened in Statistics or Sites.",
@@ -2551,5 +2558,36 @@
       },
       "mapLabel": "Map under a fixed frame. Move and zoom the map to choose the area to download."
     }
+  },
+  "datePicker": {
+    "title": "Select date",
+    "titleInput": "Enter date",
+    "toInput": "Switch to text input",
+    "toCalendar": "Switch to calendar",
+    "previousMonth": "Previous month",
+    "nextMonth": "Next month",
+    "chooseYear": "Choose year",
+    "chooseDay": "Choose day",
+    "field": "Date",
+    "format": "{pattern}",
+    "pattern": {
+      "d": "dd",
+      "m": "mm",
+      "y": "yyyy"
+    },
+    "invalid": "Enter a valid date"
+  },
+  "timePicker": {
+    "title": "Select time",
+    "titleInput": "Enter time",
+    "toInput": "Switch to text input",
+    "toDial": "Switch to clock dial",
+    "hour": "Hour",
+    "minute": "Minute",
+    "am": "AM",
+    "pm": "PM",
+    "period": "AM or PM",
+    "dial": "Clock dial",
+    "invalid": "Invalid time"
   }
 }

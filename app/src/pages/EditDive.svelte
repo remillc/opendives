@@ -20,6 +20,8 @@
   import ComboField from '../components/ComboField.svelte';
   import StarsInput from '../components/StarsInput.svelte';
   import WheelDialog from '../components/WheelDialog.svelte';
+  import DatePickerDialog from '../components/DatePickerDialog.svelte';
+  import TimePickerDialog from '../components/TimePickerDialog.svelte';
   import { logbookValues } from '../lib/people.js';
   import { logbook, saveDiveChanges, tripChange } from '../lib/logbook.svelte.js';
   import { siteChange } from '../lib/sites.svelte.js';
@@ -826,7 +828,29 @@
   </Page>
 {/if}
 
-{#if dialog === 'date'}
+{#if dialog === 'date' && !ios}
+  <DatePickerDialog
+    year={date.year}
+    month={date.month}
+    day={date.day}
+    maxYear={thisYear + 1}
+    oncancel={() => (dialog = null)}
+    onconfirm={(d) => {
+      date = { ...date, year: d.year, month: d.month, day: d.day };
+      dialog = null;
+    }}
+  />
+{:else if dialog === 'time' && !ios}
+  <TimePickerDialog
+    hour={date.hour}
+    minute={date.minute}
+    oncancel={() => (dialog = null)}
+    onconfirm={(time) => {
+      date = { ...date, hour: time.hour, minute: time.minute };
+      dialog = null;
+    }}
+  />
+{:else if dialog === 'date'}
   <WheelDialog
     title={t('edit.date')}
     wheels={dateWheels}
