@@ -178,6 +178,7 @@ test('a saved plan keeps its settings, whatever Settings say when it is reopened
   assert.equal(saved.reserveMbar, 40000);
   assert.equal(saved.lastStop6m, 1, 'a number: the core reads numbers only');
   assert.equal('bottomSacMlMin' in planSettings(), false, 'the SAC stays the field of the plan');
+  assert.equal('decoSacMlMin' in planSettings(), false, 'the deco SAC is a field of the plan too');
 
   planner.setup = { ...planner.setup, descentMmMin: 18288, reserveMbar: 34474 };
   applyRequest(saved, 7, null);
@@ -191,4 +192,16 @@ test('a saved plan keeps its settings, whatever Settings say when it is reopened
   applyRequest(older, 8, null);
   assert.equal(planner.kept, null, 'a plan saved before: the current Settings');
   assert.equal(planRequest().descentMmMin, undefined);
+});
+
+test('two SACs: the request carries the bottom SAC and the deco SAC, each its own', () => {
+  planner.source = null;
+  planner.bottomSacMlMin = 20000;
+  planner.decoSacMlMin = 15000.4;
+  const request = planRequest();
+  assert.equal(request.bottomSacMlMin, 20000);
+  assert.equal(request.decoSacMlMin, 15000);
+  planner.kept = { decoSacMlMin: 99000 };
+  assert.equal(planRequest().decoSacMlMin, 15000, 'the field of the plan wins over a kept setting');
+  planner.kept = null;
 });

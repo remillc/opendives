@@ -1387,4 +1387,51 @@ Changes:
 - **Tablet:** the download pane has the ✕ close button, like on the phone (it currently has none). The "+" floating button is hidden while the download pane is shown: we are already in the task it opened, and it covered "Réessayer".
 - The progress bar stays the standard linear one.
 - **Computer icon in tertiary** (addendum): the round Bluetooth avatar of each computer card uses `--od-tertiary-container` as background and `--od-tertiary` for the icon, in the choice and during the download.
+- **Connected computer card, tablet in landscape** (addendum, 11 November): during the download, the connected computer card is one column wide, like the cards of the choice screen (two columns), not the full pane width. Full width in portrait and on the phone. Mock-up: `android-tablette-telechargement-encours-paysage.dc.html`.
+- A line in the release notes.
+
+## [ ] 2026-11-11-31 Tablets: back arrow in the detail pane only when it has history
+
+Spec: System design, section 7, "Back arrow in the detail pane, tablets" (new), and UI specification, "Dive detail on tablets, back arrow". Mock-ups: `docs/mockups/android-tablette-accueil-{paysage,portrait}.dc.html` (first screen, no ←), `docs/mockups/android-tablette-carnet-site-{paysage,portrait}.dc.html` (dive → site, with ←, new).
+- Give the detail pane its own history, separate from the list. A row of the list replaces that history with one screen.
+- First screen of the pane (dive, trip, statistic, tool opened from the list): no ←; ✎ and ⋮ stay on the right. This is the current behaviour, keep it.
+- A screen opened from inside the pane (dive → site, trip → dive, statistic → dive, and so on): ← at the top left, 48 dp target. It goes back one screen in the pane only. The list, its scroll position and its selected row do not change.
+- Android system back: the same as ← while the pane has history. At the pane's first screen, it does what it does on the list alone (Carnet: leave the app; another section: back to Carnet), never only clearing the selection.
+- Tasks (edit, new site, download, add) keep ✕.
+- Same rule in landscape (rail) and portrait (☰).
+- iPad, when its layout is built: the secondary column shows the system back button "‹ <previous title>" only when it has history; the edge swipe goes back in that column.
+- Tests for the pane history and system back. A line in the release notes.
+
+## [ ] 2026-11-11-32 Planner: oxygen and helium as dropdown menus
+
+Mock-up: `docs/mockups/android-planificateur.dc.html` (Gaz section).
+- The "Oxygène" and "Hélium" fields of each gas become filled dropdown menus (MD3 exposed dropdown, read-only field), the same 56 dp size, label on top, value with its unit ("33 %", "0 %"), downward chevron on the right. Accessible name: "Gaz 1, oxygène : 33 %".
+- Menu content: the usual mixes first, then "Autre valeur…" (`planner.gas.otherValue`), which opens the numeric keyboard on the same field (validation as today: whole number 0–100, oxygen plus helium at most 100). Oxygen: 21, 28, 32, 36, 40, 50, 80, 100. Helium: 0, 10, 20, 30, 35, 45, 55. A value outside the list (for example 33, read from the dive) shows in the field and is checked in the menu above the usual values.
+- Wherever the planner shows these two fields: plan from a dive, new plan, phone and tablet. iOS: the same choice with a native pop-up menu when the iPhone planner is built.
+- A line in the release notes.
+
+## [x] 2026-11-11-33 Planner: bottom SAC and deco SAC, two fields
+
+Mock-ups: `docs/mockups/android-planificateur.dc.html` (plan from a dive), `docs/mockups/android-planificateur-nouveau.dc.html` (new plan).
+- The single "Consommation (SAC)" field becomes two dropdown fields side by side, under a small "Consommation (SAC)" heading: "Au fond" and "Pendant la déco". They feed the core's bottom SAC and deco SAC (the two values the planner settings already have).
+- Plan from a dive: "Au fond" is the SAC measured on the dive (as today); "Pendant la déco" comes from the planner settings. Helper: "Au fond : mesurée pendant la plongée. Pendant la déco : d’après les réglages du planificateur."
+- New plan: both come from the planner settings. Helper: "D’après les réglages du planificateur."
+- Values in the diver's volume unit per minute. Downward chevrons, not triangles. Accessible names give the full label and unit.
+- Check that the plan uses the deco SAC for the ascent and stops (planner tests: a case where the two SACs differ).
+- A line in the release notes.
+
+Done in `Planner.svelte` (two SAC dropdowns with chevrons, accessible names with the unit in words), `planner.svelte.js` (the plan's own `decoSacMlMin`, sent with each request and kept with a saved plan) and `SelectField` (`chevron`, `ariaLabel`). The core already took `decoSacMlMin`; `tests/plan_test.cpp` now checks that a higher deco SAC keeps the runtime and breathes more gas, and `tests/app/planner.test.mjs` that the request carries both SACs.
+
+## [ ] 2026-11-11-34 Planner, new plan: empty profile thumbnail instead of "+"
+
+Mock-ups: `docs/mockups/android-planificateur-nouveau.dc.html` and `docs/mockups/android-tablette-planificateur-{paysage,portrait}.dc.html` (these copies also carry the gas dropdowns of task 32 and the two SAC fields of task 33).
+- In the "Nouvelle plongée · Sans plongée de départ" card, the "+" icon suggested adding something. Replace it with an empty thumbnail: in the same 56 × 36 dp slot as a starting dive's profile thumbnail, the outline of a dive profile in a dashed grey line (`--od-outline`, 1.5 dp, dashes of 3 dp). Decorative, hidden from screen readers. "Changer" stays.
+- A line in the release notes.
+
+## [ ] 2026-11-11-35 Planner: altitude as a dropdown menu
+
+Mock-ups: `docs/mockups/android-planificateur{,-nouveau,-menu}.dc.html`, `docs/mockups/android-tablette-planificateur-{paysage,portrait}.dc.html` (Conditions section).
+- The "Altitude" field becomes a filled dropdown menu like the gas fields of task 32: same 56 dp size, value with its unit ("0 ft"), downward chevron. Accessible name: "Altitude : 0 ft".
+- Menu content, in the diver's depth unit: feet 0, 1 000, 2 000, 3 000, 5 000, 7 000, 10 000; metres 0, 300, 600, 1 000, 1 500, 2 000, 3 000; then "Autre valeur…" (same key as task 32), which opens the numeric keyboard on the field. A value outside the list (for example read from a dive) shows in the field and is checked in the menu above the usual values.
+- Every planner screen, phone and tablet.
 - A line in the release notes.
