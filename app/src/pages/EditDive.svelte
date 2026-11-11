@@ -522,6 +522,9 @@
         {:else}
           <Link iconOnly onClick={leave}><Icon name="close" /><span class="od-sr-only">{t('dialog.cancel')}</span></Link>
         {/if}
+      {:else if layout.split}
+        <!-- A task in the detail pane (tablet in portrait): ✕, never ←. -->
+        <Link back iconOnly><Icon name="close" /><span class="od-sr-only">{t('dialog.cancel')}</span></Link>
       {:else}
         <Link back iconOnly>
           <i class="icon icon-back"></i>

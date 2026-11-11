@@ -44,7 +44,7 @@
 
   /**
    * `slide`: the dive was reached by a swipe from the next or previous one.
-   * @type {{ f7route: { params: { id: string }, url: string }, f7router: any, slide?: 'next'|'previous' }}
+   * @type {{ f7route: { params: { id: string, trip?: string }, url: string }, f7router: any, slide?: 'next'|'previous' }}
    */
   let { f7route, f7router, slide = undefined } = $props();
 
@@ -146,9 +146,11 @@
     }
   }
 
-  // The list beside it highlights the dive shown.
+  // The list beside it highlights the dive shown, unless it was opened from inside the
+  // detail pane (from a trip): the list and its selected row do not change then.
   $effect(() => {
     const id = diveId;
+    if (f7route.params.trip) return;
     navigation.dive = id;
     return () => {
       if (navigation.dive === id) navigation.dive = null;

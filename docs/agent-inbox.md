@@ -1390,7 +1390,7 @@ Changes:
 - **Connected computer card, tablet in landscape** (addendum, 11 November): during the download, the connected computer card is one column wide, like the cards of the choice screen (two columns), not the full pane width. Full width in portrait and on the phone. Mock-up: `android-tablette-telechargement-encours-paysage.dc.html`.
 - A line in the release notes.
 
-## [ ] 2026-11-11-31 Tablets: back arrow in the detail pane only when it has history
+## [x] 2026-11-11-31 Tablets: back arrow in the detail pane only when it has history
 
 Spec: System design, section 7, "Back arrow in the detail pane, tablets" (new), and UI specification, "Dive detail on tablets, back arrow". Mock-ups: `docs/mockups/android-tablette-accueil-{paysage,portrait}.dc.html` (first screen, no ←), `docs/mockups/android-tablette-carnet-site-{paysage,portrait}.dc.html` (dive → site, with ←, new).
 - Give the detail pane its own history, separate from the list. A row of the list replaces that history with one screen.
@@ -1401,6 +1401,8 @@ Spec: System design, section 7, "Back arrow in the detail pane, tablets" (new), 
 - Same rule in landscape (rail) and portrait (☰).
 - iPad, when its layout is built: the secondary column shows the system back button "‹ <previous title>" only when it has history; the edge swipe goes back in that column.
 - Tests for the pane history and system back. A line in the release notes.
+
+Done in `lib/pane-history.js` (pane state and Back decision), `lib/back-button.js`, `App.svelte` (← hidden only on the pane's first screen, `page-master-detail-root`) and `EditDive.svelte` (✕ in the pane); tests in `tests/app/pane-history.test.mjs`.
 
 ## [ ] 2026-11-11-32 Planner: oxygen and helium as dropdown menus
 

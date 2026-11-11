@@ -1437,6 +1437,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Tablettes : dans le volet de détail, la flèche ← n’apparaît que sur un écran ouvert depuis le volet (le site d’une plongée, une plongée d’un voyage, une plongée d’une statistique) et revient d’un écran dans le volet, la liste restant telle quelle ; Retour fait de même, et au premier écran du volet il quitte le carnet ou y revient depuis une autre section.",
       "Planificateur : la consommation (SAC) a deux champs, « Au fond » et « Pendant la déco ». La seconde sert à la remontée et aux paliers ; elle vient des réglages du planificateur.",
       "Android, tablette : le « + » du carnet est maintenant le bouton flottant en bas à droite en paysage aussi (la barre latérale n’en a plus), et il ouvre au-dessus de lui un menu de trois choix (télécharger, importer un fichier, noter une plongée à la main) qui se déploie sur un voile léger ; le bouton devient un ✕, et Retour ou un toucher à l’extérieur ferme le menu. Avec « Supprimer les animations », il apparaît sans mouvement.",
       "Android, tablette en portrait : plus de rail de navigation ; le bouton ☰ ouvre le menu latéral et le « + » du Carnet redevient le bouton flottant, comme sur téléphone. Le rail reste en paysage.",

@@ -53,9 +53,10 @@
 </script>
 
 <li class="od-trip-row" data-trip={dives[0].trip?.id} data-virtual-list-index={index} style:top={top === undefined ? undefined : `${top}px`}>
-  <!-- The row opens the trip screen (spec, section 4, "Trip"); the arrow expands the trip in place. -->
+  <!-- The row opens the trip screen (spec, section 4, "Trip"); the arrow expands the trip in place. On a tablet the trip replaces what the pane shows (first screen of the pane). -->
   <a
     href="/trips/{dives[0].trip?.id}"
+    data-reload-detail="true"
     draggable="false"
     class="item-link item-content no-chevron"
     role={selecting ? 'checkbox' : undefined}
