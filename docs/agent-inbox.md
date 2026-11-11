@@ -1387,6 +1387,7 @@ Changes:
 - **Tablet:** the download pane has the ✕ close button, like on the phone (it currently has none). The "+" floating button is hidden while the download pane is shown: we are already in the task it opened, and it covered "Réessayer".
 - The progress bar stays the standard linear one.
 - **Computer icon in tertiary** (addendum): the round Bluetooth avatar of each computer card uses `--od-tertiary-container` as background and `--od-tertiary` for the icon, in the choice and during the download.
+- **Connected computer card, tablet in landscape** (addendum, 11 November): during the download, the connected computer card is one column wide, like the cards of the choice screen (two columns), not the full pane width. Full width in portrait and on the phone. Mock-up: `android-tablette-telechargement-encours-paysage.dc.html`.
 - A line in the release notes.
 
 ## [ ] 2026-11-11-31 Tablets: back arrow in the detail pane only when it has history
@@ -1400,3 +1401,11 @@ Spec: System design, section 7, "Back arrow in the detail pane, tablets" (new), 
 - Same rule in landscape (rail) and portrait (☰).
 - iPad, when its layout is built: the secondary column shows the system back button "‹ <previous title>" only when it has history; the edge swipe goes back in that column.
 - Tests for the pane history and system back. A line in the release notes.
+
+## [ ] 2026-11-11-33 Planner: oxygen and helium as dropdown menus
+
+Mock-up: `docs/mockups/android-planificateur.dc.html` (Gaz section).
+- The "Oxygène" and "Hélium" fields of each gas become filled dropdown menus (MD3 exposed dropdown, read-only field), the same 56 dp size, label on top, value with its unit ("33 %", "0 %"), downward chevron on the right. Accessible name: "Gaz 1, oxygène : 33 %".
+- Menu content: the usual mixes first, then "Autre valeur…" (`planner.gas.otherValue`), which opens the numeric keyboard on the same field (validation as today: whole number 0–100, oxygen plus helium at most 100). Oxygen: 21, 28, 32, 36, 40, 50, 80, 100. Helium: 0, 10, 20, 30, 35, 45, 55. A value outside the list (for example 33, read from the dive) shows in the field and is checked in the menu above the usual values.
+- Wherever the planner shows these two fields: plan from a dive, new plan, phone and tablet. iOS: the same choice with a native pop-up menu when the iPhone planner is built.
+- A line in the release notes.
