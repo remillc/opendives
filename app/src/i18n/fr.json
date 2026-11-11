@@ -1454,6 +1454,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "« Modifier la plongée » : la ligne sous le titre donne la date sans le jour de la semaine ni l’heure (« N° 5 · Lake Coleridge · 2 avril 2014 »), comme les maquettes.",
       "Android : les écrans, le menu latéral, les feuilles et les boîtes de dialogue bougent maintenant avec un mouvement à ressort (un léger rebond quand il convient), et les plongées d’une sortie que vous ouvrez glissent à leur place. Avec « Supprimer les animations », plus rien ne bouge.",
       "Android : les choix exclusifs (système d’unités, mode de plongée du filtre, Nitrox / Trimix et ordre de gonflage du mélangeur) sont des groupes de boutons connectés, et chaque menu déroulant montre un chevron vers le bas au lieu d’un triangle plein.",
       "Android : « Synchroniser maintenant » devient un bouton scindé quand la synchronisation est manuelle (menu du chevron : passer en synchronisation automatique, voir les modifications non envoyées, qui ouvre le Carnet filtré sur les plongées modifiées pas encore envoyées) ; l’en-tête de Statistiques et d’Outils se réduit en défilant, comme celui du Carnet.",
