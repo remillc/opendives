@@ -1510,6 +1510,7 @@ Christian chose the exposed dropdown menu as the single pattern for picking one 
 - **Wheels become dropdowns:** "ppO₂ maximale" in EAD et MOD and in Meilleur mélange (values 1,0 to 1,6 by 0,1, "1,4 bar"), and the "Seuils de pO₂" dialog in Settings, whose Minimum and Maximum become two dropdown fields side by side with "Par défaut …" under each.
 - Values outside the list (read from a dive or typed earlier) still show in the field and are listed at the top of the menu.
 - Add the rule to System design, section 8 (text fields and menus).
+- **Site field of "Modifier la plongée"** (addendum, 11 November): downward chevron instead of the right arrow (`android-edition`). It opens the same dropdown menu as the other fields, with a search field at the top of the menu (the site list can be long) and "Nouveau site…" at the end.
 - A line in the release notes.
 
 ## [ ] 2026-11-11-41 Android: title sizes (decision of 11 November)
