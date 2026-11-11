@@ -1510,6 +1510,7 @@ Christian chose the exposed dropdown menu as the single pattern for picking one 
 - **Wheels become dropdowns:** "ppO₂ maximale" in EAD et MOD and in Meilleur mélange (values 1,0 to 1,6 by 0,1, "1,4 bar"), and the "Seuils de pO₂" dialog in Settings, whose Minimum and Maximum become two dropdown fields side by side with "Par défaut …" under each.
 - Values outside the list (read from a dive or typed earlier) still show in the field and are listed at the top of the menu.
 - Add the rule to System design, section 8 (text fields and menus).
+- **Site field of "Modifier la plongée"** (addendum, 11 November): downward chevron instead of the right arrow (`android-edition`). It opens the same dropdown menu as the other fields, with a search field at the top of the menu (the site list can be long) and "Nouveau site…" at the end.
 - A line in the release notes.
 
 ## [ ] 2026-11-11-41 Android: title sizes (decision of 11 November)
@@ -1520,3 +1521,12 @@ Answer to the question on Expressive title sizes. "Title Large" is 22 sp in Mate
 - **Sheets** (dive, site, trip): keep their editorial title inside the page (32 sp); the top bar carries only ←.
 - No 36 sp (large flexible app bar) on phones. Check the values against the Material library before coding and tell Christian if they differ.
 - Write the rule in System design, section 4 (type).
+
+## [ ] 2026-11-11-42 Android: date and time fields with calendar and clock icons
+
+Mock-ups: `docs/mockups/android-edition.dc.html`, `android-edition-mode`, `android-planificateur-nouveau`, `android-planificateur-titre`, and the tablet `android-tablette-edition-*`, `android-tablette-planificateur-*`.
+- Every date field gets a trailing calendar icon and every time field a trailing clock icon (24 dp, `--od-on-surface-variant`), never a chevron. A tap anywhere on the field opens the Material 3 date picker or time picker (docked or modal, as the library offers on the size class), not a menu.
+- Where: "Modifier la plongée" (Date, Heure) and the planner (Date, Heure), phone and tablet; and any other date or time field.
+- The "Heure" field of "Modifier la plongée" is 120 dp wide (it truncated "10:00" at 88 dp).
+- Add the rule to System design, section 8 (text fields).
+- A line in the release notes.
