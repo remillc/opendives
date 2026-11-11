@@ -1539,7 +1539,7 @@ Mock-ups: `docs/mockups/android-edition.dc.html`, `android-edition-mode`, `andro
 
 Done in `feature/dropdowns-and-pickers` (fields: `ButtonField` with a trailing calendar or clock icon, never a chevron; Heure of Modifier la plongée at least 120 dp, growing to fit "12:44 PM") and `feature/md3-date-time-pickers` (M3 modal date picker with calendar and typed-date modes, year grid, month arrows and swipe; M3 dial time picker with hour/minute boxes, AM/PM in 12-hour format, inner ring in 24-hour format, typed-time mode). Used for Date and Heure in Modifier la plongée, the planner and Nouvelle plongée on Android; iOS keeps its wheels. Pure logic in `lib/date-time-picker.js` with tests. The modal variant is used on tablets too (no docked picker). Rule in System design, section 8.
 
-## [ ] 2026-11-11-43 Edit a dive: cylinders as cards, derived size, reordering
+## [x] 2026-11-11-43 Edit a dive: cylinders as cards, derived size, reordering
 
 Mock-ups: `docs/mockups/android-edition.dc.html`, `android-edition-mode`, `android-tablette-edition-{paysage,portrait}` (Équipement section).
 - **Each cylinder is a card** (`--od-surface` on the white section, 16 dp corners, 12 dp padding). Header: a small cylinder drawing (sand fill, ink outline), "Bouteille N", the gas in plain words on the right in a white chip ("Trimix 16/45", "EAN32", "Air", "Oxygène"), then a drag handle.
@@ -1548,6 +1548,8 @@ Mock-ups: `docs/mockups/android-edition.dc.html`, `android-edition-mode`, `andro
 - **Under Fin:** "798 psi consommés" (start minus end, in the diver's pressure unit).
 - **Reordering:** a long press or drag on the handle moves the card; the numbers follow the new order (cylinder 2 moved first becomes cylinder 1). TalkBack: actions "Monter" and "Descendre" on the handle. **Data:** gas changes and sensors in the dive refer to cylinders by index; reorder with the core's cylinder renumbering so every reference follows (as Subsurface desktop does), and check with a dive that has gas changes that the profile is unchanged after a reorder and a round trip.
 - A line in the release notes.
+
+Done in `feature/cylinder-cards`: `CylinderCard` (drawing, Bouteille N, gas chip, drag handle; Type, Utilisation, Oxygène/Hélium, Début/Fin, "… consommés"), size and working pressure from the cylinder type as the Type helper (HP at 3 300 psi and above, LP at 2 640 psi and below; a dive's own values are kept; "Autre…" reveals Taille and Pression de service), reorder by drag, arrow keys or the Monter/Descendre buttons for TalkBack. Subsurface desktop has no cylinder reorder in its editor; the façade reorders through the core's `cylinder_renumber()` (as the planner's moveAtFirst does) inside the single undoable dive edit, keeping each computer's own start gas (no gas change added where the start gas does not change, rebreather dives included). `tests/cylinder_reorder_test.cpp`: gas timeline, profile, cylinders and sensor mappings unchanged after reorder, undo, git save and reload, XML export and import, on 42 sample files (88 dives); roundtrip 97 passed, 1 known failure; edit roundtrip 92 passed, the same known Seabear failure. Checked on the emulator on the test account: reorder and reverse saved, the gas change at 0:05 follows its cylinder, the dive file is back to identical. Differences: the card is `--od-background` as drawn; a new unsaved cylinder cannot move above saved ones (the core appends new cylinders).
 
 ## [x] 2026-11-11-44 Edit a dive: Conditions collapsed by default
 
