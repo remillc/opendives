@@ -193,7 +193,8 @@
       key: nextKey++,
       carried: volumeValue(g.carriedMl),
     }));
-    altitudeValue = Math.max(0, mmToDepth(pressureToAltitudeMm(planner.surfacePressureMbar), feet));
+    // A whole foot or metre: an altitude read from a dive's surface pressure has no useful decimal.
+    altitudeValue = Math.max(0, Math.round(mmToDepth(pressureToAltitudeMm(planner.surfacePressureMbar), feet)));
     gfLowField = show(planner.deco.gfLow);
     gfHighField = show(planner.deco.gfHigh);
     invalid = {};
