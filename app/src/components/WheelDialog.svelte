@@ -74,9 +74,5 @@
       --od-field-margin: 0px;
     }
 
-    /* The open menu passes over the buttons instead of scrolling inside the dialog. */
-    :global(.od-md3-dialog.od-wheel-dialog--dropdowns .od-md3-dialog--content) {
-      overflow: visible;
-    }
   }
 </style>

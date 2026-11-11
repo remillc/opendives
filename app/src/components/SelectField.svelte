@@ -60,11 +60,16 @@
   const id = `od-select-${Math.random().toString(36).slice(2, 9)}`;
 
   let open = $state(false);
-  let up = $state(false);
+  /** Where the menu is drawn: fixed on the screen, outside every card that could clip it. */
+  let place = $state({ left: 0, width: 0, top: /** @type {number|undefined} */ (undefined), bottom: /** @type {number|undefined} */ (undefined), maxHeight: 336 });
   let query = $state('');
   let active = $state(-1);
   /** @type {HTMLDivElement|undefined} */
   let root = $state();
+  /** @type {HTMLDivElement|undefined} */
+  let box = $state();
+  /** @type {HTMLDivElement|undefined} */
+  let menu = $state();
   /** @type {HTMLButtonElement|undefined} */
   let trigger = $state();
   /** @type {HTMLInputElement|undefined} */
@@ -80,15 +85,34 @@
     if (disabled || open) return;
     query = '';
     active = all.findIndex((o) => o.value === value);
-    const rect = root?.getBoundingClientRect();
-    if (rect) {
-      const height = Math.min(280, all.length * 48 + 16) + (searchLabel ? 56 : 0);
-      up = opensUp(window.innerHeight - rect.bottom - 8, rect.top - 8, height);
-    }
     open = true;
     await tick();
+    position();
     if (searchLabel) search?.focus();
     scrollToActive();
+  }
+
+  /** Puts the menu under the field (above it when there is no room below), at the field's width. */
+  function position() {
+    const rect = box?.getBoundingClientRect();
+    if (!rect) return;
+    const below = window.innerHeight - rect.bottom - 8;
+    const above = rect.top - 8;
+    const height = menu?.offsetHeight || Math.min(336, all.length * 48 + 16 + (searchLabel ? 56 : 0));
+    const up = opensUp(below, above, height);
+    place = {
+      left: rect.left,
+      width: rect.width,
+      top: up ? undefined : rect.bottom + 4,
+      bottom: up ? window.innerHeight - rect.top + 4 : undefined,
+      maxHeight: Math.max(120, Math.min(336, (up ? above : below) - 4)),
+    };
+  }
+
+  /** The menu lives in the page's root, so no card, dialog or scroller clips it. @param {HTMLElement} node */
+  function portal(node) {
+    document.body.appendChild(node);
+    return { destroy: () => node.remove() };
   }
 
   /** @param {boolean} [refocus] */
@@ -153,7 +177,13 @@
 
   /** @param {PointerEvent} e */
   function outside(e) {
-    if (open && !root?.contains(/** @type {Node} */ (e.target))) close(false);
+    const target = /** @type {Node} */ (e.target);
+    if (open && !root?.contains(target) && !menu?.contains(target)) close(false);
+  }
+
+  /** The page scrolled or the window changed: the menu follows its field. @param {Event} e */
+  function moved(e) {
+    if (open && !(e.target instanceof Node && menu?.contains(e.target))) position();
   }
 
   // The system Back key (lib/back-button.js) closes the menu.
@@ -166,7 +196,8 @@
   });
 </script>
 
-<svelte:window onpointerdown={outside} />
+<svelte:window onpointerdown={outside} onresize={moved} />
+<svelte:document onscrollcapture={moved} />
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
@@ -177,7 +208,7 @@
   bind:this={root}
   onkeydown={keydown}
 >
-  <div class="od-select-field--box">
+  <div class="od-select-field--box" bind:this={box}>
     {#if ios}
       <label class="od-select-field--label" for={id}>{label}</label>
       <select {id} {disabled} aria-label={ariaLabel} aria-invalid={invalid} class:od-select-field--clearable={clearLabel && value} bind:value onchange={() => onchange?.(value)}>
@@ -208,7 +239,18 @@
     {/if}
     <span class="od-select-field--arrow"><DropdownArrow /></span>
     {#if open}
-      <div class="od-select-field--menu" class:od-select-field--up={up}>
+      <!-- svelte-ignore a11y_no_static_element_interactions -->
+      <div
+        class="od-select-field--menu"
+        use:portal
+        bind:this={menu}
+        onkeydown={keydown}
+        style:left="{place.left}px"
+        style:width="{place.width}px"
+        style:top={place.top === undefined ? 'auto' : place.top + 'px'}
+        style:bottom={place.bottom === undefined ? 'auto' : place.bottom + 'px'}
+        style:max-height="{place.maxHeight}px"
+      >
         {#if searchLabel}
           <div class="od-select-field--search">
             <Icon name="search" size={20} />
@@ -318,7 +360,7 @@
     }
 
     .od-select-field--open .od-select-field--label {
-      color: var(--od-text);
+      color: var(--od-primary-action);
     }
 
     .od-select-field--invalid .od-select-field--label {
@@ -404,37 +446,18 @@
       }
     }
 
-    /* The open menu passes over what follows: Framework7 gives each list its own
-       stacking level, so the list holding it comes to the front. */
-    .od-select-field--open {
-      position: relative;
-      z-index: 30;
-    }
-
-    :global(:is(.list, .od-form-surface):has(.od-select-field--open)) {
-      position: relative;
-      z-index: 30;
-    }
-
     /* Exposed dropdown menu (spec, section 8): the field's width, 4 dp corners, 8 dp
        above and below, 48 dp items at 16 sp, the current value on surface-container-highest. */
     .od-select-field--menu {
-      position: absolute;
-      left: 0;
-      right: 0;
-      top: calc(100% + 4px);
-      z-index: 20;
-      max-height: 336px;
+      position: fixed;
+      /* Above the dialogs (13500). */
+      z-index: 14000;
+      box-sizing: border-box;
       display: flex;
       flex-direction: column;
       border-radius: 4px;
       background: var(--od-surface);
       box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 6px 2px rgba(0, 0, 0, 0.15);
-
-      &.od-select-field--up {
-        top: auto;
-        bottom: calc(100% + 4px);
-      }
     }
 
     .od-select-field--options {

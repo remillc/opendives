@@ -927,8 +927,9 @@
 
       .od-edit-dive--time {
         flex: 0 0 auto;
-        /* 120 dp: the clock icon at the end and "10:00" untruncated (task 2026-11-11-42). */
-        width: 120px;
+        /* At least 120 dp; grows for "12:44 PM" in the 12-hour format, the Date field takes the rest. */
+        min-width: 120px;
+        --od-button-field-end: 48px;
       }
 
       .od-edit-dive--weight-value {
