@@ -18,6 +18,7 @@
   import StarsInput from '../components/StarsInput.svelte';
   import WheelDialog from '../components/WheelDialog.svelte';
   import ChoiceDialog from '../components/ChoiceDialog.svelte';
+  import SelectField from '../components/SelectField.svelte';
   import { logbook, addDive, renumberDives, renumberPlanFrom } from '../lib/logbook.svelte.js';
   import { confirmAction } from '../lib/dialogs.js';
   import { parseNumber } from '../lib/filter.svelte.js';
@@ -219,12 +220,12 @@
     <button type="button" class="od-new-dive--row" onclick={() => (dialog = 'date')}>
       <span class="od-new-dive--row-label">{t('newDive.date')}</span>
       <span class="od-new-dive--row-value">{dateText}</span>
-      <Icon name="chevron" size={18} />
+      {#if theme.ios}<Icon name="chevron" size={18} />{:else}<Icon name="calendar" />{/if}
     </button>
     <button type="button" class="od-new-dive--row" onclick={() => (dialog = 'time')}>
       <span class="od-new-dive--row-label">{t('newDive.time')}</span>
       <span class="od-new-dive--row-value">{timeText}</span>
-      <Icon name="chevron" size={18} />
+      {#if theme.ios}<Icon name="chevron" size={18} />{:else}<Icon name="clock" />{/if}
     </button>
     <TextField
       label={t('newDive.duration')}
@@ -251,11 +252,15 @@
 
   <h2 class="od-new-dive--group-title">{t('newDive.cylinder')}</h2>
   <div class="od-form-surface">
-    <button type="button" class="od-new-dive--row" onclick={() => (dialog = 'cylinder')}>
-      <span class="od-new-dive--row-label">{t('newDive.cylinderType')}</span>
-      <span class="od-new-dive--row-value">{cylinderType || t('newDive.defaultCylinder')}</span>
-      <Icon name="chevron" size={18} />
-    </button>
+    {#if theme.ios}
+      <button type="button" class="od-new-dive--row" onclick={() => (dialog = 'cylinder')}>
+        <span class="od-new-dive--row-label">{t('newDive.cylinderType')}</span>
+        <span class="od-new-dive--row-value">{cylinderType || t('newDive.defaultCylinder')}</span>
+        <Icon name="chevron" size={18} />
+      </button>
+    {:else}
+      <SelectField label={t('newDive.cylinderType')} bind:value={cylinderType} options={cylinderOptions} />
+    {/if}
     <div class="od-new-dive--pair">
       <TextField
         label={t('newDive.startPressure', { unit: pressureUnit })}
@@ -388,7 +393,7 @@
         font-variant-numeric: tabular-nums;
       }
 
-      :global(.od-new-dive--icon) {
+      :global(.od-icon) {
         color: var(--od-text-2);
       }
     }

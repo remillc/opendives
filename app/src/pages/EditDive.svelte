@@ -8,7 +8,7 @@
   // maximum depth are shown, measured by the dive computer. Only the fields
   // whose text changed are sent; Save applies one undoable step, saves
   // locally and closes; Undo is offered.
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
   import { Page, Navbar, Link, Popup, View, f7 } from 'framework7-svelte';
   import { showSnackbar } from '../lib/snackbar.js';
   import { OpenDivesCore } from 'opendives-core';
@@ -253,10 +253,55 @@
     if (!list.some((o) => o.value === own)) list.unshift({ value: own, label: placeName(own) });
     return list;
   };
+  /** "New site…": the field becomes a text field for the new name, created on Save. */
+  let newSite = $state(false);
+  let siteBefore = '';
+  /** @type {HTMLDivElement|undefined} */
+  let newSiteBox = $state();
+
+  /** @param {string} typed what was searched in the menu, offered as the name */
+  async function startNewSite(typed) {
+    siteBefore = siteName;
+    siteName = typed;
+    newSite = true;
+    await tick();
+    newSiteBox?.querySelector('input')?.focus();
+  }
+
+  /** Back to the menu: with the name typed, or the previous site when it is empty. */
+  function endNewSite() {
+    siteName = siteName.trim() || siteBefore;
+    newSite = false;
+  }
+
+  function cancelNewSite() {
+    siteName = siteBefore;
+    newSite = false;
+  }
+
+  /** @param {KeyboardEvent} e */
+  function newSiteKey(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      endNewSite();
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      e.stopPropagation();
+      cancelNewSite();
+    }
+  }
+
+  /** @param {FocusEvent} e */
+  function newSiteLeave(e) {
+    if (!newSiteBox?.contains(/** @type {Node|null} */ (e.relatedTarget))) endNewSite();
+  }
+
   /** Site names, the most recently dived first. */
   const siteNames = $derived(
     [...sites].filter((s) => s.name).sort((a, b) => (b.lastDate || '').localeCompare(a.lastDate || '')).map((s) => s.name),
   );
+  /** The site names as menu choices (a name is listed once even when several sites share it). */
+  const siteOptions = $derived([...new Set(siteNames)].map((n) => ({ value: n, label: n })));
   /** The logbook's trips, by location (the first one of each name). */
   const trips = $derived.by(() => {
     /** @type {Map<string, number>} */
@@ -552,15 +597,38 @@
     <section class="card od-edit-dive--card">
       {@render header(t('edit.diveGroup'))}
       <div class="od-edit-dive--row">
-        <div class="od-edit-dive--grow"><ButtonField label={t('edit.date')} value={dateText} onclick={() => (dialog = 'date')} /></div>
-        <div class="od-edit-dive--time"><ButtonField label={t('edit.time')} value={timeText} onclick={() => (dialog = 'time')} /></div>
+        <div class="od-edit-dive--grow"><ButtonField label={t('edit.date')} value={dateText} icon="calendar" onclick={() => (dialog = 'date')} /></div>
+        <div class="od-edit-dive--time"><ButtonField label={t('edit.time')} value={timeText} icon="clock" onclick={() => (dialog = 'time')} /></div>
       </div>
       <!-- Measured by the dive computer: plain text, not a field. -->
       <dl class="od-edit-dive--measured">
         <div><dt>{t('edit.duration')}</dt><dd class="od-value">{formatMinSec(dive.durationSeconds)}</dd></div>
         <div><dt>{t('edit.maxDepth')}</dt><dd class="od-value">{formatDepth(dive.maxDepthMm, prefs)}</dd></div>
       </dl>
-      <ComboField label={t('edit.site')} bind:value={siteName} options={siteNames} supporting={t('edit.siteHint')} />
+      {#if ios}
+        <ComboField label={t('edit.site')} bind:value={siteName} options={siteNames} supporting={t('edit.siteHint')} />
+      {:else if newSite}
+        <!-- svelte-ignore a11y_no_static_element_interactions -->
+        <div bind:this={newSiteBox} onfocusout={newSiteLeave} onkeydown={newSiteKey}>
+          <TextField label={t('edit.site')} bind:value={siteName} supporting={t('edit.siteNewHint')} keepTrailing>
+            {#snippet trailing()}
+              <button type="button" class="od-edit-dive--site-back" aria-label={t('edit.siteBack')} onclick={cancelNewSite}><Icon name="expand" /></button>
+            {/snippet}
+          </TextField>
+        </div>
+      {:else}
+        <SelectField
+          label={t('edit.site')}
+          bind:value={siteName}
+          options={siteOptions}
+          supporting={t('edit.siteHint')}
+          clearLabel={t('edit.siteClear')}
+          searchLabel={t('edit.siteSearch')}
+          noResultsLabel={t('edit.siteNone')}
+          newLabel={t('edit.siteNew')}
+          onnew={startNewSite}
+        />
+      {/if}
       <SelectField label={t('edit.trip')} bind:value={tripName} options={tripOptions} clearLabel={t('edit.tripClear')} />
       {#if tripName === NEW_TRIP}
         <TextField label={t('edit.tripNewName')} bind:value={newTripName} />
@@ -830,6 +898,20 @@
       color: var(--od-text);
     }
 
+    .od-edit-dive--site-back {
+      width: 40px;
+      height: 40px;
+      flex: none;
+      padding: 0;
+      border: none;
+      border-radius: 20px;
+      background: none;
+      color: var(--od-text-2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
     /* Two or three fields on one line. */
     .od-edit-dive--row {
       display: flex;
@@ -845,10 +927,9 @@
 
       .od-edit-dive--time {
         flex: 0 0 auto;
-        min-width: 96px;
-        /* No room for the arrow, as in the mock-up. */
-        --od-button-field-end: 16px;
-        --od-button-field-arrow: none;
+        /* At least 120 dp; grows for "12:44 PM" in the 12-hour format, the Date field takes the rest. */
+        min-width: 120px;
+        --od-button-field-end: 48px;
       }
 
       .od-edit-dive--weight-value {

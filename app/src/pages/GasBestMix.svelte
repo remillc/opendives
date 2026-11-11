@@ -15,7 +15,7 @@
   import { OpenDivesCore } from 'opendives-core';
   import TextField from '../components/TextField.svelte';
   import SelectField from '../components/SelectField.svelte';
-  import Po2Wheel from '../components/Po2Wheel.svelte';
+  import Po2Field from '../components/Po2Field.svelte';
   import GasResults from '../components/GasResults.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
   import { settings } from '../lib/settings.svelte.js';
@@ -109,7 +109,7 @@
   </div>
 
   <div class="od-gas-best-mix--gap"></div>
-  <Po2Wheel bind:value={po2} />
+  <Po2Field bind:value={po2} />
 
   <TextField label={t('tools.maxEnd')} bind:value={maxEnd} inputmode="decimal" invalid={endInvalid} supporting={endInvalid ? t('tools.depthInvalid') : t('tools.maxEndHelp')}>
     {#snippet trailing()}<span class="od-gas-best-mix--unit">{depthUnit(logbook.prefs)}</span>{/snippet}

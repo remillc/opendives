@@ -13,7 +13,7 @@
   import { OpenDivesCore } from 'opendives-core';
   import TextField from '../components/TextField.svelte';
   import SelectField from '../components/SelectField.svelte';
-  import Po2Wheel from '../components/Po2Wheel.svelte';
+  import Po2Field from '../components/Po2Field.svelte';
   import GasResults from '../components/GasResults.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
   import { settings } from '../lib/settings.svelte.js';
@@ -96,7 +96,7 @@
   </div>
 
   <div class="od-gas-ead-mod--gap"></div>
-  <Po2Wheel bind:value={po2} />
+  <Po2Field bind:value={po2} />
 
   <TextField
     label={t('tools.plannedDepth')}

@@ -15,7 +15,7 @@
   import ChoiceDialog from '../components/ChoiceDialog.svelte';
   import ButtonGroup from '../components/ButtonGroup.svelte';
   import MenuButton from '../components/MenuButton.svelte';
-  import { layout } from '../lib/layout.svelte.js';
+  import { layout, ios } from '../lib/layout.svelte.js';
   import { navigation } from '../lib/navigation.svelte.js';
   import WheelDialog from '../components/WheelDialog.svelte';
   import RenumberDialog from '../components/RenumberDialog.svelte';
@@ -44,7 +44,7 @@
    *   | { kind: 'choice', id: string, label: string, text?: string, value: string, title?: string, current: string,
    *       options: () => Option[] | Promise<Option[]>, set: (v: string) => unknown, dimmed?: boolean, note?: string }
    *   | { kind: 'number', id: string, label: string, text?: string, value: string, title?: string, dialogText?: string,
-   *       wheels: () => {label: string, values: string[], index: number, defaultIndex: number}[], set: (indexes: number[]) => unknown, dimmed?: boolean }
+   *       wheels: () => {label: string, values: string[], index: number, defaultIndex: number}[], set: (indexes: number[]) => unknown, dimmed?: boolean, dropdowns?: boolean }
    *   | { kind: 'link', id: string, label: string, text?: string, href?: string, action?: () => void, disabled?: boolean, value?: string, badge?: string }
    *   | { kind: 'info', id: string, label: string, value: string }} Row
    */
@@ -511,6 +511,7 @@
           text: t('settings.pp.po2Text'),
           value: `${formatNumber(p.po2MinMbar / 1000, 2)} – ${bar(p.po2MaxMbar, 1)}`,
           dialogText: t('settings.pp.po2Dialog'),
+          dropdowns: true,
           wheels: () => [
             wheel(t('settings.pp.minimum'), range(0, 1000, 10), p.po2MinMbar, defaults.po2MinMbar, (v) => formatNumber(v / 1000, 2)),
             wheel(t('settings.pp.maximum'), range(500, 3000, 100), p.po2MaxMbar, defaults.po2MaxMbar, (v) => formatNumber(v / 1000, 1)),
@@ -964,6 +965,7 @@
     title={row.title ?? row.label}
     text={row.dialogText}
     wheels={row.wheels()}
+    dropdowns={row.dropdowns && !ios}
     oncancel={() => (dialog = null)}
     onconfirm={(indexes) => {
       const chosen = row; // read before the dialog closes: row comes from it
