@@ -62,7 +62,7 @@ h1,h2,h3,h4,h1 *,h2 *,h3 *,h4 *,[style*='font-size: 2'],[style*='font-size: 3'],
     <sc-for list="{{dives}}" as="d" hint-placeholder-count="5">
       <a href="#detail" aria-current="{{d.current}}" style="margin: 0 8px; border-radius: 10px; background: {{d.bg}}; display: flex; align-items: center; gap: 12px; padding: 10px 10px; min-height: 64px; box-sizing: border-box; color: #000000; text-decoration: none">
         <svg width="56" height="36" viewBox="0 0 56 36" preserveAspectRatio="none" role="img" aria-label="{{d.alt}}" style="flex: none; border-radius: 4px; background: #F4F4F2">
-          <defs><linearGradient id="{{d.gid}}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color: #FBE3B2"></stop><stop offset="1" style="stop-color: {{d.bottom}}"></stop></linearGradient></defs>
+          <defs><linearGradient id="{{d.gid}}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color: #D4E2F2"></stop><stop offset="1" style="stop-color: {{d.bottom}}"></stop></linearGradient></defs>
           <path d="{{d.area}}" style="fill: url(#{{d.gid}}); stroke: none"></path>
           <path d="{{d.line}}" style="fill: none; stroke: #1F2124; stroke-width: 1.25; vector-effect: non-scaling-stroke"></path>
         </svg>
@@ -95,7 +95,7 @@ h1,h2,h3,h4,h1 *,h2 *,h3 *,h4 *,[style*='font-size: 2'],[style*='font-size: 3'],
     </div>
 
     <svg width="556" height="300" viewBox="0 0 556 300" role="img" aria-label="Profil de la plongée 7 : 198 ft au plus profond, 104 minutes">
-      <defs><linearGradient id="water-d7" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color: #FBE3B2"></stop><stop offset="1" style="stop-color: {{bottom}}"></stop></linearGradient></defs>
+      <defs><linearGradient id="water-d7" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color: #D4E2F2"></stop><stop offset="1" style="stop-color: {{bottom}}"></stop></linearGradient></defs>
       <sc-for list="{{yTicks}}" as="tk" hint-placeholder-count="5">
         <line x1="40" x2="556" y1="{{tk.y}}" y2="{{tk.y}}" style="stroke: #E8E8E5; stroke-width: 1"></line>
         <text x="32" y="{{tk.ty}}" style="font-size: 12px; fill: #3C3C43; text-anchor: end; font-family: 'Source Sans 3 OD', -apple-system, system-ui, sans-serif">{{tk.label}}</text>
@@ -120,7 +120,7 @@ h1,h2,h3,h4,h1 *,h2 *,h3 *,h4 *,[style*='font-size: 2'],[style*='font-size: 3'],
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1180,"height":820}}'>
 function mix(f) {
-  var a = [0xFB, 0xE3, 0xB2], b = [0xB4, 0x53, 0x0F];
+  var a = [0xD4, 0xE2, 0xF2], b = [0x55, 0x84, 0xB5];
   f = Math.max(0, Math.min(1, f));
   return 'rgb(' + a.map(function (v, i) { return Math.round(v + (b[i] - v) * f); }).join(',') + ')';
 }

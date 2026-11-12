@@ -34,7 +34,7 @@ h1,h2,h3,h4,h1 *,h2 *,h3 *,h4 *,[style*='font-size: 2'],[style*='font-size: 3'],
   <a href="detail3-ios.dc.html" style="margin: 12px 16px 0 16px; display: block; border-radius: 18px; overflow: hidden; background: #FFFFFF; color: #1F2124; text-decoration: none">
     <div style="padding: 12px 14px 0 14px"><span style="padding: 4px 10px; border-radius: 12px; background: #1F2124; color: #FFFFFF; font-size: 13px; font-weight: 700">Dernière plongée</span></div>
     <svg width="358" height="130" viewBox="0 0 358 130" preserveAspectRatio="none" role="img" aria-label="Profil, 91 ft au plus profond" style="display: block; margin-top: 10px">
-      <defs><linearGradient id="mono-3-h" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color: #FBE3B2"></stop><stop offset="1" style="stop-color: {{hb}}"></stop></linearGradient></defs>
+      <defs><linearGradient id="mono-3-h" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color: #D4E2F2"></stop><stop offset="1" style="stop-color: {{hb}}"></stop></linearGradient></defs>
       <path d="{{ha}}" style="fill: url(#mono-3-h); stroke: none"></path>
       <path d="{{hl}}" style="fill: none; stroke: #1F2124; stroke-width: 2; vector-effect: non-scaling-stroke"></path>
     </svg>
@@ -53,7 +53,7 @@ h1,h2,h3,h4,h1 *,h2 *,h3 *,h4 *,[style*='font-size: 2'],[style*='font-size: 3'],
     <sc-for list="{{rows}}" as="d" hint-placeholder-count="3">
       <a href="detail3-ios.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 60px; border-bottom: 0.5px solid #DADAD6; color: #1F2124; text-decoration: none">
         <svg width="56" height="36" viewBox="0 0 56 36" preserveAspectRatio="none" role="img" aria-label="{{d.alt}}" style="flex: none; border-radius: 6px; background: #E8E8E5">
-          <defs><linearGradient id="{{d.gid}}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color: #FBE3B2"></stop><stop offset="1" style="stop-color: {{d.bottom}}"></stop></linearGradient></defs>
+          <defs><linearGradient id="{{d.gid}}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color: #D4E2F2"></stop><stop offset="1" style="stop-color: {{d.bottom}}"></stop></linearGradient></defs>
           <path d="{{d.area}}" style="fill: url(#{{d.gid}}); stroke: none"></path>
           <path d="{{d.line}}" style="fill: none; stroke: #1F2124; stroke-width: 1.25; vector-effect: non-scaling-stroke"></path>
         </svg>
@@ -67,7 +67,7 @@ h1,h2,h3,h4,h1 *,h2 *,h3 *,h4 *,[style*='font-size: 2'],[style*='font-size: 3'],
 <script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
 function hx(h) { return [parseInt(h.substr(1,2),16), parseInt(h.substr(3,2),16), parseInt(h.substr(5,2),16)]; }
 function mix(f) {
-  var a = hx('#FBE3B2'), b = hx('#B4530F');
+  var a = hx('#D4E2F2'), b = hx('#5584B5');
   f = Math.max(0, Math.min(1, f));
   return 'rgb(' + a.map(function (v, i) { return Math.round(v + (b[i] - v) * f); }).join(',') + ')';
 }
