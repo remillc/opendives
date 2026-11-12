@@ -101,3 +101,17 @@ test('simplifying a plan from a dive uses its levels and keeps the dive; Undo re
   assert.equal(JSON.stringify(planRequest()), requestBefore);
   assert.equal(JSON.stringify(Object.entries(planner).filter(([k]) => !['version', 'loaded', 'setup'].includes(k))), stateBefore);
 });
+
+test('the safety stop at the end is not a level', async () => {
+  const { simplifyProfile } = await import('../../app/src/lib/profile-levels.js');
+  const t = [], d = [];
+  const push = (s, mm) => { t.push(s); d.push(mm); };
+  push(0, 0); push(120, 25000);
+  for (let s = 180; s <= 1800; s += 60) push(s, 25000);
+  push(2000, 5000);
+  for (let s = 2040; s <= 2220; s += 60) push(s, 5000);
+  push(2280, 0);
+  const levels = simplifyProfile({ timeSeconds: t, depthMm: d });
+  assert.equal(levels.length, 1);
+  assert.ok(Math.abs(levels[0].depthMm - 25000) <= 1000);
+});

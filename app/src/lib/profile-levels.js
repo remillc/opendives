@@ -19,7 +19,9 @@
 //    than the minimum tolerance (3 m: the surface, a snorkel moment), unless
 //    nothing else remains. Neighbours left within the tolerance of each other
 //    are merged (duration-weighted depth). Above MAX_LEVELS, the two adjacent
-//    levels closest in depth are merged until the limit is met.
+//    levels closest in depth are merged until the limit is met. A last phase
+//    at 6 m or shallower after a deeper one is the end-of-dive stop (safety or
+//    deco): dropped, the planner adds its own stops.
 // 5. Depths are rounded to 100 mm and durations to whole minutes (one minute
 //    at least). Units are the core's: millimetres and seconds.
 // A dive with no usable phase gives one level at its maximum depth.
@@ -34,6 +36,8 @@ const MIN_PHASE_S = 120;
 const MIN_TOLERANCE_MM = 3000;
 /** Share of the depth taken as tolerance. */
 const TOLERANCE_RATIO = 0.1;
+/** A last phase this shallow or shallower, after a deeper one, is the end-of-dive stop, mm. */
+const LAST_STOP_MM = 6000;
 /** The most levels a simplified profile has. */
 const MAX_LEVELS = 6;
 
@@ -120,6 +124,9 @@ export function simplifyProfile(samples) {
   const deepestPhase = levels.reduce((a, b) => (b.depthMm > a.depthMm || (b.depthMm === a.depthMm && b.durationSeconds > a.durationSeconds) ? b : a));
   const kept = levels.filter((l) => l.durationSeconds >= MIN_PHASE_S && l.depthMm >= MIN_TOLERANCE_MM);
   levels = kept.length ? kept : [deepestPhase];
+  // The end-of-dive stop (safety or last deco stop, 6 m or shallower after a
+  // deeper level) is not a level: the planner adds its own stops.
+  while (levels.length > 1 && levels[levels.length - 1].depthMm <= LAST_STOP_MM) levels.pop();
 
   // Neighbours within the tolerance of each other are one phase.
   /** @param {Level} a @param {Level} b @returns {Level} */
