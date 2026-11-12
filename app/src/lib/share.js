@@ -5,6 +5,7 @@
 // is HTML rendered to PDF by the system's print engine (htmlToPdf), the image
 // is the profile chart drawn on a canvas.
 import { Share } from '@capacitor/share';
+import { useKey } from './cylinder-use.js';
 import { OpenDivesCore } from 'opendives-core';
 import {
   formatCylinderSize,
@@ -259,7 +260,7 @@ ${cylinders.length || equipment.length ? `<h2>${esc(t('detail.gasAndEquipment'))
 ${cylinders.length ? `<table><thead><tr><th>${esc(t('share.cylinder'))}</th><th>${esc(t('edit.size'))}</th><th>${esc(t('edit.use'))}</th><th>${esc(t('share.gas'))}</th><th>${esc(t('edit.start'))}</th><th>${esc(t('edit.end'))}</th></tr></thead><tbody>${cylinders
     .map(
       (c) =>
-        `<tr><td>${esc(c.description && c.description !== 'unknown' ? c.description : '–')}</td><td class="n">${esc(formatCylinderSize(c.sizeMl, c.workingPressureMbar, prefs) ?? '')}</td><td>${esc(tIfExists(`edit.uses.${c.use}`) ?? c.use)}</td><td>${esc(formatGas(c.o2Permille, c.hePermille))}</td><td class="n">${c.startMbar ? esc(formatPressure(c.startMbar, prefs)) : ''}</td><td class="n">${c.endMbar ? esc(formatPressure(c.endMbar, prefs)) : ''}</td></tr>`,
+        `<tr><td>${esc(c.description && c.description !== 'unknown' ? c.description : '–')}</td><td class="n">${esc(formatCylinderSize(c.sizeMl, c.workingPressureMbar, prefs) ?? '')}</td><td>${esc(tIfExists(useKey(c.use, dive.divemode)) ?? c.use)}</td><td>${esc(formatGas(c.o2Permille, c.hePermille))}</td><td class="n">${c.startMbar ? esc(formatPressure(c.startMbar, prefs)) : ''}</td><td class="n">${c.endMbar ? esc(formatPressure(c.endMbar, prefs)) : ''}</td></tr>`,
     )
     .join('')}</tbody></table>` : ''}
 ${equipment.length ? `<dl class="list">${rows(equipment)}</dl>` : ''}
