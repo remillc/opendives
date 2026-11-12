@@ -12,6 +12,7 @@
   import { showSnackbar } from '../lib/snackbar.js';
   import { OpenDivesCore } from 'opendives-core';
   import Icon from '../components/Icon.svelte';
+  import ChoiceRow from '../components/ChoiceRow.svelte';
   import TextField from '../components/TextField.svelte';
   import ChipsField from '../components/ChipsField.svelte';
   import { logbookValues } from '../lib/people.js';
@@ -289,18 +290,16 @@
   <div class="od-form-surface">
     {#if sites.length > 6}<TextField label={t('newDive.searchSite')} bind:value={siteSearch} />{/if}
     <div class="od-new-dive--sites" role="radiogroup" aria-labelledby="od-new-site">
-      <label class="od-new-dive--site">
-        <input type="radio" name="od-new-site" value={0} bind:group={site} />
+      <ChoiceRow class="od-new-dive--site" name="od-new-site" selected={site === 0} onselect={() => (site = 0)}>
         <span class="od-new-dive--site-text"><span>{t('newDive.noSite')}</span></span>
-      </label>
+      </ChoiceRow>
       {#each shownSites as s (s.uuid)}
-        <label class="od-new-dive--site">
-          <input type="radio" name="od-new-site" value={s.uuid} bind:group={site} />
+        <ChoiceRow class="od-new-dive--site" name="od-new-site" selected={site === s.uuid} onselect={() => (site = s.uuid)}>
           <span class="od-new-dive--site-text">
             <span>{s.name}</span>
             {#if s.lastDate}<span class="od-new-dive--hint">{t('newDive.lastDive', { date: formatLongDate(s.lastDate) })}</span>{/if}
           </span>
-        </label>
+        </ChoiceRow>
       {/each}
     </div>
     <p class="od-new-dive--note">{t('newDive.newSiteNote')}</p>
@@ -437,21 +436,9 @@
       padding: 4px 0;
     }
 
-    .od-new-dive--site {
+    :global(.od-new-dive--site) {
       min-height: 56px;
       padding: 8px 12px;
-      box-sizing: border-box;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-
-      input {
-        flex: none;
-        width: 20px;
-        height: 20px;
-        margin: 0;
-        accent-color: var(--od-action);
-      }
     }
 
     .od-new-dive--site-text {

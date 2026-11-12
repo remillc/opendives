@@ -300,6 +300,17 @@ Where they apply (rules in `theme.css`, layer `od.base`, and in the components):
 
 Springs are kept short (all under 0.4 s except `spatial-slow`). "Remove animations" (`prefers-reduced-motion`) cuts every transition and animation to 0.01 ms through the rule at the end of `od.base`; the `--od-motion-*` tokens need no special case.
 
+### Choice rows (Android, decided on 12 November 2026)
+
+No radio buttons on Android. A choice of one item among several uses `ChoiceRow` (`app/src/components/ChoiceRow.svelte`):
+
+- The chosen row sits on `--od-surface-container-highest` with 12 dp corners and a 24 dp ink check at the start; the other rows are plain with an empty 24 dp slot, so the texts line up. A tap selects.
+- Accessibility is unchanged: the rows are `role="radio"` with `aria-checked` inside a `role="radiogroup"`; the arrow keys move and select, only the chosen row is in the tab order.
+- When the chosen option reveals fields (account import from divelogs.de), the tint covers the option and its fields as one block: option on top with 12 dp top corners, fields under it with 12 dp bottom corners, the fields on `--od-background`.
+- Choice cards (sync conflicts) keep the filled check badge on the chosen card; the other card shows no empty circle.
+- A short list opened from a row is a menu or a choice dialog whose rows use the same pattern.
+- iOS keeps its native controls: `ChoiceRow` renders the Framework7 radio row there.
+
 ### Text fields
 
 **Text fields (decided on 6 November 2026, updated the same day).** Every text field of the app on Android uses the MD3 **filled** variant (Framework7 MD inputs without the outline style): surface-container-highest background (#E8E8E5 light), 4 dp top corners, a 1 dp bottom indicator that becomes 2 dp in the primary colour on focus, the label inside the field: full size when the field is empty and not focused, with no placeholder; small above the value on focus or once the field has a value. Helper text sits under the field. A trailing icon (for example "use my position") is a plain 24 dp icon button, without a filled background. In a full-screen form, the save action is a text button at the right of the top bar ("Enregistrer"), the close action an X at the left. Reference: `docs/mockups/sites-edition-android.dc.html`.

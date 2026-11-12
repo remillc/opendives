@@ -14,6 +14,7 @@
   import { offerUndo } from '../lib/undo.js';
   import { pairsGone } from '../lib/site-cleanup.js';
   import Icon from '../components/Icon.svelte';
+  import ChoiceRow from '../components/ChoiceRow.svelte';
 
   /** @type {{ f7router: any }} */
   let { f7router } = $props();
@@ -163,7 +164,7 @@
 
   <p class="od-intro">{t('sites.cleanupIntro')}</p>
 
-  <!-- One surface per possible duplicate: the site kept is chosen with the radio buttons. -->
+  <!-- One surface per possible duplicate: the site kept is chosen with a tinted, checked row (radio buttons on iOS). -->
   {#each pairs as pair (pairKey(pair.a.uuid, pair.b.uuid))}
     {@const key = pairKey(pair.a.uuid, pair.b.uuid)}
     {@const both = ordered(pair)}
@@ -174,13 +175,9 @@
       </legend>
       {#each both as s (s.uuid)}
         <div class="od-sites-cleanup--keep-row">
-          <label class="od-sites-cleanup--keep-pick">
-            <span class="radio">
-              <input type="radio" name="keep-{key}" value={s.uuid} checked={(kept[key] ?? both[0].uuid) === s.uuid} onchange={() => (kept[key] = s.uuid)} />
-              <i class="icon-radio"></i>
-            </span>
+          <ChoiceRow class="od-sites-cleanup--keep-pick" name="keep-{key}" selected={(kept[key] ?? both[0].uuid) === s.uuid} onselect={() => (kept[key] = s.uuid)}>
             <span class="od-sites-cleanup--text"><span class="od-sites-cleanup--label">{s.name || t('sites.noName')}</span><span class="od-sites-cleanup--sub">{describe(s)}</span></span>
-          </label>
+          </ChoiceRow>
           <button type="button" class="od-icon-button od-sites-cleanup--keep-edit" aria-label={t('sites.editSite', { name: s.name || t('sites.noName') })} onclick={() => edit(s)}>
             <Icon name="edit" />
           </button>
@@ -281,16 +278,12 @@
       border-top: 1px solid var(--od-separator);
     }
 
-    .od-sites-cleanup--keep-pick {
+    :global(.od-sites-cleanup--keep-pick) {
       flex: 1;
+      width: auto;
       min-width: 0;
       min-height: 56px;
-      padding: 8px 8px 8px 16px;
-      box-sizing: border-box;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      cursor: pointer;
+      padding: 8px 16px;
     }
 
     .od-sites-cleanup--keep-edit {

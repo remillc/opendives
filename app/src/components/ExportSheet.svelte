@@ -3,10 +3,11 @@
   // "Exporter au format…" of the logbook's selection
   // (docs/mockups/carnet-export-android.dc.html; spec, section 4, "Logbook
   // selection and export"): an MD3 modal bottom sheet with the formats as a
-  // radio list (64 dp rows with a description), the "Anonymiser" switch (off
+  // choice list (64 dp rows with a description, the chosen one tinted and checked), the "Anonymiser" switch (off
   // by default) and Annuler / Exporter. The last format is remembered on the
   // device.
   import { Sheet } from 'framework7-svelte';
+  import ChoiceRow from './ChoiceRow.svelte';
   import { t } from '../lib/i18n.js';
 
   /** @typedef {'ssrf'|'uddf'|'csv'|'csvProfiles'|'pdf'} ExportFormat */
@@ -42,13 +43,12 @@
     <p class="od-export-sheet--text">{t('export.text')}</p>
     <div class="od-export-sheet--formats" role="radiogroup" aria-labelledby="od-export-title">
       {#each FORMATS as f (f)}
-        <label class="od-export-sheet--format">
-          <input type="radio" name="od-export-format" value={f} bind:group={format} />
+        <ChoiceRow class="od-export-sheet--format" name="od-export-format" selected={format === f} onselect={() => (format = f)}>
           <span class="od-export-sheet--texts">
             <span class="od-export-sheet--headline">{t(`export.formats.${f}`)}</span>
             <span class="od-export-sheet--supporting">{t(`export.formatTexts.${f}`)}</span>
           </span>
-        </label>
+        </ChoiceRow>
       {/each}
     </div>
     <label class="od-export-sheet--switch-row">
@@ -106,7 +106,15 @@
       color: var(--od-text-2);
     }
 
-    .od-export-sheet--format,
+    :global(.od-export-sheet--format) {
+      min-height: 64px;
+      padding: 8px 12px;
+    }
+
+    .od-export-sheet--formats {
+      padding: 0 12px;
+    }
+
     .od-export-sheet--switch-row {
       min-height: 64px;
       padding: 8px 24px 8px 16px;
@@ -114,14 +122,6 @@
       align-items: center;
       gap: 16px;
       color: var(--od-text);
-    }
-
-    .od-export-sheet--format input {
-      flex: none;
-      width: 20px;
-      height: 20px;
-      margin: 0 2px;
-      accent-color: var(--od-primary-action);
     }
 
     .od-export-sheet--texts {
