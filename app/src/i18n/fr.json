@@ -1552,6 +1552,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Planificateur : « Simplifier le profil » dans le menu ⋮ remplace le profil mesuré de la plongée de départ par quelques niveaux (profondeur et durée) à modifier comme dans un nouveau plan ; « Annuler » rend le profil mesuré.",
       "Une plongée seule dans son voyage (un voyage d’une plongée, que le Carnet n’affiche pas comme voyage) ne propose plus « Retirer du voyage » ; un voyage sans nom s’affiche « Voyage du … » dans la fiche.",
       "Les étiquettes viennent juste sous les notes, dans la fiche d’une plongée comme dans « Modifier la plongée ».",
       "Réglages › Carnet : « Afficher les champs photos et vidéos », désactivé par défaut ; la section Photos et vidéos d’une plongée n’apparaît que s’il est activé. Rien n’est supprimé du carnet.",
@@ -1863,6 +1864,10 @@
     "date": "Date",
     "levels": "Niveaux",
     "levelsHelper": "La descente et la remontée sont ajoutées au calcul",
+    "simplify": "Simplifier le profil",
+    "simplified": "Profil simplifié",
+    "simplifyFailed": "Le profil n’a pas pu être simplifié.",
+    "levelsFromDive": "Niveaux tirés de la plongée, à modifier comme un nouveau plan. La descente et la remontée sont ajoutées au calcul",
     "addLevel": "Ajouter un niveau",
     "removeLevel": "Retirer ce niveau",
     "addGas": "Ajouter un gaz",

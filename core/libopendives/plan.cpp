@@ -716,7 +716,9 @@ planner_error_t run_plan(const PlanRun &run, struct dive &d, diveplan &dp, bool 
 	for (size_t i = 0; i < d.cylinders.size(); i++)
 		if (d.cylinders[i].depth.mm && d.cylinders[i].cylinder_use == OC_GAS)
 			plan_add_segment(dp, 0, d.cylinders[i].depth, static_cast<int>(i), 0, false, OC);
-	if (run.source) {
+	// A source dive with levels ("Simplifier le profil"): the dive gives the date
+	// and the surface interval, the levels give the profile.
+	if (run.source && run.levels.empty()) {
 		add_source_waypoints(dp, run.source, gas_of);
 	} else if (!run.levels.empty()) {
 		add_levels(dp, run.levels);

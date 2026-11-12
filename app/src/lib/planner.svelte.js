@@ -62,6 +62,8 @@ export const planner = $state({
   /** Local time of the plan, seconds; 0 until the core has chosen one. */
   when: 0,
   levels: /** @type {Level[]} */ ([{ depthMm: 15000, durationSeconds: 20 * 60 }]),
+  /** A plan from a logbook dive whose measured profile was replaced by `levels` ("Simplifier le profil"). */
+  simplified: false,
   /** The first one is the bottom gas. */
   gases: /** @type {PlanGas[]} */ ([{ o2Permille: 209, hePermille: 0, carriedMl: 0 }]),
   /** Water type as a salinity in kg per 10000 l. */
@@ -242,6 +244,7 @@ const o2Of = (c) => c.o2Permille || 209;
  */
 export function startFromDive(dive, source, prefs) {
   planner.source = source;
+  planner.simplified = false;
   planner.when = 0;
   const breathed = dive.cylinders.filter((c) => c.used && c.use === 'OC-gas');
   const bottom = bottomCylinder(dive.cylinders);
@@ -271,6 +274,7 @@ export function startFromDive(dive, source, prefs) {
  */
 export function startNewDive(prefs) {
   planner.source = null;
+  planner.simplified = false;
   planner.when = 0;
   planner.levels = [{ depthMm: plannerDefaults(prefs).depthMm, durationSeconds: 20 * 60 }];
   planner.gases = [{ o2Permille: 209, hePermille: 0, carriedMl: 0 }];
@@ -328,6 +332,7 @@ export function applyRequest(request, planId, source) {
   planner.source = source;
   planner.when = request.when ?? 0;
   planner.levels = request.levels?.length ? request.levels.map((l) => ({ ...l })) : planner.levels;
+  planner.simplified = !!(source && request.levels?.length);
   planner.gases = request.cylinders.map((c) => ({
     o2Permille: c.o2Permille,
     hePermille: c.hePermille,
@@ -366,9 +371,11 @@ export function nextGas() {
 export function planRequest() {
   const deco = planner.deco;
   return {
-    ...(planner.source
-      ? { sourceDiveId: planner.source.id }
-      : { levels: planner.levels.map((l) => ({ depthMm: Math.round(l.depthMm), durationSeconds: Math.round(l.durationSeconds) })) }),
+    // A simplified plan keeps its dive (date, surface interval) and takes the levels.
+    ...(planner.source ? { sourceDiveId: planner.source.id } : {}),
+    ...(!planner.source || planner.simplified
+      ? { levels: planner.levels.map((l) => ({ depthMm: Math.round(l.depthMm), durationSeconds: Math.round(l.durationSeconds) })) }
+      : {}),
     ...(planner.when ? { when: planner.when } : {}),
     ...(planner.kept ?? {}),
     bottomSacMlMin: Math.round(planner.bottomSacMlMin),
@@ -386,4 +393,41 @@ export function planRequest() {
       ...(g.sourceCylinder !== undefined ? { sourceCylinder: g.sourceCylinder } : {}),
     })),
   };
+}
+
+/** Whether the plan starts from a logbook dive and still uses its measured profile. */
+export const canSimplify = () => !!planner.source && !planner.simplified;
+
+/** Every field of the plan but the planner settings read back and the two counters. */
+const SNAPSHOT_SKIP = new Set(['setup', 'version', 'loaded']);
+
+/**
+ * A copy of the plan as it is, to bring it back with restorePlan.
+ * @returns {Record<string, any>}
+ */
+export function snapshotPlan() {
+  return JSON.parse(JSON.stringify(Object.fromEntries(Object.entries(planner).filter(([k]) => !SNAPSHOT_SKIP.has(k)))));
+}
+
+/** @param {Record<string, any>} snapshot from snapshotPlan */
+export function restorePlan(snapshot) {
+  Object.assign(planner, JSON.parse(JSON.stringify(snapshot)));
+  planner.loaded++;
+  planner.version++;
+}
+
+/**
+ * "Simplifier le profil": the plan of a logbook dive takes levels in place of
+ * the measured profile (the new-plan path), keeping the dive's date and surface
+ * interval, gases, SAC and conditions.
+ * @param {Level[]} levels
+ * @returns {Record<string, any>} the plan as it was, for restorePlan
+ */
+export function simplifyPlan(levels) {
+  const before = snapshotPlan();
+  planner.levels = levels.map((l) => ({ depthMm: l.depthMm, durationSeconds: l.durationSeconds }));
+  planner.simplified = true;
+  planner.loaded++;
+  planner.version++;
+  return before;
 }
