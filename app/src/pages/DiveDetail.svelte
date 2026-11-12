@@ -30,6 +30,7 @@
   import Stars from '../components/Stars.svelte';
   import { logbook, deleteDive, tripChange } from '../lib/logbook.svelte.js';
   import { layout } from '../lib/layout.svelte.js';
+  import { settings } from '../lib/settings.svelte.js';
   import { offerUndo } from '../lib/undo.js';
   import { confirmAction } from '../lib/dialogs.js';
   import { readySiteMap } from '../lib/site-image.js';
@@ -642,7 +643,8 @@
       </section>
     {/if}
 
-    {#if dive.pictures > 0}
+    <!-- Only with "Afficher les champs photos et vidéos" (off by default, task 2026-11-12-65); the pictures stay in the logbook. -->
+    {#if dive.pictures > 0 && settings.showPhotos}
       <section class="od-dive-detail--section">
         <h2 class="od-dive-detail--section-title">{t('detail.photos')}</h2>
         <div class="od-dive-detail--group">

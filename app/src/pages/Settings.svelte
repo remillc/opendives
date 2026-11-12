@@ -408,6 +408,7 @@
           }
         } },
         { kind: 'switch', id: 'extraEnvironmental', label: t('settings.extraConditions.label'), text: t('settings.extraConditions.text'), checked: p.extraEnvironmental, set: (v) => setCore({ extraEnvironmental: v }) },
+        { kind: 'switch', id: 'showPhotos', label: t('settings.showPhotos.label'), text: t('settings.showPhotos.text'), checked: settings.showPhotos, set: (v) => setAppSetting('showPhotos', v) },
         { kind: 'switch', id: 'salinityEdit', label: t('settings.salinity.label'), text: t('settings.salinity.text'), checked: p.salinityEdit, set: (v) => setCore({ salinityEdit: v }) },
         {
           kind: 'choice',

@@ -772,6 +772,10 @@
         "salt": "1 030 g/L",
         "en13319": "Norme des ordinateurs, 1 020 g/L"
       }
+    },
+    "showPhotos": {
+      "label": "Afficher les champs photos et vidéos",
+      "text": "Dans le détail et la modification d’une plongée"
     }
   },
   "gas": {
@@ -1548,6 +1552,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Réglages › Carnet : « Afficher les champs photos et vidéos », désactivé par défaut ; la section Photos et vidéos d’une plongée n’apparaît que s’il est activé. Rien n’est supprimé du carnet.",
       "Les notes viennent juste sous Personnes, dans la fiche d’une plongée comme dans « Modifier la plongée ».",
       "« Modifier la plongée » : « Personnes » et « Notes » sont deux cartes ; les notes viennent juste avant « Avancé ».",
       "Étiquettes juste sous Équipement, dans la fiche d’une plongée comme dans « Modifier la plongée » (où elles ont leur propre carte).",

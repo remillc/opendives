@@ -36,6 +36,8 @@ export const DEFAULT_SAC_FACTOR = 200;
  *   OpenDives itself (the core only knows seconds and decimal): -35.4485, 35° 26.9′ S, 35° 26′ 54.6″ S
  * @property {'bar'|'ata'} ppUnit label of every partial pressure; the number never changes (1 bar = 1 ATA).
  *   Per device, never in the logbook. Métrique implies bar, Impérial ATA (pp-unit.js).
+ * @property {boolean} showPhotos "Afficher les champs photos et vidéos" (advanced, off by default,
+ *   task 2026-11-12-65): the Photos et vidéos section of the dive detail. Per device, never in the logbook.
  * @property {boolean} showAllBluetooth the Bluetooth scan shows every device, not only dive computers
  * @property {'system'|'letter'|'a4'} paperSize the PDF sheet of a dive: "system" follows the
  *   device's region (US Letter where it is used, A4 elsewhere)
@@ -58,6 +60,7 @@ const APP_DEFAULTS = {
   coordinatesFormat: 'decimal',
   ppUnit: 'bar',
   showAllBluetooth: false,
+  showPhotos: false,
   paperSize: 'system',
   defaultWater: 'salt',
   downloadWater: 'none',
