@@ -743,8 +743,13 @@
     "downloadWater": {
       "label": "Type d’eau des plongées téléchargées",
       "text": "Quand l’ordinateur de plongée ne l’indique pas",
-      "intro": "Pour les plongées dont l’ordinateur ne donne pas le type d’eau. Les plongées déjà dans le carnet ne changent pas.",
-      "none": "Non précisé"
+      "none": "Non précisé",
+      "help": {
+        "none": "L’app n’écrit rien",
+        "fresh": "Lacs et carrières, 1 000 g/L",
+        "salt": "1 030 g/L",
+        "en13319": "Norme des ordinateurs, 1 020 g/L"
+      }
     }
   },
   "gas": {
@@ -1518,6 +1523,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Réglages : chaque choix dans une courte liste (format de la date et de l’heure, durée, vitesses, coordonnées GPS, langue, thème, taille du texte, bouteilles par défaut, type d’eau des plongées téléchargées) s’ouvre en menu sur la ligne touchée, au lieu d’une boîte de dialogue à boutons radio. Touchez une valeur pour la choisir ; touchez à côté ou faites Retour pour fermer sans changer.",
       "Réglages › Équipement : « Proposer les tailles standard » est désactivé par défaut ; le choix du type de bouteille montre vos propres types et ceux du carnet.",
       "Réglages : le groupe « Conditions par défaut » devient « Conditions des outils » et passe après « Décompression ».",
       "Détail d’une plongée : « Gaz et équipement » devient deux sections. Gaz dessine chaque bouteille avec son gaz, son usage et sa taille, et sa pression du départ à la fin ; la partie entre la pression de fin et celle de départ est pâle, avec une ligne pointillée à chaque niveau. Sous les bouteilles, une ligne dit les changements de gaz et leur profondeur. Équipement est replié : la combinaison et le lest total ; touchez-le pour voir le lest par emplacement. « Modifier la plongée » montre le même dessin.",

@@ -12,7 +12,7 @@
   import { Page, Navbar, Link, f7 } from 'framework7-svelte';
   import { showSnackbar } from '../lib/snackbar.js';
   import { OpenDivesCore } from 'opendives-core';
-  import ChoiceDialog from '../components/ChoiceDialog.svelte';
+  import RowMenu from '../components/RowMenu.svelte';
   import ButtonGroup from '../components/ButtonGroup.svelte';
   import MenuButton from '../components/MenuButton.svelte';
   import { layout, ios } from '../lib/layout.svelte.js';
@@ -65,7 +65,7 @@
   let renumbering = $state(false);
   const UNIT_SYSTEMS = /** @type {const} */ (['metric', 'imperial', 'personalize']);
 
-  /** @type {{ kind: 'choice', row: Extract<Row, {kind: 'choice'}>, options: Option[] } | { kind: 'number', row: Extract<Row, {kind: 'number'}> } | null} */
+  /** @type {{ kind: 'choice', row: Extract<Row, {kind: 'choice'}>, options: Option[], anchor: HTMLElement } | { kind: 'number', row: Extract<Row, {kind: 'number'}> } | null} */
   let dialog = $state(null);
 
   /** @param {unknown} e */
@@ -167,7 +167,6 @@
       label,
       value: settings[key] || t('settings.defaultCylinder.none'),
       current: settings[key],
-      note: t('settings.defaultCylinder.listNote'),
       options: () => cylinderChoices(p),
       set: (v) => setAppSetting(key, v),
     };
@@ -398,8 +397,7 @@
           text: t('settings.downloadWater.text'),
           value: downloadWaterName(settings.downloadWater),
           current: settings.downloadWater,
-          note: t('settings.downloadWater.intro'),
-          options: () => /** @type {const} */ (['none', 'fresh', 'salt', 'en13319']).map((id) => ({ value: id, label: downloadWaterName(id) })),
+          options: () => /** @type {const} */ (['none', 'fresh', 'salt', 'en13319']).map((id) => ({ value: id, label: downloadWaterName(id), example: t(`settings.downloadWater.help.${id}`) })),
           set: (v) => setAppSetting('downloadWater', /** @type {'none'|'fresh'|'salt'|'en13319'} */ (v)),
         },
       ],
@@ -415,7 +413,6 @@
           text: t('settings.defaultCylinder.text'),
           value: p.defaultCylinder || t('settings.defaultCylinder.none'),
           current: p.defaultCylinder,
-          note: t('settings.defaultCylinder.listNote'),
           options: () => cylinderChoices(p),
           set: (v) => setCore({ defaultCylinder: v }),
         },
@@ -687,11 +684,11 @@
 
   // --- Actions ------------------------------------------------------------------
 
-  /** @param {Row} row */
-  async function open(row) {
+  /** @param {Row} row @param {HTMLElement} anchor the touched row, where a choice menu opens */
+  async function open(row, anchor) {
     if (row.kind === 'choice') {
       try {
-        dialog = { kind: 'choice', row, options: await row.options() };
+        dialog = { kind: 'choice', row, options: await row.options(), anchor };
       } catch (e) {
         failed(e);
       }
@@ -810,8 +807,8 @@
       class="od-settings--row"
       class:od-settings--dimmed={'dimmed' in row && row.dimmed}
       disabled={row.kind === 'link' && row.disabled}
-      aria-haspopup={row.kind === 'link' ? undefined : 'dialog'}
-      onclick={() => open(row)}
+      aria-haspopup={row.kind === 'link' ? undefined : row.kind === 'choice' ? 'listbox' : 'dialog'}
+      onclick={(e) => open(row, e.currentTarget)}
     >
       <span class="od-settings--texts">
         <span class="od-settings--label">{row.label}</span>
@@ -948,17 +945,13 @@
 
 {#if dialog?.kind === 'choice'}
   {@const row = dialog.row}
-  <ChoiceDialog
-    title={row.title ?? row.label}
+  <RowMenu
+    anchor={dialog.anchor}
+    label={row.label}
     options={dialog.options}
     value={row.current}
-    note={row.note}
-    oncancel={() => (dialog = null)}
-    onselect={(v) => {
-      const chosen = row; // read before the dialog closes: row comes from it
-      dialog = null;
-      if (v !== chosen.current) chosen.set(v);
-    }}
+    onclose={() => (dialog = null)}
+    onselect={(v) => row.set(v)}
   />
 {:else if dialog?.kind === 'number'}
   {@const row = dialog.row}

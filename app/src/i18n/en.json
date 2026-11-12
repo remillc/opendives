@@ -743,8 +743,13 @@
     "downloadWater": {
       "label": "Water type of downloaded dives",
       "text": "When the dive computer does not give it",
-      "intro": "For dives whose computer gives no water type. Dives already in the logbook do not change.",
-      "none": "Not specified"
+      "none": "Not specified",
+      "help": {
+        "none": "The app writes nothing",
+        "fresh": "Lakes and quarries, 1,000 g/L",
+        "salt": "1,030 g/L",
+        "en13319": "Standard used by dive computers, 1,020 g/L"
+      }
     }
   },
   "gas": {
@@ -1518,6 +1523,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Settings: every choice in a short list (date and time format, duration, speeds, GPS coordinates, language, theme, text size, default cylinders, water type of downloaded dives) opens as a menu on the touched row instead of a radio-button dialog. Tap a value to choose it; tap outside or press Back to close without changing.",
       "Settings › Equipment: “Offer standard sizes” is off by default; the cylinder type choice shows your own types and those of the logbook.",
       "Settings: the “Default conditions” group becomes “Tool conditions” and moves after “Decompression”.",
       "Dive detail: “Gas and equipment” is now two sections. Gas shows a drawing of each cylinder with its gas, its use and size, and its pressure from start to end; the part between the end and the start pressure is pale, with a dashed line at each level. Under the cylinders, one line tells the gas changes and their depth. Equipment is collapsed: the suit and the total weight; tap it to see the weights by location. “Edit dive” shows the same drawing.",
