@@ -990,7 +990,7 @@
     "addCylinder": "Ajouter une bouteille",
     "cylinderInUse": "Une bouteille utilisée dans le profil ne peut pas être retirée. Rien n’a changé.",
     "gasGroup": "Gaz",
-    "gasHelper": "Couleur pâle : pression au départ. Couleur pleine : pression en fin de plongée. Touchez une bouteille pour la modifier, ou la flèche pour toutes les bouteilles et les changements de gaz.",
+    "gasHelper": "Touchez une bouteille pour la modifier, ou la flèche pour toutes les bouteilles et les changements de gaz.",
     "cylinderOpen": "Bouteille {n}, {gas}. Modifier",
     "gasOpen": "Toutes les bouteilles et les changements de gaz",
     "noCylinders": "Aucune bouteille",
@@ -1542,6 +1542,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "« Modifier la plongée » : le texte sous le résumé Gaz n’explique plus les couleurs.",
       "Fiche d’une plongée : la carte Équipement n’a plus de chevron quand l’ouvrir n’afficherait rien de plus (un seul lest sans emplacement).",
       "Plongée en recycleur : la bouteille en circuit ouvert s’appelle « Secours (bailout) » dans le choix de son utilisation ; le carnet n’est pas modifié.",
       "Menu : choisir une section depuis les Réglages ou À propos ferme ces écrans et montre la section, même celle qui était dessous (avant, « Carnet » choisi depuis les Réglages ne faisait rien).",

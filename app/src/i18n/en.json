@@ -990,7 +990,7 @@
     "addCylinder": "Add a cylinder",
     "cylinderInUse": "A cylinder used in the profile cannot be removed. Nothing changed.",
     "gasGroup": "Gas",
-    "gasHelper": "Pale colour: pressure at the start. Full colour: pressure at the end of the dive. Tap a cylinder to edit it, or the arrow for all the cylinders and the gas changes.",
+    "gasHelper": "Tap a cylinder to edit it, or the arrow for all the cylinders and the gas changes.",
     "cylinderOpen": "Cylinder {n}, {gas}. Edit",
     "gasOpen": "All cylinders and gas changes",
     "noCylinders": "No cylinder",
@@ -1542,6 +1542,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "“Edit dive”: the text under the Gas summary no longer explains the colours.",
       "Dive detail: the Equipment card has no chevron when opening it would show nothing more (one weight without a location).",
       "Rebreather dives: the open-circuit cylinder is called “Bailout” in the choice of its use; the logbook does not change.",
       "Menu: choosing a section from Settings or About closes them and shows the section, even the one underneath (before, choosing “Logbook” from Settings did nothing).",
