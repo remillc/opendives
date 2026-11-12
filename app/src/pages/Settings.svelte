@@ -876,11 +876,6 @@
     {/if}
   {/if}
 
-  {#if group('conditions').rows.length}
-    {@render groupView('conditions')}
-    <p class="od-settings--note">{t('settings.conditions.note')}</p>
-  {/if}
-
   {@render groupView('logbook')}
   {@render groupView('equipment')}
   {@render groupView('profile')}
@@ -895,6 +890,12 @@
       {#each group('deco').rows as row (row.id)}<div role="listitem">{@render rowView(row)}</div>{/each}
     </div>
     <p class="od-settings--note">{t('settings.deco.note')}</p>
+  {/if}
+
+  <!-- Used by the tools only (task 2026-11-12-47): after Décompression. -->
+  {#if group('conditions').rows.length}
+    {@render groupView('conditions')}
+    <p class="od-settings--note">{t('settings.conditions.note')}</p>
   {/if}
 
   {@render groupView('partialPressures')}
