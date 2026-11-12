@@ -1458,7 +1458,7 @@ Replaces tasks 32 and 35 (dropdowns, not to be built) and the dropdown form of t
 
 Done in `WheelField.svelte` (`od-wheel-field`), `wheel-rules.js` (steps, snapping, clamping, fling), `Planner.svelte` (gases, the two SACs and altitude as wheels; the planner's vertical rhythm set to the mock-up's) and System design sections 3 and 8. The haptic tick uses `navigator.vibrate` where it exists (Capacitor Haptics is not a dependency).
 
-## [ ] 2026-11-11-37 Planner: a title when saving a new plan, then back to the list
+## [x] 2026-11-11-37 Planner: a title when saving a new plan, then back to the list
 
 Mock-ups: `docs/mockups/android-planificateur-titre.dc.html` (dialog), `docs/mockups/android-plans-enregistre.dc.html` (list after saving).
 - **Title dialog.** On a new plan, "Enregistrer" opens an MD3 basic dialog "Enregistrer le plan" with one filled text field "Titre", focused with the keyboard open, and the buttons "Annuler" (closes, nothing saved) and "Enregistrer". No helper text. A reopened plan saves without the dialog, as today (it keeps its title).
@@ -1468,6 +1468,8 @@ Mock-ups: `docs/mockups/android-planificateur-titre.dc.html` (dialog), `docs/moc
 - **List rows** show the title in place of the site ("Sans plongée de départ" is no longer shown).
 - **Storage: Wait.** The core has no title field on a dive. Before writing anything, check what Subsurface desktop shows and keeps for a planned dive, and report the options to Christian in the chat with what each one does in Subsurface: (a) the dive's location / site (creates a site), (b) the first line of the notes (Subsurface's planner already writes its plan into the notes), (c) a tag, (d) anything better you find. The design session leans towards the notes, without certainty. Never break a log read by Subsurface.
 - Release notes line once built.
+
+Done in `feature/plan-title` (10d8e4a), with Christian's choice of task 2026-11-12-70: the title is kept in the extra data of the planned dive's first dive computer, key "OpenDives title" (`save_plan(..., title)`, same undoable step as the plan; an empty title writes no key; `list_plans` returns it; notes, site and tags untouched; tests/edit_roundtrip.cpp `plans` mode checks save, undo/redo, git reload and removal). A new plan opens "Enregistrer le plan" (`PlanTitleDialog`, pre-filled with the starting dive's site), a reopened plan saves without it; the list shows the title or "Plan du <date>" in the variant colour, highlights the saved row for 2 s, scrolls to it, snackbar "Plan enregistré" with the "Nouveau plan" FAB moving up. Checked on the phone emulator (saved with a title on the test account, then deleted). Release lock: planner save code changed.
 
 ## [x] 2026-11-11-38 Planner: back to dropdown menus instead of wheels
 
@@ -1855,7 +1857,7 @@ Christian asks for your answer on task 2026-11-11-37 (title when saving a new pl
 **Christian's choice (12 November 2026): (d) only**, the extra data of the dive computer, key "OpenDives title"; the notes are not touched. Task 2026-11-11-37 is built with it.
 
 
-## [ ] 2026-11-12-71 SAC fields: editable dropdown, presets 0 to 2 by 0.5
+## [x] 2026-11-12-71 SAC fields: editable dropdown, presets 0 to 2 by 0.5
 
 Christian's request, for **every SAC field** (planner "Au fond" and "Pendant la déco", Réglages du planificateur, tablet planner and settings). Spec: new paragraph "SAC fields: editable dropdown". Mock-up: `android-planificateur-sac` (list open). This replaces the dropdown in steps of 0.01 cuft/min / 0.5 L/min of tasks 33 and 38.
 - Same filled field with its down chevron, but editable (combobox, `role="combobox"`, `aria-expanded`): the chevron or a tap opens a list of presets; typing in the field is allowed.
@@ -1864,9 +1866,14 @@ Christian's request, for **every SAC field** (planner "Au fond" and "Pendant la 
 - Helper while the list is open: "Choisissez une valeur ou tapez la vôtre, à deux décimales."
 - Tablet and iOS: the same behaviour. A line in the release notes.
 
-## [ ] 2026-11-12-72 Altitude fields: editable dropdown
+Done in `feature/plan-title` (e047166, 5895a52): `NumberComboField` (role combobox, aria-expanded, presets list, typing) with `SacField`: planner Au fond and Pendant la déco and the planner settings; presets in one constant (`lib/sac-field.js`: 0,0 to 2,0 cuft/min, 0 to 60 L/min, metric still to be confirmed by Christian); typed values kept to two decimals, clamped; helper while open. `roundSacMl` now rounds to 0.01 L/min (its own commit). The core accepts a SAC of 0 (it only multiplies). Checked on the phone emulator.
+
+## [x] 2026-11-12-72 Altitude fields: editable dropdown
 
 Christian's request: every Altitude field uses the same editable dropdown as the SAC fields (task 71): planner Conditions, Réglages du planificateur if it has one, Settings › Conditions des outils, tablet screens. Spec: new paragraph "Altitude fields: editable dropdown". Mock-up: `android-planificateur-altitude` (list open).
 - Presets, imperial: 0, 1 000, 2 000, 3 000, 4 000, 5 000, 6 000, 8 000, 10 000 ft. Metric: 0, 300, 600, 900, 1 200, 1 500, 2 000, 2 500, 3 000 m (from a web and forum survey: altitude diving starts at 300 m / 1 000 ft, tables step by 1 000 ft, dive computers stop around 3 000 m).
 - Typing any whole value is allowed, clamped to 0–4 500 m (0–15 000 ft). The current value is tinted in the list when it is a preset. No helper text needed beyond the existing ones.
 - Tablet and iOS: the same. A line in the release notes.
+
+Done in `feature/plan-title` (7437210, a9efe8d): `AltitudeField` on the same component, in the planner Conditions and Settings › Conditions des outils; presets of the task (`lib/altitude-field.js`, tested), whole values clamped to 0–4500 m / 0–15000 ft; the preset tests updated in their own commit.
+
