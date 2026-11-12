@@ -1791,9 +1791,12 @@ Christian's request. Spec: new paragraph "Photos and videos fields" in `docs/ui-
 
 Done in `feature/photos-setting`: app setting `showPhotos` (per device, default off, back to off by the reset through APP_DEFAULTS) with its switch in Settings › Carnet right after the surface waves switch; the dive detail shows "Photos et vidéos" only when it is on (phone, tablet, iOS share the file). Modifier la plongée has no photo or video field or action today, so nothing to hide there.
 
-## [ ] 2026-11-12-66 Étiquettes right under Notes (replaces the place given in task 62)
+## [x] 2026-11-12-66 Étiquettes right under Notes (replaces the place given in task 62)
 
 Christian's correction, in every view of a dive. Task 62 put Étiquettes under Équipement: **ignore that place**, Étiquettes goes right under Notes. Final order:
 - **Dive detail** (phone light, dark, cursor, menu open, tablet detail panes): data grid, Personnes, Notes, **Étiquettes**, Gaz, Équipement, Conditions, Photos et vidéos (when the task 65 setting is on).
 - **Modifier la plongée** (phone, cylinder sheet background, tablet edit dialogs): La plongée, Personnes, Notes, **Étiquettes**, Gaz, Équipement, Conditions, Avancé.
 - Mock-ups updated: `detail3-android*`, `detail2-android-menu`, `android-edition`, `android-edition-bouteille`, `android-tablette-*`. iOS: the same order.
+
+Done in `feature/tags-under-notes`: the detail shows Personnes, Notes, Étiquettes, Gaz, Équipement, Conditions, Photos et vidéos; Modifier la plongée shows La plongée, Personnes, Notes, Étiquettes, Gaz, Équipement, Conditions, Avancé. Phone, tablet and iOS share both files.
+
