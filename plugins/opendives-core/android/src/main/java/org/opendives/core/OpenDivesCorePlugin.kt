@@ -1228,6 +1228,28 @@ class OpenDivesCorePlugin : Plugin() {
         call.resolve(bluetoothStatusObject())
     }
 
+    /**
+     * The gauge camera: a full-screen camera (GaugeCameraActivity) that reads cylinder
+     * pressures from a photo. `options` carries every visible text (title, subtitle,
+     * hintMain, hintSub, flash, photos, photosDescription, shutter, manual, close,
+     * nothingTitle, nothingText, permissionReason, permissionButton, permissionDenied,
+     * cameraFailed) and `nothingRead` to open on the alert. Resolves with
+     * {action: "cancelled"}, {action: "manual"} or {action: "photo", thumbnail (base64 JPEG),
+     * blocks: [{text, left, top, right, bottom, confidence}]}.
+     */
+    @PluginMethod
+    fun gaugeCamera(call: PluginCall) {
+        val intent = Intent(context, GaugeCameraActivity::class.java)
+        intent.putExtra("options", call.data.toString())
+        startActivityForResult(call, intent, "gaugeCameraResult")
+    }
+
+    @ActivityCallback
+    private fun gaugeCameraResult(call: PluginCall, result: ActivityResult) {
+        val json = result.data?.getStringExtra("result")
+        if (json == null) call.resolve(JSObject().put("action", "cancelled")) else call.resolve(JSObject(json))
+    }
+
     /** The first screen is drawn: the launch screen can go (see SplashGate). */
     @PluginMethod
     fun contentShown(call: PluginCall) {

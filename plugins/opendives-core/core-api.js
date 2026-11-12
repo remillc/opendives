@@ -36,6 +36,40 @@ import { registerPlugin } from '@capacitor/core';
  */
 
 /**
+ * Every visible text of the gauge camera (it is native: the app passes the translated texts).
+ * @typedef {Object} GaugeCameraOptions
+ * @property {string} title "Pression de début"
+ * @property {string} subtitle cylinder and gas
+ * @property {string} hintMain
+ * @property {string} hintSub
+ * @property {string} flash accessible name of the flash button
+ * @property {string} photos "Photos"
+ * @property {string} photosDescription accessible name of the gallery button
+ * @property {string} shutter
+ * @property {string} manual "Saisir à la main"
+ * @property {string} close
+ * @property {string} nothingTitle
+ * @property {string} nothingText
+ * @property {string} permissionReason why the camera permission is asked
+ * @property {string} permissionButton
+ * @property {string} permissionDenied
+ * @property {string} cameraFailed
+ * @property {boolean} [nothingRead] open on the "nothing read" alert
+ */
+
+/**
+ * A piece of text found in a picture; the box is in fractions (0 to 1) of the analysed picture.
+ * @typedef {{text: string, left: number, top: number, right: number, bottom: number, confidence: number}} GaugeTextBlock
+ */
+
+/**
+ * How the gauge camera ended: closed, "Saisir à la main", or a picture that contained text
+ * (a picture with none keeps the camera open on its alert). thumbnail: base64 JPEG of the
+ * analysed area; the picture itself is never kept.
+ * @typedef {{action: 'cancelled'|'manual'} | {action: 'photo', thumbnail: string, blocks: GaugeTextBlock[]}} GaugeCameraResult
+ */
+
+/**
  * A dive in the logbook list.
  * @typedef {Object} Dive
  * @property {number} id identifier valid until the next load (for getDive)
@@ -675,6 +709,8 @@ import { registerPlugin } from '@capacitor/core';
  *   The system dialog that turns Bluetooth on.
  * @property {() => Promise<void>} openAppSettings
  *   The app's page of the system settings (a permission refused for good).
+ * @property {(options: GaugeCameraOptions) => Promise<GaugeCameraResult>} gaugeCamera
+ *   Android: the full-screen camera that reads cylinder pressures (see GaugeCameraResult).
  * @property {() => Promise<void>} contentShown
  *   The first screen is drawn: the launch screen (splash) can go (Android; no effect elsewhere).
  * @property {(options?: {durationMs?: number}) => Promise<void>} startBluetoothScan
@@ -860,6 +896,7 @@ export const OpenDivesCore = {
   enableBluetooth: () => native.enableBluetooth(),
   openAppSettings: () => native.openAppSettings(),
   contentShown: () => native.contentShown(),
+  gaugeCamera: (options) => native.gaugeCamera(options),
   startBluetoothScan: (options = {}) => native.startBluetoothScan(options),
   stopBluetoothScan: () => native.stopBluetoothScan(),
   async bluetoothModels() {

@@ -51,4 +51,11 @@ dependencies {
     implementation "androidx.activity:activity:${rootProject.ext.androidxActivityVersion}"
     // Offline map downloads: background work with a foreground notification.
     implementation "androidx.work:work-runtime:2.10.0"
+    // The gauge camera (pressures read from a photo): the live preview and the still capture.
+    implementation "androidx.camera:camera-core:1.4.1"
+    implementation "androidx.camera:camera-camera2:1.4.1"
+    implementation "androidx.camera:camera-lifecycle:1.4.1"
+    implementation "androidx.camera:camera-view:1.4.1"
+    // Text recognition on the device (Latin), with its model inside the app: no download, no network.
+    implementation "com.google.mlkit:text-recognition:16.0.1"
 }
