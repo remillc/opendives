@@ -60,14 +60,6 @@ export const mbarToPressure = (mbar, psi) => (psi ? mbar / MBAR_PER_PSI : mbar /
 export const gasTotalMl = (cylinder) => cylinder.gasUsedMl + cylinder.reserveMl;
 
 /**
- * The alarm of "Volume transporté": the diver gave the volume carried (above
- * zero) and it is less than the volume needed.
- * @param {number} carriedMl 0: not given
- * @param {number} totalMl
- */
-export const isShort = (carriedMl, totalMl) => carriedMl > 0 && carriedMl < totalMl;
-
-/**
  * The alarm of the bottom gas: it is too rich for the deepest point of the plan
  * at the ppO2 for the bottom (`bottomModMm`, 0 or less when the gas has none).
  * @param {number} maxDepthMm

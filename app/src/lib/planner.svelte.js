@@ -48,8 +48,8 @@ const DECO_SAC_DEFAULT = 17000;
 
 /**
  * A gas of the plan. `sourceCylinder`: the cylinder of the logbook dive it
- * stands for. `carriedMl`: the volume the diver carries, optional (0: not given).
- * @typedef {{ o2Permille: number, hePermille: number, carriedMl: number, sourceCylinder?: number }} PlanGas
+ * stands for.
+ * @typedef {{ o2Permille: number, hePermille: number, sourceCylinder?: number }} PlanGas
  */
 
 /** @typedef {{ decoModel: 'buehlmann'|'vpmb', gfLow: number, gfHigh: number, vpmbConservatism: number }} PlanDeco */
@@ -65,7 +65,7 @@ export const planner = $state({
   /** A plan from a logbook dive whose measured profile was replaced by `levels` ("Simplifier le profil"). */
   simplified: false,
   /** The first one is the bottom gas. */
-  gases: /** @type {PlanGas[]} */ ([{ o2Permille: 209, hePermille: 0, carriedMl: 0 }]),
+  gases: /** @type {PlanGas[]} */ ([{ o2Permille: 209, hePermille: 0 }]),
   /** Water type as a salinity in kg per 10000 l. */
   salinity: 10300,
   surfacePressureMbar: 1013,
@@ -252,10 +252,9 @@ export function startFromDive(dive, source, prefs) {
     ? [bottom, ...breathed.filter((c) => c !== bottom && o2Of(c) > o2Of(bottom))].map((c) => ({
         o2Permille: o2Of(c),
         hePermille: c.hePermille,
-        carriedMl: 0,
         sourceCylinder: dive.cylinders.indexOf(c),
       }))
-    : [{ o2Permille: 209, hePermille: 0, carriedMl: 0 }];
+    : [{ o2Permille: 209, hePermille: 0 }];
   if (dive.sacMlMin > 0) planner.bottomSacMlMin = dive.sacMlMin;
   else planner.bottomSacMlMin = planner.setup?.bottomSacMlMin ?? BOTTOM_SAC_DEFAULT;
   planner.decoSacMlMin = planner.setup?.decoSacMlMin ?? DECO_SAC_DEFAULT;
@@ -277,7 +276,7 @@ export function startNewDive(prefs) {
   planner.simplified = false;
   planner.when = 0;
   planner.levels = [{ depthMm: plannerDefaults(prefs).depthMm, durationSeconds: 20 * 60 }];
-  planner.gases = [{ o2Permille: 209, hePermille: 0, carriedMl: 0 }];
+  planner.gases = [{ o2Permille: 209, hePermille: 0 }];
   planner.salinity = salinityOfWaterType(settings.defaultWater);
   planner.surfacePressureMbar = altitudeToPressureMbar(settings.defaultAltitudeMm);
   planner.bottomSacMlMin = planner.setup?.bottomSacMlMin ?? BOTTOM_SAC_DEFAULT;
@@ -336,7 +335,6 @@ export function applyRequest(request, planId, source) {
   planner.gases = request.cylinders.map((c) => ({
     o2Permille: c.o2Permille,
     hePermille: c.hePermille,
-    carriedMl: c.carriedMl ?? 0,
     ...(c.sourceCylinder !== undefined ? { sourceCylinder: c.sourceCylinder } : {}),
   }));
   planner.salinity = request.salinity ?? 10300;
@@ -360,7 +358,7 @@ export function applyRequest(request, planId, source) {
 /** The next gas added: EAN50, then oxygen. @returns {PlanGas} */
 export function nextGas() {
   const has50 = planner.gases.some((g) => g.o2Permille === 500);
-  return { o2Permille: has50 ? 1000 : 500, hePermille: 0, carriedMl: 0 };
+  return { o2Permille: has50 ? 1000 : 500, hePermille: 0 };
 }
 
 /**
@@ -389,7 +387,6 @@ export function planRequest() {
     cylinders: planner.gases.map((g) => ({
       o2Permille: g.o2Permille,
       hePermille: g.hePermille,
-      ...(g.carriedMl > 0 ? { carriedMl: Math.round(g.carriedMl) } : {}),
       ...(g.sourceCylinder !== undefined ? { sourceCylinder: g.sourceCylinder } : {}),
     })),
   };
