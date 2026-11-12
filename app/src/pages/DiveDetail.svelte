@@ -16,7 +16,7 @@
   import Icon from '../components/Icon.svelte';
   import GasCard from '../components/GasCard.svelte';
   import EquipmentCard from '../components/EquipmentCard.svelte';
-  import { equipmentLabel, equipmentOpens, fillLevels, gasChangeLine, gasChanges, gasGroupLabel } from '../lib/gas-summary.js';
+  import { cylinderListed, equipmentLabel, equipmentOpens, fillLevels, gasChangeLine, gasChanges, gasGroupLabel, unusedShown } from '../lib/gas-summary.js';
   import { gasName, typeHelper } from '../lib/cylinder-card.js';
   import { typeLine } from '../lib/gas-group.js';
   import FloatingToolbar from '../components/FloatingToolbar.svelte';
@@ -349,9 +349,10 @@
   const gasCylinders = $derived.by(() => {
     if (!dive) return [];
     return dive.cylinders
-      .filter((c) => c.used)
+      .filter((c) => cylinderListed(c, prefs.includeUnusedTanks !== false))
       .map((c) => {
-        const levels = fillLevels(c.startMbar, c.endMbar, c.workingPressureMbar);
+        const unused = unusedShown(c);
+        const levels = unused ? { end: 1, start: null } : fillLevels(c.startMbar, c.endMbar, c.workingPressureMbar);
         const size = typeHelper(formatCylinderSize(c.sizeMl, c.workingPressureMbar, prefs), c.workingPressureMbar);
         const use = c.use === 'diluent' || c.use === 'oxygen' ? t(`detail.cylinderUseNames.${c.use}`) : rebreather ? t('detail.cylinderUseNames.bailout') : '';
         return {
@@ -359,8 +360,11 @@
           line: typeLine(c.description, size, use),
           start: c.startMbar > 0 && c.endMbar > 0 ? pressureValue(c.startMbar) : '',
           end: c.endMbar > 0 ? formatPressure(c.endMbar, prefs) : '',
-          range:
-            c.startMbar > 0 && c.endMbar > 0
+          range: unused
+            ? unused.pressureMbar
+              ? formatPressure(unused.pressureMbar, prefs)
+              : t('edit.uses.not used')
+            : c.startMbar > 0 && c.endMbar > 0
               ? t('detail.pressureRange', { start: pressureValue(c.startMbar), end: formatPressure(c.endMbar, prefs) })
               : c.startMbar > 0
                 ? formatPressure(c.startMbar, prefs)

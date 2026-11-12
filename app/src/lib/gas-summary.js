@@ -116,6 +116,29 @@ export function equipmentLabel({ suit, weight, open, opens = true }, words) {
 }
 
 /**
+ * Whether a cylinder of a dive is listed (task 2026-11-12-56): all of them
+ * with "Afficher les bouteilles inutilisées" on, otherwise the core's rule
+ * (`used`: pressure drop, gas switch to it, CCR oxygen).
+ * @param {{ used: boolean }} cylinder
+ * @param {boolean} includeUnused
+ */
+export const cylinderListed = (cylinder, includeUnused) => includeUnused || cylinder.used;
+
+/**
+ * How a listed cylinder that was not used shows (task 2026-11-12-56): drawn
+ * full, without the pale band or the end line, its pressure line "Non
+ * utilisée" without pressures, or the one pressure when start equals end.
+ * Null for a cylinder that was used (the core's rule) or whose pressure drops.
+ * @param {{ used: boolean, startMbar: number, endMbar: number }} cylinder
+ * @returns {null|{ pressureMbar: number }}
+ */
+export function unusedShown(cylinder) {
+  const { used, startMbar, endMbar } = cylinder;
+  if (used || (startMbar > 0 && endMbar > 0 && startMbar > endMbar)) return null;
+  return { pressureMbar: startMbar > 0 ? startMbar : endMbar > 0 ? endMbar : 0 };
+}
+
+/**
  * Whether opening the Equipment card shows something more than the total
  * (Christian, 12 November 2026: no chevron when it would change nothing):
  * several weights, or one whose location is known.
