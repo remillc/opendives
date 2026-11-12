@@ -1797,3 +1797,11 @@ Christian's correction, in every view of a dive. Task 62 put Étiquettes under �
 - **Dive detail** (phone light, dark, cursor, menu open, tablet detail panes): data grid, Personnes, Notes, **Étiquettes**, Gaz, Équipement, Conditions, Photos et vidéos (when the task 65 setting is on).
 - **Modifier la plongée** (phone, cylinder sheet background, tablet edit dialogs): La plongée, Personnes, Notes, **Étiquettes**, Gaz, Équipement, Conditions, Avancé.
 - Mock-ups updated: `detail3-android*`, `detail2-android-menu`, `android-edition`, `android-edition-bouteille`, `android-tablette-*`. iOS: the same order.
+
+## [ ] 2026-11-12-67 Bug: "Retirer du voyage" shown for a dive that is not in a trip
+
+Christian reports that on `/dives/88554` the ⋮ menu of the dive detail shows "Retirer du voyage" although the dive is not part of a trip (as he sees it). `DiveDetail.svelte` shows it when `removableFromTrip` is true: `!!dive?.trip && (!dive.trip.autogen || more than one dive in that trip)`.
+- Find out what `dive.trip` is for 88554. Likely suspects: an automatic trip (`autogen`, from "Regrouper les plongées en voyages") that the detail header or the logbook does not show as a trip, or a stale trip reference.
+- Rule to apply: the item is shown only when the dive belongs to a trip the user can see as a trip in the logbook and in the detail header ("Voyage : …"). If the header shows no trip, the menu shows no "Retirer du voyage". Same rule for the logbook selection menu ("Retirer du voyage" with checked dives).
+- Add a test with a dive outside any trip and one in an automatic trip.
+- Tell Christian in your answer what 88554's trip actually was.
