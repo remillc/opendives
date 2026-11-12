@@ -57,7 +57,7 @@ h1,h2,h3,h4,h1 *,h2 *,h3 *,h4 *,[style*='font-size: 2'],[style*='font-size: 3'],
       </span>
       <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
         <span style="font-size: 16px; line-height: 24px; letter-spacing: 0.15px">Voyage du 2 février 2013</span>
-        <span style="font-size: 14px; line-height: 20px; color: #4A4D52">4 plongées, de 69 à 94 ft</span>
+        <span style="font-size: 14px; line-height: 20px; color: #4A4D52">4 plongées, de 69 à 94 pi</span>
       </span>
       <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #4A4D52; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M6 15l6-6 6 6"></path></svg>
     </button>
@@ -111,11 +111,11 @@ var P = {
   d1: [[0,1.4],[120,6.1],[240,9.0],[360,15.7],[480,24.9],[600,27.8],[720,28.7],[840,27.3],[960,27.4],[1080,26.5],[1200,25.2],[1320,25.2],[1440,23.1],[1560,21.9],[1680,20.1],[1800,21.3],[1920,21.8],[2040,20.9],[2160,20.1],[2280,14.5],[2400,14.8],[2520,16.3],[2640,15.9],[2760,16.0],[2880,16.3],[3000,8.2],[3120,5.8],[3240,5.7],[3360,5.9],[3480,4.8],[3600,3.5],[3640,1.9]]
 };
 var ROWS = [
-  { k: 'd9', site: 'Site à préciser', missing: true, date: '7 févr. 2026, 09:09', max: '91 ft', dur: '55 min' },
-  { k: 'd8', site: 'Site à préciser', missing: true, date: '27 sept. 2025, 11:55', max: '333 ft', dur: '102 min' },
-  { k: 'd7', site: 'Northern Arch', date: '24 avr. 2022, 10:30', max: '198 ft', dur: '104 min' },
-  { k: 'd6', site: 'Hälvälä', date: '23 mai 2015, 13:23', max: '261 ft', dur: '100 min' },
-  { k: 'd5', site: 'Lake Coleridge', date: '2 avr. 2014, 10:00', max: '128 ft', dur: '78 min' }
+  { k: 'd9', site: 'Site à préciser', missing: true, date: '7 févr. 2026, 9 h 09', max: '91 pi', dur: '55 min' },
+  { k: 'd8', site: 'Site à préciser', missing: true, date: '27 sept. 2025, 11 h 55', max: '333 pi', dur: '102 min' },
+  { k: 'd7', site: 'Northern Arch', date: '24 avr. 2022, 10 h 30', max: '198 pi', dur: '104 min' },
+  { k: 'd6', site: 'Hälvälä', date: '23 mai 2015, 13 h 23', max: '261 pi', dur: '100 min' },
+  { k: 'd5', site: 'Lake Coleridge', date: '2 avr. 2014, 10 h 00', max: '128 pi', dur: '78 min' }
 ];
 class Component extends DCLogic {
   renderVals() {
@@ -130,15 +130,15 @@ class Component extends DCLogic {
     });
 
     var TRIP = [
-      { k: 'd4', date: '4 févr. 2013, 08:47' },
-      { k: 'd3', date: '3 févr. 2013, 09:10' },
-      { k: 'd2', date: '2 févr. 2013, 14:05' },
-      { k: 'd1', date: '2 févr. 2013, 08:21' }
+      { k: 'd4', date: '4 févr. 2013, 8 h 47' },
+      { k: 'd3', date: '3 févr. 2013, 9 h 10' },
+      { k: 'd2', date: '2 févr. 2013, 14 h 05' },
+      { k: 'd1', date: '2 févr. 2013, 8 h 21' }
     ];
     var tripDives = TRIP.map(function (r) {
       var pts = P[r.k], mx = 0; pts.forEach(function (q) { if (q[1] > mx) mx = q[1]; });
       var p = prof(pts, 56, 40);
-      var ft = Math.round(mx / 0.3048) + ' ft', mn = Math.round(pts[pts.length - 1][0] / 60) + ' min';
+      var ft = Math.round(mx / 0.3048) + ' pi', mn = Math.round(pts[pts.length - 1][0] / 60) + ' min';
       return { checked: 'false', boxBorder: '#4A4D52', boxBg: 'transparent', mark: 0, rowBg: 'transparent', site: 'Site à préciser', siteColor: '#4A4D52', date: 'N° ' + r.k.slice(1) + ' · ' + r.date, max: ft, dur: mn, line: p.line, area: p.area, bottom: p.bottom, gid: 'av-' + r.k, alt: 'Profil, ' + ft + ' au plus profond' };
     });
     return { dives: dives, trip: trip, tripDives: tripDives };
