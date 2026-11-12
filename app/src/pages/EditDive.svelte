@@ -1012,7 +1012,6 @@
       {@render header(t('edit.peopleGroup'))}
       <ChipsField label={t('edit.guides')} bind:values={guides} suggestions={known.guide} supporting={t('edit.guidesHint')} />
       <ChipsField label={t('edit.buddies')} bind:values={buddies} suggestions={known.buddy} supporting={t('edit.buddiesHint')} />
-      <ChipsField label={t('edit.tags')} bind:values={tags} suggestions={known.tag} supporting={t('edit.tagsHint')} />
       <TextField label={t('edit.notes')} bind:value={f.notes} multiline />
       <div class="od-edit-dive--end"></div>
     </section>
@@ -1063,6 +1062,12 @@
           <p class="od-edit-dive--helper">{t('edit.mainComputerHelp')}</p>
         </div>
       {/if}
+    </section>
+
+    <!-- Étiquettes: a card of its own, between Équipement and Conditions (task 2026-11-12-62). -->
+    <section class="card od-edit-dive--card">
+      {@render header(t('edit.tagsGroup'))}
+      <ChipsField label={t('edit.tags')} bind:values={tags} suggestions={known.tag} supporting={t('edit.tagsHint')} />
     </section>
 
     <!-- Conditions -->
