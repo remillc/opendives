@@ -34,6 +34,8 @@
   import { ios } from '../lib/layout.svelte.js';
   import { WATER_TYPES, altitudeToPressureMbar, formatHoursMinutes, pressureToAltitudeMm, waterTypeName, waterTypeOfSalinity } from '../lib/tools.js';
   import { sharePlanPdf, sharePlanSummary } from '../lib/share.js';
+  import { planShareRows, sharePlanFile, sharePlanTableImage } from '../lib/slate-share.js';
+  import PlanSlate from '../components/PlanSlate.svelte';
   import { settings } from '../lib/settings.svelte.js';
   import { bottomVolumeKey } from '../lib/reserve-factor.js';
   import { MM_PER_FT, ML_PER_CUFT, O2_CHOICES, HE_CHOICES, depthToMm, gasTotalMl, gasValid, modAlarm, mmToDepth, roundSacMl } from '../lib/planner-rules.js';
@@ -56,6 +58,8 @@
   let started = $state(false);
   let choosing = $state(false);
   let sharing = $state(false);
+  let slating = $state(false);
+  let slateRequest = $state(/** @type {import('opendives-core').PlanRequest|null} */ (null));
   let saving = $state(false);
   let titling = $state(false);
   let decoOpen = $state(false);
@@ -600,13 +604,20 @@
     }
   }
 
-  /** @param {'pdf'|'summary'} kind */
+  /** @param {'slate'|'pdf'|'image'|'ssrf'|'summary'} kind */
   async function share(kind) {
     sharing = false;
     if (!result) return;
+    if (kind === 'slate') {
+      slateRequest = planRequest(); // the plan as it is now, for the time the slate is open
+      slating = true;
+      return;
+    }
     const title = planner.title || (planner.source ? planner.source.site || t('dive.siteNotSet') : t('plan.noStartDive'));
     try {
       if (kind === 'pdf') await sharePlanPdf(result, planRequest(), prefs, title);
+      else if (kind === 'image') await sharePlanTableImage(result, planRequest(), prefs, title);
+      else if (kind === 'ssrf') await sharePlanFile(planner.planId, title, result);
       else await sharePlanSummary(result, planRequest(), prefs, title);
     } catch (e) {
       console.error('Sharing the plan', e);
@@ -943,7 +954,11 @@
 {/if}
 
 {#if sharing}
-  <ShareSheet pdfText={t('plan.sharePdfText')} summaryLabel={t('plan.shareSummary')} summaryText={t('plan.shareSummaryText')} onpdf={() => share('pdf')} onsummary={() => share('summary')} onclose={() => (sharing = false)} />
+  <ShareSheet heading={t('plan.share')} rows={planShareRows(planner.planId > 0, share)} onclose={() => (sharing = false)} />
+{/if}
+
+{#if slating && result && slateRequest}
+  <PlanSlate {result} request={slateRequest} {prefs} title={planner.title || (planner.source ? planner.source.site || t('dive.siteNotSet') : t('plan.noStartDive'))} onclose={() => (slating = false)} />
 {/if}
 
 {#if dialog === 'date' && !ios}

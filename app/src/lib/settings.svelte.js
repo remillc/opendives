@@ -38,7 +38,13 @@ const UNIT_KEYS = /** @type {const} */ (['length', 'temperature', 'pressure', 'v
  *   task 2026-11-12-65): the Photos et vidéos section of the dive detail. Per device, never in the logbook.
  * @property {boolean} showAllBluetooth the Bluetooth scan shows every device, not only dive computers
  * @property {'system'|'letter'|'a4'} paperSize the PDF sheet of a dive: "system" follows the
- *   device's region (US Letter where it is used, A4 elsewhere)
+ *   device's region (US Letter where it is used, A4 elsewhere). Used by every printable PDF:
+ *   the dive sheet, the plan sheet, the water slate (task 2026-11-12-76)
+ * @property {'standard'|'small'|'full'} slateSize "Ardoise pour l’eau", Taille: the last choice (its
+ *   label follows the paper region, slate.js). Per device
+ * @property {'pdf'|'png'|'text'} slateFile "Ardoise pour l’eau", Fichier: the last choice
+ * @property {boolean} slatePlus5 "Ardoise pour l’eau": include the plan with 5 min more at the bottom
+ * @property {boolean} slatePlusDepth "Ardoise pour l’eau": include the plan 10 ft (3 m) deeper
  * @property {'fresh'|'salt'|'en13319'} defaultWater "Conditions par défaut": the water type a new
  *   plan and the gas calculator start from
  * @property {'none'|'fresh'|'salt'|'en13319'} downloadWater water type written on dives downloaded from a
@@ -64,6 +70,10 @@ const APP_DEFAULTS = {
   showAllBluetooth: false,
   showPhotos: false,
   paperSize: 'system',
+  slateSize: 'standard',
+  slateFile: 'pdf',
+  slatePlus5: true,
+  slatePlusDepth: true,
   defaultWater: 'salt',
   downloadWater: 'none',
   defaultAltitudeMm: 0,

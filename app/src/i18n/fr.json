@@ -744,9 +744,10 @@
     },
     "paperSize": {
       "label": "Format du papier",
-      "text": "Selon la région de l’appareil : {name}",
-      "letter": "Lettre US",
-      "a4": "A4"
+      "text": "{name}, selon la région",
+      "letter": "Lettre",
+      "a4": "A4",
+      "auto": "Automatique"
     },
     "conditions": {
       "waterType": "Type d’eau",
@@ -1552,6 +1553,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Planificateur : « Partager le plan » propose cinq choix : l’ardoise pour l’eau, la fiche PDF, l’image du tableau, le fichier de carnet (.ssrf) de la plongée planifiée et le résumé texte. L’ardoise est une carte de poche à imprimer (4 × 6 po ou A6, 3 × 5 po ou A7, ou pleine page) avec les plans de secours de votre choix : 5 min de plus au fond, 3 m (10 ft) de plus, ou un gaz de déco perdu, chacun recalculé par le planificateur et ajouté en colonne Fin ; en PDF à la taille réelle avec des traits de coupe, en image ou en texte. Vos derniers choix sont gardés. Réglages › Langue et formats › Format du papier : Automatique, Lettre ou A4, pour tous les PDF à imprimer.",
       "Planificateur : le gaz est écrit sur chaque ligne du tableau ; le gaz surligné marque un changement.",
       "Planificateur : le résultat liste toutes les lignes de la plongée, pas seulement les paliers : descente, niveaux prévus, remontées, paliers et remontée finale en surface, avec le début, la durée et la fin de chacune en minutes, les vitesses de descente et de remontée, et le gaz là où il change.",
       "Planificateur : en métrique, la liste des consommations (SAC) propose 10, 15, 20, 25 et 30 L/min ; on peut toujours taper sa valeur, jusqu’à 60 L/min.",
@@ -2734,5 +2736,75 @@
     "period": "AM ou PM",
     "dial": "Cadran",
     "invalid": "Heure invalide"
+  },
+  "planShare": {
+    "slate": "Ardoise pour l’eau",
+    "slateText": "Format poche à imprimer, avec les plans de secours",
+    "image": "Image du tableau",
+    "imageText": "Les paliers en image, pour un message",
+    "ssrf": "Fichier de carnet (.ssrf)",
+    "ssrfText": "La plongée planifiée, lisible par Subsurface",
+    "ssrfUnsaved": "Enregistrez d’abord le plan",
+    "text": "Résumé texte",
+    "textText": "Niveaux, paliers, gaz et volumes",
+    "ssrfFailed": "Le fichier de carnet n’a pas pu être créé."
+  },
+  "slate": {
+    "title": "Ardoise pour l’eau",
+    "share": "Partager",
+    "close": "Fermer",
+    "plans": "Plans à inclure",
+    "planned": "Plan prévu",
+    "always": "Toujours inclus",
+    "plus5Row": "Plus 5 min au fond",
+    "plusDepthRow": "Plus {depth}",
+    "withoutRow": "Sans {gas}",
+    "withoutText": "Si le gaz de déco est perdu",
+    "levelText": "{depth} pendant {time}",
+    "plansNote": "Chaque plan de secours ajoute une colonne Fin. Les paliers sont recalculés pour chacun.",
+    "print": "Impression",
+    "sizeLabel": "Taille",
+    "fileLabel": "Fichier",
+    "noteSheet": "Imprimée sur une feuille {paper}, à la taille réelle, avec des traits de coupe. Le format du papier suit la région, voir Réglages › Langue et formats.",
+    "noteImage": "L’image montre la carte seule, sans marge.",
+    "noteText": "Le texte contient le tableau, à coller dans une note ou un message.",
+    "preview": "Aperçu",
+    "previewLabel": "Aperçu de l’ardoise",
+    "computing": "Calcul des plans de secours…",
+    "unplannable": "Ce plan de secours ne peut pas être calculé : sa colonne est vide.",
+    "sizeFull": "{name} ({paper})",
+    "files": {
+      "pdf": "PDF à imprimer",
+      "pdfNote": "Pour imprimer et plastifier",
+      "png": "Image (PNG)",
+      "pngNote": "Pour un message ou la galerie",
+      "text": "Texte",
+      "textNote": "À copier dans une note"
+    },
+    "size": {
+      "letterStandard": "Fiche 4 × 6 po",
+      "letterStandardNote": "10 × 15 cm, la taille des carnets étanches",
+      "letterSmall": "Fiche 3 × 5 po",
+      "letterSmallNote": "8 × 13 cm, pour une ardoise de poignet",
+      "full": "Pleine page",
+      "a4Standard": "Poche (A6)",
+      "a4StandardNote": "10,5 × 14,8 cm",
+      "a4Small": "Carte (A7)",
+      "a4SmallNote": "7,4 × 10,5 cm"
+    },
+    "depth": "Palier",
+    "gas": "Gaz",
+    "duration": "Durée",
+    "end": "Fin",
+    "plus5": "+5 min",
+    "without": "Sans {gas}",
+    "surface": "Surface",
+    "atBottom": "{gas} au fond",
+    "at": "{gas} à {depth}",
+    "note": "Fin en minutes depuis la mise à l’eau. Gaz souligné : changement de gaz.",
+    "gasNeeded": "Gaz nécessaire : {gases}",
+    "footer": "Créé avec OpenDives le {date}. À vérifier avant la plongée.",
+    "filePrefix": "OpenDives-ardoise",
+    "failed": "L’ardoise n’a pas pu être partagée."
   }
 }

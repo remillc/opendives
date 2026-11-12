@@ -272,10 +272,10 @@
           text: settings.paperSize === 'system'
             ? t('settings.paperSize.text', { name: t(regionUsesLetter() ? 'settings.paperSize.letter' : 'settings.paperSize.a4') })
             : undefined,
-          value: settings.paperSize === 'system' ? t('settings.system') : t(`settings.paperSize.${settings.paperSize}`),
+          value: settings.paperSize === 'system' ? t('settings.paperSize.auto') : t(`settings.paperSize.${settings.paperSize}`),
           current: settings.paperSize,
           options: () => [
-            { value: 'system', label: t('settings.system'), example: t(regionUsesLetter() ? 'settings.paperSize.letter' : 'settings.paperSize.a4') },
+            { value: 'system', label: t('settings.paperSize.auto'), example: t(regionUsesLetter() ? 'settings.paperSize.letter' : 'settings.paperSize.a4') },
             { value: 'letter', label: t('settings.paperSize.letter') },
             { value: 'a4', label: t('settings.paperSize.a4') },
           ],
