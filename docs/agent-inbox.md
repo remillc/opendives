@@ -1703,4 +1703,5 @@ Christian's request, on the collapsed "Conditions" row of "Modifier la plongée"
 - The average stars are drawn in grey (#9A9DA1, fill and outline), not in ink: they are a summary to read, not stars to touch.
 - The number ("2,3") is removed. The row shows the title, "Eau 4,3 °C" under it, the grey stars and the chevron.
 - The accessible name keeps the average: "Conditions, moyenne 2,3 sur 5, eau 4,3 °C. Afficher le détail".
+- **Open section too** (addendum): when Conditions is open (`android-edition-conditions`), its header also loses the "2,3" and shows the average stars in the same grey. The stars to touch below (Visibilité, Courant…) stay in ink.
 - Dark mode: the matching grey from the dark palette. Tablet and iOS: the same.
