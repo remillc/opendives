@@ -16,9 +16,10 @@ test('without a working pressure the start pressure stands in', () => {
   assert.deepEqual(fillLevels(200000, 50000, 0), { start: 1, end: 0.25 });
 });
 
-test('an unknown start gives no start level; an unknown end gives 0', () => {
+test('an unknown start gives no start level; an unknown end fills to the start in full colour', () => {
   assert.deepEqual(fillLevels(0, 100000, 200000), { start: null, end: 0.5 });
-  assert.deepEqual(fillLevels(200000, 0, 200000), { start: 1, end: 0 });
+  assert.deepEqual(fillLevels(200000, 0, 200000), { start: null, end: 1 });
+  assert.deepEqual(fillLevels(150000, 0, 200000), { start: null, end: 0.75 });
   assert.deepEqual(fillLevels(0, 0, 0), { start: null, end: 0 });
 });
 
