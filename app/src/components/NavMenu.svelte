@@ -180,12 +180,12 @@
       height: 34px;
 
       .od-nav-menu--area {
-        fill: rgb(255 255 255 / 0.1);
+        fill: var(--od-band-profile-area);
       }
 
       .od-sync-status--line {
         fill: none;
-        stroke: rgb(31 33 36 / 0.22);
+        stroke: var(--od-band-profile-line);
         stroke-width: 1.5;
         stroke-linejoin: round;
       }

@@ -408,6 +408,7 @@
     "rebreather": "Rebreather",
     "description": "Dive profile: {depth} max. depth, {duration}",
     "temperature": "Temperature",
+    "temperatureShort": "Temp.",
     "water": "Water",
     "ppo2": "ppO₂",
     "ceiling": "Ceiling",
@@ -1594,6 +1595,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Blue theme: the header bands and the side menu are ocean blue, and so are the water of the dive profile and thumbnails, the cylinder drawings, selections and progress bars. Rust and sand now mark data such as the water temperature and the statistics charts. Main buttons stay black. On the phone, the temperature button reads “Temp.”.",
       "Edit the dive: a camera button in the Start and End fields of each cylinder opens a camera to read the pressure on a gauge (Android). You can also pick an existing photo with “Photos”, or type the value. The photo stays on the device and is not kept. It reads digital displays (one or two gauges, bar or psi) and fills the field for you to check; a needle dial is not read yet.",
       "Dive detail: the Gas section of a closed-circuit rebreather dive draws the rebreather seen from the back, with the diluent cylinder on its left and the oxygen on its right; bailout and stage cylinders stand beside it.",
       "Dive profile: under the time axis, the time you entered the water and the exit time (the end of the profile); a dashed line marks the average depth across the whole profile, labelled “avg.” on the left. The profile’s accessible name gives them too.",

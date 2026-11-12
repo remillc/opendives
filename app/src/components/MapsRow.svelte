@@ -154,7 +154,6 @@
 
     .od-maps-row--body :global(.od-maps-row--wavy) {
       margin-top: 4px;
-      --od-linear-wavy-progress-track: var(--od-primary-container);
     }
 
     .od-maps-row--body :global(.od-maps-row--progress > span) {

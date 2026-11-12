@@ -187,11 +187,11 @@
     }
 
     .od-rebreather-drawing--water-top {
-      stop-color: var(--od-loading-indicator-top);
+      stop-color: var(--od-cylinder-water-top);
     }
 
     .od-rebreather-drawing--water-bottom {
-      stop-color: var(--od-loading-indicator-bottom);
+      stop-color: var(--od-cylinder-water-bottom);
     }
 
     .od-rebreather-drawing--start-fill {
