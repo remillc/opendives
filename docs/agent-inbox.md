@@ -1758,10 +1758,13 @@ Christian's request, in every view of a dive.
 
 Done in `feature/tags-under-equipment`: the detail shows Étiquettes after Équipement and before Conditions; Modifier la plongée has an "Étiquettes" card of its own (header snippet, field and helper unchanged) between Équipement and Conditions. The notes stay in the people card, as asked. Phone, tablet and iOS share both files.
 
-## [ ] 2026-11-12-63 Modifier la plongée: "Personnes" and "Notes" as two cards
+## [x] 2026-11-12-63 Modifier la plongée: "Personnes" and "Notes" as two cards
 
 Christian's request (now approved; the mock-ups already sent with task 62 show it). In "Modifier la plongée" (phone, tablet edit dialogs):
 - The card "Personnes et notes" becomes **"Personnes"**: Guide de palanquée and Compagnons, unchanged.
 - The Notes field gets its own card **"Notes"** (same card style, 16 sp semibold title), placed after Conditions, right before Avancé, as in the dive detail where the notes come last.
 - Order: La plongée, Personnes, Gaz, Équipement, Étiquettes, Conditions, Notes, Avancé.
 - Mock-ups: `android-edition`, `android-edition-bouteille`, `android-tablette-edition-*`. iOS: the same.
+
+Done in `feature/notes-card`: "Personnes" (`edit.peopleGroup`) keeps Guide de palanquée and Compagnons; the Notes field has its own "Notes" card (`edit.notesGroup`) right before Avancé. Order: La plongée, Personnes, Gaz, Équipement, Étiquettes, Conditions, Notes, Avancé. Phone, tablet and iOS share EditDive.
+

@@ -1007,12 +1007,11 @@
       </div>
     </section>
 
-    <!-- Personnes et notes -->
+    <!-- Personnes -->
     <section class="card od-edit-dive--card">
       {@render header(t('edit.peopleGroup'))}
       <ChipsField label={t('edit.guides')} bind:values={guides} suggestions={known.guide} supporting={t('edit.guidesHint')} />
       <ChipsField label={t('edit.buddies')} bind:values={buddies} suggestions={known.buddy} supporting={t('edit.buddiesHint')} />
-      <TextField label={t('edit.notes')} bind:value={f.notes} multiline />
       <div class="od-edit-dive--end"></div>
     </section>
 
@@ -1115,6 +1114,13 @@
       </div>
       <div class="od-edit-dive--end"></div>
       {/if}
+    </section>
+
+    <!-- Notes: a card of their own, last before Avancé, as the notes end the dive detail (task 2026-11-12-63). -->
+    <section class="card od-edit-dive--card">
+      {@render header(t('edit.notesGroup'))}
+      <TextField label={t('edit.notes')} bind:value={f.notes} multiline />
+      <div class="od-edit-dive--end"></div>
     </section>
 
     <!-- Avancé -->

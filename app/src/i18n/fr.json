@@ -941,7 +941,7 @@
     "site": "Site",
     "trip": "Voyage",
     "none": "Aucun",
-    "peopleGroup": "Personnes et notes",
+    "peopleGroup": "Personnes",
     "guides": "Guide de palanquée",
     "buddies": "Compagnons",
     "tags": "Étiquettes",
@@ -1055,7 +1055,8 @@
     "mainComputer": "Principal : son profil est celui de la plongée",
     "unnamedComputer": "Ordinateur sans nom",
     "mainComputerHelp": "Avec plusieurs ordinateurs, choisissez le principal.",
-    "tagsGroup": "Étiquettes"
+    "tagsGroup": "Étiquettes",
+    "notesGroup": "Notes"
   },
   "tripScreen": {
     "kicker": "Voyage · {range}",
@@ -1547,6 +1548,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "« Modifier la plongée » : « Personnes » et « Notes » sont deux cartes ; les notes viennent juste avant « Avancé ».",
       "Étiquettes juste sous Équipement, dans la fiche d’une plongée comme dans « Modifier la plongée » (où elles ont leur propre carte).",
       "Fiche d’une plongée : la carte Conditions passe juste après Équipement (avant Photos et vidéos et Notes).",
       "Les ordinateurs de plongée font partie de l’équipement : dans « Modifier la plongée », ils sont en bas de la carte Équipement ; la fiche d’une plongée montre l’ordinateur principal en troisième ligne de la carte Équipement (tous, avec « Principal », quand elle est ouverte).",
