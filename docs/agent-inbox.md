@@ -1975,3 +1975,5 @@ Your summary should cover at least:
 
 **Christian's decisions (12 November 2026):** (1) analog dials through a small trained model (TensorFlow Lite keypoints: centre, needle tip, scale ends; ML Kit reads the scale numbers), not classical OpenCV; (2) ship first the camera, the gallery, manual entry and digital displays (CameraX, photo picker, ML Kit text recognition approved by that choice), the dial later once its measured accuracy is good enough; (3) Christian has no gauge photos yet and will gather some: the dial step waits for them. Size estimate given: about 8 to 11 MB more per phone in all.
 
+
+**Addendum (12 November 2026), Christian:** no "pending pressures" feature for readings taken before the dive exists in the logbook. A diver who wants the start pressure before diving just takes an ordinary photo with the phone's camera, then, once the dive is downloaded, picks that photo with "Photos" in the gauge camera. Nothing else to build for that case.
