@@ -13,7 +13,7 @@
   import { logbook } from '../lib/logbook.svelte.js';
   import { DEFAULT_SAC_FACTOR } from '../lib/settings.svelte.js';
   import { planner, loadSetup, adoptUnitDefaults, plannerDefaults, setting, setSetting, ascentRate, setAscentRate } from '../lib/planner.svelte.js';
-  import { formatNumber, depthUnit } from '../lib/format.js';
+  import { formatNumber, formatPartialPressure, depthUnit } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
   import { carriedToMl, depthToMm, mbarToPressure, mlToCarried, mmToDepth, pressureToMbar } from '../lib/planner-rules.js';
 
@@ -87,7 +87,7 @@
     set: (ml) => setSetting(key, ml),
   });
 
-  /** A ppO₂, always in bar. @returns {NumberRow} */
+  /** A ppO₂: the number is the same in bar and in ATA. @returns {NumberRow} */
   const po2Row = (/** @type {'bottomPo2Mbar'|'decoPo2Mbar'} */ key, /** @type {string} */ label, /** @type {number} */ def) => ({
     kind: 'number',
     id: key,
@@ -97,7 +97,7 @@
     wheel: range(1, 2, 0.1),
     toUnit: (mbar) => mbar / 1000,
     toStored: (v) => Math.round(v * 1000),
-    show: (v) => `${formatNumber(v, 1)} ${t('units.bar')}`,
+    show: (v) => formatPartialPressure(v, 1),
     set: (mbar) => setSetting(key, mbar),
   });
 

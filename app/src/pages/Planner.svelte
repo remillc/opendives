@@ -22,7 +22,7 @@
   import { logbook, savePlan } from '../lib/logbook.svelte.js';
   import { planner, loadSetup, adoptUnitDefaults, planRequest, startFromDive, startNewDive, requestOfPlan, applyRequest, nextGas, planSettings } from '../lib/planner.svelte.js';
   import { waterBottomColor } from '../lib/water-column.js';
-  import { formatDateTime, formatDuration, formatGasVolume, formatMixName, formatGasLong, formatNumber, formatSac, formatTimeOfDay, decoSummary, depthUnit, locale } from '../lib/format.js';
+  import { formatDateTime, formatDuration, formatGasVolume, formatMixName, formatGasLong, formatNumber, formatPartialPressure, formatSac, formatTimeOfDay, decoSummary, depthUnit, locale } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
   import { ios } from '../lib/layout.svelte.js';
   import { WATER_TYPES, altitudeToPressureMbar, formatHoursMinutes, pressureToAltitudeMm, waterTypeName, waterTypeOfSalinity } from '../lib/tools.js';
@@ -533,7 +533,7 @@
     if (!result || !bottom || !modAlarm(result.maxDepthMm, bottom.bottomModMm)) return null;
     return {
       label: t('plan.modTitle'),
-      hint: t('plan.modText', { po2: formatNumber((result.setup.bottomPo2Mbar ?? 1400) / 1000, 1), depth: depthText(bottom.bottomModMm) }),
+      hint: t('plan.modText', { po2: formatPartialPressure((result.setup.bottomPo2Mbar ?? 1400) / 1000, 1), depth: depthText(bottom.bottomModMm) }),
       value: depthText(bottom.bottomModMm),
     };
   });

@@ -7,7 +7,7 @@
   // and tissues, each offered only when the dive has the data.
   import Icon from './Icon.svelte';
   import { waterBottomColor } from '../lib/water-column.js';
-  import { depthUnit, formatDepth, formatDuration, formatMinSec, formatNumber, formatTemperature } from '../lib/format.js';
+  import { depthUnit, formatDepth, formatDuration, formatMinSec, formatNumber, formatPartialPressure, formatTemperature } from '../lib/format.js';
   import { tissueColor } from '../lib/tissues.js';
   import { t } from '../lib/i18n.js';
 
@@ -261,7 +261,7 @@
         <span>{t('profile.water')} <strong class="od-dive-profile--water">{formatTemperature(temperature.mk[cursor], prefs)}</strong></span>
       {/if}
       {#if showPpo2}
-        <span>{t('profile.ppo2')} <strong>{formatNumber(samples.ppo2Mbar[cursor] / 1000, 2)} bar</strong></span>
+        <span>{t('profile.ppo2')} <strong>{formatPartialPressure(samples.ppo2Mbar[cursor] / 1000, 2)}</strong></span>
       {/if}
       {#if ceilingLayer && ceilingMm}
         <span>{t('profile.ceiling')} <strong>{formatDepth(ceilingMm[cursor], prefs)}</strong></span>
