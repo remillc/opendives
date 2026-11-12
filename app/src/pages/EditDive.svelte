@@ -43,6 +43,7 @@
   import { canMove, dropIndex, gasName, moveItem, OTHER_TYPE, pressureUsed, typeHelper } from '../lib/cylinder-card.js';
   import { deletionOutcome, fillRatio, gasChangeMoments, typeLine } from '../lib/gas-group.js';
   import { t, tIfExists } from '../lib/i18n.js';
+  import LeaveGuard from '../components/LeaveGuard.svelte';
 
   /** @type {{ f7route: { params: { id: string } }, f7router: any }} */
   let { f7route, f7router } = $props();
@@ -723,6 +724,17 @@
     return out;
   }
 
+  /** Something differs from what was opened: the fields, the site, the trip, the main computer. */
+  function dirty() {
+    if (!dive) return false;
+    if (Object.keys(changes()).length || mainComputer > 0) return true;
+    if (siteName.trim() !== dive.site) return true;
+    const oldTrip = dive.trip?.location ?? '';
+    const tripText = tripName === NEW_TRIP ? newTripName.trim() || oldTrip : tripName.trim();
+    return tripText !== oldTrip;
+  }
+  let guard = /** @type {LeaveGuard|undefined} */ (undefined);
+
   /** @param {string} text */
   function toast(text) {
     showSnackbar(text);
@@ -899,15 +911,15 @@
         {/if}
       {:else if sheet}
         {#if ios}
-          <Link onClick={leave}>{t('dialog.cancel')}</Link>
+          <Link onClick={() => guard?.attempt()}>{t('dialog.cancel')}</Link>
         {:else}
-          <Link iconOnly onClick={leave}><Icon name="close" /><span class="od-sr-only">{t('dialog.cancel')}</span></Link>
+          <Link iconOnly onClick={() => guard?.attempt()}><Icon name="close" /><span class="od-sr-only">{t('dialog.cancel')}</span></Link>
         {/if}
       {:else if layout.split}
         <!-- A task in the detail pane (tablet in portrait): ✕, never ←. -->
-        <Link back iconOnly><Icon name="close" /><span class="od-sr-only">{t('dialog.cancel')}</span></Link>
+        <Link iconOnly onClick={() => guard?.attempt()}><Icon name="close" /><span class="od-sr-only">{t('dialog.cancel')}</span></Link>
       {:else}
-        <Link back iconOnly>
+        <Link iconOnly onClick={() => guard?.attempt()}>
           <i class="icon icon-back"></i>
           <span class="od-sr-only">{t('detail.back')}</span>
         </Link>
@@ -917,6 +929,7 @@
       {#if !gasPage}<Link onClick={save} class={saving ? 'disabled' : ''}>{t('edit.save')}</Link>{/if}
     {/snippet}
   </Navbar>
+  <LeaveGuard bind:this={guard} noun="dive" {dirty} {save} {leave} />
 {/snippet}
 
 {#snippet content()}

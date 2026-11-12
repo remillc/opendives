@@ -18,6 +18,8 @@
   import { formatCoordinates, geocodeSite, parseCoordinates, siteChange } from '../lib/sites.svelte.js';
   import { language, t } from '../lib/i18n.js';
   import { confirmAction } from '../lib/dialogs.js';
+  import LeaveGuard from '../components/LeaveGuard.svelte';
+  import { isDirty } from '../lib/leave-guard.js';
 
   /** @type {{ f7route: { params: { uuid?: string }, query: { dive?: string } }, f7router: any }} */
   let { f7route, f7router } = $props();
@@ -41,13 +43,33 @@
   let fullscreen = $state(false);
   let lookups = 0;
 
+  // Leaving with changes asks first (components/LeaveGuard.svelte): the fields
+  // against those at opening. A new site opens at once; one being edited, when it
+  // is read. The position the device finds by itself is not a change.
+  const values = () => ({ name, description, notes, country, region, place: position ? `${position.latUdeg},${position.lonUdeg}` : '' });
+  let opened = $state(/** @type {ReturnType<typeof values>|null} */ (editing ? null : values()));
+  const dirty = () => opened !== null && isDirty(opened, values());
+  let guard = /** @type {LeaveGuard|undefined} */ (undefined);
+
   onMount(async () => {
     if (!editing) {
       // A new site starts where the diver is (often on the boat or the
       // shore); without a position, the map stays as it is, silently.
       navigator.geolocation?.getCurrentPosition(
         (pos) => {
-          if (!position) setPosition({ latUdeg: Math.round(pos.coords.latitude * 1e6), lonUdeg: Math.round(pos.coords.longitude * 1e6) });
+          if (position) return;
+          setPosition({ latUdeg: Math.round(pos.coords.latitude * 1e6), lonUdeg: Math.round(pos.coords.longitude * 1e6) }).then(() => {
+            // The found position, country and region are the opening values; what was typed meanwhile stays a change.
+            if (!opened) return;
+            const now = values();
+            const auto = (/** @type {string} */ typed, /** @type {string} */ found) => (found && typed === found ? typed : null);
+            opened = {
+              ...opened,
+              place: now.place,
+              country: auto(country, autoCountry) ?? opened.country,
+              region: auto(region, autoRegion) ?? opened.region,
+            };
+          });
         },
         () => {},
         { enableHighAccuracy: true, timeout: 15000 },
@@ -67,6 +89,7 @@
       position = { latUdeg: s.latUdeg, lonUdeg: s.lonUdeg };
       coordsText = formatCoordinates(s.latUdeg, s.lonUdeg);
     }
+    opened = values();
   });
 
   /** @param {{latUdeg: number, lonUdeg: number}} p */
@@ -209,12 +232,13 @@
 <Page class="od-site-edit">
   <Navbar title={editing ? t('sites.editTitle') : t('sites.newSite')}>
     {#snippet left()}
-      <Link back iconOnly><Icon name="close" /><span class="od-sr-only">{t('sites.close')}</span></Link>
+      <Link iconOnly onClick={() => guard?.attempt()}><Icon name="close" /><span class="od-sr-only">{t('sites.close')}</span></Link>
     {/snippet}
     {#snippet right()}
       <Link onClick={save} class={saving ? 'disabled' : ''}>{t('edit.save')}</Link>
     {/snippet}
   </Navbar>
+  <LeaveGuard bind:this={guard} noun="site" {dirty} {save} leave={() => f7router.back()} />
 
   <TextField label={t('sites.name')} bind:value={name} />
 

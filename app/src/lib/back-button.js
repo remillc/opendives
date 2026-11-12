@@ -5,6 +5,7 @@
 import { App as CapacitorApp } from '@capacitor/app';
 import { f7 } from 'framework7-svelte';
 import { backTarget, readPane } from './pane-history.js';
+import { backThroughGuard } from './leave-guard.js';
 
 export function enableBackButton() {
   CapacitorApp.addListener('backButton', () => {
@@ -53,6 +54,9 @@ export function enableBackButton() {
       gasPage.dispatchEvent(new CustomEvent('od-cancel'));
       return;
     }
+    // 3c. A form with unsaved changes (the full screen, or its popup on a tablet) asks
+    // before it is left (lib/leave-guard.js); a sheet or dialog above it closed first.
+    if ((!modal || modal.classList.contains('popup')) && backThroughGuard(modal)) return;
     if (modal) {
       // OpenDives' own dialogs (components/Md3Dialog.svelte) cancel themselves.
       if (modal.classList.contains('od-md3-dialog') || modal.classList.contains('od-cylinder-sheet')) modal.dispatchEvent(new CustomEvent('od-cancel'));

@@ -12,6 +12,8 @@
   import { OpenDivesCore } from 'opendives-core';
   import Icon from '../components/Icon.svelte';
   import TextField from '../components/TextField.svelte';
+  import LeaveGuard from '../components/LeaveGuard.svelte';
+  import { isDirty } from '../lib/leave-guard.js';
   import { t } from '../lib/i18n.js';
   import { logbook, renameCylinderType } from '../lib/logbook.svelte.js';
   import { keepCylinderLibrary } from '../lib/settings.svelte.js';
@@ -44,6 +46,13 @@
   /** A number typed with a comma or a point; NaN when invalid. @param {string} text */
   const parse = (text) => (text.trim() === '' ? 0 : Number(text.trim().replace(',', '.')));
 
+  // Leaving with changes asks first (components/LeaveGuard.svelte): the fields as
+  // filled at opening (a type being edited: once it is read), against now.
+  const values = () => ({ name, volume, pressure });
+  let opened = $state(/** @type {unknown} */ (editing ? null : values()));
+  const dirty = () => opened !== null && isDirty(opened, values());
+  let guard = /** @type {LeaveGuard|undefined} */ (undefined);
+
   onMount(async () => {
     if (!editing) return;
     try {
@@ -56,6 +65,7 @@
     } catch (e) {
       console.error('Reading the cylinder type', e);
     }
+    opened = values();
   });
 
   /** The size typed, in ml and mbar; null with `error` set when invalid. */
@@ -144,7 +154,7 @@
 <Page class="od-cylinder-type">
   <Navbar title={editing ? t('settings.cylinders.editTitle') : t('settings.cylinders.newTitle')}>
     {#snippet left()}
-      <Link back iconOnly>
+      <Link iconOnly onClick={() => guard?.attempt()}>
         <Icon name="close" />
         <span class="od-sr-only">{t('plan.chooseClose')}</span>
       </Link>
@@ -153,6 +163,7 @@
       <Link onClick={save} class={saving ? 'disabled' : ''}>{t('edit.save')}</Link>
     {/snippet}
   </Navbar>
+  <LeaveGuard bind:this={guard} noun="cylinderType" {dirty} {save} leave={() => f7router.back()} />
 
   <div class="od-form-surface">
     <TextField label={t('settings.cylinders.name')} bind:value={name} supporting={error || t('settings.cylinders.nameHelp')} invalid={!!error} />

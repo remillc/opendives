@@ -28,6 +28,8 @@
   import { depthUnit, formatCylinderSize, formatLongDate, locale } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
   import { ios } from '../lib/layout.svelte.js';
+  import LeaveGuard from '../components/LeaveGuard.svelte';
+  import { isDirty } from '../lib/leave-guard.js';
   import { offerUndo } from '../lib/undo.js';
 
   /** @type {{ f7router: any }} */
@@ -66,6 +68,13 @@
   let sites = $state([]);
   /** @type {import('opendives-core').CylinderType[]} */
   let cylinderTypes = $state([]);
+
+  // Leaving with changes asks first (components/LeaveGuard.svelte): the values now
+  // against those at opening (the date and time at that moment included).
+  const values = () => ({ year, month, day, hour, minute, duration, depth, water, cylinderType, startPressure, endPressure, o2, he, buddies: [...buddies], notes, rating, site });
+  const opened = values();
+  const dirty = () => isDirty(opened, values());
+  let guard = /** @type {LeaveGuard|undefined} */ (undefined);
 
   onMount(async () => {
     logbookValues('buddy').then((list) => (knownBuddies = list));
@@ -210,15 +219,16 @@
   <Navbar title={t('newDive.title')}>
     {#snippet left()}
       {#if theme.ios}
-        <Link back>{t('newDive.cancel')}</Link>
+        <Link onClick={() => guard?.attempt()}>{t('newDive.cancel')}</Link>
       {:else}
-        <Link back iconOnly><Icon name="close" /><span class="od-sr-only">{t('newDive.cancel')}</span></Link>
+        <Link iconOnly onClick={() => guard?.attempt()}><Icon name="close" /><span class="od-sr-only">{t('newDive.cancel')}</span></Link>
       {/if}
     {/snippet}
     {#snippet right()}
       <Link onClick={save} class={saving ? 'disabled' : ''}>{t('newDive.save')}</Link>
     {/snippet}
   </Navbar>
+  <LeaveGuard bind:this={guard} noun="dive" {dirty} {save} leave={() => f7router.back()} />
 
   <div class="od-form-surface">
     <button type="button" class="od-new-dive--row" onclick={() => (dialog = 'date')}>
