@@ -288,6 +288,12 @@
     "gasGroupCylinder": "{gas} de {start} à {end}",
     "gasGroupCylinderGas": "{gas}",
     "gasGroupJoin": ", ",
+    "rebreatherGroup": "Gaz du recycleur : {list}",
+    "rebreatherDiluent": "diluant {cylinder}",
+    "rebreatherOxygen": "oxygène {cylinder}",
+    "rebreatherBailout": "Secours : {list}",
+    "rebreatherRange": "de {start} à {end}",
+    "rebreatherMarks": { "diluent": "DIL", "oxygen": "O₂", "bailout": "SECOURS" },
     "gasChange": {
       "line": "Passage {list}.",
       "item": "{to} à {depth}",
@@ -1558,6 +1564,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Détail de plongée : la section Gaz d’une plongée en recycleur à circuit fermé dessine le recycleur vu de dos, avec la bouteille de diluant à gauche et l’oxygène à droite ; les bouteilles de secours et les étages sont à côté.",
       "Profil de la plongée : sous l’axe du temps, l’heure d’entrée dans l’eau et l’heure de sortie (fin du profil) ; une ligne pointillée marque la profondeur moyenne sur tout le profil, avec son étiquette « moy. » à gauche. Le nom accessible du profil les indique aussi.",
       "Profil de la plongée sur téléphone : le profil occupe toute la largeur de l’écran, sans carte ni marges, avec la ligne d’aide centrée. Les tablettes gardent la carte.",
       "Planificateur : « Partager le plan » propose cinq choix : l’ardoise pour l’eau, la fiche PDF, l’image du tableau, le fichier de carnet (.ssrf) de la plongée planifiée et le résumé texte. L’ardoise est une carte de poche à imprimer (4 × 6 po ou A6, 3 × 5 po ou A7, ou pleine page) avec les plans de secours de votre choix : 5 min de plus au fond, 3 m (10 ft) de plus, ou un gaz de déco perdu, chacun recalculé par le planificateur et ajouté en colonne Fin ; en PDF à la taille réelle avec des traits de coupe, en image ou en texte. Vos derniers choix sont gardés. Réglages › Langue et formats › Format du papier : Automatique, Lettre ou A4, pour tous les PDF à imprimer.",

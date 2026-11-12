@@ -1,0 +1,48 @@
+// The rebreather drawing: which cylinder goes where, and the accessible name.
+import assert from 'node:assert/strict';
+import { test } from 'node:test';
+import { rebreatherLabel, rebreatherLayout } from '../../app/src/lib/rebreather-gas.js';
+
+test('diluent and oxygen go in the unit, the rest beside it', () => {
+  const layout = rebreatherLayout([{ use: 'OC-gas' }, { use: 'oxygen' }, { use: 'diluent' }, { use: 'OC-gas' }]);
+  assert.deepEqual(layout, { diluent: 2, oxygen: 1, others: [0, 3] });
+});
+
+test('the first of each kind is in the unit, the others beside it in order', () => {
+  const layout = rebreatherLayout([{ use: 'diluent' }, { use: 'diluent' }, { use: 'oxygen' }, { use: 'oxygen' }, { use: 'OC-gas' }]);
+  assert.deepEqual(layout, { diluent: 0, oxygen: 2, others: [1, 3, 4] });
+});
+
+test('a missing kind is -1', () => {
+  assert.deepEqual(rebreatherLayout([{ use: 'diluent' }]), { diluent: 0, oxygen: -1, others: [] });
+  assert.deepEqual(rebreatherLayout([]), { diluent: -1, oxygen: -1, others: [] });
+});
+
+const words = {
+  group: 'Rebreather gas: {list}',
+  diluent: 'diluent {cylinder}',
+  oxygen: 'oxygen {cylinder}',
+  bailout: 'Bailout: {list}',
+  cylinder: '{gas} from {start} to {end}',
+  cylinderGas: '{gas}',
+  range: 'from {start} to {end}',
+  join: ', ',
+};
+
+test('the accessible name follows the spec', () => {
+  const items = [
+    { gas: 'Trimix 16/45', start: '2 683', end: '1 885 psi' },
+    { gas: 'Oxygen', start: '2 756', end: '1 885 psi' },
+    { gas: 'air', start: '3 002', end: '2 901 psi' },
+  ];
+  const layout = rebreatherLayout([{ use: 'diluent' }, { use: 'oxygen' }, { use: 'OC-gas' }]);
+  assert.equal(
+    rebreatherLabel(items, layout, words),
+    'Rebreather gas: diluent Trimix 16/45 from 2 683 to 1 885 psi, oxygen from 2 756 to 1 885 psi. Bailout: air from 3 002 to 2 901 psi',
+  );
+});
+
+test('without pressures only the gas is named; no bailout part without bailout', () => {
+  const items = [{ gas: 'Air', start: '', end: '' }, { gas: 'Oxygen', start: '', end: '' }];
+  assert.equal(rebreatherLabel(items, rebreatherLayout([{ use: 'diluent' }, { use: 'oxygen' }]), words), 'Rebreather gas: diluent Air, oxygen');
+});
