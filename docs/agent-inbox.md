@@ -1590,3 +1590,12 @@ Christian's request: the dive detail gets the same split as "Modifier la plongé
 
 Done in `feature/detail-gas-equipment` and `fix/unknown-end-pressure`: the detail has Gaz (`GasCard`: drawn cylinders with gas, use and size, start → end pressure, one gas-change sentence, accessible group name) and Équipement (`EquipmentCard`, collapsed, Combinaison only when set, Lest total, opens to the weights by location; no section without suit or weight). `CylinderDrawing` draws the full water gradient to the end level, the pale sand band to the start level and the two dashed level lines (`--od-cylinder-breathed`, `--od-cylinder-level`), in the detail and in the edit Gaz summary, whose helper text changed. Checked on the phone emulator. Choices: a cylinder without an end pressure is filled in full colour to its start (nothing says what was breathed); SAC stays as a small row inside the Gaz card (not in the mock-ups); the use label shows only when the cylinder has no type name.
 
+
+## [ ] 2026-11-12-47 Settings: "Conditions des outils", moved after "Décompression"
+
+Christian's request: the group "Conditions par défaut" is only used by the tools, so it is renamed and moved lower. Mock-ups: `android-reglages` and the other Settings boards (`android-tablette-reglages-*`, `reglages-*-android`). Spec: `docs/ui-specification.md`, Settings paragraph.
+- Rename the group "Conditions par défaut" to **"Conditions des outils"**.
+- Move it from after "Unités" to **after "Décompression"**, before "Pressions partielles". Same rows: "Type d’eau" (Eau de mer) and "Altitude" (0).
+- New note under the group: "Le planificateur, EAD et MOD et Meilleur mélange partent de ces valeurs. On peut les changer dans chaque outil."
+- Nothing changes in behaviour: the setting keys (`defaultWater`, `defaultAltitudeMm`) stay as they are. "Type d’eau des plongées téléchargées" in "Carnet" is a separate setting and stays where it is.
+- Tablet and iOS: the same order and wording.
