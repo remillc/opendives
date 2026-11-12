@@ -1997,3 +1997,11 @@ Christian's request. Spec: new paragraph "Profile chart full width on the phone"
 - Touch cursor and readout unchanged. Tablet panes keep the card. iOS phone: the same.
 
 **Addendum to task 79 (12 November 2026), Christian:** center the hint line "Touchez le profil pour lire les valeurs" above the chart (phone dive detail and site detail). The cursor readout is unchanged. Note: `detail3-android` also shows entry and exit times under the time axis ("Entrée 10:00", "Sortie 11:18") and a dotted line at the exit; that is still being decided, **do not build it yet**.
+
+## [ ] 2026-11-12-80 Profile chart: entry and exit times, average depth line
+
+Christian's request (this replaces the "do not build it yet" note in the task 79 addendum). Spec: new paragraph "Entry and exit times and average depth in the profile chart". Mock-up: `detail3-android`.
+- Under the time axis, a second label row in the axis style: "Entrée 10:00" and "Sortie 11:18". The **first digit of each time sits on its tick** (time zero, exit time) and the word is to its left. A thin dotted vertical line marks the exit time.
+- Average depth: thin dashed horizontal line (0.6 dp, dashes 4/3, axis grey) from entry to exit, label "moy. 58" (user depth unit, 9 sp) in the left depth-label column at that height. Take the mean depth from the core.
+- Accessible name of the chart: add entry and exit times and the average depth.
+- Wherever the profile chart is drawn (phone and tablet, light and dark, with the cursor). The info grid under the chips stays as it is for now.
