@@ -1633,3 +1633,14 @@ Christian's request: in Settings › Unités, the row "Pression" (psi or bar, co
 
 Done in `feature/cylinder-pressure-label`: `settings.pressure` is "Pression des bouteilles" / "Cylinder pressure"; it names the Units row and its choice menu (task 49), on phone, tablet and iOS, which share Settings.svelte. Label only.
 
+
+## [ ] 2026-11-12-51 Settings: a "Téléchargement" group for the download settings
+
+Christian's request: the settings used for downloading are grouped. Mock-ups: `android-reglages`, `reglages-menu-android` (⋮ menu open) and the other Settings boards. Spec: Settings paragraph of `docs/ui-specification.md`.
+- "Ordinateurs de plongée" keeps only the row "Ordinateurs du carnet".
+- A new group **"Téléchargement"** follows it, same group title style:
+  1. A card with the switch "Montrer tous les appareils Bluetooth" and its supporting text.
+  2. Under that card, on the page background (not in a card), an overline in 14 sp semibold, variant colour: "Ordinateur mémorisé pour le téléchargement Bluetooth" with one remembered computer, "Ordinateurs mémorisés pour le téléchargement Bluetooth" with several.
+  3. A card with the remembered computers, one row each: the name only (no more "Bluetooth, mémorisé" line), and its ⋮ (Renommer, Oublier cet ordinateur, unchanged). At the bottom of that card, the outlined button "Oublier l’ordinateur mémorisé" with one computer, "Oublier les ordinateurs mémorisés" with several (the confirmation dialog follows the same count).
+- With no remembered computer, the overline and the second card are not shown.
+- Tablet and iOS: the same grouping.
