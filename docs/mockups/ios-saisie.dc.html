@@ -30,7 +30,7 @@ h1,h2,h3,h4,h1 *,h2 *,h3 *,h4 *,[style*='font-size: 2'],[style*='font-size: 3'],
 
   <div style="padding: 14px 16px; display: flex; align-items: center; gap: 12px">
     <svg width="56" height="36" viewBox="0 0 56 36" preserveAspectRatio="none" role="img" aria-label="Profil, 91 ft au plus profond" style="flex: none; border-radius: 4px; background: #FFFFFF">
-      <defs><linearGradient id="qs-d9" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color: #FBE3B2"></stop><stop offset="1" style="stop-color: {{bottom}}"></stop></linearGradient></defs>
+      <defs><linearGradient id="qs-d9" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color: #D4E2F2"></stop><stop offset="1" style="stop-color: {{bottom}}"></stop></linearGradient></defs>
       <path d="{{area}}" style="fill: url(#qs-d9); stroke: none"></path>
       <path d="{{line}}" style="fill: none; stroke: #1F2124; stroke-width: 1.25; vector-effect: non-scaling-stroke"></path>
     </svg>
@@ -81,7 +81,7 @@ h1,h2,h3,h4,h1 *,h2 *,h3 *,h4 *,[style*='font-size: 2'],[style*='font-size: 3'],
 <script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
 var PTS = [[10,0.0],[110,7.3],[210,14.4],[310,20.9],[410,25.0],[510,25.9],[610,25.3],[710,25.3],[810,24.8],[910,27.1],[1010,26.2],[1110,25.3],[1210,26.2],[1310,27.5],[1410,26.8],[1510,22.1],[1610,16.7],[1710,16.3],[1810,16.4],[1910,15.2],[2010,14.8],[2110,16.5],[2210,15.3],[2310,15.5],[2410,15.1],[2510,15.9],[2610,15.6],[2710,16.1],[2810,13.7],[2910,13.1],[3010,8.9],[3110,6.3],[3210,6.2],[3310,5.2],[3390,0.0]];
 function mix(f) {
-  var a = [0xFB, 0xE3, 0xB2], b = [0xB4, 0x53, 0x0F];
+  var a = [0xD4, 0xE2, 0xF2], b = [0x55, 0x84, 0xB5];
   f = Math.max(0, Math.min(1, f));
   return 'rgb(' + a.map(function (v, i) { return Math.round(v + (b[i] - v) * f); }).join(',') + ')';
 }
