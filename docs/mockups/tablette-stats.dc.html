@@ -49,7 +49,7 @@ h1,h2,h3,h4,h1 *,h2 *,h3 *,h4 *,[style*='font-size: 2'],[style*='font-size: 3'],
     </div>
     <dl style="margin: 4px 16px 0 16px; background: #FFFFFF; border-radius: 10px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; font-variant-numeric: tabular-nums">
       <div style="padding: 12px; border-right: 0.5px solid #E8E8E5"><dt style="font-size: 13px; color: #3C3C43">Plongées</dt><dd style="margin: 2px 0 0 0; font-size: 22px; font-weight: 700">9</dd></div>
-      <div style="padding: 12px; border-right: 0.5px solid #E8E8E5"><dt style="font-size: 13px; color: #3C3C43">Sous l’eau</dt><dd style="margin: 2px 0 0 0; font-size: 22px; font-weight: 700">11 h 26</dd></div>
+      <div style="padding: 12px; border-right: 0.5px solid #E8E8E5"><dt style="font-size: 13px; color: #3C3C43">Sous l’eau</dt><dd style="margin: 2px 0 0 0; font-size: 22px; font-weight: 700">11 h 26</dd></div>
       <div style="padding: 12px"><dt style="font-size: 13px; color: #3C3C43">La plus profonde</dt><dd style="margin: 2px 0 0 0; font-size: 22px; font-weight: 700">333 pi</dd></div>
     </dl>
     <sc-for list="{{sections}}" as="s" hint-placeholder-count="4">
@@ -95,7 +95,7 @@ h1,h2,h3,h4,h1 *,h2 *,h3 *,h4 *,[style*='font-size: 2'],[style*='font-size: 3'],
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1180,"height":820}}'>
-var DIVES = [['2 févr., 8 h 21', 28.7], ['2 févr., 10 h 53', 22.0], ['2 févr., 13 h 44', 21.8], ['2 févr., 16 h 14', 22.4]];
+var DIVES = [['2 févr., 8 h 21', 28.7], ['2 févr., 10 h 53', 22.0], ['2 févr., 13 h 44', 21.8], ['2 févr., 16 h 14', 22.4]];
 function mix(f) {
   var a = [0xD4, 0xE2, 0xF2], b = [0x55, 0x84, 0xB5];
   f = Math.max(0, Math.min(1, f));
@@ -110,13 +110,13 @@ class Component extends DCLogic {
     });
     return {
       sections: [
-        { title: 'Par mode', empty: false, rows: [row('Circuit ouvert', '7 h 29', 6), row('Recycleur', '3 h 58', 3)] },
+        { title: 'Par mode', empty: false, rows: [row('Circuit ouvert', '7 h 29', 6), row('Recycleur', '3 h 58', 3)] },
         { title: 'Par combinaison', empty: true, emptyText: 'Aucune combinaison notée pour l’instant.', rows: [] },
         { title: 'Par compagnon', empty: true, emptyText: 'Aucun compagnon noté pour l’instant.', rows: [] },
-        { title: 'Par ordinateur', empty: false, rows: [row('Suunto Vyper Air', '4 h 07', 4, true), row('AP DiveSight', '1 h 44', 1), row('Shearwater Perdix 2', '1 h 42', 1)] }
+        { title: 'Par ordinateur', empty: false, rows: [row('Suunto Vyper Air', '4 h 07', 4, true), row('AP DiveSight', '1 h 44', 1), row('Shearwater Perdix 2', '1 h 42', 1)] }
       ],
       facts: [
-        { label: 'Temps sous l’eau', value: '4 h 07' },
+        { label: 'Temps sous l’eau', value: '4 h 07' },
         { label: 'Plongées', value: '4' },
         { label: 'Profondeur maximale', value: '94 pi' },
         { label: 'Moyenne des maximales', value: '78 pi' },

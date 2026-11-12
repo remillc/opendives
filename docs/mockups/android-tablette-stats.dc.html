@@ -60,7 +60,7 @@ h1,h2,h3,h4,h1 *,h2 *,h3 *,h4 *,[style*='font-size: 2'],[style*='font-size: 3'],
     </div>
     <dl style="margin: 8px 0 0 16px; background: #E8E8E5; border-radius: 16px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; font-variant-numeric: tabular-nums">
       <div style="padding: 14px 12px"><dt style="font-size: 12px; color: #4A4D52; letter-spacing: 0.4px">Plongées</dt><dd style="margin: 2px 0 0 0; font-size: 22px">9</dd></div>
-      <div style="padding: 14px 12px"><dt style="font-size: 12px; color: #4A4D52; letter-spacing: 0.4px">Sous l’eau</dt><dd style="margin: 2px 0 0 0; font-size: 22px">11 h 26</dd></div>
+      <div style="padding: 14px 12px"><dt style="font-size: 12px; color: #4A4D52; letter-spacing: 0.4px">Sous l’eau</dt><dd style="margin: 2px 0 0 0; font-size: 22px">11 h 26</dd></div>
       <div style="padding: 14px 12px"><dt style="font-size: 12px; color: #4A4D52; letter-spacing: 0.4px">La plus profonde</dt><dd style="margin: 2px 0 0 0; font-size: 22px">333 ft</dd></div>
     </dl>
     <sc-for list="{{sections}}" as="s" hint-placeholder-count="4">
@@ -119,13 +119,13 @@ class Component extends DCLogic {
     });
     return {
       sections: [
-        { title: 'Par mode', empty: false, rows: [row('Circuit ouvert', '7 h 29', 6), row('Recycleur', '3 h 58', 3)] },
+        { title: 'Par mode', empty: false, rows: [row('Circuit ouvert', '7 h 29', 6), row('Recycleur', '3 h 58', 3)] },
         { title: 'Par combinaison', empty: true, emptyText: 'Aucune combinaison notée pour l’instant.', rows: [] },
         { title: 'Par compagnon', empty: true, emptyText: 'Aucun compagnon noté pour l’instant.', rows: [] },
-        { title: 'Par ordinateur', empty: false, rows: [row('Suunto Vyper Air', '4 h 07', 4, true), row('AP DiveSight', '1 h 44', 1), row('Shearwater Perdix 2', '1 h 42', 1)] }
+        { title: 'Par ordinateur', empty: false, rows: [row('Suunto Vyper Air', '4 h 07', 4, true), row('AP DiveSight', '1 h 44', 1), row('Shearwater Perdix 2', '1 h 42', 1)] }
       ],
       facts: [
-        { label: 'Temps sous l’eau', value: '4 h 07' },
+        { label: 'Temps sous l’eau', value: '4 h 07' },
         { label: 'Plongées', value: '4' },
         { label: 'Profondeur maximale', value: '94 ft' },
         { label: 'Moyenne des maximales', value: '78 ft' },
