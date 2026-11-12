@@ -93,6 +93,9 @@
     /* Loading indicator (Android): the water gradient, sand to rust. */
     --od-loading-indicator-top: #F3C47A;
     --od-loading-indicator-bottom: #B4530F;
+    /* Drawn cylinders: pale band between the end and the start pressure, and the dashed level lines. */
+    --od-cylinder-breathed: #F6DCAE;
+    --od-cylinder-level: #B4530F;
     --od-trace: #1F2124;
     /* Outline drawn under the profile line; only used in dark mode. */
     --od-trace-outline: transparent;
@@ -194,6 +197,8 @@
     --od-water-bottom: #EF7625;
     --od-loading-indicator-top: #E5B961;
     --od-loading-indicator-bottom: #EF7625;
+    --od-cylinder-breathed: #5C4A2A;
+    --od-cylinder-level: #E5B961;
     --od-trace: #F4F4F2;
     --od-trace-outline: #121314;
     --od-chart-grid: #3A3C40;

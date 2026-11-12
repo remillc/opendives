@@ -11,11 +11,12 @@
 
   /**
    * @type {{
-   *   items: { key: number, n: number, gas: string, pressure: string, ratio: number }[],
+   *   items: { key: number, n: number, gas: string, pressure: string, ratio: number, startRatio: number|null }[],
    *   onopen: () => void,
    *   onedit: (key: number) => void,
    * }}
-   * pressure: the end pressure as shown ("1 885 psi"), empty when unknown.
+   * pressure: the end pressure as shown ("1 885 psi"), empty when unknown. ratio and startRatio:
+   * the end and start levels drawn (lib/gas-summary.js fillLevels).
    */
   let { items, onopen, onedit } = $props();
 
@@ -34,7 +35,7 @@
   <div class="od-gas-summary--cylinders">
     {#each items as item (item.key)}
       <button type="button" class="od-gas-summary--cylinder" data-key={item.key} aria-label={t('edit.cylinderOpen', { n: item.n, gas: item.gas })}>
-        <CylinderDrawing ratio={item.ratio} />
+        <CylinderDrawing ratio={item.ratio} startRatio={item.startRatio} />
         <span class="od-gas-summary--gas">{item.gas}</span>
         {#if item.pressure}<span class="od-gas-summary--pressure od-value">{item.pressure}</span>{/if}
       </button>

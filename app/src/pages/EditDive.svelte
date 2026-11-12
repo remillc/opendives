@@ -22,6 +22,7 @@
   import CylinderSheet from '../components/CylinderSheet.svelte';
   import CylinderDeleteDialog from '../components/CylinderDeleteDialog.svelte';
   import GasSummary from '../components/GasSummary.svelte';
+  import { fillLevels } from '../lib/gas-summary.js';
   import StarsInput from '../components/StarsInput.svelte';
   import Stars from '../components/Stars.svelte';
   import { conditionsMean, roundHalfUp1 } from '../lib/conditions.js';
@@ -456,6 +457,11 @@
     const own = cylinderValues(c);
     return fillRatio(own.endMbar, own.workingPressureMbar, own.startMbar);
   };
+  /** The drawn levels: `ratio` is the end level, `startRatio` the start level (pale band). */
+  const levelsOf = (/** @type {ReturnType<typeof cylinderValues>} */ own) => {
+    const levels = fillLevels(own.startMbar, own.endMbar, own.workingPressureMbar);
+    return { ratio: levels.end, startRatio: levels.start };
+  };
   const gasItems = $derived(
     cylinders.map((c, i) => {
       const own = cylinderValues(c);
@@ -464,7 +470,7 @@
         n: i + 1,
         gas: gasName(own.o2, own.he, gasWords),
         pressure: own.endMbar ? formatPressure(own.endMbar, prefs) : '',
-        ratio: fillRatio(own.endMbar, own.workingPressureMbar, own.startMbar),
+        ...levelsOf(own),
       };
     }),
   );
