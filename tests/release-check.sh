@@ -99,7 +99,7 @@ mutations_cpp() {
 }
 mutations_js() {
   local bad=0
-  for m in psi cuft ft alarm mod decomodel carried; do
+  for m in psi cuft ft mod decomodel; do
     if OD_JS_MUTATE=$m "$NODE" --import ./tests/app/register.mjs --test tests/app/planner.test.mjs >"$OUT/logs/mutation-app-$m.log" 2>&1; then
       echo "NOT DETECTED: app with $m"; bad=1
     else

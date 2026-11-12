@@ -24,10 +24,8 @@ const MUTATIONS = {
   psi: ['', '68.947572932', '68.9'],
   cuft: ['', '28316.8466', '28000'],
   ft: ['', '304.8', '300'],
-  alarm: ['planner-rules.js', 'carriedMl > 0 && carriedMl < totalMl', 'carriedMl > 0 && carriedMl <= totalMl'],
   mod: ['planner-rules.js', 'bottomModMm > 0 && maxDepthMm > bottomModMm', 'bottomModMm > 0 && maxDepthMm >= bottomModMm'],
   decomodel: ['planner.svelte.js', "decoModel: deco.decoModel === 'vpmb' ? 1 : 0,", "decoModel: deco.decoModel === 'vpmb' ? 0 : 1,"],
-  carried: ['planner.svelte.js', '...(g.carriedMl > 0 ? { carriedMl: Math.round(g.carriedMl) } : {}),', '...{ carriedMl: Math.round(g.carriedMl) },'],
 };
 
 function mutate(url, source) {

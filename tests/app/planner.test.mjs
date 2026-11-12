@@ -45,14 +45,8 @@ test('pressure: bar and psi to mbar', () => {
   assert.equal(rules.mbarToPressure(200000, false), 200);
 });
 
-test('alarm "Volume transporté": only when given and below the total', () => {
+test('volume needed per gas: what is breathed plus the reserve', () => {
   assert.equal(rules.gasTotalMl({ gasUsedMl: 1500000, reserveMl: 500000 }), 2000000);
-  assert.equal(rules.isShort(0, 2000000), false, 'not given: no alarm');
-  assert.equal(rules.isShort(1999999, 2000000), true, 'one ml short');
-  assert.equal(rules.isShort(2000000, 2000000), false, 'exactly the total is enough');
-  assert.equal(rules.isShort(2000001, 2000000), false);
-  assert.equal(rules.isShort(1, 2000000), true);
-  assert.equal(rules.isShort(-5, 2000000), false);
 });
 
 test('alarm of the bottom gas (MOD): only below the deepest point', () => {
@@ -72,8 +66,8 @@ test('request: levels, gases and conditions as the core takes them', () => {
     { depthMm: rules.depthToMm(60, true), durationSeconds: 10 * 60 + 0.4 },
   ];
   planner.gases = [
-    { o2Permille: 210, hePermille: 350, carriedMl: 0 },
-    { o2Permille: 500, hePermille: 0, carriedMl: rules.carriedToMl(40, true) },
+    { o2Permille: 210, hePermille: 350 },
+    { o2Permille: 500, hePermille: 0 },
   ];
   planner.salinity = 10000;
   planner.surfacePressureMbar = tools.altitudeToPressureMbar(rules.depthToMm(5000, true));
@@ -90,8 +84,8 @@ test('request: levels, gases and conditions as the core takes them', () => {
   assert.equal(request.decoModel, 1);
   assert.equal(request.vpmbConservatism, 2);
   assert.deepEqual(request.cylinders, [
-    { o2Permille: 210, hePermille: 350 }, // no volume carried: not sent
-    { o2Permille: 500, hePermille: 0, carriedMl: 1132674 },
+    { o2Permille: 210, hePermille: 350 },
+    { o2Permille: 500, hePermille: 0 },
   ]);
   planner.deco = { decoModel: 'buehlmann', gfLow: 45, gfHigh: 85, vpmbConservatism: 3 };
   const buehlmann = planRequest();
@@ -103,7 +97,7 @@ test('request: levels, gases and conditions as the core takes them', () => {
 test('request: a plan from a logbook dive sends the dive, not the levels', () => {
   planner.source = { id: 42, number: 7, durationSeconds: 3000, date: '2025-01-01T10:00:00', site: 'x', maxDepthMm: 20000, profile: [] };
   planner.levels = [{ depthMm: 99000, durationSeconds: 60 }];
-  planner.gases = [{ o2Permille: 209, hePermille: 0, carriedMl: 0, sourceCylinder: 1 }];
+  planner.gases = [{ o2Permille: 209, hePermille: 0, sourceCylinder: 1 }];
   const request = planRequest();
   assert.equal(request.sourceDiveId, 42);
   assert.equal(request.levels, undefined);
@@ -160,11 +154,7 @@ test('altitude and water of a plan', () => {
   assert.equal(tools.salinityOfWaterType(undefined), 10300);
 });
 
-test('the alarm texts name the missing volume in the diver\'s unit', () => {
-  const total = 2000000;
-  const carried = 1500000;
-  const missing = rules.isShort(carried, total) ? t('plan.volumeShort', { missing: format.formatGasVolume(total - carried, imperial) }) : '';
-  assert.match(plain(missing), /18 pi³/); // 500 000 ml = 17.66 cuft, shown as a whole number
+test('the alarm text of the bottom gas names its depth', () => {
   assert.match(plain(t('plan.modText', { po2: format.formatNumber(1.4, 1), depth: '56 m' })), /56 m/);
 });
 
@@ -192,6 +182,13 @@ test('a saved plan keeps its settings, whatever Settings say when it is reopened
   applyRequest(older, 8, null);
   assert.equal(planner.kept, null, 'a plan saved before: the current Settings');
   assert.equal(planRequest().descentMmMin, undefined);
+});
+
+test('a plan saved with a volume carried still opens, the field being ignored', () => {
+  planner.kept = null;
+  applyRequest({ levels: [{ depthMm: 30000, durationSeconds: 1200 }], cylinders: [{ o2Permille: 210, hePermille: 0, carriedMl: 12000 }] }, 9, null);
+  assert.equal(planner.gases[0].carriedMl, undefined);
+  assert.deepEqual(planRequest().cylinders, [{ o2Permille: 210, hePermille: 0 }]);
 });
 
 test('two SACs: the request carries the bottom SAC and the deco SAC, each its own', () => {
