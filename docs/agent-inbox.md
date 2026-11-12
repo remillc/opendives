@@ -1731,7 +1731,7 @@ Christian's request: in the floating toolbar of the dive detail (task 39), the o
 Done in `feature/toolbar-plan-first`: the detail toolbar reads Modifier, Planifier depuis cette plongée, Partager, ⋮ (phone, dark mode and tablet panes share it). The iOS menu already listed Planifier before Partager.
 
 
-## [ ] 2026-11-12-60 Dive computers move into Équipement
+## [x] 2026-11-12-60 Dive computers move into Équipement
 
 Christian's request: the dive computers of a dive belong to the equipment.
 - **Modifier la plongée** (`android-edition`, `android-edition-bouteille`, tablet edit boards): the card "Ordinateurs" goes away. Its content becomes a sub-section at the bottom of the Équipement card, after the weights and "Ajouter un lest": a sub-title "Ordinateurs" in the same style as "Lest" (14 sp semibold), then the computer rows as today (task 58 pattern, main computer tinted and checked) and the helper "Avec plusieurs ordinateurs, choisissez le principal."
@@ -1739,6 +1739,11 @@ Christian's request: the dive computers of a dive belong to the equipment.
 - Settings keep their "Ordinateurs de plongée" group (the logbook's computers), unchanged.
 - Tablet and iOS: the same.
 
-## [ ] 2026-11-12-61 Dive detail: Conditions after Équipement
+Done in `feature/computers-in-equipment` (e06db78): Modifier la plongée has no Ordinateurs card; the computers are a sub-section at the end of Équipement (sub-title in the Lest style, ChoiceRow rows, helper). The detail has no Ordinateurs de plongée section; the Équipement card has an "Ordinateur" row (main computer, variant colour), lists all computers with "Principal" when open, opens when there are several (`equipmentOpens`, tested), and shows with a computer only. Settings unchanged. Checked on the phone emulator.
+
+## [x] 2026-11-12-61 Dive detail: Conditions after Équipement
 
 Christian's request: in every dive detail view, the Conditions card moves right after Équipement. Order: data grid, then Personnes, Étiquettes, Gaz, Équipement, **Conditions**, Photos et vidéos, Notes. Phone (light, dark, cursor on the profile, menu open) and tablet detail panes; "Modifier la plongée" already has this order. Mock-ups: `detail3-android`, `-sombre`, `-curseur`, `detail2-android-menu`, `android-tablette-*` detail panes. Order only. iOS: the same.
+
+Done in `feature/computers-in-equipment` (fe6683a): in DiveDetail the Conditions card follows Équipement (data grid, Personnes, Étiquettes, Gaz, Équipement, Conditions, Photos et vidéos, Notes); phone, tablet panes and iOS share the file.
+
