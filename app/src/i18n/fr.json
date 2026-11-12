@@ -1552,6 +1552,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Planificateur : les étiquettes des niveaux du graphique ne se chevauchent plus.",
       "Planificateur : « Simplifier le profil » dans le menu ⋮ remplace le profil mesuré de la plongée de départ par quelques niveaux (profondeur et durée) à modifier comme dans un nouveau plan ; « Annuler » rend le profil mesuré.",
       "Une plongée seule dans son voyage (un voyage d’une plongée, que le Carnet n’affiche pas comme voyage) ne propose plus « Retirer du voyage » ; un voyage sans nom s’affiche « Voyage du … » dans la fiche.",
       "Les étiquettes viennent juste sous les notes, dans la fiche d’une plongée comme dans « Modifier la plongée ».",

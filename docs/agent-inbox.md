@@ -1811,7 +1811,7 @@ Christian reports that on `/dives/88554` the ⋮ menu of the dive detail shows "
 Done in `fix/remove-from-trip-shown`: dive 88554 (no number, 4 Nov 2026) was the only dive of a trip made by hand (not `autogen`) and unnamed, id 88551. The logbook draws a one-dive trip as the dive and the detail hid it, but the ⋮ item only skipped automatic one-dive trips. `shownTrip` (lib/trip-shown.js, tested: no trip, one-dive manual trip, two-dive automatic trip) is now the one rule for the detail header, the ⋮ item and the logbook selection's "Retirer du voyage": a trip with two dives or more. The header names an unnamed trip "Voyage du …". Checked on Christian's phone (88554: Renuméroter and Supprimer only).
 
 
-## [ ] 2026-11-12-68 Planner: "Simplifier le profil"
+## [x] 2026-11-12-68 Planner: "Simplifier le profil"
 
 Christian's request. Spec: new paragraph "Planner: simplify the profile" in `docs/ui-specification.md`. Mock-ups: `android-planificateur-menu` (menu item), `android-planificateur-simplifie` (result).
 - Planner ⋮ menu, first item, only when the plan starts from a logbook dive: **"Simplifier le profil"** (bowl-shaped profile icon, path `M3 5l4 12h10l4-12`).
@@ -1821,3 +1821,6 @@ Christian's request. Spec: new paragraph "Planner: simplify the profile" in `doc
 - Tablet and iOS: the same item and result.
 - Tests: a square dive gives one level; a two-phase dive gives two levels; Annuler restores the original plan.
 - A line in the release notes.
+
+Done in `feature/simplify-profile-stop` (from `feature/simplify-profile`): `simplifyProfile` (lib/profile-levels.js, tested: square dive one level, two phases two levels, noise and spikes ignored, multilevel ascent at most 6 levels, the end-of-dive stop at 6 m or shallower not a level) turns the measured profile into levels; the ⋮ item "Simplifier le profil" (first, only for a plan from a dive) applies them through the new-plan levels path with `sourceDiveId` kept, so the plan keeps the dive's date, surface interval, gases, SAC and conditions; "Profil prévu" with level labels (placed so that they never overlap, lib/chart-labels.js), the Niveaux rows and the helper; snackbar "Profil simplifié" with Annuler restoring the measured plan (tested; checked on the emulator: 97 min, 137 min simplified, 97 min after Annuler). Core: `run_plan` uses the source dive's waypoints only when no levels are given (plan.cpp, one line); `build/poc/plan` 0 failed, natives rebuilt. **Release lock:** planner code changed, a new `tests/release-check.sh` report is needed before the next tag.
+
