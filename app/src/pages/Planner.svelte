@@ -15,11 +15,15 @@
   import TextField from '../components/TextField.svelte';
   import SelectField from '../components/SelectField.svelte';
   import ChoiceField from '../components/ChoiceField.svelte';
+  import SacField from '../components/SacField.svelte';
+  import AltitudeField from '../components/AltitudeField.svelte';
   import ButtonField from '../components/ButtonField.svelte';
   import WheelDialog from '../components/WheelDialog.svelte';
   import DatePickerDialog from '../components/DatePickerDialog.svelte';
   import TimePickerDialog from '../components/TimePickerDialog.svelte';
   import ShareSheet from '../components/ShareSheet.svelte';
+  import PlanTitleDialog from '../components/PlanTitleDialog.svelte';
+  import { cleanPlanTitle } from '../lib/plan-title.js';
   import { logbook, savePlan } from '../lib/logbook.svelte.js';
   import { planner, loadSetup, adoptUnitDefaults, planRequest, startFromDive, startNewDive, requestOfPlan, applyRequest, nextGas, planSettings, canSimplify, simplifyPlan, restorePlan } from '../lib/planner.svelte.js';
   import { simplifyProfile } from '../lib/profile-levels.js';
@@ -29,7 +33,7 @@
   import { ios } from '../lib/layout.svelte.js';
   import { WATER_TYPES, altitudeToPressureMbar, formatHoursMinutes, pressureToAltitudeMm, waterTypeName, waterTypeOfSalinity } from '../lib/tools.js';
   import { sharePlanPdf, sharePlanSummary } from '../lib/share.js';
-  import { MM_PER_FT, ML_PER_CUFT, O2_CHOICES, HE_CHOICES, altitudePresets, depthToMm, gasTotalMl, gasValid, modAlarm, mmToDepth, roundSacMl, sacChoices } from '../lib/planner-rules.js';
+  import { MM_PER_FT, ML_PER_CUFT, O2_CHOICES, HE_CHOICES, depthToMm, gasTotalMl, gasValid, modAlarm, mmToDepth, roundSacMl } from '../lib/planner-rules.js';
 
   /**
    * `reopen`: the route /plans/<id>, a saved plan; otherwise /plan/new or /plan/<dive id>.
@@ -50,6 +54,7 @@
   let choosing = $state(false);
   let sharing = $state(false);
   let saving = $state(false);
+  let titling = $state(false);
   let decoOpen = $state(false);
   let dialog = $state(/** @type {null|'date'|'time'} */ (null));
 
@@ -108,7 +113,7 @@
         request.levels = plan.levels;
       }
       const source = stillThere ? (await sourceOf(/** @type {number} */ (request.sourceDiveId))).source : null;
-      applyRequest(request, id, source);
+      applyRequest(request, id, source, plan.title ?? '');
     } catch (e) {
       console.error('Reopening a plan', e);
       failed = true;
@@ -205,15 +210,14 @@
 
   let levelFields = $state(/** @type {{ key: number, depth: string, time: string }[]} */ ([]));
   let gasFields = $state(/** @type {{ key: number, o2: string, he: string }[]} */ ([]));
-  let altitudeField = $state('');
   let gfLowField = $state('');
   let gfHighField = $state('');
   /** @type {Record<string, boolean>} */
   let invalid = $state({});
   let nextKey = 0;
 
-  /** The altitude of the plan as typed: a whole foot or metre (read from a dive's surface pressure it has no useful decimal). */
-  const altitudeText = () => show(Math.max(0, Math.round(mmToDepth(pressureToAltitudeMm(planner.surfacePressureMbar), feet))));
+  /** The altitude of the plan: a whole foot or metre (read from a dive's surface pressure it has no useful decimal). */
+  const altitude = $derived(Math.max(0, Math.round(mmToDepth(pressureToAltitudeMm(planner.surfacePressureMbar), feet))));
 
   /** The fields from the plan: on opening, and when "Changer" brings another dive. */
   function fillFields() {
@@ -230,7 +234,6 @@
       o2: show(g.o2Permille / 10),
       he: show(g.hePermille / 10),
     }));
-    altitudeField = altitudeText();
     gfLowField = show(planner.deco.gfLow);
     gfHighField = show(planner.deco.gfHigh);
     invalid = {};
@@ -333,43 +336,24 @@
     return switchMm ? t('plan.gasSwitch', { name, depth: depthText(switchMm) }) : name;
   }
 
-  /**
-   * A SAC, an exposed dropdown menu: the steps around the current value (0.01
-   * cuft/min or 0.5 L/min), always shown with the unit's own decimals (two in
-   * cuft/min). The current value was rounded to its step on loading. In ml/min.
-   * @param {number} current
-   */
-  function sacOptionsOf(current) {
-    return { selected: current, list: sacChoices(current, cuft).map((ml) => ({ value: String(ml), label: formatSac(ml, prefs) })) };
-  }
   /** A SAC for screen readers: the number and the unit in words. @param {number} ml */
   const sacSpoken = (ml) =>
     cuft
       ? t('units.cubicFeetPerMinuteLong', { n: Math.round((ml / ML_PER_CUFT) * 100) / 100, v: formatNumber(ml / ML_PER_CUFT, 2) })
-      : t('units.litersPerMinuteLong', { n: Math.round(ml / 100) / 10, v: formatNumber(ml / 1000, 1) });
+      : t('units.litersPerMinuteLong', { n: Math.round(ml / 10) / 100, v: formatNumber(ml / 1000, 2) });
+  const sacUnit = $derived(t(cuft ? 'units.cubicFeetPerMinute' : 'units.litersPerMinute'));
   // Two SACs (Subsurface's bottom SAC and deco SAC): at the bottom, and during the ascent and the stops.
-  const sacOptions = $derived(sacOptionsOf(planner.bottomSacMlMin));
-  const decoSacOptions = $derived(sacOptionsOf(planner.decoSacMlMin));
-  let sacChoice = $state('');
-  let decoSacChoice = $state('');
-  $effect(() => {
-    sacChoice = String(sacOptions.selected);
-  });
-  $effect(() => {
-    decoSacChoice = String(decoSacOptions.selected);
-  });
-  $effect(() => {
-    const ml = Number(sacChoice);
-    if (!ml || ml === sacOptions.selected) return;
+  // Editable dropdowns (task 71): the field hands back a value in ml/min, clamped.
+  /** @param {number} ml */
+  function setBottomSac(ml) {
     planner.bottomSacMlMin = ml;
     planner.version++;
-  });
-  $effect(() => {
-    const ml = Number(decoSacChoice);
-    if (!ml || ml === decoSacOptions.selected) return;
+  }
+  /** @param {number} ml */
+  function setDecoSac(ml) {
     planner.decoSacMlMin = ml;
     planner.version++;
-  });
+  }
 
   // --- Date, for a new dive --------------------------------------------------
 
@@ -422,8 +406,10 @@
   });
   const waterOptions = WATER_TYPES.map((w) => ({ value: w.id, label: waterTypeName(w.id) }));
 
-  function altitudeChanged() {
-    typed('altitude', altitudeField, 0, feet ? 16000 : 5000, (v) => (planner.surfacePressureMbar = altitudeToPressureMbar(depthToMm(v, feet))));
+  /** @param {number} v a whole foot or metre, already clamped by the field */
+  function setAltitude(v) {
+    planner.surfacePressureMbar = altitudeToPressureMbar(depthToMm(v, feet));
+    planner.version++;
   }
 
   let modelChoice = $state('');
@@ -564,11 +550,21 @@
     else f7router.navigate('/plans/', { reloadCurrent: true });
   }
 
-  async function save() {
+  /** "Enregistrer": a new plan asks for its title first, a reopened one keeps its own. */
+  function save() {
+    if (!canSave) return;
+    if (planner.planId) saveWith(planner.title);
+    else titling = true;
+  }
+
+  /** @param {string} wanted */
+  async function saveWith(wanted) {
+    titling = false;
     if (!canSave || !result) return;
     saving = true;
     try {
-      await savePlan({ ...planRequest(), ...planSettings(), when: result.when }, planner.planId);
+      planner.title = cleanPlanTitle(wanted);
+      planner.justSaved = await savePlan({ ...planRequest(), ...planSettings(), when: result.when }, planner.planId, planner.title);
       toList();
     } catch (e) {
       console.error('Saving the plan', e);
@@ -582,7 +578,7 @@
   async function share(kind) {
     sharing = false;
     if (!result) return;
-    const title = planner.source ? planner.source.site || t('dive.siteNotSet') : t('plan.noStartDive');
+    const title = planner.title || (planner.source ? planner.source.site || t('dive.siteNotSet') : t('plan.noStartDive'));
     try {
       if (kind === 'pdf') await sharePlanPdf(result, planRequest(), prefs, title);
       else await sharePlanSummary(result, planRequest(), prefs, title);
@@ -766,8 +762,8 @@
         <button type="button" class="od-planner--add" onclick={addGas}><Icon name="plus" size={18} />{t('plan.addGas')}</button>
         <p class="od-planner--subhead">{t('plan.sac')}</p>
         <div class="od-planner--pair">
-          <SelectField label={t('plan.sacBottom')} bind:value={sacChoice} options={sacOptions.list} ariaLabel={t('plan.sacBottomLong', { value: sacSpoken(sacOptions.selected) })} />
-          <SelectField label={t('plan.sacDeco')} bind:value={decoSacChoice} options={decoSacOptions.list} ariaLabel={t('plan.sacDecoLong', { value: sacSpoken(decoSacOptions.selected) })} />
+          <SacField label={t('plan.sacBottom')} value={planner.bottomSacMlMin} {cuft} unit={sacUnit} ariaLabel={t('plan.sacBottomLong', { value: sacSpoken(planner.bottomSacMlMin) })} helper={t('plan.sacHelper')} openLabel={t('plan.sacOpen')} onchange={setBottomSac} />
+          <SacField label={t('plan.sacDeco')} value={planner.decoSacMlMin} {cuft} unit={sacUnit} ariaLabel={t('plan.sacDecoLong', { value: sacSpoken(planner.decoSacMlMin) })} helper={t('plan.sacHelper')} openLabel={t('plan.sacOpen')} onchange={setDecoSac} />
         </div>
         <p class="od-planner--helper od-planner--inner">{t(planner.source ? 'plan.sacFromDive' : 'plan.sacFromSettings')}</p>
       </div>
@@ -776,21 +772,7 @@
       <div class="od-planner--fields">
         <div class="od-planner--pair">
           <SelectField label={t('plan.waterType')} bind:value={water} options={waterOptions} />
-          <ChoiceField
-            label={t('plan.altitude')}
-            bind:value={altitudeField}
-            presets={altitudePresets(feet)}
-            unit={depthUnit(prefs)}
-            otherLabel={t('plan.otherValue')}
-            backLabel={t('plan.backToList')}
-            ariaLabel={t('plan.altitudeLong', { value: `${formatNumber(parse(altitudeField))} ${depthUnit(prefs)}` })}
-            invalid={invalid.altitude}
-            oninput={altitudeChanged}
-            onrevert={() => {
-              altitudeField = altitudeText();
-              invalid.altitude = false;
-            }}
-          />
+          <AltitudeField label={t('plan.altitude')} value={altitude} {feet} unit={depthUnit(prefs)} ariaLabel={t('plan.altitudeLong', { value: `${formatNumber(altitude)} ${depthUnit(prefs)}` })} openLabel={t('plan.sacOpen')} onchange={setAltitude} />
         </div>
         <p class="od-planner--helper od-planner--inner">{t(planner.source ? 'plan.conditionsFromDive' : 'plan.conditionsDefault')}</p>
       </div>
@@ -921,6 +903,10 @@
     </Page>
   </Popup>
 </Page>
+
+{#if titling}
+  <PlanTitleDialog title={planner.title} oncancel={() => (titling = false)} onsave={saveWith} />
+{/if}
 
 {#if sharing}
   <ShareSheet pdfText={t('plan.sharePdfText')} summaryLabel={t('plan.shareSummary')} summaryText={t('plan.shareSummaryText')} onpdf={() => share('pdf')} onsummary={() => share('summary')} onclose={() => (sharing = false)} />

@@ -1030,7 +1030,7 @@ class OpenDivesCorePlugin : Plugin() {
             call.reject("Missing request", "BAD_ARGUMENT")
             return@onCoreThread
         }
-        call.resolve(JSObject().put("json", NativeCore.savePlan(request.toString(), call.getInt("replaceId") ?: 0)))
+        call.resolve(JSObject().put("json", NativeCore.savePlan(request.toString(), call.getInt("replaceId") ?: 0, call.getString("title") ?: "")))
     }
 
     /** Deletes a dive (delete_dive): one undoable step. */

@@ -1552,6 +1552,9 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Planificateur : les champs Altitude (les Conditions du planificateur et Réglages › Conditions des outils) sont des listes déroulantes modifiables : la flèche propose de 0 à 10 000 ft (0 à 3 000 m) et on peut taper n’importe quelle altitude entière, limitée à 0 à 15 000 ft (4 500 m).",
+      "Planificateur : chaque champ de consommation (SAC) (« Au fond » et « Pendant la déco » du planificateur, et les réglages du planificateur) est une liste déroulante modifiable : la flèche propose 0,0, 0,5, 1,0, 1,5 et 2,0 cuft/min (0, 15, 30, 45 et 60 L/min), et on peut taper sa propre valeur, gardée à deux décimales et limitée à 0 à 2 cuft/min (0 à 60 L/min).",
+      "Planificateur : « Enregistrer » demande un titre pour un nouveau plan (le site de la plongée de départ par défaut, vide permis), puis revient à « Plongées planifiées » en mettant le nouveau plan en évidence un instant. Le titre remplace le site dans la liste ; sans titre, une ligne affiche « Plan du » suivi de sa date. « Sans plongée de départ » ne s’affiche plus.",
       "Planificateur : le champ facultatif « Volume transporté » de chaque gaz disparaît, avec la couleur d’alarme de « Volume nécessaire par gaz », qui affiche toujours le total, le volume consommé et la réserve dans la couleur normale. Les plans enregistrés qui avaient un volume transporté s’ouvrent toujours.",
       "Planificateur : les étiquettes des niveaux du graphique ne se chevauchent plus.",
       "Planificateur : « Simplifier le profil » dans le menu ⋮ remplace le profil mesuré de la plongée de départ par quelques niveaux (profondeur et durée) à modifier comme dans un nouveau plan ; « Annuler » rend le profil mesuré.",
@@ -1857,6 +1860,9 @@
     "shareSummaryText": "Niveaux, paliers, gaz et volumes",
     "shareHeadline": "{depth}, durée totale {time}",
     "shareFailed": "Le plan n’a pas pu être partagé.",
+    "saved": "Plan enregistré",
+    "titleDialog": "Enregistrer le plan",
+    "titleLabel": "Titre",
     "saveFailed": "Le plan n’a pas pu être enregistré.",
     "filePrefix": "OpenDives-plan",
     "noStartDive": "Sans plongée de départ",
@@ -1883,6 +1889,8 @@
     "gasOxygenLong": "Gaz {n}, oxygène : {value}",
     "gasHeliumLong": "Gaz {n}, hélium : {value}",
     "altitudeLong": "Altitude : {value}",
+    "sacHelper": "Choisissez une valeur ou tapez la vôtre, à deux décimales.",
+    "sacOpen": "Afficher les valeurs usuelles",
     "sacBottomLong": "Consommation au fond : {value}",
     "sacDecoLong": "Consommation pendant la déco : {value}",
     "sacBottom": "Au fond",
@@ -2435,6 +2443,7 @@
     "deleteText": "Il disparaît aussi du carnet synchronisé.",
     "deleted": "Plan supprimé",
     "deleteFailed": "Le plan n’a pas pu être supprimé.",
+    "fallbackTitle": "Plan du {date}",
     "failed": "Les plongées planifiées n’ont pas pu être lues."
   },
   "band": {

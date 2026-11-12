@@ -486,13 +486,18 @@ int plan_dive(const std::string &request, std::string &json, std::string &error)
 // [{"id", "date", "when", "site", "maxDepthMm", "durationSeconds", "salinity",
 //   "surfacePressureMbar", "profile", "levels": [{"depthMm", "durationSeconds"}],
 //   "gases": [{"o2Permille", "hePermille"}], "request": the plan as saved by
-//   OpenDives, a JSON text, or ""}], newest first.
+//   OpenDives, a JSON text, or "", "title": the title kept with the plan, or ""}],
+//   newest first.
 int list_plans(std::string &json);
 // Saves the plan of `request` (as plan_dive; cylinders without size or
 // pressure) as a planned dive, not numbered and in no trip, in one undoable
 // step; replace_id, when not 0, is the plan it replaces (Subsurface's
-// replan). INVALID_PLAN when the core refuses the plan.
-int save_plan(const std::string &request, int replace_id, std::string &result_json, std::string &error);
+// replan). INVALID_PLAN when the core refuses the plan. `title` is kept in the
+// extra data of the planned dive's first dive computer ("OpenDives title"),
+// next to the plan; empty (after trimming) writes no key, so a replaced plan
+// loses its previous title.
+int save_plan(const std::string &request, int replace_id, std::string &result_json, std::string &error,
+	      const std::string &title = std::string());
 // --- Free filter (filter.cpp), read-only -----------------------------------
 //
 // One constraint in the text form of Subsurface's filter presets (the

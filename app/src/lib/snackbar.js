@@ -14,14 +14,16 @@ import { snackbarClasses, snackbarTimeout } from './snackbar-logic.js';
  * @property {() => void} [onClosed] the snackbar is gone, whatever the cause
  * @property {number} [timeout] ms; raised to the floor (4 s, 6 s with an action)
  * @property {boolean} [undoable] closed at once when the undo history is cleared
+ * @property {boolean} [hasFab] force whether the snackbar floats above a FAB (default: the page has one);
+ *   false when the page moves its FAB up itself while the snackbar shows
  */
 
 /**
  * @param {string} text
  * @param {SnackbarOptions} [options]
  */
-export function showSnackbar(text, { action, onAction, onClosed, timeout, undoable } = {}) {
-  const hasFab = typeof document !== 'undefined' && !!document.querySelector('.view.tab-active .page-current .fab');
+export function showSnackbar(text, { action, onAction, onClosed, timeout, undoable, hasFab: forcedFab } = {}) {
+  const hasFab = forcedFab ?? (typeof document !== 'undefined' && !!document.querySelector('.view.tab-active .page-current .fab'));
   /** @type {Record<string, () => void>} */
   const on = {};
   if (action && onAction) on.closeButtonClick = onAction;

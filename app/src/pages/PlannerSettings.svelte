@@ -10,12 +10,13 @@
   import { Page, Navbar, Link, theme } from 'framework7-svelte';
   import RowMenu from '../components/RowMenu.svelte';
   import WheelDialog from '../components/WheelDialog.svelte';
+  import SacField from '../components/SacField.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
   import { DEFAULT_SAC_FACTOR } from '../lib/settings.svelte.js';
   import { planner, loadSetup, adoptUnitDefaults, plannerDefaults, setting, setSetting, ascentRate, setAscentRate } from '../lib/planner.svelte.js';
   import { formatNumber, formatPartialPressure, depthUnit } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
-  import { carriedToMl, depthToMm, mbarToPressure, mlToCarried, mmToDepth, pressureToMbar } from '../lib/planner-rules.js';
+  import { depthToMm, mbarToPressure, mmToDepth, pressureToMbar } from '../lib/planner-rules.js';
 
   loadSetup()
     .then(() => adoptUnitDefaults(logbook.prefs))
@@ -52,7 +53,8 @@
    * @typedef {{ kind: 'choice', id: string, label: string, value: string, current: string,
    *   options: { value: string, label: string }[], set: (v: string) => unknown }} ChoiceRow
    * @typedef {{ kind: 'switch', id: string, label: string, text?: string, checked: boolean, set: (v: boolean) => unknown }} SwitchRow
-   * @typedef {NumberRow|ChoiceRow|SwitchRow} Row
+   * @typedef {{ kind: 'sac', id: 'bottomSacMlMin'|'decoSacMlMin', label: string, text?: string, stored: number }} SacRow
+   * @typedef {NumberRow|ChoiceRow|SwitchRow|SacRow} Row
    */
 
   const perMinute = $derived(`${depthUnit(prefs)}/${t('units.minutes')}`);
@@ -72,19 +74,13 @@
     set,
   });
 
-  /** A SAC in L/min or cuft/min. @returns {NumberRow} */
-  const sacRow = (/** @type {'bottomSacMlMin'|'decoSacMlMin'} */ key, /** @type {string} */ label, /** @type {number} */ def, /** @type {string} */ text = '') => ({
-    kind: 'number',
+  /** A SAC, an editable dropdown (task 71), in ml/min. @returns {SacRow} */
+  const sacRow = (/** @type {'bottomSacMlMin'|'decoSacMlMin'} */ key, /** @type {string} */ label, /** @type {string} */ text = '') => ({
+    kind: 'sac',
     id: key,
     label,
     text,
     stored: Number(setting(key)),
-    def,
-    wheel: cuft ? range(0.2, 1.5, 0.01) : range(5, 40, 1),
-    toUnit: (ml) => mlToCarried(ml, cuft),
-    toStored: (v) => carriedToMl(v, cuft),
-    show: (v) => `${formatNumber(v, cuft ? 2 : 0)} ${sacUnit}`,
-    set: (ml) => setSetting(key, ml),
   });
 
   /** A ppO₂: the number is the same in bar and in ATA. @returns {NumberRow} */
@@ -155,8 +151,8 @@
         id: 'gas',
         title: t('plannerSettings.groups.gas'),
         rows: [
-          sacRow('bottomSacMlMin', t('plannerSettings.bottomSac'), 20000, t('plannerSettings.bottomSacText')),
-          sacRow('decoSacMlMin', t('plannerSettings.decoSac'), 17000),
+          sacRow('bottomSacMlMin', t('plannerSettings.bottomSac'), t('plannerSettings.bottomSacText')),
+          sacRow('decoSacMlMin', t('plannerSettings.decoSac')),
           po2Row('bottomPo2Mbar', t('plannerSettings.bottomPo2'), 1400),
           po2Row('decoPo2Mbar', t('plannerSettings.decoPo2'), 1600),
         ],
@@ -230,6 +226,20 @@
         <span class="toggle-icon"></span>
       </span>
     </label>
+  {:else if row.kind === 'sac'}
+    <div class="od-planner-settings--sac">
+      <SacField
+        label={row.label}
+        value={row.stored}
+        {cuft}
+        unit={sacUnit}
+        ariaLabel={`${row.label}`}
+        helper={t('plan.sacHelper')}
+        openLabel={t('plan.sacOpen')}
+        onchange={(ml) => Promise.resolve(setSetting(row.id, ml)).catch(failed)}
+      />
+      {#if row.text}<p class="od-planner-settings--supporting od-planner-settings--sac-text">{row.text}</p>{/if}
+    </div>
   {:else}
     <button type="button" class="od-planner-settings--row" aria-haspopup={row.kind === 'number' ? 'dialog' : 'listbox'} onclick={(e) => (dialog = row.kind === 'number' ? { kind: 'number', row } : { kind: 'choice', row, anchor: e.currentTarget })}>
       <span class="od-planner-settings--texts">
@@ -317,6 +327,16 @@
       :global(.od-planner-settings--ios-list) & {
         border-radius: 10px;
       }
+    }
+
+    /* A SAC field in its group: 12 dp from the edges, as every field in a white surface. */
+    .od-planner-settings--sac {
+      --od-field-margin: 12px;
+      padding-bottom: 8px;
+    }
+
+    .od-planner-settings--sac-text {
+      margin: 4px 16px 0;
     }
 
     .od-planner-settings--row {

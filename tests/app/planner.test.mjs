@@ -209,11 +209,11 @@ test('dropdown choices: every gas value, all shown; usual altitudes', () => {
   const range = (a, b) => Array.from({ length: b - a + 1 }, (_, i) => a + i);
   assert.deepEqual(rules.O2_CHOICES, range(5, 100), 'oxygen: 5 to 100 by 1');
   assert.deepEqual(rules.HE_CHOICES, range(0, 95), 'helium: 0 to 95 by 1');
-  assert.deepEqual(rules.altitudePresets(true), [0, 1000, 2000, 3000, 5000, 7000, 10000]);
-  assert.deepEqual(rules.altitudePresets(false), [0, 300, 600, 1000, 1500, 2000, 3000]);
+  assert.deepEqual(rules.altitudePresets(true), [0, 1000, 2000, 3000, 4000, 5000, 6000, 8000, 10000]);
+  assert.deepEqual(rules.altitudePresets(false), [0, 300, 600, 900, 1200, 1500, 2000, 2500, 3000]);
   assert.deepEqual(rules.choiceValues(rules.O2_CHOICES, 20.9).slice(0, 2), [20.9, 5], '20.9 % from a dive heads the menu');
   assert.deepEqual(rules.choiceValues(rules.O2_CHOICES, 32), rules.O2_CHOICES, 'a value of the list adds nothing');
-  assert.deepEqual(rules.choiceValues(rules.altitudePresets(false), 450), [450, 0, 300, 600, 1000, 1500, 2000, 3000]);
+  assert.deepEqual(rules.choiceValues(rules.altitudePresets(false), 450), [450, 0, 300, 600, 900, 1200, 1500, 2000, 2500, 3000]);
   assert.deepEqual(rules.choiceValues(rules.altitudePresets(false), NaN), rules.altitudePresets(false), 'empty or invalid entry: nothing added');
 });
 
@@ -238,22 +238,9 @@ test('SAC: rounded to its step before it is shown or used, two decimals in cuft/
   assert.equal(Math.abs(measured - cuft(0.36)) <= 1, true, 'the value used is the rounded one');
   assert.equal(rules.roundSacMl(measured, true), measured, 'rounding twice changes nothing');
   assert.equal(rules.roundSacMl(cuft(0.3549), true), Math.round(cuft(0.35)));
-  assert.equal(rules.roundSacMl(17300, false), 17500, 'litres: 0.5 L/min steps');
+  assert.equal(rules.roundSacMl(17300, false), 17300, 'litres: two decimals too since task 71 (was 0.5 L/min steps)');
+  assert.equal(rules.roundSacMl(17304, false), 17300);
   assert.equal(rules.roundSacMl(17000, false), 17000);
-  assert.equal(rules.sacStepMl(false), 500);
+  assert.equal(rules.sacStepMl(false), 10);
 });
 
-test('SAC menu: steps around the value, within the limits, the value itself when off them', () => {
-  const list = rules.sacChoices(17000, false);
-  assert.equal(list.length, 41);
-  assert.equal(list[0], 7000);
-  assert.equal(list[40], 27000);
-  assert.equal(list.includes(17000), true);
-  assert.equal(rules.sacChoices(1000, false)[0], 1000, 'not below 1 L/min');
-  assert.equal(rules.sacChoices(99000, false).at(-1), 99000, 'not above 99 L/min');
-  const c = rules.roundSacMl(0.36 * rules.ML_PER_CUFT, true);
-  const cl = rules.sacChoices(c, true);
-  assert.equal(cl.includes(c), true);
-  assert.equal(new Set(cl).size, cl.length, 'no value twice');
-  assert.equal(rules.sacChoices(1234, false).includes(1234), true, 'an off-step value stays in the list');
-});

@@ -257,6 +257,7 @@ import { registerPlugin } from '@capacitor/core';
  * @property {{depthMm: number, durationSeconds: number}[]} levels
  * @property {{o2Permille: number, hePermille: number}[]} gases
  * @property {string} request the plan as saved by OpenDives (JSON), or "" for one made elsewhere
+ * @property {string} title the title the diver gave it (extra data "OpenDives title" of the first dive computer), or ""
  */
 
 /**
@@ -663,8 +664,10 @@ import { registerPlugin } from '@capacitor/core';
  *   One tile of a ready region, base64 ('' for an empty tile). Rejects with NOT_FOUND when the
  *   region or the tile is absent.
  * @property {() => Promise<PlannedDive[]>} listPlans
- * @property {(options: {request: PlanRequest, replaceId?: number}) => Promise<EditResult>} savePlan
- *   Saves the plan as a planned dive, or replaces one: one undoable step.
+ * @property {(options: {request: PlanRequest, replaceId?: number, title?: string}) => Promise<EditResult>} savePlan
+ *   Saves the plan as a planned dive, or replaces one: one undoable step. `title` is kept
+ *   with the plan as extra data "OpenDives title" of its first dive computer; empty or
+ *   missing writes no key (a replaced plan loses its previous title).
  * @property {() => Promise<BluetoothStatus>} bluetoothStatus
  * @property {() => Promise<BluetoothStatus>} requestBluetoothPermission
  *   Asks for the Bluetooth permissions (Android 12+: nearby devices; before: location).

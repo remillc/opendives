@@ -313,6 +313,12 @@ int list_plans(std::string &json)
 				request = e.value;
 		std::replace(request.begin(), request.end(), '\'', '"');
 		append_json_string(json, request);
+		json += ",\"title\":";
+		std::string title;
+		for (const extra_data &e: d.dcs[0].extra_data)
+			if (e.key == "OpenDives title")
+				title = e.value;
+		append_json_string(json, title);
 		json += '}';
 	}
 	json += ']';

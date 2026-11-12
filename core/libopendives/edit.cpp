@@ -3431,7 +3431,8 @@ int create_dive(const std::string &fields_json, std::string &result_json, std::s
 	return 0;
 }
 
-int save_plan(const std::string &request, int replace_id, std::string &result_json, std::string &error)
+int save_plan(const std::string &request, int replace_id, std::string &result_json, std::string &error,
+	      const std::string &title)
 {
 	if (check_writable_log(error))
 		return -1;
@@ -3447,6 +3448,14 @@ int save_plan(const std::string &request, int replace_id, std::string &result_js
 	dive_site *site = nullptr;
 	if (internal::build_plan(request, *d, site, error))
 		return -1;
+	// The title, next to "OpenDives plan" (build_plan): no key when empty.
+	{
+		size_t from = title.find_first_not_of(" \t\r\n");
+		if (from != std::string::npos) {
+			size_t to = title.find_last_not_of(" \t\r\n");
+			add_extra_data(&d->dcs[0], "OpenDives title", title.substr(from, to - from + 1));
+		}
+	}
 	// DivePlannerPointsModel::createPlan(), without a number or a trip. Two
 	// dives of the log never start at the same second: the plan of a logged
 	// dive, or its duplicate, starts a minute later.

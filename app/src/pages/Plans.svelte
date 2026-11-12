@@ -12,8 +12,10 @@
   import ProfileThumbnail from '../components/ProfileThumbnail.svelte';
   import ShareSheet from '../components/ShareSheet.svelte';
   import { logbook, savePlan, deleteDives } from '../lib/logbook.svelte.js';
-  import { requestOfPlan, loadSetup } from '../lib/planner.svelte.js';
-  import { formatDepth, formatDuration, formatGasLong, formatLongDate, formatMixName } from '../lib/format.js';
+  import { planner, requestOfPlan, loadSetup } from '../lib/planner.svelte.js';
+  import { formatDepth, formatDuration, formatGasLong, formatLongDate, formatMixName, formatShortDate } from '../lib/format.js';
+  import { planRowTitle } from '../lib/plan-title.js';
+  import { tick } from 'svelte';
   import { confirmAction } from '../lib/dialogs.js';
   import { offerUndo } from '../lib/undo.js';
   import { sharePlanPdf, sharePlanSummary } from '../lib/share.js';
@@ -29,6 +31,12 @@
   let failed = $state(false);
   let current = $state(/** @type {PlannedDive|null} */ (null));
   let sharing = $state(false);
+  /** The plan just saved: its row is highlighted for about 2 s. */
+  let highlighted = $state(0);
+  /** The "Plan enregistré" snackbar is showing: the FAB sits above it. */
+  let snackbarUp = $state(false);
+  /** @type {HTMLElement|undefined} */
+  let listEl = $state();
 
   async function load() {
     try {
@@ -38,13 +46,32 @@
       console.error('Planned dives', e);
       failed = true;
     }
+    if (planner.justSaved) await announceSaved();
+  }
+
+  /** After saving a plan: highlight its row, scroll to it, say so (task 37). */
+  async function announceSaved() {
+    const id = planner.justSaved;
+    planner.justSaved = 0;
+    highlighted = id;
+    snackbarUp = true;
+    showSnackbar(t('plan.saved'), { hasFab: false, onClosed: () => (snackbarUp = false) });
+    setTimeout(() => {
+      if (highlighted === id) highlighted = 0;
+    }, 2000);
+    await tick();
+    listEl?.querySelector('.od-plans--row-highlighted')?.scrollIntoView({ block: 'nearest' });
   }
   loadSetup().catch((e) => console.error('Planner setup', e));
 
   /** @param {PlannedDive} plan */
   function title(plan) {
-    if (plan.site) return plan.site;
-    return requestOfPlan(plan, prefs).sourceDiveId ? t('dive.siteNotSet') : t('plan.noStartDive');
+    return planRowTitle(plan.title, t('plans.fallbackTitle', { date: formatShortDate(plan.date) })).text;
+  }
+
+  /** @param {PlannedDive} plan */
+  function untitled(plan) {
+    return planRowTitle(plan.title, '').isFallback;
   }
 
   /** @param {PlannedDive} plan */
@@ -139,13 +166,13 @@
     </div>
   {:else if plans}
     <p class="od-plans--intro">{t('plans.intro')}</p>
-    <div class="list">
+    <div class="list" bind:this={listEl}>
       {#each plans as plan (plan.id)}
-        <div class="od-plans--row">
+        <div class="od-plans--row" class:od-plans--row-highlighted={plan.id === highlighted}>
           <a class="od-plans--open" href="/plans/{plan.id}">
             <ProfileThumbnail profile={plan.profile} maxDepthMm={plan.maxDepthMm} {prefs} />
             <span class="od-plans--texts">
-              <span class="od-plans--name">{title(plan)}</span>
+              <span class="od-plans--name" class:od-plans--name-fallback={untitled(plan)}>{title(plan)}</span>
               <span class="od-plans--sub">{detail(plan)}</span>
             </span>
             <span class="od-plans--figures od-value">
@@ -175,7 +202,7 @@
   </Popover>
 
   {#snippet fixedContent()}
-    <div class="fab fab-right-bottom fab-extended od-fab-add">
+    <div class="fab fab-right-bottom fab-extended od-fab-add od-plans--fab" class:od-plans--fab-raised={snackbarUp}>
       <a href="/plan/new">
         <i class="icon"><Icon name="plus" /></i>
         <div class="fab-text">{t('plans.new')}</div>
@@ -201,6 +228,41 @@
       display: flex;
       align-items: center;
       min-height: 72px;
+    }
+
+    /* The saved plan, then back to normal: the highlight fades over 400 ms after its 2 s. */
+    .od-plans--row {
+      background: transparent;
+      transition: background-color 400ms ease-out;
+    }
+
+    .od-plans--row-highlighted {
+      background: var(--od-surface-container-high);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .od-plans--row {
+        transition: none;
+      }
+    }
+
+    .od-plans--name-fallback {
+      color: var(--od-text-2);
+    }
+
+    .od-plans--fab {
+      transition: transform 250ms ease-out;
+    }
+
+    .od-plans--fab-raised {
+      /* The snackbar (48 dp at 24 dp) takes the bottom: the FAB goes above it. */
+      transform: translateY(-80px);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .od-plans--fab {
+        transition: none;
+      }
     }
 
     .od-plans--open {

@@ -27,6 +27,7 @@
 #include "core/trip.h"
 #include "core/divesite.h"
 #include "core/divecomputer.h"
+#include "core/extradata.h"
 #include "core/equipment.h"
 #include "core/filterpreset.h"
 #include "core/filterpresettable.h"
@@ -435,6 +436,83 @@ int main(int argc, char **argv)
 		if (!divelog.dives.get_by_uniq_id(logged->id))
 			return fail("the dive left the log");
 
+		// The title of a plan: extra data "OpenDives title" of the first dive
+		// computer, written with the plan in the same undoable step, back after
+		// a reload, gone when saved empty, and never in the notes, site or tags.
+		{
+			auto title_of = [](const dive &d) {
+				std::string title = "<none>";
+				for (const extra_data &e: d.dcs[0].extra_data)
+					if (e.key == "OpenDives title")
+						title = e.value;
+				return title;
+			};
+			auto traits = [](const dive &d) {
+				return d.notes + "|" + (d.dive_site ? d.dive_site->name : std::string("-")) + "|" + taglist_get_tagstring(d.tags);
+			};
+			auto listed_title = [&](int id) {
+				std::string list;
+				list_plans(list);
+				size_t at = list.find("{\"id\":" + std::to_string(id) + ",");
+				if (at == std::string::npos)
+					return std::string("<not listed>");
+				size_t end = list.find("\"title\":", at);
+				size_t next = list.find("{\"id\":", at + 1);
+				if (end == std::string::npos || (next != std::string::npos && end > next))
+					return std::string("<no field>");
+				end += 8;
+				return list.substr(end, list.find('}', end) - end);
+			};
+			dive *target = divelog.dives.back().get();
+			if (!target->is_planned())
+				return fail("the last dive is not a plan");
+			int target_id = target->id;
+			// Without a title: no key, the reference for the notes, site and tags.
+			if (save_plan(request, target_id, result, error, "")) {
+				printf("error=%s\n", error.c_str());
+				return 1;
+			}
+			target = divelog.dives.back().get();
+			if (title_of(*target) != "<none>" || listed_title(target->id) != "\"\"")
+				return fail("a plan saved without a title has one");
+			const std::string untitled = traits(*target);
+			// With a title (blanks around it are dropped); one undoable step.
+			const std::string text_before = undo_text();
+			if (save_plan(request, target->id, result, error, "  Wreck trip  ")) {
+				printf("error=%s\n", error.c_str());
+				return 1;
+			}
+			target = divelog.dives.back().get();
+			if (title_of(*target) != "Wreck trip" || listed_title(target->id) != "\"Wreck trip\"")
+				return fail("the title was not kept with the plan");
+			if (traits(*target) != untitled)
+				return fail("the title changed the notes, the site or the tags");
+			if (undo(result, error) || title_of(*divelog.dives.back()) != "<none>")
+				return fail("undo did not take the title off with the plan");
+			if (redo(result, error) || title_of(*divelog.dives.back()) != "Wreck trip")
+				return fail("redo did not bring the title back");
+			// Saved, reloaded from git: the title is back, the rest as before.
+			if (save_local(error)) {
+				printf("error=%s\n", error.c_str());
+				return 1;
+			}
+			if (open_log(log))
+				return 1;
+			target = divelog.dives.back().get();
+			if (!target->is_planned() || title_of(*target) != "Wreck trip" || listed_title(target->id) != "\"Wreck trip\"")
+				return fail("the title did not survive a reload");
+			if (traits(*target) != untitled)
+				return fail("a reload changed the notes, the site or the tags");
+			// Saved again with an empty title: the key is gone, after a reload too.
+			if (save_plan(request, target->id, result, error, "   ") || title_of(*divelog.dives.back()) != "<none>")
+				return fail("an empty title kept the key");
+			if (save_local(error) || open_log(log))
+				return 1;
+			target = divelog.dives.back().get();
+			if (title_of(*target) != "<none>" || listed_title(target->id) != "\"\"" || traits(*target) != untitled)
+				return fail("the empty title did not survive a reload");
+			(void)text_before;
+		}
 		if (delete_dive(divelog.dives.back()->id, result, error))
 			return fail("deleting a plan");
 		printf("plans=ok\n");
