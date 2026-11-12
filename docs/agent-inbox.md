@@ -1894,3 +1894,6 @@ Christian's request: the result table shows **all the rows of the dive**, not on
 
 Done in `feature/plan-table` (c7adfba): `planRows` (lib/plan-rows.js, tested) builds the rows from the core's `segments` only, as core/plannernotes.cpp selects them for its non-verbatim table (ascents between stops merged into the next stop, minutes rounded as `(s+30)/60`, Début the sum of the shown minutes, Fin the rounded runtime); type icon with its accessible name, Palier, Début, Durée, Fin, Gaz in a sand chip on the first row and where it changes; transit rows in the variant colour with the planner speed under the depth; the note under the table. A plan from a dive without deco keeps its sentence. Checked on the phone emulator (130 ft 30 min: descent 60 ft/min, level, ascent, six stops, Surface 107 = total). Gaps: an ascent that crosses several of Subsurface's ascent-rate bands shows no speed (no single rate applies); the PDF share keeps its old stops-only table.
 
+
+Addendum done in `feature/plan-table-gas-every-row`: every row names its gas (`breathed` in plan-rows.js, tested), the sand chip only where it changes, and the note ends with "Le gaz surligné marque un changement de gaz." Checked on the phone emulator.
+

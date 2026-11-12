@@ -507,7 +507,8 @@
           start: formatNumber(r.startMinutes, 0),
           duration: formatNumber(r.durationMinutes, 0),
           end: formatNumber(r.endMinutes, 0),
-          gas: r.gas ? gasName(r.gas.o2Permille, r.gas.hePermille) : '',
+          gas: r.breathed ? gasName(r.breathed.o2Permille, r.breathed.hePermille) : '',
+          gasChange: !!r.gas,
         }))
       : [],
   );
@@ -854,7 +855,7 @@
                     <td class="od-planner--num">{row.start}</td>
                     <td class="od-planner--num">{row.duration}</td>
                     <td class="od-planner--num od-planner--row-end">{row.end}</td>
-                    <td>{#if row.gas}<span class="od-planner--gas-chip">{row.gas}</span>{/if}</td>
+                    <td>{#if row.gasChange}<span class="od-planner--gas-chip">{row.gas}</span>{:else}{row.gas}{/if}</td>
                   </tr>
                 {/each}
               </tbody>

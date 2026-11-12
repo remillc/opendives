@@ -1552,6 +1552,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Planner: the gas is written on every row of the table; the highlighted gas marks a change.",
       "Planner: the result lists every row of the dive, not only the deco stops: descent, planned levels, ascents, stops and the final ascent to the surface, with the start, duration and end of each in minutes, the descent and ascent speeds, and the gas where it changes.",
       "Planner: in metric, the SAC list offers 10, 15, 20, 25 and 30 L/min; any value up to 60 L/min can still be typed.",
       "Planner: the Altitude fields (the planner’s Conditions and Settings › Tool conditions) are editable dropdowns: the arrow lists 0 to 10,000 ft (0 to 3,000 m) and you can type any whole altitude, limited to 0 to 15,000 ft (4,500 m).",
@@ -1835,7 +1836,7 @@
     "rowAscent": "Ascent",
     "rowStop": "Deco stop",
     "surface": "Surface",
-    "rowsNote": "Start and end in minutes since entering the water. ↓ descent, → planned level, ↑ ascent, – deco stop. Short ascents between stops are counted in the stop. The gas is shown only where it changes.",
+    "rowsNote": "Start and end in minutes since entering the water. ↓ descent, → planned level, ↑ ascent, – deco stop. Short ascents between stops are counted in the stop. The highlighted gas marks a gas change.",
     "gasColumn": "Gas",
     "noStop": "No mandatory decompression stop. The ascent stayed above the ceiling.",
     "ceilingLegend": "Decompression ceiling",
