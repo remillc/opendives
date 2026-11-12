@@ -98,3 +98,20 @@ test('two levels and a gas switch: the gas is written on the first row and where
 test('a plan without waypoints has no row', () => {
   assert.deepEqual(planRows({ cylinders: [], segments: [] }), []);
 });
+
+test('every row names its gas; the change marker stays where the gas changes (addendum)', async () => {
+  const { planRows } = await import('../../app/src/lib/plan-rows.js');
+  const plan = {
+    setup: { descentMmMin: 18000, ascent75MmMin: 9000, ascent50MmMin: 9000, ascentStopsMmMin: 9000, ascentLast6mMmMin: 9000 },
+    cylinders: [{ o2Permille: 210, hePermille: 0 }],
+    segments: [
+      { timeSeconds: 120, depthMm: 20000, cylinder: 0, entered: true },
+      { timeSeconds: 1320, depthMm: 20000, cylinder: 0, entered: true },
+      { timeSeconds: 1500, depthMm: 0, cylinder: 0, entered: false },
+    ],
+  };
+  const rows = planRows(plan);
+  assert.ok(rows.length >= 2);
+  for (const r of rows) assert.deepEqual(r.breathed, { o2Permille: 210, hePermille: 0 });
+  assert.equal(rows.filter((r) => r.gas).length, 1);
+});

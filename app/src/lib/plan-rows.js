@@ -21,7 +21,8 @@
  * @property {number} startMinutes when to leave for this row
  * @property {number} durationMinutes
  * @property {number} endMinutes the surface row's end is the total runtime
- * @property {{o2Permille: number, hePermille: number}|null} gas set on the first row and where the gas changes
+ * @property {{o2Permille: number, hePermille: number}|null} gas set on the first row and where the gas changes (the chip)
+ * @property {{o2Permille: number, hePermille: number}|null} breathed the gas of every row (task 2026-11-12-73 addendum: never an empty cell)
  * @property {number|null} speedMmMin descent and ascent rows: the planner setting that applies
  */
 
@@ -113,6 +114,7 @@ export function planRows(plan) {
         lastGas = gas;
       }
 
+      const breathed = shown ?? lastGas;
       const minutes = roundMinutes(dp.timeSeconds - lastTime);
       let speed = null;
       if (kind === 'descent' || kind === 'ascent') {
@@ -128,6 +130,7 @@ export function planRows(plan) {
         durationMinutes: minutes,
         endMinutes: roundMinutes(dp.timeSeconds),
         gas: shown ? { o2Permille: shown.o2Permille, hePermille: shown.hePermille } : null,
+        breathed: breathed ? { o2Permille: breathed.o2Permille, hePermille: breathed.hePermille } : null,
         speedMmMin: speed,
       });
       lastTime += minutes * 60;
