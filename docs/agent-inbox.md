@@ -1898,10 +1898,13 @@ Done in `feature/plan-table` (c7adfba): `planRows` (lib/plan-rows.js, tested) bu
 Addendum done in `feature/plan-table-gas-every-row`: every row names its gas (`breathed` in plan-rows.js, tested), the sand chip only where it changes, and the note ends with "Le gaz surligné marque un changement de gaz." Checked on the phone emulator.
 
 
-## [ ] 2026-11-12-74 Reserve: stress factor and divers on the gas, both 1 by default
+## [x] 2026-11-12-74 Reserve: stress factor and divers on the gas, both 1 by default
 
 Christian's choice. Spec: planner settings, group "Réserve", and "Résultat". Mock-ups: `reglages-planificateur-android`, `android-tablette-reglages-planificateur-{portrait,paysage}`.
 - Réglages du planificateur › Réserve: "Facteur de consommation sous stress", **1,0 by default** (was 2,0), then a new row **"Plongeurs sur ce gaz"**, **1 by default**, supporting text "Mettre 2 pour remonter à deux en partageant le gaz". Same value rows and editors as the other rows of the group (whole number for the divers, 1 to 4).
 - The core keeps one factor (Subsurface's `sacfactor`, 4.0 by default in Subsurface): OpenDives stores both values in its own settings and gives the core **their product** (stress × divers). Never write anything new to the logbook for this. Existing users who had the old default keep their value only if they changed it; otherwise they get 1,0 × 1.
 - Planner result, "Volume nécessaire par gaz": the supporting text is "X consommés et Y de réserve", followed by " pour remonter à deux" when the divers are 2 and " pour remonter à N" when they are more; nothing more with 1.
 - Tablet and iOS: the same. A line in the release notes.
+
+Done in `feature/reserve-divers` (d3f9791): app settings `stressFactor` (default 1.0) and `reserveDivers` (1 to 4, default 1) with their rows in Réserve; the core's `sacFactor` receives their product at start and on each change (`lib/reserve-factor.js`, tested). Migration: a stored core factor of 2.0 (the old default) or none becomes 1.0 × 1, any other value is kept as the stress factor. The bottom gas row reads "X consommés et Y de réserve", plus " pour remonter à deux" / " à N" with 2 or more divers. The planner's own reset brings both back to 1.0 and 1; the global "Réinitialiser tous les réglages" keeps them, as it keeps the other planner settings (PLANNER_APP_KEYS). No reference value changed (the tests set their factor). Checked on the phone emulator (core factor 1.0 after migration; "36 cu ft used and 9 cu ft reserve"). Release lock: planner settings changed.
+
