@@ -1658,6 +1658,9 @@ Christian's request. Spec: new paragraph "Partial pressure unit" in `docs/ui-spe
 - Tablet and iOS: the same row.
 - A line in the release notes.
 
-## [ ] 2026-11-12-53 Settings: "Types de bouteilles" first in Équipement
+## [x] 2026-11-12-53 Settings: "Types de bouteilles" first in Équipement
 
 Christian's request: in Settings › Équipement, the row "Types de bouteilles" ("Ajouter, renommer, retirer", chevron) moves to the top of the group, before the default cylinders (Bouteille circuit ouvert, Diluant, Oxygène, Secours), "Afficher les bouteilles inutilisées" and "Proposer les tailles standard". Order only. Mock-ups: `android-reglages` and the other Settings boards. Tablet and iOS: the same order.
+
+Done in `feature/cylinder-types-first`: the "Types de bouteilles" row is the first of Équipement in `Settings.svelte` (phone, tablet and iOS share it). Order only.
+

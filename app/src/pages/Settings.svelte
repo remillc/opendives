@@ -406,6 +406,8 @@
       id: 'equipment',
       title: t('settings.groups.equipment'),
       rows: [
+        // "Types de bouteilles" first (task 2026-11-12-53).
+        { kind: 'link', id: 'cylinderTypes', label: t('settings.cylinderTypes.label'), text: t('settings.cylinderTypes.text'), href: '/settings/cylinders/' },
         {
           kind: 'choice',
           id: 'defaultCylinder',
@@ -428,7 +430,6 @@
         },
         { kind: 'switch', id: 'includeUnusedTanks', label: t('settings.unusedTanks.label'), text: t('settings.unusedTanks.text'), checked: p.includeUnusedTanks, set: (v) => setCore({ includeUnusedTanks: v }) },
         { kind: 'switch', id: 'displayDefaultTankInfos', label: t('settings.standardSizes.label'), text: t('settings.standardSizes.text'), checked: p.displayDefaultTankInfos, set: (v) => setCore({ displayDefaultTankInfos: v }) },
-        { kind: 'link', id: 'cylinderTypes', label: t('settings.cylinderTypes.label'), text: t('settings.cylinderTypes.text'), href: '/settings/cylinders/' },
       ],
     },
     {
