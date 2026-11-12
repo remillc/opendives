@@ -557,29 +557,6 @@
       </dl>
     {/if}
 
-    {#if conditions.length}
-      <!-- Collapsed by default, with a summary of the filled-in conditions. -->
-      <section class="od-dive-detail--section">
-        <div class="od-dive-detail--group">
-          <button type="button" class="od-dive-detail--disclosure" aria-expanded={conditionsOpen} onclick={() => (conditionsOpen = !conditionsOpen)}>
-            <span class="od-dive-detail--text">
-              <span class="od-dive-detail--title">{t('detail.conditions')}</span>
-              {#if !conditionsOpen}<span class="od-dive-detail--summary">{conditionsSummary}</span>{/if}
-            </span>
-            <span class="od-dive-detail--arrow" class:od-dive-detail--open={conditionsOpen}><Icon name="expand" size={22} weight={2} /></span>
-          </button>
-          {#if conditionsOpen}
-            {#each conditions as condition (condition.key)}
-              <div class="od-dive-detail--row">
-                <span>{condition.name}</span>
-                <Stars value={condition.value} label={t('detail.starsLabel', { name: condition.name, n: condition.value })} />
-              </div>
-            {/each}
-          {/if}
-        </div>
-      </section>
-    {/if}
-
     {#if dive.guides.length || dive.buddies.length}
       <section class="od-dive-detail--section">
         <h2 class="od-dive-detail--section-title">{t('detail.people')}</h2>
@@ -629,6 +606,29 @@
           open={equipmentOpen}
           ontoggle={() => (equipmentOpen = !equipmentOpen)}
         />
+      </section>
+    {/if}
+
+    {#if conditions.length}
+      <!-- Collapsed by default, with a summary of the filled-in conditions. -->
+      <section class="od-dive-detail--section">
+        <div class="od-dive-detail--group">
+          <button type="button" class="od-dive-detail--disclosure" aria-expanded={conditionsOpen} onclick={() => (conditionsOpen = !conditionsOpen)}>
+            <span class="od-dive-detail--text">
+              <span class="od-dive-detail--title">{t('detail.conditions')}</span>
+              {#if !conditionsOpen}<span class="od-dive-detail--summary">{conditionsSummary}</span>{/if}
+            </span>
+            <span class="od-dive-detail--arrow" class:od-dive-detail--open={conditionsOpen}><Icon name="expand" size={22} weight={2} /></span>
+          </button>
+          {#if conditionsOpen}
+            {#each conditions as condition (condition.key)}
+              <div class="od-dive-detail--row">
+                <span>{condition.name}</span>
+                <Stars value={condition.value} label={t('detail.starsLabel', { name: condition.name, n: condition.value })} />
+              </div>
+            {/each}
+          {/if}
+        </div>
       </section>
     {/if}
 

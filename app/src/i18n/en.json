@@ -1546,6 +1546,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Dive detail: the Conditions card now comes right after Equipment (before Photos and videos and Notes).",
       "Dive computers now belong to the equipment: in “Edit dive” they are listed at the bottom of the Equipment card, and the dive detail shows the main computer as a third row of the Equipment card (all of them, with “Main”, when opened).",
       "Android: no more radio buttons. The chosen item of a choice shows on a tinted row with a check at the start (sync conflicts, account import, export, clean up sites, main dive computer, new dive site, choice dialogs).",
       "Dive detail: in the toolbar, “Plan from this dive” now comes before “Share”.",
