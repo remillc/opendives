@@ -11,8 +11,9 @@ import { gasKind } from './cylinder-card.js';
  * capped at full (without a working pressure the start pressure stands in for
  * it). `end` is the top of the full water gradient, `start` the top of the pale
  * band (what was breathed). `start` is null when the start pressure is unknown
- * (no band, no line); `end` is 0 when the end pressure is unknown. The start is
- * never drawn below the end.
+ * (no band, no line). When the end pressure is unknown, nothing tells what was
+ * breathed: the start level is drawn in full colour, with no pale band. The
+ * start is never drawn below the end.
  * @param {number} startMbar
  * @param {number} endMbar
  * @param {number} workingPressureMbar
@@ -22,6 +23,7 @@ export function fillLevels(startMbar, endMbar, workingPressureMbar) {
   const full = workingPressureMbar > 0 ? workingPressureMbar : startMbar > 0 ? startMbar : endMbar > 0 ? endMbar : 0;
   /** @param {number} mbar */
   const level = (mbar) => (mbar > 0 && full > 0 ? Math.min(1, mbar / full) : 0);
+  if (!(endMbar > 0)) return { start: null, end: level(startMbar) };
   const end = level(endMbar);
   if (!(startMbar > 0)) return { start: null, end };
   return { start: Math.max(end, level(startMbar)), end };
