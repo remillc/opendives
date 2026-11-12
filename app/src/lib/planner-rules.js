@@ -90,7 +90,7 @@ export const O2_CHOICES = range(5, 100);
 /** Every helium fraction the menu offers, %: 0 to 95, by 1, all of them. */
 export const HE_CHOICES = range(0, 95);
 /** The usual altitudes, in feet or in metres (the diver's depth unit). @param {boolean} feet */
-export const altitudePresets = (feet) => (feet ? [0, 1000, 2000, 3000, 5000, 7000, 10000] : [0, 300, 600, 1000, 1500, 2000, 3000]);
+export const altitudePresets = (feet) => (feet ? [0, 1000, 2000, 3000, 4000, 5000, 6000, 8000, 10000] : [0, 300, 600, 900, 1200, 1500, 2000, 2500, 3000]);
 
 /**
  * A typed number: "12,5" or "12.5"; NaN when empty or not a number.

@@ -209,11 +209,11 @@ test('dropdown choices: every gas value, all shown; usual altitudes', () => {
   const range = (a, b) => Array.from({ length: b - a + 1 }, (_, i) => a + i);
   assert.deepEqual(rules.O2_CHOICES, range(5, 100), 'oxygen: 5 to 100 by 1');
   assert.deepEqual(rules.HE_CHOICES, range(0, 95), 'helium: 0 to 95 by 1');
-  assert.deepEqual(rules.altitudePresets(true), [0, 1000, 2000, 3000, 5000, 7000, 10000]);
-  assert.deepEqual(rules.altitudePresets(false), [0, 300, 600, 1000, 1500, 2000, 3000]);
+  assert.deepEqual(rules.altitudePresets(true), [0, 1000, 2000, 3000, 4000, 5000, 6000, 8000, 10000]);
+  assert.deepEqual(rules.altitudePresets(false), [0, 300, 600, 900, 1200, 1500, 2000, 2500, 3000]);
   assert.deepEqual(rules.choiceValues(rules.O2_CHOICES, 20.9).slice(0, 2), [20.9, 5], '20.9 % from a dive heads the menu');
   assert.deepEqual(rules.choiceValues(rules.O2_CHOICES, 32), rules.O2_CHOICES, 'a value of the list adds nothing');
-  assert.deepEqual(rules.choiceValues(rules.altitudePresets(false), 450), [450, 0, 300, 600, 1000, 1500, 2000, 3000]);
+  assert.deepEqual(rules.choiceValues(rules.altitudePresets(false), 450), [450, 0, 300, 600, 900, 1200, 1500, 2000, 2500, 3000]);
   assert.deepEqual(rules.choiceValues(rules.altitudePresets(false), NaN), rules.altitudePresets(false), 'empty or invalid entry: nothing added');
 });
 
