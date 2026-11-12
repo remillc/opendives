@@ -1613,7 +1613,7 @@ Christian's request: in Settings › Équipement, the switch "Proposer les taill
 Done in `feature/standard-sizes-off`: `OD_CORE_DEFAULTS` (lib/settings-reset.js) holds the core values whose OpenDives default differs from Subsurface's (`salinityEdit: true`, `displayDefaultTankInfos: false`); the start sets `displayDefaultTankInfos` to false unless this device has a value, and "Réinitialiser tous les réglages" sets both. The core then lists only the diver's own types and those of the logbook, as it does when the pref is off. Phone, tablet and iOS share this. Checked on the phone emulator (core pref false, switch off).
 
 
-## [ ] 2026-11-12-49 Settings: choice dialogs become menus on the row
+## [x] 2026-11-12-49 Settings: choice dialogs become menus on the row
 
 Christian's request: the radio-button choice dialogs of Settings are replaced, everywhere in the app, by a menu anchored to the touched row. Spec: `docs/ui-specification.md`, new paragraph "Settings choices as menus" (and the water-type paragraph). Mock-ups: `reglages-type-eau-android`, `reglages-choix-android` (date format), `reglages-duree-android`, `reglages-vitesse-android`, `reglages-coordonnees-android` (opens above), `reglages-bouteille-choix-android`.
 - Applies to every Settings row that picks one value from a short list: date format, time format, duration, speeds, GPS coordinates, language, theme, text size, the default cylinders (open circuit, diluent, oxygen), water type of downloaded dives, and any other of the same kind.
@@ -1624,6 +1624,8 @@ Christian's request: the radio-button choice dialogs of Settings are replaced, e
 - Unchanged: sync conflict choices, export, account import, and dialogs where a number is typed (pO₂ thresholds…).
 - Tablet: same menus, anchored to the row in the settings pane. iOS: the native pull-down menu on the row.
 - A line in the release notes.
+
+Done in `feature/settings-row-menus`: `RowMenu` (od-row-menu), anchored to the row (tinted, 12 dp corners), 280 dp, right-aligned with the card, under or above the row (`lib/row-menu.js`, tested), options with help lines, current value tinted with a check, listbox/option roles, focus in and back, Back and outside tap close. Every `choice` row of Settings uses it (units, date and time formats, duration, speeds, coordinates, language, theme, text size, default cylinders, water type of downloaded dives with the help lines of the task) and the choice rows of the planner settings. Kept as dialogs: bailout list, offline maps size limit, download, computers, new dive, sites, sync conflicts. iOS: the app is a WebView, so the same anchored menu in UIMenu style (no native pull-down). Dark mode menu on `--od-surface-container-highest`. Checked on the phone emulator.
 
 ## [x] 2026-11-12-50 Settings: "Pression" becomes "Pression des bouteilles"
 
