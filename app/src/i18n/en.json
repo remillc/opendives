@@ -1542,6 +1542,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Dive detail: the Equipment card has no chevron when opening it would show nothing more (one weight without a location).",
       "Rebreather dives: the open-circuit cylinder is called “Bailout” in the choice of its use; the logbook does not change.",
       "Menu: choosing a section from Settings or About closes them and shows the section, even the one underneath (before, choosing “Logbook” from Settings did nothing).",
       "Settings › Units: a new “Partial pressures” choice, bar or ATA. Only the label changes (1.4 bar becomes 1.4 ATA, no conversion), in the planner, the gas tools, the profile and the pressure settings. Metric sets bar, Imperial sets ATA, and a different choice switches the units to Personalised. Kept on this device only.",

@@ -15,16 +15,28 @@
    *   weightTotal: string,
    *   weights: { place: string, weight: string }[],
    *   open: boolean,
+   *   opens?: boolean,
    *   ontoggle: () => void,
    * }}
    * label: the accessible name, "Equipment: dry suit, weights 35 lb. Show details";
    * weightTotal: empty when no weight is set; weights: one entry per location.
+   * opens: false when opening would show nothing more (one weight, no
+   * location): a plain card, no chevron.
    */
-  let { label, suit, weightTotal, weights, open, ontoggle } = $props();
+  let { label, suit, weightTotal, weights, open, opens = true, ontoggle } = $props();
 </script>
 
 <div class="od-equipment-card">
-  <button type="button" class="od-equipment-card--summary" aria-expanded={open} aria-label={label} onclick={ontoggle}>
+  <svelte:element
+    this={opens ? 'button' : 'div'}
+    type={opens ? 'button' : undefined}
+    class="od-equipment-card--summary"
+    class:od-equipment-card--static={!opens}
+    role={opens ? undefined : 'group'}
+    aria-expanded={opens ? open : undefined}
+    aria-label={label}
+    onclick={opens ? ontoggle : undefined}
+  >
     <span class="od-equipment-card--rows">
       {#if suit}
         <span class="od-equipment-card--row"><span class="od-equipment-card--name">{t('detail.suitRow')}</span><span class="od-equipment-card--value">{suit}</span></span>
@@ -33,9 +45,9 @@
         <span class="od-equipment-card--row"><span class="od-equipment-card--name">{t('detail.weights')}</span><span class="od-equipment-card--value od-equipment-card--strong od-value">{weightTotal}</span></span>
       {/if}
     </span>
-    <span class="od-equipment-card--chevron" class:od-equipment-card--open={open}><Icon name="expand" size={24} weight={2} /></span>
-  </button>
-  {#if open && weights.length}
+    {#if opens}<span class="od-equipment-card--chevron" class:od-equipment-card--open={open}><Icon name="expand" size={24} weight={2} /></span>{/if}
+  </svelte:element>
+  {#if opens && open && weights.length}
     <ul class="od-equipment-card--weights" aria-label={t('detail.weightsByPlace')}>
       {#each weights as weight, i (i)}
         <li class="od-value"><span>{weight.place || t('detail.weights')}</span><span>{weight.weight}</span></li>
@@ -55,6 +67,7 @@
 
     .od-equipment-card--summary {
       width: 100%;
+      box-sizing: border-box;
       padding: 4px 8px 4px 16px;
       border: none;
       background: none;
@@ -65,6 +78,11 @@
       align-items: center;
       gap: 8px;
       cursor: pointer;
+
+      &.od-equipment-card--static {
+        padding-inline-end: 16px;
+        cursor: default;
+      }
     }
 
     .od-equipment-card--rows {

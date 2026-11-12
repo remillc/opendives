@@ -16,7 +16,7 @@
   import Icon from '../components/Icon.svelte';
   import GasCard from '../components/GasCard.svelte';
   import EquipmentCard from '../components/EquipmentCard.svelte';
-  import { equipmentLabel, fillLevels, gasChangeLine, gasChanges, gasGroupLabel } from '../lib/gas-summary.js';
+  import { equipmentLabel, equipmentOpens, fillLevels, gasChangeLine, gasChanges, gasGroupLabel } from '../lib/gas-summary.js';
   import { gasName, typeHelper } from '../lib/cylinder-card.js';
   import { typeLine } from '../lib/gas-group.js';
   import FloatingToolbar from '../components/FloatingToolbar.svelte';
@@ -420,7 +420,7 @@
   let equipmentOpen = $state(false);
   const equipmentName = $derived(
     equipmentLabel(
-      { suit: dive?.suit ?? '', weight: weights.length ? weightTotal : '', open: equipmentOpen },
+      { suit: dive?.suit ?? '', weight: weights.length ? weightTotal : '', open: equipmentOpen, opens: equipmentOpens(weightEntries) },
       {
         both: t('detail.equipmentBoth'),
         weightOnly: t('detail.equipmentWeight'),
@@ -622,6 +622,7 @@
           suit={dive.suit ?? ''}
           weightTotal={weights.length ? weightTotal : ''}
           {weights}
+          opens={equipmentOpens(weightEntries)}
           open={equipmentOpen}
           ontoggle={() => (equipmentOpen = !equipmentOpen)}
         />

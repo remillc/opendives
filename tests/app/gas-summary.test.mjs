@@ -112,3 +112,14 @@ test('the Equipment card name', () => {
   assert.equal(equipmentLabel({ suit: '', weight: '35 lb', open: true }, w), 'Equipment: weights 35 lb. Hide details');
   assert.equal(equipmentLabel({ suit: 'dry suit', weight: '', open: false }, w), 'Equipment: dry suit. Show details');
 });
+
+test('the Equipment card opens only when it would show more than the total', async () => {
+  const { equipmentOpens, equipmentLabel } = await import('../../app/src/lib/gas-summary.js');
+  assert.equal(equipmentOpens([{ description: 'unknown' }]), false);
+  assert.equal(equipmentOpens([{ description: '' }]), false);
+  assert.equal(equipmentOpens([{ description: 'belt' }]), true);
+  assert.equal(equipmentOpens([{ description: 'belt' }, { description: 'ankle' }]), true);
+  const words = { both: '{suit}, {weight}', weightOnly: '{weight}', suitOnly: '{suit}', show: 'Show', hide: 'Hide' };
+  assert.equal(equipmentLabel({ suit: 'dry', weight: '7 lb', open: false, opens: false }, words), 'dry, 7 lb');
+  assert.equal(equipmentLabel({ suit: 'dry', weight: '7 lb', open: false }, words), 'dry, 7 lb. Show');
+});
