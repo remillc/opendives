@@ -2035,3 +2035,8 @@ Christian's request (TODO #45). Spec: `docs/system-design.md`, paragraph "Blue t
 Reference mock-ups: `android-carnet`, `android-accueil-c`, `detail3-android`, `detail3-android-sombre`, `appbar-tiroir-android-ouvert`, `android-stats`, `outils-desaturation-android`, `partage-android`, `android-telechargement-encours`, `android-etat-conflit-ordinateurs`. Check light and dark on the phone emulator.
 
 **Addendum to task 81 (12 November 2026):** the colour chart is updated for the blue theme, `docs/mockups/palette-roles.dc.html` (secondary = ocean-night blue, tertiary = rust and sand, with the contrast ratios). Use it as the reference for the role tokens (`--od-secondary*`, `--od-tertiary*`) in light and dark.
+
+## [ ] 2026-11-12-82 Blue logo
+
+Christian chose proposal A "ocean-night" (spec: `docs/system-design.md`, blue theme paragraph; mock-up `docs/mockups/logo-bleu.dc.html`, rows "A"). Same drawing, only the three wave gradients change: light #D4E2F2→#BCD2EB, #8FB0D6→#7199C2, #3F6F9F→#2D5E90; dark #D6E4F4→#BED3EC, #93B6E0→#77A0D2, #4F84C2→#3A6FAE. The brand sources in `docs/brand/` are already updated. Regenerate everything made from them: `app/public/favicon.svg`, `logo-light.svg`, `logo-dark.svg`, `logo-small-light.svg`, the Android launcher icons (adaptive foreground, round, legacy), the iOS app icon and the splash screen. Check the 24 and 32 px sizes on the emulator.
+
