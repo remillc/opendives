@@ -1728,3 +1728,11 @@ Christian's request: in the floating toolbar of the dive detail (task 39), the o
 
 Done in `feature/toolbar-plan-first`: the detail toolbar reads Modifier, Planifier depuis cette plongée, Partager, ⋮ (phone, dark mode and tablet panes share it). The iOS menu already listed Planifier before Partager.
 
+
+## [ ] 2026-11-12-60 Dive computers move into Équipement
+
+Christian's request: the dive computers of a dive belong to the equipment.
+- **Modifier la plongée** (`android-edition`, `android-edition-bouteille`, tablet edit boards): the card "Ordinateurs" goes away. Its content becomes a sub-section at the bottom of the Équipement card, after the weights and "Ajouter un lest": a sub-title "Ordinateurs" in the same style as "Lest" (14 sp semibold), then the computer rows as today (task 58 pattern, main computer tinted and checked) and the helper "Avec plusieurs ordinateurs, choisissez le principal."
+- **Dive detail** (`detail3-android`, `-sombre`, `-curseur`, `detail2-android-menu`, tablet detail panes): the section "Ordinateurs de plongée" goes away. The collapsed Équipement card (task 46) gets a third row "Ordinateur" with the main computer's name on the right (variant colour, not bold), after Combinaison and Lest. With several computers, the row shows the main one; the open card lists them all with "Principal" on the main one. The accessible name adds "ordinateur <name>".
+- Settings keep their "Ordinateurs de plongée" group (the logbook's computers), unchanged.
+- Tablet and iOS: the same.
