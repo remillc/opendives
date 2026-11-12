@@ -1015,6 +1015,13 @@
       <div class="od-edit-dive--end"></div>
     </section>
 
+    <!-- Notes: a card of their own, right under Personnes (tasks 2026-11-12-63 and 64). -->
+    <section class="card od-edit-dive--card">
+      {@render header(t('edit.notesGroup'))}
+      <TextField label={t('edit.notes')} bind:value={f.notes} multiline />
+      <div class="od-edit-dive--end"></div>
+    </section>
+
     <!-- Gaz -->
     <section class="card od-edit-dive--card">
       {@render header(t('edit.gasGroup'))}
@@ -1114,13 +1121,6 @@
       </div>
       <div class="od-edit-dive--end"></div>
       {/if}
-    </section>
-
-    <!-- Notes: a card of their own, last before Avancé, as the notes end the dive detail (task 2026-11-12-63). -->
-    <section class="card od-edit-dive--card">
-      {@render header(t('edit.notesGroup'))}
-      <TextField label={t('edit.notes')} bind:value={f.notes} multiline />
-      <div class="od-edit-dive--end"></div>
     </section>
 
     <!-- Avancé -->

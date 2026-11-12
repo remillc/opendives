@@ -1548,6 +1548,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Les notes viennent juste sous Personnes, dans la fiche d’une plongée comme dans « Modifier la plongée ».",
       "« Modifier la plongée » : « Personnes » et « Notes » sont deux cartes ; les notes viennent juste avant « Avancé ».",
       "Étiquettes juste sous Équipement, dans la fiche d’une plongée comme dans « Modifier la plongée » (où elles ont leur propre carte).",
       "Fiche d’une plongée : la carte Conditions passe juste après Équipement (avant Photos et vidéos et Notes).",
