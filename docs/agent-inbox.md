@@ -1854,3 +1854,12 @@ Christian asks for your answer on task 2026-11-11-37 (title when saving a new pl
 
 **Christian's choice (12 November 2026): (d) only**, the extra data of the dive computer, key "OpenDives title"; the notes are not touched. Task 2026-11-11-37 is built with it.
 
+
+## [ ] 2026-11-12-71 SAC fields: editable dropdown, presets 0 to 2 by 0.5
+
+Christian's request, for **every SAC field** (planner "Au fond" and "Pendant la déco", Réglages du planificateur, tablet planner and settings). Spec: new paragraph "SAC fields: editable dropdown". Mock-up: `android-planificateur-sac` (list open). This replaces the dropdown in steps of 0.01 cuft/min / 0.5 L/min of tasks 33 and 38.
+- Same filled field with its down chevron, but editable (combobox, `role="combobox"`, `aria-expanded`): the chevron or a tap opens a list of presets; typing in the field is allowed.
+- Presets, shown with **one decimal**: 0,0 / 0,5 / 1,0 / 1,5 / 2,0 cuft/min. Metric: 0 / 15 / 30 / 45 / 60 L/min (proposal, Christian has not confirmed yet: keep it easy to change).
+- A typed value is kept with up to **two decimals** (0,36), clamped to 0–2 cuft/min (0–60 L/min), decimal comma in French. The current value need not be a preset.
+- Helper while the list is open: "Choisissez une valeur ou tapez la vôtre, à deux décimales."
+- Tablet and iOS: the same behaviour. A line in the release notes.
