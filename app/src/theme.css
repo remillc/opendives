@@ -101,6 +101,7 @@
     /* Rebreather drawing (dive detail, CCR): canister, head, hoses, stand, valves. */
     --od-rebreather-canister: #2B2F33;
     --od-rebreather-head: #1F2124;
+    --od-rebreather-hose: #1F2124;
     --od-rebreather-hardware: #9A9DA1;
     --od-rebreather-valve: #75787C;
     --od-trace: #1F2124;
@@ -209,6 +210,8 @@
     --od-cylinder-level: #E5B961;
     --od-rebreather-canister: #3A3E43;
     --od-rebreather-head: #4A4D52;
+    /* Lighter than the head: the hoses cross the dark card, not the canister. */
+    --od-rebreather-hose: #75787C;
     --od-rebreather-hardware: #8E9196;
     --od-rebreather-valve: #6B6E73;
     --od-trace: #F4F4F2;

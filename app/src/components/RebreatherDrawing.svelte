@@ -122,7 +122,7 @@
 
     .od-rebreather-drawing--hose {
       fill: none;
-      stroke: var(--od-rebreather-head);
+      stroke: var(--od-rebreather-hose);
       stroke-width: 8;
       stroke-linecap: round;
       stroke-dasharray: 2.5 1.2;

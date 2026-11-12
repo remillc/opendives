@@ -1980,7 +1980,7 @@ Your summary should cover at least:
 
 **Addendum (12 November 2026), Christian:** no "pending pressures" feature for readings taken before the dive exists in the logbook. A diver who wants the start pressure before diving just takes an ordinary photo with the phone's camera, then, once the dive is downloaded, picks that photo with "Photos" in the gauge camera. Nothing else to build for that case.
 
-## [ ] 2026-11-12-78 Dive detail: draw the rebreather in the Gaz section of a CCR dive
+## [x] 2026-11-12-78 Dive detail: draw the rebreather in the Gaz section of a CCR dive
 
 Christian's request. Spec: new paragraph "Gas section of a rebreather dive". Mock-up: `detail3-android-ccr` (only the Gaz section, to compare with the Gaz section of `detail3-android`).
 - Only when the dive mode is CCR; open circuit and pSCR keep today's view.
@@ -1989,7 +1989,9 @@ Christian's request. Spec: new paragraph "Gas section of a rebreather dive". Moc
 - Under each cylinder the same three lines as today, then the gas-switch line. Cylinders found by their use (Diluant, Oxygène); more than one of a kind: the first goes in the unit, the others beside it.
 - One SVG component, dark theme too, accessible name as in the spec. Tablet and iOS: the same. A line in the release notes.
 
-## [ ] 2026-11-12-79 Phone: profile chart full width
+Done in `feature/ccr-gas-drawing` (621dd3c) and on main: RebreatherDrawing.svelte (one SVG, back view: canister, head, hoses, stand, DIL left and O₂ right, same fill marks as CylinderDrawing) shown by GasCard when the dive mode is CCR; `lib/rebreather-gas.js` (tested) picks the cylinders by use, the first diluent and oxygen go in the unit, the others beside it with their use written vertically. New colours --od-rebreather-canister, -head, -hose, -hardware, -valve (light and dark). A missing diluent or oxygen is an empty outline. Accessible name per the spec. Checked on the phone emulator, light and dark, on a CCR dive with diluent, oxygen and a bailout (hoses given a lighter dark colour after the check).
+
+## [x] 2026-11-12-79 Phone: profile chart full width
 
 Christian's request. Spec: new paragraph "Profile chart full width on the phone". Mock-ups: `detail3-android` (and `-sombre`, `-curseur`, `detail2-android-menu`, `sites-sans-site-profil-android`).
 - Dive detail (and site detail with a profile) on the phone: the profile section loses its card (no 16 dp side margin, no rounded corners), its white band goes edge to edge.
@@ -1998,7 +2000,9 @@ Christian's request. Spec: new paragraph "Profile chart full width on the phone"
 
 **Addendum to task 79 (12 November 2026), Christian:** center the hint line "Touchez le profil pour lire les valeurs" above the chart (phone dive detail and site detail). The cursor readout is unchanged. Note: `detail3-android` also shows entry and exit times under the time axis ("Entrée 10:00", "Sortie 11:18") and a dotted line at the exit; that is still being decided, **do not build it yet**.
 
-## [ ] 2026-11-12-80 Profile chart: entry and exit times, average depth line
+Done in `feature/profile-full-width` (4c5eee8) and on main: on the phone the profile section has no card (edge to edge), the hint line is centred with 20 dp padding, the chart keeps about 14 dp left and 26 dp right for its labels; tablet panes keep the card (`.views.od-tablet`). Dive detail and site detail share DiveProfile.svelte. Checked on the phone emulator.
+
+## [x] 2026-11-12-80 Profile chart: entry and exit times, average depth line
 
 Christian's request (this replaces the "do not build it yet" note in the task 79 addendum). Spec: new paragraph "Entry and exit times and average depth in the profile chart". Mock-up: `detail3-android`.
 - Under the time axis, a second label row in the axis style: "Entrée 10:00" and "Sortie 11:18". The **first digit of each time sits on its tick** (time zero, exit time) and the word is to its left. A thin dotted vertical line marks the exit time.
@@ -2007,3 +2011,5 @@ Christian's request (this replaces the "do not build it yet" note in the task 79
 - Wherever the profile chart is drawn (phone and tablet, light and dark, with the cursor). The info grid under the chips stays as it is for now.
 
 **Addendum to task 80 (12 November 2026):** no dotted vertical line for the exit. "Sortie" goes at the **end of the profile** (last sample), with entry time + profile length (11:23 in the mock-up, whose profile lasts 82:50), and the average-depth line runs across the whole profile. Christian noticed the profile went on past the old exit mark (78 min = the file's duration, shorter than its samples).
+
+Done in `feature/profile-full-width` (c28f81e) and on main: a second label row under the time axis, "Entrée" at time zero and "Sortie" at the last sample (entry time + profile length, rounded to the minute), no vertical line; dashed average-depth line across the profile from the core's meanDepthMm, labelled "moy. N" in the depth-label column (nudged off a depth label if they overlap, `lib/profile-times.js`, tested); accessible name extended; the shared PDF/PNG profile includes them. Checked on the phone emulator. Note: the exit time can differ by a minute from the info grid's Sortie, which uses the dive's duration.
