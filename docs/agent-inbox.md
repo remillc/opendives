@@ -1909,12 +1909,14 @@ Christian's choice. Spec: planner settings, group "Réserve", and "Résultat". M
 Done in `feature/reserve-divers` (d3f9791): app settings `stressFactor` (default 1.0) and `reserveDivers` (1 to 4, default 1) with their rows in Réserve; the core's `sacFactor` receives their product at start and on each change (`lib/reserve-factor.js`, tested). Migration: a stored core factor of 2.0 (the old default) or none becomes 1.0 × 1, any other value is kept as the stress factor. The bottom gas row reads "X consommés et Y de réserve", plus " pour remonter à deux" / " à N" with 2 or more divers. The planner's own reset brings both back to 1.0 and 1; the global "Réinitialiser tous les réglages" keeps them, as it keeps the other planner settings (PLANNER_APP_KEYS). No reference value changed (the tests set their factor). Checked on the phone emulator (core factor 1.0 after migration; "36 cu ft used and 9 cu ft reserve"). Release lock: planner settings changed.
 
 
-## [ ] 2026-11-12-75 Ask before leaving a form with unsaved changes
+## [x] 2026-11-12-75 Ask before leaving a form with unsaved changes
 
 Christian's request, for the planner and **every full-screen form with "Enregistrer"**: planner (←), "Nouvelle plongée" and "Modifier la plongée" (✕), "Modifier le type" (cylinder), "Modifier l'ordinateur", the saved-filter form, and any later one. Spec: new paragraph "Leaving a form with unsaved changes". Mock-up: `android-planificateur-quitter`.
 - Trigger: leaving by ← or ✕, Android Back (button or gesture, including the hardware back handler), iOS swipe back, **only when the form differs from what was opened** (compare values, so a change undone by hand counts as none). No change: leave at once, no dialog.
 - MD3 dialog "Quitter sans enregistrer ?", body "Les changements apportés à ce plan seront perdus." with the noun of the screen (à cette plongée, à ce type de bouteille, à cet ordinateur, à ce filtre). Buttons: "Rester" (close the dialog), "Enregistrer" (same as the screen's button, a new plan still asks for its title, then leave), "Quitter" in `--od-alarm` (drop changes, leave).
 - One shared helper (dirty check + guard on navigation and Back), not one per screen. Tablet and iOS: the same. A line in the release notes.
+
+Done in `feature/leave-guard` (431f73a): one helper (`lib/leave-guard.js`: content comparison, tested; `LeaveGuard.svelte`: the MD3 dialog "Quitter sans enregistrer ?" with Rester, Enregistrer, Quitter in the alarm colour) on the planner, Nouvelle plongée, Modifier la plongée, Modifier le type, Modifier l'ordinateur, the saved-filter form, plus SiteEdit and StatisticNew. Android Back goes through it (lib/back-button.js); on iOS a dirty page loses Framework7's swipe back and an edge swipe opens the dialog instead (untested, no Mac); dirty popups cannot be swiped or tapped away. Checked on the phone emulator (edit: no change leaves, a change asks, Back = Rester, a change undone by hand leaves; planner: ← asks, Quitter leaves).
 
 ## [ ] 2026-11-12-76 Share a plan: share sheet, water slate, paper format
 
