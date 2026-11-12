@@ -1022,6 +1022,12 @@
       <div class="od-edit-dive--end"></div>
     </section>
 
+    <!-- Étiquettes: a card of their own, right under Notes (tasks 2026-11-12-62 and 66). -->
+    <section class="card od-edit-dive--card">
+      {@render header(t('edit.tagsGroup'))}
+      <ChipsField label={t('edit.tags')} bind:values={tags} suggestions={known.tag} supporting={t('edit.tagsHint')} />
+    </section>
+
     <!-- Gaz -->
     <section class="card od-edit-dive--card">
       {@render header(t('edit.gasGroup'))}
@@ -1068,12 +1074,6 @@
           <p class="od-edit-dive--helper">{t('edit.mainComputerHelp')}</p>
         </div>
       {/if}
-    </section>
-
-    <!-- Étiquettes: a card of its own, between Équipement and Conditions (task 2026-11-12-62). -->
-    <section class="card od-edit-dive--card">
-      {@render header(t('edit.tagsGroup'))}
-      <ChipsField label={t('edit.tags')} bind:values={tags} suggestions={known.tag} supporting={t('edit.tagsHint')} />
     </section>
 
     <!-- Conditions -->

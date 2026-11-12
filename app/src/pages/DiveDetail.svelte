@@ -581,6 +581,16 @@
       </section>
     {/if}
 
+    <!-- Tags right under Notes (task 2026-11-12-66). -->
+    {#if dive.tags.length}
+      <section class="od-dive-detail--section">
+        <h2 class="od-dive-detail--section-title">{t('detail.tags', { n: dive.tags.length })}</h2>
+        <ul class="od-dive-detail--tags">
+          {#each dive.tags as tag (tag)}<li class="od-dive-detail--tag">{tag}</li>{/each}
+        </ul>
+      </section>
+    {/if}
+
     {#if hasGas}
       <section class="od-dive-detail--section">
         <h2 class="od-dive-detail--section-title">{t('detail.gasSection')}</h2>
@@ -610,15 +620,6 @@
       </section>
     {/if}
 
-    <!-- Tags right under Équipement (task 2026-11-12-62). -->
-    {#if dive.tags.length}
-      <section class="od-dive-detail--section">
-        <h2 class="od-dive-detail--section-title">{t('detail.tags', { n: dive.tags.length })}</h2>
-        <ul class="od-dive-detail--tags">
-          {#each dive.tags as tag (tag)}<li class="od-dive-detail--tag">{tag}</li>{/each}
-        </ul>
-      </section>
-    {/if}
 
     {#if conditions.length}
       <!-- Collapsed by default, with a summary of the filled-in conditions. -->
