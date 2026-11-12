@@ -1648,7 +1648,7 @@ Christian's request: the settings used for downloading are grouped. Mock-ups: `a
 Done in `feature/settings-download-group`: "Ordinateurs de plongée" keeps only "Ordinateurs du carnet"; the new "Téléchargement" group holds the Bluetooth switch card, then (only with remembered computers) the overline `.od-settings--overline` and a card with each computer's name, its ⋮ and the outlined forget button; the overline, the button and its confirmation have one/other forms. Phone, tablet and iOS share Settings.svelte. The ⋮ menu is unchanged (it holds "Oublier cet ordinateur"; there is no "Renommer" in it today). Checked on the phone emulator with one remembered computer.
 
 
-## [ ] 2026-11-12-52 Settings: partial pressure unit, bar or ATA
+## [x] 2026-11-12-52 Settings: partial pressure unit, bar or ATA
 
 Christian's request. Spec: new paragraph "Partial pressure unit" in `docs/ui-specification.md`. Mock-ups: `android-reglages` and the other Settings boards (`reglages-duree-android` now opens its menu above the row, since the list grew).
 - Settings › Unités: a new row **"Pressions partielles"** right after "Pression des bouteilles", value "bar" or "ATA", opened as a menu on the row (task 49 pattern).
@@ -1657,6 +1657,8 @@ Christian's request. Spec: new paragraph "Partial pressure unit" in `docs/ui-spe
 - App setting per device, never in the logbook, so Subsurface compatibility is unaffected. Reset all settings brings it back to bar (or to what the Métrique/Impérial preset implies).
 - Tablet and iOS: the same row.
 - A line in the release notes.
+
+Done in `feature/pp-unit`: app setting `ppUnit` (bar or ATA, per device, never in the logbook) with its row "Pressions partielles" after "Pression des bouteilles", opened as a row menu. Métrique sets bar, Impérial ATA (in `setCorePrefs`); a manual change that differs from the system switches the core to Personnalisé and keeps the five other units; the reset follows the reset system (`lib/pp-unit.js`, tested). `formatPartialPressure` / `ppUnitLabel` (lib/format.js) label the pO₂/pN₂/pHe/MOD/setpoint rows of Settings and their dialogs, the planner settings, the planner MOD hint, `Po2Field` (EAD et MOD, Meilleur mélange), the EAD/MOD subtitle and the profile ppO₂ tooltip. The profile ppO₂ axis shows bare numbers as before; the dive detail shows no partial pressure. Checked on the phone emulator (ATA then back to bar, units unchanged).
 
 ## [x] 2026-11-12-53 Settings: "Types de bouteilles" first in Équipement
 
