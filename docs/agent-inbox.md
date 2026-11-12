@@ -1677,3 +1677,7 @@ Christian's request. In a rebreather dive (CCR or pSCR), the "Utilisation" choic
 
 Done in `feature/bailout-label`: `useKey(use, divemode)` (lib/cylinder-use.js, tested) names `OC-gas` "Secours (bailout)" (`edit.uses.bailout`, en "Bailout") in a CCR or pSCR dive, "Circuit ouvert" otherwise; used by the Utilisation menu (gas page, cylinder sheet, tablet dialog: same SelectField), the delete dialog's line and the PDF sheet. The logbook keeps `OC-gas`. Checked on the phone emulator on a CCR dive.
 
+
+## [ ] 2026-11-12-55 Gas summary helper: no colour legend
+
+Christian's request. The helper under the Gaz summary of "Modifier la plongée" (task 46 wording) loses its colour legend. It now reads only: "Touchez une bouteille pour la modifier, ou la flèche pour toutes les bouteilles et les changements de gaz." The pale band and the two dashed lines stay as drawn. Mock-ups: `android-edition`, `android-edition-bouteille`.
