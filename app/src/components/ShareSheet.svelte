@@ -9,17 +9,41 @@
   import Icon from './Icon.svelte';
   import { t } from '../lib/i18n.js';
 
+  /** An icon name of Icon.svelte, from a row's text. @param {string} name @returns {any} */
+  const iconName = (name) => name;
+
   /**
-   * The texts of the rows default to those of a dive.
-   * @type {{ onpdf: () => void, onsummary: () => void, onclose: () => void, pdfText?: string, summaryLabel?: string, summaryText?: string }}
+   * The texts of the rows default to those of a dive. `rows` replaces the two rows with any
+   * number (sharing a plan, task 2026-11-12-76): an icon (a name of Icon.svelte, or 'pdf'),
+   * the title and supporting text, `disabled` for a row that cannot be chosen now, and
+   * `title` as the sheet's own title when it is not "Partager".
+   * @type {{
+   *   onpdf?: () => void, onsummary?: () => void, onclose: () => void, pdfText?: string, summaryLabel?: string, summaryText?: string,
+   *   heading?: string,
+   *   rows?: { id: string, icon: string, title: string, text: string, disabled?: boolean, onclick: () => void }[],
+   * }}
    */
-  let { onpdf, onsummary, onclose, pdfText = t('share.pdfText'), summaryLabel = t('share.summary'), summaryText = t('share.summaryText') } = $props();
+  let { onpdf, onsummary, onclose, pdfText = t('share.pdfText'), summaryLabel = t('share.summary'), summaryText = t('share.summaryText'), heading = t('share.title'), rows = undefined } = $props();
 </script>
 
 <Sheet opened swipeToClose backdrop class="od-share-sheet" style="height: auto" onSheetClosed={onclose}>
   <div class="od-share-sheet--sheet" role="dialog" aria-labelledby="od-share-title">
     <div class="od-share-sheet--handle" aria-hidden="true"></div>
-    <h2 id="od-share-title" class="od-share-sheet--title">{t('share.title')}</h2>
+    <h2 id="od-share-title" class="od-share-sheet--title">{heading}</h2>
+    {#if rows}
+      {#each rows as row (row.id)}
+        <button type="button" class="od-share-sheet--row" class:od-share-sheet--disabled={row.disabled} disabled={row.disabled} onclick={row.onclick}>
+          <span class="od-share-sheet--circle" aria-hidden="true">
+            {#if row.icon === 'pdf'}
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8.5 7.5c0 .83-.67 1.5-1.5 1.5H9v2H7.5V7H10c.83 0 1.5.67 1.5 1.5v1zm5 2c0 .83-.67 1.5-1.5 1.5h-2.5V7H15c.83 0 1.5.67 1.5 1.5v3zm4-3H19v1h1.5V11H19v2h-1.5V7h3v1.5zM9 9.5h1v-1H9v1zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm10 5.5h1v-3h-1v3z"></path></svg>
+            {:else}
+              <Icon name={iconName(row.icon)} size={22} weight={2} />
+            {/if}
+          </span>
+          <span class="od-share-sheet--texts"><span class="od-share-sheet--headline">{row.title}</span><span class="od-share-sheet--supporting">{row.text}</span></span>
+        </button>
+      {/each}
+    {:else}
     <button type="button" class="od-share-sheet--row" onclick={onpdf}>
       <span class="od-share-sheet--circle" aria-hidden="true">
         <!-- Material Symbols "picture_as_pdf": a filled glyph, unlike the line icons of Icon.svelte. -->
@@ -31,6 +55,7 @@
       <span class="od-share-sheet--circle" aria-hidden="true"><Icon name="image" size={22} weight={2} /></span>
       <span class="od-share-sheet--texts"><span class="od-share-sheet--headline">{summaryLabel}</span><span class="od-share-sheet--supporting">{summaryText}</span></span>
     </button>
+    {/if}
   </div>
 </Sheet>
 
@@ -88,6 +113,10 @@
       justify-content: center;
       background: var(--od-share-circle);
       color: var(--od-share-icon);
+    }
+
+    .od-share-sheet--disabled {
+      opacity: 0.5;
     }
 
     .od-share-sheet--texts {

@@ -154,8 +154,11 @@ export function regionUsesLetter() {
   return LETTER_REGIONS.has(region);
 }
 
-/** The paper of the PDF sheet: the setting (Settings, "Format du papier"), else the region's. */
-function letterPaper() {
+/**
+ * The paper of every printable PDF (the dive sheet, the plan sheet, the water slate): the
+ * setting (Settings, "Format du papier"), else the region's. True for US Letter.
+ */
+export function letterPaper() {
   return settings.paperSize === 'system' ? regionUsesLetter() : settings.paperSize === 'letter';
 }
 
@@ -347,7 +350,7 @@ export async function sharePdf(dive, prefs, svg) {
 /** @typedef {import('opendives-core').PlanRequest} PlanRequest */
 
 /** @param {number} o2 @param {number} he */
-const planGas = (o2, he) => (he === 0 && o2 >= 1000 ? formatGasLong(o2, he) : formatMixName(o2, he));
+export const planGas = (o2, he) => (he === 0 && o2 >= 1000 ? formatGasLong(o2, he) : formatMixName(o2, he));
 
 /** @param {number} seconds */
 const planMinutes = (seconds) => `${formatNumber(Math.floor((seconds + 30) / 60), 0)} ${t('units.minutes')}`;

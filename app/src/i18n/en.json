@@ -744,9 +744,10 @@
     },
     "paperSize": {
       "label": "Paper size",
-      "text": "From the device’s region: {name}",
-      "letter": "US Letter",
-      "a4": "A4"
+      "text": "{name}, from the region",
+      "letter": "Letter",
+      "a4": "A4",
+      "auto": "Automatic"
     },
     "conditions": {
       "waterType": "Water type",
@@ -1552,6 +1553,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Planner: “Share plan” offers five choices: the water slate, the PDF sheet, the table image, the logbook file (.ssrf) of the planned dive and the text summary. The slate is a pocket card to print (4 × 6 in or A6, 3 × 5 in or A7, or a full page) with the backup plans you choose: 5 min more at the bottom, 3 m (10 ft) deeper, or a lost deco gas, each calculated again by the planner and added as an End column; as a PDF at actual size with cut marks, as an image or as text. Your last choices are kept. Settings › Language and formats › Paper size: Automatic, Letter or A4, for every PDF to print.",
       "Forms: when you leave a form whose values you changed (←, ✕, Android Back or the iOS swipe), a dialog asks “Leave without saving?” with Stay, Save and Leave. With no change, or if you put the original value back, you leave at once.",
       "Planner: the gas is written on every row of the table; the highlighted gas marks a change.",
       "Planner: the result lists every row of the dive, not only the deco stops: descent, planned levels, ascents, stops and the final ascent to the surface, with the start, duration and end of each in minutes, the descent and ascent speeds, and the gas where it changes.",
@@ -2750,5 +2752,75 @@
     "period": "AM or PM",
     "dial": "Clock dial",
     "invalid": "Invalid time"
+  },
+  "planShare": {
+    "slate": "Slate for the water",
+    "slateText": "Pocket size to print, with the backup plans",
+    "image": "Table image",
+    "imageText": "The stops as a picture, for a message",
+    "ssrf": "Logbook file (.ssrf)",
+    "ssrfText": "The planned dive, readable by Subsurface",
+    "ssrfUnsaved": "Save the plan first",
+    "text": "Text summary",
+    "textText": "Levels, stops, gases and volumes",
+    "ssrfFailed": "The logbook file could not be created."
+  },
+  "slate": {
+    "title": "Slate for the water",
+    "share": "Share",
+    "close": "Close",
+    "plans": "Plans to include",
+    "planned": "Planned dive",
+    "always": "Always included",
+    "plus5Row": "Plus 5 min at the bottom",
+    "plusDepthRow": "Plus {depth}",
+    "withoutRow": "Without {gas}",
+    "withoutText": "If the deco gas is lost",
+    "levelText": "{depth} for {time}",
+    "plansNote": "Each backup plan adds an End column. The stops are calculated again for each one.",
+    "print": "Printing",
+    "sizeLabel": "Size",
+    "fileLabel": "File",
+    "noteSheet": "Printed on a {paper} sheet, at actual size, with cut marks. The paper follows the region, see Settings › Language and formats.",
+    "noteImage": "The image shows the card alone, without margin.",
+    "noteText": "The text holds the table, to paste in a note or a message.",
+    "preview": "Preview",
+    "previewLabel": "Preview of the slate",
+    "computing": "Calculating the backup plans…",
+    "unplannable": "This backup plan cannot be calculated: its column is empty.",
+    "sizeFull": "{name} ({paper})",
+    "files": {
+      "pdf": "PDF to print",
+      "pdfNote": "To print and laminate",
+      "png": "Image (PNG)",
+      "pngNote": "For a message or the gallery",
+      "text": "Text",
+      "textNote": "To copy into a note"
+    },
+    "size": {
+      "letterStandard": "4 × 6 in card",
+      "letterStandardNote": "10 × 15 cm, the size of waterproof notebooks",
+      "letterSmall": "3 × 5 in card",
+      "letterSmallNote": "8 × 13 cm, for a wrist slate",
+      "full": "Full page",
+      "a4Standard": "Pocket (A6)",
+      "a4StandardNote": "10.5 × 14.8 cm",
+      "a4Small": "Card (A7)",
+      "a4SmallNote": "7.4 × 10.5 cm"
+    },
+    "depth": "Stop",
+    "gas": "Gas",
+    "duration": "Time",
+    "end": "End",
+    "plus5": "+5 min",
+    "without": "No {gas}",
+    "surface": "Surface",
+    "atBottom": "{gas} at the bottom",
+    "at": "{gas} at {depth}",
+    "note": "End in minutes since entering the water. Underlined gas: gas switch.",
+    "gasNeeded": "Gas needed: {gases}",
+    "footer": "Made with OpenDives on {date}. Check before the dive.",
+    "filePrefix": "OpenDives-slate",
+    "failed": "The slate could not be shared."
   }
 }
