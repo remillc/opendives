@@ -1889,3 +1889,5 @@ Christian's request: the result table shows **all the rows of the dive**, not on
 - Take the rows from the core's computed plan (the planned dive's samples or the planner's decompression stops), never recompute deco in JavaScript. Round to the minute like Subsurface's plan notes.
 - The plan made from a dive with no deco stop keeps its sentence for now; Christian has not decided whether it also gets the table.
 - Tablet and iOS: the same. A line in the release notes.
+
+**Addendum (12 November 2026), Christian:** write the gas on **every row**, descents and ascents included: an empty cell could be misread. The sand chip stays only on the rows where the gas changes. The note under the table now ends with "Le gaz surligné marque un changement de gaz." Spec and mock-ups updated.
