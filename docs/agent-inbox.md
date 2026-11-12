@@ -1995,3 +1995,5 @@ Christian's request. Spec: new paragraph "Profile chart full width on the phone"
 - Dive detail (and site detail with a profile) on the phone: the profile section loses its card (no 16 dp side margin, no rounded corners), its white band goes edge to edge.
 - Hint line or cursor readout: 20 dp side padding. Chart: as wide as the screen minus the room for axis labels (≈14 dp left, ≈26 dp right); keep its aspect ratio.
 - Touch cursor and readout unchanged. Tablet panes keep the card. iOS phone: the same.
+
+**Addendum to task 79 (12 November 2026), Christian:** center the hint line "Touchez le profil pour lire les valeurs" above the chart (phone dive detail and site detail). The cursor readout is unchanged. Note: `detail3-android` also shows entry and exit times under the time axis ("Entrée 10:00", "Sortie 11:18") and a dotted line at the exit; that is still being decided, **do not build it yet**.
