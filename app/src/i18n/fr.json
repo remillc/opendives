@@ -1552,6 +1552,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Planificateur : « Enregistrer » demande un titre pour un nouveau plan (le site de la plongée de départ par défaut, vide permis), puis revient à « Plongées planifiées » en mettant le nouveau plan en évidence un instant. Le titre remplace le site dans la liste ; sans titre, une ligne affiche « Plan du » suivi de sa date. « Sans plongée de départ » ne s’affiche plus.",
       "Planificateur : le champ facultatif « Volume transporté » de chaque gaz disparaît, avec la couleur d’alarme de « Volume nécessaire par gaz », qui affiche toujours le total, le volume consommé et la réserve dans la couleur normale. Les plans enregistrés qui avaient un volume transporté s’ouvrent toujours.",
       "Planificateur : les étiquettes des niveaux du graphique ne se chevauchent plus.",
       "Planificateur : « Simplifier le profil » dans le menu ⋮ remplace le profil mesuré de la plongée de départ par quelques niveaux (profondeur et durée) à modifier comme dans un nouveau plan ; « Annuler » rend le profil mesuré.",
@@ -1857,6 +1858,9 @@
     "shareSummaryText": "Niveaux, paliers, gaz et volumes",
     "shareHeadline": "{depth}, durée totale {time}",
     "shareFailed": "Le plan n’a pas pu être partagé.",
+    "saved": "Plan enregistré",
+    "titleDialog": "Enregistrer le plan",
+    "titleLabel": "Titre",
     "saveFailed": "Le plan n’a pas pu être enregistré.",
     "filePrefix": "OpenDives-plan",
     "noStartDive": "Sans plongée de départ",
@@ -2435,6 +2439,7 @@
     "deleteText": "Il disparaît aussi du carnet synchronisé.",
     "deleted": "Plan supprimé",
     "deleteFailed": "Le plan n’a pas pu être supprimé.",
+    "fallbackTitle": "Plan du {date}",
     "failed": "Les plongées planifiées n’ont pas pu être lues."
   },
   "band": {

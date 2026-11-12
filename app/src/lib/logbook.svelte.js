@@ -290,9 +290,10 @@ export async function addDive(fields) {
  * and synced like an edit. The dive list does not show planned dives.
  * @param {import('opendives-core').PlanRequest} request
  * @param {number} [replaceId]
+ * @param {string} [title] kept with the plan; empty for none
  */
-export async function savePlan(request, replaceId = 0) {
-  const result = await OpenDivesCore.savePlan({ request, replaceId });
+export async function savePlan(request, replaceId = 0, title = '') {
+  const result = await OpenDivesCore.savePlan({ request, replaceId, title });
   logbook.undoText = result.undo;
   logbook.redoText = result.redo ?? '';
   await persistChanges();

@@ -18,6 +18,7 @@ import { DEFAULT_SAC_FACTOR, settings, setCorePrefs, resetCorePrefs } from './se
 import { SETTING_KEYS } from './settings-reset.js';
 import { altitudeToPressureMbar, salinityOfWaterType } from './tools.js';
 import { bottomCylinder } from './plan-gases.js';
+import { defaultPlanTitle } from './plan-title.js';
 
 /** @typedef {import('opendives-core').PlannerSetup} PlannerSetup */
 /** @typedef {import('opendives-core').DiveDetail} DiveDetail */
@@ -59,6 +60,10 @@ export const planner = $state({
   source: /** @type {PlanSource|null} */ (null),
   /** The planned dive reopened (saving replaces it), or 0. */
   planId: 0,
+  /** The title the plan is saved with (task 37); empty for none. */
+  title: '',
+  /** The plan just saved, for the list to highlight it once (id), or 0. */
+  justSaved: 0,
   /** Local time of the plan, seconds; 0 until the core has chosen one. */
   when: 0,
   levels: /** @type {Level[]} */ ([{ depthMm: 15000, durationSeconds: 20 * 60 }]),
@@ -244,6 +249,7 @@ const o2Of = (c) => c.o2Permille || 209;
  */
 export function startFromDive(dive, source, prefs) {
   planner.source = source;
+  planner.title = defaultPlanTitle(source);
   planner.simplified = false;
   planner.when = 0;
   const breathed = dive.cylinders.filter((c) => c.used && c.use === 'OC-gas');
@@ -273,6 +279,7 @@ export function startFromDive(dive, source, prefs) {
  */
 export function startNewDive(prefs) {
   planner.source = null;
+  planner.title = '';
   planner.simplified = false;
   planner.when = 0;
   planner.levels = [{ depthMm: plannerDefaults(prefs).depthMm, durationSeconds: 20 * 60 }];
@@ -325,9 +332,11 @@ export function requestOfPlan(plan, prefs) {
  * @param {PlanRequest} request
  * @param {number} planId
  * @param {PlanSource|null} source
+ * @param {string} [title] the title the plan was saved with
  */
-export function applyRequest(request, planId, source) {
+export function applyRequest(request, planId, source, title = '') {
   planner.planId = planId;
+  planner.title = title;
   planner.source = source;
   planner.when = request.when ?? 0;
   planner.levels = request.levels?.length ? request.levels.map((l) => ({ ...l })) : planner.levels;

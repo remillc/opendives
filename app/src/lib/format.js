@@ -248,6 +248,12 @@ export function formatDateTime(iso) {
   return `${day} ${formatTimeChoice(date, settings.timeFormat)}`;
 }
 
+/** Short date without the time, in the format chosen in Settings: "9 nov. 2026". @param {string} iso */
+export function formatShortDate(iso) {
+  const date = toDate(iso);
+  return settings.dateFormat === 'system' ? dateOnlyFormat.format(date) : formatDateChoice(date, settings.dateFormat);
+}
+
 /** Long date without the time: "2 février 2013", "1er juillet 2016". @param {string} iso */
 export function formatLongDate(iso) {
   return firstOfMonth(longDateFormat.format(toDate(iso)));

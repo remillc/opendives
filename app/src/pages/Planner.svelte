@@ -20,6 +20,8 @@
   import DatePickerDialog from '../components/DatePickerDialog.svelte';
   import TimePickerDialog from '../components/TimePickerDialog.svelte';
   import ShareSheet from '../components/ShareSheet.svelte';
+  import PlanTitleDialog from '../components/PlanTitleDialog.svelte';
+  import { cleanPlanTitle } from '../lib/plan-title.js';
   import { logbook, savePlan } from '../lib/logbook.svelte.js';
   import { planner, loadSetup, adoptUnitDefaults, planRequest, startFromDive, startNewDive, requestOfPlan, applyRequest, nextGas, planSettings, canSimplify, simplifyPlan, restorePlan } from '../lib/planner.svelte.js';
   import { simplifyProfile } from '../lib/profile-levels.js';
@@ -50,6 +52,7 @@
   let choosing = $state(false);
   let sharing = $state(false);
   let saving = $state(false);
+  let titling = $state(false);
   let decoOpen = $state(false);
   let dialog = $state(/** @type {null|'date'|'time'} */ (null));
 
@@ -108,7 +111,7 @@
         request.levels = plan.levels;
       }
       const source = stillThere ? (await sourceOf(/** @type {number} */ (request.sourceDiveId))).source : null;
-      applyRequest(request, id, source);
+      applyRequest(request, id, source, plan.title ?? '');
     } catch (e) {
       console.error('Reopening a plan', e);
       failed = true;
@@ -564,11 +567,21 @@
     else f7router.navigate('/plans/', { reloadCurrent: true });
   }
 
-  async function save() {
+  /** "Enregistrer": a new plan asks for its title first, a reopened one keeps its own. */
+  function save() {
+    if (!canSave) return;
+    if (planner.planId) saveWith(planner.title);
+    else titling = true;
+  }
+
+  /** @param {string} wanted */
+  async function saveWith(wanted) {
+    titling = false;
     if (!canSave || !result) return;
     saving = true;
     try {
-      await savePlan({ ...planRequest(), ...planSettings(), when: result.when }, planner.planId);
+      planner.title = cleanPlanTitle(wanted);
+      planner.justSaved = await savePlan({ ...planRequest(), ...planSettings(), when: result.when }, planner.planId, planner.title);
       toList();
     } catch (e) {
       console.error('Saving the plan', e);
@@ -582,7 +595,7 @@
   async function share(kind) {
     sharing = false;
     if (!result) return;
-    const title = planner.source ? planner.source.site || t('dive.siteNotSet') : t('plan.noStartDive');
+    const title = planner.title || (planner.source ? planner.source.site || t('dive.siteNotSet') : t('plan.noStartDive'));
     try {
       if (kind === 'pdf') await sharePlanPdf(result, planRequest(), prefs, title);
       else await sharePlanSummary(result, planRequest(), prefs, title);
@@ -921,6 +934,10 @@
     </Page>
   </Popup>
 </Page>
+
+{#if titling}
+  <PlanTitleDialog title={planner.title} oncancel={() => (titling = false)} onsave={saveWith} />
+{/if}
 
 {#if sharing}
   <ShareSheet pdfText={t('plan.sharePdfText')} summaryLabel={t('plan.shareSummary')} summaryText={t('plan.shareSummaryText')} onpdf={() => share('pdf')} onsummary={() => share('summary')} onclose={() => (sharing = false)} />

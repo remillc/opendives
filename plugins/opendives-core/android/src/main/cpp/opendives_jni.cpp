@@ -1040,10 +1040,10 @@ Java_org_opendives_core_NativeCore_listPlans(JNIEnv *env, jobject)
 }
 
 JNIEXPORT jstring JNICALL
-Java_org_opendives_core_NativeCore_savePlan(JNIEnv *env, jobject, jstring request, jint replaceId)
+Java_org_opendives_core_NativeCore_savePlan(JNIEnv *env, jobject, jstring request, jint replaceId, jstring title)
 {
 	std::string json, error;
-	if (opendives::save_plan(to_string(env, request), replaceId, json, error)) {
+	if (opendives::save_plan(to_string(env, request), replaceId, json, error, to_string(env, title))) {
 		throw_core_error(env, error);
 		return nullptr;
 	}

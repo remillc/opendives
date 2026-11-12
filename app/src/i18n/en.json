@@ -1552,6 +1552,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Planner: “Save” asks for a title for a new plan (the site of the starting dive by default, empty allowed), then returns to “Planned dives” and highlights the new plan for a moment. The title replaces the site in the list; without a title, a row reads “Plan of” followed by its date. “No starting dive” is no longer shown.",
       "Planner: the optional “Volume carried” field of each gas is gone, and with it the alarm colour on “Volume needed per gas”, which now always shows the total, what is used and the reserve in the normal colour. Saved plans that had a volume carried still open.",
       "Planner: the level labels of the chart no longer overlap.",
       "Planner: “Simplify profile” in the ⋮ menu replaces the measured profile of the starting dive with a few levels (depth and duration) to edit as in a new plan; “Undo” brings the measured profile back.",
@@ -1857,6 +1858,9 @@
     "shareSummaryText": "Levels, stops, gases and volumes",
     "shareHeadline": "{depth}, total time {time}",
     "shareFailed": "The plan could not be shared.",
+    "saved": "Plan saved",
+    "titleDialog": "Save plan",
+    "titleLabel": "Title",
     "saveFailed": "The plan could not be saved.",
     "filePrefix": "OpenDives-plan",
     "noStartDive": "No starting dive",
@@ -2435,6 +2439,7 @@
     "deleteText": "It also leaves the synced logbook.",
     "deleted": "Plan deleted",
     "deleteFailed": "The plan could not be deleted.",
+    "fallbackTitle": "Plan of {date}",
     "failed": "The planned dives could not be read."
   },
   "band": {

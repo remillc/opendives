@@ -19,7 +19,7 @@ internal object NativeCore {
     external fun plannerSetup(): String
     external fun planDive(request: String): String
     external fun listPlans(): String
-    external fun savePlan(request: String, replaceId: Int): String
+    external fun savePlan(request: String, replaceId: Int, title: String): String
     external fun setCaFile(path: String)
     external fun cloudListDives(email: String, password: String): String
     external fun cloudConfigure(email: String, password: String)
