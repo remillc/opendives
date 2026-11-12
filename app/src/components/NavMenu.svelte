@@ -13,7 +13,7 @@
   import SyncFailureRow from './SyncFailureRow.svelte';
   import SyncControl from './SyncControl.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
-  import { navigation, sections, showSection, closeMenu, restoreFocus, openSettings, openAbout } from '../lib/navigation.svelte.js';
+  import { navigation, sections, goToSection, closeMenu, restoreFocus, openSettings, openAbout } from '../lib/navigation.svelte.js';
   import { t } from '../lib/i18n.js';
   import { updatesCount } from '../lib/offline-maps.svelte.js';
   import { tolerantTaps } from '../lib/tap.js';
@@ -90,7 +90,7 @@
         <img src="logo-small-light.svg" alt="" width="44" height="44" />
         <span class="od-nav-menu--name">{t('menu.title')}</span>
       </div>
-      <a href="#account" class="od-nav-menu--account" aria-label={t('menu.accountLabel', { name: accountName })} onclick={(e) => choose(e, () => showSection('account'))}>
+      <a href="#account" class="od-nav-menu--account" aria-label={t('menu.accountLabel', { name: accountName })} onclick={(e) => choose(e, () => goToSection('account'))}>
         <Icon name="account" />
         <span class="od-nav-menu--texts">
           <span class="od-nav-menu--address">{accountName}</span>
@@ -102,7 +102,7 @@
     </div>
 
     {#each sections as section (section)}
-      <a href="#{section}" class="od-nav-menu--item" aria-current={current === section ? 'page' : undefined} onclick={(e) => choose(e, () => showSection(section))}>
+      <a href="#{section}" class="od-nav-menu--item" aria-current={current === section ? 'page' : undefined} onclick={(e) => choose(e, () => goToSection(section))}>
         <Icon name={icons[section]} />
         <span>{t(`tabs.${section}`)}</span>
       </a>
