@@ -123,3 +123,14 @@ test('the Equipment card opens only when it would show more than the total', asy
   assert.equal(equipmentLabel({ suit: 'dry', weight: '7 lb', open: false, opens: false }, words), 'dry, 7 lb');
   assert.equal(equipmentLabel({ suit: 'dry', weight: '7 lb', open: false }, words), 'dry, 7 lb. Show');
 });
+
+test('unused cylinders: listed with the setting on, drawn full with "not used" or their one pressure', async () => {
+  const { cylinderListed, unusedShown } = await import('../../app/src/lib/gas-summary.js');
+  assert.equal(cylinderListed({ used: false }, true), true);
+  assert.equal(cylinderListed({ used: false }, false), false);
+  assert.equal(cylinderListed({ used: true }, false), true);
+  assert.deepEqual(unusedShown({ used: false, startMbar: 0, endMbar: 0 }), { pressureMbar: 0 });
+  assert.deepEqual(unusedShown({ used: false, startMbar: 207000, endMbar: 207000 }), { pressureMbar: 207000 });
+  assert.equal(unusedShown({ used: true, startMbar: 0, endMbar: 0 }), null);
+  assert.equal(unusedShown({ used: false, startMbar: 200000, endMbar: 150000 }), null);
+});

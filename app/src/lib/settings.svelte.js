@@ -145,6 +145,9 @@ export function applyDeviceSettings() {
   // 2026-11-12-48), on in Subsurface: the cylinder type choice shows the
   // diver's own types and those of the logbook. A value chosen stays.
   storedCore.displayDefaultTankInfos ??= false;
+  // "Afficher les bouteilles inutilisées" is on by default in OpenDives (task
+  // 2026-11-12-56), off in Subsurface: every cylinder entered or imported shows.
+  storedCore.includeUnusedTanks ??= true;
   delete storedCore.threeMGrid;
   // A value refused by this core (an older version kept something else): the others are kept.
   if (Object.keys(storedCore).length) {

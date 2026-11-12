@@ -1542,6 +1542,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Every cylinder of a dive shows, even unused ones (“Show unused cylinders” is on by default); an unused cylinder is drawn full, with “Not used” or its one pressure.",
       "“Edit dive”: the text under the Gas summary no longer explains the colours.",
       "Dive detail: the Equipment card has no chevron when opening it would show nothing more (one weight without a location).",
       "Rebreather dives: the open-circuit cylinder is called “Bailout” in the choice of its use; the logbook does not change.",

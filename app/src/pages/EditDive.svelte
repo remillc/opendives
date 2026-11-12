@@ -22,7 +22,7 @@
   import CylinderSheet from '../components/CylinderSheet.svelte';
   import CylinderDeleteDialog from '../components/CylinderDeleteDialog.svelte';
   import GasSummary from '../components/GasSummary.svelte';
-  import { fillLevels } from '../lib/gas-summary.js';
+  import { cylinderListed, fillLevels, unusedShown } from '../lib/gas-summary.js';
   import StarsInput from '../components/StarsInput.svelte';
   import Stars from '../components/Stars.svelte';
   import { conditionsMean, roundHalfUp1 } from '../lib/conditions.js';
@@ -137,16 +137,17 @@
    * texts and those it opened with; `key` identifies its card while the cards
    * are reordered, `custom` shows the Size and Working pressure fields (a
    * cylinder outside the table of types, "Other…").
-   * @typedef {{ key: number, index: number, protected: boolean, custom: boolean, f: Record<string, string>, initial: Record<string, string> }} EditedCylinder
+   * @typedef {{ key: number, index: number, protected: boolean, used: boolean, custom: boolean, f: Record<string, string>, initial: Record<string, string> }} EditedCylinder
    */
   /** @type {EditedCylinder[]} */
   let cylinders = $state([]);
   let cylinderKeys = 0;
-  /** @param {number} index @param {boolean} isProtected @param {Record<string, string>} texts @returns {EditedCylinder} */
-  const editedCylinder = (index, isProtected, texts) => ({
+  /** @param {number} index @param {boolean} isProtected @param {Record<string, string>} texts @param {boolean} [used] the core's rule, at load; a new cylinder counts as used @returns {EditedCylinder} */
+  const editedCylinder = (index, isProtected, texts, used = true) => ({
     key: cylinderKeys++,
     index,
     protected: isProtected,
+    used,
     custom: !texts.description && !!texts.size,
     f: { ...texts },
     initial: texts,
@@ -212,7 +213,7 @@
         chill: d.conditions?.chill ?? 0,
       };
       invalid = d.invalid;
-      cylinders = d.cylinders.map((c, index) => editedCylinder(index, c.protected, cylinderTexts(c)));
+      cylinders = d.cylinders.map((c, index) => editedCylinder(index, c.protected, cylinderTexts(c), c.used));
       weights = d.weights.map((w) => ({ description: w.description, weight: weightText(w.grams), grams0: w.grams, text0: weightText(w.grams) }));
       initialWeights = JSON.stringify(weights);
       const [guide, buddy, tag, suitList] = await Promise.all([logbookValues('guide'), logbookValues('buddy'), logbookValues('tag'), logbookValues('suit')]);
@@ -463,17 +464,23 @@
     const levels = fillLevels(own.startMbar, own.endMbar, own.workingPressureMbar);
     return { ratio: levels.end, startRatio: levels.start };
   };
+  /** The cylinders listed (task 2026-11-12-56): all, or the core's rule with the setting off. */
+  const includeUnused = $derived(prefs.includeUnusedTanks !== false);
   const gasItems = $derived(
-    cylinders.map((c, i) => {
-      const own = cylinderValues(c);
-      return {
-        key: c.key,
-        n: i + 1,
-        gas: gasName(own.o2, own.he, gasWords),
-        pressure: own.endMbar ? formatPressure(own.endMbar, prefs) : '',
-        ...levelsOf(own),
-      };
-    }),
+    cylinders
+      .map((c, i) => {
+        const own = cylinderValues(c);
+        const unused = unusedShown({ used: c.used, startMbar: own.startMbar, endMbar: own.endMbar });
+        return {
+          listed: cylinderListed(c, includeUnused),
+          key: c.key,
+          n: i + 1,
+          gas: gasName(own.o2, own.he, gasWords),
+          pressure: unused ? (unused.pressureMbar ? formatPressure(unused.pressureMbar, prefs) : t('edit.uses.not used')) : own.endMbar ? formatPressure(own.endMbar, prefs) : '',
+          ...(unused ? { ratio: 1, startRatio: null } : levelsOf(own)),
+        };
+      })
+      .filter((item) => item.listed),
   );
   const sheetIndex = $derived(sheetKey === null ? -1 : cylinders.findIndex((c) => c.key === sheetKey));
   const deleteIndex = $derived(deleteKey === null ? -1 : cylinders.findIndex((c) => c.key === deleteKey));
@@ -924,6 +931,7 @@
         <section class="card od-edit-dive--card">
           <div class="od-sr-only" aria-live="polite">{moved}</div>
           {#each cylinders as c, i (c.key)}
+            {#if cylinderListed(c, includeUnused)}
             <CylinderCard
               n={i + 1}
               gas={cylinderGas(c)}
@@ -940,6 +948,7 @@
             >
               {@render cylinderFields(c)}
             </CylinderCard>
+            {/if}
           {/each}
           <button type="button" class="od-edit-dive--add" onclick={addCylinder}><Icon name="plus" />{t('edit.addCylinder')}</button>
           <div class="od-edit-dive--end"></div>

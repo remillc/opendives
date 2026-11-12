@@ -31,9 +31,10 @@ export const PLANNER_APP_KEYS = /** @type {const} */ (['defaultWater', 'defaultA
 /**
  * Core values whose OpenDives default differs from Subsurface's: set at the
  * first start and by "Reset all settings". "Choisir le type d’eau dans
- * l’éditeur" on; "Proposer les tailles standard" off (task 2026-11-12-48).
+ * l’éditeur" on; "Proposer les tailles standard" off (task 2026-11-12-48);
+ * "Afficher les bouteilles inutilisées" on (task 2026-11-12-56).
  */
-export const OD_CORE_DEFAULTS = Object.freeze({ salinityEdit: true, displayDefaultTankInfos: false });
+export const OD_CORE_DEFAULTS = Object.freeze({ salinityEdit: true, displayDefaultTankInfos: false, includeUnusedTanks: true });
 
 /**
  * The core values to set back to Subsurface's defaults: all but the planner's.

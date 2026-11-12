@@ -1685,7 +1685,7 @@ Christian's request. The helper under the Gaz summary of "Modifier la plongée" 
 Done in `fix/gas-helper-text`: `edit.gasHelper` (fr, en) keeps only the tap instructions; the drawing is unchanged.
 
 
-## [ ] 2026-11-12-56 Unused cylinders: shown by default, the dive follows the setting
+## [x] 2026-11-12-56 Unused cylinders: shown by default, the dive follows the setting
 
 Christian's answer to your question about the hidden third cylinder of dive 88548: **every cylinder entered by hand or imported is always shown; the diver cleans up as needed.**
 - Settings › Équipement, "Afficher les bouteilles inutilisées" (`include_unused_tanks`): default **on**, unlike Subsurface (off). New installs and "Réinitialiser tous les réglages" start with it on. A value the user already set stays as it is. Spec table updated; mock-ups show the switch on.
@@ -1693,3 +1693,6 @@ Christian's answer to your question about the hidden third cylinder of dive 8854
 - A cylinder shown but unused (no pressure drop) is drawn full, without the pale band nor the end line, and its pressure line reads "Non utilisée" when there are no pressures, or the single pressure ("3 002 psi") when start equals end.
 - This is an advanced setting: Christian started `docs/advanced-settings.md`, a list of such settings. No interface change for that list yet.
 - A line in the release notes.
+
+Done in `feature/unused-cylinders-shown`: `includeUnusedTanks` joins `OD_CORE_DEFAULTS` (on at the first start unless this device has a value, and after a reset). `cylinderListed` and `unusedShown` (lib/gas-summary.js, tested): the dive detail Gaz card, the Gaz summary and the gas page of Modifier la plongée list every cylinder with the setting on, the core's `used` ones with it off; a listed cylinder that was not used (core rule, and no pressure drop) is drawn full without the pale band or lines, with "Non utilisée" or its one pressure. The PDF sheet keeps its own rule (used, or with a start pressure). Checked on Christian's phone with dive 88548 (its bailout now shows, "Non utilisée").
+
