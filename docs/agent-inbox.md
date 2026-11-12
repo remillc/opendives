@@ -1827,15 +1827,27 @@ fil simplifié" with "Annuler", which restores the measured profile.
 Done in `feature/simplify-profile-stop` (from `feature/simplify-profile`): `simplifyProfile` (lib/profile-levels.js, tested: square dive one level, two phases two levels, noise and spikes ignored, multilevel ascent at most 6 levels, the end-of-dive stop at 6 m or shallower not a level) turns the measured profile into levels; the ⋮ item "Simplifier le profil" (first, only for a plan from a dive) applies them through the new-plan levels path with `sourceDiveId` kept, so the plan keeps the dive's date, surface interval, gases, SAC and conditions; "Profil prévu" with level labels (placed so that they never overlap, lib/chart-labels.js), the Niveaux rows and the helper; snackbar "Profil simplifié" with Annuler restoring the measured plan (tested; checked on the emulator: 97 min, 137 min simplified, 97 min after Annuler). Core: `run_plan` uses the source dive's waypoints only when no levels are given (plan.cpp, one line); `build/poc/plan` 0 failed, natives rebuilt. **Release lock:** planner code changed, a new `tests/release-check.sh` report is needed before the next tag.
 
 
-## [ ] 2026-11-12-69 Planner: remove "Volume transporté"
+## [x] 2026-11-12-69 Planner: remove "Volume transporté"
 
 Christian's request: the planner has no "Volume transporté" field in the mock-ups; remove it from the app. Spec updated (`docs/ui-specification.md`, planner "Gaz" paragraph).
 - Remove the optional "Volume transporté" field of each gas and everything tied to it: the alarm colour on "Volume nécessaire par gaz" when the carried volume is short, the "what is missing" supporting text, its storage in the plan, its translations.
 - "Volume nécessaire par gaz" shows the total, consumed and reserve as before, in the normal colour.
 - Tablet and iOS: the same. A line in the release notes.
 
+Done in `feature/remove-carried-volume` (75919c3 app, d353b1d tests): the "Volume transporté" field, its alarm and supporting text, `carriedMl` in the plan state and request (old saved plans with it still open), `isShort` and the keys `plan.carried` and `plan.volumeShort` are gone; "Volume nécessaire par gaz" shows total, used and reserve in the normal colour. Tests of the feature removed in their own commit (the isShort test, the "short" half of the alarm-text test, the `alarm` and `carried` mutations of the app chain, e2e section 8 and the carried value of step 12); no other reference value changed. AGENTS.md still describes the carried-volume alarm in its Planner bullet: left for Christian. Release lock: planner code changed, a new `tests/release-check.sh` report is needed before the next tag. Checked on the phone emulator.
+
 ## [ ] 2026-11-12-70 Reminder: task 37, where to store a plan's title
 
 Christian asks for your answer on task 2026-11-11-37 (title when saving a new plan). Nothing has been built or reported yet. Before any code:
 - Check what Subsurface desktop shows and keeps for a planned dive, and list the storage options with what each one does in Subsurface (desktop and mobile) and in a logbook read back by Subsurface: (a) the dive's site / location (creates a site), (b) the first line of the notes (Subsurface's planner already writes its plan into the notes), (c) a tag, (d) anything better you find.
 - Write the options here, under this task, with your recommendation, then stop and wait for Christian's choice. Never break a log read by Subsurface.
+
+**Answer (code agent, 12 November 2026).** What Subsurface does with a planned dive: it has no title field. Its planner (core/plannernotes.cpp, `add_plan_to_notes`) **replaces** the dive's notes with the plan text (HTML: runtime table, gas use, warnings) each time the plan is computed; a planned dive is otherwise a normal dive (site, tags, extra data) with the "planned" flag. OpenDives already keeps each plan's request in the main dive computer's extra data, key "OpenDives plan" (core/libopendives/plan.cpp).
+
+- (a) **Site / location.** Desktop shows it as the dive's location everywhere (list, map). But a title becomes a dive site: it appears in the Sites list, the map (without a position), filters and statistics, and stays there after the plan is deleted unless cleaned up. Readable, but it pollutes the sites.
+- (b) **First line of the notes.** Desktop shows it in the Notes tab, above the plan. Safe for a log read back by Subsurface (plain notes). But re-planning the dive in Subsurface desktop replaces the notes, so the title is lost there; OpenDives would write it again in front of the plan text at each save.
+- (c) **A tag.** Shown in desktop's tags, but each title becomes a tag in the tag lists, filters and statistics: wrong meaning, pollutes.
+- (d) **Extra data of the dive computer**, a new key "OpenDives title" next to "OpenDives plan". Kept as is by Subsurface on save (unknown data preserved), shown in desktop's "Extra info" tab only, never in lists. Probably dropped if the dive is re-planned in desktop.
+
+**Recommendation: (b) + (d).** The title is the first line of the notes (what a Subsurface user sees) and is also kept in "OpenDives title"; OpenDives reads "OpenDives title" first, the notes' first line if it is missing, and the list shows "Plan du <date>" when both are empty. Nothing new for Subsurface to read, no site, no tag. Waiting for Christian's choice; no code before it.
+
