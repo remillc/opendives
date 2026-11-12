@@ -1863,3 +1863,10 @@ Christian's request, for **every SAC field** (planner "Au fond" and "Pendant la 
 - A typed value is kept with up to **two decimals** (0,36), clamped to 0–2 cuft/min (0–60 L/min), decimal comma in French. The current value need not be a preset.
 - Helper while the list is open: "Choisissez une valeur ou tapez la vôtre, à deux décimales."
 - Tablet and iOS: the same behaviour. A line in the release notes.
+
+## [ ] 2026-11-12-72 Altitude fields: editable dropdown
+
+Christian's request: every Altitude field uses the same editable dropdown as the SAC fields (task 71): planner Conditions, Réglages du planificateur if it has one, Settings › Conditions des outils, tablet screens. Spec: new paragraph "Altitude fields: editable dropdown". Mock-up: `android-planificateur-altitude` (list open).
+- Presets, imperial: 0, 1 000, 2 000, 3 000, 4 000, 5 000, 6 000, 8 000, 10 000 ft. Metric: 0, 300, 600, 900, 1 200, 1 500, 2 000, 2 500, 3 000 m (from a web and forum survey: altitude diving starts at 300 m / 1 000 ft, tables step by 1 000 ft, dive computers stop around 3 000 m).
+- Typing any whole value is allowed, clamped to 0–4 500 m (0–15 000 ft). The current value is tinted in the list when it is a preset. No helper text needed beyond the existing ones.
+- Tablet and iOS: the same. A line in the release notes.
