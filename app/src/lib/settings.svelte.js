@@ -9,6 +9,7 @@
 // The app's own settings (language, theme, date and time formats, GPS
 // coordinates, Bluetooth filter) live here only.
 import { OpenDivesCore } from 'opendives-core';
+import { impliedPpUnit, systemAfterPpUnit, ppUnitAfterReset } from './pp-unit.js';
 import { OD_CORE_DEFAULTS, coreResetChanges, storedAfterReset, appSettingsAfterReset } from './settings-reset.js';
 
 const CORE_KEY = 'od.corePrefs';
@@ -33,6 +34,8 @@ export const DEFAULT_SAC_FACTOR = 200;
  * @property {'system'|'24'|'12'} timeFormat
  * @property {'decimal'|'minutes'|'seconds'} coordinatesFormat GPS coordinates, formatted by
  *   OpenDives itself (the core only knows seconds and decimal): -35.4485, 35° 26.9′ S, 35° 26′ 54.6″ S
+ * @property {'bar'|'ata'} ppUnit label of every partial pressure; the number never changes (1 bar = 1 ATA).
+ *   Per device, never in the logbook. Métrique implies bar, Impérial ATA (pp-unit.js).
  * @property {boolean} showAllBluetooth the Bluetooth scan shows every device, not only dive computers
  * @property {'system'|'letter'|'a4'} paperSize the PDF sheet of a dive: "system" follows the
  *   device's region (US Letter where it is used, A4 elsewhere)
@@ -53,6 +56,7 @@ const APP_DEFAULTS = {
   dateFormat: 'system',
   timeFormat: 'system',
   coordinatesFormat: 'decimal',
+  ppUnit: 'bar',
   showAllBluetooth: false,
   paperSize: 'system',
   defaultWater: 'salt',
@@ -191,8 +195,30 @@ export async function setCorePrefs(changes) {
   }
   writeJson(CORE_KEY, storedCore);
   if ('extraEnvironmental' in changes) settings.extraConditions = changes.extraEnvironmental === true;
+  // Métrique and Impérial carry their partial pressure unit with them.
+  const implied = changes.unitSystem ? impliedPpUnit(changes.unitSystem) : null;
+  if (implied) setAppSetting('ppUnit', implied);
   if (changes.duration) settings.duration = changes.duration === 'minutes' ? 'minutes' : 'mixed';
   return prefs;
+}
+
+/**
+ * The partial pressure unit chosen by hand. A value that differs from what
+ * Métrique or Impérial implies makes the system "Personnalisé", the five
+ * units staying as they are (they are sent with it, so that all five are kept
+ * on this device as when one unit is changed).
+ * @param {'bar'|'ata'} ppUnit
+ * @returns {Promise<CorePrefValues>} the core's preferences
+ */
+export async function setPpUnit(ppUnit) {
+  setAppSetting('ppUnit', ppUnit);
+  const prefs = await OpenDivesCore.getPrefs();
+  if (systemAfterPpUnit(prefs.unitSystem, ppUnit) === prefs.unitSystem) return prefs;
+  const changes = /** @type {Partial<CorePrefValues>} */ ({ unitSystem: 'personalize' });
+  for (const key of UNIT_KEYS) /** @type {any} */ (changes)[key] = prefs[key];
+  const result = await setCorePrefs(changes);
+  setAppSetting('ppUnit', ppUnit); // the system is personalised: the choice stays
+  return result;
 }
 
 /**
@@ -270,6 +296,7 @@ export async function resetAllSettings(defaults) {
   }
   const languageChanged = settings.language !== APP_DEFAULTS.language;
   Object.assign(settings, appSettingsAfterReset(settings, APP_DEFAULTS), { extraConditions: defaults.extraEnvironmental === true, duration: defaults.duration ?? 'mixed' });
+  settings.ppUnit = ppUnitAfterReset(defaults.unitSystem);
   setAppSetting('theme', settings.theme);
   if (languageChanged) location.reload();
   return OpenDivesCore.getPrefs();

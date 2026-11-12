@@ -140,6 +140,21 @@ export function formatPressure(mbar, prefs) {
     : `${formatNumber(mbar / 1000, 0)}${NBSP}${t('units.bar')}`;
 }
 
+/** The label of every partial pressure: "bar" or "ATA" (Settings › Unités). */
+export function ppUnitLabel() {
+  return t(settings.ppUnit === 'ata' ? 'units.ata' : 'units.bar');
+}
+
+/**
+ * A partial pressure given in bar, with the unit of the settings. Same number
+ * whatever the unit (1 bar is taken as 1 ATA): only the label changes.
+ * @param {number} bar
+ * @param {number} decimals
+ */
+export function formatPartialPressure(bar, decimals) {
+  return `${formatNumber(bar, decimals)}${NBSP}${ppUnitLabel()}`;
+}
+
 /**
  * Gas consumption (SAC), per minute: 1 decimal in litres, 2 in cubic feet (0,36 cuft/min).
  * @param {number} mlPerMin

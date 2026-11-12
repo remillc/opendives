@@ -24,6 +24,7 @@
   import {
     settings,
     setCorePrefs,
+    setPpUnit,
     setAppSetting,
     forgetDiveComputers,
     resetAllSettings,
@@ -31,7 +32,7 @@
     TIME_PATTERNS,
   } from '../lib/settings.svelte.js';
   import { confirmAction } from '../lib/dialogs.js';
-  import { formatNumber, formatDuration, formatDateChoice, formatTimeChoice, formatDepth } from '../lib/format.js';
+  import { formatNumber, formatDuration, formatDateChoice, formatTimeChoice, formatDepth, formatPartialPressure, ppUnitLabel } from '../lib/format.js';
   import { regionUsesLetter } from '../lib/share.js';
   import { waterTypeName, downloadWaterName } from '../lib/tools.js';
   import { cylinderChoices } from '../lib/cylinder-choices.js';
@@ -99,7 +100,7 @@
   const languageNames = { fr: 'Français', 'fr-CA': 'Français (Canada)', en: 'English' };
 
   /** @param {number} mbar @param {number} decimals */
-  const bar = (mbar, decimals) => `${formatNumber(mbar / 1000, decimals)} ${t('units.bar')}`;
+  const bar = (mbar, decimals) => formatPartialPressure(mbar / 1000, decimals);
 
   /**
    * Values of a wheel: from `min` to `max` by `step` (integers in the core's unit).
@@ -285,6 +286,24 @@
       rows: [
         unitRow('length', t('settings.depth')),
         unitRow('pressure', t('settings.pressure')),
+        {
+          kind: 'choice',
+          id: 'ppUnit',
+          label: t('settings.ppUnit'),
+          value: ppUnitLabel(),
+          current: settings.ppUnit,
+          options: () => [
+            { value: 'bar', label: t('units.bar') },
+            { value: 'ata', label: t('units.ata') },
+          ],
+          set: async (v) => {
+            try {
+              logbook.prefs = await setPpUnit(v === 'ata' ? 'ata' : 'bar');
+            } catch (e) {
+              failed(e);
+            }
+          },
+        },
         unitRow('volume', t('settings.volume')),
         unitRow('temperature', t('settings.temperature')),
         unitRow('weight', t('settings.weight')),
@@ -507,7 +526,7 @@
           label: t('settings.pp.po2'),
           text: t('settings.pp.po2Text'),
           value: `${formatNumber(p.po2MinMbar / 1000, 2)} – ${bar(p.po2MaxMbar, 1)}`,
-          dialogText: t('settings.pp.po2Dialog'),
+          dialogText: t('settings.pp.po2Dialog', { unit: ppUnitLabel() }),
           dropdowns: true,
           wheels: () => [
             wheel(t('settings.pp.minimum'), range(0, 1000, 10), p.po2MinMbar, defaults.po2MinMbar, (v) => formatNumber(v / 1000, 2)),
@@ -520,7 +539,7 @@
           id: 'pn2',
           label: t('settings.pp.pn2'),
           value: bar(p.pn2Mbar, 1),
-          dialogText: t('settings.pp.thresholdDialog'),
+          dialogText: t('settings.pp.thresholdDialog', { unit: ppUnitLabel() }),
           wheels: () => [wheel(t('settings.pp.pn2'), range(0, 10000, 100), p.pn2Mbar, defaults.pn2Mbar, (v) => formatNumber(v / 1000, 1))],
           set: ([i]) => setCore({ pn2Mbar: i * 100 }),
         },
@@ -529,7 +548,7 @@
           id: 'phe',
           label: t('settings.pp.phe'),
           value: bar(p.pheMbar, 1),
-          dialogText: t('settings.pp.thresholdDialog'),
+          dialogText: t('settings.pp.thresholdDialog', { unit: ppUnitLabel() }),
           wheels: () => [wheel(t('settings.pp.phe'), range(0, 20000, 100), p.pheMbar, defaults.pheMbar, (v) => formatNumber(v / 1000, 1))],
           set: ([i]) => setCore({ pheMbar: i * 100 }),
         },
@@ -538,7 +557,7 @@
           id: 'modPo2',
           label: t('settings.pp.mod'),
           value: bar(p.modPo2Mbar, 1),
-          dialogText: t('settings.pp.modDialog'),
+          dialogText: t('settings.pp.modDialog', { unit: ppUnitLabel() }),
           wheels: () => [wheel(t('settings.pp.mod'), range(500, 3000, 100), p.modPo2Mbar, defaults.modPo2Mbar, (v) => formatNumber(v / 1000, 1))],
           set: ([i]) => setCore({ modPo2Mbar: 500 + i * 100 }),
         },
@@ -554,7 +573,7 @@
           label: t('settings.rebreather.setpoint'),
           text: t('settings.rebreather.setpointText'),
           value: bar(p.setpointMbar, 1),
-          dialogText: t('settings.rebreather.setpointDialog'),
+          dialogText: t('settings.rebreather.setpointDialog', { unit: ppUnitLabel() }),
           wheels: () => [wheel(t('settings.rebreather.setpoint'), range(0, 10000, 100), p.setpointMbar, defaults.setpointMbar, (v) => formatNumber(v / 1000, 1))],
           set: ([i]) => setCore({ setpointMbar: i * 100 }),
         },
