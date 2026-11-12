@@ -1816,8 +1816,9 @@ Done in `fix/remove-from-trip-shown`: dive 88554 (no number, 4 Nov 2026) was the
 Christian's request. Spec: new paragraph "Planner: simplify the profile" in `docs/ui-specification.md`. Mock-ups: `android-planificateur-menu` (menu item), `android-planificateur-simplifie` (result).
 - Planner ⋮ menu, first item, only when the plan starts from a logbook dive: **"Simplifier le profil"** (bowl-shaped profile icon, path `M3 5l4 12h10l4-12`).
 - It turns the measured profile into a few levels: detect the depth phases of the dive (bottom at max depth, plus distinct shallower phases when the dive had clear ones; a reasonable tolerance, say 10 % of the depth or 3 m, and drop phases shorter than 2 min), each with its duration. Descent and ascent are then computed by the planner as for a new plan (the existing new-plan path with levels).
-- After it: chart title "Profil prévu" with a label per level ("94 ft · 25 min"), the "Niveaux" section shown with the levels as editable rows (as for a new plan), helper "Niveaux tirés de la plongée, à modifier comme un nouveau plan. La descente et la remontée sont ajoutées au calcul". No Date section (the plan keeps the dive's date and surface interval). Gases, SAC and conditions stay those taken from the dive.
-- Recompute at once; snackbar "Profil simplifié" with "Annuler", which restores the measured profile.
+- After it: chart title "Profil prévu" with a label per level ("94 ft · 25 min"), the "Niveaux" section shown with the levels as editable rows (as for a new plan), helper under the levels unchanged ("La descente et la remontée sont ajoutées au calcul"). No Date section (the plan keeps the dive's date and surface interval). Gases, SAC and conditions stay those taken from the dive.
+- Recompute at once; snackbar "Pro- **Helper under the chart** (addendum): before simplifying, the measured profile keeps "Temps et profondeurs repris de la plongée. Pour les changer, faites un nouveau plan." After simplifying, it becomes "Profil simplifié à partir de la plongée. Pour le changer, modifiez les niveaux." (Annuler brings the first one back.)
+fil simplifié" with "Annuler", which restores the measured profile.
 - Tablet and iOS: the same item and result.
 - Tests: a square dive gives one level; a two-phase dive gives two levels; Annuler restores the original plan.
 - A line in the release notes.
