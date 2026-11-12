@@ -5,3 +5,4 @@ A running list of the settings Christian considers advanced: settings most diver
 | Setting | Where | Default | Core preference | Added | Why advanced |
 |---|---|---|---|---|---|
 | Afficher les bouteilles inutilisées | Réglages › Équipement | on (unlike Subsurface, off) | `include_unused_tanks` | 12 November 2026 | Every cylinder entered by hand or imported is shown by default and the diver cleans up as needed. Turning it off hides the cylinders the core considers unused (no pressure drop, no gas switch to it, not the CCR oxygen), which also hides unbreathed bailout cylinders. |
+| Afficher les champs photos et vidéos | Réglages › Carnet | off | OpenDives app setting (no core preference) | 12 November 2026 | Off: the "Photos et vidéos" section is hidden in the dive detail and in "Modifier la plongée"; the pictures stay in the logbook. The mock-ups still draw the section, for design. |
