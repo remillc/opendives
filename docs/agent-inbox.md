@@ -1836,7 +1836,7 @@ Christian's request: the planner has no "Volume transporté" field in the mock-u
 
 Done in `feature/remove-carried-volume` (75919c3 app, d353b1d tests): the "Volume transporté" field, its alarm and supporting text, `carriedMl` in the plan state and request (old saved plans with it still open), `isShort` and the keys `plan.carried` and `plan.volumeShort` are gone; "Volume nécessaire par gaz" shows total, used and reserve in the normal colour. Tests of the feature removed in their own commit (the isShort test, the "short" half of the alarm-text test, the `alarm` and `carried` mutations of the app chain, e2e section 8 and the carried value of step 12); no other reference value changed. AGENTS.md still describes the carried-volume alarm in its Planner bullet: left for Christian. Release lock: planner code changed, a new `tests/release-check.sh` report is needed before the next tag. Checked on the phone emulator.
 
-## [ ] 2026-11-12-70 Reminder: task 37, where to store a plan's title
+## [x] 2026-11-12-70 Reminder: task 37, where to store a plan's title
 
 Christian asks for your answer on task 2026-11-11-37 (title when saving a new plan). Nothing has been built or reported yet. Before any code:
 - Check what Subsurface desktop shows and keeps for a planned dive, and list the storage options with what each one does in Subsurface (desktop and mobile) and in a logbook read back by Subsurface: (a) the dive's site / location (creates a site), (b) the first line of the notes (Subsurface's planner already writes its plan into the notes), (c) a tag, (d) anything better you find.
@@ -1850,4 +1850,7 @@ Christian asks for your answer on task 2026-11-11-37 (title when saving a new pl
 - (d) **Extra data of the dive computer**, a new key "OpenDives title" next to "OpenDives plan". Kept as is by Subsurface on save (unknown data preserved), shown in desktop's "Extra info" tab only, never in lists. Probably dropped if the dive is re-planned in desktop.
 
 **Recommendation: (b) + (d).** The title is the first line of the notes (what a Subsurface user sees) and is also kept in "OpenDives title"; OpenDives reads "OpenDives title" first, the notes' first line if it is missing, and the list shows "Plan du <date>" when both are empty. Nothing new for Subsurface to read, no site, no tag. Waiting for Christian's choice; no code before it.
+
+
+**Christian's choice (12 November 2026): (d) only**, the extra data of the dive computer, key "OpenDives title"; the notes are not touched. Task 2026-11-11-37 is built with it.
 
