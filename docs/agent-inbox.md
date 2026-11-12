@@ -2018,7 +2018,7 @@ Christian's request (this replaces the "do not build it yet" note in the task 79
 
 Done in `feature/profile-full-width` (c28f81e) and on main: a second label row under the time axis, "Entrée" at time zero and "Sortie" at the last sample (entry time + profile length, rounded to the minute), no vertical line; dashed average-depth line across the profile from the core's meanDepthMm, labelled "moy. N" in the depth-label column (nudged off a depth label if they overlap, `lib/profile-times.js`, tested); accessible name extended; the shared PDF/PNG profile includes them. Checked on the phone emulator. Note: the exit time can differ by a minute from the info grid's Sortie, which uses the dive's duration.
 
-## [ ] 2026-11-12-81 Blue theme ("ocean-night"), header fixes, small UI changes
+## [x] 2026-11-12-81 Blue theme ("ocean-night"), header fixes, small UI changes
 
 Christian's request (TODO #45). Spec: `docs/system-design.md`, paragraph "Blue theme (decided on 12 November 2026)" and the colour-roles table. Every mock-up of the canvas is now blue; the sand-and-copper screens are kept for reference on the canvas page "Du sable au cuivre". Put every colour in tokens, nothing hard-coded.
 - **Primary stays the ink** (#1F2124): main buttons stay black.
@@ -2038,14 +2038,20 @@ Reference mock-ups: `android-carnet`, `android-accueil-c`, `detail3-android`, `d
 
 **Addendum to task 81 (12 November 2026):** the colour chart is updated for the blue theme, `docs/mockups/palette-roles.dc.html` (secondary = ocean-night blue, tertiary = rust and sand, with the contrast ratios). Use it as the reference for the role tokens (`--od-secondary*`, `--od-tertiary*`) in light and dark.
 
-## [ ] 2026-11-12-82 Blue logo
+Done in `feature/blue-theme`: every colour of the list above is a `--od-*` token in `theme.css` (band gradient and its faint profile, secondary and tertiary roles, selected fill, water, cylinder water and red dashed marks, wavy progress, sand icon circles, statistics ramp from `android-stats`); the titled band's wave is 20 dp at −2 dp; "Temp." on the phone; the band's search field keeps the band's ink in dark mode (its icon was invisible). Checked on the phone emulator, light and dark: logbook band and thumbnails, side menu, detail profile and temperature chip, rebreather and open-circuit cylinders with the red marks. Picked without a spec value: the dark selected fill #1A2D47 and the dark gauge/hatch shades. Not checked: the ☰ under the conflict dialog (a z-index rule, untested: the conflict state could not be produced) and the "top padding as in `android-carnet`". Seen, not fixed: in dark mode the status-bar icons are white over the light band.
+
+## [x] 2026-11-12-82 Blue logo
 
 Christian chose proposal A "ocean-night" (spec: `docs/system-design.md`, blue theme paragraph; mock-up `docs/mockups/logo-bleu.dc.html`, rows "A"). Same drawing, only the three wave gradients change: light #D4E2F2→#BCD2EB, #8FB0D6→#7199C2, #3F6F9F→#2D5E90; dark #D6E4F4→#BED3EC, #93B6E0→#77A0D2, #4F84C2→#3A6FAE. The brand sources in `docs/brand/` are already updated. Regenerate everything made from them: `app/public/favicon.svg`, `logo-light.svg`, `logo-dark.svg`, `logo-small-light.svg`, the Android launcher icons (adaptive foreground, round, legacy), the iOS app icon and the splash screen. Check the 24 and 32 px sizes on the emulator.
 
+Done in `feature/blue-logo`: the SVG logos and favicon, the Android adaptive foreground and splash vectors (light and night) recoloured; the launcher PNGs (square and round, mdpi to xxxhdpi), apple-touch-icon, the iOS app icons (light and dark) and the iOS splash images re-rendered from `docs/brand/` with sharp at the same sizes (the method reproduces the old PNGs within 0.7/255). Checked on the emulator: the launcher icon and the logo of the side menu.
 
-## [ ] 2026-11-12-83 Detail info grid, list margins, fr-CA formats
+
+## [x] 2026-11-12-83 Detail info grid, list margins, fr-CA formats
 
 Christian's decisions of 12 November 2026.
 - **Info grid of the dive detail:** remove the Entrée, Sortie and Prof. moyenne cells everywhere (phone and tablet, light and dark, with the cursor, with the menu open, iOS too). The profile chart already shows these three values (task 80). The grid starts with Air.
 - **Dive list margins:** the mock-ups are the reference, row padding 16 dp start and 24 dp end. On Christian's phone screenshot the margins look wider (about 25 / 33 dp). Check where the extra space comes from and align on 16 / 24.
 - **fr-CA formats:** in French (Canada), times use "10 h 44" and feet use "pi" (and other fr-CA unit labels). Check that every screen formats times and units through the locale, not with hard-coded "10:44" or "ft". The mock-ups will be updated to match.
+
+Done in `feature/detail-grid-fr-ca`: the grid starts after the three cells (phone, tablet and iOS share one list). Margins: Framework7's Material rule gives `li > .item-link` an 8 dp side margin that stayed on our rows, whose link is also the content (24 / 32 dp); reset for `.od-row` rows, now 16 / 24, checked on the emulator. Times: the format locale is now fr-CA whenever the interface is fr-CA, so times read "10 h 44" even with another device region (tested). Units: "pi" kept in all French as before; Claude Conception is standardising the fr-CA wording, and the unit labels will follow that work.
