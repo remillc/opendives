@@ -1738,3 +1738,7 @@ Christian's request: the dive computers of a dive belong to the equipment.
 - **Dive detail** (`detail3-android`, `-sombre`, `-curseur`, `detail2-android-menu`, tablet detail panes): the section "Ordinateurs de plongée" goes away. The collapsed Équipement card (task 46) gets a third row "Ordinateur" with the main computer's name on the right (variant colour, not bold), after Combinaison and Lest. With several computers, the row shows the main one; the open card lists them all with "Principal" on the main one. The accessible name adds "ordinateur <name>".
 - Settings keep their "Ordinateurs de plongée" group (the logbook's computers), unchanged.
 - Tablet and iOS: the same.
+
+## [ ] 2026-11-12-61 Dive detail: Conditions after Équipement
+
+Christian's request: in every dive detail view, the Conditions card moves right after Équipement. Order: data grid, then Personnes, Étiquettes, Gaz, Équipement, **Conditions**, Photos et vidéos, Notes. Phone (light, dark, cursor on the profile, menu open) and tablet detail panes; "Modifier la plongée" already has this order. Mock-ups: `detail3-android`, `-sombre`, `-curseur`, `detail2-android-menu`, `android-tablette-*` detail panes. Order only. iOS: the same.
