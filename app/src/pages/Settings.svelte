@@ -588,6 +588,14 @@
       title: t('settings.groups.computers'),
       rows: [
         { kind: 'link', id: 'logbookComputers', label: t('settings.logbookComputers.title'), text: t('settings.logbookComputers.rowText'), href: '/settings/computers/' },
+      ],
+    },
+    {
+      // The settings used when downloading (task 2026-11-12-51); the remembered
+      // computers follow it in the page.
+      id: 'download',
+      title: t('settings.groups.download'),
+      rows: [
         {
           kind: 'switch',
           id: 'showAllBluetooth',
@@ -670,10 +678,12 @@
     }),
   );
   const unitsShown = $derived(!query || matches({ label: t('settings.unitSystem.label'), text: t('settings.unitSystem.note') }, t('settings.groups.units')));
+  /** The remembered computers, under "Téléchargement": shown when there are some and they match the search. */
   const computersShown = $derived(
-    !query ||
-      matches({ label: t('settings.computers.forgetAll') }, t('settings.groups.computers')) ||
-      computers.some((c) => matches({ label: `${c.vendor} ${c.product}` }, t('settings.groups.computers'))),
+    computers.length > 0 &&
+      (!query ||
+        matches({ label: t('settings.computers.forgetAll', { n: computers.length }), text: t('settings.computers.overline', { n: computers.length }) }, t('settings.groups.download')) ||
+        computers.some((c) => matches({ label: `${c.vendor} ${c.product}` }, t('settings.groups.download')))),
   );
   const advancedShown = $derived(!query || matches({ label: t('settings.advanced.reset'), text: t('settings.advanced.resetText') }, t('settings.groups.advanced')));
   const decoWarningShown = $derived(shown.find((g) => g.id === 'deco')?.rows.length);
@@ -759,8 +769,8 @@
 
   function confirmForgetAll() {
     confirmAction({
-      title: t('settings.computers.forgetAllTitle'),
-      text: t('settings.computers.forgetAllText'),
+      title: t('settings.computers.forgetAllTitle', { n: computers.length }),
+      text: t('settings.computers.forgetAllText', { n: computers.length }),
       action: t('settings.computers.forget'),
       onConfirm: () => forget(0),
     });
@@ -898,27 +908,32 @@
   {@render groupView('partialPressures')}
   {@render groupView('rebreather')}
 
-  {#if computersShown || group('computers').rows.length}
-    <h2 class="od-settings--title">{t('settings.groups.computers')}</h2>
-    <div class="od-settings--surface" role="list">
-      {#each computers as computer (computer.slot)}
-        <div role="listitem" class="od-settings--row">
-          <span class="od-settings--texts">
-            <span class="od-settings--label">{computerName(computer)}</span>
-            <span class="od-settings--supporting">{computer.name || t('settings.computers.remembered')}</span>
-          </span>
-          <button type="button" class="od-settings--more" aria-label={t('settings.computers.more', { name: computerName(computer) })} onclick={(e) => computerMenu(e, computer)}>
-            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5.5" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="12" cy="18.5" r="2"></circle></svg>
-          </button>
-        </div>
-      {:else}
-        <div role="listitem" class="od-settings--row"><span class="od-settings--texts"><span class="od-settings--supporting">{t('settings.computers.none')}</span></span></div>
-      {/each}
-      {#each group('computers').rows as row (row.id)}<div role="listitem">{@render rowView(row)}</div>{/each}
-      <div class="od-settings--action">
-        <button type="button" class="od-outlined-button" disabled={!computers.length} onclick={confirmForgetAll}>{t('settings.computers.forgetAll')}</button>
+  {@render groupView('computers')}
+
+  <!-- Téléchargement: the Bluetooth switch, then the remembered computers on their own card. -->
+  {#if group('download').rows.length || computersShown}
+    <h2 class="od-settings--title">{t('settings.groups.download')}</h2>
+    {#if group('download').rows.length}
+      <div class="od-settings--surface" role="list">
+        {#each group('download').rows as row (row.id)}<div role="listitem">{@render rowView(row)}</div>{/each}
       </div>
-    </div>
+    {/if}
+    {#if computersShown}
+      <h3 class="od-settings--overline">{t('settings.computers.overline', { n: computers.length })}</h3>
+      <div class="od-settings--surface" role="list">
+        {#each computers as computer (computer.slot)}
+          <div role="listitem" class="od-settings--row">
+            <span class="od-settings--texts"><span class="od-settings--label">{computerName(computer)}</span></span>
+            <button type="button" class="od-settings--more" aria-label={t('settings.computers.more', { name: computerName(computer) })} onclick={(e) => computerMenu(e, computer)}>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5.5" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="12" cy="18.5" r="2"></circle></svg>
+            </button>
+          </div>
+        {/each}
+        <div class="od-settings--action">
+          <button type="button" class="od-outlined-button" onclick={confirmForgetAll}>{t('settings.computers.forgetAll', { n: computers.length })}</button>
+        </div>
+      </div>
+    {/if}
   {/if}
 
   {@render groupView('display')}
@@ -1151,6 +1166,15 @@
 
     .od-settings--segmented {
       margin: 4px var(--od-settings-margin) 0;
+    }
+
+    /* An overline on the page background, above a card (task 2026-11-12-51). */
+    .od-settings--overline {
+      margin: 16px 32px 8px;
+      font-size: 14px;
+      line-height: 20px;
+      font-weight: 600;
+      color: var(--od-text-2);
     }
 
     .od-settings--note {
