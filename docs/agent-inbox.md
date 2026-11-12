@@ -1833,3 +1833,9 @@ Christian's request: the planner has no "Volume transporté" field in the mock-u
 - Remove the optional "Volume transporté" field of each gas and everything tied to it: the alarm colour on "Volume nécessaire par gaz" when the carried volume is short, the "what is missing" supporting text, its storage in the plan, its translations.
 - "Volume nécessaire par gaz" shows the total, consumed and reserve as before, in the normal colour.
 - Tablet and iOS: the same. A line in the release notes.
+
+## [ ] 2026-11-12-70 Reminder: task 37, where to store a plan's title
+
+Christian asks for your answer on task 2026-11-11-37 (title when saving a new plan). Nothing has been built or reported yet. Before any code:
+- Check what Subsurface desktop shows and keeps for a planned dive, and list the storage options with what each one does in Subsurface (desktop and mobile) and in a logbook read back by Subsurface: (a) the dive's site / location (creates a site), (b) the first line of the notes (Subsurface's planner already writes its plan into the notes), (c) a tag, (d) anything better you find.
+- Write the options here, under this task, with your recommendation, then stop and wait for Christian's choice. Never break a log read by Subsurface.
