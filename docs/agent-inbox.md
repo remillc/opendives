@@ -1624,3 +1624,7 @@ Christian's request: the radio-button choice dialogs of Settings are replaced, e
 - Unchanged: sync conflict choices, export, account import, and dialogs where a number is typed (pO₂ thresholds…).
 - Tablet: same menus, anchored to the row in the settings pane. iOS: the native pull-down menu on the row.
 - A line in the release notes.
+
+## [ ] 2026-11-12-50 Settings: "Pression" becomes "Pression des bouteilles"
+
+Christian's request: in Settings › Unités, the row "Pression" (psi or bar, core `pressure` unit) is renamed **"Pression des bouteilles"**, since that unit only applies to cylinder pressures (atmospheric pressure stays in mbar, as in Subsurface). Label only, no behaviour change. Also use the new label wherever this unit is chosen (the unit choice menu, tablet settings, iOS). Mock-ups: `android-reglages` and the other Settings boards.
