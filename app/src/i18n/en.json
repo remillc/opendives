@@ -391,6 +391,11 @@
   },
   "profile": {
     "hint": "Touch the profile to read the values",
+    "entry": "Entry",
+    "exit": "Exit",
+    "mean": "avg. {depth}",
+    "descriptionTimes": "Entry {entry}, exit {exit}.",
+    "descriptionMean": "Average depth {depth}.",
     "time": "Time",
     "depth": "Depth",
     "gas": "Gas",
@@ -1553,6 +1558,8 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Dive profile: under the time axis, the time you entered the water and the exit time (the end of the profile); a dashed line marks the average depth across the whole profile, labelled “avg.” on the left. The profile’s accessible name gives them too.",
+      "Dive profile on the phone: the profile fills the full width of the screen, with no card or side margins, and its hint line is centred. Tablets keep the card.",
       "Planner: “Share plan” offers five choices: the water slate, the PDF sheet, the table image, the logbook file (.ssrf) of the planned dive and the text summary. The slate is a pocket card to print (4 × 6 in or A6, 3 × 5 in or A7, or a full page) with the backup plans you choose: 5 min more at the bottom, 3 m (10 ft) deeper, or a lost deco gas, each calculated again by the planner and added as an End column; as a PDF at actual size with cut marks, as an image or as text. Your last choices are kept. Settings › Language and formats › Paper size: Automatic, Letter or A4, for every PDF to print.",
       "Forms: when you leave a form whose values you changed (←, ✕, Android Back or the iOS swipe), a dialog asks “Leave without saving?” with Stay, Save and Leave. With no change, or if you put the original value back, you leave at once.",
       "Planner: the gas is written on every row of the table; the highlighted gas marks a change.",

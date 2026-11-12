@@ -57,6 +57,8 @@
       divemode={dive.divemode}
       maxDepthMm={dive.maxDepthMm}
       durationSeconds={dive.durationSeconds}
+      startIso={dive.date}
+      meanDepthMm={dive.meanDepthMm}
       prefs={logbook.prefs}
     />
     {#if facts}<p class="od-dive-no-site-profile--facts">{facts}</p>{/if}
