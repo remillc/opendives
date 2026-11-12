@@ -47,7 +47,6 @@
     formatPressure,
     formatSac,
     formatTemperature,
-    formatTimeOfDay,
     formatWeight,
   } from '../lib/format.js';
   import { navigation } from '../lib/navigation.svelte.js';
@@ -258,9 +257,6 @@
     if (!dive) return [];
     /** @type {[string, string|null|undefined|false][]} */
     const list = [
-      [t('detail.entry'), formatTimeOfDay(dive.date)],
-      [t('detail.exit'), dive.durationSeconds > 0 && formatTimeOfDay(dive.date, dive.durationSeconds)],
-      [t('detail.meanDepth'), dive.meanDepthMm > 0 && formatDepth(dive.meanDepthMm, prefs)],
       [t('detail.airTemperature'), formatTemperature(dive.airTempMk, prefs)],
       [t('detail.water'), dive.waterType && tIfExists(`detail.waterTypes.${dive.waterType}`)],
       // Always in mbar, as Subsurface shows it.

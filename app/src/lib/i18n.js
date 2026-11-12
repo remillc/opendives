@@ -54,8 +54,24 @@ export const language = (() => {
   return deviceLanguage;
 })();
 
+/**
+ * Locale of the numbers, dates and times: the device's own ("10:44" in fr-FR,
+ * "10 h 44" in fr-CA). When the interface is fr-CA (chosen in Settings, or
+ * the device is fr-CA) and the device region says otherwise, fr-CA wins so
+ * that the times read "10 h 44" with the "pi" of the unit labels.
+ * @param {string} lang interface language
+ * @param {string|undefined} deviceTag navigator.language
+ */
+export function formatLocale(lang, deviceTag) {
+  if (lang === 'fr-CA') return 'fr-CA';
+  return deviceTag || lang;
+}
+
+/** Locale of every number, date and time the app formats. */
+export const locale = formatLocale(language, typeof navigator !== 'undefined' ? navigator.language : undefined);
+
 /** Number format: the device's ("1 353" in French). */
-const numbers = new Intl.NumberFormat(typeof navigator !== 'undefined' ? navigator.language : language);
+const numbers = new Intl.NumberFormat(locale);
 const plurals = new Intl.PluralRules(language.split('-')[0]); // fr-CA follows French
 
 /**

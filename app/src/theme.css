@@ -658,6 +658,17 @@ html.ios {
       display: none;
     }
 
+    /*
+     * Framework7 9 gives a media-list link (li > .item-link) a side margin of
+     * half the item padding (8 dp each side) for its rounded state layer. Our
+     * row is the link and the content at once, so that margin came on top of
+     * the 16 / 24 dp padding (about 25 / 33 dp on screen). No margin: 16 / 24.
+     */
+    li > .item-link.item-content:has(> .od-row) {
+      margin-left: 0;
+      margin-right: 0;
+    }
+
     .item-content:has(> .od-row) {
       box-sizing: border-box;
       min-height: 72px;
