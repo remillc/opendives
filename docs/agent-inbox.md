@@ -2005,3 +2005,5 @@ Christian's request (this replaces the "do not build it yet" note in the task 79
 - Average depth: thin dashed horizontal line (0.6 dp, dashes 4/3, axis grey) from entry to exit, label "moy. 58" (user depth unit, 9 sp) in the left depth-label column at that height. Take the mean depth from the core.
 - Accessible name of the chart: add entry and exit times and the average depth.
 - Wherever the profile chart is drawn (phone and tablet, light and dark, with the cursor). The info grid under the chips stays as it is for now.
+
+**Addendum to task 80 (12 November 2026):** no dotted vertical line for the exit. "Sortie" goes at the **end of the profile** (last sample), with entry time + profile length (11:23 in the mock-up, whose profile lasts 82:50), and the average-depth line runs across the whole profile. Christian noticed the profile went on past the old exit mark (78 min = the file's duration, shorter than its samples).
