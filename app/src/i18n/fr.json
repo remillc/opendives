@@ -417,7 +417,7 @@
   },
   "units": {
     "meters": "m",
-    "feet": "pi",
+    "feet": "ft",
     "minutes": "min",
     "liters": "L",
     "litersPerMinute": "L/min",
@@ -425,8 +425,8 @@
       "one": "{v} litre par minute",
       "other": "{v} litres par minute"
     },
-    "cubicFeet": "pi³",
-    "cubicFeetPerMinute": "pi³/min",
+    "cubicFeet": "ft³",
+    "cubicFeetPerMinute": "ft³/min",
     "cubicFeetPerMinuteLong": {
       "one": "{v} pied cube par minute",
       "other": "{v} pieds cubes par minute"
@@ -1594,6 +1594,9 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Détail de plongée : la grille d’informations ne répète plus l’entrée, la sortie et la profondeur moyenne, déjà lues sur le profil ; elle commence par l’air.",
+      "Carnet sur Android : les rangées de plongées retrouvent leurs marges de 16 dp au début et 24 dp à la fin.",
+      "Français : les heures s’écrivent « 10 h 44 » et les pieds « pi » en français du Canada, « ft » en français de France, selon la langue de l’appareil.",
       "Modifier la plongée : un bouton appareil photo dans les champs Début et Fin de chaque bouteille ouvre un appareil photo pour lire la pression sur un manomètre (Android). Vous pouvez aussi choisir une photo existante avec « Photos », ou saisir la valeur. La photo reste sur l’appareil et n’est pas conservée. Elle lit les affichages numériques (un ou deux manomètres, bar ou psi) et remplit le champ pour vérification ; un cadran à aiguille n’est pas encore lu.",
       "Détail de plongée : la section Gaz d’une plongée en recycleur à circuit fermé dessine le recycleur vu de dos, avec la bouteille de diluant à gauche et l’oxygène à droite ; les bouteilles de secours et les étages sont à côté.",
       "Profil de la plongée : sous l’axe du temps, l’heure d’entrée dans l’eau et l’heure de sortie (fin du profil) ; une ligne pointillée marque la profondeur moyenne sur tout le profil, avec son étiquette « moy. » à gauche. Le nom accessible du profil les indique aussi.",

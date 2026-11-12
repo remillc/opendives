@@ -3,13 +3,13 @@
 // Values come from the core in integer SI units; conversion happens here, at
 // display time, never in the data.
 
-import { t } from './i18n.js';
+import { t, locale } from './i18n.js';
 import { settings } from './settings.svelte.js';
 
 /** Units only: the full preferences (logbook.prefs) can be passed. @typedef {import('opendives-core').Units} Prefs */
 
-/** Device language; formats follow it (decimal comma in French). */
-export const locale = typeof navigator !== 'undefined' ? navigator.language : 'fr';
+/** Locale of the formats (lib/i18n.js): the device's, or fr-CA when the interface is fr-CA. */
+export { locale };
 
 const NBSP = ' '; // non-breaking space before units
 const isFrench = locale.toLowerCase().startsWith('fr');
