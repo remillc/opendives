@@ -1657,3 +1657,7 @@ Christian's request. Spec: new paragraph "Partial pressure unit" in `docs/ui-spe
 - App setting per device, never in the logbook, so Subsurface compatibility is unaffected. Reset all settings brings it back to bar (or to what the Métrique/Impérial preset implies).
 - Tablet and iOS: the same row.
 - A line in the release notes.
+
+## [ ] 2026-11-12-53 Settings: "Types de bouteilles" first in Équipement
+
+Christian's request: in Settings › Équipement, the row "Types de bouteilles" ("Ajouter, renommer, retirer", chevron) moves to the top of the group, before the default cylinders (Bouteille circuit ouvert, Diluant, Oxygène, Secours), "Afficher les bouteilles inutilisées" and "Proposer les tailles standard". Order only. Mock-ups: `android-reglages` and the other Settings boards. Tablet and iOS: the same order.
