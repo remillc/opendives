@@ -4,7 +4,7 @@
   // detail" and "Conditions"): number and date, site, location, trip and
   // rating; key figures; profile; facts in a three-column grid; a collapsed
   // Conditions block; people and tags; "Gas" (drawn cylinders, gas
-  // changes, SAC) and "Equipment" (collapsed: suit, total weight); dive computers; photos; notes
+  // changes, SAC) and "Equipment" (collapsed: suit, total weight, main computer); photos; notes
   // in full. Edit and an overflow menu in the navbar. A row without a value is
   // never shown.
   import { onMount } from 'svelte';
@@ -417,36 +417,33 @@
   );
   const weightTotal = $derived(formatWeight(weightEntries.reduce((sum, w) => sum + w.grams, 0), prefs));
 
+  /** Dive computers (task 2026-11-12-60): the first is the main one. */
+  const computers = $derived(
+    (dive?.diveComputers ?? [])
+      .filter((dc) => dc.model)
+      .map((dc, i) => ({ name: dc.nickname || dc.model, main: i === 0 })),
+  );
+
   const hasGas = $derived(gasCylinders.length > 0 || !!sac);
-  const hasEquipment = $derived(!!dive?.suit || weights.length > 0);
+  const hasEquipment = $derived(!!dive?.suit || weights.length > 0 || computers.length > 0);
 
   // Collapsed by default; a tap opens the weights by location.
   let equipmentOpen = $state(false);
   const equipmentName = $derived(
     equipmentLabel(
-      { suit: dive?.suit ?? '', weight: weights.length ? weightTotal : '', open: equipmentOpen, opens: equipmentOpens(weightEntries) },
+      { suit: dive?.suit ?? '', weight: weights.length ? weightTotal : '', computer: computers[0]?.name ?? '', open: equipmentOpen, opens: equipmentOpens(weightEntries, computers.length) },
       {
         both: t('detail.equipmentBoth'),
         weightOnly: t('detail.equipmentWeight'),
         suitOnly: t('detail.equipmentSuit'),
         show: t('detail.equipmentShow'),
         hide: t('detail.equipmentHide'),
+        computer: t('detail.equipmentComputer'),
+        computerOnly: t('detail.equipmentComputerOnly'),
       },
     ),
   );
 
-  /** Dive computers: the first is the main one; its mode follows. */
-  const computers = $derived(
-    (dive?.diveComputers ?? [])
-      .filter((dc) => dc.model)
-      .map((dc, i) => ({
-        model: dc.nickname || dc.model,
-        role: [
-          i === 0 ? t('detail.mainComputer') : t('detail.otherComputer'),
-          tIfExists(`detail.computerModes.${dc.divemode}`) ?? dc.divemode,
-        ].join(' · '),
-      })),
-  );
 </script>
 
 <!-- no-swipeback: here a swipe to the right shows the previous dive. -->
@@ -560,29 +557,6 @@
       </dl>
     {/if}
 
-    {#if conditions.length}
-      <!-- Collapsed by default, with a summary of the filled-in conditions. -->
-      <section class="od-dive-detail--section">
-        <div class="od-dive-detail--group">
-          <button type="button" class="od-dive-detail--disclosure" aria-expanded={conditionsOpen} onclick={() => (conditionsOpen = !conditionsOpen)}>
-            <span class="od-dive-detail--text">
-              <span class="od-dive-detail--title">{t('detail.conditions')}</span>
-              {#if !conditionsOpen}<span class="od-dive-detail--summary">{conditionsSummary}</span>{/if}
-            </span>
-            <span class="od-dive-detail--arrow" class:od-dive-detail--open={conditionsOpen}><Icon name="expand" size={22} weight={2} /></span>
-          </button>
-          {#if conditionsOpen}
-            {#each conditions as condition (condition.key)}
-              <div class="od-dive-detail--row">
-                <span>{condition.name}</span>
-                <Stars value={condition.value} label={t('detail.starsLabel', { name: condition.name, n: condition.value })} />
-              </div>
-            {/each}
-          {/if}
-        </div>
-      </section>
-    {/if}
-
     {#if dive.guides.length || dive.buddies.length}
       <section class="od-dive-detail--section">
         <h2 class="od-dive-detail--section-title">{t('detail.people')}</h2>
@@ -626,20 +600,34 @@
           suit={dive.suit ?? ''}
           weightTotal={weights.length ? weightTotal : ''}
           {weights}
-          opens={equipmentOpens(weightEntries)}
+          computer={computers[0]?.name ?? ''}
+          {computers}
+          opens={equipmentOpens(weightEntries, computers.length)}
           open={equipmentOpen}
           ontoggle={() => (equipmentOpen = !equipmentOpen)}
         />
       </section>
     {/if}
 
-    {#if computers.length}
+    {#if conditions.length}
+      <!-- Collapsed by default, with a summary of the filled-in conditions. -->
       <section class="od-dive-detail--section">
-        <h2 class="od-dive-detail--section-title">{t('detail.computers')}</h2>
         <div class="od-dive-detail--group">
-          {#each computers as computer, i (i)}
-            <div class="od-dive-detail--row"><span class="od-dive-detail--stacked"><span>{computer.model}</span><span class="od-dive-detail--sub">{computer.role}</span></span></div>
-          {/each}
+          <button type="button" class="od-dive-detail--disclosure" aria-expanded={conditionsOpen} onclick={() => (conditionsOpen = !conditionsOpen)}>
+            <span class="od-dive-detail--text">
+              <span class="od-dive-detail--title">{t('detail.conditions')}</span>
+              {#if !conditionsOpen}<span class="od-dive-detail--summary">{conditionsSummary}</span>{/if}
+            </span>
+            <span class="od-dive-detail--arrow" class:od-dive-detail--open={conditionsOpen}><Icon name="expand" size={22} weight={2} /></span>
+          </button>
+          {#if conditionsOpen}
+            {#each conditions as condition (condition.key)}
+              <div class="od-dive-detail--row">
+                <span>{condition.name}</span>
+                <Stars value={condition.value} label={t('detail.starsLabel', { name: condition.name, n: condition.value })} />
+              </div>
+            {/each}
+          {/if}
         </div>
       </section>
     {/if}
