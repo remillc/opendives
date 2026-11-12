@@ -1667,7 +1667,7 @@
       "Modifier la plongée : chaque bouteille montre tous ses champs, sans ligne repliée.",
       "Partager : icône PDF pour la fiche. Exporter : le premier format se nomme « Fichier de carnet (.ssrf) ».",
       "À propos : chaque bibliothèque libre ouvre son site dans le navigateur.",
-      "Planificateur : le facteur de consommation sous stress vaut 2,0 par défaut.",
+      "Planificateur : la réserve a un facteur de consommation sous stress (1,0 par défaut) et un nombre de plongeurs sur le gaz (1 par défaut, 2 pour remonter à deux) ; le résultat l’indique.",
       "Réglages : bouteilles par défaut pour le circuit ouvert et le recycleur (diluant, oxygène, secours), ajoutées quand une plongée passe en recycleur. Types de bouteilles : nombre de plongées et nouvelle fiche. Profil : plafonds réorganisés, grille de profondeur retirée.",
       "Menu latéral et en-têtes refaits : bandeau, compte en haut du menu, synchronisation centrée, résumé de chaque section, barre de recherche du carnet. Réglages et À propos s’ouvrent avec le menu ☰.",
       "Carnet : lignes alignées sur la maquette (sans séparateurs), plongées d’un voyage déplié dans un cadre blanc. Compte : même en-tête que les sections.",
@@ -1809,7 +1809,9 @@
     "decoPo2": "ppO₂ pendant la déco",
     "reserve": "Réserve minimale",
     "problemSolving": "Temps pour régler un problème",
-    "sacFactor": "Facteur de consommation sous stress"
+    "sacFactor": "Facteur de consommation sous stress",
+    "reserveDivers": "Plongeurs sur ce gaz",
+    "reserveDiversText": "Mettre 2 pour remonter à deux en partageant le gaz"
   },
   "plan": {
     "title": "Planificateur",
@@ -1919,7 +1921,8 @@
     "intervalNone": "Aucune plongée récente à prendre en compte",
     "intervalOverlap": "Ce moment chevauche une plongée du carnet",
     "volumes": "Volume nécessaire par gaz",
-    "volumeBottom": "{used} consommés et {reserve} de réserve pour remonter à deux",
+    "volumeBottomTwo": "{used} consommés et {reserve} de réserve pour remonter à deux",
+    "volumeBottomMany": "{used} consommés et {reserve} de réserve pour remonter à {divers}",
     "volumeDeco": "{used} consommés et {reserve} de réserve"
   },
   "filter": {

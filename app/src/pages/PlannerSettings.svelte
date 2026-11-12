@@ -12,8 +12,9 @@
   import WheelDialog from '../components/WheelDialog.svelte';
   import SacField from '../components/SacField.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
-  import { DEFAULT_SAC_FACTOR } from '../lib/settings.svelte.js';
-  import { planner, loadSetup, adoptUnitDefaults, plannerDefaults, setting, setSetting, ascentRate, setAscentRate } from '../lib/planner.svelte.js';
+  import { settings } from '../lib/settings.svelte.js';
+  import { DEFAULT_STRESS_FACTOR, DEFAULT_DIVERS, MIN_DIVERS, MAX_DIVERS } from '../lib/reserve-factor.js';
+  import { planner, loadSetup, adoptUnitDefaults, plannerDefaults, setting, setSetting, setReserveFactor, ascentRate, setAscentRate } from '../lib/planner.svelte.js';
   import { formatNumber, formatPartialPressure, depthUnit } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
   import { depthToMm, mbarToPressure, mmToDepth, pressureToMbar } from '../lib/planner-rules.js';
@@ -189,13 +190,26 @@
             kind: 'number',
             id: 'sacFactor',
             label: t('plannerSettings.sacFactor'),
-            stored: Number(setting('sacFactor')),
-            def: DEFAULT_SAC_FACTOR,
+            stored: settings.stressFactor,
+            def: DEFAULT_STRESS_FACTOR,
             wheel: range(1, 5, 0.1),
             toUnit: (x) => x / 100,
             toStored: (v) => Math.round(v * 100),
             show: (v) => formatNumber(v, 1),
-            set: (x) => setSetting('sacFactor', x),
+            set: (x) => setReserveFactor({ stressFactor: x }),
+          },
+          {
+            kind: 'number',
+            id: 'reserveDivers',
+            label: t('plannerSettings.reserveDivers'),
+            text: t('plannerSettings.reserveDiversText'),
+            stored: settings.reserveDivers,
+            def: DEFAULT_DIVERS,
+            wheel: range(MIN_DIVERS, MAX_DIVERS, 1),
+            toUnit: (x) => x,
+            toStored: (v) => Math.round(v),
+            show: (v) => formatNumber(v, 0),
+            set: (x) => setReserveFactor({ reserveDivers: x }),
           },
         ],
       },

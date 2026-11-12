@@ -14,7 +14,8 @@
 //   settings (settings.svelte.js), read back with plannerSetup. A saved plan
 //   keeps its own copy, so that reopening it gives the same result.
 import { OpenDivesCore } from 'opendives-core';
-import { DEFAULT_SAC_FACTOR, settings, setCorePrefs, resetCorePrefs } from './settings.svelte.js';
+import { settings, setAppSetting, setCorePrefs, resetCorePrefs } from './settings.svelte.js';
+import { DEFAULT_STRESS_FACTOR, DEFAULT_DIVERS, coreSacFactor } from './reserve-factor.js';
 import { SETTING_KEYS } from './settings-reset.js';
 import { altitudeToPressureMbar, salinityOfWaterType } from './tools.js';
 import { bottomCylinder } from './plan-gases.js';
@@ -134,6 +135,17 @@ export async function setSetting(key, value) {
 }
 
 /**
+ * The reserve's stress factor (x100) and divers on the gas: kept in the app's own
+ * settings; the core receives their product as its one factor (task 2026-11-12-74).
+ * @param {{ stressFactor?: number, reserveDivers?: number }} changes
+ */
+export async function setReserveFactor(changes) {
+  if (changes.stressFactor != null) setAppSetting('stressFactor', changes.stressFactor);
+  if (changes.reserveDivers != null) setAppSetting('reserveDivers', changes.reserveDivers);
+  await setSetting('sacFactor', coreSacFactor(settings.stressFactor, settings.reserveDivers));
+}
+
+/**
  * The planner's defaults in the user's units, round in each system as
  * Subsurface's M_OR_FT: 15 m or 45 ft, 9 m/min or 30 ft/min, 18 m/min or
  * 60 ft/min, a 40 bar or 500 psi reserve.
@@ -209,12 +221,14 @@ export async function setAscentRate(mmMin) {
  */
 export async function resetSettings(prefs) {
   const d = plannerDefaults(prefs);
+  setAppSetting('stressFactor', DEFAULT_STRESS_FACTOR);
+  setAppSetting('reserveDivers', DEFAULT_DIVERS);
   await resetCorePrefs([...SETTING_KEYS]);
   await setCorePrefs({
     ...Object.fromEntries(ASCENT_KEYS.map((k) => [k, Math.round(d.ascentMmMin)])),
     descentMmMin: Math.round(d.descentMmMin),
     reserveMbar: d.reserveMbar,
-    sacFactor: DEFAULT_SAC_FACTOR,
+    sacFactor: coreSacFactor(DEFAULT_STRESS_FACTOR, DEFAULT_DIVERS),
   });
   await loadSetup();
   if (planner.setup) updateKept(Object.fromEntries(KEPT_KEYS.map((k) => [k, Number(planner.setup?.[k])])));

@@ -34,6 +34,8 @@
   import { ios } from '../lib/layout.svelte.js';
   import { WATER_TYPES, altitudeToPressureMbar, formatHoursMinutes, pressureToAltitudeMm, waterTypeName, waterTypeOfSalinity } from '../lib/tools.js';
   import { sharePlanPdf, sharePlanSummary } from '../lib/share.js';
+  import { settings } from '../lib/settings.svelte.js';
+  import { bottomVolumeKey } from '../lib/reserve-factor.js';
   import { MM_PER_FT, ML_PER_CUFT, O2_CHOICES, HE_CHOICES, depthToMm, gasTotalMl, gasValid, modAlarm, mmToDepth, roundSacMl } from '../lib/planner-rules.js';
 
   /**
@@ -535,7 +537,7 @@
       return {
         key: i,
         label: gasName(c.o2Permille, c.hePermille),
-        hint: t(i === bottomIndex ? 'plan.volumeBottom' : 'plan.volumeDeco', { used, reserve }),
+        hint: t(i === bottomIndex ? bottomVolumeKey(settings.reserveDivers) : 'plan.volumeDeco', { used, reserve, divers: formatNumber(settings.reserveDivers, 0) }),
         value: formatGasVolume(total, prefs),
         usedPercent: whole > 0 ? (c.gasUsedMl / whole) * 100 : null,
         hasReserve: c.reserveMl > 0,

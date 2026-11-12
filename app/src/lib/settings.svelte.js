@@ -10,6 +10,7 @@
 // coordinates, Bluetooth filter) live here only.
 import { OpenDivesCore } from 'opendives-core';
 import { impliedPpUnit, systemAfterPpUnit, ppUnitAfterReset } from './pp-unit.js';
+import { DEFAULT_STRESS_FACTOR, DEFAULT_DIVERS, coreSacFactor, reserveSettings } from './reserve-factor.js';
 import { OD_CORE_DEFAULTS, coreResetChanges, storedAfterReset, appSettingsAfterReset } from './settings-reset.js';
 
 const CORE_KEY = 'od.corePrefs';
@@ -20,9 +21,6 @@ const COMPUTERS_KEY = 'od.diveComputers';
 
 /** The units set one by one (Subsurface's "personalize" system). */
 const UNIT_KEYS = /** @type {const} */ (['length', 'temperature', 'pressure', 'volume', 'weight']);
-
-/** SAC factor under stress, x100: 2.0, the planner's default. */
-export const DEFAULT_SAC_FACTOR = 200;
 
 /** @typedef {import('opendives-core').CorePrefValues} CorePrefValues */
 
@@ -49,6 +47,10 @@ export const DEFAULT_SAC_FACTOR = 200;
  * @property {string} defaultDiluent cylinder type added as diluent when a dive becomes CCR or pSCR
  * @property {string} defaultOxygen the same for the oxygen cylinder
  * @property {string[]} defaultBailout the same for the bailout cylinders (open-circuit use)
+ * @property {number} stressFactor planner reserve: consumption factor under stress, x100 (100 = 1.0).
+ *   Per device, never in the logbook (task 2026-11-12-74)
+ * @property {number} reserveDivers planner reserve: divers on the gas, 1 to 4. The core's sacfactor is
+ *   stress x divers (reserve-factor.js)
  */
 
 /** @type {AppSettings} */
@@ -68,6 +70,8 @@ const APP_DEFAULTS = {
   defaultDiluent: '',
   defaultOxygen: '',
   defaultBailout: [],
+  stressFactor: DEFAULT_STRESS_FACTOR,
+  reserveDivers: DEFAULT_DIVERS,
 };
 
 /**
@@ -109,9 +113,16 @@ try {
   // Not fatal.
 }
 
+const storedApp = /** @type {Partial<AppSettings>} */ (readJson(APP_KEY) ?? {});
+// Task 2026-11-12-74: the app's own stress factor and divers. Devices from before keep the
+// core factor they had if the diver changed it (200, the old default, counts as unchanged).
+const reserve = reserveSettings(storedApp, storedCore.sacFactor);
+if (storedApp.stressFactor == null) writeJson(APP_KEY, { ...APP_DEFAULTS, ...storedApp, ...reserve });
+
 export const settings = $state({
   ...APP_DEFAULTS,
-  ...(/** @type {Partial<AppSettings>} */ (readJson(APP_KEY) ?? {})),
+  ...storedApp,
+  ...reserve,
   /**
    * "Surface waves, surge and chill" (spec, section 4, "Conditions"), the
    * core's extraEnvironmentalDefault: off by default. On, editing adds these
@@ -138,9 +149,9 @@ export function applyDeviceSettings() {
    * @param {() => Promise<unknown>} call
    */
   const send = (failure, call) => calls.push(call().catch((/** @type {unknown} */ e) => console.error(failure, e)));
-  // OpenDives' default stress factor (spec, "Planner settings") instead of the
-  // core's 4.0, unless the diver has chosen one.
-  storedCore.sacFactor ??= DEFAULT_SAC_FACTOR;
+  // The core's one factor is the product of the app's stress factor and divers
+  // (task 2026-11-12-74), instead of the core's 4.0.
+  storedCore.sacFactor = coreSacFactor(settings.stressFactor, settings.reserveDivers);
   // "Choisir le type d’eau dans l’éditeur" is on by default in OpenDives; the
   // depth grid is no longer a setting: the core's default.
   storedCore.salinityEdit ??= true;
