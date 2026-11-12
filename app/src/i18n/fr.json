@@ -278,7 +278,11 @@
     "airTemperature": "Air",
     "gasAndEquipment": "Gaz et équipement",
     "gasSection": "Gaz",
-    "cylinderUseNames": { "diluent": "Diluant", "oxygen": "Oxygène", "bailout": "Secours" },
+    "cylinderUseNames": {
+      "diluent": "Diluant",
+      "oxygen": "Oxygène",
+      "bailout": "Secours"
+    },
     "equipmentSection": "Équipement",
     "gasGroup": "Gaz : {list}",
     "gasGroupCylinder": "{gas} de {start} à {end}",
@@ -441,6 +445,7 @@
       "partialPressures": "Pressions partielles",
       "rebreather": "Recycleur",
       "computers": "Ordinateurs de plongée",
+      "download": "Téléchargement",
       "display": "Affichage",
       "maps": "Cartes hors ligne",
       "advanced": "Avancé"
@@ -641,8 +646,6 @@
       "removed": "Ordinateur retiré de la liste"
     },
     "computers": {
-      "remembered": "Mémorisé",
-      "none": "Aucun ordinateur mémorisé",
       "more": "Plus d’options pour {name}",
       "rename": "Renommer",
       "forgetOne": "Oublier cet ordinateur",
@@ -650,10 +653,23 @@
       "forgetOneText": "Il ne sera plus proposé au téléchargement. Les plongées déjà téléchargées ne changent pas.",
       "showAll": "Montrer tous les appareils Bluetooth",
       "showAllText": "Même ceux qui ne sont pas reconnus comme ordinateurs de plongée",
-      "forgetAll": "Oublier les ordinateurs mémorisés",
-      "forgetAllTitle": "Oublier les ordinateurs mémorisés ?",
-      "forgetAllText": "Ils ne seront plus proposés au téléchargement. Les plongées déjà téléchargées ne changent pas.",
-      "forget": "Oublier"
+      "forgetAll": {
+        "one": "Oublier l’ordinateur mémorisé",
+        "other": "Oublier les ordinateurs mémorisés"
+      },
+      "forgetAllTitle": {
+        "one": "Oublier l’ordinateur mémorisé ?",
+        "other": "Oublier les ordinateurs mémorisés ?"
+      },
+      "forgetAllText": {
+        "one": "Il ne sera plus proposé au téléchargement. Les plongées déjà téléchargées ne changent pas.",
+        "other": "Ils ne seront plus proposés au téléchargement. Les plongées déjà téléchargées ne changent pas."
+      },
+      "forget": "Oublier",
+      "overline": {
+        "one": "Ordinateur mémorisé pour le téléchargement Bluetooth",
+        "other": "Ordinateurs mémorisés pour le téléchargement Bluetooth"
+      }
     },
     "display": {
       "theme": "Thème",
@@ -1523,6 +1539,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Réglages : nouveau groupe « Téléchargement » (appareils Bluetooth et ordinateurs mémorisés) ; « Ordinateurs de plongée » ne garde que les ordinateurs du carnet.",
       "Réglages › Unités : « Pression » devient « Pression des bouteilles » ; cette unité ne sert qu’aux bouteilles (la pression atmosphérique reste en mbar).",
       "Réglages : chaque choix dans une courte liste (format de la date et de l’heure, durée, vitesses, coordonnées GPS, langue, thème, taille du texte, bouteilles par défaut, type d’eau des plongées téléchargées) s’ouvre en menu sur la ligne touchée, au lieu d’une boîte de dialogue à boutons radio. Touchez une valeur pour la choisir ; touchez à côté ou faites Retour pour fermer sans changer.",
       "Réglages › Équipement : « Proposer les tailles standard » est désactivé par défaut ; le choix du type de bouteille montre vos propres types et ceux du carnet.",

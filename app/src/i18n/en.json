@@ -278,7 +278,11 @@
     "airTemperature": "Air",
     "gasAndEquipment": "Gas and equipment",
     "gasSection": "Gas",
-    "cylinderUseNames": { "diluent": "Diluent", "oxygen": "Oxygen", "bailout": "Bailout" },
+    "cylinderUseNames": {
+      "diluent": "Diluent",
+      "oxygen": "Oxygen",
+      "bailout": "Bailout"
+    },
     "equipmentSection": "Equipment",
     "gasGroup": "Gas: {list}",
     "gasGroupCylinder": "{gas} from {start} to {end}",
@@ -441,6 +445,7 @@
       "partialPressures": "Partial pressures",
       "rebreather": "Rebreather",
       "computers": "Dive computers",
+      "download": "Download",
       "display": "Display",
       "maps": "Offline maps",
       "advanced": "Advanced"
@@ -641,8 +646,6 @@
       "removed": "Computer removed from the list"
     },
     "computers": {
-      "remembered": "Remembered",
-      "none": "No remembered dive computer",
       "more": "More options for {name}",
       "rename": "Rename",
       "forgetOne": "Forget this computer",
@@ -650,10 +653,23 @@
       "forgetOneText": "It will no longer be offered for download. Dives already downloaded do not change.",
       "showAll": "Show all Bluetooth devices",
       "showAllText": "Even those not recognised as dive computers",
-      "forgetAll": "Forget remembered dive computers",
-      "forgetAllTitle": "Forget remembered dive computers?",
-      "forgetAllText": "They will no longer be offered for download. Dives already downloaded do not change.",
-      "forget": "Forget"
+      "forgetAll": {
+        "one": "Forget the remembered computer",
+        "other": "Forget the remembered computers"
+      },
+      "forgetAllTitle": {
+        "one": "Forget the remembered computer?",
+        "other": "Forget the remembered computers?"
+      },
+      "forgetAllText": {
+        "one": "It will no longer be offered for download. Dives already downloaded do not change.",
+        "other": "They will no longer be offered for download. Dives already downloaded do not change."
+      },
+      "forget": "Forget",
+      "overline": {
+        "one": "Computer remembered for Bluetooth download",
+        "other": "Computers remembered for Bluetooth download"
+      }
     },
     "display": {
       "theme": "Theme",
@@ -1523,6 +1539,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Settings: a new “Download” group (Bluetooth devices and remembered computers); “Dive computers” keeps only the logbook’s computers.",
       "Settings › Units: “Pressure” becomes “Cylinder pressure”; this unit is only used for cylinders (atmospheric pressure stays in mbar).",
       "Settings: every choice in a short list (date and time format, duration, speeds, GPS coordinates, language, theme, text size, default cylinders, water type of downloaded dives) opens as a menu on the touched row instead of a radio-button dialog. Tap a value to choose it; tap outside or press Back to close without changing.",
       "Settings › Equipment: “Offer standard sizes” is off by default; the cylinder type choice shows your own types and those of the logbook.",
