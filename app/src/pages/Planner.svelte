@@ -15,6 +15,7 @@
   import TextField from '../components/TextField.svelte';
   import SelectField from '../components/SelectField.svelte';
   import ChoiceField from '../components/ChoiceField.svelte';
+  import SacField from '../components/SacField.svelte';
   import ButtonField from '../components/ButtonField.svelte';
   import WheelDialog from '../components/WheelDialog.svelte';
   import DatePickerDialog from '../components/DatePickerDialog.svelte';
@@ -31,7 +32,7 @@
   import { ios } from '../lib/layout.svelte.js';
   import { WATER_TYPES, altitudeToPressureMbar, formatHoursMinutes, pressureToAltitudeMm, waterTypeName, waterTypeOfSalinity } from '../lib/tools.js';
   import { sharePlanPdf, sharePlanSummary } from '../lib/share.js';
-  import { MM_PER_FT, ML_PER_CUFT, O2_CHOICES, HE_CHOICES, altitudePresets, depthToMm, gasTotalMl, gasValid, modAlarm, mmToDepth, roundSacMl, sacChoices } from '../lib/planner-rules.js';
+  import { MM_PER_FT, ML_PER_CUFT, O2_CHOICES, HE_CHOICES, altitudePresets, depthToMm, gasTotalMl, gasValid, modAlarm, mmToDepth, roundSacMl } from '../lib/planner-rules.js';
 
   /**
    * `reopen`: the route /plans/<id>, a saved plan; otherwise /plan/new or /plan/<dive id>.
@@ -336,43 +337,24 @@
     return switchMm ? t('plan.gasSwitch', { name, depth: depthText(switchMm) }) : name;
   }
 
-  /**
-   * A SAC, an exposed dropdown menu: the steps around the current value (0.01
-   * cuft/min or 0.5 L/min), always shown with the unit's own decimals (two in
-   * cuft/min). The current value was rounded to its step on loading. In ml/min.
-   * @param {number} current
-   */
-  function sacOptionsOf(current) {
-    return { selected: current, list: sacChoices(current, cuft).map((ml) => ({ value: String(ml), label: formatSac(ml, prefs) })) };
-  }
   /** A SAC for screen readers: the number and the unit in words. @param {number} ml */
   const sacSpoken = (ml) =>
     cuft
       ? t('units.cubicFeetPerMinuteLong', { n: Math.round((ml / ML_PER_CUFT) * 100) / 100, v: formatNumber(ml / ML_PER_CUFT, 2) })
-      : t('units.litersPerMinuteLong', { n: Math.round(ml / 100) / 10, v: formatNumber(ml / 1000, 1) });
+      : t('units.litersPerMinuteLong', { n: Math.round(ml / 10) / 100, v: formatNumber(ml / 1000, 2) });
+  const sacUnit = $derived(t(cuft ? 'units.cubicFeetPerMinute' : 'units.litersPerMinute'));
   // Two SACs (Subsurface's bottom SAC and deco SAC): at the bottom, and during the ascent and the stops.
-  const sacOptions = $derived(sacOptionsOf(planner.bottomSacMlMin));
-  const decoSacOptions = $derived(sacOptionsOf(planner.decoSacMlMin));
-  let sacChoice = $state('');
-  let decoSacChoice = $state('');
-  $effect(() => {
-    sacChoice = String(sacOptions.selected);
-  });
-  $effect(() => {
-    decoSacChoice = String(decoSacOptions.selected);
-  });
-  $effect(() => {
-    const ml = Number(sacChoice);
-    if (!ml || ml === sacOptions.selected) return;
+  // Editable dropdowns (task 71): the field hands back a value in ml/min, clamped.
+  /** @param {number} ml */
+  function setBottomSac(ml) {
     planner.bottomSacMlMin = ml;
     planner.version++;
-  });
-  $effect(() => {
-    const ml = Number(decoSacChoice);
-    if (!ml || ml === decoSacOptions.selected) return;
+  }
+  /** @param {number} ml */
+  function setDecoSac(ml) {
     planner.decoSacMlMin = ml;
     planner.version++;
-  });
+  }
 
   // --- Date, for a new dive --------------------------------------------------
 
@@ -779,8 +761,8 @@
         <button type="button" class="od-planner--add" onclick={addGas}><Icon name="plus" size={18} />{t('plan.addGas')}</button>
         <p class="od-planner--subhead">{t('plan.sac')}</p>
         <div class="od-planner--pair">
-          <SelectField label={t('plan.sacBottom')} bind:value={sacChoice} options={sacOptions.list} ariaLabel={t('plan.sacBottomLong', { value: sacSpoken(sacOptions.selected) })} />
-          <SelectField label={t('plan.sacDeco')} bind:value={decoSacChoice} options={decoSacOptions.list} ariaLabel={t('plan.sacDecoLong', { value: sacSpoken(decoSacOptions.selected) })} />
+          <SacField label={t('plan.sacBottom')} value={planner.bottomSacMlMin} {cuft} unit={sacUnit} ariaLabel={t('plan.sacBottomLong', { value: sacSpoken(planner.bottomSacMlMin) })} helper={t('plan.sacHelper')} openLabel={t('plan.sacOpen')} onchange={setBottomSac} />
+          <SacField label={t('plan.sacDeco')} value={planner.decoSacMlMin} {cuft} unit={sacUnit} ariaLabel={t('plan.sacDecoLong', { value: sacSpoken(planner.decoSacMlMin) })} helper={t('plan.sacHelper')} openLabel={t('plan.sacOpen')} onchange={setDecoSac} />
         </div>
         <p class="od-planner--helper od-planner--inner">{t(planner.source ? 'plan.sacFromDive' : 'plan.sacFromSettings')}</p>
       </div>

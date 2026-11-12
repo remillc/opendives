@@ -244,17 +244,3 @@ test('SAC: rounded to its step before it is shown or used, two decimals in cuft/
   assert.equal(rules.sacStepMl(false), 10);
 });
 
-test('SAC menu: steps around the value, within the limits, the value itself when off them', () => {
-  const list = rules.sacChoices(17000, false);
-  assert.equal(list.length, 41);
-  assert.equal(list[0], 7000);
-  assert.equal(list[40], 27000);
-  assert.equal(list.includes(17000), true);
-  assert.equal(rules.sacChoices(1000, false)[0], 1000, 'not below 1 L/min');
-  assert.equal(rules.sacChoices(99000, false).at(-1), 99000, 'not above 99 L/min');
-  const c = rules.roundSacMl(0.36 * rules.ML_PER_CUFT, true);
-  const cl = rules.sacChoices(c, true);
-  assert.equal(cl.includes(c), true);
-  assert.equal(new Set(cl).size, cl.length, 'no value twice');
-  assert.equal(rules.sacChoices(1234, false).includes(1234), true, 'an off-step value stays in the list');
-});

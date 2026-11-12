@@ -124,25 +124,3 @@ export function roundSacMl(ml, cuft) {
   if (cuft) return Math.round((Math.round((ml / ML_PER_CUFT) * 100) / 100) * ML_PER_CUFT);
   return Math.round(ml / 10) * 10;
 }
-
-/**
- * The SAC values of a menu, in ml/min: the steps around the current value (20
- * each side), within 0.04 to 3.5 cuft/min or 1 to 99 L/min, and the current
- * value itself when it is off them.
- * @param {number} currentMl
- * @param {boolean} cuft
- */
-export function sacChoices(currentMl, cuft) {
-  const step = cuft ? 0.01 * ML_PER_CUFT : 500;
-  const min = cuft ? 0.04 * ML_PER_CUFT : 1000;
-  const max = cuft ? 3.5 * ML_PER_CUFT : 99000;
-  const base = Math.round(currentMl / step);
-  /** @type {number[]} */
-  const values = [];
-  for (let k = base - 20; k <= base + 20; k++) {
-    const ml = Math.round(k * step);
-    if (ml >= min && ml <= max) values.push(ml);
-  }
-  if (!values.includes(currentMl)) values.push(currentMl);
-  return values.sort((a, b) => a - b);
-}
