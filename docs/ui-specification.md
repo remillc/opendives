@@ -150,7 +150,7 @@ Layout: titles sit on the page background, 18 px bold; each group is a white sur
 | Oxygène, recycleur | same choice dialog, own title | Aucune | OpenDives device setting; added with the use "oxygène" |
 | Secours (bailout), recycleur | chevron to a sub-screen (`reglages-secours-android.dc.html`): one row per bailout cylinder type with "Changer" and ✕, then "Ajouter une bouteille de secours (bailout)"; supporting text "Une ou plusieurs bouteilles", value the list of types | none | OpenDives device setting; added to CCR and pSCR dives as open-circuit cylinders, the gas set in each dive |
 | Afficher les bouteilles inutilisées | switch | off | `include_unused_tanks` |
-| Proposer les tailles standard | switch | on | `display_default_tank_infos` |
+| Proposer les tailles standard | switch | off (decided on 12 November 2026, unlike the core) | `display_default_tank_infos` |
 | Types de bouteilles | chevron | sub-screen, see below | core tank info table |
 | Profondeur moyenne | switch | on | `show_average_depth` |
 | Plafond donné par l'ordinateur | switch, helper "Affiche le plafond donné par l’ordinateur de plongée" | on | `dcceiling` |
