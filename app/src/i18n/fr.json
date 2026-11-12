@@ -1054,7 +1054,8 @@
     "tripNewName": "Nom du voyage",
     "mainComputer": "Principal : son profil est celui de la plongée",
     "unnamedComputer": "Ordinateur sans nom",
-    "mainComputerHelp": "Avec plusieurs ordinateurs, choisissez le principal."
+    "mainComputerHelp": "Avec plusieurs ordinateurs, choisissez le principal.",
+    "tagsGroup": "Étiquettes"
   },
   "tripScreen": {
     "kicker": "Voyage · {range}",
@@ -1546,6 +1547,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Étiquettes juste sous Équipement, dans la fiche d’une plongée comme dans « Modifier la plongée » (où elles ont leur propre carte).",
       "Fiche d’une plongée : la carte Conditions passe juste après Équipement (avant Photos et vidéos et Notes).",
       "Les ordinateurs de plongée font partie de l’équipement : dans « Modifier la plongée », ils sont en bas de la carte Équipement ; la fiche d’une plongée montre l’ordinateur principal en troisième ligne de la carte Équipement (tous, avec « Principal », quand elle est ouverte).",
       "Android : plus de boutons radio. L’élément choisi apparaît sur une ligne teintée avec une coche au début (conflits de synchronisation, import du compte, export, nettoyage des sites, ordinateur principal, site d’une nouvelle plongée, boîtes de choix).",

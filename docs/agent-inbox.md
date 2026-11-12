@@ -1748,10 +1748,13 @@ Christian's request: in every dive detail view, the Conditions card moves right 
 Done in `feature/computers-in-equipment` (fe6683a): in DiveDetail the Conditions card follows Équipement (data grid, Personnes, Étiquettes, Gaz, Équipement, Conditions, Photos et vidéos, Notes); phone, tablet panes and iOS share the file.
 
 
-## [ ] 2026-11-12-62 Étiquettes right under Équipement
+## [x] 2026-11-12-62 Étiquettes right under Équipement
 
 Christian's request, in every view of a dive.
 - **Dive detail** (phone light, dark, cursor, menu open, tablet detail panes): the "Étiquettes" section (title and chips) moves right after Équipement, before Conditions. Order: data grid, Personnes, Gaz, Équipement, Étiquettes, Conditions, Photos et vidéos, Notes.
 - **Modifier la plongée** (phone, cylinder sheet background, tablet edit dialogs): the "Étiquettes" field leaves the people card and gets a card of its own, "Étiquettes" (same card style, 16 sp semibold title), between Équipement and Conditions. Field and helper unchanged.
 - Mock-ups: `detail3-android*`, `detail2-android-menu`, `android-edition`, `android-edition-bouteille`, `android-tablette-*`. Note: the edit mock-ups also show the people card split from the notes ("Personnes" and a "Notes" card before Avancé). That change is not approved yet: leave the notes where they are for now, a separate task will follow if Christian approves it.
 - iOS: the same order.
+
+Done in `feature/tags-under-equipment`: the detail shows Étiquettes after Équipement and before Conditions; Modifier la plongée has an "Étiquettes" card of its own (header snippet, field and helper unchanged) between Équipement and Conditions. The notes stay in the people card, as asked. Phone, tablet and iOS share both files.
+

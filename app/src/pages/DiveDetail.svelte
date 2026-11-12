@@ -571,15 +571,6 @@
       </section>
     {/if}
 
-    {#if dive.tags.length}
-      <section class="od-dive-detail--section">
-        <h2 class="od-dive-detail--section-title">{t('detail.tags', { n: dive.tags.length })}</h2>
-        <ul class="od-dive-detail--tags">
-          {#each dive.tags as tag (tag)}<li class="od-dive-detail--tag">{tag}</li>{/each}
-        </ul>
-      </section>
-    {/if}
-
     {#if hasGas}
       <section class="od-dive-detail--section">
         <h2 class="od-dive-detail--section-title">{t('detail.gasSection')}</h2>
@@ -606,6 +597,16 @@
           open={equipmentOpen}
           ontoggle={() => (equipmentOpen = !equipmentOpen)}
         />
+      </section>
+    {/if}
+
+    <!-- Tags right under Équipement (task 2026-11-12-62). -->
+    {#if dive.tags.length}
+      <section class="od-dive-detail--section">
+        <h2 class="od-dive-detail--section-title">{t('detail.tags', { n: dive.tags.length })}</h2>
+        <ul class="od-dive-detail--tags">
+          {#each dive.tags as tag (tag)}<li class="od-dive-detail--tag">{tag}</li>{/each}
+        </ul>
       </section>
     {/if}
 
