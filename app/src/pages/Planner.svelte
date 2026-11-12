@@ -27,6 +27,7 @@
   import { logbook, savePlan } from '../lib/logbook.svelte.js';
   import { planner, loadSetup, adoptUnitDefaults, planRequest, startFromDive, startNewDive, requestOfPlan, applyRequest, nextGas, planSettings, canSimplify, simplifyPlan, restorePlan } from '../lib/planner.svelte.js';
   import { simplifyProfile } from '../lib/profile-levels.js';
+  import { planRows } from '../lib/plan-rows.js';
   import { waterBottomColor } from '../lib/water-column.js';
   import { formatDateTime, formatDuration, formatGasVolume, formatMixName, formatGasLong, formatNumber, formatPartialPressure, formatSac, formatTimeOfDay, decoSummary, depthUnit, locale } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
@@ -480,18 +481,40 @@
     return { line, water: `${line} L${W} 0 L0 0 Z`, bottom: waterBottomColor(result.maxDepthMm), ceilingLine, ceilingArea, deepest, labels };
   });
 
-  const stops = $derived(
-    (result?.stops ?? []).map((s) => ({
-      depth: depthText(s.depthMm),
-      duration: minutes(s.durationSeconds),
-      runtime: minutes(s.runtimeSeconds),
-      gas: result ? gasName(result.cylinders[s.cylinder].o2Permille, result.cylinders[s.cylinder].hePermille) : '',
-    })),
+  /** The glyph of each kind of row and the name read for it (task 73). */
+  const ROW_KINDS = {
+    descent: { glyph: '↓', label: 'plan.rowDescent' },
+    level: { glyph: '→', label: 'plan.rowLevel' },
+    ascent: { glyph: '↑', label: 'plan.rowAscent' },
+    stop: { glyph: '–', label: 'plan.rowStop' },
+  };
+
+  /** A vertical speed in the planner's unit: "59 ft/min". @param {number} mmPerMin */
+  function speedText(mmPerMin) {
+    return `${formatNumber(mmToDepth(mmPerMin, feet), 0)} ${depthUnit(prefs)}/${t('units.minutes')}`;
+  }
+
+  /** Every row of the plan, from the core's waypoints. */
+  const rows = $derived(
+    result?.stops?.length
+      ? planRows(result).map((r) => ({
+          kind: r.kind,
+          glyph: ROW_KINDS[r.kind].glyph,
+          kindLabel: t(ROW_KINDS[r.kind].label),
+          depth: r.surface ? t('plan.surface') : depthText(r.depthMm),
+          surface: r.surface,
+          speed: r.speedMmMin ? speedText(r.speedMmMin) : '',
+          start: formatNumber(r.startMinutes, 0),
+          duration: formatNumber(r.durationMinutes, 0),
+          end: formatNumber(r.endMinutes, 0),
+          gas: r.gas ? gasName(r.gas.o2Permille, r.gas.hePermille) : '',
+        }))
+      : [],
   );
 
   const profileLabel = $derived(
     result
-      ? t(stops.length ? 'plan.profileLabelStops' : 'plan.profileLabel', {
+      ? t(result.stops?.length ? 'plan.profileLabelStops' : 'plan.profileLabel', {
           depth: depthText(result.maxDepthMm),
           time: minutes(result.runtimeSeconds),
           stops: (result.stops ?? []).map((s) => depthText(s.depthMm)).join(', '),
@@ -808,27 +831,35 @@
         <h2 class="od-planner--section-title">{t('plan.result', { time: minutes(result.runtimeSeconds) })}</h2>
         <div class="od-planner--plan">
           {#if errorText}<p class="od-planner--error" role="alert">{errorText}</p>{/if}
-          {#if stops.length}
-            <table class="od-value">
+          {#if rows.length}
+            <table class="od-planner--rows od-value">
               <thead>
                 <tr>
+                  <th scope="col"><span class="od-planner--visually-hidden">{t('plan.rowType')}</span></th>
                   <th scope="col">{t('plan.stop')}</th>
+                  <th scope="col" class="od-planner--num">{t('plan.start')}</th>
                   <th scope="col" class="od-planner--num">{t('plan.duration')}</th>
-                  <th scope="col" class="od-planner--num">{t('plan.runtime')}</th>
+                  <th scope="col" class="od-planner--num">{t('plan.end')}</th>
                   <th scope="col">{t('plan.gasColumn')}</th>
                 </tr>
               </thead>
               <tbody>
-                {#each stops as stop, i (i)}
-                  <tr>
-                    <td class="od-planner--depth">{stop.depth}</td>
-                    <td class="od-planner--num">{stop.duration}</td>
-                    <td class="od-planner--num">{stop.runtime}</td>
-                    <td>{stop.gas}</td>
+                {#each rows as row, i (i)}
+                  <tr class="od-planner--row" class:od-planner--row-transit={row.kind === 'descent' || row.kind === 'ascent'} class:od-planner--row-surface={row.surface}>
+                    <td class="od-planner--row-icon"><span role="img" aria-label={row.kindLabel}>{row.glyph}</span></td>
+                    <td class="od-planner--depth">
+                      {row.depth}
+                      {#if row.speed}<span class="od-planner--row-speed">{row.speed}</span>{/if}
+                    </td>
+                    <td class="od-planner--num">{row.start}</td>
+                    <td class="od-planner--num">{row.duration}</td>
+                    <td class="od-planner--num od-planner--row-end">{row.end}</td>
+                    <td>{#if row.gas}<span class="od-planner--gas-chip">{row.gas}</span>{/if}</td>
                   </tr>
                 {/each}
               </tbody>
             </table>
+            <p class="od-planner--rows-note">{t('plan.rowsNote')}</p>
           {:else}
             <p class="od-planner--no-stop">{t('plan.noStop')}</p>
           {/if}
@@ -1353,6 +1384,67 @@
       .od-planner--depth {
         font-weight: 500;
       }
+    }
+
+    /* The plan table (task 73): a transit row is in the variant colour with its
+       speed under the depth; the gas is a sand chip where it starts. */
+    .od-planner--rows {
+      .od-planner--row-icon {
+        width: 18px;
+        padding-right: 0;
+        font-size: 18px;
+        line-height: 18px;
+        color: var(--od-text-2);
+        text-align: center;
+      }
+
+      .od-planner--row-transit {
+        color: var(--od-text-2);
+
+        .od-planner--depth {
+          font-weight: 400;
+        }
+      }
+
+      .od-planner--row-speed {
+        display: block;
+        font-size: 12px;
+        font-weight: 400;
+        color: var(--od-text-2);
+      }
+
+      .od-planner--row-surface .od-planner--depth,
+      .od-planner--row-surface .od-planner--row-end {
+        font-weight: 600;
+      }
+
+      .od-planner--gas-chip {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 8px;
+        background: var(--od-cylinder-breathed);
+        color: var(--od-text);
+        font-size: 13px;
+        font-weight: 600;
+        white-space: nowrap;
+      }
+    }
+
+    .od-planner--rows-note {
+      margin: 0;
+      padding: 8px 16px 12px;
+      border-top: 1px solid var(--od-separator);
+      font-size: 12px;
+      color: var(--od-text-2);
+    }
+
+    .od-planner--visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
     }
 
     .od-planner--no-stop,
