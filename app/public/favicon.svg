@@ -5,10 +5,10 @@
   <style>
     .bg { fill: #F4F4F2 } .disc { fill: #FFFFFF } .ink { fill: #1F2124 }
     .ring { fill: none; stroke: #1F2124; stroke-width: 3; stroke-linecap: round } .grey { stroke: #A3A5A8 }
-    .t1 { stop-color: #FBE3B2 } .b1 { stop-color: #F4C98C } .t2 { stop-color: #E5A661 } .b2 { stop-color: #D88A45 } .t3 { stop-color: #C76A25 } .b3 { stop-color: #A9490C }
+    .t1 { stop-color: #D4E2F2 } .b1 { stop-color: #BCD2EB } .t2 { stop-color: #8FB0D6 } .b2 { stop-color: #7199C2 } .t3 { stop-color: #3F6F9F } .b3 { stop-color: #2D5E90 }
     @media (prefers-color-scheme: dark) {
       .bg { fill: #121314 } .disc { fill: #1E2023 } .ink { fill: #F4F4F2 } .ring { stroke: #F4F4F2 } .grey { stroke: #6B6E72 }
-      .t1 { stop-color: #F5E2B0 } .b1 { stop-color: #EFD08F } .t2 { stop-color: #EBAD60 } .b2 { stop-color: #E3923C } .t3 { stop-color: #D9702A } .b3 { stop-color: #C2550F }
+      .t1 { stop-color: #D6E4F4 } .b1 { stop-color: #BED3EC } .t2 { stop-color: #93B6E0 } .b2 { stop-color: #77A0D2 } .t3 { stop-color: #4F84C2 } .b3 { stop-color: #3A6FAE }
     }
   </style>
   <defs>

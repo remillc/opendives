@@ -1594,6 +1594,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "App icon, logo and splash screen: the three waves are now shades of blue instead of sand and rust, with the same drawing.",
       "Edit the dive: a camera button in the Start and End fields of each cylinder opens a camera to read the pressure on a gauge (Android). You can also pick an existing photo with “Photos”, or type the value. The photo stays on the device and is not kept. It reads digital displays (one or two gauges, bar or psi) and fills the field for you to check; a needle dial is not read yet.",
       "Dive detail: the Gas section of a closed-circuit rebreather dive draws the rebreather seen from the back, with the diluent cylinder on its left and the oxygen on its right; bailout and stage cylinders stand beside it.",
       "Dive profile: under the time axis, the time you entered the water and the exit time (the end of the profile); a dashed line marks the average depth across the whole profile, labelled “avg.” on the left. The profile’s accessible name gives them too.",
