@@ -772,6 +772,10 @@
         "salt": "1,030 g/L",
         "en13319": "Standard used by dive computers, 1,020 g/L"
       }
+    },
+    "showPhotos": {
+      "label": "Show photo and video fields",
+      "text": "In the detail and the editing of a dive"
     }
   },
   "gas": {
@@ -1548,6 +1552,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Settings › Logbook: “Show photo and video fields”, off by default; a dive’s Photos and videos section only shows when it is on. Nothing is removed from the logbook.",
       "The notes come right under People, in the dive detail as in “Edit dive”.",
       "“Edit dive”: “People” and “Notes” are two cards; the notes come right before “Advanced”.",
       "Tags right under Equipment, in the dive detail as in “Edit dive” (where they have a card of their own).",
