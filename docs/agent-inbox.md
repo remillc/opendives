@@ -1915,3 +1915,13 @@ Christian's request, for the planner and **every full-screen form with "Enregist
 - Trigger: leaving by ← or ✕, Android Back (button or gesture, including the hardware back handler), iOS swipe back, **only when the form differs from what was opened** (compare values, so a change undone by hand counts as none). No change: leave at once, no dialog.
 - MD3 dialog "Quitter sans enregistrer ?", body "Les changements apportés à ce plan seront perdus." with the noun of the screen (à cette plongée, à ce type de bouteille, à cet ordinateur, à ce filtre). Buttons: "Rester" (close the dialog), "Enregistrer" (same as the screen's button, a new plan still asks for its title, then leave), "Quitter" in `--od-alarm` (drop changes, leave).
 - One shared helper (dirty check + guard on navigation and Back), not one per screen. Tablet and iOS: the same. A line in the release notes.
+
+## [ ] 2026-11-12-76 Share a plan: share sheet, water slate, paper format
+
+Christian's request. Spec: new paragraph "Sharing a plan", the planner top bar, and Settings › Language and formats (paper format). Mock-ups: `android-planificateur-partage`, `android-planificateur-ardoise`, `-ardoise-taille`, `-ardoise-fichier`, the planner menus (link), and the Settings boards (new "Format du papier" row).
+- "Partager le plan" opens a bottom sheet with five choices: Ardoise pour l’eau, Fiche PDF, Image du tableau, Fichier de carnet (.ssrf, the core's export of this planned dive only), Résumé texte. All end in the system share sheet.
+- "Ardoise pour l’eau": full-screen task with the plans to include (base plan always; +5 min and +10 ft / +3 m on by default; one "Sans <gas>" per deco gas), Taille and Fichier as menus on the row, and a live preview of the card. **Every extra plan is computed by the core** (run the planner again with the changed inputs), never in JavaScript; each adds a Fin column.
+- Sizes by paper region: Letter regions 4 × 6 in (default), 3 × 5 in, full Letter page; elsewhere A6 (default), A7, full A4. The PDF is always one Letter or A4 page with the card at real size and cut marks; PNG is the card alone; Texte is plain text.
+- New setting, Réglages › Langue et formats › "Format du papier": Automatique (by device region), Lettre, A4. Use it for every printable PDF (the dive PDF sheet too, which today follows the region).
+- Remember the last choices on the device. Tablet and iOS: the same. A line in the release notes.
+- Not now: QR code and share link (later, Christian to decide what they carry).
