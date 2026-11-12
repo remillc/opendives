@@ -1552,6 +1552,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Planner: the Altitude fields (the planner’s Conditions and Settings › Tool conditions) are editable dropdowns: the arrow lists 0 to 10,000 ft (0 to 3,000 m) and you can type any whole altitude, limited to 0 to 15,000 ft (4,500 m).",
       "Planner: every SAC field (the planner’s “At the bottom” and “During deco”, and the planner settings) is an editable dropdown: the arrow lists 0.0, 0.5, 1.0, 1.5 and 2.0 cu ft/min (0, 15, 30, 45 and 60 L/min), and you can type your own value, kept with two decimals and limited to 0 to 2 cu ft/min (0 to 60 L/min).",
       "Planner: “Save” asks for a title for a new plan (the site of the starting dive by default, empty allowed), then returns to “Planned dives” and highlights the new plan for a moment. The title replaces the site in the list; without a title, a row reads “Plan of” followed by its date. “No starting dive” is no longer shown.",
       "Planner: the optional “Volume carried” field of each gas is gone, and with it the alarm colour on “Volume needed per gas”, which now always shows the total, what is used and the reserve in the normal colour. Saved plans that had a volume carried still open.",

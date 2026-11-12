@@ -13,6 +13,7 @@
   import { showSnackbar } from '../lib/snackbar.js';
   import { OpenDivesCore } from 'opendives-core';
   import RowMenu from '../components/RowMenu.svelte';
+  import AltitudeField from '../components/AltitudeField.svelte';
   import ButtonGroup from '../components/ButtonGroup.svelte';
   import MenuButton from '../components/MenuButton.svelte';
   import { layout, ios } from '../lib/layout.svelte.js';
@@ -32,7 +33,8 @@
     TIME_PATTERNS,
   } from '../lib/settings.svelte.js';
   import { confirmAction } from '../lib/dialogs.js';
-  import { formatNumber, formatDuration, formatDateChoice, formatTimeChoice, formatDepth, formatPartialPressure, ppUnitLabel } from '../lib/format.js';
+  import { formatNumber, formatDuration, formatDateChoice, formatTimeChoice, formatDepth, formatPartialPressure, ppUnitLabel, depthUnit } from '../lib/format.js';
+  import { depthToMm, mmToDepth } from '../lib/planner-rules.js';
   import { regionUsesLetter } from '../lib/share.js';
   import { waterTypeName, downloadWaterName } from '../lib/tools.js';
   import { cylinderChoices } from '../lib/cylinder-choices.js';
@@ -46,6 +48,7 @@
    *       options: () => Option[] | Promise<Option[]>, set: (v: string) => unknown, dimmed?: boolean, note?: string }
    *   | { kind: 'number', id: string, label: string, text?: string, value: string, title?: string, dialogText?: string,
    *       wheels: () => {label: string, values: string[], index: number, defaultIndex: number}[], set: (indexes: number[]) => unknown, dimmed?: boolean, dropdowns?: boolean }
+   *   | { kind: 'altitude', id: string, label: string }
    *   | { kind: 'link', id: string, label: string, text?: string, href?: string, action?: () => void, disabled?: boolean, value?: string, badge?: string }
    *   | { kind: 'info', id: string, label: string, value: string }} Row
    */
@@ -191,8 +194,8 @@
   /** Depth wheel values (best-mix END), in mm: metre by metre, or 10 ft by 10 ft. */
   const depthWheel = $derived(p.length === 'ft' ? range(0, 330, 10).map((ft) => Math.round(ft * 304.8)) : range(0, 100, 1).map((m) => m * 1000));
 
-  /** Altitude wheel values, in mm: 50 m by 50 m, or 100 ft by 100 ft. */
-  const altitudeWheel = $derived(p.length === 'ft' ? range(0, 16000, 100).map((ft) => Math.round(ft * 304.8)) : range(0, 5000, 50).map((m) => m * 1000));
+  /** The default altitude as the field shows it: a whole foot or metre (task 72). */
+  const defaultAltitude = $derived(Math.max(0, Math.round(mmToDepth(settings.defaultAltitudeMm, p.length === 'ft'))));
 
   const computers = $derived(logbook.prefs.diveComputers ?? []);
 
@@ -370,14 +373,7 @@
           options: () => /** @type {const} */ (['fresh', 'salt', 'en13319']).map((id) => ({ value: id, label: waterTypeName(id) })),
           set: (v) => setAppSetting('defaultWater', /** @type {'fresh'|'salt'|'en13319'} */ (v)),
         },
-        {
-          kind: 'number',
-          id: 'defaultAltitude',
-          label: t('settings.conditions.altitude'),
-          value: formatDepth(settings.defaultAltitudeMm, p),
-          wheels: () => [wheel(t('settings.conditions.altitude'), altitudeWheel, settings.defaultAltitudeMm, 0, (mm) => formatDepth(mm, p))],
-          set: ([i]) => setAppSetting('defaultAltitudeMm', altitudeWheel[i]),
-        },
+        { kind: 'altitude', id: 'defaultAltitude', label: t('settings.conditions.altitude') },
       ],
     },
     {
@@ -827,6 +823,18 @@
         <span class="toggle-icon"></span>
       </span>
     </label>
+  {:else if row.kind === 'altitude'}
+    <div class="od-settings--altitude">
+      <AltitudeField
+        label={row.label}
+        value={defaultAltitude}
+        feet={p.length === 'ft'}
+        unit={depthUnit(p)}
+        ariaLabel={`${row.label}: ${formatNumber(defaultAltitude)} ${depthUnit(p)}`}
+        openLabel={t('plan.sacOpen')}
+        onchange={(v) => setAppSetting('defaultAltitudeMm', depthToMm(v, p.length === 'ft'))}
+      />
+    </div>
   {:else if row.kind === 'info'}
     <div class="od-settings--row">
       <span class="od-settings--texts"><span class="od-settings--label">{row.label}</span></span>
@@ -1063,6 +1071,12 @@
       &.od-settings--spaced {
         margin-top: 10px;
       }
+    }
+
+    /* An editable dropdown in its group: 12 dp from the edges, as every field in a white surface. */
+    .od-settings--altitude {
+      --od-field-margin: 12px;
+      padding-bottom: 8px;
     }
 
     .od-settings--row {

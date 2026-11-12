@@ -16,6 +16,7 @@
   import SelectField from '../components/SelectField.svelte';
   import ChoiceField from '../components/ChoiceField.svelte';
   import SacField from '../components/SacField.svelte';
+  import AltitudeField from '../components/AltitudeField.svelte';
   import ButtonField from '../components/ButtonField.svelte';
   import WheelDialog from '../components/WheelDialog.svelte';
   import DatePickerDialog from '../components/DatePickerDialog.svelte';
@@ -32,7 +33,7 @@
   import { ios } from '../lib/layout.svelte.js';
   import { WATER_TYPES, altitudeToPressureMbar, formatHoursMinutes, pressureToAltitudeMm, waterTypeName, waterTypeOfSalinity } from '../lib/tools.js';
   import { sharePlanPdf, sharePlanSummary } from '../lib/share.js';
-  import { MM_PER_FT, ML_PER_CUFT, O2_CHOICES, HE_CHOICES, altitudePresets, depthToMm, gasTotalMl, gasValid, modAlarm, mmToDepth, roundSacMl } from '../lib/planner-rules.js';
+  import { MM_PER_FT, ML_PER_CUFT, O2_CHOICES, HE_CHOICES, depthToMm, gasTotalMl, gasValid, modAlarm, mmToDepth, roundSacMl } from '../lib/planner-rules.js';
 
   /**
    * `reopen`: the route /plans/<id>, a saved plan; otherwise /plan/new or /plan/<dive id>.
@@ -209,15 +210,14 @@
 
   let levelFields = $state(/** @type {{ key: number, depth: string, time: string }[]} */ ([]));
   let gasFields = $state(/** @type {{ key: number, o2: string, he: string }[]} */ ([]));
-  let altitudeField = $state('');
   let gfLowField = $state('');
   let gfHighField = $state('');
   /** @type {Record<string, boolean>} */
   let invalid = $state({});
   let nextKey = 0;
 
-  /** The altitude of the plan as typed: a whole foot or metre (read from a dive's surface pressure it has no useful decimal). */
-  const altitudeText = () => show(Math.max(0, Math.round(mmToDepth(pressureToAltitudeMm(planner.surfacePressureMbar), feet))));
+  /** The altitude of the plan: a whole foot or metre (read from a dive's surface pressure it has no useful decimal). */
+  const altitude = $derived(Math.max(0, Math.round(mmToDepth(pressureToAltitudeMm(planner.surfacePressureMbar), feet))));
 
   /** The fields from the plan: on opening, and when "Changer" brings another dive. */
   function fillFields() {
@@ -234,7 +234,6 @@
       o2: show(g.o2Permille / 10),
       he: show(g.hePermille / 10),
     }));
-    altitudeField = altitudeText();
     gfLowField = show(planner.deco.gfLow);
     gfHighField = show(planner.deco.gfHigh);
     invalid = {};
@@ -407,8 +406,10 @@
   });
   const waterOptions = WATER_TYPES.map((w) => ({ value: w.id, label: waterTypeName(w.id) }));
 
-  function altitudeChanged() {
-    typed('altitude', altitudeField, 0, feet ? 16000 : 5000, (v) => (planner.surfacePressureMbar = altitudeToPressureMbar(depthToMm(v, feet))));
+  /** @param {number} v a whole foot or metre, already clamped by the field */
+  function setAltitude(v) {
+    planner.surfacePressureMbar = altitudeToPressureMbar(depthToMm(v, feet));
+    planner.version++;
   }
 
   let modelChoice = $state('');
@@ -771,21 +772,7 @@
       <div class="od-planner--fields">
         <div class="od-planner--pair">
           <SelectField label={t('plan.waterType')} bind:value={water} options={waterOptions} />
-          <ChoiceField
-            label={t('plan.altitude')}
-            bind:value={altitudeField}
-            presets={altitudePresets(feet)}
-            unit={depthUnit(prefs)}
-            otherLabel={t('plan.otherValue')}
-            backLabel={t('plan.backToList')}
-            ariaLabel={t('plan.altitudeLong', { value: `${formatNumber(parse(altitudeField))} ${depthUnit(prefs)}` })}
-            invalid={invalid.altitude}
-            oninput={altitudeChanged}
-            onrevert={() => {
-              altitudeField = altitudeText();
-              invalid.altitude = false;
-            }}
-          />
+          <AltitudeField label={t('plan.altitude')} value={altitude} {feet} unit={depthUnit(prefs)} ariaLabel={t('plan.altitudeLong', { value: `${formatNumber(altitude)} ${depthUnit(prefs)}` })} openLabel={t('plan.sacOpen')} onchange={setAltitude} />
         </div>
         <p class="od-planner--helper od-planner--inner">{t(planner.source ? 'plan.conditionsFromDive' : 'plan.conditionsDefault')}</p>
       </div>
