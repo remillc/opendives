@@ -1810,3 +1810,14 @@ Christian reports that on `/dives/88554` the ⋮ menu of the dive detail shows "
 
 Done in `fix/remove-from-trip-shown`: dive 88554 (no number, 4 Nov 2026) was the only dive of a trip made by hand (not `autogen`) and unnamed, id 88551. The logbook draws a one-dive trip as the dive and the detail hid it, but the ⋮ item only skipped automatic one-dive trips. `shownTrip` (lib/trip-shown.js, tested: no trip, one-dive manual trip, two-dive automatic trip) is now the one rule for the detail header, the ⋮ item and the logbook selection's "Retirer du voyage": a trip with two dives or more. The header names an unnamed trip "Voyage du …". Checked on Christian's phone (88554: Renuméroter and Supprimer only).
 
+
+## [ ] 2026-11-12-68 Planner: "Simplifier le profil"
+
+Christian's request. Spec: new paragraph "Planner: simplify the profile" in `docs/ui-specification.md`. Mock-ups: `android-planificateur-menu` (menu item), `android-planificateur-simplifie` (result).
+- Planner ⋮ menu, first item, only when the plan starts from a logbook dive: **"Simplifier le profil"** (bowl-shaped profile icon, path `M3 5l4 12h10l4-12`).
+- It turns the measured profile into a few levels: detect the depth phases of the dive (bottom at max depth, plus distinct shallower phases when the dive had clear ones; a reasonable tolerance, say 10 % of the depth or 3 m, and drop phases shorter than 2 min), each with its duration. Descent and ascent are then computed by the planner as for a new plan (the existing new-plan path with levels).
+- After it: chart title "Profil prévu" with a label per level ("94 ft · 25 min"), the "Niveaux" section shown with the levels as editable rows (as for a new plan), helper "Niveaux tirés de la plongée, à modifier comme un nouveau plan. La descente et la remontée sont ajoutées au calcul". No Date section (the plan keeps the dive's date and surface interval). Gases, SAC and conditions stay those taken from the dive.
+- Recompute at once; snackbar "Profil simplifié" with "Annuler", which restores the measured profile.
+- Tablet and iOS: the same item and result.
+- Tests: a square dive gives one level; a two-phase dive gives two levels; Annuler restores the original plan.
+- A line in the release notes.
