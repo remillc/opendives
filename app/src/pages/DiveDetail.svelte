@@ -673,9 +673,9 @@
         clearFab={layout.split && !layout.rail && navigation.section === 'logbook'}
         actions={[
           { key: 'edit', icon: 'edit', label: t('detail.edit'), text: t('detail.edit'), onclick: () => f7router.navigate(`/dives/${diveId}/edit`) },
-          { key: 'share', icon: 'share', label: t('share.title'), onclick: () => (sharing = true) },
-          // This page's router, not a link: see the overflow menu.
+          // This page's router, not a link: see the overflow menu. Plan before Share (task 2026-11-12-59).
           { key: 'plan', icon: 'plan', label: t('detail.plan'), onclick: () => f7router.navigate(`/plan/${diveId}`) },
+          { key: 'share', icon: 'share', label: t('share.title'), onclick: () => (sharing = true) },
           { key: 'more', icon: 'more', label: t('detail.moreOptionsList'), menu: `#${menuId}` },
         ]}
       />
