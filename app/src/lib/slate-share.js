@@ -89,32 +89,69 @@ function fileBase(result) {
 }
 
 /**
- * The card as a PNG, base64: the card's HTML drawn as an SVG foreign object on a canvas.
+ * The card as a PNG, base64. The card's HTML is laid out off screen, then each word and each
+ * cell border is drawn again on a canvas at the place the page gave it. (An SVG foreign object
+ * drawn on a canvas taints it in the Android WebView, and the canvas can no longer be read.)
  * @param {SlateCard} card @param {ReturnType<typeof slateLayout>} layout
  * @param {number} [scale] pixels per CSS pixel
  */
 export async function cardPng(card, layout, scale = 4) {
-  const w = Math.round((layout.widthMm * 96) / 25.4);
-  const h = Math.round((layout.heightMm * 96) / 25.4);
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><foreignObject x="0" y="0" width="${w}" height="${h}"><div xmlns="http://www.w3.org/1999/xhtml">${cardHtml(card, layout)}</div></foreignObject></svg>`;
-  const url = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
+  const host = document.createElement('div');
+  host.style.cssText = 'position:fixed;left:-10000px;top:0;pointer-events:none';
+  host.innerHTML = cardHtml(card, layout);
+  document.body.appendChild(host);
   try {
-    const image = new Image();
-    await new Promise((resolve, reject) => {
-      image.onload = resolve;
-      image.onerror = reject;
-      image.src = url;
-    });
+    await document.fonts?.ready;
+    const root = /** @type {HTMLElement} */ (host.firstElementChild);
+    const origin = root.getBoundingClientRect();
+    // The image stops below its last line, with the card's padding: a picture for a message
+    // has no use for the card's empty bottom.
+    const last = /** @type {Element} */ (root.lastElementChild).getBoundingClientRect();
+    const height = Math.min(origin.height, last.bottom - origin.top + parseFloat(getComputedStyle(root).paddingBottom));
     const canvas = document.createElement('canvas');
-    canvas.width = w * scale;
-    canvas.height = h * scale;
+    canvas.width = Math.round(origin.width * scale);
+    canvas.height = Math.round(height * scale);
     const ctx = /** @type {CanvasRenderingContext2D} */ (canvas.getContext('2d'));
+    ctx.scale(scale, scale);
     ctx.fillStyle = '#FFFFFF';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+    ctx.fillRect(0, 0, origin.width, height);
+
+    // The rows' top borders.
+    for (const cell of root.querySelectorAll('td')) {
+      const style = getComputedStyle(cell);
+      const width = parseFloat(style.borderTopWidth);
+      if (!width) continue;
+      const r = cell.getBoundingClientRect();
+      ctx.fillStyle = style.borderTopColor;
+      ctx.fillRect(r.left - origin.left, r.top - origin.top, r.width, width);
+    }
+
+    // The text, word by word, where the layout put each word.
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    const range = document.createRange();
+    ctx.textBaseline = 'alphabetic';
+    for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+      const text = node.textContent ?? '';
+      const style = getComputedStyle(/** @type {Element} */ (node.parentElement));
+      ctx.font = `${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+      ctx.fillStyle = style.color;
+      const underline = (style.textDecorationLine || '').includes('underline') || !!node.parentElement?.closest('[style*="underline"]');
+      const fontPx = parseFloat(style.fontSize);
+      for (const match of text.matchAll(/\S+/g)) {
+        range.setStart(node, match.index ?? 0);
+        range.setEnd(node, (match.index ?? 0) + match[0].length);
+        const r = range.getBoundingClientRect();
+        if (!r.width) continue;
+        const metrics = ctx.measureText(match[0]);
+        // The baseline: the line box's middle, moved down by half the glyphs' ascent minus descent.
+        const baseline = r.top - origin.top + r.height / 2 + (metrics.fontBoundingBoxAscent - metrics.fontBoundingBoxDescent) / 2;
+        ctx.fillText(match[0], r.left - origin.left, baseline);
+        if (underline) ctx.fillRect(r.left - origin.left, baseline + fontPx * 0.12, r.width, Math.max(0.5, fontPx * 0.07));
+      }
+    }
     return canvas.toDataURL('image/png').split(',')[1];
   } finally {
-    URL.revokeObjectURL(url);
+    host.remove();
   }
 }
 

@@ -1918,7 +1918,7 @@ Christian's request, for the planner and **every full-screen form with "Enregist
 
 Done in `feature/leave-guard` (431f73a): one helper (`lib/leave-guard.js`: content comparison, tested; `LeaveGuard.svelte`: the MD3 dialog "Quitter sans enregistrer ?" with Rester, Enregistrer, Quitter in the alarm colour) on the planner, Nouvelle plongée, Modifier la plongée, Modifier le type, Modifier l'ordinateur, the saved-filter form, plus SiteEdit and StatisticNew. Android Back goes through it (lib/back-button.js); on iOS a dirty page loses Framework7's swipe back and an edge swipe opens the dialog instead (untested, no Mac); dirty popups cannot be swiped or tapped away. Checked on the phone emulator (edit: no change leaves, a change asks, Back = Rester, a change undone by hand leaves; planner: ← asks, Quitter leaves).
 
-## [ ] 2026-11-12-76 Share a plan: share sheet, water slate, paper format
+## [x] 2026-11-12-76 Share a plan: share sheet, water slate, paper format
 
 Christian's request. Spec: new paragraph "Sharing a plan", the planner top bar, and Settings › Language and formats (paper format). Mock-ups: `android-planificateur-partage`, `android-planificateur-ardoise`, `-ardoise-taille`, `-ardoise-fichier`, the planner menus (link), and the Settings boards (new "Format du papier" row).
 - "Partager le plan" opens a bottom sheet with five choices: Ardoise pour l’eau, Fiche PDF, Image du tableau, Fichier de carnet (.ssrf, the core's export of this planned dive only), Résumé texte. All end in the system share sheet.
@@ -1927,6 +1927,8 @@ Christian's request. Spec: new paragraph "Sharing a plan", the planner top bar, 
 - New setting, Réglages › Langue et formats › "Format du papier": Automatique (by device region), Lettre, A4. Use it for every printable PDF (the dive PDF sheet too, which today follows the region).
 - Remember the last choices on the device. Tablet and iOS: the same. A line in the release notes.
 - Not now: QR code and share link (later, Christian to decide what they carry).
+
+Done in `feature/share-plan` (25d95a4, then on main): "Partager le plan" opens the five rows (ShareSheet gains optional rows and heading). The slate (PlanSlate.svelte) offers the base plan, "+5 min" (deepest level + 300 s), "+10 ft / +3 m" (every level deeper, times kept) and "Sans <gas>" per deco gas; each extra plan is one more planDive call to the core on a copy of the request, nothing computed in JavaScript. Rows are matched by order for levels and by depth for ascents and stops; a plan the core cannot compute shows "–". Sizes: 4 × 6 in, 3 × 5 in or full Letter; A6, A7 or full A4 elsewhere; the PDF is one page with the card at real size and cut marks. The PNG is drawn word by word on a canvas from the laid-out card (the SVG foreign object route tainted the canvas in the WebView) and cropped to its content. The .ssrf row needs a saved plan and uses the core export. Last choices remembered (slateSize, slateFile, slatePlus5, slatePlusDepth). Checked on the phone emulator: share sheet, slate preview with core-computed +5 min and +10 ft columns, PDF (A4 page, A6 card, cut marks) and table PNG. Not checked on device: a deco plan with "Sans <gas>" (covered by node tests).
 
 ## [ ] 2026-11-12-77 Read cylinder pressures from a photo (to-do #41): plan first, no code
 

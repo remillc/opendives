@@ -2781,7 +2781,7 @@
     "print": "Printing",
     "sizeLabel": "Size",
     "fileLabel": "File",
-    "noteSheet": "Printed on a {paper} sheet, at actual size, with cut marks. The paper follows the region, see Settings › Language and formats.",
+    "noteSheet": "Printed on one {paper} sheet, at actual size, with cut marks. The paper follows the region, see Settings › Language and formats.",
     "noteImage": "The image shows the card alone, without margin.",
     "noteText": "The text holds the table, to paste in a note or a message.",
     "preview": "Preview",
