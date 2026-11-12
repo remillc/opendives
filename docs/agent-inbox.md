@@ -1944,3 +1944,29 @@ Your summary should cover at least:
 - A confidence threshold: when do you show a value, when "Aucune pression lue".
 - Privacy: the photo stays on the device and is deleted afterwards.
 - Effort, steps, and what you would ship first.
+
+**Plan (code agent, 12 November 2026). Nothing built; waiting for Christian's go-ahead.**
+
+1. **Camera and gallery.**
+   - Android: a full-screen camera view of our own, written with **CameraX** in the opendives-core plugin (Kotlin), because the system camera app that `@capacitor/camera` opens cannot draw our frame, the gauge outlines or "Aucune pression lue" over the live picture. The web layer shows the frame and the buttons over a native preview, as the maps and Bluetooth parts already mix native and web.
+   - Gallery ("Photos"): the Android **photo picker** (`PickVisualMedia`, no storage permission; backported down to our minSdk 24 through Google Play services).
+   - Permission: CAMERA only, asked the first time the camera icon is touched, with the reason in plain words; refused, the gallery and "Saisir à la main" stay available.
+   - iOS: AVFoundation for the camera and PHPicker for the photos, in Swift. Blocked until there is a Mac.
+2. **Digital displays.** On-device text recognition: **ML Kit Text Recognition v2** (Latin) on Android, **Vision** (`VNRecognizeTextRequest`) on iOS. I would bundle the ML Kit model (about 4 MB per ABI) rather than let Play services download it, so that it works offline and on phones without Play services. Seven-segment digits are read less well than printed text by these engines; I expect most clear LCDs to work, and dim, reflective or angled ones to fail. Preprocessing: crop to the frame, raise the contrast, keep only number-shaped tokens.
+3. **Analog dials (needle).** This is a research problem, not a library call: find the dial, the needle angle, the scale (start and end marks and their numbers) and the unit, often with two printed scales (bar and psi). Options: (a) classical image processing with **OpenCV** (circle detection for the dial, line detection for the needle, ML Kit to read the scale numbers, then angle → value); OpenCV adds 10 to 20 MB per ABI unless trimmed; (b) a small model of our own (TensorFlow Lite, a few MB) that finds the centre, the needle tip and the scale ends, which needs a few hundred labelled photos to train. **I recommend that the needle comes later**, as a separate step with a go/no-go on measured accuracy (target about ±5 bar / ±50 psi), and that the first version reads digital displays only and says plainly when it cannot read a dial.
+4. **One or two gauges, order, unit.**
+   - Digital: the recognised numbers are grouped by position; two separate groups are two gauges, ordered left to right as in the picture; each gets its own row and its "Pour" menu.
+   - Analog (later): the two largest dials found, left to right.
+   - Unit: a "bar" or "psi" printed next to the number wins; otherwise the value's range decides (above 400, psi), then the diver's pressure unit. The value is always shown converted to the diver's unit, in an editable field.
+5. **Confidence.** A value is shown only if (a) it is a plausible pressure (0 to 350 bar, 0 to 5 000 psi), (b) the recognizer's confidence is above a threshold (start at 0.8, tuned on the test photos) and (c) on the live camera, three consecutive frames agree within 2 %. Otherwise "Aucune pression lue". A read value is never saved silently: it always prefills the field for the diver to check, and "Saisir à la main" is always there.
+6. **Privacy.** The live frames are analysed in memory and never written. A photo from the gallery is read through its URI, never copied. A still capture, if needed, goes to the app's cache and is deleted as soon as it is read or cancelled. Nothing is sent anywhere (the model is bundled, no network), and nothing is attached to the dive.
+7. **Tests.** Christian takes real photos (digital and analog, one and two gauges, good and bad light), each with the expected values in a small JSON. An Android instrumented test runs the recognizer over the set and reports accuracy; the pure rules (grouping, ordering, unit, plausibility, threshold) get node:test tests. The photos stay out of git if they show anything personal.
+8. **Steps and what ships first.**
+   1. Camera screen, gallery, permission, "Saisir à la main", and the result sheets (one and two gauges) with manual entry only: the whole flow without recognition (about 2 days).
+   2. Digital reading with ML Kit, one gauge then two (about 2 days), then tuning on Christian's photos.
+   3. Ship 1 and 2 on Android.
+   4. Analog prototype, go/no-go on accuracy (1 to 2 weeks, uncertain).
+   5. iOS with Vision, when a Mac is available.
+   - Size added: CameraX about 1 MB, ML Kit about 4 MB per ABI; OpenCV only if the needle goes ahead.
+   - **Native dependencies to approve:** CameraX, the photo picker, ML Kit text recognition (and later OpenCV or TensorFlow Lite). Per AGENTS.md and task 15's rule, nothing is added before Christian says yes.
+
