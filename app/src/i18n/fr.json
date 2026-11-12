@@ -433,7 +433,7 @@
     "groups": {
       "language": "Langue et formats",
       "units": "Unités",
-      "conditions": "Conditions par défaut",
+      "conditions": "Conditions des outils",
       "logbook": "Carnet",
       "equipment": "Équipement",
       "profile": "Profil de plongée",
@@ -729,7 +729,7 @@
     "conditions": {
       "waterType": "Type d’eau",
       "altitude": "Altitude",
-      "note": "Le planificateur part de ces valeurs. On peut les changer pour chaque plan."
+      "note": "Le planificateur, EAD et MOD et Meilleur mélange partent de ces valeurs. On peut les changer dans chaque outil."
     },
     "bailout": {
       "intro": "Ajoutées aux plongées en recycleur, comme bouteilles de circuit ouvert. Le gaz se règle ensuite dans chaque plongée.",
@@ -1518,6 +1518,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Réglages : le groupe « Conditions par défaut » devient « Conditions des outils » et passe après « Décompression ».",
       "Détail d’une plongée : « Gaz et équipement » devient deux sections. Gaz dessine chaque bouteille avec son gaz, son usage et sa taille, et sa pression du départ à la fin ; la partie entre la pression de fin et celle de départ est pâle, avec une ligne pointillée à chaque niveau. Sous les bouteilles, une ligne dit les changements de gaz et leur profondeur. Équipement est replié : la combinaison et le lest total ; touchez-le pour voir le lest par emplacement. « Modifier la plongée » montre le même dessin.",
       "« Modifier la plongée » : la fiche d’une bouteille se ferme en touchant sa poignée ou en la faisant glisser vers le bas.",
       "« Modifier la plongée » : un nouveau groupe Gaz avant Équipement. Il contient le mode de plongée et un dessin de chaque bouteille, remplie jusqu’à sa pression de fin, avec son gaz et sa pression. Touchez une bouteille pour la modifier dans une feuille, ou n’importe où ailleurs sur le dessin pour la page Gaz : une carte par bouteille, les profondeurs de changement de gaz et « Ajouter une bouteille ». Chaque bouteille a son « Supprimer la bouteille N », qui demande confirmation et dit quand le profil utilise la bouteille. Rien n’est enregistré avant Enregistrer.",
