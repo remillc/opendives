@@ -468,7 +468,7 @@
     "depth": "Depth",
     "meters": "Metres",
     "feet": "Feet",
-    "pressure": "Pressure",
+    "pressure": "Cylinder pressure",
     "volume": "Volume",
     "liters": "Litres",
     "cubicFeet": "Cubic feet",
@@ -1523,6 +1523,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Settings › Units: “Pressure” becomes “Cylinder pressure”; this unit is only used for cylinders (atmospheric pressure stays in mbar).",
       "Settings: every choice in a short list (date and time format, duration, speeds, GPS coordinates, language, theme, text size, default cylinders, water type of downloaded dives) opens as a menu on the touched row instead of a radio-button dialog. Tap a value to choose it; tap outside or press Back to close without changing.",
       "Settings › Equipment: “Offer standard sizes” is off by default; the cylinder type choice shows your own types and those of the logbook.",
       "Settings: the “Default conditions” group becomes “Tool conditions” and moves after “Decompression”.",
