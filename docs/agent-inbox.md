@@ -1979,3 +1979,12 @@ Your summary should cover at least:
 
 
 **Addendum (12 November 2026), Christian:** no "pending pressures" feature for readings taken before the dive exists in the logbook. A diver who wants the start pressure before diving just takes an ordinary photo with the phone's camera, then, once the dive is downloaded, picks that photo with "Photos" in the gauge camera. Nothing else to build for that case.
+
+## [ ] 2026-11-12-78 Dive detail: draw the rebreather in the Gaz section of a CCR dive
+
+Christian's request. Spec: new paragraph "Gas section of a rebreather dive". Mock-up: `detail3-android-ccr` (only the Gaz section, to compare with the Gaz section of `detail3-android`).
+- Only when the dive mode is CCR; open circuit and pSCR keep today's view.
+- The rebreather seen from the back: narrow dark scrubber canister, head on top, two breathing hoses toward the shoulders, small stand below; diluent cylinder on the left (DIL), oxygen on the right (O₂), valves down, a bit taller than the canister. Same fill marks as the open-circuit cylinders (sand, gradient, dashed start and end lines).
+- Other cylinders (bailout, stages) beside the unit, open-circuit style, use written vertically ("SECOURS").
+- Under each cylinder the same three lines as today, then the gas-switch line. Cylinders found by their use (Diluant, Oxygène); more than one of a kind: the first goes in the unit, the others beside it.
+- One SVG component, dark theme too, accessible name as in the spec. Tablet and iOS: the same. A line in the release notes.
