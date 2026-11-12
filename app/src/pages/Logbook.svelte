@@ -26,6 +26,7 @@
   import { logbook, loadLogbook, importFile, undoLastChange, reopenConflict, deleteDives, tripChange } from '../lib/logbook.svelte.js';
   import { conflictDiveCount } from '../lib/conflict-choices.js';
   import { confirmAction } from '../lib/dialogs.js';
+  import { shownTrip } from '../lib/trip-shown.js';
   import { filter, loadOptions, applyFilter, isEmpty } from '../lib/filter.svelte.js';
   import { layout } from '../lib/layout.svelte.js';
   import { navigation } from '../lib/navigation.svelte.js';
@@ -298,7 +299,8 @@
   }
 
   /** Checked dives that belong to a trip: "Remove from the trip". */
-  const checkedInTrip = $derived(logbook.dives.filter((d) => d.trip && checked[d.id]).map((d) => d.id));
+  /** Checked dives in a trip the logbook shows (lib/trip-shown.js): a trip of one dive is no trip. */
+  const checkedInTrip = $derived(logbook.dives.filter((d) => checked[d.id] && shownTrip(d, logbook.dives)).map((d) => d.id));
 
   async function removeFromTrip() {
     const n = checkedInTrip.length;

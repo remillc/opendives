@@ -30,6 +30,7 @@
   import Stars from '../components/Stars.svelte';
   import { logbook, deleteDive, tripChange } from '../lib/logbook.svelte.js';
   import { layout } from '../lib/layout.svelte.js';
+  import { shownTrip } from '../lib/trip-shown.js';
   import { settings } from '../lib/settings.svelte.js';
   import { offerUndo } from '../lib/undo.js';
   import { confirmAction } from '../lib/dialogs.js';
@@ -38,6 +39,7 @@
   import {
     formatCylinderSize,
     formatDepth,
+    formatLongDate,
     formatDiveDay,
         formatGasLong,
     formatNumber,
@@ -271,9 +273,9 @@
 
   const rebreather = $derived(dive ? dive.divemode === 'CCR' || dive.divemode === 'PSCR' : false);
 
-  /** The dive can leave its trip; a trip of one dive made by the automatic grouping is no trip. */
+  /** The dive can leave its trip only when the logbook shows that trip (lib/trip-shown.js, task 2026-11-12-67). */
   const removableFromTrip = $derived(
-    !!dive?.trip && (!dive.trip.autogen || logbook.dives.filter((d) => d.trip?.id === dive?.trip?.id).length > 1),
+    !!shownTrip(dive, logbook.dives),
   );
 
   // "Retirer du voyage": at once, as Subsurface's "Remove dive(s) from trip".
@@ -293,11 +295,8 @@
     }
   }
 
-  /** The dive's trip; a trip of one dive is no trip, as in the logbook list. */
-  const trip = $derived.by(() => {
-    const own = dive?.trip;
-    return own?.location && logbook.dives.filter((d) => d.trip?.id === own.id).length > 1 ? own : null;
-  });
+  /** The dive's trip as the logbook shows it (lib/trip-shown.js): a trip of one dive is no trip. */
+  const trip = $derived(shownTrip(dive, logbook.dives));
 
   /** Location line under the title, from the site's taxonomy; empty when unknown. */
   const location = $derived(
@@ -528,7 +527,7 @@
       <h1 class="od-dive-detail--site" class:od-dive-detail--not-set={!dive.site}>{dive.site || t('dive.siteNotSet')}</h1>
       {#if location || trip}
         <p class="od-dive-detail--location">
-          {location}{#if location && trip}{' · '}{/if}{#if trip}<a href="/trips/{trip.id}">{t('detail.tripLine', { name: trip.location })}</a>{/if}
+          {location}{#if location && trip}{' · '}{/if}{#if trip}<a href="/trips/{trip.id}">{t('detail.tripLine', { name: trip.location || t('trip.startingOn', { date: formatLongDate(logbook.dives.filter((d) => d.trip?.id === trip.id).map((d) => d.date).sort()[0]) }) })}</a>{/if}
         </p>
       {/if}
       {#if dive.rating > 0}

@@ -1552,6 +1552,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "A dive alone in its trip (a one-dive trip, which the Logbook does not show as a trip) no longer offers “Remove from trip”; an unnamed trip shows as “Trip starting on …” in the detail.",
       "Tags come right under the notes, in the dive detail as in “Edit dive”.",
       "Settings › Logbook: “Show photo and video fields”, off by default; a dive’s Photos and videos section only shows when it is on. Nothing is removed from the logbook.",
       "The notes come right under People, in the dive detail as in “Edit dive”.",
