@@ -105,12 +105,20 @@ export function gasGroupLabel(items, words) {
 /**
  * The accessible name of the Equipment card: "Equipment: dry suit, weights 35
  * lb. Show details" (the suit only when there is one).
- * @param {{ suit: string, weight: string, open: boolean }} state
+ * @param {{ suit: string, weight: string, open: boolean, opens?: boolean }} state
  * @param {{ both: string, weightOnly: string, suitOnly: string, show: string, hide: string }} words
  *   both: "Equipment: {suit}, weights {weight}"; weightOnly: "Equipment: weights {weight}";
  *   suitOnly: "Equipment: {suit}"; show / hide: the action appended ("Show details")
  */
-export function equipmentLabel({ suit, weight, open }, words) {
+export function equipmentLabel({ suit, weight, open, opens = true }, words) {
   const base = (suit && weight ? words.both : weight ? words.weightOnly : words.suitOnly).replace('{suit}', suit).replace('{weight}', weight);
-  return `${base}. ${open ? words.hide : words.show}`;
+  return opens ? `${base}. ${open ? words.hide : words.show}` : base;
 }
+
+/**
+ * Whether opening the Equipment card shows something more than the total
+ * (Christian, 12 November 2026: no chevron when it would change nothing):
+ * several weights, or one whose location is known.
+ * @param {{ description?: string }[]} weights the weights that are set
+ */
+export const equipmentOpens = (weights) => weights.length > 1 || (weights.length === 1 && !!weights[0].description && weights[0].description !== 'unknown');
