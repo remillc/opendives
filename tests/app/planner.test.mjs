@@ -238,9 +238,10 @@ test('SAC: rounded to its step before it is shown or used, two decimals in cuft/
   assert.equal(Math.abs(measured - cuft(0.36)) <= 1, true, 'the value used is the rounded one');
   assert.equal(rules.roundSacMl(measured, true), measured, 'rounding twice changes nothing');
   assert.equal(rules.roundSacMl(cuft(0.3549), true), Math.round(cuft(0.35)));
-  assert.equal(rules.roundSacMl(17300, false), 17500, 'litres: 0.5 L/min steps');
+  assert.equal(rules.roundSacMl(17300, false), 17300, 'litres: two decimals too since task 71 (was 0.5 L/min steps)');
+  assert.equal(rules.roundSacMl(17304, false), 17300);
   assert.equal(rules.roundSacMl(17000, false), 17000);
-  assert.equal(rules.sacStepMl(false), 500);
+  assert.equal(rules.sacStepMl(false), 10);
 });
 
 test('SAC menu: steps around the value, within the limits, the value itself when off them', () => {
