@@ -193,11 +193,7 @@ async function check(name, sys, expected, { alarms } = {}) {
   });
   same(`${name}: CNS and OTU`, numbers(ui.oxygen), [ref.cns, ref.otu]);
   if (alarms) {
-    ref.cylinders.forEach((c, i) => {
-      const carried = expected.cylinders[i].carriedMl ?? 0;
-      const total = c.gasUsedMl + c.reserveMl;
-      same(`${name}: gas ${i + 1} short alarm`, ui.rows[i].alarm, carried > 0 && carried < total);
-    });
+    ref.cylinders.forEach((c, i) => yes(`${name}: gas ${i + 1} is in the normal colour`, !ui.rows[i].alarm, JSON.stringify(ui.rows[i])));
   }
   return { ref, ui, sent };
 }
@@ -345,30 +341,6 @@ async function run() {
     cylinders: [air(), { o2Permille: 500, hePermille: 0 }],
   });
 
-  // 8. The "Volume transporté" alarm (volume carried) -------------------------------------------------
-  await openNew();
-  await type(T('plan.depth'), 0, '100');
-  await type(T('plan.duration'), 0, '20');
-  await settle();
-  const total = (() => 0)();
-  let probe = await read();
-  const totalCuft = number(probe.rows[0].value);
-  await type(T('plan.carried'), 0, String(totalCuft - 5));
-  const shortReq = { ...base, levels: [{ depthMm: 30480, durationSeconds: 1200 }], cylinders: [air({ carriedMl: Math.round((totalCuft - 5) * ML_PER_CUFT) })] };
-  const shortRun = await check('8a carried below the total', 'imperial', shortReq, { alarms: true });
-  yes('8a the alarm is on, with the missing volume', shortRun.ui.rows[0].alarm && /short/.test(shortRun.ui.rows[0].hint), JSON.stringify(shortRun.ui.rows[0]));
-  await type(T('plan.carried'), 0, String(totalCuft + 20));
-  const enough = await check('8b carried above the total', 'imperial', { ...shortReq, cylinders: [air({ carriedMl: Math.round((totalCuft + 20) * ML_PER_CUFT) })] }, { alarms: true });
-  yes('8b no alarm', !enough.ui.rows[0].alarm, JSON.stringify(enough.ui.rows[0]));
-  await type(T('plan.carried'), 0, '');
-  const none = await check('8c nothing carried', 'imperial', { ...base, levels: [{ depthMm: 30480, durationSeconds: 1200 }], cylinders: [air()] }, { alarms: true });
-  yes('8c no alarm when the volume is not given', !none.ui.rows[0].alarm, JSON.stringify(none.ui.rows[0]));
-  // exactly the total: not short (the rule is strict)
-  const exact = Math.ceil(totalCuft + 0.5);
-  await type(T('plan.carried'), 0, String(exact));
-  const atTotal = await settle().then(read);
-  yes('8d a carried volume of at least the total shows no alarm', !atTotal.rows[0].alarm, JSON.stringify(atTotal.rows[0]));
-
   // 9. The bottom gas MOD alarm ---------------------------------------------------------------------------
   await useUnits('metric');
   await openNew();
@@ -453,11 +425,10 @@ async function run() {
   await type(T('plan.heliumPercent'), 0, '35');
   await click('button.od-planner--add', T('plan.addGas'));
   await click('button.od-planner--add', T('plan.addGas'));
-  await type(T('plan.carried'), 1, '12');
   const saved = await check('12 the plan to save', 'metric', {
     ...base,
     levels: [{ depthMm: 45000, durationSeconds: 1500 }],
-    cylinders: [{ o2Permille: 210, hePermille: 350 }, { o2Permille: 500, hePermille: 0, carriedMl: 12000 }, { o2Permille: 1000, hePermille: 0 }],
+    cylinders: [{ o2Permille: 210, hePermille: 350 }, { o2Permille: 500, hePermille: 0 }, { o2Permille: 1000, hePermille: 0 }],
   }, { alarms: true });
   yes('12 the save is allowed', !(await read()).saveDisabled);
   const account = await p.eval(`document.querySelector('#view-account')?.textContent ?? ''`);
@@ -493,7 +464,7 @@ async function run() {
   await p.waitFor(`!!__od.root()?.querySelector('.od-planner--outcome .od-planner--plan')`, 'the reopened plan');
   await settle();
   const reopened = await read();
-  same('12 reopened after a reload: fields', await p.eval(`[__od.field(${q(T('plan.depth'))}, 0).value, __od.field(${q(T('plan.duration'))}, 0).value, __od.field(${q(T('plan.oxygenPercent'))}, 1).value, __od.field(${q(T('plan.carried'))}, 1).value]`), ['45', '25', '50', '12']);
+  same('12 reopened after a reload: fields', await p.eval(`[__od.field(${q(T('plan.depth'))}, 0).value, __od.field(${q(T('plan.duration'))}, 0).value, __od.field(${q(T('plan.oxygenPercent'))}, 1).value]`), ['45', '25', '50']);
   same('12 reopened after a reload: the same result', [number(reopened.title), reopened.stops.length, reopened.oxygen], [minutes(saved.ref.runtimeSeconds), saved.ref.stops.length, saved.ui.oxygen]);
   same('12 reopened: the alarm is the same', reopened.rows.map((x) => x.alarm), saved.ui.rows.map((x) => x.alarm));
   await core('setPrefs', { changes: { descentMmMin: setupBeforeReopen.descentMmMin, reserveMbar: setupBeforeReopen.reserveMbar } });

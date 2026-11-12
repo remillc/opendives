@@ -1552,6 +1552,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Planificateur : le champ facultatif « Volume transporté » de chaque gaz disparaît, avec la couleur d’alarme de « Volume nécessaire par gaz », qui affiche toujours le total, le volume consommé et la réserve dans la couleur normale. Les plans enregistrés qui avaient un volume transporté s’ouvrent toujours.",
       "Planificateur : les étiquettes des niveaux du graphique ne se chevauchent plus.",
       "Planificateur : « Simplifier le profil » dans le menu ⋮ remplace le profil mesuré de la plongée de départ par quelques niveaux (profondeur et durée) à modifier comme dans un nouveau plan ; « Annuler » rend le profil mesuré.",
       "Une plongée seule dans son voyage (un voyage d’une plongée, que le Carnet n’affiche pas comme voyage) ne propose plus « Retirer du voyage » ; un voyage sans nom s’affiche « Voyage du … » dans la fiche.",
@@ -1888,7 +1889,6 @@
     "sacDeco": "Pendant la déco",
     "sacFromDive": "Au fond : mesurée pendant la plongée. Pendant la déco : d’après les réglages du planificateur.",
     "sacFromSettings": "D’après les réglages du planificateur.",
-    "carried": "Volume transporté (facultatif)",
     "conditions": "Conditions",
     "altitude": "Altitude",
     "conditionsDefault": "Valeurs par défaut reprises des réglages",
@@ -1900,8 +1900,7 @@
     "intervalOverlap": "Ce moment chevauche une plongée du carnet",
     "volumes": "Volume nécessaire par gaz",
     "volumeBottom": "{used} consommés et {reserve} de réserve pour remonter à deux",
-    "volumeDeco": "{used} consommés et {reserve} de réserve",
-    "volumeShort": "Il manque {missing}."
+    "volumeDeco": "{used} consommés et {reserve} de réserve"
   },
   "filter": {
     "title": "Filtrer",

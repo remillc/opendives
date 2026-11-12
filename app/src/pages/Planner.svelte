@@ -29,7 +29,7 @@
   import { ios } from '../lib/layout.svelte.js';
   import { WATER_TYPES, altitudeToPressureMbar, formatHoursMinutes, pressureToAltitudeMm, waterTypeName, waterTypeOfSalinity } from '../lib/tools.js';
   import { sharePlanPdf, sharePlanSummary } from '../lib/share.js';
-  import { MM_PER_FT, ML_PER_CUFT, O2_CHOICES, HE_CHOICES, altitudePresets, carriedToMl, depthToMm, gasTotalMl, gasValid, isShort, mlToCarried, modAlarm, mmToDepth, roundSacMl, sacChoices } from '../lib/planner-rules.js';
+  import { MM_PER_FT, ML_PER_CUFT, O2_CHOICES, HE_CHOICES, altitudePresets, depthToMm, gasTotalMl, gasValid, modAlarm, mmToDepth, roundSacMl, sacChoices } from '../lib/planner-rules.js';
 
   /**
    * `reopen`: the route /plans/<id>, a saved plan; otherwise /plan/new or /plan/<dive id>.
@@ -204,15 +204,13 @@
   const parse = (text) => (text.trim() === '' ? NaN : Number(text.trim().replace(',', '.')));
 
   let levelFields = $state(/** @type {{ key: number, depth: string, time: string }[]} */ ([]));
-  let gasFields = $state(/** @type {{ key: number, o2: string, he: string, carried: string }[]} */ ([]));
+  let gasFields = $state(/** @type {{ key: number, o2: string, he: string }[]} */ ([]));
   let altitudeField = $state('');
   let gfLowField = $state('');
   let gfHighField = $state('');
   /** @type {Record<string, boolean>} */
   let invalid = $state({});
   let nextKey = 0;
-
-  const volumeValue = (/** @type {number} */ ml) => (ml > 0 ? show(mlToCarried(ml, cuft), 1) : '');
 
   /** The altitude of the plan as typed: a whole foot or metre (read from a dive's surface pressure it has no useful decimal). */
   const altitudeText = () => show(Math.max(0, Math.round(mmToDepth(pressureToAltitudeMm(planner.surfacePressureMbar), feet))));
@@ -231,7 +229,6 @@
       key: nextKey++,
       o2: show(g.o2Permille / 10),
       he: show(g.hePermille / 10),
-      carried: volumeValue(g.carriedMl),
     }));
     altitudeField = altitudeText();
     gfLowField = show(planner.deco.gfLow);
@@ -310,22 +307,10 @@
     invalid[`gas-${f.key}`] = false;
   }
 
-  /** The volume carried, optional: empty means not given. @param {number} i */
-  function carriedChanged(i) {
-    const f = gasFields[i];
-    if (f.carried.trim() === '') {
-      invalid[`carried-${f.key}`] = false;
-      planner.gases[i].carriedMl = 0;
-      planner.version++;
-      return;
-    }
-    typed(`carried-${f.key}`, f.carried, cuft ? 1 : 10, cuft ? 1000 : 30000, (v) => (planner.gases[i].carriedMl = carriedToMl(v, cuft)));
-  }
-
   function addGas() {
     const gas = nextGas();
     planner.gases.push(gas);
-    gasFields.push({ key: nextKey++, o2: show(gas.o2Permille / 10), he: show(0), carried: '' });
+    gasFields.push({ key: nextKey++, o2: show(gas.o2Permille / 10), he: show(0) });
     planner.version++;
   }
 
@@ -333,7 +318,6 @@
   function removeGas(i) {
     planner.gases.splice(i, 1);
     delete invalid[`gas-${gasFields[i].key}`];
-    delete invalid[`carried-${gasFields[i].key}`];
     gasFields.splice(i, 1);
     planner.version++;
   }
@@ -529,10 +513,7 @@
       : '',
   );
 
-  /**
-   * "Volume nécessaire par gaz": what is breathed plus the reserve. The volume
-   * carried, when given, turns an insufficient total into an alarm.
-   */
+  /** "Volume nécessaire par gaz": what is breathed plus the reserve. */
   const volumeRows = $derived.by(() => {
     if (!result) return [];
     const bottomIndex = result.minimumGas?.cylinder ?? 0;
@@ -540,17 +521,12 @@
       const used = formatGasVolume(c.gasUsedMl, prefs);
       const reserve = formatGasVolume(c.reserveMl, prefs);
       const total = gasTotalMl(c);
-      const carried = planner.gases[i]?.carriedMl ?? 0;
-      const short = isShort(carried, total);
-      const parts = [t(i === bottomIndex ? 'plan.volumeBottom' : 'plan.volumeDeco', { used, reserve })];
-      if (short) parts.push(t('plan.volumeShort', { missing: formatGasVolume(total - carried, prefs) }));
       const whole = c.gasUsedMl + c.reserveMl;
       return {
         key: i,
         label: gasName(c.o2Permille, c.hePermille),
-        hint: parts.join(' '),
+        hint: t(i === bottomIndex ? 'plan.volumeBottom' : 'plan.volumeDeco', { used, reserve }),
         value: formatGasVolume(total, prefs),
-        alarm: short,
         usedPercent: whole > 0 ? (c.gasUsedMl / whole) * 100 : null,
         hasReserve: c.reserveMl > 0,
         barLabel: t('plan.volumeBar', { used, reserve }),
@@ -785,12 +761,6 @@
               {/if}
             </div>
             <p class="od-planner--helper od-planner--inner">{gasHelper(i)}</p>
-            <div class="od-planner--pair od-planner--with-remove">
-              <TextField label={t('plan.carried')} bind:value={gas.carried} inputmode="decimal" invalid={invalid[`carried-${gas.key}`]} oninput={() => carriedChanged(i)}>
-                {#snippet trailing()}<span class="od-planner--unit">{t(cuft ? 'units.cubicFeet' : 'units.liters')}</span>{/snippet}
-              </TextField>
-              <span class="od-planner--remove" aria-hidden="true"></span>
-            </div>
           </div>
         {/each}
         <button type="button" class="od-planner--add" onclick={addGas}><Icon name="plus" size={18} />{t('plan.addGas')}</button>
@@ -896,7 +866,7 @@
                   </span>
                 {/if}
               </span>
-              <span class="od-planner--value od-value" class:od-planner--alarm={row.alarm}>{row.value}</span>
+              <span class="od-planner--value od-value">{row.value}</span>
             </div>
           {/each}
           {#if modRow}

@@ -1552,6 +1552,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Planner: the optional “Volume carried” field of each gas is gone, and with it the alarm colour on “Volume needed per gas”, which now always shows the total, what is used and the reserve in the normal colour. Saved plans that had a volume carried still open.",
       "Planner: the level labels of the chart no longer overlap.",
       "Planner: “Simplify profile” in the ⋮ menu replaces the measured profile of the starting dive with a few levels (depth and duration) to edit as in a new plan; “Undo” brings the measured profile back.",
       "A dive alone in its trip (a one-dive trip, which the Logbook does not show as a trip) no longer offers “Remove from trip”; an unnamed trip shows as “Trip starting on …” in the detail.",
@@ -1888,7 +1889,6 @@
     "sacDeco": "During deco",
     "sacFromDive": "At the bottom: measured during the dive. During deco: from the planner settings.",
     "sacFromSettings": "From the planner settings.",
-    "carried": "Volume carried (optional)",
     "conditions": "Conditions",
     "altitude": "Altitude",
     "conditionsDefault": "Default values from Settings",
@@ -1900,8 +1900,7 @@
     "intervalOverlap": "This time overlaps a dive of the logbook",
     "volumes": "Volume needed per gas",
     "volumeBottom": "{used} used and {reserve} reserve to ascend as two",
-    "volumeDeco": "{used} used and {reserve} reserve",
-    "volumeShort": "{missing} short."
+    "volumeDeco": "{used} used and {reserve} reserve"
   },
   "filter": {
     "title": "Filter",
