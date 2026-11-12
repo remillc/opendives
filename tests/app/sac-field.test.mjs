@@ -3,10 +3,10 @@ import assert from 'node:assert/strict';
 import { ML_PER_CUFT } from '../../app/src/lib/planner-rules.js';
 import { parseSac, sacMax, sacPresets, sacPresetText, sacText } from '../../app/src/lib/sac-field.js';
 
-test('presets: 0 to 2 cuft/min by 0.5, 0 to 60 L/min by 15', () => {
+test('presets: 0 to 2 cuft/min by 0.5, 10 to 30 L/min by 5 (typing up to 60 L/min)', () => {
   assert.deepEqual(sacPresets(true).map((p) => p.unit), [0, 0.5, 1, 1.5, 2]);
-  assert.deepEqual(sacPresets(false).map((p) => p.unit), [0, 15, 30, 45, 60]);
-  assert.equal(sacPresets(false)[2].ml, 30000);
+  assert.deepEqual(sacPresets(false).map((p) => p.unit), [10, 15, 20, 25, 30]);
+  assert.equal(sacPresets(false)[2].ml, 20000);
   assert.equal(sacPresets(true)[1].ml, Math.round(0.5 * ML_PER_CUFT));
   assert.equal(sacMax(true), 2);
   assert.equal(sacMax(false), 60);

@@ -6,10 +6,14 @@ import { ML_PER_CUFT } from './planner-rules.js';
 
 // The presets, in the user's unit. Easy to change: this is the one place.
 export const SAC_PRESETS_CUFT = [0, 0.5, 1, 1.5, 2];
-export const SAC_PRESETS_LITERS = [0, 15, 30, 45, 60];
+// Metric: the usual SAC of divers, 10 to 30 L/min by 5 (Christian, 12 November 2026).
+export const SAC_PRESETS_LITERS = [10, 15, 20, 25, 30];
+/** The largest SAC that can be typed, in the user's unit. */
+export const SAC_MAX_CUFT = 2;
+export const SAC_MAX_LITERS = 60;
 
-/** The largest SAC, in the user's unit: the last preset. @param {boolean} cuft */
-export const sacMax = (cuft) => (cuft ? SAC_PRESETS_CUFT : SAC_PRESETS_LITERS).at(-1) ?? 0;
+/** The largest SAC that can be typed, in the user's unit. @param {boolean} cuft */
+export const sacMax = (cuft) => (cuft ? SAC_MAX_CUFT : SAC_MAX_LITERS);
 
 /** ml/min in the user's unit. @param {number} ml @param {boolean} cuft */
 const toUnit = (ml, cuft) => ml / (cuft ? ML_PER_CUFT : 1000);
