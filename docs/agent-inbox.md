@@ -1696,3 +1696,11 @@ Christian's answer to your question about the hidden third cylinder of dive 8854
 
 Done in `feature/unused-cylinders-shown`: `includeUnusedTanks` joins `OD_CORE_DEFAULTS` (on at the first start unless this device has a value, and after a reset). `cylinderListed` and `unusedShown` (lib/gas-summary.js, tested): the dive detail Gaz card, the Gaz summary and the gas page of Modifier la plongée list every cylinder with the setting on, the core's `used` ones with it off; a listed cylinder that was not used (core rule, and no pressure drop) is drawn full without the pale band or lines, with "Non utilisée" or its one pressure. The PDF sheet keeps its own rule (used, or with a start pressure). Checked on Christian's phone with dive 88548 (its bailout now shows, "Non utilisée").
 
+
+## [ ] 2026-11-12-57 Collapsed Conditions: grey stars, no number
+
+Christian's request, on the collapsed "Conditions" row of "Modifier la plongée" (task 44). Mock-up: `android-edition`.
+- The average stars are drawn in grey (#9A9DA1, fill and outline), not in ink: they are a summary to read, not stars to touch.
+- The number ("2,3") is removed. The row shows the title, "Eau 4,3 °C" under it, the grey stars and the chevron.
+- The accessible name keeps the average: "Conditions, moyenne 2,3 sur 5, eau 4,3 °C. Afficher le détail".
+- Dark mode: the matching grey from the dark palette. Tablet and iOS: the same.
