@@ -2017,3 +2017,35 @@ Christian's request (this replaces the "do not build it yet" note in the task 79
 **Addendum to task 80 (12 November 2026):** no dotted vertical line for the exit. "Sortie" goes at the **end of the profile** (last sample), with entry time + profile length (11:23 in the mock-up, whose profile lasts 82:50), and the average-depth line runs across the whole profile. Christian noticed the profile went on past the old exit mark (78 min = the file's duration, shorter than its samples).
 
 Done in `feature/profile-full-width` (c28f81e) and on main: a second label row under the time axis, "Entrée" at time zero and "Sortie" at the last sample (entry time + profile length, rounded to the minute), no vertical line; dashed average-depth line across the profile from the core's meanDepthMm, labelled "moy. N" in the depth-label column (nudged off a depth label if they overlap, `lib/profile-times.js`, tested); accessible name extended; the shared PDF/PNG profile includes them. Checked on the phone emulator. Note: the exit time can differ by a minute from the info grid's Sortie, which uses the dive's duration.
+
+## [ ] 2026-11-12-81 Blue theme ("ocean-night"), header fixes, small UI changes
+
+Christian's request (TODO #45). Spec: `docs/system-design.md`, paragraph "Blue theme (decided on 12 November 2026)" and the colour-roles table. Every mock-up of the canvas is now blue; the sand-and-copper screens are kept for reference on the canvas page "Du sable au cuivre". Put every colour in tokens, nothing hard-coded.
+- **Primary stays the ink** (#1F2124): main buttons stay black.
+- **Header bands and side-menu band:** gradient 165°, #D4E2F2 0 %, #7199C2 55 %, #2D5E90 100 % (`--od-band-gradient`). Summary text stays #3D3A33, warm neutrals unchanged (#F4F4F2, #E3E1DC).
+- **Secondary (selection, active state, tonal buttons, check badge, active row of the drawer):** #114477 / on #FFFFFF / container #D4E2F2 / on-container #0B2440; dark #8FB6E6 / #0B2440 / #1E3552 / #D4E2F2. Selected fill (old #FCE9C6) becomes #E6EEF8.
+- **Tertiary (data series: temperature curve and chip, statistics charts):** the old rust and sand, #B4530F / #FFFFFF / #FBE3B2 / #3D2200; dark #F0A66B / #3D2200 / #4A3216 / #FBE3B2. The temperature chip label becomes "Temp." on the phone (full word on tablet).
+- **Water:** #D4E2F2 at the surface to #5584B5 at 60 m and deeper, mixed by maximum depth as before (profile, dive-list thumbnails, desaturation bars, plan thumbnails). Dark: #BFD6F0 to #4C8BD4, light line outlined in #121314 as today. The black profile line keeps at least 3:1 on #5584B5.
+- **Gas cylinder drawings:** water colours (#A9C4E2 to #5584B5, light fill #CFDEF0; dark #BFD6F0 to #4C8BD4, fill #2A4466). Their dashed start/end marks are **red** (#C62828, dark #FF8A80), an exception to "red for alarms only".
+- **Progress bars** (dive download, account import, map download and update): wavy indicator and end dot #114477 on a #D4E2F2 track.
+- **Decorative icon circles** (share sheet, plan share sheet, sync error screens): sand #FBE3B2 with ink icons.
+- **Header band (Android "titled" band), to match the mock-ups:** keep the faint profile curve at the bottom (34 dp, bottom 2 dp), and make the wave 20 dp tall at bottom −2 dp so no thin line shows under it. Title on its own line in Roboto 28/36 weight 500, top padding as in `android-carnet`.
+- **Dialogs over a band** (sync conflict): the ☰ button must sit under the scrim and dialog.
+- **Logo:** stays as is for now; a blue version will follow in a separate task.
+- Unchanged: alarm red, oxygen green, pending brown.
+
+Reference mock-ups: `android-carnet`, `android-accueil-c`, `detail3-android`, `detail3-android-sombre`, `appbar-tiroir-android-ouvert`, `android-stats`, `outils-desaturation-android`, `partage-android`, `android-telechargement-encours`, `android-etat-conflit-ordinateurs`. Check light and dark on the phone emulator.
+
+**Addendum to task 81 (12 November 2026):** the colour chart is updated for the blue theme, `docs/mockups/palette-roles.dc.html` (secondary = ocean-night blue, tertiary = rust and sand, with the contrast ratios). Use it as the reference for the role tokens (`--od-secondary*`, `--od-tertiary*`) in light and dark.
+
+## [ ] 2026-11-12-82 Blue logo
+
+Christian chose proposal A "ocean-night" (spec: `docs/system-design.md`, blue theme paragraph; mock-up `docs/mockups/logo-bleu.dc.html`, rows "A"). Same drawing, only the three wave gradients change: light #D4E2F2→#BCD2EB, #8FB0D6→#7199C2, #3F6F9F→#2D5E90; dark #D6E4F4→#BED3EC, #93B6E0→#77A0D2, #4F84C2→#3A6FAE. The brand sources in `docs/brand/` are already updated. Regenerate everything made from them: `app/public/favicon.svg`, `logo-light.svg`, `logo-dark.svg`, `logo-small-light.svg`, the Android launcher icons (adaptive foreground, round, legacy), the iOS app icon and the splash screen. Check the 24 and 32 px sizes on the emulator.
+
+
+## [ ] 2026-11-12-83 Detail info grid, list margins, fr-CA formats
+
+Christian's decisions of 12 November 2026.
+- **Info grid of the dive detail:** remove the Entrée, Sortie and Prof. moyenne cells everywhere (phone and tablet, light and dark, with the cursor, with the menu open, iOS too). The profile chart already shows these three values (task 80). The grid starts with Air.
+- **Dive list margins:** the mock-ups are the reference, row padding 16 dp start and 24 dp end. On Christian's phone screenshot the margins look wider (about 25 / 33 dp). Check where the extra space comes from and align on 16 / 24.
+- **fr-CA formats:** in French (Canada), times use "10 h 44" and feet use "pi" (and other fr-CA unit labels). Check that every screen formats times and units through the locale, not with hard-coded "10:44" or "ft". The mock-ups will be updated to match.

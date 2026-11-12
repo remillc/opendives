@@ -53,7 +53,7 @@ h1,h2,h3,h4,h1 *,h2 *,h3 *,h4 *,[style*='font-size: 2'],[style*='font-size: 3'],
     <div style="background: #FFFFFF; border-radius: 10px; overflow: hidden">
       <a href="tablette-carnet.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 60px; padding: 8px 16px; box-sizing: border-box; border-bottom: 0.5px solid #E8E8E5; color: #000000; text-decoration: none">
         <svg width="56" height="36" viewBox="0 0 56 36" preserveAspectRatio="none" role="img" aria-label="Profil de la plongée de départ, 94 ft au plus profond" style="flex: none; border-radius: 4px; background: #F4F4F2">
-          <defs><linearGradient id="tsrc" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color: #FBE3B2"></stop><stop offset="1" style="stop-color: {{srcBottom}}"></stop></linearGradient></defs>
+          <defs><linearGradient id="tsrc" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color: #D4E2F2"></stop><stop offset="1" style="stop-color: {{srcBottom}}"></stop></linearGradient></defs>
           <path d="{{srcArea}}" style="fill: url(#tsrc); stroke: none"></path>
           <path d="{{srcLine}}" style="fill: none; stroke: #1F2124; stroke-width: 1.25; vector-effect: non-scaling-stroke"></path>
         </svg>
@@ -80,7 +80,7 @@ h1,h2,h3,h4,h1 *,h2 *,h3 *,h4 *,[style*='font-size: 2'],[style*='font-size: 3'],
     </div>
     <div style="border-radius: 10px; overflow: hidden; background: #F4F4F2">
       <svg width="536" height="200" viewBox="0 0 536 200" preserveAspectRatio="none" role="img" aria-label="Profil prévu : 92 ft pendant 30 min, paliers à 20 et 10 ft" style="display: block">
-        <defs><linearGradient id="tpl-w" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color: #FBE3B2"></stop><stop offset="1" style="stop-color: {{bottom}}"></stop></linearGradient></defs>
+        <defs><linearGradient id="tpl-w" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color: #D4E2F2"></stop><stop offset="1" style="stop-color: {{bottom}}"></stop></linearGradient></defs>
         <path d="{{area}}" style="fill: url(#tpl-w); stroke: none"></path>
         <path d="{{line}}" style="fill: none; stroke: #1F2124; stroke-width: 2; vector-effect: non-scaling-stroke"></path>
       </svg>
@@ -109,7 +109,7 @@ h1,h2,h3,h4,h1 *,h2 *,h3 *,h4 *,[style*='font-size: 2'],[style*='font-size: 3'],
 // Résultat réel du planificateur de Subsurface (cœur compilé sans Qt).
 var PTS = [[0,0],[93,28],[1800,28],[1948,6],[1980,6],[2000,3],[2280,3],[2300,0]];
 function mix(f) {
-  var a = [0xFB, 0xE3, 0xB2], b = [0xB4, 0x53, 0x0F];
+  var a = [0xD4, 0xE2, 0xF2], b = [0x55, 0x84, 0xB5];
   f = Math.max(0, Math.min(1, f));
   return 'rgb(' + a.map(function (v, i) { return Math.round(v + (b[i] - v) * f); }).join(',') + ')';
 }

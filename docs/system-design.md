@@ -53,8 +53,8 @@ The theme is **black and white**: a neutral light background, actions without a 
 | `--od-tint` | #E8E8E5 | #2E3033 | Pills (gases, buddies, tags), secondary button, selected item |
 | `--od-separator` | #DADAD6 | #3A3C40 | Separators and outlines |
 | `--od-outline` | #74777C | #8E9196 | Dashed outline of an empty profile thumbnail |
-| `--od-water-top` | #FBE3B2 | #E5B961 | Top of the water column |
-| `--od-water-bottom` | #B4530F | #EF7625 (tempered amber) | Water column at 60 m and deeper; in between, the colour is mixed according to the maximum depth |
+| `--od-water-top` | #D4E2F2 | #BFD6F0 | Top of the water column |
+| `--od-water-bottom` | #5584B5 (3:1 or more with the #1F2124 line) | #4C8BD4 | Water column at 60 m and deeper; in between, the colour is mixed according to the maximum depth |
 | `--od-trace` | #1F2124 (3.2:1 on the bottom of the water) | #F4F4F2, 2 px, over a 4.5 px #121314 outline | Profile line |
 | `--od-alarm` | #C62828 (5.1:1) | #FF8A80 (8.1:1) | Ceiling violated, fast ascent, insufficient gas reserve, errors; never anywhere else |
 | `--od-oxygen` | #2E7D32 (4.7:1) | #7FD283 | ppO2 curve, nitrox and oxygen mixes |
@@ -65,11 +65,13 @@ The theme is **black and white**: a neutral light background, actions without a 
 | Role | Light: colour / on / container / on-container | Dark: colour / on / container / on-container | Use, and only this one |
 | --- | --- | --- | --- |
 | Primary (ink) | #1F2124 / #FFFFFF / #E8E8E5 / #1F2124 | #F4F4F2 / #1F2124 / #2E3033 / #F4F4F2 | Main actions, links, text (unchanged) |
-| Secondary (rust and sand) | #B4530F / #FFFFFF / #FBE3B2 / #3D2200 | #F0A66B / #3D2200 / #4A3216 / #FBE3B2 | Selection and active state (check badge, selected card, active row of the side menu), tonal buttons, small accents; never an alert. Rust text on the light background is 4.6:1: short bold labels only |
-| Tertiary (blue) | #2F6DB5 / #FFFFFF / #DCE8F7 / #0F2F55 | #8AB4F8 / #0F2F55 / #1E3A5F / #DCE8F7 | Data series other than the water: temperature, charts of the logbook and of the statistics; sparingly |
+| Secondary (ocean-night blue) | #114477 / #FFFFFF / #D4E2F2 / #0B2440 | #8FB6E6 / #0B2440 / #1E3552 / #D4E2F2 | Selection and active state (check badge, selected card, active row of the side menu), tonal buttons, small accents; never an alert |
+| Tertiary (rust and sand) | #B4530F / #FFFFFF / #FBE3B2 / #3D2200 | #F0A66B / #3D2200 / #4A3216 / #FBE3B2 | Data series other than the water: temperature, charts of the logbook and of the statistics; sparingly. Rust text on the light background is 4.6:1: short bold labels only |
 | Error (red) | #C62828 / #FFFFFF / #FDE2E0 / #5F1010 | #FF8A80 / #3A0A08 / #5C1A16 / #FDE2E0 | Alarms and errors only (unchanged, `--od-alarm`) |
 
 All text pairs reach 4.5:1 and all graphic marks 3:1 (ratios in the reference). Reference: `docs/mockups/palette-roles.dc.html`.
+
+**Blue theme (decided on 12 November 2026, TODO #45).** The interface moves from sand and copper to an "ocean-night" blue. The primary colour stays the ink (#1F2124): main buttons stay black. Header bands and the side-menu band use the gradient #D4E2F2 0 %, #7199C2 55 %, #2D5E90 100 % (165°), with the same faint profile and wave; the summary text in the band stays warm grey (#3D3A33), and the warm neutrals (paper #F4F4F2, menu tint #E3E1DC) are kept. The secondary role becomes blue (table above) and the old rust and sand become the tertiary role, used for data series such as temperature, so that they stand out on blue water. The water is blue: #D4E2F2 at the surface to #5584B5 at 60 m and deeper, a mid blue chosen so that the black profile line keeps at least 3:1; in dark mode #BFD6F0 to #4C8BD4 with the light line outlined in #121314. Gas cylinder drawings use the water colours (#A9C4E2 to #5584B5, light fill #CFDEF0), and their dashed start and end marks are red (#C62828, dark #FF8A80). The logo becomes blue too (proposal A "ocean-night", chosen on 12 November 2026): light mode #D4E2F2 to #BCD2EB, #8FB0D6 to #7199C2, #3F6F9F to #2D5E90; dark mode #D6E4F4 to #BED3EC, #93B6E0 to #77A0D2, #4F84C2 to #3A6FAE. Same drawing and same rule: the top of a layer is always darker than the bottom of the layer above. Reference: `docs/mockups/logo-bleu.dc.html`; the brand files in `docs/brand/` are updated. The alarm red, the oxygen green and the pending brown are unchanged. The sand-and-copper screens are kept for reference on the canvas page "Du sable au cuivre". References: the screens of the canvas and `docs/mockups/palette-roles.dc.html`.
 
 **Dark mode.** Backgrounds are neutral and almost black; the ink becomes #F4F4F2. The water is a tempered amber gradient, from light honey at the surface (#E5B961) to a strong orange at depth (#EF7625), chosen on 5 November 2026: rust looked dull on a dark background, an amber starting from brown was too flat, saturated gradients were too bright. The gradient must stay visible: a shallow dive stays light, a deep dive goes down to the orange. The light profile line has a dark outline, which keeps it readable on the amber and on the background.
 

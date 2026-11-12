@@ -34,7 +34,7 @@ h1,h2,h3,h4,h1 *,h2 *,h3 *,h4 *,[style*='font-size: 2'],[style*='font-size: 3'],
     <sc-for list="{{dives}}" as="d" hint-placeholder-count="3">
       <a href="detail3-ios.dc.html" style="display: flex; align-items: center; gap: 12px; padding: 10px 16px 10px 12px; min-height: 64px; box-sizing: border-box; color: #000000; text-decoration: none; border-bottom: 0.5px solid #DADAD6">
         <svg width="56" height="36" viewBox="0 0 56 36" preserveAspectRatio="none" role="img" aria-label="{{d.alt}}" style="flex: none; border-radius: 4px; background: #F4F4F2">
-          <defs><linearGradient id="{{d.gid}}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color: #FBE3B2"></stop><stop offset="1" style="stop-color: {{d.bottom}}"></stop></linearGradient></defs>
+          <defs><linearGradient id="{{d.gid}}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color: #D4E2F2"></stop><stop offset="1" style="stop-color: {{d.bottom}}"></stop></linearGradient></defs>
           <path d="{{d.area}}" style="fill: url(#{{d.gid}}); stroke: none"></path>
           <path d="{{d.line}}" style="fill: none; stroke: #1F2124; stroke-width: 1.25; vector-effect: non-scaling-stroke"></path>
         </svg>
@@ -53,7 +53,7 @@ h1,h2,h3,h4,h1 *,h2 *,h3 *,h4 *,[style*='font-size: 2'],[style*='font-size: 3'],
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
 function mix(f) {
-  var a = [0xFB, 0xE3, 0xB2], b = [0xB4, 0x53, 0x0F];
+  var a = [0xD4, 0xE2, 0xF2], b = [0x55, 0x84, 0xB5];
   f = Math.max(0, Math.min(1, f));
   return 'rgb(' + a.map(function (v, i) { return Math.round(v + (b[i] - v) * f); }).join(',') + ')';
 }

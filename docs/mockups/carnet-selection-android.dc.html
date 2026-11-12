@@ -31,7 +31,7 @@ h1,h2,h3,h4,h1 *,h2 *,h3 *,h4 *,[style*='font-size: 2'],[style*='font-size: 3'],
     <sc-for list="{{dives}}" as="d" hint-placeholder-count="5">
       <a href="#" role="checkbox" aria-checked="{{d.checked}}" style="display: flex; align-items: center; gap: 16px; padding: 8px 24px 8px 16px; min-height: 72px; box-sizing: border-box; color: #1F2124; text-decoration: none; background: {{d.rowBg}}"><span aria-hidden="true" style="flex: none; width: 18px; height: 18px; box-sizing: border-box; border-radius: 2px; border: 2px solid {{d.boxBorder}}; background: {{d.boxBg}}; display: flex; align-items: center; justify-content: center"><svg width="14" height="14" viewBox="0 0 24 24" style="fill: none; stroke: #FFFFFF; stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; opacity: {{d.mark}}"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span>
         <svg width="56" height="40" viewBox="0 0 56 40" preserveAspectRatio="none" role="img" aria-label="{{d.alt}}" style="flex: none; border-radius: 8px; background: #E8E8E5">
-          <defs><linearGradient id="{{d.gid}}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color: #FBE3B2"></stop><stop offset="1" style="stop-color: {{d.bottom}}"></stop></linearGradient></defs>
+          <defs><linearGradient id="{{d.gid}}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color: #D4E2F2"></stop><stop offset="1" style="stop-color: {{d.bottom}}"></stop></linearGradient></defs>
           <path d="{{d.area}}" style="fill: url(#{{d.gid}}); stroke: none"></path>
           <path d="{{d.line}}" style="fill: none; stroke: #1F2124; stroke-width: 1.25; vector-effect: non-scaling-stroke"></path>
         </svg>
@@ -49,7 +49,7 @@ h1,h2,h3,h4,h1 *,h2 *,h3 *,h4 *,[style*='font-size: 2'],[style*='font-size: 3'],
       <span style="flex: none; width: 56px; height: 40px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2px">
         <sc-for list="{{trip}}" as="t" hint-placeholder-count="4">
           <svg width="27" height="19" viewBox="0 0 27 19" preserveAspectRatio="none" aria-hidden="true" style="border-radius: 4px; background: #E8E8E5">
-            <defs><linearGradient id="{{t.gid}}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color: #FBE3B2"></stop><stop offset="1" style="stop-color: {{t.bottom}}"></stop></linearGradient></defs>
+            <defs><linearGradient id="{{t.gid}}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color: #D4E2F2"></stop><stop offset="1" style="stop-color: {{t.bottom}}"></stop></linearGradient></defs>
             <path d="{{t.area}}" style="fill: url(#{{t.gid}}); stroke: none"></path>
             <path d="{{t.line}}" style="fill: none; stroke: #1F2124; stroke-width: 1; vector-effect: non-scaling-stroke"></path>
           </svg>
@@ -65,7 +65,7 @@ h1,h2,h3,h4,h1 *,h2 *,h3 *,h4 *,[style*='font-size: 2'],[style*='font-size: 3'],
     <sc-for list="{{tripDives}}" as="t2" hint-placeholder-count="4">
       <a href="#" role="checkbox" aria-checked="{{t2.checked}}" style="display: flex; align-items: center; gap: 16px; padding: 8px 12px 8px 12px; min-height: 64px; box-sizing: border-box; color: #1F2124; text-decoration: none; background: {{t2.rowBg}}"><span aria-hidden="true" style="flex: none; width: 18px; height: 18px; box-sizing: border-box; border-radius: 2px; border: 2px solid {{t2.boxBorder}}; background: {{t2.boxBg}}; display: flex; align-items: center; justify-content: center"><svg width="14" height="14" viewBox="0 0 24 24" style="fill: none; stroke: #FFFFFF; stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; opacity: {{t2.mark}}"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span>
         <svg width="56" height="40" viewBox="0 0 56 40" preserveAspectRatio="none" role="img" aria-label="{{t2.alt}}" style="flex: none; border-radius: 8px; background: #E8E8E5">
-          <defs><linearGradient id="{{t2.gid}}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color: #FBE3B2"></stop><stop offset="1" style="stop-color: {{t2.bottom}}"></stop></linearGradient></defs>
+          <defs><linearGradient id="{{t2.gid}}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color: #D4E2F2"></stop><stop offset="1" style="stop-color: {{t2.bottom}}"></stop></linearGradient></defs>
           <path d="{{t2.area}}" style="fill: url(#{{t2.gid}}); stroke: none"></path>
           <path d="{{t2.line}}" style="fill: none; stroke: #1F2124; stroke-width: 1.25; vector-effect: non-scaling-stroke"></path>
         </svg>
@@ -87,7 +87,7 @@ h1,h2,h3,h4,h1 *,h2 *,h3 *,h4 *,[style*='font-size: 2'],[style*='font-size: 3'],
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":880}}'>
 function mix(f) {
-  var a = [0xFB, 0xE3, 0xB2], b = [0xB4, 0x53, 0x0F];
+  var a = [0xD4, 0xE2, 0xF2], b = [0x55, 0x84, 0xB5];
   f = Math.max(0, Math.min(1, f));
   return 'rgb(' + a.map(function (v, i) { return Math.round(v + (b[i] - v) * f); }).join(',') + ')';
 }
