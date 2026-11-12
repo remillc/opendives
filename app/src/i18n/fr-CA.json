@@ -1,9 +1,4 @@
 {
-  "units": {
-    "feet": "pi",
-    "cubicFeet": "pi³",
-    "cubicFeetPerMinute": "pi³/min"
-  },
   "logbook": {
     "deleteText": {
       "one": "La plongée est retirée du carnet, sur cet appareil et dans le nuage. Vous pourrez l'annuler pendant quelques secondes.",
