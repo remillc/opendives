@@ -1925,3 +1925,22 @@ Christian's request. Spec: new paragraph "Sharing a plan", the planner top bar, 
 - New setting, Réglages › Langue et formats › "Format du papier": Automatique (by device region), Lettre, A4. Use it for every printable PDF (the dive PDF sheet too, which today follows the region).
 - Remember the last choices on the device. Tablet and iOS: the same. A line in the release notes.
 - Not now: QR code and share link (later, Christian to decide what they carry).
+
+## [ ] 2026-11-12-77 Read cylinder pressures from a photo (to-do #41): plan first, no code
+
+**Christian asks you not to start the work.** First write here, under this task, a summary of how you plan to build this part of the app, then stop and wait for his go-ahead.
+
+What is designed (spec: new paragraph "Reading cylinder pressures from a photo"; mock-ups `android-manometre-photo`, `-resultat`, `-resultat-deux`, `-illisible`, camera icon in the cylinder sheet and gas editing):
+- A camera icon in the Début and Fin fields opens a full-screen camera, or a photo picked from the gallery ("Photos").
+- One or two gauges in the same image; analog (needle) and digital displays.
+- One gauge: a sheet with the prefilled field to check or correct. Two gauges: one row each with a "Pour" menu to pick the cylinder.
+- Nothing read: a message in the camera, and "Saisir à la main" always available.
+- Everything on the device; the photo is never kept with the dive.
+
+Your summary should cover at least:
+- Camera and gallery on Android and iOS (Capacitor plugins, permissions, the full-screen camera view with its frame).
+- How you read a **digital** display (on-device text recognition: ML Kit on Android, Vision on iOS?) and how you read an **analog** dial (needle angle, scale, unit, two gauges in one picture): libraries or models, size added to the app, accuracy you expect, how you would test it (Christian can take real photos). Say plainly if the needle should come later.
+- How you find one or two gauges in the picture, their order left to right, and the unit (psi or bar).
+- A confidence threshold: when do you show a value, when "Aucune pression lue".
+- Privacy: the photo stays on the device and is deleted afterwards.
+- Effort, steps, and what you would ship first.
