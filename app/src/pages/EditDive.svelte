@@ -26,6 +26,7 @@
   import GasSummary from '../components/GasSummary.svelte';
   import { cylinderListed, fillLevels, unusedShown } from '../lib/gas-summary.js';
   import { gaugeCameraAvailable, runGaugeCamera } from '../lib/gauge-photo.js';
+  import { readGauges } from '../lib/gauge-reading.js';
   import StarsInput from '../components/StarsInput.svelte';
   import Stars from '../components/Stars.svelte';
   import { conditionsMean, roundHalfUp1 } from '../lib/conditions.js';
@@ -456,13 +457,10 @@
 
   /**
    * What the recognised text blocks mean as pressures.
-   * @param {import('opendives-core').GaugeTextBlock[]} _blocks
-   * @param {'bar'|'psi'} _userUnit
-   * @returns {import('../lib/gauge-reading.js').GaugeReading[]}
+   * @param {import('opendives-core').GaugeTextBlock[]} blocks
+   * @param {'bar'|'psi'} userUnit
    */
-  function gaugeDecide(_blocks, _userUnit) {
-    return [];
-  }
+  const gaugeDecide = (blocks, userUnit) => readGauges(blocks, { userUnit });
 
   /** @param {number} key @param {'start'|'end'} field */
   function focusPressure(key, field) {
