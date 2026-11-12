@@ -303,7 +303,6 @@
       right: 0;
       top: calc(var(--f7-safe-area-top) + var(--f7-navbar-height));
       height: 10px;
-      --od-linear-wavy-progress-active: var(--od-primary-action);
     }
 
     .od-editorial-page--spinner {

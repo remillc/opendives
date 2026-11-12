@@ -31,29 +31,32 @@
     --od-on-primary: #FFFFFF;
     --od-primary-container: #E8E8E5;
     --od-on-primary-container: #1F2124;
-    --od-secondary: #B4530F;
+    /* Secondary: the ocean-night blue (selection, active state, tonal buttons). */
+    --od-secondary: #114477;
     --od-on-secondary: #FFFFFF;
-    --od-secondary-container: #FBE3B2;
-    --od-on-secondary-container: #3D2200;
-    --od-tertiary: #2F6DB5;
+    --od-secondary-container: #D4E2F2;
+    --od-on-secondary-container: #0B2440;
+    /* Tertiary: rust and sand, for data series other than the water (temperature, statistics charts). */
+    --od-tertiary: #B4530F;
     --od-on-tertiary: #FFFFFF;
-    --od-tertiary-container: #DCE8F7;
+    --od-tertiary-container: #FBE3B2;
     /* Charts that do not measure depth: smallest value, largest value. */
     /* The stripes of a reserve, on the tertiary container. */
-    --od-tertiary-hatch: #B9D0EE;
-    /* The cylinder bars of the dive detail: pressure used, empty track. */
-    --od-gauge-used: #B9D0EE;
-    --od-gauge-track: #DCE8F7;
-    --od-chart-low: #5B8BCB;
-    --od-chart-high: #24589A;
-    --od-on-tertiary-container: #0F2F55;
+    --od-tertiary-hatch: #EDC691;
+    /* The cylinder bars of the dive detail: pressure used, empty track (water colours). */
+    --od-gauge-used: #A9C4E2;
+    --od-gauge-track: #CFDEF0;
+    --od-chart-low: #C45911;
+    --od-chart-high: #AF4F0F;
+    --od-on-tertiary-container: #3D2200;
     --od-error: var(--od-alarm);
     --od-on-error: #FFFFFF;
     --od-error-container: #FDE2E0;
     --od-on-error-container: #5F1010;
     /* Selection and tonal buttons: the secondary role. */
     --od-selected: var(--od-secondary);
-    --od-selected-container: var(--od-secondary-container);
+    /* The selected fill (a selected card or row): lighter than the container. */
+    --od-selected-container: #E6EEF8;
     --od-tonal: var(--od-secondary-container);
     --od-oxygen: #2E7D32;
     --od-pending: #8A4B00;
@@ -86,18 +89,26 @@
     --od-primary-action: var(--od-action);
     --od-on-primary-action: var(--od-on-action);
     --od-cursor: var(--od-action);
-    --od-water-top: #FBE3B2;
+    --od-water-top: #D4E2F2;
     /* Header band of the sections and of the side menu, the same in dark mode. */
-    --od-band-gradient: linear-gradient(165deg, #FBE3B2 0%, #EFB677 55%, #C97A35 100%);
+    --od-band-gradient: linear-gradient(165deg, #D4E2F2 0%, #7199C2 55%, #2D5E90 100%);
+    /* The faint dive profile drawn at the bottom of a band: its area and its line. */
+    --od-band-profile-area: rgb(255 255 255 / 0.1);
+    --od-band-profile-line: rgb(31 33 36 / 0.22);
     --od-on-band: #1F2124;
     --od-on-band-2: #3D3A33;
-    --od-water-bottom: #B4530F;
-    /* Loading indicator (Android): the water gradient, sand to rust. */
-    --od-loading-indicator-top: #F3C47A;
-    --od-loading-indicator-bottom: #B4530F;
-    /* Drawn cylinders: pale band between the end and the start pressure, and the dashed level lines. */
-    --od-cylinder-breathed: #F6DCAE;
-    --od-cylinder-level: #B4530F;
+    --od-water-bottom: #5584B5;
+    /* Loading indicator (Android): a blue gradient. */
+    --od-loading-indicator-top: #7199C2;
+    --od-loading-indicator-bottom: #2D5E90;
+    /* Drawn cylinders: water gradient, pale band between the end and the start pressure, and the red dashed start and end marks. */
+    --od-cylinder-water-top: #A9C4E2;
+    --od-cylinder-water-bottom: #5584B5;
+    --od-cylinder-breathed: #CFDEF0;
+    --od-cylinder-level: #C62828;
+    /* Progress bars: the wavy indicator and its end dot, on the track. */
+    --od-progress-active: #114477;
+    --od-progress-track: #D4E2F2;
     /* Rebreather drawing (dive detail, CCR): canister, head, hoses, stand, valves. */
     --od-rebreather-canister: #2B2F33;
     --od-rebreather-head: #1F2124;
@@ -117,9 +128,9 @@
     --od-pin: #1F2124;
     --od-on-pin: #FFFFFF;
     --od-temperature: var(--od-tertiary);
-    /* Share sheet: each row's icon in a circle of the water's top colour. */
-    --od-share-circle: var(--od-water-top);
-    --od-share-icon: #8A3E09;
+    /* Share sheet and sync error screens: decorative icon circle, sand with an ink icon. */
+    --od-share-circle: #FBE3B2;
+    --od-share-icon: #1F2124;
     --od-block: var(--od-surface);
     --od-on-block: var(--od-text);
     --od-trace-block: var(--od-trace);
@@ -162,19 +173,20 @@
     --od-on-primary: #1F2124;
     --od-primary-container: #2E3033;
     --od-on-primary-container: #F4F4F2;
-    --od-secondary: #F0A66B;
-    --od-on-secondary: #3D2200;
-    --od-secondary-container: #4A3216;
-    --od-on-secondary-container: #FBE3B2;
-    --od-tertiary: #8AB4F8;
-    --od-on-tertiary: #0F2F55;
-    --od-tertiary-container: #1E3A5F;
-    --od-tertiary-hatch: #2F5A8C;
-    --od-gauge-used: #456A9C;
-    --od-gauge-track: #2E3033;
-    --od-chart-low: #8AB4F8;
-    --od-chart-high: #5B8BCB;
-    --od-on-tertiary-container: #DCE8F7;
+    --od-secondary: #8FB6E6;
+    --od-on-secondary: #0B2440;
+    --od-secondary-container: #1E3552;
+    --od-on-secondary-container: #D4E2F2;
+    --od-tertiary: #F0A66B;
+    --od-on-tertiary: #3D2200;
+    --od-tertiary-container: #4A3216;
+    --od-tertiary-hatch: #6A4A22;
+    --od-gauge-used: #4C8BD4;
+    --od-gauge-track: #2A4466;
+    --od-chart-low: #F0A66B;
+    --od-chart-high: #C97A35;
+    --od-on-tertiary-container: #FBE3B2;
+    --od-selected-container: #1A2D47;
     --od-on-error: #3A0A08;
     --od-error-container: #5C1A16;
     --od-on-error-container: #FDE2E0;
@@ -202,12 +214,16 @@
     --od-action: #F4F4F2;
     --od-on-action: #1F2124;
     --od-cursor: #F4F4F2;
-    --od-water-top: #E5B961;
-    --od-water-bottom: #EF7625;
-    --od-loading-indicator-top: #E5B961;
-    --od-loading-indicator-bottom: #EF7625;
-    --od-cylinder-breathed: #5C4A2A;
-    --od-cylinder-level: #E5B961;
+    --od-water-top: #BFD6F0;
+    --od-water-bottom: #4C8BD4;
+    --od-loading-indicator-top: #BFD6F0;
+    --od-loading-indicator-bottom: #4C8BD4;
+    --od-cylinder-water-top: #BFD6F0;
+    --od-cylinder-water-bottom: #4C8BD4;
+    --od-cylinder-breathed: #2A4466;
+    --od-cylinder-level: #FF8A80;
+    --od-progress-active: #8FB6E6;
+    --od-progress-track: #1E3552;
     --od-rebreather-canister: #3A3E43;
     --od-rebreather-head: #4A4D52;
     /* Lighter than the head: the hoses cross the dark card, not the canister. */
@@ -221,11 +237,11 @@
     /* Dark: the usual selected background, no border. */
     --od-curve-chip-bg: var(--od-primary-container);
     --od-curve-chip-border-width: 0px;
-    --od-pin: #E5B961;
+    --od-pin: #BFD6F0;
     --od-on-pin: #121314;
     --od-temperature: var(--od-tertiary);
-    --od-share-circle: #4A3410;
-    --od-share-icon: #E5B961;
+    --od-share-circle: #4A3216;
+    --od-share-icon: #F4F4F2;
     --od-block: var(--od-surface);
     --od-tint: var(--od-surface-2);
     --od-on-tint: var(--od-text);
@@ -1165,6 +1181,11 @@ html.md {
   background-color: transparent;
 }
 
+/* A dialog or sheet over a band: the ☰ button goes under its scrim. */
+html[class*="with-modal"] .navbar.od-band-bar {
+  z-index: 0;
+}
+
 .navbar.od-band-bar .navbar-bg::after {
   display: none;
 }
@@ -1180,6 +1201,11 @@ html.md {
   --f7-searchbar-input-height: 56px;
   --f7-searchbar-input-border-radius: 28px;
   --f7-searchbar-input-bg-color: var(--od-band-control);
+  /* The band stays light in dark mode, so its field keeps the band's ink, not the page's. */
+  --f7-searchbar-input-text-color: var(--od-on-band);
+  --f7-searchbar-placeholder-color: var(--od-on-band-2);
+  --f7-searchbar-search-icon-color: var(--od-on-band);
+  --f7-searchbar-clear-button-color: var(--od-on-band-2);
   --f7-searchbar-inner-padding-left: 0px;
   --f7-searchbar-inner-padding-right: 0px;
   position: relative;

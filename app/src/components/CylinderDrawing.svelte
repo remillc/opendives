@@ -66,11 +66,11 @@
 
     /* The water gradient: sand to rust (dark: honey to amber). */
     .od-cylinder-drawing--water-top {
-      stop-color: var(--od-loading-indicator-top);
+      stop-color: var(--od-cylinder-water-top);
     }
 
     .od-cylinder-drawing--water-bottom {
-      stop-color: var(--od-loading-indicator-bottom);
+      stop-color: var(--od-cylinder-water-bottom);
     }
 
     /* Between the end and the start pressure: what was breathed. */

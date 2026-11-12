@@ -408,6 +408,7 @@
     "rebreather": "Recycleur",
     "description": "Profil de plongée : {depth} au plus profond, {duration}",
     "temperature": "Température",
+    "temperatureShort": "Temp.",
     "water": "Eau",
     "ppo2": "ppO₂",
     "ceiling": "Plafond",
@@ -1594,6 +1595,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Thème bleu : les bandeaux et le menu latéral passent au bleu océan, tout comme l’eau du profil et des vignettes, les bouteilles dessinées, les sélections et les barres de progression. Le rouille et le sable marquent désormais les données comme la température de l’eau et les graphiques des statistiques. Les boutons principaux restent noirs. Sur le téléphone, le bouton de température indique « Temp. ».",
       "Modifier la plongée : un bouton appareil photo dans les champs Début et Fin de chaque bouteille ouvre un appareil photo pour lire la pression sur un manomètre (Android). Vous pouvez aussi choisir une photo existante avec « Photos », ou saisir la valeur. La photo reste sur l’appareil et n’est pas conservée. Elle lit les affichages numériques (un ou deux manomètres, bar ou psi) et remplit le champ pour vérification ; un cadran à aiguille n’est pas encore lu.",
       "Détail de plongée : la section Gaz d’une plongée en recycleur à circuit fermé dessine le recycleur vu de dos, avec la bouteille de diluant à gauche et l’oxygène à droite ; les bouteilles de secours et les étages sont à côté.",
       "Profil de la plongée : sous l’axe du temps, l’heure d’entrée dans l’eau et l’heure de sortie (fin du profil) ; une ligne pointillée marque la profondeur moyenne sur tout le profil, avec son étiquette « moy. » à gauche. Le nom accessible du profil les indique aussi.",

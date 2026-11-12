@@ -11,6 +11,7 @@
   import { entryExitTimes, meanLabelY } from '../lib/profile-times.js';
   import { tissueColor } from '../lib/tissues.js';
   import { t } from '../lib/i18n.js';
+  import { layout } from '../lib/layout.svelte.js';
 
   /**
    * @type {{
@@ -432,7 +433,7 @@
           }}
         >
           <span class="chip od-dive-profile--chip" class:od-dive-profile--chip-outline={!temperatureLayer} class:od-dive-profile--chip-temperature={temperatureLayer}>
-            {#if temperatureLayer}<Icon name="check" size={18} weight={2.4} />{/if}<span class="chip-label">{t('profile.temperature')}</span>
+            {#if temperatureLayer}<Icon name="check" size={18} weight={2.4} />{/if}<span class="chip-label">{t(layout.phone ? 'profile.temperatureShort' : 'profile.temperature')}</span>
           </span>
         </button>
       {/if}

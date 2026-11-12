@@ -294,7 +294,7 @@ export function profileSvgFromSamples(dive, prefs) {
   const water = `${line}L${x(tMax).toFixed(1)},${y(0).toFixed(1)}L${x(0).toFixed(1)},${y(0).toFixed(1)}Z`;
   const minutes = Math.round(tMax / 60);
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
-<defs><linearGradient id="w" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FBE3B2"/><stop offset="1" stop-color="#E9B97A"/></linearGradient></defs>
+<defs><linearGradient id="w" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#D4E2F2"/><stop offset="1" stop-color="#9EBAD8"/></linearGradient></defs>
 <path d="${water}" fill="url(#w)"/><path d="${line}" fill="none" stroke="#1F2124" stroke-width="2" stroke-linejoin="round"/>
 <line x1="${L}" x2="${W - 6}" y1="${H - B + 4}" y2="${H - B + 4}" stroke="#4A4D52"/>
 <text x="${L - 4}" y="12" font-size="10" text-anchor="end" fill="#4A4D52">0</text>
@@ -400,7 +400,7 @@ function planSvg(result) {
   const dMax = result.maxDepthMm || 1;
   const xy = (/** @type {number} */ s, /** @type {number} */ mm) => `${((s / tMax) * W).toFixed(1)} ${(4 + (mm / dMax) * (H - 8)).toFixed(1)}`;
   const line = 'M' + points.map(([s, mm]) => xy(s, mm)).join(' L');
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}"><path d="${line} L${W} 0 L0 0 Z" fill="#FBE3B2"/><path d="${line}" fill="none" stroke="#1F2124" stroke-width="1.5"/></svg>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}"><path d="${line} L${W} 0 L0 0 Z" fill="#D4E2F2"/><path d="${line}" fill="none" stroke="#1F2124" stroke-width="1.5"/></svg>`;
 }
 
 /**

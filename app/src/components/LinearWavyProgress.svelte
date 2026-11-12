@@ -97,15 +97,15 @@
       }
 
       .od-linear-wavy-progress--wave {
-        stroke: var(--od-linear-wavy-progress-active, var(--od-action));
+        stroke: var(--od-linear-wavy-progress-active, var(--od-progress-active));
       }
 
       .od-linear-wavy-progress--track {
-        stroke: var(--od-linear-wavy-progress-track, var(--od-separator));
+        stroke: var(--od-linear-wavy-progress-track, var(--od-progress-track));
       }
 
       .od-linear-wavy-progress--dot {
-        fill: var(--od-linear-wavy-progress-active, var(--od-action));
+        fill: var(--od-linear-wavy-progress-active, var(--od-progress-active));
         stroke: none;
       }
     }

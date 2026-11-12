@@ -85,12 +85,12 @@
       height: 34px;
 
       .od-section-band--area {
-        fill: rgb(255 255 255 / 0.1);
+        fill: var(--od-band-profile-area);
       }
 
       .od-section-band--line {
         fill: none;
-        stroke: rgb(31 33 36 / 0.22);
+        stroke: var(--od-band-profile-line);
         stroke-width: 1.5;
         stroke-linejoin: round;
       }
@@ -99,9 +99,9 @@
     .od-section-band--wave {
       position: absolute;
       left: 0;
-      bottom: -1px;
+      bottom: -2px;
       width: 100%;
-      height: 18px;
+      height: 20px;
       display: block;
 
       path {
