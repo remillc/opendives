@@ -77,6 +77,8 @@
     --od-text-2: #4A4D52;
     --od-separator: #DADAD6;
     --od-outline: #74777C;
+    /* Stars to read, not to touch (the average of Conditions in the edit screen). */
+    --od-star-summary: #9A9DA1;
     /* Dividers between the rows of a white surface (Sites). */
     --od-row-divider: #ECECEA;
     --od-action: #1F2124;
@@ -185,6 +187,7 @@
     --od-text-2: #B5B8BC;
     --od-separator: #3A3C40;
     --od-outline: #8E9196;
+    --od-star-summary: #75787C;
     --od-row-divider: #3A3C40;
     --od-map-sea: #1E2A36;
     --od-map-land-low: #232426;
