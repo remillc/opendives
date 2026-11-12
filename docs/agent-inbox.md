@@ -1779,7 +1779,7 @@ Christian's correction, in every view of a dive. Task 63 put the Notes card befo
 Done in `feature/notes-under-people`: the detail shows Notes right after Personnes (before Gaz); Modifier la plongée has its Notes card right after Personnes (before Gaz). Phone, tablet and iOS share both files.
 
 
-## [ ] 2026-11-12-65 Advanced setting: "Afficher les champs photos et vidéos", off by default
+## [x] 2026-11-12-65 Advanced setting: "Afficher les champs photos et vidéos", off by default
 
 Christian's request. Spec: new paragraph "Photos and videos fields" in `docs/ui-specification.md`; listed in `docs/advanced-settings.md`.
 - Settings › Carnet, right after "Vagues de surface, flux-reflux et froid": switch **"Afficher les champs photos et vidéos"**, supporting text "Dans le détail et la modification d’une plongée", **off** by default (new installs and "Réinitialiser tous les réglages").
@@ -1788,6 +1788,8 @@ Christian's request. Spec: new paragraph "Photos and videos fields" in `docs/ui-
 - The mock-ups still draw the "Photos et vidéos" section for design purposes: in the app it follows the switch.
 - The example footnotes ("* Exemples…") and their asterisks were removed from the mock-ups; nothing to do in the app.
 - A line in the release notes.
+
+Done in `feature/photos-setting`: app setting `showPhotos` (per device, default off, back to off by the reset through APP_DEFAULTS) with its switch in Settings › Carnet right after the surface waves switch; the dive detail shows "Photos et vidéos" only when it is on (phone, tablet, iOS share the file). Modifier la plongée has no photo or video field or action today, so nothing to hide there.
 
 ## [ ] 2026-11-12-66 Étiquettes right under Notes (replaces the place given in task 62)
 
