@@ -1768,3 +1768,10 @@ Christian's request (now approved; the mock-ups already sent with task 62 show i
 
 Done in `feature/notes-card`: "Personnes" (`edit.peopleGroup`) keeps Guide de palanquée and Compagnons; the Notes field has its own "Notes" card (`edit.notesGroup`) right before Avancé. Order: La plongée, Personnes, Gaz, Équipement, Étiquettes, Conditions, Notes, Avancé. Phone, tablet and iOS share EditDive.
 
+
+## [ ] 2026-11-12-64 Notes right under Personnes (replaces the place given in task 63)
+
+Christian's correction, in every view of a dive. Task 63 put the Notes card before Avancé: **ignore that place**, Notes goes right under Personnes.
+- **Dive detail** (phone light, dark, cursor, menu open, tablet detail panes): data grid, Personnes, **Notes**, Gaz, Équipement, Étiquettes, Conditions, Photos et vidéos.
+- **Modifier la plongée** (phone, cylinder sheet background, tablet edit dialogs): La plongée, Personnes, **Notes**, Gaz, Équipement, Étiquettes, Conditions, Avancé.
+- Mock-ups updated: `detail3-android*`, `detail2-android-menu`, `android-edition`, `android-edition-bouteille`, `android-tablette-*`. iOS: the same order.
