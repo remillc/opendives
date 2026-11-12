@@ -5,6 +5,7 @@
   // dive and for a new dive. The plan, gas volumes, reserve, CNS and OTU all
   // come from the core (Subsurface's planner). Saved, a plan is a planned dive
   // of the logbook, listed by "Plongées planifiées" only.
+  import { placeLevelLabels } from '../lib/chart-labels.js';
   import { Page, Navbar, Link, List, ListItem, Popup, Popover, f7, theme } from 'framework7-svelte';
   import { showSnackbar } from '../lib/snackbar.js';
   import { OpenDivesCore } from 'opendives-core';
@@ -20,7 +21,8 @@
   import TimePickerDialog from '../components/TimePickerDialog.svelte';
   import ShareSheet from '../components/ShareSheet.svelte';
   import { logbook, savePlan } from '../lib/logbook.svelte.js';
-  import { planner, loadSetup, adoptUnitDefaults, planRequest, startFromDive, startNewDive, requestOfPlan, applyRequest, nextGas, planSettings } from '../lib/planner.svelte.js';
+  import { planner, loadSetup, adoptUnitDefaults, planRequest, startFromDive, startNewDive, requestOfPlan, applyRequest, nextGas, planSettings, canSimplify, simplifyPlan, restorePlan } from '../lib/planner.svelte.js';
+  import { simplifyProfile } from '../lib/profile-levels.js';
   import { waterBottomColor } from '../lib/water-column.js';
   import { formatDateTime, formatDuration, formatGasVolume, formatMixName, formatGasLong, formatNumber, formatPartialPressure, formatSac, formatTimeOfDay, decoSummary, depthUnit, locale } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
@@ -152,6 +154,33 @@
         if (mine === run) failed = true;
       });
   });
+
+  /**
+   * "Simplifier le profil": the measured profile of the starting dive becomes a
+   * few levels, edited as in a new plan; "Annuler" brings the profile back.
+   */
+  async function simplify() {
+    f7.popover.close(`#${menuId}`);
+    const source = planner.source;
+    if (!source || planner.simplified) return;
+    try {
+      const dive = await OpenDivesCore.getDive({ id: source.id });
+      let levels = simplifyProfile(dive.samples);
+      if (!levels.length) levels = [{ depthMm: source.maxDepthMm, durationSeconds: Math.max(60, Math.round(source.durationSeconds / 60) * 60) }];
+      if (planner.source?.id !== source.id) return;
+      const before = simplifyPlan(levels);
+      showSnackbar(t('plan.simplified'), {
+        action: t('edit.undo'),
+        onAction: () => {
+          // Only while the plan is still the one that was simplified.
+          if (planner.simplified && planner.source?.id === source.id) restorePlan(before);
+        },
+      });
+    } catch (e) {
+      console.error('Simplifying the profile', e);
+      showSnackbar(t('plan.simplifyFailed'));
+    }
+  }
 
   /** Whole metres or feet. @param {number} mm */
   function depthText(mm) {
@@ -461,21 +490,23 @@
     const ceilingLine = deepest > 0 ? 'M' + ceiling.map(([s, mm]) => xy(s, mm)).join(' L') : '';
     const ceilingArea = ceilingLine ? `${ceilingLine} L${xy(ceiling[ceiling.length - 1][0], 0)} L${xy(ceiling[0][0], 0)} Z` : '';
     // A label on each held level ("100 ft · 15 min"), a new dive only.
-    /** @type {{ left: number, top: number, text: string }[]} */
-    const labels = [];
-    if (!planner.source) {
+    /** @type {{ left: number, top: number, text: string, span: number }[]} */
+    const levelMarks = [];
+    if (!planner.source || planner.simplified) {
       const entered = (result.segments ?? []).filter((s) => s.entered);
       for (let i = 1; i < entered.length; i++) {
         const a = entered[i - 1];
         const b = entered[i];
         if (a.depthMm <= 0 || a.depthMm !== b.depthMm) continue;
-        labels.push({
+        levelMarks.push({
+          span: ((b.timeSeconds - a.timeSeconds) / tMax) * 100,
           left: (((a.timeSeconds + b.timeSeconds) / 2 / tMax) * 100),
           top: ((4 + (a.depthMm / dMax) * (H - 8)) / H) * 100,
           text: `${depthText(a.depthMm)} · ${minutes(b.timeSeconds - a.timeSeconds)}`,
         });
       }
     }
+    const labels = placeLevelLabels(levelMarks);
     return { line, water: `${line} L${W} 0 L0 0 Z`, bottom: waterBottomColor(result.maxDepthMm), ceilingLine, ceilingArea, deepest, labels };
   });
 
@@ -604,6 +635,9 @@
 
   <Popover id={menuId} class="od-menu" backdrop={false}>
     <List noChevron>
+      {#if canSimplify()}
+        <MenuItem icon="simplifyProfile" text={t('plan.simplify')} onclick={simplify} />
+      {/if}
       <MenuItem
         icon="share"
         text={t('plan.share')}
@@ -650,7 +684,7 @@
     </div>
 
     <div class="od-planner--chart">
-      <h2 class="od-planner--section-title">{t(planner.source ? 'plan.profileOfDive' : 'plan.profilePlanned')}</h2>
+      <h2 class="od-planner--section-title">{t(planner.source && !planner.simplified ? 'plan.profileOfDive' : 'plan.profilePlanned')}</h2>
       {#if shape}
         <div class="od-planner--profile-box">
           <svg class="od-planner--profile" viewBox="0 0 {W} {H}" preserveAspectRatio="none" role="img" aria-label={profileLabel}>
@@ -677,7 +711,7 @@
       {:else if !failed}
         <div class="skeleton-block od-planner--loading" aria-busy="true" aria-label={t('plan.computing')}></div>
       {/if}
-      {#if planner.source}<p class="od-planner--helper">{t('plan.fromDiveHelper')}</p>{/if}
+      {#if planner.source && !planner.simplified}<p class="od-planner--helper">{t('plan.fromDiveHelper')}</p>{/if}
     </div>
 
     <div class="od-planner--data">
@@ -690,7 +724,9 @@
           </div>
           {#if intervalHelper}<p class="od-planner--helper od-planner--inner">{intervalHelper}</p>{/if}
         </div>
+      {/if}
 
+      {#if !planner.source || planner.simplified}
         <h2 class="od-planner--section-title">{t('plan.levels')}</h2>
         <div class="od-planner--fields">
           {#each levelFields as level, i (level.key)}
@@ -711,7 +747,7 @@
           {#if levelFields.length < 20}
             <button type="button" class="od-planner--add" onclick={addLevel}><Icon name="plus" size={18} />{t('plan.addLevel')}</button>
           {/if}
-          <p class="od-planner--helper od-planner--inner">{t('plan.levelsHelper')}</p>
+          <p class="od-planner--helper od-planner--inner">{t(planner.simplified ? 'plan.levelsFromDive' : 'plan.levelsHelper')}</p>
         </div>
       {/if}
 

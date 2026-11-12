@@ -233,6 +233,8 @@ import { registerPlugin } from '@capacitor/core';
 /**
  * The profile (levels, the waypoints of a logged dive, or a square one) and the
  * settings for this plan. Each level's time is at depth; the transit is added.
+ * With both sourceDiveId and levels, the levels are the profile and the dive
+ * gives the date and the surface interval (it stays out of the tissue loading).
  * @typedef {Partial<Omit<PlannerSetup, 'model'>> & {
  *   levels?: {depthMm: number, durationSeconds: number}[], sourceDiveId?: number,
  *   depthMm?: number, bottomTimeSeconds?: number, cylinders: PlanCylinderRequest[],
