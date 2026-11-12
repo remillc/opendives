@@ -35,6 +35,41 @@ export function showSection(section) {
 }
 
 /**
+ * Settings or About opened over a section (openOver): back to the section's
+ * own first screen.
+ * @param {any} view a Framework7 view
+ */
+function closeOverPages(view) {
+  const router = view?.router;
+  if (!router || router.history.length < 2) return;
+  if (!isOverPath(router.currentRoute?.path ?? '')) return;
+  // One step back when Settings or About sit right on the first screen;
+  // deeper (a page of Settings), straight back to the first screen. Without
+  // animation Framework7 left the first screen shifted as a previous page.
+  if (router.history.length === 2) router.back();
+  else router.back(router.history[0], { force: true });
+}
+
+/**
+ * Whether a route is one of the screens opened over a section.
+ * @param {string} path
+ */
+export const isOverPath = (path) => path.startsWith('/settings/') || path === '/about';
+
+/**
+ * A section chosen in the side menu or the navigation rail: Settings or About
+ * opened over the current section close first, and the section chosen shows
+ * its own screen even when it is the one under Settings (bug of 12 November
+ * 2026: Carnet chosen from Settings opened over the Carnet did nothing).
+ * @param {Section} section
+ */
+export function goToSection(section) {
+  closeOverPages(f7.views.current);
+  showSection(section);
+  closeOverPages(f7.views.get(`#view-${section}`));
+}
+
+/**
  * Opens Settings or About over the current section. On a tablet, a section
  * with a list and a detail (Logbook, Statistics, Tools) would show it beside
  * its list: it opens full width in the Account section instead.

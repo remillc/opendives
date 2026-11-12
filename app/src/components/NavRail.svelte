@@ -8,7 +8,7 @@
   import SyncStatus from './SyncStatus.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
   import { ios } from '../lib/layout.svelte.js';
-  import { navigation, sections, showSection, openSettings, openAbout } from '../lib/navigation.svelte.js';
+  import { navigation, sections, goToSection, openSettings, openAbout } from '../lib/navigation.svelte.js';
   import { t } from '../lib/i18n.js';
   import { tolerantTaps } from '../lib/tap.js';
 
@@ -31,7 +31,7 @@
       href="#{section}"
       class="od-nav-rail--item"
       aria-current={navigation.section === section ? 'page' : undefined}
-      onclick={(e) => choose(e, () => showSection(section))}
+      onclick={(e) => choose(e, () => goToSection(section))}
     >
       <span class="od-nav-rail--icon"><Icon name={section} size={ios ? 22 : 24} /></span>
       <span class="od-nav-rail--label">{t(`tabs.${section}`)}</span>
@@ -42,7 +42,7 @@
     href="#account"
     class="od-nav-rail--item od-nav-rail--bottom"
     aria-current={navigation.section === 'account' ? 'page' : undefined}
-    onclick={(e) => choose(e, () => showSection('account'))}
+    onclick={(e) => choose(e, () => goToSection('account'))}
   >
     <span class="od-nav-rail--icon"><Icon name="account" size={ios ? 22 : 24} /></span>
     <span class="od-nav-rail--label" class:od-sr-only={!ios}>{t('account.title')}</span>
