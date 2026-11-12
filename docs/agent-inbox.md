@@ -1877,3 +1877,15 @@ Christian's request: every Altitude field uses the same editable dropdown as the
 
 Done in `feature/plan-title` (7437210, a9efe8d): `AltitudeField` on the same component, in the planner Conditions and Settings › Conditions des outils; presets of the task (`lib/altitude-field.js`, tested), whole values clamped to 0–4500 m / 0–15000 ft; the preset tests updated in their own commit.
 
+
+## [ ] 2026-11-12-73 Planner result: show every row of the plan
+
+Christian's request: the result table shows **all the rows of the dive**, not only the deco stops, with when to leave for each row and the descent and ascent speeds. Spec: "Résultat" and the new paragraph "Plan table" in the planner section. Mock-ups: `android-planificateur-simplifie`, `android-planificateur-nouveau` (and the same table in `-simplifie-menu`, `-titre`, tablet portrait and landscape).
+- Rows, in order: the initial descent (↓), each planned level (→), the ascent between levels and to the first stop (↑), each deco stop (–), the final ascent (↑ "Surface", weight 600). The short ascents between two deco stops are counted in the next stop (as Subsurface's plan does) and get no row.
+- Columns: type icon (accessible names Descente, Niveau prévu, Remontée, Palier de déco), Palier, **Début** (minutes since the start, when to leave for this row), Durée, **Fin** (replaces "Temps écoulé"; the Surface row's Fin is the total), Gaz.
+- Descent and ascent rows: in the variant text colour, with their **speed** under the depth in 12 sp, taken from the planner's settings (descent, ascent).
+- Gas: on the first row, then only where it changes, in a sand chip (#F6DCAE, weight 600).
+- The 12 sp note under the table, text in the spec.
+- Take the rows from the core's computed plan (the planned dive's samples or the planner's decompression stops), never recompute deco in JavaScript. Round to the minute like Subsurface's plan notes.
+- The plan made from a dive with no deco stop keeps its sentence for now; Christian has not decided whether it also gets the table.
+- Tablet and iOS: the same. A line in the release notes.
