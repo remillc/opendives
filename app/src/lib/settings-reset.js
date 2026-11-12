@@ -26,7 +26,7 @@ export const SETTING_KEYS = /** @type {const} */ ([
 ]);
 
 /** App settings that belong to the planner ("Conditions par défaut"): kept by the reset. */
-export const PLANNER_APP_KEYS = /** @type {const} */ (['defaultWater', 'defaultAltitudeMm']);
+export const PLANNER_APP_KEYS = /** @type {const} */ (['defaultWater', 'defaultAltitudeMm', 'stressFactor', 'reserveDivers']);
 
 /**
  * Core values whose OpenDives default differs from Subsurface's: set at the

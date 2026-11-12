@@ -25,6 +25,7 @@ import {
 } from './format.js';
 import { t, tIfExists } from './i18n.js';
 import { settings } from './settings.svelte.js';
+import { bottomVolumeKey } from './reserve-factor.js';
 
 /** @typedef {import('opendives-core').DiveDetail} DiveDetail */
 /** @typedef {import('opendives-core').Prefs} Prefs */
@@ -368,7 +369,8 @@ function planFacts(result, request, prefs) {
     gases: result.cylinders.map((c, i) => ({
       name: planGas(c.o2Permille, c.hePermille),
       total: formatGasVolume(c.gasUsedMl + c.reserveMl, prefs),
-      detail: t(i === bottomIndex ? 'plan.volumeBottom' : 'plan.volumeDeco', {
+      detail: t(i === bottomIndex ? bottomVolumeKey(settings.reserveDivers) : 'plan.volumeDeco', {
+        divers: String(settings.reserveDivers),
         used: formatGasVolume(c.gasUsedMl, prefs),
         reserve: formatGasVolume(c.reserveMl, prefs),
       }),

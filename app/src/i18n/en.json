@@ -1667,7 +1667,7 @@
       "Edit dive: every cylinder shows all its fields, no collapsed lines.",
       "Share: a PDF icon for the sheet. Export: the first format is named “Logbook file (.ssrf)”.",
       "About: each open source library opens its website in the browser.",
-      "Planner: the SAC factor under stress is 2.0 by default.",
+      "Planner: the reserve has a SAC factor under stress (1.0 by default) and a number of divers on the gas (1 by default, 2 to ascend as two); the result says so.",
       "Settings: default cylinders for open circuit and rebreather (diluent, oxygen, bailout), added when a dive becomes a rebreather dive. Cylinder types: number of dives and a new form. Profile: ceilings reordered, depth grid removed.",
       "Side menu and headers redone: band, account at the top of the menu, centred sync, a summary for each section, logbook search bar. Settings and About use the ☰ menu.",
       "Logbook: rows aligned with the design (no dividers), the dives of an expanded trip in a white surface. Account: same header as the sections.",
@@ -1809,7 +1809,9 @@
     "decoPo2": "Deco ppO₂",
     "reserve": "Minimum reserve",
     "problemSolving": "Problem-solving time",
-    "sacFactor": "SAC factor under stress"
+    "sacFactor": "SAC factor under stress",
+    "reserveDivers": "Divers on this gas",
+    "reserveDiversText": "Set 2 to ascend as two, sharing the gas"
   },
   "plan": {
     "title": "Planner",
@@ -1919,7 +1921,8 @@
     "intervalNone": "No recent dive to take into account",
     "intervalOverlap": "This time overlaps a dive of the logbook",
     "volumes": "Volume needed per gas",
-    "volumeBottom": "{used} used and {reserve} reserve to ascend as two",
+    "volumeBottomTwo": "{used} used and {reserve} reserve to ascend as two",
+    "volumeBottomMany": "{used} used and {reserve} reserve to ascend as {divers}",
     "volumeDeco": "{used} used and {reserve} reserve"
   },
   "filter": {
