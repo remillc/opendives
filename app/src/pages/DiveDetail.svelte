@@ -3,8 +3,8 @@
   // Dive detail screen, after the detail3 mock-ups (spec, section 4, "Full dive
   // detail" and "Conditions"): number and date, site, location, trip and
   // rating; key figures; profile; facts in a three-column grid; a collapsed
-  // Conditions block; people and tags; "Gas and equipment" (one entry per
-  // cylinder, SAC, suit, weights per location); dive computers; photos; notes
+  // Conditions block; people and tags; "Gas" (drawn cylinders, gas
+  // changes, SAC) and "Equipment" (collapsed: suit, total weight); dive computers; photos; notes
   // in full. Edit and an overflow menu in the navbar. A row without a value is
   // never shown.
   import { onMount } from 'svelte';
@@ -14,6 +14,11 @@
   import DiveProfile from '../components/DiveProfile.svelte';
   import DiveFigures from '../components/DiveFigures.svelte';
   import Icon from '../components/Icon.svelte';
+  import GasCard from '../components/GasCard.svelte';
+  import EquipmentCard from '../components/EquipmentCard.svelte';
+  import { equipmentLabel, fillLevels, gasChangeLine, gasChanges, gasGroupLabel } from '../lib/gas-summary.js';
+  import { gasName, typeHelper } from '../lib/cylinder-card.js';
+  import { typeLine } from '../lib/gas-group.js';
   import FloatingToolbar from '../components/FloatingToolbar.svelte';
   import MenuItem from '../components/MenuItem.svelte';
   import RenumberDiveDialog from '../components/RenumberDiveDialog.svelte';
@@ -326,62 +331,69 @@
     return more > 0 ? t('detail.summaryMore', { list, n: more }) : list;
   });
 
+  const gasWords = $derived({
+    air: t('edit.gasName.air'),
+    oxygen: t('edit.gasName.oxygen'),
+    nitrox: t('edit.gasName.nitrox'),
+    trimix: t('edit.gasName.trimix'),
+  });
+
+  /** A pressure without its unit, to sit before the end pressure: "2 683". @param {number} mbar */
+  const pressureValue = (mbar) => formatNumber(mbar / (prefs.pressure === 'psi' ? 68.947572932 : 1000), 0);
+
   /**
-   * Cylinders of the "Gas and equipment" block, one entry each: name, size and
-   * use, start and end pressures, a bar of the pressure left, then working
-   * pressure, switch depth and gas used. Gas used and switch depth come from
-   * the core, never computed here.
+   * The cylinders of the "Gas" card, one entry each: the gas in plain words, the
+   * use and size ("Dil2, 16 cuft HP"; the use when the cylinder has no type), the
+   * pressure from start to end in the diver's unit and the drawn levels.
    */
-  const cylinders = $derived.by(() => {
+  const gasCylinders = $derived.by(() => {
     if (!dive) return [];
     return dive.cylinders
       .filter((c) => c.used)
       .map((c) => {
-        const gas = formatGasLong(c.o2Permille, c.hePermille);
-        const gasLower = gas.toLocaleLowerCase();
-        const use =
-          c.use === 'diluent'
-            ? t('detail.cylinderUses.diluent', { gas: gasLower })
-            : c.use === 'oxygen'
-              ? t('detail.cylinderUses.oxygen')
-              : rebreather
-                ? t('detail.cylinderUses.bailout', { gas: gasLower })
-                : gasLower;
-        const usedMbar = c.startMbar > 0 && c.endMbar > 0 && c.startMbar >= c.endMbar ? c.startMbar - c.endMbar : null;
-        const pressureValue = (/** @type {number} */ mbar) =>
-          formatNumber(mbar / (prefs.pressure === 'psi' ? 68.947572932 : 1000), 0);
+        const levels = fillLevels(c.startMbar, c.endMbar, c.workingPressureMbar);
+        const size = typeHelper(formatCylinderSize(c.sizeMl, c.workingPressureMbar, prefs), c.workingPressureMbar);
+        const use = c.use === 'diluent' || c.use === 'oxygen' ? t(`detail.cylinderUseNames.${c.use}`) : rebreather ? t('detail.cylinderUseNames.bailout') : '';
         return {
-          name: c.description || gas,
-          subtitle: [formatCylinderSize(c.sizeMl, c.workingPressureMbar, prefs), use].filter(Boolean).join(' · '),
-          pressures:
+          gas: gasName(c.o2Permille, c.hePermille, gasWords),
+          line: typeLine(c.description, size, use),
+          start: c.startMbar > 0 && c.endMbar > 0 ? pressureValue(c.startMbar) : '',
+          end: c.endMbar > 0 ? formatPressure(c.endMbar, prefs) : '',
+          range:
             c.startMbar > 0 && c.endMbar > 0
               ? t('detail.pressureRange', { start: pressureValue(c.startMbar), end: formatPressure(c.endMbar, prefs) })
               : c.startMbar > 0
                 ? formatPressure(c.startMbar, prefs)
                 : '',
-          // From 0 to the working pressure; no bar when a pressure is missing.
-          bar:
-            usedMbar !== null && c.workingPressureMbar > 0
-              ? {
-                  remaining: Math.min(100, (c.endMbar / c.workingPressureMbar) * 100),
-                  used: Math.min(100, (usedMbar / c.workingPressureMbar) * 100),
-                  label: t('detail.pressureBar', {
-                    end: formatPressure(c.endMbar, prefs),
-                    working: formatPressure(c.workingPressureMbar, prefs),
-                    used: formatPressure(usedMbar, prefs),
-                  }),
-                }
-              : null,
-          details: [
-            c.workingPressureMbar > 0 && t('detail.service', { pressure: formatPressure(c.workingPressureMbar, prefs) }),
-            usedMbar !== null && t('detail.pressureUsed', { pressure: formatPressure(usedMbar, prefs) }),
-            c.switchDepthMm > 0 && t('detail.switchAt', { depth: formatDepth(c.switchDepthMm, prefs) }),
-          ]
-            .filter(Boolean)
-            .join(' · '),
+          ratio: levels.end,
+          startRatio: levels.start,
         };
       });
   });
+
+  const gasLabel = $derived(
+    gasGroupLabel(
+      gasCylinders.map((c, i) => ({ gas: i === 0 ? c.gas : c.gas.toLocaleLowerCase(), start: c.start, end: c.end })),
+      { group: t('detail.gasGroup'), cylinder: t('detail.gasGroupCylinder'), cylinderGas: t('detail.gasGroupCylinderGas'), join: t('detail.gasGroupJoin') },
+    ),
+  );
+
+  /** The gas changes, in one plain line: "Switch to air at 222 ft." (nothing when there is none). */
+  const gasChangesLine = $derived(
+    dive
+      ? gasChangeLine(gasChanges(dive.events ?? [], dive.samples, dive.cylinders), (mm) => formatDepth(mm, prefs), {
+          line: t('detail.gasChange.line'),
+          item: t('detail.gasChange.item'),
+          then: t('detail.gasChange.then'),
+          to: {
+            air: t('detail.gasChange.to.air'),
+            oxygen: t('detail.gasChange.to.oxygen'),
+            nitrox: t('detail.gasChange.to.nitrox'),
+            trimix: t('detail.gasChange.to.trimix'),
+          },
+        })
+      : '',
+  );
 
   /** SAC: only when the core computes one, never on a rebreather dive. */
   const sac = $derived(dive && !rebreather && dive.sacMlMin > 0 ? formatSac(dive.sacMlMin, prefs) : '');
@@ -401,7 +413,23 @@
   );
   const weightTotal = $derived(formatWeight(weightEntries.reduce((sum, w) => sum + w.grams, 0), prefs));
 
-  const hasEquipment = $derived(cylinders.length > 0 || !!sac || !!dive?.suit || weights.length > 0);
+  const hasGas = $derived(gasCylinders.length > 0 || !!sac);
+  const hasEquipment = $derived(!!dive?.suit || weights.length > 0);
+
+  // Collapsed by default; a tap opens the weights by location.
+  let equipmentOpen = $state(false);
+  const equipmentName = $derived(
+    equipmentLabel(
+      { suit: dive?.suit ?? '', weight: weights.length ? weightTotal : '', open: equipmentOpen },
+      {
+        both: t('detail.equipmentBoth'),
+        weightOnly: t('detail.equipmentWeight'),
+        suitOnly: t('detail.equipmentSuit'),
+        show: t('detail.equipmentShow'),
+        hide: t('detail.equipmentHide'),
+      },
+    ),
+  );
 
   /** Dive computers: the first is the main one; its mode follows. */
   const computers = $derived(
@@ -574,48 +602,29 @@
       </section>
     {/if}
 
+    {#if hasGas}
+      <section class="od-dive-detail--section">
+        <h2 class="od-dive-detail--section-title">{t('detail.gasSection')}</h2>
+        <GasCard
+          label={gasLabel}
+          items={gasCylinders}
+          changes={gasChangesLine}
+          sac={sac ? { label: t('detail.sacFull'), value: sac } : null}
+        />
+      </section>
+    {/if}
+
     {#if hasEquipment}
       <section class="od-dive-detail--section">
-        <h2 class="od-dive-detail--section-title">{t('detail.gasAndEquipment')}</h2>
-        <div class="od-dive-detail--group">
-          {#each cylinders as cylinder, i (i)}
-            <div class="od-dive-detail--cylinder">
-              <div class="od-dive-detail--line">
-                <span class="od-dive-detail--name"><span class="od-dive-detail--gas">{cylinder.name}</span>{#if cylinder.subtitle}<span class="od-dive-detail--type">{cylinder.subtitle}</span>{/if}</span>
-                {#if cylinder.pressures}<span class="od-dive-detail--value od-value">{cylinder.pressures}</span>{/if}
-              </div>
-              {#if cylinder.bar}
-                <div class="od-dive-detail--bar" role="img" aria-label={cylinder.bar.label}>
-                  <div class="od-dive-detail--fill" style="width: {cylinder.bar.remaining}%"></div>
-                  <div class="od-dive-detail--gap"></div>
-                  <div class="od-dive-detail--used" style="width: {cylinder.bar.used}%"></div>
-                </div>
-              {/if}
-              {#if cylinder.details}<div class="od-dive-detail--secondary od-value"><span>{cylinder.details}</span></div>{/if}
-            </div>
-          {/each}
-          {#if sac}
-            <div class="od-dive-detail--row"><span>{t('detail.sacFull')}</span><span class="od-dive-detail--value od-value">{sac}</span></div>
-          {/if}
-          {#if dive.suit}
-            <div class="od-dive-detail--row"><span>{t('detail.suitRow')}</span><span class="od-dive-detail--value">{dive.suit}</span></div>
-          {/if}
-          {#if weights.length === 1}
-            <div class="od-dive-detail--row">
-              <span class="od-dive-detail--stacked"><span>{t('detail.weights')}</span>{#if weights[0].place}<span class="od-dive-detail--sub">{weights[0].place}</span>{/if}</span>
-              <span class="od-dive-detail--value od-value">{weights[0].weight}</span>
-            </div>
-          {:else if weights.length > 1}
-            <div class="od-dive-detail--weights">
-              <div class="od-dive-detail--total"><span>{t('detail.weights')}</span><span class="od-value">{weightTotal}</span></div>
-              <ul aria-label={t('detail.weightsByPlace')}>
-                {#each weights as weight, i (i)}
-                  <li class="od-value"><span>{weight.place || t('detail.weights')}</span><span>{weight.weight}</span></li>
-                {/each}
-              </ul>
-            </div>
-          {/if}
-        </div>
+        <h2 class="od-dive-detail--section-title">{t('detail.equipmentSection')}</h2>
+        <EquipmentCard
+          label={equipmentName}
+          suit={dive.suit ?? ''}
+          weightTotal={weights.length ? weightTotal : ''}
+          {weights}
+          open={equipmentOpen}
+          ontoggle={() => (equipmentOpen = !equipmentOpen)}
+        />
       </section>
     {/if}
 
@@ -788,80 +797,6 @@
       overflow: hidden;
     }
 
-    .od-dive-detail--cylinder {
-      padding: 12px 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-
-      & + & {
-        border-top: 1px solid var(--od-separator);
-      }
-    }
-
-    .od-dive-detail--line {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      gap: 8px;
-    }
-
-    .od-dive-detail--name {
-      display: flex;
-      align-items: baseline;
-      flex-wrap: wrap;
-      gap: 0 4px;
-
-      .od-dive-detail--gas {
-        font-size: 16px;
-        font-weight: 700;
-      }
-
-      .od-dive-detail--type {
-        font-size: 14px;
-        color: var(--od-text-2);
-      }
-    }
-
-    .od-dive-detail--cylinder .od-dive-detail--value {
-      font-size: 16px;
-      font-weight: 700;
-      white-space: nowrap;
-    }
-
-    /* From 0 to the working pressure: what is left, then what was used. */
-    .od-dive-detail--bar {
-      display: flex;
-      height: 8px;
-      border-radius: 4px;
-      background: var(--od-gauge-track);
-      overflow: hidden;
-
-      > div {
-        flex: none;
-      }
-
-      .od-dive-detail--fill {
-        background: var(--od-tertiary);
-      }
-
-      .od-dive-detail--gap {
-        width: 2px;
-        background: var(--od-surface);
-      }
-
-      .od-dive-detail--used {
-        background: var(--od-gauge-used);
-      }
-    }
-
-    .od-dive-detail--secondary {
-      display: flex;
-      justify-content: space-between;
-      font-size: 13px;
-      color: var(--od-text-2);
-    }
-
     .od-dive-detail--row {
       box-sizing: border-box;
       min-height: 44px;
@@ -882,54 +817,9 @@
       &:first-child {
         border-top: none;
       }
-
-      .od-dive-detail--value {
-        font-size: 14px;
-        color: var(--od-text-2);
-        font-variant-numeric: tabular-nums;
-        text-align: right;
-      }
     }
 
-    /* A label with a second line under it (weight location, computer role, photos). */
-    /* Several weights: the total, then one line per location, no dividers. */
-    .od-dive-detail--weights {
-      padding: 16px 16px 14px;
-      border-top: 1px solid var(--od-separator);
-
-      .od-dive-detail--total {
-        display: flex;
-        justify-content: space-between;
-        align-items: baseline;
-        gap: 12px;
-        font-size: 16px;
-        line-height: 24px;
-        color: var(--od-text);
-
-        .od-value {
-          font-weight: 600;
-        }
-      }
-
-      ul {
-        margin: 4px 0 0;
-        padding: 0;
-        list-style: none;
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-      }
-
-      li {
-        display: flex;
-        justify-content: space-between;
-        gap: 12px;
-        font-size: 14px;
-        line-height: 20px;
-        color: var(--od-text-2);
-      }
-    }
-
+    /* A label with a second line under it (computer role, photos). */
     .od-dive-detail--stacked {
       padding: 10px 0;
       display: flex;
