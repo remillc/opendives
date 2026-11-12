@@ -1552,6 +1552,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Formulaires : quand on quitte un formulaire dont on a modifié des valeurs (←, ✕, retour d’Android ou balayage d’iOS), une boîte demande « Quitter sans enregistrer ? » avec Rester, Enregistrer et Quitter. Sans changement, ou si on remet la valeur d’origine, on quitte tout de suite.",
       "Planificateur : le gaz est écrit sur chaque ligne du tableau ; le gaz surligné marque un changement.",
       "Planificateur : le résultat liste toutes les lignes de la plongée, pas seulement les paliers : descente, niveaux prévus, remontées, paliers et remontée finale en surface, avec le début, la durée et la fin de chacune en minutes, les vitesses de descente et de remontée, et le gaz là où il change.",
       "Planificateur : en métrique, la liste des consommations (SAC) propose 10, 15, 20, 25 et 30 L/min ; on peut toujours taper sa valeur, jusqu’à 60 L/min.",
@@ -1812,6 +1813,21 @@
     "sacFactor": "Facteur de consommation sous stress",
     "reserveDivers": "Plongeurs sur ce gaz",
     "reserveDiversText": "Mettre 2 pour remonter à deux en partageant le gaz"
+  },
+  "leave": {
+    "title": "Quitter sans enregistrer ?",
+    "stay": "Rester",
+    "save": "Enregistrer",
+    "discard": "Quitter",
+    "text": {
+      "plan": "Les changements apportés à ce plan seront perdus.",
+      "dive": "Les changements apportés à cette plongée seront perdus.",
+      "cylinderType": "Les changements apportés à ce type de bouteille seront perdus.",
+      "computer": "Les changements apportés à cet ordinateur seront perdus.",
+      "filter": "Les changements apportés à ce filtre seront perdus.",
+      "site": "Les changements apportés à ce site seront perdus.",
+      "statistic": "Les changements apportés à cette statistique seront perdus."
+    }
   },
   "plan": {
     "title": "Planificateur",

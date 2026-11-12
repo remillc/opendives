@@ -1552,6 +1552,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Forms: when you leave a form whose values you changed (←, ✕, Android Back or the iOS swipe), a dialog asks “Leave without saving?” with Stay, Save and Leave. With no change, or if you put the original value back, you leave at once.",
       "Planner: the gas is written on every row of the table; the highlighted gas marks a change.",
       "Planner: the result lists every row of the dive, not only the deco stops: descent, planned levels, ascents, stops and the final ascent to the surface, with the start, duration and end of each in minutes, the descent and ascent speeds, and the gas where it changes.",
       "Planner: in metric, the SAC list offers 10, 15, 20, 25 and 30 L/min; any value up to 60 L/min can still be typed.",
@@ -1812,6 +1813,21 @@
     "sacFactor": "SAC factor under stress",
     "reserveDivers": "Divers on this gas",
     "reserveDiversText": "Set 2 to ascend as two, sharing the gas"
+  },
+  "leave": {
+    "title": "Leave without saving?",
+    "stay": "Stay",
+    "save": "Save",
+    "discard": "Leave",
+    "text": {
+      "plan": "Changes made to this plan will be lost.",
+      "dive": "Changes made to this dive will be lost.",
+      "cylinderType": "Changes made to this cylinder type will be lost.",
+      "computer": "Changes made to this computer will be lost.",
+      "filter": "Changes made to this filter will be lost.",
+      "site": "Changes made to this site will be lost.",
+      "statistic": "Changes made to this statistic will be lost."
+    }
   },
   "plan": {
     "title": "Planner",

@@ -12,6 +12,8 @@
   import SelectField from '../components/SelectField.svelte';
   import KeyFigures from '../components/KeyFigures.svelte';
   import TextField from '../components/TextField.svelte';
+  import LeaveGuard from '../components/LeaveGuard.svelte';
+  import { isDirty } from '../lib/leave-guard.js';
   import { logbook } from '../lib/logbook.svelte.js';
   import {
     CRITERIA,
@@ -28,6 +30,11 @@
   let name = $state('');
   /** The name was typed: it is no longer proposed from the criteria. */
   let nameTyped = $state(false);
+
+  // Leaving with changes asks first (components/LeaveGuard.svelte): the values
+  // chosen and a name typed, against the empty form that opened.
+  const dirty = () => isDirty({ values: [], name: '' }, { values: criteria.map((c) => [...c.values]).flat(), name: nameTyped ? name : '' });
+  let guard = /** @type {LeaveGuard|undefined} */ (undefined);
 
   let result = $state(/** @type {import('../lib/statistics.svelte.js').StatsResult|null} */ (null));
 
@@ -84,6 +91,9 @@
     f7.popup.close();
   }
 
+  /** ✕ and Back: with something chosen, ask before the popup closes. */
+  const cancel = () => guard?.attempt();
+
   function save() {
     if (!canSave) return;
     saveStatistic(name.trim() || proposed, $state.snapshot(chosen));
@@ -113,15 +123,16 @@
       <Navbar title={t(theme.ios ? 'stats.newTitleShort' : 'stats.newTitle')}>
         {#snippet left()}
           {#if theme.ios}
-            <Link onClick={close}>{t('dialog.cancel')}</Link>
+            <Link onClick={cancel}>{t('dialog.cancel')}</Link>
           {:else}
-            <Link iconOnly onClick={close}><Icon name="close" /><span class="od-sr-only">{t('stats.close')}</span></Link>
+            <Link iconOnly onClick={cancel}><Icon name="close" /><span class="od-sr-only">{t('stats.close')}</span></Link>
           {/if}
         {/snippet}
         {#snippet right()}
           <Link class={`od-statistic-new--save${canSave ? '' : ' disabled'}`} onClick={save}>{t('edit.save')}</Link>
         {/snippet}
       </Navbar>
+      <LeaveGuard bind:this={guard} noun="statistic" {dirty} {save} leave={close} canSave={() => canSave} />
 
       {#if theme.ios}
         <div class="block-title">{t('stats.name')}</div>

@@ -9,6 +9,8 @@
   import { OpenDivesCore } from 'opendives-core';
   import Icon from '../components/Icon.svelte';
   import TextField from '../components/TextField.svelte';
+  import LeaveGuard from '../components/LeaveGuard.svelte';
+  import { isDirty } from '../lib/leave-guard.js';
   import ChoiceDialog from '../components/ChoiceDialog.svelte';
   import { computerName, computerChange, duplicatesOf, mergeTargets, sameRecordings } from '../lib/dive-computers.js';
   import { confirmAction } from '../lib/dialogs.js';
@@ -36,10 +38,17 @@
   let busy = $state(false);
   let choosing = $state(false);
 
+  // Leaving with changes asks first (components/LeaveGuard.svelte): the name as
+  // it was when the computer was read, against the name now.
+  let opened = $state(/** @type {string|null} */ (null));
+  const dirty = () => opened !== null && isDirty(opened, name);
+  let guard = /** @type {LeaveGuard|undefined} */ (undefined);
+
   onMount(async () => {
     try {
       all = await OpenDivesCore.diveComputers();
       name = computer?.nickname || model;
+      opened = name;
     } catch (e) {
       console.error('Logbook computer', e);
     }
@@ -100,12 +109,13 @@
 <Page class="od-logbook-computer">
   <Navbar title={t('settings.logbookComputers.editTitle')}>
     {#snippet left()}
-      <Link back iconOnly><Icon name="close" /><span class="od-sr-only">{t('dialog.cancel')}</span></Link>
+      <Link iconOnly onClick={() => guard?.attempt()}><Icon name="close" /><span class="od-sr-only">{t('dialog.cancel')}</span></Link>
     {/snippet}
     {#snippet right()}
       <Link onClick={save} class={busy ? 'disabled' : ''}>{t('edit.save')}</Link>
     {/snippet}
   </Navbar>
+  <LeaveGuard bind:this={guard} noun="computer" {dirty} {save} leave={() => f7router.back()} />
 
   {#if computer}
     <!-- Subsurface keeps a nickname by serial number: without one there is nothing to attach it to. -->

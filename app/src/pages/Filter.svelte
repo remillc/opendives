@@ -17,6 +17,8 @@
   import ButtonGroup from '../components/ButtonGroup.svelte';
   import Md3Dialog from '../components/Md3Dialog.svelte';
   import TextField from '../components/TextField.svelte';
+  import LeaveGuard from '../components/LeaveGuard.svelte';
+  import { isDirty } from '../lib/leave-guard.js';
   import { logbook, undoLastChange } from '../lib/logbook.svelte.js';
   import { confirmAction } from '../lib/dialogs.js';
   import { offerUndo } from '../lib/undo.js';
@@ -114,6 +116,13 @@
     f7router.back();
   }
 
+  // Leaving with changes asks first (components/LeaveGuard.svelte): the draft
+  // against the filter applied when the screen opened. Its "Enregistrer" is
+  // "Save this filter", and the screen is left once the filter is kept.
+  const dirty = () => isDirty(filter.applied, filter.draft);
+  let guard = /** @type {LeaveGuard|undefined} */ (undefined);
+  let leaveAfterSave = false;
+
   // "Save this filter": a name, then one undoable step.
   let naming = $state(false);
   let presetName = $state('');
@@ -123,6 +132,11 @@
     presetName = filter.draft.preset?.name ?? '';
     saveError = '';
     naming = true;
+  }
+
+  function cancelNaming() {
+    naming = false;
+    leaveAfterSave = false;
   }
 
   /** @param {string} text */
@@ -140,6 +154,7 @@
       await savePreset(name, filter.draft, logbook.prefs);
       naming = false;
       undoToast(t('filter.saved', { name }));
+      if (leaveAfterSave) f7router.back();
     } catch (e) {
       const code = String(/** @type {any} */ (e)?.message ?? '');
       console.error('Save a filter', code);
@@ -209,15 +224,26 @@
   <Navbar title={t('filter.title')}>
     {#snippet left()}
       {#if theme.ios}
-        <Link back>{t('filter.cancel')}</Link>
+        <Link onClick={() => guard?.attempt()}>{t('filter.cancel')}</Link>
       {:else}
-        <Link back iconOnly><Icon name="close" /><span class="od-sr-only">{t('filter.cancel')}</span></Link>
+        <Link iconOnly onClick={() => guard?.attempt()}><Icon name="close" /><span class="od-sr-only">{t('filter.cancel')}</span></Link>
       {/if}
     {/snippet}
     {#snippet right()}
       <Link class="od-filter--clear" onClick={clearAll}>{t('filter.clearAll')}</Link>
     {/snippet}
   </Navbar>
+  <LeaveGuard
+    bind:this={guard}
+    noun="filter"
+    {dirty}
+    save={() => {
+      leaveAfterSave = true;
+      startSaving();
+    }}
+    leave={() => f7router.back()}
+    canSave={() => !isEmpty(filter.draft)}
+  />
 
   {#if theme.ios}
     <Searchbar
@@ -379,12 +405,12 @@
 </Page>
 
 {#if naming}
-  <Md3Dialog class="od-filter" title={t('filter.saveTitle')} text={t('filter.saveText')} oncancel={() => (naming = false)}>
+  <Md3Dialog class="od-filter" title={t('filter.saveTitle')} text={t('filter.saveText')} oncancel={cancelNaming}>
     <div class="od-filter--name-field">
       <TextField label={t('filter.name')} bind:value={presetName} invalid={!!saveError} supporting={saveError} />
     </div>
     {#snippet actions()}
-      <button type="button" onclick={() => (naming = false)}>{t('dialog.cancel')}</button>
+      <button type="button" onclick={cancelNaming}>{t('dialog.cancel')}</button>
       <button type="button" onclick={confirmSave}>{t('filter.saveConfirm')}</button>
     {/snippet}
   </Md3Dialog>

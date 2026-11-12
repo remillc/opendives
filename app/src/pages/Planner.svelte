@@ -5,6 +5,7 @@
   // dive and for a new dive. The plan, gas volumes, reserve, CNS and OTU all
   // come from the core (Subsurface's planner). Saved, a plan is a planned dive
   // of the logbook, listed by "Plongées planifiées" only.
+  import { untrack } from 'svelte';
   import { placeLevelLabels } from '../lib/chart-labels.js';
   import { Page, Navbar, Link, List, ListItem, Popup, Popover, f7, theme } from 'framework7-svelte';
   import { showSnackbar } from '../lib/snackbar.js';
@@ -23,6 +24,8 @@
   import TimePickerDialog from '../components/TimePickerDialog.svelte';
   import ShareSheet from '../components/ShareSheet.svelte';
   import PlanTitleDialog from '../components/PlanTitleDialog.svelte';
+  import LeaveGuard from '../components/LeaveGuard.svelte';
+  import { isDirty } from '../lib/leave-guard.js';
   import { cleanPlanTitle } from '../lib/plan-title.js';
   import { logbook, savePlan } from '../lib/logbook.svelte.js';
   import { planner, loadSetup, adoptUnitDefaults, planRequest, startFromDive, startNewDive, requestOfPlan, applyRequest, nextGas, planSettings, canSimplify, simplifyPlan, restorePlan } from '../lib/planner.svelte.js';
@@ -576,6 +579,15 @@
     else f7router.navigate('/plans/', { reloadCurrent: true });
   }
 
+  // Leaving with changes asks first (components/LeaveGuard.svelte): the plan as
+  // first computed, against the plan now.
+  let guard = /** @type {LeaveGuard|undefined} */ (undefined);
+  let opened = $state(/** @type {unknown} */ (null));
+  $effect(() => {
+    if (result && untrack(() => opened) === null) opened = planRequest();
+  });
+  const dirty = () => opened !== null && isDirty(opened, planRequest());
+
   /** "Enregistrer": a new plan asks for its title first, a reopened one keeps its own. */
   function save() {
     if (!canSave) return;
@@ -618,7 +630,7 @@
 <Page class="od-planner" onPageReinit={refresh}>
   <Navbar title={t('plan.title')}>
     {#snippet left()}
-      <Link iconOnly={!theme.ios} onClick={toList}>
+      <Link iconOnly={!theme.ios} onClick={() => guard?.attempt()}>
         <i class="icon icon-back"></i>
         {#if theme.ios}<span>{t('plan.back')}</span>{:else}<span class="od-sr-only">{t('plan.back')}</span>{/if}
       </Link>
@@ -630,6 +642,7 @@
       </Link>
     {/snippet}
   </Navbar>
+  <LeaveGuard bind:this={guard} noun="plan" {dirty} {save} leave={toList} canSave={() => canSave} />
 
   <Popover id={menuId} class="od-menu" backdrop={false}>
     <List noChevron>
