@@ -1878,7 +1878,7 @@ Christian's request: every Altitude field uses the same editable dropdown as the
 Done in `feature/plan-title` (7437210, a9efe8d): `AltitudeField` on the same component, in the planner Conditions and Settings › Conditions des outils; presets of the task (`lib/altitude-field.js`, tested), whole values clamped to 0–4500 m / 0–15000 ft; the preset tests updated in their own commit.
 
 
-## [ ] 2026-11-12-73 Planner result: show every row of the plan
+## [x] 2026-11-12-73 Planner result: show every row of the plan
 
 Christian's request: the result table shows **all the rows of the dive**, not only the deco stops, with when to leave for each row and the descent and ascent speeds. Spec: "Résultat" and the new paragraph "Plan table" in the planner section. Mock-ups: `android-planificateur-simplifie`, `android-planificateur-nouveau` (and the same table in `-simplifie-menu`, `-titre`, tablet portrait and landscape).
 - Rows, in order: the initial descent (↓), each planned level (→), the ascent between levels and to the first stop (↑), each deco stop (–), the final ascent (↑ "Surface", weight 600). The short ascents between two deco stops are counted in the next stop (as Subsurface's plan does) and get no row.
@@ -1891,3 +1891,6 @@ Christian's request: the result table shows **all the rows of the dive**, not on
 - Tablet and iOS: the same. A line in the release notes.
 
 **Addendum (12 November 2026), Christian:** write the gas on **every row**, descents and ascents included: an empty cell could be misread. The sand chip stays only on the rows where the gas changes. The note under the table now ends with "Le gaz surligné marque un changement de gaz." Spec and mock-ups updated.
+
+Done in `feature/plan-table` (c7adfba): `planRows` (lib/plan-rows.js, tested) builds the rows from the core's `segments` only, as core/plannernotes.cpp selects them for its non-verbatim table (ascents between stops merged into the next stop, minutes rounded as `(s+30)/60`, Début the sum of the shown minutes, Fin the rounded runtime); type icon with its accessible name, Palier, Début, Durée, Fin, Gaz in a sand chip on the first row and where it changes; transit rows in the variant colour with the planner speed under the depth; the note under the table. A plan from a dive without deco keeps its sentence. Checked on the phone emulator (130 ft 30 min: descent 60 ft/min, level, ascent, six stops, Surface 107 = total). Gaps: an ascent that crosses several of Subsurface's ascent-rate bands shows no speed (no single rate applies); the PDF share keeps its old stops-only table.
+
