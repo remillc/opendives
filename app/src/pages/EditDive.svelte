@@ -1048,6 +1048,21 @@
       <button type="button" class="od-edit-dive--add" onclick={() => weights.push({ description: weightTypes[0]?.name ?? 'integrated', weight: weightText(weightTypes[0]?.grams ?? 0), grams0: -1, text0: '' })}>
         <Icon name="plus" />{t('edit.addWeight')}
       </button>
+
+      {#if dive.diveComputers.length}
+        <h3 class="od-edit-dive--sub">{t('edit.computersGroup')}</h3>
+        <div class="od-edit-dive--computers" role="radiogroup" aria-label={t('edit.computersGroup')}>
+          {#each dive.diveComputers as computer, i (i)}
+            <ChoiceRow class="od-edit-dive--computer" name="od-main-computer" selected={i === mainComputer} onselect={() => (mainComputer = i)}>
+              <span class="od-edit-dive--texts">
+                <span>{computer.nickname || computer.model || t('edit.unnamedComputer')}</span>
+                {#if i === mainComputer}<span class="od-edit-dive--role">{t('edit.mainComputer')}</span>{/if}
+              </span>
+            </ChoiceRow>
+          {/each}
+          <p class="od-edit-dive--helper">{t('edit.mainComputerHelp')}</p>
+        </div>
+      {/if}
     </section>
 
     <!-- Conditions -->
@@ -1096,24 +1111,6 @@
       <div class="od-edit-dive--end"></div>
       {/if}
     </section>
-
-    <!-- Ordinateurs -->
-    {#if dive.diveComputers.length}
-      <section class="card od-edit-dive--card">
-        {@render header(t('edit.computersGroup'))}
-        <div class="od-edit-dive--computers" role="radiogroup" aria-label={t('edit.computersGroup')}>
-          {#each dive.diveComputers as computer, i (i)}
-            <ChoiceRow class="od-edit-dive--computer" name="od-main-computer" selected={i === mainComputer} onselect={() => (mainComputer = i)}>
-              <span class="od-edit-dive--texts">
-                <span>{computer.nickname || computer.model || t('edit.unnamedComputer')}</span>
-                {#if i === mainComputer}<span class="od-edit-dive--role">{t('edit.mainComputer')}</span>{/if}
-              </span>
-            </ChoiceRow>
-          {/each}
-          <p class="od-edit-dive--helper">{t('edit.mainComputerHelp')}</p>
-        </div>
-      </section>
-    {/if}
 
     <!-- Avancé -->
     <section class="card od-edit-dive--card od-edit-dive--last">

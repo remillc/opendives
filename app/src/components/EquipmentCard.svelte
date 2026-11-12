@@ -14,16 +14,19 @@
    *   suit: string,
    *   weightTotal: string,
    *   weights: { place: string, weight: string }[],
+   *   computer?: string,
+   *   computers?: { name: string, main: boolean }[],
    *   open: boolean,
    *   opens?: boolean,
    *   ontoggle: () => void,
    * }}
    * label: the accessible name, "Equipment: dry suit, weights 35 lb. Show details";
    * weightTotal: empty when no weight is set; weights: one entry per location.
+   * computer: the main computer's name (a third row); computers: all of them, listed when open;
    * opens: false when opening would show nothing more (one weight, no
    * location): a plain card, no chevron.
    */
-  let { label, suit, weightTotal, weights, open, opens = true, ontoggle } = $props();
+  let { label, suit, weightTotal, weights, computer = '', computers = [], open, opens = true, ontoggle } = $props();
 </script>
 
 <div class="od-equipment-card">
@@ -44,9 +47,19 @@
       {#if weightTotal}
         <span class="od-equipment-card--row"><span class="od-equipment-card--name">{t('detail.weights')}</span><span class="od-equipment-card--value od-equipment-card--strong od-value">{weightTotal}</span></span>
       {/if}
+      {#if computer}
+        <span class="od-equipment-card--row"><span class="od-equipment-card--name">{t('detail.computerRow')}</span><span class="od-equipment-card--value">{computer}</span></span>
+      {/if}
     </span>
     {#if opens}<span class="od-equipment-card--chevron" class:od-equipment-card--open={open}><Icon name="expand" size={24} weight={2} /></span>{/if}
   </svelte:element>
+  {#if opens && open && computers.length > 1}
+    <ul class="od-equipment-card--weights" aria-label={t('detail.computers')}>
+      {#each computers as c, i (i)}
+        <li><span>{c.name}</span>{#if c.main}<span>{t('detail.mainBadge')}</span>{/if}</li>
+      {/each}
+    </ul>
+  {/if}
   {#if opens && open && weights.length}
     <ul class="od-equipment-card--weights" aria-label={t('detail.weightsByPlace')}>
       {#each weights as weight, i (i)}

@@ -124,6 +124,17 @@ test('the Equipment card opens only when it would show more than the total', asy
   assert.equal(equipmentLabel({ suit: 'dry', weight: '7 lb', open: false }, words), 'dry, 7 lb. Show');
 });
 
+test('the Equipment card also opens with several dive computers, and its name adds the computer', async () => {
+  const { equipmentOpens, equipmentLabel } = await import('../../app/src/lib/gas-summary.js');
+  assert.equal(equipmentOpens([], 1), false);
+  assert.equal(equipmentOpens([{ description: 'unknown' }], 1), false);
+  assert.equal(equipmentOpens([], 2), true);
+  assert.equal(equipmentOpens([{ description: 'unknown' }], 2), true);
+  const words = { both: 'Equipment: {suit}, weights {weight}', weightOnly: 'Equipment: weights {weight}', suitOnly: 'Equipment: {suit}', show: 'Show', hide: 'Hide', computer: ', computer {name}', computerOnly: 'Equipment: computer {name}' };
+  assert.equal(equipmentLabel({ suit: 'dry', weight: '7 lb', computer: 'Perdix', open: false, opens: false }, words), 'Equipment: dry, weights 7 lb, computer Perdix');
+  assert.equal(equipmentLabel({ suit: '', weight: '', computer: 'Perdix', open: true }, words), 'Equipment: computer Perdix. Hide');
+});
+
 test('unused cylinders: listed with the setting on, drawn full with "not used" or their one pressure', async () => {
   const { cylinderListed, unusedShown } = await import('../../app/src/lib/gas-summary.js');
   assert.equal(cylinderListed({ used: false }, true), true);

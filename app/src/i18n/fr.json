@@ -307,6 +307,10 @@
     "pressureRange": "{start} → {end}",
     "left": "reste {percent} %",
     "sacFull": "Consommation en surface (SAC)",
+    "computerRow": "Ordinateur",
+    "mainBadge": "Principal",
+    "equipmentComputer": ", ordinateur {name}",
+    "equipmentComputerOnly": "Équipement : ordinateur {name}",
     "suitRow": "Combinaison",
     "weights": "Lest",
     "weightsByPlace": "Lest par emplacement",
@@ -1542,6 +1546,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Les ordinateurs de plongée font partie de l’équipement : dans « Modifier la plongée », ils sont en bas de la carte Équipement ; la fiche d’une plongée montre l’ordinateur principal en troisième ligne de la carte Équipement (tous, avec « Principal », quand elle est ouverte).",
       "Android : plus de boutons radio. L’élément choisi apparaît sur une ligne teintée avec une coche au début (conflits de synchronisation, import du compte, export, nettoyage des sites, ordinateur principal, site d’une nouvelle plongée, boîtes de choix).",
       "Fiche d’une plongée : dans la barre d’outils, « Planifier depuis cette plongée » passe avant « Partager ».",
       "« Modifier la plongée » : l’en-tête de Conditions montre la moyenne en étoiles grises, sans le chiffre.",

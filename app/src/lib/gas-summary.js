@@ -105,13 +105,19 @@ export function gasGroupLabel(items, words) {
 /**
  * The accessible name of the Equipment card: "Equipment: dry suit, weights 35
  * lb. Show details" (the suit only when there is one).
- * @param {{ suit: string, weight: string, open: boolean, opens?: boolean }} state
- * @param {{ both: string, weightOnly: string, suitOnly: string, show: string, hide: string }} words
+ * @param {{ suit: string, weight: string, computer?: string, open: boolean, opens?: boolean }} state
+ * @param {{ both: string, weightOnly: string, suitOnly: string, show: string, hide: string, computer?: string, computerOnly?: string }} words
  *   both: "Equipment: {suit}, weights {weight}"; weightOnly: "Equipment: weights {weight}";
- *   suitOnly: "Equipment: {suit}"; show / hide: the action appended ("Show details")
+ *   suitOnly: "Equipment: {suit}"; show / hide: the action appended ("Show details");
+ *   computer: ", computer {name}" appended; computerOnly: "Equipment: computer {name}"
  */
-export function equipmentLabel({ suit, weight, open, opens = true }, words) {
-  const base = (suit && weight ? words.both : weight ? words.weightOnly : words.suitOnly).replace('{suit}', suit).replace('{weight}', weight);
+export function equipmentLabel({ suit, weight, computer = '', open, opens = true }, words) {
+  let base;
+  if (!suit && !weight && computer) base = (words.computerOnly ?? '').replace('{name}', computer);
+  else {
+    base = (suit && weight ? words.both : weight ? words.weightOnly : words.suitOnly).replace('{suit}', suit).replace('{weight}', weight);
+    if (computer) base += (words.computer ?? '').replace('{name}', computer);
+  }
   return opens ? `${base}. ${open ? words.hide : words.show}` : base;
 }
 
@@ -141,7 +147,10 @@ export function unusedShown(cylinder) {
 /**
  * Whether opening the Equipment card shows something more than the total
  * (Christian, 12 November 2026: no chevron when it would change nothing):
- * several weights, or one whose location is known.
+ * several weights, one whose location is known, or several dive computers
+ * (task 2026-11-12-60: the open card lists them all).
  * @param {{ description?: string }[]} weights the weights that are set
+ * @param {number} [computers] how many dive computers the dive has
  */
-export const equipmentOpens = (weights) => weights.length > 1 || (weights.length === 1 && !!weights[0].description && weights[0].description !== 'unknown');
+export const equipmentOpens = (weights, computers = 0) =>
+  weights.length > 1 || (weights.length === 1 && !!weights[0].description && weights[0].description !== 'unknown') || computers > 1;
