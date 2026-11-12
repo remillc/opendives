@@ -1548,6 +1548,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "The notes come right under People, in the dive detail as in “Edit dive”.",
       "“Edit dive”: “People” and “Notes” are two cards; the notes come right before “Advanced”.",
       "Tags right under Equipment, in the dive detail as in “Edit dive” (where they have a card of their own).",
       "Dive detail: the Conditions card now comes right after Equipment (before Photos and videos and Notes).",

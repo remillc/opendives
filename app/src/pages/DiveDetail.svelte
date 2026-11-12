@@ -571,6 +571,15 @@
       </section>
     {/if}
 
+    <!-- Notes right under Personnes (task 2026-11-12-64). -->
+    {#if dive.notes.trim()}
+      <section class="od-dive-detail--section">
+        <h2 class="od-dive-detail--section-title">{t('detail.notes')}</h2>
+        <!-- Shown in full, line breaks kept: no "Read more". -->
+        <p class="od-dive-detail--group od-dive-detail--notes">{dive.notes}</p>
+      </section>
+    {/if}
+
     {#if hasGas}
       <section class="od-dive-detail--section">
         <h2 class="od-dive-detail--section-title">{t('detail.gasSection')}</h2>
@@ -644,13 +653,6 @@
       </section>
     {/if}
 
-    {#if dive.notes.trim()}
-      <section class="od-dive-detail--section">
-        <h2 class="od-dive-detail--section-title">{t('detail.notes')}</h2>
-        <!-- Shown in full, line breaks kept: no "Read more". -->
-        <p class="od-dive-detail--group od-dive-detail--notes">{dive.notes}</p>
-      </section>
-    {/if}
     <div class="od-dive-detail--end" aria-hidden="true"></div>
   {/if}
 
