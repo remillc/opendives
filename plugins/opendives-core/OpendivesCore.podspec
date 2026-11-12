@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
-  s.name = 'OpendivesCoreIos'
+  s.name = 'OpendivesCore'
   s.version = '0.0.0'
-  s.summary = 'iOS side of the OpenDives core plugin'
+  s.summary = 'The OpenDives core plugin, iOS side'
   s.license = { :type => 'GPL-2.0-only' }
   s.homepage = 'https://github.com/remillc/opendives'
   s.author = 'Christian Rémillard'

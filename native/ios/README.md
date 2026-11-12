@@ -15,7 +15,7 @@ GitHub macOS runner (`.github/workflows/ios.yml`). It uses the same web layer
   `cap sync ios`.
 - `plugins/opendives-core/ios/Plugin/` is the Swift side of the plugin, the
   counterpart of the Kotlin side in `plugins/opendives-core/android/`; its pod
-  is `plugins/opendives-core/OpendivesCoreIos.podspec`.
+  is `plugins/opendives-core/OpendivesCore.podspec`.
 - `app/ios/` is the Capacitor iOS project (icon, launch screen, Info.plist).
 - `tests/ios/` runs the round-trip and planner tests in a simulator
   (`run-simulator.sh`; expected round-trip result: 97 passed, 1 known failure,

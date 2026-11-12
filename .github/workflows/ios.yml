@@ -9,7 +9,7 @@ on:
     paths:
       - app/ios/**
       - plugins/opendives-core/ios/**
-      - plugins/opendives-core/OpendivesCoreIos.podspec
+      - plugins/opendives-core/OpendivesCore.podspec
       - native/env.sh
       - native/ios/**
       - core/**

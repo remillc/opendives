@@ -1,6 +1,6 @@
 import UIKit
 import Capacitor
-import OpendivesCoreIos
+import OpendivesCore
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
