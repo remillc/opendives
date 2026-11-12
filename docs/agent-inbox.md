@@ -1788,3 +1788,10 @@ Christian's request. Spec: new paragraph "Photos and videos fields" in `docs/ui-
 - The mock-ups still draw the "Photos et vidéos" section for design purposes: in the app it follows the switch.
 - The example footnotes ("* Exemples…") and their asterisks were removed from the mock-ups; nothing to do in the app.
 - A line in the release notes.
+
+## [ ] 2026-11-12-66 Étiquettes right under Notes (replaces the place given in task 62)
+
+Christian's correction, in every view of a dive. Task 62 put Étiquettes under Équipement: **ignore that place**, Étiquettes goes right under Notes. Final order:
+- **Dive detail** (phone light, dark, cursor, menu open, tablet detail panes): data grid, Personnes, Notes, **Étiquettes**, Gaz, Équipement, Conditions, Photos et vidéos (when the task 65 setting is on).
+- **Modifier la plongée** (phone, cylinder sheet background, tablet edit dialogs): La plongée, Personnes, Notes, **Étiquettes**, Gaz, Équipement, Conditions, Avancé.
+- Mock-ups updated: `detail3-android*`, `detail2-android-menu`, `android-edition`, `android-edition-bouteille`, `android-tablette-*`. iOS: the same order.
