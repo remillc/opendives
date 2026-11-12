@@ -5,7 +5,7 @@ on:
   # when the native side changes; a change of the web layer alone, and every
   # branch, are built by hand (workflow_dispatch).
   push:
-    branches: [main, feature/ios]   # feature/ios: until this workflow is on main
+    branches: [main]
     paths:
       - app/ios/**
       - plugins/opendives-core/ios/**
