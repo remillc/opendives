@@ -27,3 +27,8 @@ local.properties
 .claude/settings.local.json
 .claude/inbox-watch.pid
 .claude/worktrees/
+
+# iOS: put in place by native/ios/prepare-app.sh
+plugins/opendives-core/ios/OpenDivesCore.xcframework/
+plugins/opendives-core/ios/include/
+plugins/opendives-core/ios/Resources/

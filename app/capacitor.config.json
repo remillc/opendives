@@ -3,5 +3,8 @@
   "appName": "OpenDives",
   "webDir": "dist",
   "loggingBehavior": "none",
-  "appendUserAgent": "OpenDives"
+  "appendUserAgent": "OpenDives",
+  "ios": {
+    "loggingBehavior": "debug"
+  }
 }

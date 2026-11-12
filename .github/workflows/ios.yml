@@ -1,0 +1,125 @@
+name: iOS
+
+on:
+  # Each run that fails or is cancelled sends an email: few runs. On main, only
+  # when the native side changes; a change of the web layer alone, and every
+  # branch, are built by hand (workflow_dispatch).
+  push:
+    branches: [main, feature/ios]   # feature/ios: until this workflow is on main
+    paths:
+      - app/ios/**
+      - plugins/opendives-core/ios/**
+      - plugins/opendives-core/OpendivesCoreIos.podspec
+      - native/env.sh
+      - native/ios/**
+      - core/**
+      - third_party/**
+      - tests/*.cpp
+      - tests/run-roundtrip.sh
+      - tests/ios/**
+      - .github/workflows/ios.yml
+  workflow_dispatch:
+    inputs:
+      maps_limit:
+        description: Also check the 50 MiB stop of the offline maps (downloads about 50 MiB)
+        type: boolean
+        default: false
+      launches:
+        description: Also install and start the app this many times, to catch an intermittent start-up error (0 for none)
+        type: number
+        default: 0
+
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install the build tools
+        run: brew install autoconf automake libtool ninja
+
+      - name: Show the toolchain
+        run: |
+          xcodebuild -version
+          cmake --version
+
+      - name: Restore the dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            build/ios/deps
+            build/ios/work
+          key: ios-deps-${{ hashFiles('native/ios/build-deps.sh', 'native/ios/env.sh', 'native/env.sh') }}
+
+      - name: Build
+        run: bash native/ios/build-ios.sh
+
+      # About 15 minutes: on main only, branches go straight to the app.
+      - name: Run the tests in the simulator
+        if: github.ref == 'refs/heads/main'
+        run: bash tests/ios/run-simulator.sh
+
+      - name: Prepare the app
+        run: bash native/ios/prepare-app.sh
+
+      - name: Build the app for the simulator
+        run: |
+          xcodebuild -workspace app/ios/App/App.xcworkspace -scheme App -configuration Debug \
+            -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build/app CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY=- DEVELOPMENT_TEAM= build | tail -40
+          test "${PIPESTATUS[0]}" = 0
+          ditto -c -k --sequesterRsrc --keepParent \
+            build/app/Build/Products/Debug-iphonesimulator/App.app build/ios/OpenDives-simulator.zip
+
+      - name: Start the app in the simulator
+        run: bash tests/ios/run-app.sh "$PWD/build/app/Build/Products/Debug-iphonesimulator/App.app"
+
+      - name: Offline maps in the iPhone simulator
+        if: always()
+        run: bash tests/ios/run-maps.sh "$PWD/build/app/Build/Products/Debug-iphonesimulator/App.app" iPhone ${{ inputs.maps_limit && 'limit' || '' }}
+
+      - name: Offline maps in the iPad simulator
+        if: always()
+        run: bash tests/ios/run-maps.sh "$PWD/build/app/Build/Products/Debug-iphonesimulator/App.app" iPad
+      - name: Start the app again and again
+        if: always() && inputs.launches > 0
+        run: bash tests/ios/run-launches.sh "$PWD/build/app/Build/Products/Debug-iphonesimulator/App.app" ${{ inputs.launches }}
+
+      - name: Keep the test logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-logs
+          path: build/ios/test-logs
+          if-no-files-found: ignore
+
+      - name: Keep the framework
+        uses: actions/upload-artifact@v4
+        with:
+          name: OpenDivesCore
+          path: |
+            build/ios/OpenDivesCore.xcframework
+            build/ios/assets
+
+      - name: Keep the app for the simulator
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: OpenDives-simulator
+          path: build/ios/OpenDives-simulator.zip
+          if-no-files-found: ignore
+
+      - name: Keep the app's first screen and log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-run
+          path: |
+            build/ios/app-run
+            build/ios/maps-iPhone
+            build/ios/maps-iPad
+            build/ios/launches
+          if-no-files-found: ignore

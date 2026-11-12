@@ -63,10 +63,10 @@ OpenDives is a full dive log app for mobile. It improves on Subsurface-mobile, b
 ```
 AGENTS.md                 this file
 app/                      Capacitor app (Svelte 5, Framework7) + report (README.md)
-plugins/opendives-core/   local Capacitor plugin: JSDoc contract, Kotlin, JNI
+plugins/opendives-core/   local Capacitor plugin: JSDoc contract, Kotlin, JNI, Swift (ios/)
 core/compat/              OpenDives additions to build Subsurface's core without Qt
 core/libopendives/        C++ facade over the core
-native/                   Android build of the core and its dependencies
+native/                   Android build of the core and its dependencies; ios/: the iOS build
 poc/                      proof of concept: build.sh + report (README.md)
 tests/                    roundtrip.cpp, run-roundtrip.sh, facade.cpp, plan_test.cpp, plan_oracle.cpp,
                           release-check.sh (the release lock), app/ (node:test), android/, e2e/
@@ -112,6 +112,10 @@ $env:ANDROID_HOME = "$env:LOCALAPPDATA\Android\Sdk"
 ```
 
 Gradle does not rebuild the native code: rerun `native/build-android.sh` when the C++ changes. Report: `app/README.md`.
+
+### iOS app
+
+There is no Mac for now: the iOS build runs in the `iOS` workflow on a GitHub macOS runner (`.github/workflows/ios.yml`), on `main` when the native side changes, else by hand. The Swift side of the plugin is in `plugins/opendives-core/ios/`, the Xcode project in `app/ios/`, the scripts in `native/ios/` and `tests/ios/`; see `native/ios/README.md`. A plugin method added or changed on Android is added or changed in Swift too.
 
 ## Conventions
 
