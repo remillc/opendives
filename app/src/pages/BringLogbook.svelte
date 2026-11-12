@@ -14,6 +14,8 @@
   // that has no logbook yet.
   import { OpenDivesCore } from 'opendives-core';
   import TextField from '../components/TextField.svelte';
+  import ChoiceRow from '../components/ChoiceRow.svelte';
+  import { theme } from 'framework7-svelte';
   import EditorialPage from '../components/EditorialPage.svelte';
   import { notAvailableYet } from '../lib/not-available.js';
   import { accountFlow, errorCode, finishAccount, showFailure } from '../lib/account.js';
@@ -129,28 +131,27 @@
   <div class="od-bring-logbook--sources" role="radiogroup" aria-label={t('bringLogbook.sourceLabel')}>
     {#if deviceCount}
       <!-- The dives already on this device come first when there are some. -->
-      <label class="od-bring-logbook--source">
-        <span class="radio"><input type="radio" name="od-source" value="device" bind:group={source} disabled={busy} /><i class="icon-radio"></i></span>
+      <ChoiceRow class="od-bring-logbook--source" name="od-source" selected={source === 'device'} onselect={() => (source = 'device')} disabled={busy}>
         <span class="od-bring-logbook--text">
           <span class="od-bring-logbook--label">{t('bringLogbook.device', { n: deviceCount })}</span>
           <span class="od-bring-logbook--consequence">{t('bringLogbook.deviceText')}</span>
         </span>
-      </label>
+      </ChoiceRow>
     {/if}
     <!-- Order of the mock-ups: empty logbook, divelogs.de, file (divelogs.de stays the default). -->
-    <label class="od-bring-logbook--source">
-      <span class="radio"><input type="radio" name="od-source" value="empty" bind:group={source} disabled={busy} /><i class="icon-radio"></i></span>
+    <ChoiceRow class="od-bring-logbook--source" name="od-source" selected={source === 'empty'} onselect={() => (source = 'empty')} disabled={busy}>
       <span class="od-bring-logbook--text">
         <span class="od-bring-logbook--label">{t('bringLogbook.empty')}</span>
       </span>
-    </label>
-    <label class="od-bring-logbook--source">
-      <span class="radio"><input type="radio" name="od-source" value="divelogs" bind:group={source} disabled={busy} /><i class="icon-radio"></i></span>
+    </ChoiceRow>
+    <!-- Android: the chosen source and its fields form one tinted block. -->
+    <div class="od-bring-logbook--block" class:od-bring-logbook--open={source === 'divelogs' && !theme.ios}>
+    <ChoiceRow class="od-bring-logbook--source" name="od-source" selected={source === 'divelogs'} onselect={() => (source = 'divelogs')} disabled={busy} tinted={false}>
       <span class="od-bring-logbook--text">
         <span class="od-bring-logbook--label">{t('bringLogbook.divelogs')}</span>
         <span class="od-bring-logbook--consequence">{t('bringLogbook.divelogsText')}</span>
       </span>
-    </label>
+    </ChoiceRow>
     {#if source === 'divelogs'}
       <div class="od-bring-logbook--credentials">
         <TextField label={t('bringLogbook.user')} bind:value={user} autocomplete="username" disabled={busy} />
@@ -165,36 +166,45 @@
         />
       </div>
     {/if}
-    <label class="od-bring-logbook--source">
-      <span class="radio"><input type="radio" name="od-source" value="file" bind:group={source} disabled={busy} /><i class="icon-radio"></i></span>
+    </div>
+    <ChoiceRow class="od-bring-logbook--source" name="od-source" selected={source === 'file'} onselect={() => (source = 'file')} disabled={busy}>
       <span class="od-bring-logbook--text">
         <span class="od-bring-logbook--label">{t('bringLogbook.file')}</span>
         <span class="od-bring-logbook--consequence">{t('bringLogbook.fileText')}</span>
       </span>
-    </label>
+    </ChoiceRow>
   </div>
 </EditorialPage>
 
 <style>
   @layer od.components {
-    /* Android: plain rows on the page, radio buttons 20 dp (never shrunk). */
+    /* Android: plain rows on the page, the chosen one tinted and checked (no radio button). */
     .od-bring-logbook--sources {
       margin: 12px 16px 0;
       display: flex;
       flex-direction: column;
     }
 
-    .od-bring-logbook--source {
-      display: flex;
-      gap: 16px;
-      padding: 8px;
-      min-height: 48px;
-      box-sizing: border-box;
+    :global(.od-bring-logbook--source) {
       align-items: flex-start;
-      cursor: pointer;
+    }
 
-      .radio {
-        margin-top: 2px;
+    /* The chosen source and its fields: one block, option on top, fields under it. */
+    .od-bring-logbook--block {
+      border-radius: 12px;
+
+      &.od-bring-logbook--open {
+        background: var(--od-surface-container-highest);
+
+        /* The fields sit on the page background. */
+        .od-bring-logbook--credentials {
+          --od-surface-2: var(--od-background);
+        }
+
+        :global(.od-bring-logbook--source) {
+          padding-bottom: 4px;
+          border-radius: 12px 12px 0 0;
+        }
       }
     }
 
@@ -220,7 +230,9 @@
 
     /* Under the divelogs.de choice, aligned with its text. */
     .od-bring-logbook--credentials {
-      margin: 0 8px 8px 44px;
+      margin: 0;
+      padding: 8px 12px 12px 48px;
+      border-radius: 0 0 12px 12px;
       --od-field-margin: 0;
     }
 
@@ -231,18 +243,22 @@
       overflow: hidden;
       background: var(--od-surface);
 
-      .od-bring-logbook--source {
+      :global(.od-bring-logbook--source) {
         gap: 12px;
         padding: 12px 16px;
 
-        & + .od-bring-logbook--source,
-        .od-bring-logbook--credentials + & {
-          box-shadow: inset 0 0.5px 0 var(--od-separator);
-        }
-
-        .radio {
+        :global(.radio) {
           margin-top: 1px;
         }
+      }
+
+      :global(.od-bring-logbook--source + .od-bring-logbook--source),
+      .od-bring-logbook--block {
+        box-shadow: inset 0 0.5px 0 var(--od-separator);
+      }
+
+      :global(.od-bring-logbook--block + .od-bring-logbook--source) {
+        box-shadow: inset 0 0.5px 0 var(--od-separator);
       }
 
       .od-bring-logbook--text {
@@ -260,8 +276,12 @@
         letter-spacing: 0;
       }
 
+      .od-bring-logbook--block {
+        border-radius: 0;
+      }
+
       .od-bring-logbook--credentials {
-        margin: 0 16px 12px 50px;
+        padding: 0 16px 12px 50px;
       }
     }
   }

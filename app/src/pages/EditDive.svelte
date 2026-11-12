@@ -13,6 +13,7 @@
   import { showSnackbar } from '../lib/snackbar.js';
   import { OpenDivesCore } from 'opendives-core';
   import Icon from '../components/Icon.svelte';
+  import ChoiceRow from '../components/ChoiceRow.svelte';
   import TextField from '../components/TextField.svelte';
   import SelectField from '../components/SelectField.svelte';
   import ButtonField from '../components/ButtonField.svelte';
@@ -1102,13 +1103,12 @@
         {@render header(t('edit.computersGroup'))}
         <div class="od-edit-dive--computers" role="radiogroup" aria-label={t('edit.computersGroup')}>
           {#each dive.diveComputers as computer, i (i)}
-            <label class="od-edit-dive--computer">
-              <input type="radio" name="od-main-computer" checked={i === mainComputer} onchange={() => (mainComputer = i)} />
+            <ChoiceRow class="od-edit-dive--computer" name="od-main-computer" selected={i === mainComputer} onselect={() => (mainComputer = i)}>
               <span class="od-edit-dive--texts">
                 <span>{computer.nickname || computer.model || t('edit.unnamedComputer')}</span>
                 {#if i === mainComputer}<span class="od-edit-dive--role">{t('edit.mainComputer')}</span>{/if}
               </span>
-            </label>
+            </ChoiceRow>
           {/each}
           <p class="od-edit-dive--helper">{t('edit.mainComputerHelp')}</p>
         </div>
@@ -1464,36 +1464,10 @@
       padding: 0 16px;
     }
 
-    .od-edit-dive--computer {
+    /* The main computer: tinted and checked, 12 dp at the sides (no radio button). */
+    :global(.od-edit-dive--computer) {
       min-height: 64px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-
-      input {
-        flex: none;
-        appearance: none;
-        width: 20px;
-        height: 20px;
-        margin: 0;
-        border-radius: 10px;
-        border: 2px solid var(--od-text-2);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        &:checked {
-          border-color: var(--od-text);
-
-          &::after {
-            content: '';
-            width: 10px;
-            height: 10px;
-            border-radius: 5px;
-            background: var(--od-text);
-          }
-        }
-      }
+      padding: 0 12px;
 
       .od-edit-dive--texts {
         flex: 1;
@@ -1512,8 +1486,13 @@
     }
 
     .od-edit-dive--helper {
-      margin: 0 0 8px 36px;
+      /* Aligned with the text: 12 dp padding, 24 dp check, 16 dp gap. */
+      margin: 6px 0 8px 52px;
       font-size: 12px;
+
+      :global(.ios) & {
+        margin-left: 46px;
+      }
       line-height: 16px;
       color: var(--od-text-2);
     }

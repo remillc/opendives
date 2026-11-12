@@ -237,7 +237,7 @@
           {@const selected = sideOf(item) === side}
           <label class="od-conflict-sheet--choice" class:od-conflict-sheet--selected={selected}>
             <input type="radio" name="od-conflict-{item.path}" value={side} checked={selected} disabled={forAll} onchange={() => (choices[item.path] = side)} />
-            <span class="od-conflict-sheet--mark" aria-hidden="true">{#if selected}<Icon name="check" size={16} weight={3} />{/if}</span>
+            {#if selected || theme.ios}<span class="od-conflict-sheet--mark" aria-hidden="true">{#if selected}<Icon name="check" size={16} weight={3} />{/if}</span>{/if}
             <span class="od-conflict-sheet--card-text">
               <span class="od-conflict-sheet--card-title">{t(side === 'device' ? 'conflict.deviceCard' : 'conflict.cloudCard')}</span>
               <span class="od-conflict-sheet--card-when">
@@ -269,7 +269,7 @@
           {disabled}
           onchange={() => (item ? (choices[item.path] = side) : (allSide = side))}
         />
-        <span class="od-conflict-sheet--mark od-conflict-sheet--small-mark" aria-hidden="true">{#if selected}<Icon name="check" size={13} weight={3} />{/if}</span>
+        {#if selected || theme.ios}<span class="od-conflict-sheet--mark od-conflict-sheet--small-mark" aria-hidden="true">{#if selected}<Icon name="check" size={13} weight={3} />{/if}</span>{/if}
         <span class="od-conflict-sheet--small-title">{t(side === 'device' ? 'conflict.phoneShort' : 'conflict.cloudShort')}</span>
         {#if item}
           <span class="od-conflict-sheet--small-when">{when(side === 'device' ? (conflict?.deviceTime ?? '') : (conflict?.cloudTime ?? ''))}</span>

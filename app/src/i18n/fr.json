@@ -1542,6 +1542,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Android : plus de boutons radio. L’élément choisi apparaît sur une ligne teintée avec une coche au début (conflits de synchronisation, import du compte, export, nettoyage des sites, ordinateur principal, site d’une nouvelle plongée, boîtes de choix).",
       "« Modifier la plongée » : l’en-tête de Conditions montre la moyenne en étoiles grises, sans le chiffre.",
       "Toutes les bouteilles d’une plongée s’affichent, même inutilisées (« Afficher les bouteilles inutilisées » est activé par défaut) ; une bouteille inutilisée est dessinée pleine, avec « Non utilisée » ou sa seule pression.",
       "« Modifier la plongée » : le texte sous le résumé Gaz n’explique plus les couleurs.",

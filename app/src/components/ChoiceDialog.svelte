@@ -1,11 +1,12 @@
 <script>
   // @ts-check
   // Single-choice dialog of Material 3 (spec, section 4, "Settings: what each
-  // row does"; docs/mockups/reglages-choix-android.dc.html): a radio button at
-  // the start of each 56 dp row, the label, then its example in secondary text
-  // at the end of the row; only the radio button shows the selection (no tint,
-  // no bold). "Cancel" and "OK" at the bottom right; OK applies the choice.
+  // row does"; docs/mockups/reglages-choix-android.dc.html): 56 dp rows, a
+  // check at the start of the chosen one on the selected tint (no radio button,
+  // see ChoiceRow), the label, then its example in secondary text at the end of
+  // the row. "Cancel" and "OK" at the bottom right; OK applies the choice.
   import Md3Dialog from './Md3Dialog.svelte';
+  import ChoiceRow from './ChoiceRow.svelte';
   import { t } from '../lib/i18n.js';
 
   /**
@@ -28,12 +29,10 @@
 <Md3Dialog class="od-choice-dialog" {title} {oncancel}>
   <div class="od-choice-dialog--choices" role="radiogroup" aria-label={title}>
     {#each options as option (option.value)}
-      <label class="od-choice-dialog--choice">
-        <input type="radio" {name} value={option.value} bind:group={selected} />
-        <span class="radio" aria-hidden="true"></span>
+      <ChoiceRow class="od-choice-dialog--choice" {name} selected={selected === option.value} onselect={() => (selected = option.value)}>
         <span class="od-choice-dialog--label">{option.label}</span>
         {#if option.example}<span class="od-choice-dialog--example">{option.example}</span>{/if}
-      </label>
+      </ChoiceRow>
     {/each}
   </div>
   {#if note}<p class="od-choice-dialog--note">{note}</p>{/if}
@@ -48,6 +47,7 @@
     .od-choice-dialog--choices {
       display: flex;
       flex-direction: column;
+      padding: 0 12px;
     }
 
     .od-choice-dialog--note {
@@ -57,51 +57,9 @@
       color: var(--od-text-2);
     }
 
-    .od-choice-dialog--choice {
-      position: relative;
+    :global(.od-choice-dialog--choice) {
       min-height: 56px;
-      padding: 0 24px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      cursor: pointer;
-    }
-
-    input {
-      position: absolute;
-      opacity: 0;
-      width: 1px;
-      height: 1px;
-    }
-
-    .radio {
-      flex: none;
-      box-sizing: border-box;
-      width: 20px;
-      height: 20px;
-      border: 2px solid var(--od-text-2);
-      border-radius: 10px;
-      position: relative;
-    }
-
-    input:checked + .radio {
-      border-color: var(--od-action);
-
-      &::after {
-        content: '';
-        position: absolute;
-        left: 3px;
-        top: 3px;
-        width: 10px;
-        height: 10px;
-        border-radius: 5px;
-        background: var(--od-action);
-      }
-    }
-
-    input:focus-visible + .radio {
-      outline: 2px solid var(--od-action);
-      outline-offset: 6px;
+      padding: 0 12px;
     }
 
     .od-choice-dialog--label {

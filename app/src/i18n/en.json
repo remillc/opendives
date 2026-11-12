@@ -1542,6 +1542,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Android: no more radio buttons. The chosen item of a choice shows on a tinted row with a check at the start (sync conflicts, account import, export, clean up sites, main dive computer, new dive site, choice dialogs).",
       "“Edit dive”: the Conditions header shows the average as grey stars, without the number.",
       "Every cylinder of a dive shows, even unused ones (“Show unused cylinders” is on by default); an unused cylinder is drawn full, with “Not used” or its one pressure.",
       "“Edit dive”: the text under the Gas summary no longer explains the colours.",
