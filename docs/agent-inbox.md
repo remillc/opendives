@@ -2040,3 +2040,10 @@ Reference mock-ups: `android-carnet`, `android-accueil-c`, `detail3-android`, `d
 
 Christian chose proposal A "ocean-night" (spec: `docs/system-design.md`, blue theme paragraph; mock-up `docs/mockups/logo-bleu.dc.html`, rows "A"). Same drawing, only the three wave gradients change: light #D4E2F2→#BCD2EB, #8FB0D6→#7199C2, #3F6F9F→#2D5E90; dark #D6E4F4→#BED3EC, #93B6E0→#77A0D2, #4F84C2→#3A6FAE. The brand sources in `docs/brand/` are already updated. Regenerate everything made from them: `app/public/favicon.svg`, `logo-light.svg`, `logo-dark.svg`, `logo-small-light.svg`, the Android launcher icons (adaptive foreground, round, legacy), the iOS app icon and the splash screen. Check the 24 and 32 px sizes on the emulator.
 
+
+## [ ] 2026-11-12-83 Detail info grid, list margins, fr-CA formats
+
+Christian's decisions of 12 November 2026.
+- **Info grid of the dive detail:** remove the Entrée, Sortie and Prof. moyenne cells everywhere (phone and tablet, light and dark, with the cursor, with the menu open, iOS too). The profile chart already shows these three values (task 80). The grid starts with Air.
+- **Dive list margins:** the mock-ups are the reference, row padding 16 dp start and 24 dp end. On Christian's phone screenshot the margins look wider (about 25 / 33 dp). Check where the extra space comes from and align on 16 / 24.
+- **fr-CA formats:** in French (Canada), times use "10 h 44" and feet use "pi" (and other fr-CA unit labels). Check that every screen formats times and units through the locale, not with hard-coded "10:44" or "ft". The mock-ups will be updated to match.
