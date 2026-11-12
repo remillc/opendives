@@ -3,12 +3,12 @@
   // Planner settings, a screen of their own (spec, section 4; docs/mockups/
   // reglages-planificateur-android.dc.html; tasks 2026-11-08-01, 03, 04):
   // opened from the planner's "tune" button, at /settings/planner. Four groups
-  // as in Settings: value rows open the number (wheel) or choice dialogs,
+  // as in Settings: value rows open the number (wheel) dialog or a choice menu on the row,
   // switches change in place. The values are the core's planner preferences,
   // kept on this device, with Subsurface's defaults; one ascent rate is
   // written to Subsurface's four depth bands.
   import { Page, Navbar, Link, theme } from 'framework7-svelte';
-  import ChoiceDialog from '../components/ChoiceDialog.svelte';
+  import RowMenu from '../components/RowMenu.svelte';
   import WheelDialog from '../components/WheelDialog.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
   import { DEFAULT_SAC_FACTOR } from '../lib/settings.svelte.js';
@@ -209,7 +209,7 @@
   /** The value shown on a number row: the stored value in the user's unit. @param {NumberRow} row */
   const shown = (row) => row.show(row.wheel[nearest(row.wheel, row.toUnit(row.stored))]);
 
-  /** @type {null|{ kind: 'number', row: NumberRow }|{ kind: 'choice', row: ChoiceRow }} */
+  /** @type {null|{ kind: 'number', row: NumberRow }|{ kind: 'choice', row: ChoiceRow, anchor: HTMLElement }} */
   let dialog = $state(null);
 
   /** @param {unknown} e */
@@ -231,7 +231,7 @@
       </span>
     </label>
   {:else}
-    <button type="button" class="od-planner-settings--row" aria-haspopup="dialog" onclick={() => (dialog = row.kind === 'number' ? { kind: 'number', row } : { kind: 'choice', row })}>
+    <button type="button" class="od-planner-settings--row" aria-haspopup={row.kind === 'number' ? 'dialog' : 'listbox'} onclick={(e) => (dialog = row.kind === 'number' ? { kind: 'number', row } : { kind: 'choice', row, anchor: e.currentTarget })}>
       <span class="od-planner-settings--texts">
         <span class="od-planner-settings--label">{row.label}</span>
         {#if row.kind === 'number' && row.text}<span class="od-planner-settings--supporting">{row.text}</span>{/if}
@@ -265,16 +265,13 @@
 
 {#if dialog?.kind === 'choice'}
   {@const row = dialog.row}
-  <ChoiceDialog
-    title={row.label}
+  <RowMenu
+    anchor={dialog.anchor}
+    label={row.label}
     options={row.options}
     value={row.current}
-    oncancel={() => (dialog = null)}
-    onselect={(v) => {
-      const chosen = row;
-      dialog = null;
-      if (v !== chosen.current) Promise.resolve(chosen.set(v)).catch(failed);
-    }}
+    onclose={() => (dialog = null)}
+    onselect={(v) => Promise.resolve(row.set(v)).catch(failed)}
   />
 {:else if dialog?.kind === 'number'}
   {@const row = dialog.row}

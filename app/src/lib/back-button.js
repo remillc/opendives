@@ -8,7 +8,13 @@ import { backTarget, readPane } from './pane-history.js';
 
 export function enableBackButton() {
   CapacitorApp.addListener('backButton', () => {
-    // 0. An open dropdown menu (components/SelectField.svelte) closes first.
+    // 0. An open Settings row menu (components/RowMenu.svelte) closes first.
+    const rowMenu = document.querySelector('.od-row-menu');
+    if (rowMenu) {
+      rowMenu.dispatchEvent(new CustomEvent('od-cancel'));
+      return;
+    }
+    // 0b. An open dropdown menu (components/SelectField.svelte) closes first.
     const dropdown = document.querySelector('.od-select-field--open');
     if (dropdown) {
       dropdown.dispatchEvent(new CustomEvent('od-cancel'));
