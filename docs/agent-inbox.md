@@ -1708,3 +1708,16 @@ Christian's request, on the collapsed "Conditions" row of "Modifier la plongée"
 
 Done in `feature/conditions-grey-stars`: the Conditions header (collapsed and open, one header) draws the average with `Stars summary` in `--od-star-summary` (#9A9DA1 light, #75787C dark) and no longer shows the number; the accessible name keeps the average and ends with "Afficher le détail" or "Masquer le détail". The stars to touch stay in ink. Tablet and iOS share EditDive.
 
+
+## [ ] 2026-11-12-58 No radio buttons on Android
+
+Christian's request: replace every radio button left in the Android app with the Material 3 Expressive pattern already used by the menus (task 49). Spec: new paragraph "No radio buttons on Android" in `docs/ui-specification.md`.
+- Pattern: the chosen item sits on the selected tint (#E3E1DC, 12 dp corners) with a check (24 dp, ink) at the start; the other items are plain, with an empty 24 dp slot so the texts line up. A tap selects. Keep `role="radiogroup"`/`role="radio"` and `aria-checked` for screen readers.
+- Screens and mock-ups:
+  - Sync conflicts (`android-etat-conflit`, `-plusieurs`, `-ordinateurs`): the choice cards keep the filled check badge on the chosen card; the empty circle on the other card goes away.
+  - Account import, "Reprendre votre carnet ?" (`android-compte-import`, `compte-import-identifiants-android`): the chosen source and its divelogs.de fields form one tinted block (option on top with 12 dp top corners, fields under it with 12 dp bottom corners, fields on #F4F4F2).
+  - Export sheet (`carnet-export-android`): the chosen format tinted and checked.
+  - Clean up sites (`sites-nettoyer-android`, `sites-nettoyer-pas-doublons-android`, tablet `android-tablette-sites-nettoyer-*`): in each duplicate group, the site to keep is tinted and checked.
+  - Dive computers in "Modifier la plongée" (`android-edition` and the tablet edit boards): the main computer row tinted and checked, with 12 dp side padding; the helper under it aligned with the text.
+- Search the code for any other radio button on Android and apply the same pattern. iOS keeps its native controls.
+- A line in the release notes.
