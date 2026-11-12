@@ -1988,3 +1988,10 @@ Christian's request. Spec: new paragraph "Gas section of a rebreather dive". Moc
 - Other cylinders (bailout, stages) beside the unit, open-circuit style, use written vertically ("SECOURS").
 - Under each cylinder the same three lines as today, then the gas-switch line. Cylinders found by their use (Diluant, Oxygène); more than one of a kind: the first goes in the unit, the others beside it.
 - One SVG component, dark theme too, accessible name as in the spec. Tablet and iOS: the same. A line in the release notes.
+
+## [ ] 2026-11-12-79 Phone: profile chart full width
+
+Christian's request. Spec: new paragraph "Profile chart full width on the phone". Mock-ups: `detail3-android` (and `-sombre`, `-curseur`, `detail2-android-menu`, `sites-sans-site-profil-android`).
+- Dive detail (and site detail with a profile) on the phone: the profile section loses its card (no 16 dp side margin, no rounded corners), its white band goes edge to edge.
+- Hint line or cursor readout: 20 dp side padding. Chart: as wide as the screen minus the room for axis labels (≈14 dp left, ≈26 dp right); keep its aspect ratio.
+- Touch cursor and readout unchanged. Tablet panes keep the card. iOS phone: the same.
