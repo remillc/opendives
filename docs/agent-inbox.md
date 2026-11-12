@@ -1697,7 +1697,7 @@ Christian's answer to your question about the hidden third cylinder of dive 8854
 Done in `feature/unused-cylinders-shown`: `includeUnusedTanks` joins `OD_CORE_DEFAULTS` (on at the first start unless this device has a value, and after a reset). `cylinderListed` and `unusedShown` (lib/gas-summary.js, tested): the dive detail Gaz card, the Gaz summary and the gas page of Modifier la plongée list every cylinder with the setting on, the core's `used` ones with it off; a listed cylinder that was not used (core rule, and no pressure drop) is drawn full without the pale band or lines, with "Non utilisée" or its one pressure. The PDF sheet keeps its own rule (used, or with a start pressure). Checked on Christian's phone with dive 88548 (its bailout now shows, "Non utilisée").
 
 
-## [ ] 2026-11-12-57 Collapsed Conditions: grey stars, no number
+## [x] 2026-11-12-57 Collapsed Conditions: grey stars, no number
 
 Christian's request, on the collapsed "Conditions" row of "Modifier la plongée" (task 44). Mock-up: `android-edition`.
 - The average stars are drawn in grey (#9A9DA1, fill and outline), not in ink: they are a summary to read, not stars to touch.
@@ -1705,3 +1705,6 @@ Christian's request, on the collapsed "Conditions" row of "Modifier la plongée"
 - The accessible name keeps the average: "Conditions, moyenne 2,3 sur 5, eau 4,3 °C. Afficher le détail".
 - **Open section too** (addendum): when Conditions is open (`android-edition-conditions`), its header also loses the "2,3" and shows the average stars in the same grey. The stars to touch below (Visibilité, Courant…) stay in ink.
 - Dark mode: the matching grey from the dark palette. Tablet and iOS: the same.
+
+Done in `feature/conditions-grey-stars`: the Conditions header (collapsed and open, one header) draws the average with `Stars summary` in `--od-star-summary` (#9A9DA1 light, #75787C dark) and no longer shows the number; the accessible name keeps the average and ends with "Afficher le détail" or "Masquer le détail". The stars to touch stay in ink. Tablet and iOS share EditDive.
+

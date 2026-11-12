@@ -814,7 +814,7 @@
       t('edit.conditionsGroup'),
       conditionsAvg === null ? t('edit.conditionsNoAverage') : t('edit.conditionsAverage', { average: conditionsAvgText }),
       ...(conditionsWater ? [t('edit.conditionsWaterLabel', { value: conditionsWater })] : []),
-    ].join(', '),
+    ].join(', ') + `. ${t(conditionsOpen ? 'detail.equipmentHide' : 'detail.equipmentShow')}`,
   );
 </script>
 
@@ -1062,8 +1062,7 @@
           <span class="od-edit-dive--conditions-title" role="heading" aria-level="2">{t('edit.conditionsGroup')}</span>
           {#if conditionsWater}<span class="od-edit-dive--conditions-water">{t('edit.conditionsWater', { value: conditionsWater })}</span>{/if}
         </span>
-        <Stars value={conditionsAvg ?? 0} label="" size={20} decorative />
-        <span class="od-edit-dive--conditions-average">{conditionsAvgText}</span>
+        <Stars value={conditionsAvg ?? 0} label="" size={20} decorative summary />
         <span class="od-edit-dive--conditions-chevron" class:od-edit-dive--conditions-chevron-up={conditionsOpen}><Icon name="expand" /></span>
       </button>
       {#if conditionsOpen}
@@ -1308,13 +1307,6 @@
       font-variant-numeric: tabular-nums;
     }
 
-    .od-edit-dive--conditions-average {
-      min-width: 28px;
-      font-size: 14px;
-      font-weight: 600;
-      font-variant-numeric: tabular-nums;
-      text-align: end;
-    }
 
     .od-edit-dive--conditions-chevron {
       display: flex;
