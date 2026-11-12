@@ -1721,3 +1721,7 @@ Christian's request: replace every radio button left in the Android app with the
   - Dive computers in "Modifier la plongée" (`android-edition` and the tablet edit boards): the main computer row tinted and checked, with 12 dp side padding; the helper under it aligned with the text.
 - Search the code for any other radio button on Android and apply the same pattern. iOS keeps its native controls.
 - A line in the release notes.
+
+## [ ] 2026-11-12-59 Dive detail toolbar: Planifier before Partager
+
+Christian's request: in the floating toolbar of the dive detail (task 39), the order becomes **Modifier, Planifier depuis cette plongée, Partager, ⋮** (Planifier and Partager swap). Phone (light and dark), detail with the menu open, and the tablet detail panes. Mock-ups: `detail3-android`, `-sombre`, `-curseur`, `detail2-android-menu`, `android-tablette-*` detail panes. Order only. iOS: the same order.
