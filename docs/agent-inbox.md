@@ -1755,3 +1755,11 @@ Christian's request, in every view of a dive.
 - **Modifier la plongée** (phone, cylinder sheet background, tablet edit dialogs): the "Étiquettes" field leaves the people card and gets a card of its own, "Étiquettes" (same card style, 16 sp semibold title), between Équipement and Conditions. Field and helper unchanged.
 - Mock-ups: `detail3-android*`, `detail2-android-menu`, `android-edition`, `android-edition-bouteille`, `android-tablette-*`. Note: the edit mock-ups also show the people card split from the notes ("Personnes" and a "Notes" card before Avancé). That change is not approved yet: leave the notes where they are for now, a separate task will follow if Christian approves it.
 - iOS: the same order.
+
+## [ ] 2026-11-12-63 Modifier la plongée: "Personnes" and "Notes" as two cards
+
+Christian's request (now approved; the mock-ups already sent with task 62 show it). In "Modifier la plongée" (phone, tablet edit dialogs):
+- The card "Personnes et notes" becomes **"Personnes"**: Guide de palanquée and Compagnons, unchanged.
+- The Notes field gets its own card **"Notes"** (same card style, 16 sp semibold title), placed after Conditions, right before Avancé, as in the dive detail where the notes come last.
+- Order: La plongée, Personnes, Gaz, Équipement, Étiquettes, Conditions, Notes, Avancé.
+- Mock-ups: `android-edition`, `android-edition-bouteille`, `android-tablette-edition-*`. iOS: the same.
