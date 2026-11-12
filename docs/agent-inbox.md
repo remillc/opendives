@@ -1602,3 +1602,10 @@ Christian's request: the group "Conditions par défaut" is only used by the tool
 
 Done in `feature/tool-conditions`: the group is renamed "Conditions des outils" ("Tool conditions"), moved after Décompression and before Pressions partielles in `Settings.svelte` (phone, tablet and iOS share the template), with the new note under it. Setting keys unchanged. Checked on the phone emulator.
 
+
+## [ ] 2026-11-12-48 Settings: "Proposer les tailles standard" off by default
+
+Christian's request: in Settings › Équipement, the switch "Proposer les tailles standard" ("Dans le choix du type de bouteille", core pref `display_default_tank_infos`) is **off by default**, unlike Subsurface where it is on. Spec table updated (`docs/ui-specification.md`); mock-ups `android-reglages` and the other Settings boards show it off.
+- New installs and "Réinitialiser tous les réglages" start with it off. A value the user already set stays as it is.
+- When off, the cylinder type choice shows only the user's own cylinder types (and the ones already in the logbook), as the core does.
+- Tablet and iOS: the same default.
