@@ -1800,10 +1800,13 @@ Christian's correction, in every view of a dive. Task 62 put Étiquettes under �
 
 Done in `feature/tags-under-notes`: the detail shows Personnes, Notes, Étiquettes, Gaz, Équipement, Conditions, Photos et vidéos; Modifier la plongée shows La plongée, Personnes, Notes, Étiquettes, Gaz, Équipement, Conditions, Avancé. Phone, tablet and iOS share both files.
 
-## [ ] 2026-11-12-67 Bug: "Retirer du voyage" shown for a dive that is not in a trip
+## [x] 2026-11-12-67 Bug: "Retirer du voyage" shown for a dive that is not in a trip
 
 Christian reports that on `/dives/88554` the ⋮ menu of the dive detail shows "Retirer du voyage" although the dive is not part of a trip (as he sees it). `DiveDetail.svelte` shows it when `removableFromTrip` is true: `!!dive?.trip && (!dive.trip.autogen || more than one dive in that trip)`.
 - Find out what `dive.trip` is for 88554. Likely suspects: an automatic trip (`autogen`, from "Regrouper les plongées en voyages") that the detail header or the logbook does not show as a trip, or a stale trip reference.
 - Rule to apply: the item is shown only when the dive belongs to a trip the user can see as a trip in the logbook and in the detail header ("Voyage : …"). If the header shows no trip, the menu shows no "Retirer du voyage". Same rule for the logbook selection menu ("Retirer du voyage" with checked dives).
 - Add a test with a dive outside any trip and one in an automatic trip.
 - Tell Christian in your answer what 88554's trip actually was.
+
+Done in `fix/remove-from-trip-shown`: dive 88554 (no number, 4 Nov 2026) was the only dive of a trip made by hand (not `autogen`) and unnamed, id 88551. The logbook draws a one-dive trip as the dive and the detail hid it, but the ⋮ item only skipped automatic one-dive trips. `shownTrip` (lib/trip-shown.js, tested: no trip, one-dive manual trip, two-dive automatic trip) is now the one rule for the detail header, the ⋮ item and the logbook selection's "Retirer du voyage": a trip with two dives or more. The header names an unnamed trip "Voyage du …". Checked on Christian's phone (88554: Renuméroter and Supprimer only).
+
