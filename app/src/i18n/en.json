@@ -1539,6 +1539,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Settings › Equipment: “Cylinder types” is now first in the group.",
       "Settings: a new “Download” group (Bluetooth devices and remembered computers); “Dive computers” keeps only the logbook’s computers.",
       "Settings › Units: “Pressure” becomes “Cylinder pressure”; this unit is only used for cylinders (atmospheric pressure stays in mbar).",
       "Settings: every choice in a short list (date and time format, duration, speeds, GPS coordinates, language, theme, text size, default cylinders, water type of downloaded dives) opens as a menu on the touched row instead of a radio-button dialog. Tap a value to choose it; tap outside or press Back to close without changing.",

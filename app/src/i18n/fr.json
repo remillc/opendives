@@ -1539,6 +1539,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Réglages › Équipement : « Types de bouteilles » passe en tête du groupe.",
       "Réglages : nouveau groupe « Téléchargement » (appareils Bluetooth et ordinateurs mémorisés) ; « Ordinateurs de plongée » ne garde que les ordinateurs du carnet.",
       "Réglages › Unités : « Pression » devient « Pression des bouteilles » ; cette unité ne sert qu’aux bouteilles (la pression atmosphérique reste en mbar).",
       "Réglages : chaque choix dans une courte liste (format de la date et de l’heure, durée, vitesses, coordonnées GPS, langue, thème, taille du texte, bouteilles par défaut, type d’eau des plongées téléchargées) s’ouvre en menu sur la ligne touchée, au lieu d’une boîte de dialogue à boutons radio. Touchez une valeur pour la choisir ; touchez à côté ou faites Retour pour fermer sans changer.",
