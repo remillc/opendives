@@ -14,6 +14,7 @@
   import DiveProfile from '../components/DiveProfile.svelte';
   import DiveFigures from '../components/DiveFigures.svelte';
   import Icon from '../components/Icon.svelte';
+  import { rebreatherLabel, rebreatherLayout } from '../lib/rebreather-gas.js';
   import GasCard from '../components/GasCard.svelte';
   import EquipmentCard from '../components/EquipmentCard.svelte';
   import { cylinderListed, equipmentLabel, equipmentOpens, fillLevels, gasChangeLine, gasChanges, gasGroupLabel, unusedShown } from '../lib/gas-summary.js';
@@ -357,6 +358,7 @@
         const use = c.use === 'diluent' || c.use === 'oxygen' ? t(`detail.cylinderUseNames.${c.use}`) : rebreather ? t('detail.cylinderUseNames.bailout') : '';
         return {
           gas: gasName(c.o2Permille, c.hePermille, gasWords),
+          use: c.use,
           line: typeLine(c.description, size, use),
           start: c.startMbar > 0 && c.endMbar > 0 ? pressureValue(c.startMbar) : '',
           end: c.endMbar > 0 ? formatPressure(c.endMbar, prefs) : '',
@@ -381,6 +383,33 @@
       { group: t('detail.gasGroup'), cylinder: t('detail.gasGroupCylinder'), cylinderGas: t('detail.gasGroupCylinderGas'), join: t('detail.gasGroupJoin') },
     ),
   );
+
+  /**
+   * The rebreather view of the Gas card (closed circuit only, task
+   * 2026-11-12-78): the cylinders found by their use, the marks and the name.
+   */
+  const ccrView = $derived.by(() => {
+    if (!dive || dive.divemode !== 'CCR' || gasCylinders.length === 0) return null;
+    const layout = rebreatherLayout(gasCylinders);
+    return {
+      ...layout,
+      marks: { diluent: t('detail.rebreatherMarks.diluent'), oxygen: t('detail.rebreatherMarks.oxygen'), bailout: t('detail.rebreatherMarks.bailout') },
+      label: rebreatherLabel(
+        gasCylinders.map((c, i) => ({ gas: i === layout.diluent ? c.gas : c.gas.toLocaleLowerCase(), start: c.start, end: c.end })),
+        layout,
+        {
+          group: t('detail.rebreatherGroup'),
+          diluent: t('detail.rebreatherDiluent'),
+          oxygen: t('detail.rebreatherOxygen'),
+          bailout: t('detail.rebreatherBailout'),
+          cylinder: t('detail.gasGroupCylinder'),
+          cylinderGas: t('detail.gasGroupCylinderGas'),
+          range: t('detail.rebreatherRange'),
+          join: t('detail.gasGroupJoin'),
+        },
+      ),
+    };
+  });
 
   /** The gas changes, in one plain line: "Switch to air at 222 ft." (nothing when there is none). */
   const gasChangesLine = $derived(
@@ -594,8 +623,9 @@
       <section class="od-dive-detail--section">
         <h2 class="od-dive-detail--section-title">{t('detail.gasSection')}</h2>
         <GasCard
-          label={gasLabel}
+          label={ccrView ? ccrView.label : gasLabel}
           items={gasCylinders}
+          rebreather={ccrView}
           changes={gasChangesLine}
           sac={sac ? { label: t('detail.sacFull'), value: sac } : null}
         />

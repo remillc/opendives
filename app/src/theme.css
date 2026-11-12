@@ -98,6 +98,11 @@
     /* Drawn cylinders: pale band between the end and the start pressure, and the dashed level lines. */
     --od-cylinder-breathed: #F6DCAE;
     --od-cylinder-level: #B4530F;
+    /* Rebreather drawing (dive detail, CCR): canister, head, hoses, stand, valves. */
+    --od-rebreather-canister: #2B2F33;
+    --od-rebreather-head: #1F2124;
+    --od-rebreather-hardware: #9A9DA1;
+    --od-rebreather-valve: #75787C;
     --od-trace: #1F2124;
     /* Outline drawn under the profile line; only used in dark mode. */
     --od-trace-outline: transparent;
@@ -202,6 +207,10 @@
     --od-loading-indicator-bottom: #EF7625;
     --od-cylinder-breathed: #5C4A2A;
     --od-cylinder-level: #E5B961;
+    --od-rebreather-canister: #3A3E43;
+    --od-rebreather-head: #4A4D52;
+    --od-rebreather-hardware: #8E9196;
+    --od-rebreather-valve: #6B6E73;
     --od-trace: #F4F4F2;
     --od-trace-outline: #121314;
     --od-chart-grid: #3A3C40;
