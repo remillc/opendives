@@ -1667,10 +1667,13 @@ Christian's request: in Settings › Équipement, the row "Types de bouteilles" 
 Done in `feature/cylinder-types-first`: the "Types de bouteilles" row is the first of Équipement in `Settings.svelte` (phone, tablet and iOS share it). Order only.
 
 
-## [ ] 2026-11-12-54 Cylinder use: "Secours (bailout)" in rebreather dives
+## [x] 2026-11-12-54 Cylinder use: "Secours (bailout)" in rebreather dives
 
 Christian's request. In a rebreather dive (CCR or pSCR), the "Utilisation" choice of a cylinder (gas page and cylinder sheet of "Modifier la plongée", tablet dialog too) shows the core's `OC-gas` use as **"Secours (bailout)"** instead of "Circuit ouvert". Mock-up: `android-edition-gaz` (third cylinder, Air).
 - Label only: the value stored in the logbook stays `OC-gas`, as Subsurface writes it. Nothing else changes in the data.
 - In an open-circuit dive, the choice keeps the label "Circuit ouvert".
 - The other choices are unchanged: Diluant, Oxygène, Gaz de transit, Non utilisée.
 - Same wording wherever the use of a cylinder is named in a rebreather dive (the card summary already says "Secours").
+
+Done in `feature/bailout-label`: `useKey(use, divemode)` (lib/cylinder-use.js, tested) names `OC-gas` "Secours (bailout)" (`edit.uses.bailout`, en "Bailout") in a CCR or pSCR dive, "Circuit ouvert" otherwise; used by the Utilisation menu (gas page, cylinder sheet, tablet dialog: same SelectField), the delete dialog's line and the PDF sheet. The logbook keeps `OC-gas`. Checked on the phone emulator on a CCR dive.
+

@@ -1034,7 +1034,8 @@
       "diluent": "Diluant",
       "oxygen": "Oxygène",
       "not used": "Non utilisée",
-      "Travel Gas": "Gaz de transit"
+      "Travel Gas": "Gaz de transit",
+      "bailout": "Secours (bailout)"
     },
     "siteHint": "Un site du carnet ou un nouveau nom",
     "siteSearch": "Rechercher un site",
@@ -1541,6 +1542,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Plongée en recycleur : la bouteille en circuit ouvert s’appelle « Secours (bailout) » dans le choix de son utilisation ; le carnet n’est pas modifié.",
       "Menu : choisir une section depuis les Réglages ou À propos ferme ces écrans et montre la section, même celle qui était dessous (avant, « Carnet » choisi depuis les Réglages ne faisait rien).",
       "Réglages › Unités : un nouveau choix « Pressions partielles », bar ou ATA. Seule l’unité affichée change (1,4 bar devient 1,4 ATA, sans conversion), dans le planificateur, les outils de gaz, le profil et les réglages de pressions. Métrique donne bar, Impérial donne ATA, et un autre choix passe les unités en Personnalisé. Gardé sur cet appareil seulement.",
       "Réglages › Équipement : « Types de bouteilles » passe en tête du groupe.",

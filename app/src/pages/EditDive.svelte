@@ -26,6 +26,7 @@
   import StarsInput from '../components/StarsInput.svelte';
   import Stars from '../components/Stars.svelte';
   import { conditionsMean, roundHalfUp1 } from '../lib/conditions.js';
+  import { useKey } from '../lib/cylinder-use.js';
   import WheelDialog from '../components/WheelDialog.svelte';
   import DatePickerDialog from '../components/DatePickerDialog.svelte';
   import TimePickerDialog from '../components/TimePickerDialog.svelte';
@@ -258,7 +259,7 @@
   /** @param {string} mode */
   const formatDiveMode = (mode) => tIfExists(`detail.modes.${mode}`) ?? mode;
   const modeOptions = MODES.map((m) => ({ value: m, label: tIfExists(`detail.modes.${m}`) ?? m }));
-  const useOptions = USES.map((u) => ({ value: u, label: t(`edit.uses.${u}`) }));
+  const useOptions = $derived(USES.map((u) => ({ value: u, label: t(useKey(u, f.divemode)) })));
   const waterOptions = $derived([{ value: '', label: t('edit.notSet') }, ...WATER_TYPES.map((w) => ({ value: w.id, label: waterTypeName(w.id) }))]);
   /** The cylinder types, with this cylinder's own when it is not among them. @param {string} own */
   const cylinderTypeOptions = (own) => {
@@ -505,7 +506,7 @@
     const size = formatCylinderSize(own.sizeMl, own.workingPressureMbar, prefs);
     const moments = gasChangeMoments(dive?.events ?? [], c.index);
     return {
-      line: typeLine(c.f.description, typeHelper(size, own.workingPressureMbar), c.f.use ? t(`edit.uses.${c.f.use}`) : ''),
+      line: typeLine(c.f.description, typeHelper(size, own.workingPressureMbar), c.f.use ? t(useKey(c.f.use, f.divemode)) : ''),
       moments,
       outcome: deletionOutcome({ protected: c.protected, moments }),
     };
