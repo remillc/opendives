@@ -7,7 +7,8 @@
   // and tissues, each offered only when the dive has the data.
   import Icon from './Icon.svelte';
   import { waterBottomColor } from '../lib/water-column.js';
-  import { depthUnit, formatDepth, formatDuration, formatMinSec, formatNumber, formatPartialPressure, formatTemperature } from '../lib/format.js';
+  import { depthUnit, depthValue, formatDepth, formatDuration, formatMinSec, formatNumber, formatPartialPressure, formatTemperature, formatTimeOfDay } from '../lib/format.js';
+  import { entryExitTimes, meanLabelY } from '../lib/profile-times.js';
   import { tissueColor } from '../lib/tissues.js';
   import { t } from '../lib/i18n.js';
 
@@ -18,17 +19,20 @@
    *   divemode: string,
    *   maxDepthMm: number,
    *   durationSeconds: number,
+   *   startIso?: string,
+   *   meanDepthMm?: number,
    *   prefs: import('opendives-core').Prefs,
    * }}
    */
-  let { samples, cylinders, divemode, maxDepthMm, durationSeconds, prefs } = $props();
+  let { samples, cylinders, divemode, maxDepthMm, durationSeconds, startIso, meanDepthMm = 0, prefs } = $props();
 
   const uid = $props.id();
   let width = $state(320);
-  const HEIGHT = 168;
+  const HEIGHT = 184;
   const MARGIN_LEFT = 30;
   const MARGIN_TOP = 6;
-  const MARGIN_BOTTOM = 21;
+  // Under the plot: the time axis (21), then the row of entry and exit times (16).
+  const MARGIN_BOTTOM = 37;
   const BAND = 22;
 
   const times = $derived(samples.timeSeconds);
@@ -105,7 +109,7 @@
     [...scaleOrder].reverse().find((l) => (l === 'temperature' ? showTemperature : showPpo2)) ?? null,
   );
 
-  const MARGIN_RIGHT = $derived(rightScale ? 28 : 8);
+  const MARGIN_RIGHT = $derived(rightScale ? 28 : 18);
   const plotWidth = $derived(Math.max(10, width - MARGIN_LEFT - MARGIN_RIGHT));
   const plotHeight = $derived(HEIGHT - MARGIN_TOP - MARGIN_BOTTOM);
   // The deepest point sits just above the time axis.
@@ -247,8 +251,27 @@
     if (e.buttons || e.pointerType === 'touch') placeCursor(e);
   }
 
+  // Entry and exit times (the exit is the last sample) and the average depth.
+  const ends = $derived(entryExitTimes(startIso, tMax, formatTimeOfDay));
+  const showMean = $derived(meanDepthMm > 0 && times.length > 0);
+  const meanY = $derived(y(meanDepthMm));
+  const meanLabel = $derived(
+    meanLabelY(
+      meanY,
+      ticks.list.filter((tick) => tick.major).map((tick) => y(tick.mm)),
+      MARGIN_TOP + 4,
+      MARGIN_TOP + scaleHeight,
+    ),
+  );
+
   const description = $derived(
-    t('profile.description', { depth: formatDepth(maxDepthMm, prefs), duration: formatDuration(durationSeconds) }),
+    [
+      t('profile.description', { depth: formatDepth(maxDepthMm, prefs), duration: formatDuration(durationSeconds) }),
+      ends && t('profile.descriptionTimes', ends),
+      showMean && t('profile.descriptionMean', { depth: formatDepth(meanDepthMm, prefs) }),
+    ]
+      .filter(Boolean)
+      .join(' '),
   );
 </script>
 
@@ -318,6 +341,22 @@
           >
         {/if}
       {/each}
+
+      {#if showMean}
+        <line class="od-dive-profile--mean" x1={MARGIN_LEFT} x2={MARGIN_LEFT + plotWidth} y1={meanY} y2={meanY} />
+        <text class="od-dive-profile--mean-label od-value" x={MARGIN_LEFT - 4} y={meanLabel + 3} text-anchor="end"
+          >{t('profile.mean', { depth: depthValue(meanDepthMm, prefs) })}</text
+        >
+      {/if}
+
+      {#if ends}
+        <!-- Second label row: the first digit of each time on its tick, the word to its left. -->
+        {@const rowY = MARGIN_TOP + plotHeight + 32}
+        <text class="od-dive-profile--tick od-value" x={MARGIN_LEFT - 7} y={rowY} text-anchor="end">{t('profile.entry')}</text>
+        <text class="od-dive-profile--tick od-value" x={MARGIN_LEFT - 3} y={rowY}>{ends.entry}</text>
+        <text class="od-dive-profile--tick od-value" x={MARGIN_LEFT + plotWidth - 7} y={rowY} text-anchor="end">{t('profile.exit')}</text>
+        <text class="od-dive-profile--tick od-value" x={MARGIN_LEFT + plotWidth - 3} y={rowY}>{ends.exit}</text>
+      {/if}
 
       {#if showPpo2}
         {#each [1.4, 1.6] as limit (limit)}
@@ -563,6 +602,18 @@
     .od-dive-profile--temperature-label {
       font-size: 10px;
       fill: var(--od-temperature);
+    }
+
+    /* Average depth: a thin dashed line across the whole profile, in the axis grey. */
+    .od-dive-profile--mean {
+      stroke: var(--od-text-2);
+      stroke-width: 0.6;
+      stroke-dasharray: 4 3;
+    }
+
+    .od-dive-profile--mean-label {
+      font-size: 9px;
+      fill: var(--od-text-2);
     }
 
     .od-dive-profile--tick {

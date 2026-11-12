@@ -546,6 +546,8 @@
       divemode={dive.divemode}
       maxDepthMm={dive.maxDepthMm}
       durationSeconds={dive.durationSeconds}
+      startIso={dive.date}
+      meanDepthMm={dive.meanDepthMm}
       {prefs}
     />
 
