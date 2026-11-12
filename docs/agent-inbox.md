@@ -2033,3 +2033,5 @@ Christian's request (TODO #45). Spec: `docs/system-design.md`, paragraph "Blue t
 - Unchanged: alarm red, oxygen green, pending brown.
 
 Reference mock-ups: `android-carnet`, `android-accueil-c`, `detail3-android`, `detail3-android-sombre`, `appbar-tiroir-android-ouvert`, `android-stats`, `outils-desaturation-android`, `partage-android`, `android-telechargement-encours`, `android-etat-conflit-ordinateurs`. Check light and dark on the phone emulator.
+
+**Addendum to task 81 (12 November 2026):** the colour chart is updated for the blue theme, `docs/mockups/palette-roles.dc.html` (secondary = ocean-night blue, tertiary = rust and sand, with the contrast ratios). Use it as the reference for the role tokens (`--od-secondary*`, `--od-tertiary*`) in light and dark.
