@@ -1552,6 +1552,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Planificateur : en métrique, la liste des consommations (SAC) propose 10, 15, 20, 25 et 30 L/min ; on peut toujours taper sa valeur, jusqu’à 60 L/min.",
       "Planificateur : les champs Altitude (les Conditions du planificateur et Réglages › Conditions des outils) sont des listes déroulantes modifiables : la flèche propose de 0 à 10 000 ft (0 à 3 000 m) et on peut taper n’importe quelle altitude entière, limitée à 0 à 15 000 ft (4 500 m).",
       "Planificateur : chaque champ de consommation (SAC) (« Au fond » et « Pendant la déco » du planificateur, et les réglages du planificateur) est une liste déroulante modifiable : la flèche propose 0,0, 0,5, 1,0, 1,5 et 2,0 cuft/min (0, 15, 30, 45 et 60 L/min), et on peut taper sa propre valeur, gardée à deux décimales et limitée à 0 à 2 cuft/min (0 à 60 L/min).",
       "Planificateur : « Enregistrer » demande un titre pour un nouveau plan (le site de la plongée de départ par défaut, vide permis), puis revient à « Plongées planifiées » en mettant le nouveau plan en évidence un instant. Le titre remplace le site dans la liste ; sans titre, une ligne affiche « Plan du » suivi de sa date. « Sans plongée de départ » ne s’affiche plus.",
