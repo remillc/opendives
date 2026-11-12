@@ -1518,6 +1518,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Settings › Equipment: “Offer standard sizes” is off by default; the cylinder type choice shows your own types and those of the logbook.",
       "Settings: the “Default conditions” group becomes “Tool conditions” and moves after “Decompression”.",
       "Dive detail: “Gas and equipment” is now two sections. Gas shows a drawing of each cylinder with its gas, its use and size, and its pressure from start to end; the part between the end and the start pressure is pale, with a dashed line at each level. Under the cylinders, one line tells the gas changes and their depth. Equipment is collapsed: the suit and the total weight; tap it to see the weights by location. “Edit dive” shows the same drawing.",
       "“Edit dive”: a cylinder’s sheet closes when you tap its handle or drag it down.",

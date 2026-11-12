@@ -1518,6 +1518,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Réglages › Équipement : « Proposer les tailles standard » est désactivé par défaut ; le choix du type de bouteille montre vos propres types et ceux du carnet.",
       "Réglages : le groupe « Conditions par défaut » devient « Conditions des outils » et passe après « Décompression ».",
       "Détail d’une plongée : « Gaz et équipement » devient deux sections. Gaz dessine chaque bouteille avec son gaz, son usage et sa taille, et sa pression du départ à la fin ; la partie entre la pression de fin et celle de départ est pâle, avec une ligne pointillée à chaque niveau. Sous les bouteilles, une ligne dit les changements de gaz et leur profondeur. Équipement est replié : la combinaison et le lest total ; touchez-le pour voir le lest par emplacement. « Modifier la plongée » montre le même dessin.",
       "« Modifier la plongée » : la fiche d’une bouteille se ferme en touchant sa poignée ou en la faisant glisser vers le bas.",

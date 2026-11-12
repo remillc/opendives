@@ -9,7 +9,7 @@
 // The app's own settings (language, theme, date and time formats, GPS
 // coordinates, Bluetooth filter) live here only.
 import { OpenDivesCore } from 'opendives-core';
-import { coreResetChanges, storedAfterReset, appSettingsAfterReset } from './settings-reset.js';
+import { OD_CORE_DEFAULTS, coreResetChanges, storedAfterReset, appSettingsAfterReset } from './settings-reset.js';
 
 const CORE_KEY = 'od.corePrefs';
 const LIBRARY_KEY = 'od.cylinderLibrary';
@@ -137,6 +137,10 @@ export function applyDeviceSettings() {
   // "Choisir le type d’eau dans l’éditeur" is on by default in OpenDives; the
   // depth grid is no longer a setting: the core's default.
   storedCore.salinityEdit ??= true;
+  // "Proposer les tailles standard" is off by default in OpenDives (task
+  // 2026-11-12-48), on in Subsurface: the cylinder type choice shows the
+  // diver's own types and those of the logbook. A value chosen stays.
+  storedCore.displayDefaultTankInfos ??= false;
   delete storedCore.threeMGrid;
   // A value refused by this core (an older version kept something else): the others are kept.
   if (Object.keys(storedCore).length) {
@@ -254,10 +258,10 @@ export function setAppSetting(key, value) {
  * @param {Partial<CorePrefValues>} defaults
  */
 export async function resetAllSettings(defaults) {
-  await OpenDivesCore.setPrefs({ changes: { ...coreResetChanges(defaults), salinityEdit: true } });
+  await OpenDivesCore.setPrefs({ changes: { ...coreResetChanges(defaults), ...OD_CORE_DEFAULTS } });
   const kept = storedAfterReset(storedCore);
   for (const key of Object.keys(storedCore)) delete storedCore[/** @type {keyof CorePrefValues} */ (key)];
-  Object.assign(storedCore, kept);
+  Object.assign(storedCore, kept, OD_CORE_DEFAULTS);
   writeJson(CORE_KEY, Object.keys(storedCore).length ? storedCore : null);
   try {
     localStorage.removeItem('od.extraConditions');
