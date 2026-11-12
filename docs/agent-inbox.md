@@ -1612,3 +1612,15 @@ Christian's request: in Settings › Équipement, the switch "Proposer les taill
 
 Done in `feature/standard-sizes-off`: `OD_CORE_DEFAULTS` (lib/settings-reset.js) holds the core values whose OpenDives default differs from Subsurface's (`salinityEdit: true`, `displayDefaultTankInfos: false`); the start sets `displayDefaultTankInfos` to false unless this device has a value, and "Réinitialiser tous les réglages" sets both. The core then lists only the diver's own types and those of the logbook, as it does when the pref is off. Phone, tablet and iOS share this. Checked on the phone emulator (core pref false, switch off).
 
+
+## [ ] 2026-11-12-49 Settings: choice dialogs become menus on the row
+
+Christian's request: the radio-button choice dialogs of Settings are replaced, everywhere in the app, by a menu anchored to the touched row. Spec: `docs/ui-specification.md`, new paragraph "Settings choices as menus" (and the water-type paragraph). Mock-ups: `reglages-type-eau-android`, `reglages-choix-android` (date format), `reglages-duree-android`, `reglages-vitesse-android`, `reglages-coordonnees-android` (opens above), `reglages-bouteille-choix-android`.
+- Applies to every Settings row that picks one value from a short list: date format, time format, duration, speeds, GPS coordinates, language, theme, text size, the default cylinders (open circuit, diluent, oxygen), water type of downloaded dives, and any other of the same kind.
+- The row takes the selected tint (#E3E1DC, 12 dp corners) while the menu is open. Menu: 16 dp corners, surface #F4F4F2, level-2 shadow, right-aligned with the card, about 280 dp wide, under the row or above it when there is no room below.
+- No title, no intro sentence, no footer note, no Annuler/OK. Options of 48 dp, 56 dp with a help line (13 sp variant, the example the dialog showed: "45 min, 1 h 12", "80 cuft, 3 000 psi", "-35.4485"…). Current value tinted, semibold, check at the end. A tap picks and closes, a tap outside or Back closes without change.
+- Water type of downloaded dives: help lines "L’app n’écrit rien", "Lacs et carrières, 1 000 g/L", "1 030 g/L", "Norme des ordinateurs, 1 020 g/L".
+- Accessibility: `role="listbox"` named after the row, `role="option"` with `aria-selected`, focus into the menu and back to the row on close.
+- Unchanged: sync conflict choices, export, account import, and dialogs where a number is typed (pO₂ thresholds…).
+- Tablet: same menus, anchored to the row in the settings pane. iOS: the native pull-down menu on the row.
+- A line in the release notes.
