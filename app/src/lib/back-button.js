@@ -59,7 +59,7 @@ export function enableBackButton() {
     if ((!modal || modal.classList.contains('popup')) && backThroughGuard(modal)) return;
     if (modal) {
       // OpenDives' own dialogs (components/Md3Dialog.svelte) cancel themselves.
-      if (modal.classList.contains('od-md3-dialog') || modal.classList.contains('od-cylinder-sheet')) modal.dispatchEvent(new CustomEvent('od-cancel'));
+      if (modal.classList.contains('od-md3-dialog') || modal.classList.contains('od-cylinder-sheet') || modal.classList.contains('od-gauge-sheet')) modal.dispatchEvent(new CustomEvent('od-cancel'));
       else if (modal.classList.contains('actions-modal')) f7.actions.close();
       else if (modal.classList.contains('dialog')) f7.dialog.close();
       else if (modal.classList.contains('sheet-modal')) f7.sheet.close();

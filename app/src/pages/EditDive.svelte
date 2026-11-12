@@ -21,9 +21,11 @@
   import ComboField from '../components/ComboField.svelte';
   import CylinderCard from '../components/CylinderCard.svelte';
   import CylinderSheet from '../components/CylinderSheet.svelte';
+  import GaugeSheet from '../components/GaugeSheet.svelte';
   import CylinderDeleteDialog from '../components/CylinderDeleteDialog.svelte';
   import GasSummary from '../components/GasSummary.svelte';
   import { cylinderListed, fillLevels, unusedShown } from '../lib/gas-summary.js';
+  import { gaugeCameraAvailable, runGaugeCamera } from '../lib/gauge-photo.js';
   import StarsInput from '../components/StarsInput.svelte';
   import Stars from '../components/Stars.svelte';
   import { conditionsMean, roundHalfUp1 } from '../lib/conditions.js';
@@ -447,6 +449,73 @@
   /** The Gas page (every cylinder and the gas changes) replaces the form until ← or Back. */
   let gasPage = $state(false);
   /** The cylinder shown in its sheet, and the one asked about in the delete dialog, by key. */
+  // --- Reading a pressure from a photo (lib/gauge-photo.js, components/GaugeSheet.svelte) ---
+  /** The result of the gauge camera waiting for the diver's check. @type {{ field: 'start'|'end', key: number, readings: { text: string, x: number }[], thumbnail: string }|null} */
+  let gaugeResult = $state(null);
+  let gaugeOpen = false;
+
+  /**
+   * What the recognised text blocks mean as pressures.
+   * @param {import('opendives-core').GaugeTextBlock[]} _blocks
+   * @param {'bar'|'psi'} _userUnit
+   * @returns {import('../lib/gauge-reading.js').GaugeReading[]}
+   */
+  function gaugeDecide(_blocks, _userUnit) {
+    return [];
+  }
+
+  /** @param {number} key @param {'start'|'end'} field */
+  function focusPressure(key, field) {
+    tick().then(() => /** @type {HTMLInputElement|null} */ (document.querySelector(`[data-od-pressure="${key}:${field}"] input`))?.focus());
+  }
+
+  /**
+   * The camera icon of Début or Fin: the full-screen camera, then the result sheet; "Saisir à la main" focuses the field.
+   * @param {EditedCylinder} c
+   * @param {'start'|'end'} field
+   */
+  async function readGauge(c, field) {
+    if (gaugeOpen) return;
+    gaugeOpen = true;
+    try {
+      const n = cylinders.indexOf(c) + 1;
+      const result = await runGaugeCamera({
+        field,
+        cylinder: t('edit.cylinderTitle', { n }),
+        gas: cylinderGas(c),
+        userUnit: psi ? 'psi' : 'bar',
+        decide: gaugeDecide,
+      });
+      if (result.action === 'manual') focusPressure(c.key, field);
+      else if (result.action === 'photo') {
+        gaugeResult = { field, key: c.key, thumbnail: result.thumbnail, readings: result.readings.map((r) => ({ text: pressureText(r.mbar), x: r.x })) };
+      }
+    } catch (e) {
+      console.error('Gauge camera', e);
+      focusPressure(c.key, field);
+    } finally {
+      gaugeOpen = false;
+    }
+  }
+
+  /** @param {{ target: string, text: string }[]} items */
+  function useGaugeReadings(items) {
+    const g = gaugeResult;
+    gaugeResult = null;
+    if (!g) return;
+    for (const item of items) {
+      const target = cylinders.find((c) => String(c.key) === item.target);
+      if (target) target.f[g.field] = item.text;
+    }
+  }
+
+  function retryGauge() {
+    const g = gaugeResult;
+    gaugeResult = null;
+    const c = g && cylinders.find((x) => x.key === g.key);
+    if (g && c) readGauge(c, g.field);
+  }
+
   let sheetKey = $state(/** @type {number|null} */ (null));
   let deleteKey = $state(/** @type {number|null} */ (null));
   let savedScroll = 0;
@@ -837,6 +906,16 @@
 
 {#snippet unit(/** @type {string} */ text)}<span class="od-edit-dive--unit">{text}</span>{/snippet}
 
+<!-- Début and Fin: the unit, then the camera that reads the pressure on a gauge (Android). -->
+{#snippet pressureTrailing(/** @type {EditedCylinder} */ c, /** @type {'start'|'end'} */ field)}
+  {@render unit(pressureUnitText)}
+  {#if gaugeCameraAvailable()}
+    <button type="button" class="od-edit-dive--gauge" aria-label={t(field === 'start' ? 'gauge.readStart' : 'gauge.readEnd')} onclick={() => readGauge(c, field)}>
+      <Icon name="camera" />
+    </button>
+  {/if}
+{/snippet}
+
 {#snippet cylinderFields(/** @type {EditedCylinder} */ c)}
   {@const cb = cylinderBad(c)}
   {@const own = cylinderValues(c)}
@@ -875,12 +954,12 @@
     </div>
   </div>
   <div class="od-edit-dive--row od-edit-dive--card-row">
-    <div class="od-edit-dive--grow">
+    <div class="od-edit-dive--grow" data-od-pressure="{c.key}:start">
       <TextField label={t('edit.start')} bind:value={c.f.start} inputmode="decimal" invalid={cb.start}>
-        {#snippet trailing()}{@render unit(pressureUnitText)}{/snippet}
+        {#snippet trailing()}{@render pressureTrailing(c, 'start')}{/snippet}
       </TextField>
     </div>
-    <div class="od-edit-dive--grow">
+    <div class="od-edit-dive--grow" data-od-pressure="{c.key}:end">
       <TextField
         label={t('edit.end')}
         bind:value={c.f.end}
@@ -888,7 +967,7 @@
         invalid={cb.end}
         supporting={own.used ? t('edit.consumed', { amount: formatPressure(own.used, prefs) }) : ''}
       >
-        {#snippet trailing()}{@render unit(pressureUnitText)}{/snippet}
+        {#snippet trailing()}{@render pressureTrailing(c, 'end')}{/snippet}
       </TextField>
     </div>
   </div>
@@ -1227,6 +1306,21 @@
   </CylinderSheet>
 {/if}
 
+{#if gaugeResult}
+  {@const g = gaugeResult}
+  <GaugeSheet
+    field={g.field}
+    readings={g.readings}
+    thumbnail={g.thumbnail}
+    cylinders={cylinders.flatMap((c, i) => (cylinderListed(c, includeUnused) ? [{ value: String(c.key), label: t('edit.cylinderTitle', { n: i + 1 }) }] : []))}
+    firstTarget={String(g.key)}
+    unit={pressureUnitText}
+    onuse={useGaugeReadings}
+    onretry={retryGauge}
+    oncancel={() => (gaugeResult = null)}
+  />
+{/if}
+
 {#if deleteIndex >= 0}
   {@const c = cylinders[deleteIndex]}
   {@const details = deleteDetails(c)}
@@ -1391,6 +1485,23 @@
 
     .od-edit-dive--unit {
       color: var(--od-text-2);
+    }
+
+    /* The camera that reads a pressure on a gauge: a 40 dp icon button after the unit. */
+    .od-edit-dive--gauge {
+      width: 40px;
+      height: 40px;
+      margin-left: 4px;
+      padding: 0;
+      border: none;
+      border-radius: 20px;
+      background: none;
+      color: var(--od-text-2);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      vertical-align: middle;
+      cursor: pointer;
     }
 
     /* Duration and maximum depth: plain text side by side, not fields. */
