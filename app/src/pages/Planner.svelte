@@ -5,6 +5,7 @@
   // dive and for a new dive. The plan, gas volumes, reserve, CNS and OTU all
   // come from the core (Subsurface's planner). Saved, a plan is a planned dive
   // of the logbook, listed by "Plongées planifiées" only.
+  import { placeLevelLabels } from '../lib/chart-labels.js';
   import { Page, Navbar, Link, List, ListItem, Popup, Popover, f7, theme } from 'framework7-svelte';
   import { showSnackbar } from '../lib/snackbar.js';
   import { OpenDivesCore } from 'opendives-core';
@@ -489,21 +490,23 @@
     const ceilingLine = deepest > 0 ? 'M' + ceiling.map(([s, mm]) => xy(s, mm)).join(' L') : '';
     const ceilingArea = ceilingLine ? `${ceilingLine} L${xy(ceiling[ceiling.length - 1][0], 0)} L${xy(ceiling[0][0], 0)} Z` : '';
     // A label on each held level ("100 ft · 15 min"), a new dive only.
-    /** @type {{ left: number, top: number, text: string }[]} */
-    const labels = [];
+    /** @type {{ left: number, top: number, text: string, span: number }[]} */
+    const levelMarks = [];
     if (!planner.source || planner.simplified) {
       const entered = (result.segments ?? []).filter((s) => s.entered);
       for (let i = 1; i < entered.length; i++) {
         const a = entered[i - 1];
         const b = entered[i];
         if (a.depthMm <= 0 || a.depthMm !== b.depthMm) continue;
-        labels.push({
+        levelMarks.push({
+          span: ((b.timeSeconds - a.timeSeconds) / tMax) * 100,
           left: (((a.timeSeconds + b.timeSeconds) / 2 / tMax) * 100),
           top: ((4 + (a.depthMm / dMax) * (H - 8)) / H) * 100,
           text: `${depthText(a.depthMm)} · ${minutes(b.timeSeconds - a.timeSeconds)}`,
         });
       }
     }
+    const labels = placeLevelLabels(levelMarks);
     return { line, water: `${line} L${W} 0 L0 0 Z`, bottom: waterBottomColor(result.maxDepthMm), ceilingLine, ceilingArea, deepest, labels };
   });
 
