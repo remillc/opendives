@@ -439,15 +439,22 @@
 
 <style>
   @layer od.components {
-    /* The profile sits in a rounded block (white in the light themes). */
+    /* On the phone the profile is a band from edge to edge (white in the light
+       themes); a tablet pane keeps the rounded card (spec, "Profile chart full
+       width on the phone"). */
     .od-dive-profile--profile {
+      margin: 14px 0 0;
+      overflow: hidden;
+    }
+
+    :global(.views.od-tablet) .od-dive-profile--profile {
       margin: 14px 16px 0;
       border-radius: 16px;
-      overflow: hidden;
     }
 
     svg {
       display: block;
+      overflow: visible;
     }
 
     .od-dive-profile--readout {
@@ -455,7 +462,7 @@
       flex-wrap: wrap;
       gap: 0 16px;
       min-height: 24px;
-      padding: 8px 12px 0;
+      padding: 8px 20px 0;
       align-items: baseline;
       font-size: 14px;
       color: var(--od-text-2);
@@ -469,14 +476,27 @@
       }
     }
 
+    :global(.views.od-tablet) .od-dive-profile--readout {
+      padding: 8px 12px 0;
+    }
+
+    /* The hint line is centred; the cursor readout stays at the start. */
     .od-dive-profile--hint {
+      flex: 1;
+      text-align: center;
       font-size: 12px;
     }
 
+    /* The chart is as wide as the screen minus the room its axis labels need:
+       about 14 dp for the depths on the left, 26 dp for the temperatures on the right. */
     .od-dive-profile--frame {
-      width: 100%;
+      margin: 0 26px 0 14px;
       touch-action: pan-y;
       user-select: none;
+    }
+
+    :global(.views.od-tablet) .od-dive-profile--frame {
+      margin: 0 12px;
     }
 
     .od-dive-profile--grid {
