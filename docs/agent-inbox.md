@@ -2077,7 +2077,6 @@ Christian's decision of 13 November 2026. The cylinder drawings of the gas card 
 
 Reference mock-ups: `detail3-android`, `detail3-android-sombre`, `android-edition`, `android-edition-bouteille`, `android-tablette-detail-menu-portrait`. Check light and dark on the phone emulator, and on a tablet layout.
 
-**Addendum to task 85 (13 November 2026):** the small cylinder icon of the gas rows (20 × 32, in the gas detail, delete-a-cylinder and one-cylinder editing screens) gets the same shape, scaled down, with no valve: `M8.64 1 L8.64 2.82 C6.14 3.27 4.09 5.55 4.09 8.73 L4.09 25.55 C4.09 28.73 6.36 31 10 31 C13.64 31 15.91 28.73 15.91 25.55 L15.91 8.73 C15.91 5.55 13.86 3.27 11.36 2.82 L11.36 1 Z`, fill #D4E2F2, 1.5 dp ink outline, round joins. Mock-ups: `android-edition-gaz`, `android-edition-gaz-supprimer`, `android-edition-bouteille`.
 
 Done in `feature/cylinder-shape`: `CylinderDrawing.svelte`, already the one drawing of the gas card (detail), the gas summary (editing), the cylinder cards and sheets, now draws the given path (filled, clip of the levels, then the round-joined outline) with no valve; the levels keep their scale (full at 12, empty at 74) and are clipped by the shape. Checked on the phone emulator (detail light, editing dark) and the tablet emulator (detail). Also: the rebreather drawing is now 140 px tall on every screen (on the tablet it grew with the pane's width).
 
@@ -2091,3 +2090,7 @@ Christian's decisions of 13 November 2026, on the Gaz card of the dive editing s
 Check on the phone emulator with an open-circuit dive and a CCR dive, light and dark.
 
 Done in `feature/edit-gas-ccr`: in CCR mode `GasSummary.svelte` draws `RebreatherDrawing` (the detail's component, hatched when pressures are missing) with one column per gas (name, end pressure); the whole card is one button that opens the Gas page, with the chevron and the help line; its name comes from `rebreatherSummaryLabel` (tested): "Gaz : recycleur avec diluant Air et oxygène, secours : air. Ouvrir le détail" (the bailout part reads "secours : {gas}" so that it works for every gas name). **Christian's additions (13 November 2026):** freediving hides the Gas card of the editing screen (the mode field stays) and the Gas section of the detail; the editing screen no longer writes "Non utilisée" under an unused cylinder without pressure. Checked on the phone emulator: CCR light and dark, freediving (not saved), open circuit in task 85.
+
+## [ ] 2026-11-13-87 Small cylinder icon: new shape
+
+Follow-up to task 85, the small cylinder icon of the gas rows (20 × 32, in the gas detail, delete-a-cylinder and one-cylinder editing screens) gets the same shape, scaled down, with no valve: `M8.64 1 L8.64 2.82 C6.14 3.27 4.09 5.55 4.09 8.73 L4.09 25.55 C4.09 28.73 6.36 31 10 31 C13.64 31 15.91 28.73 15.91 25.55 L15.91 8.73 C15.91 5.55 13.86 3.27 11.36 2.82 L11.36 1 Z`, fill #D4E2F2, 1.5 dp ink outline, round joins. Mock-ups: `android-edition-gaz`, `android-edition-gaz-supprimer`, `android-edition-bouteille`. Check on the phone emulator, light and dark.
