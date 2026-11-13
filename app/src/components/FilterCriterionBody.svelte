@@ -11,7 +11,7 @@
   import Icon from './Icon.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
   import { filter, kindOf, choices, unitOf, validBound } from '../lib/filter.svelte.js';
-  import { formatLongDate } from '../lib/format.js';
+  import { formatLongDate, locale } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
 
   /** @typedef {import('../lib/filter.svelte.js').Criteria} Criteria */
@@ -36,7 +36,8 @@
         if (d.trip && !trips.has(String(d.trip.id)))
           trips.set(String(d.trip.id), d.trip.location || t('trip.startingOn', { date: formatLongDate(d.date) }));
       }
-      return [...trips].map(([value, text]) => ({ value, text }));
+      // Alphabetical, as the diver looks for a trip by its name.
+      return [...trips].map(([value, text]) => ({ value, text })).sort((a, b) => a.text.localeCompare(b.text, locale, { sensitivity: 'base', numeric: true }));
     }
     const o = /** @type {Record<string, any>} */ (filter.options ?? {});
     /** @type {string[]} */
