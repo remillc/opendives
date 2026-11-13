@@ -225,7 +225,8 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      color: var(--od-on-band);
+      /* A light card on the band: dark ink, as the mock-up draws it. */
+      color: var(--od-on-band-control);
       text-decoration: none;
 
       .od-nav-menu--texts {
@@ -249,7 +250,7 @@
         font-size: 12px;
         line-height: 16px;
         letter-spacing: 0.4px;
-        color: var(--od-on-band-2);
+        color: var(--od-on-band-control-2);
       }
     }
 
@@ -270,7 +271,8 @@
 
       &[aria-current='page'] {
         background: var(--od-water-top);
-        color: var(--od-on-band);
+        /* The pill stays light in dark mode too: dark ink on it. */
+        color: var(--od-on-band-control);
         font-weight: 700;
 
         :global(svg) {
@@ -311,19 +313,32 @@
 
     /* The sync card: the button and the state, centred. */
     .od-nav-menu--status {
-      margin: 0 12px;
-      padding: 12px;
+      margin: 0 12px 16px;
+      padding: 12px 16px;
       border-radius: 16px;
       background: var(--od-surface);
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 6px;
+      gap: 10px;
+
+      /* The state line under the button: 13/18, secondary ink, no padding of its own. */
+      :global(.od-sync-status) {
+        padding: 0;
+        font-size: 13px;
+        line-height: 18px;
+        color: var(--od-text-2);
+      }
+
+      :global(.od-sync-status.od-sync-status--pending) {
+        color: var(--od-tertiary);
+      }
 
       :global(.od-sync-status),
       :global(.od-sync-status .od-sync-status--line) {
         justify-content: center;
         text-align: center;
+        min-height: 0;
       }
     }
 
