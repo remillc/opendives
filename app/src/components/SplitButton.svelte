@@ -23,6 +23,20 @@
     if (open) f7.popover.close(`#${id}`);
     else f7.popover.open(`#${id}`, trigger);
   }
+
+  /**
+   * The menu opens upward, above the button, its right edge on the chevron's
+   * (docs/mockups/appbar-tiroir-android-ouvert-manuel-options.dc.html, task
+   * 2026-11-13-101), instead of where Framework7 would centre it.
+   * @param {{ el: HTMLElement }} popover
+   */
+  function place(popover) {
+    const el = popover?.el;
+    const anchor = trigger?.closest('.od-split-button')?.getBoundingClientRect();
+    if (!el || !anchor) return;
+    el.style.left = `${Math.max(8, anchor.right - el.offsetWidth)}px`;
+    el.style.top = `${Math.max(8, anchor.top - el.offsetHeight - 8)}px`;
+  }
 </script>
 
 {#if theme.ios}
@@ -43,7 +57,16 @@
       <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M7 10l5 5 5-5" /></svg>
     </button>
   </div>
-  <Popover {id} class="od-menu od-split-button--menu" backdrop={false} onPopoverOpen={() => (open = true)} onPopoverClosed={() => (open = false)}>
+  <Popover
+    {id}
+    class="od-menu od-split-button--menu"
+    backdrop={false}
+    onPopoverOpen={(/** @type {any} */ popover) => {
+      open = true;
+      place(popover);
+    }}
+    onPopoverClosed={() => (open = false)}
+  >
     <List noChevron>{@render menu()}</List>
   </Popover>
 {/if}
@@ -92,6 +115,13 @@
           transform: rotate(180deg);
         }
       }
+    }
+
+    /* 280 dp wide, on the surface colour (the mock-up of task 2026-11-13-101). */
+    :global(.popover.od-menu.od-split-button--menu) {
+      --f7-popover-width: 280px;
+      width: 280px;
+      background: var(--od-surface);
     }
 
     /* Labels as long as "Switch to automatic sync" wrap inside the 280 dp of the menu instead of being cut. */

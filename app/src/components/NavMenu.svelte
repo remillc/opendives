@@ -87,7 +87,7 @@
         <path d={PROFILE} class="od-sync-status--line" />
       </svg>
       <div class="od-nav-menu--brand">
-        <img src="logo-small-light.svg" alt="" width="44" height="44" />
+        <img src="logo-menu.svg" alt="" width="44" height="44" />
         <span class="od-nav-menu--name">{t('menu.title')}</span>
       </div>
       <a href="#account" class="od-nav-menu--account" aria-label={t('menu.accountLabel', { name: accountName })} onclick={(e) => choose(e, () => goToSection('account'))}>
