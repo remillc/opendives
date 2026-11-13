@@ -2077,6 +2077,8 @@ Christian's decision of 13 November 2026. The cylinder drawings of the gas card 
 
 Reference mock-ups: `detail3-android`, `detail3-android-sombre`, `android-edition`, `android-edition-bouteille`, `android-tablette-detail-menu-portrait`. Check light and dark on the phone emulator, and on a tablet layout.
 
+**Addendum to task 85 (13 November 2026):** the small cylinder icon of the gas rows (20 × 32, in the gas detail, delete-a-cylinder and one-cylinder editing screens) gets the same shape, scaled down, with no valve: `M8.64 1 L8.64 2.82 C6.14 3.27 4.09 5.55 4.09 8.73 L4.09 25.55 C4.09 28.73 6.36 31 10 31 C13.64 31 15.91 28.73 15.91 25.55 L15.91 8.73 C15.91 5.55 13.86 3.27 11.36 2.82 L11.36 1 Z`, fill #D4E2F2, 1.5 dp ink outline, round joins. Mock-ups: `android-edition-gaz`, `android-edition-gaz-supprimer`, `android-edition-bouteille`.
+
 Done in `feature/cylinder-shape`: `CylinderDrawing.svelte`, already the one drawing of the gas card (detail), the gas summary (editing), the cylinder cards and sheets, now draws the given path (filled, clip of the levels, then the round-joined outline) with no valve; the levels keep their scale (full at 12, empty at 74) and are clipped by the shape. Checked on the phone emulator (detail light, editing dark) and the tablet emulator (detail). Also: the rebreather drawing is now 140 px tall on every screen (on the tablet it grew with the pane's width).
 
 ## [x] 2026-11-13-86 Dive editing: gas card follows the dive mode
