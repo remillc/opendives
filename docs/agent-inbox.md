@@ -2325,3 +2325,10 @@ Done in feature/paper-grain-trial: the filter is a 256 px SVG tile in the `--od-
 ## [ ] 2026-11-13-109 Paper grain: kept, remove the trial switch
 
 Christian's decision of 13 November 2026, after seeing task 108 on his phone: the paper grain on the header band is **kept**. Remove the trial option from the three-dot menu (and any other place it was added, Réglages included), with its strings and stored preference, so the grain is always on. The rule is now in `docs/system-design.md` (« Paper grain on the header band »).
+
+## [ ] 2026-11-13-110 Réglages: « Affichage » first, no « Taille du texte »
+
+Christian's decision of 13 November 2026. Mock-up: `docs/mockups/android-reglages.dc.html`.
+- The « Affichage » group (Thème) becomes the **first** group of Réglages, before « Langue et formats » and « Unités ». The other groups keep their order.
+- The « Taille du texte » row (`settings.display.textSize`, read-only « Comme l’appareil ») is removed, with its strings: the app already follows the system text size. Update the release note that lists the settings menus if it names it.
+Same on the tablet layout. Check on the phone emulator.
