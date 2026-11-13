@@ -243,7 +243,7 @@
       <!-- The result card opens the filtered result (in the Statistics section, behind this dialog). -->
       <KeyFigures figures={result?.total ?? null} prefs={logbook.prefs} href={canSave ? resultHref : undefined} onclick={openResult} />
 
-      <p class="od-statistic-new--note od-statistic-new--rules">{theme.ios ? '' : `${t('stats.rulesValues')} `}{t('stats.rules')}</p>
+      <p class="od-statistic-new--note od-statistic-new--rules">{t('stats.rules')}</p>
       <div class="od-statistic-new--end"></div>
     </Page>
   </View>

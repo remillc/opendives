@@ -527,7 +527,7 @@
     },
     "extraConditions": {
       "label": "Vagues de surface, flux-reflux et froid",
-      "text": "Ajoute ces trois conditions quand on modifie une plongée"
+      "text": "Ajoute ces trois conditions à Modifier une plongée"
     },
     "salinity": {
       "label": "Choisir le type d’eau dans l’éditeur",
@@ -568,7 +568,7 @@
       "text": "Sous le profil, montre quelle bouteille est utilisée à chaque moment"
     },
     "deco": {
-      "warning": "Ces réglages changent les paliers et les limites calculés par l’app. Des valeurs mal choisies exposent à un accident de décompression. Ne les modifiez que si vous savez ce que vous faites.",
+      "warning": "Ces réglages changent les paliers et les limites calculés par l’app. Une mauvaise valeur expose à un accident de décompression.",
       "model": "Modèle",
       "orVpmb": "Ou VPM-B",
       "orBuehlmann": "Ou Bühlmann ZH-L16",
@@ -616,7 +616,7 @@
     "logbookComputers": {
       "title": "Ordinateurs du carnet",
       "rowText": "Renommer, retirer les doublons",
-      "intro": "Les ordinateurs d’où viennent vos plongées. Le nom choisi s’affiche dans le carnet et le détail des plongées.",
+      "intro": "Le nom choisi s’affiche dans le carnet et le détail des plongées.",
       "empty": "Aucun ordinateur dans ce carnet.",
       "duplicate": "Doublon possible",
       "hasDuplicate": "A un doublon",
@@ -661,7 +661,7 @@
       },
       "merged": "Fusionné avec {name}",
       "remove": "Retirer de la liste",
-      "removeHelp": "Seule la fiche est retirée. Les plongées gardent leurs données, et il revient si de nouvelles plongées en viennent.",
+      "removeHelp": "Seule la fiche est retirée. Les plongées gardent leurs données. La fiche revient si cet ordinateur fournit de nouvelles plongées.",
       "removed": "Ordinateur retiré de la liste"
     },
     "computers": {
@@ -671,7 +671,7 @@
       "forgetOneTitle": "Oublier {name} ?",
       "forgetOneText": "Il ne sera plus proposé au téléchargement. Les plongées déjà téléchargées ne changent pas.",
       "showAll": "Montrer tous les appareils Bluetooth",
-      "showAllText": "Même ceux qui ne sont pas reconnus comme ordinateurs de plongée",
+      "showAllText": "Affiche aussi les appareils non reconnus comme ordinateurs de plongée",
       "forgetAll": {
         "one": "Oublier l’ordinateur mémorisé",
         "other": "Oublier les ordinateurs mémorisés"
@@ -724,7 +724,7 @@
       "intro": "Proposés quand on choisit le type d’une bouteille. Renommer un type renomme aussi les bouteilles de ce type dans le carnet. Changer sa taille ou le retirer ne modifie pas les plongées existantes.",
       "yours": "Vos types",
       "standard": "Standard",
-      "standardNote": "Toucher un type ouvre sa fiche (nom, volume, pression de service). Un type standard se modifie comme les autres.",
+      "standardNote": "Les types standard sont modifiables comme les vôtres.",
       "hidden": "Les tailles standard sont masquées : le réglage « Proposer les tailles standard » est désactivé.",
       "add": "Ajouter un type",
       "newTitle": "Nouveau type",
@@ -750,8 +750,8 @@
       "usedInNoDive": "utilisé dans aucune plongée",
       "usedInOneDive": "utilisé dans 1 plongée",
       "usedInDives": "utilisé dans {n} plongées",
-      "noteStandard": "Type standard, {use}. Le renommer renomme aussi les bouteilles de ce type dans le carnet. Changer sa taille ne modifie pas les plongées existantes.",
-      "noteYours": "Type personnel, {use}. Le renommer renomme aussi les bouteilles de ce type dans le carnet. Changer sa taille ne modifie pas les plongées existantes.",
+      "noteStandard": "Type standard, {use}. Le renommer renomme aussi ces bouteilles dans le carnet. Changer sa taille ne modifie pas les plongées existantes.",
+      "noteYours": "Type personnel, {use}. Le renommer renomme aussi ces bouteilles dans le carnet. Changer sa taille ne modifie pas les plongées existantes.",
       "volumeNoteCuft": "Le volume de gaz à la pression de service, en pieds cubes. En unités métriques, on saisit le volume d’eau de la bouteille en litres.",
       "volumeNoteLitres": "Le volume d’eau de la bouteille, en litres. En unités impériales, on saisit le volume de gaz à la pression de service, en pieds cubes. La pression de service est facultative pour un volume en litres."
     },
@@ -852,7 +852,7 @@
     "changePasswordText": "Un lien est envoyé à votre courriel",
     "leaveGroup": "Quitter",
     "signOut": "Se déconnecter",
-    "signOutText": "Déconnecter votre app du cloud. Vos plongées restent dans le cloud et sur cet appareil.",
+    "signOutText": "Vos plongées restent dans le cloud et sur cet appareil.",
     "delete": "Supprimer le compte",
     "deleteText": "Supprime le compte et toutes ses plongées du cloud Subsurface. Irréversible.",
     "server": "Connecté via le serveur {region} ({host}).",
@@ -878,7 +878,7 @@
       "other": "Vos {n} plongées sont ajoutées à celles du compte, sans rien écraser"
     },
     "notAvailable": "Pas encore disponible",
-    "autoSyncOff": "Désactivée : les modifications restent sur cet appareil, et celles des autres appareils n'arrivent pas, tant que vous ne synchronisez pas",
+    "autoSyncOff": "Désactivée : rien n'est envoyé ni reçu tant que vous ne synchronisez pas.",
     "pending": "Modifications non envoyées",
     "bandSignedIn": "Votre carnet dans le cloud",
     "bandNone": "Aucun compte connecté",
@@ -913,8 +913,8 @@
     "title": "Se déconnecter ?",
     "textNone": "Le carnet reste dans le cloud. Une copie reste sur cet appareil, non affichée, et sert si vous vous reconnectez.",
     "textPending": {
-      "one": "{n} modification n'est pas encore envoyée au cloud. Si vous vous déconnectez quand même, elle sera envoyée à votre prochaine connexion à ce compte, depuis cet appareil.",
-      "other": "{n} modifications ne sont pas encore envoyées au cloud. Si vous vous déconnectez quand même, elles seront envoyées à votre prochaine connexion à ce compte, depuis cet appareil."
+      "one": "{n} modification n'est pas encore envoyée. Elle partira à votre prochaine connexion à ce compte depuis cet appareil.",
+      "other": "{n} modifications ne sont pas encore envoyées. Elles partiront à votre prochaine connexion à ce compte depuis cet appareil."
     },
     "deleteCopy": "Effacer aussi la copie de cet appareil",
     "deleteCopyHint": "Possible une fois les modifications envoyées",
@@ -944,7 +944,7 @@
     "exportText": "Un fichier Subsurface (.ssrf), à garder ailleurs",
     "password": "Mot de passe du compte",
     "passwordText": "Pour confirmer que c'est bien vous",
-    "note": "Les modifications pas encore envoyées seront synchronisées d'abord, pour que la copie gardée soit complète. Le compte n'est déclaré supprimé que si le serveur le confirme.",
+    "note": "Les modifications en attente sont envoyées d'abord. Le compte n'est supprimé qu'après la confirmation du serveur.",
     "confirm": "Supprimer définitivement le compte",
     "connectionNeeded": "Connexion nécessaire",
     "deleted": "Le compte a été supprimé.",
@@ -1042,7 +1042,7 @@
     "addCylinder": "Ajouter une bouteille",
     "cylinderInUse": "Une bouteille utilisée dans le profil ne peut pas être retirée. Rien n’a changé.",
     "gasGroup": "Gaz",
-    "gasHelper": "Touchez une bouteille pour la modifier, ou la flèche pour toutes les bouteilles et les changements de gaz.",
+    "gasHelper": "Touchez une bouteille pour la modifier. La flèche ouvre toutes les bouteilles et les changements de gaz.",
     "gasCcrLabel": "Gaz : recycleur avec {list}. Ouvrir le détail",
     "gasCcrDiluent": "diluant {gas}",
     "gasCcrOxygen": "oxygène",
@@ -1217,7 +1217,7 @@
     "profileComputer": "Ordinateur : {model}",
     "noGps": "Pas de position GPS enregistrée",
     "cleanupTitle": "Nettoyer les sites",
-    "cleanupIntro": "Les imports créent parfois le même site plusieurs fois. Fusionner garde un seul site, avec toutes ses plongées. C’est annulable.",
+    "cleanupIntro": "Fusionner garde un seul site, avec toutes ses plongées. C’est annulable.",
     "sameNameAt": "Même nom à la casse près, à {n} m l’un de l’autre",
     "sameName": "Même nom à la casse près",
     "samePlace": "Même position, noms différents",
@@ -1234,8 +1234,8 @@
     "mergeText": "« {keep} » garde toutes les plongées de « {other} », qui disparaît. C’est annulable.",
     "unusedTitle": "Sites sans plongée",
     "unusedIntro": {
-      "one": "{n} site n’est utilisé par aucune plongée. Ils viennent souvent d’imports ou de plongées supprimées.",
-      "other": "{n} sites ne sont utilisés par aucune plongée. Ils viennent souvent d’imports ou de plongées supprimées."
+      "one": "{n} site n’est utilisé par aucune plongée.",
+      "other": "{n} sites ne sont utilisés par aucune plongée."
     },
     "selectAll": "Tout sélectionner",
     "noDive": "Aucune plongée",
@@ -1419,8 +1419,7 @@
     "name": "Nom",
     "nameHint": "Facultatif, proposé d’après les critères.",
     "nameHintShort": "Facultatif. Proposé d’après les critères",
-    "rulesValues": "Les valeurs sont celles qui existent dans votre carnet.",
-    "rules": "Plusieurs valeurs cochées comptent les plongées qui ont l’une ou l’autre. Plusieurs critères comptent les plongées qui les remplissent tous."
+    "rules": "Plusieurs valeurs cochées : les plongées qui ont l’une ou l’autre. Plusieurs critères : les plongées qui les remplissent tous."
   },
   "tools": {
     "title": "Outils",
@@ -1553,7 +1552,7 @@
   "signIn": {
     "title": "Se connecter",
     "heading": "Votre compte Subsurface",
-    "intro": "Le même compte que dans Subsurface sur l'ordinateur ou dans Subsurface-mobile. Vos plongées sont lues depuis le cloud, puis une copie reste sur cet appareil.",
+    "intro": "Le même compte que dans Subsurface sur ordinateur. Vos plongées sont téléchargées, puis une copie reste sur cet appareil.",
     "email": "Adresse e-mail",
     "password": "Mot de passe",
     "passwordText": "Gardé seulement dans le stockage sécurisé de cet appareil",
@@ -1601,6 +1600,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Textes de l’interface : plus courts et plus clairs.",
       "Recycleur : les bouteilles de secours prennent la nouvelle forme, avec épaules et col, sans robinet.",
       "Fiche de la plongée : plus de ligne « Passage à… » pour les plongées en recycleur, et plus de « Non utilisée » sous les bouteilles sans pression.",
       "Recycleur : DIL, O₂ et SECOURS sont centrés sur leur bouteille.",
@@ -1833,10 +1833,10 @@
     "signedInTitle": "Votre compte",
     "signedInIntro": "Ce compte n'a pas encore de carnet. Vous pouvez le remplir tout de suite avec les plongées que vous avez déjà.",
     "heading": "Reprendre votre carnet ?",
-    "intro": "Votre compte Subsurface est prêt. Vous pouvez le remplir tout de suite avec les plongées que vous avez déjà.",
+    "intro": "Ajoutez maintenant les plongées que vous avez déjà.",
     "sourceLabel": "Source du carnet",
     "divelogs": "Depuis divelogs.de",
-    "divelogsText": "Les plongées sont téléchargées une seule fois, puis enregistrées dans votre compte Subsurface. Ensuite, divelogs.de et OpenDives ne se synchronisent pas : vous pourrez y renvoyer des plongées quand vous voulez.",
+    "divelogsText": "Les plongées sont copiées une seule fois dans votre compte. divelogs.de et OpenDives ne restent pas synchronisés.",
     "user": "Nom d'utilisateur divelogs.de",
     "password": "Mot de passe divelogs.de",
     "credentialsNote": "Ces identifiants servent seulement à ce téléchargement. OpenDives ne les garde pas.",
@@ -1923,7 +1923,7 @@
     "rowAscent": "Remontée",
     "rowStop": "Palier de déco",
     "surface": "Surface",
-    "rowsNote": "Début et fin en minutes depuis la mise à l’eau. ↓ descente, → niveau prévu, ↑ remontée, – palier de déco. Les courtes remontées entre les paliers sont comptées dans le palier. Le gaz surligné marque un changement de gaz.",
+    "rowsNote": "Début et fin en minutes depuis la mise à l’eau. ↓ descente, → niveau prévu, ↑ remontée, – palier de déco. Gaz surligné : changement de gaz.",
     "gasColumn": "Gaz",
     "noStop": "Aucun palier de décompression obligatoire. La remontée est restée au-dessus du plafond.",
     "ceilingLegend": "Plafond de décompression",
@@ -2222,7 +2222,7 @@
     },
     "permission": {
       "title": "Autoriser le Bluetooth",
-      "text": "Pour trouver l'ordinateur de plongée et s'y connecter, Android demande l'autorisation « Appareils à proximité » (la localisation avant Android 12). OpenDives ne s'en sert pour rien d'autre.",
+      "text": "Android demande l'autorisation « Appareils à proximité » pour trouver l'ordinateur de plongée. OpenDives ne s'en sert pas pour autre chose.",
       "button": "Autoriser"
     },
     "denied": {
@@ -2266,7 +2266,7 @@
     "checks": {
       "on": "L'ordinateur est allumé et en mode transfert Bluetooth.",
       "near": "Il est à moins d'un mètre du téléphone.",
-      "otherApp": "Aucune autre app (par exemple Subsurface-mobile) n'est connectée à l'ordinateur."
+      "otherApp": "Aucune autre app n'est connectée à l'ordinateur."
     },
     "otherComputer": "Choisir un autre ordinateur",
     "retry": "Réessayer",
@@ -2373,7 +2373,7 @@
     "failed": "Le choix n'a pas pu être enregistré. Rien n'a changé.",
     "unknownDive": "Plongée sans date",
     "titleMany": "{n} plongées en conflit",
-    "introMany": "Modifiées ici et dans le cloud, depuis un autre appareil. Pour chacune, touchez la version à garder. Rien n’est perdu tant que vous n’avez pas choisi. ✕ ferme sans rien changer : vous choisirez plus tard.",
+    "introMany": "Modifiées ici et dans le cloud, depuis un autre appareil. Pour chacune, touchez la version à garder. Rien n’est perdu tant que vous n’avez pas choisi. ✕ reporte le choix.",
     "allSame": "Même choix pour toutes",
     "allSameText": "Toutes ce téléphone, ou toutes le cloud",
     "phoneShort": "Ce téléphone",
@@ -2738,7 +2738,7 @@
       },
       "space": {
         "title": "Espace insuffisant",
-        "text": "{name} peut demander jusqu’à {size}. Il ne resterait que {remaining} libres sur l’appareil. OpenDives garde toujours au moins {floor} libre pour que le téléphone continue de bien fonctionner."
+        "text": "{name} peut demander jusqu’à {size}. Il resterait {remaining}, sous le minimum de {floor} qu’OpenDives garde libre. Supprimez une région ou libérez de l’espace."
       },
       "manage": {
         "title": "Espace sur l’appareil",
@@ -2752,7 +2752,7 @@
       },
       "replace": {
         "title": "Remplacer la carte ?",
-        "text": "La mise à jour de {name} peut demander jusqu’à {size} de plus pendant le téléchargement. Pour rester sous la limite, l’ancienne carte sera supprimée d’abord. {name} sera indisponible sans réseau jusqu’à la fin.",
+        "text": "La mise à jour demande jusqu’à {size} de plus. Faute de place, l’ancienne carte est supprimée d’abord. {name} reste indisponible sans réseau jusqu’à la fin du téléchargement.",
         "confirm": "Remplacer"
       },
       "delete": {
@@ -2848,7 +2848,7 @@
     "print": "Impression",
     "sizeLabel": "Taille",
     "fileLabel": "Fichier",
-    "noteSheet": "Imprimée sur une feuille {paper}, à la taille réelle, avec des traits de coupe. Le format du papier suit la région, voir Réglages › Langue et formats.",
+    "noteSheet": "Feuille {paper}, taille réelle, avec traits de coupe. Le format du papier se change dans Réglages › Langue et formats.",
     "noteImage": "L’image montre la carte seule, sans marge.",
     "noteText": "Le texte contient le tableau, à coller dans une note ou un message.",
     "preview": "Aperçu",
