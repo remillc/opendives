@@ -130,10 +130,10 @@
     .od-band-backdrop--fill {
       position: absolute;
       inset: 0;
-      background-image: var(--od-band-gradient);
+      background-image: var(--od-band-grain), var(--od-band-gradient);
       /* At least the layer: on a tablet the status bar is outside the app and the band is taller than its phone height. */
-      background-size: 100% max(var(--od-band-h), 100%);
-      background-repeat: no-repeat;
+      background-size: 256px 256px, 100% max(var(--od-band-h), 100%);
+      background-repeat: repeat, no-repeat;
       transform: translate3d(0, var(--od-band-rise, 0px), 0);
     }
 

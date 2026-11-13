@@ -101,6 +101,9 @@
     /* Header band of the sections and of the side menu, the same in dark mode: the « grand bleu »
        of task 2026-11-13-97, colours only (the band's drawing does not change). */
     --od-band-gradient: radial-gradient(140% 115% at 38% -4%, #A9C4E2 0%, #7199C2 25%, #5584B5 37%, #2D5E90 59%, #114477 86%);
+    /* TRIAL (task 2026-11-13-108): paper grain over the band, a 256 px tile drawn once by the
+       browser and repeated (no live filter while scrolling). Off: html.od-no-paper-grain. */
+    --od-band-grain: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='256' height='256'><filter id='p' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4' seed='7' stitchTiles='stitch' result='n'/><feDiffuseLighting in='n' lighting-color='%23FFFFFF' surfaceScale='1'><feDistantLight azimuth='45' elevation='55'/></feDiffuseLighting><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -0.18 0 0 0 0.155'/></filter><rect width='100%25' height='100%25' filter='url(%23p)'/></svg>");
     /* The faint dive profile drawn at the bottom of a band: its area and its line. */
     --od-band-profile-area: rgb(255 255 255 / 0.1);
     --od-band-profile-line: rgb(255 255 255 / 0.3);
@@ -1204,9 +1207,9 @@ html.md {
 }
 
 .navbar.od-band-bar .navbar-bg {
-  background-image: var(--od-band-gradient);
-  background-size: 100% var(--od-band-h);
-  background-repeat: no-repeat;
+  background-image: var(--od-band-grain), var(--od-band-gradient);
+  background-size: 256px 256px, 100% var(--od-band-h);
+  background-repeat: repeat, no-repeat;
   background-color: transparent;
 }
 
@@ -1308,4 +1311,9 @@ html[class*="with-modal"] .navbar.od-band-bar {
       letter-spacing: normal;
     }
   }
+}
+
+/* TRIAL (task 2026-11-13-108): the switch at the end of Réglages removes the grain. */
+html.od-no-paper-grain {
+  --od-band-grain: none;
 }
