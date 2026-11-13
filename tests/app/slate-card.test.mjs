@@ -35,7 +35,8 @@ test('the card has the plan, its gases and one Fin column per extra plan', () =>
   });
   assert.equal(card.title, 'Épave');
   assert.equal(card.extraHeaders.length, 2);
-  assert.equal(card.extraHeaders[0], '+5 min');
+  // A non-breaking space between the number and its unit (docs/ui-writing.md, task 2026-11-13-116).
+  assert.equal(card.extraHeaders[0], '+5\u00A0min');
   assert.ok(card.gasLine.includes('21'), card.gasLine);
   assert.ok(card.rows.length >= 3);
   const last = card.rows[card.rows.length - 1];
