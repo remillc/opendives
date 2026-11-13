@@ -167,7 +167,7 @@
     }
 
     .item-text.od-dive-row--pending {
-      color: var(--od-pending);
+      color: var(--od-tertiary);
     }
 
     .od-dive-row--not-set {

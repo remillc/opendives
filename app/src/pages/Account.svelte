@@ -342,7 +342,7 @@
     }
 
     .od-account--pending {
-      color: var(--od-pending);
+      color: var(--od-tertiary);
     }
 
     /* Sign-out dialog (outside this page in the document): fully global selectors. */

@@ -29,7 +29,7 @@
     /* Pickers: the ink fills the selected day, the dial handle and the selected box's outline. */
     --od-primary: #1F2124;
     --od-on-primary: #FFFFFF;
-    --od-primary-container: #E8E8E5;
+    --od-primary-container: #EBEAE5;
     --od-on-primary-container: #1F2124;
     /* Secondary: the ocean-night blue (selection, active state, tonal buttons). */
     --od-secondary: #114477;
@@ -64,22 +64,25 @@
     --od-pending: #8A4B00;
     /* On the header band, whose colours stay light in dark mode too. */
     --od-band-pending: #8A4B00;
-    --od-band-control: rgb(255 255 255 / 0.78);
+    --od-band-control: rgb(255 255 255 / 0.9);
+    /* Text and icons on a control placed on the band (white at 90 %): they stay dark. */
+    --od-on-band-control: #1F2124;
+    --od-on-band-control-2: #4B4A47;
     /* The simplified offline map (sea, land, land inside a downloaded region, roads). */
     --od-map-sea: #D3E0EC;
     --od-map-land-low: #EDECE7;
     --od-map-land: #F7F6F2;
     --od-map-road: #D9D3C4;
 
-    --od-background: #F4F4F2;
+    --od-background: #F5F4F0;
     --od-surface: #FFFFFF;
-    --od-surface-2: #E8E8E5;
+    --od-surface-2: #EBEAE5;
     /* MD3 surface-container-high: the tonal buttons of a connected button group. */
-    --od-surface-container-high: #E8E8E5;
+    --od-surface-container-high: #EBEAE5;
     /* MD3 surface-container-highest: the current value of an exposed dropdown menu. */
     --od-surface-container-highest: #E3E1DC;
     --od-text: #1F2124;
-    --od-text-2: #4A4D52;
+    --od-text-2: #4B4A47;
     --od-separator: #DADAD6;
     --od-outline: #74777C;
     /* Stars to read, not to touch (the average of Conditions in the edit screen). */
@@ -92,13 +95,14 @@
     --od-on-primary-action: var(--od-on-action);
     --od-cursor: var(--od-action);
     --od-water-top: #D4E2F2;
-    /* Header band of the sections and of the side menu, the same in dark mode. */
-    --od-band-gradient: linear-gradient(165deg, #D4E2F2 0%, #7199C2 55%, #2D5E90 100%);
+    /* Header band of the sections and of the side menu, the same in dark mode: the « grand bleu »
+       of task 2026-11-13-97, colours only (the band's drawing does not change). */
+    --od-band-gradient: radial-gradient(140% 115% at 38% -4%, #A9C4E2 0%, #7199C2 25%, #5584B5 37%, #2D5E90 59%, #114477 86%);
     /* The faint dive profile drawn at the bottom of a band: its area and its line. */
     --od-band-profile-area: rgb(255 255 255 / 0.1);
-    --od-band-profile-line: rgb(31 33 36 / 0.22);
-    --od-on-band: #1F2124;
-    --od-on-band-2: #3D3A33;
+    --od-band-profile-line: rgb(255 255 255 / 0.3);
+    --od-on-band: #FFFFFF;
+    --od-on-band-2: #D4E2F2;
     --od-water-bottom: #5584B5;
     /* Loading indicator (Android): a blue gradient. */
     --od-loading-indicator-top: #7199C2;
@@ -126,7 +130,7 @@
     /* Outline drawn under the profile line; only used in dark mode. */
     --od-trace-outline: transparent;
     /* Profile chart: grid lines of the depth axis, water temperature curve and its scale. */
-    --od-chart-grid: #E8E8E5;
+    --od-chart-grid: #EBEAE5;
     --od-chip-outline: #75787C;
     /* Selected curve button of the profile: white with a 1 px border in the curve colour. */
     --od-curve-chip-bg: #FFFFFF;
@@ -158,15 +162,15 @@
     --od-fab-tonal: #E3E1DC;
     /* Vibrant floating toolbar (spec, section 8): ink container, light icons. */
     --od-toolbar-container: #1F2124;
-    --od-toolbar-on-container: #F4F4F2;
-    --od-toolbar-primary: #F4F4F2;
+    --od-toolbar-on-container: #F5F4F0;
+    --od-toolbar-primary: #F5F4F0;
     --od-toolbar-on-primary: #1F2124;
     /* "Choisir sur la carte": the fixed frame and the 40 % veil outside it. */
     --od-area-frame: #1F2124;
     --od-area-veil: rgb(31 33 36 / 0.4);
     /* Snackbar (ui-foundations, section 8): surface, text 12.0:1, action 6.3:1. */
     --od-inverse-surface: #2E3033;
-    --od-inverse-on-surface: #F4F4F2;
+    --od-inverse-on-surface: #F5F4F0;
     --od-inverse-primary: #8AB4F8;
   }
 
@@ -1224,10 +1228,10 @@ html[class*="with-modal"] .navbar.od-band-bar {
   --f7-searchbar-input-border-radius: 28px;
   --f7-searchbar-input-bg-color: var(--od-band-control);
   /* The band stays light in dark mode, so its field keeps the band's ink, not the page's. */
-  --f7-searchbar-input-text-color: var(--od-on-band);
-  --f7-searchbar-placeholder-color: var(--od-on-band-2);
-  --f7-searchbar-search-icon-color: var(--od-on-band);
-  --f7-searchbar-clear-button-color: var(--od-on-band-2);
+  --f7-searchbar-input-text-color: var(--od-on-band-control);
+  --f7-searchbar-placeholder-color: var(--od-on-band-control-2);
+  --f7-searchbar-search-icon-color: var(--od-on-band-control);
+  --f7-searchbar-clear-button-color: var(--od-on-band-control-2);
   --f7-searchbar-inner-padding-left: 0px;
   --f7-searchbar-inner-padding-right: 0px;
   position: relative;

@@ -71,7 +71,7 @@
       }
 
       &.od-sync-status--pending {
-        color: var(--od-pending);
+        color: var(--od-tertiary);
       }
     }
 

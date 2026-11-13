@@ -574,7 +574,7 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
       padding: 0 12px 0 8px;
       border-radius: 14px;
       background: var(--od-band-control);
-      color: var(--od-on-band);
+      color: var(--od-on-band-control);
       font-size: 13px;
       font-weight: 600;
     }
@@ -636,6 +636,7 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
 
       .od-sites--open & {
         background: var(--od-band-control);
+        color: var(--od-on-band-control);
         clip-path: inset(0 0 0 0 round 24px);
         transition-duration: 300ms;
         transition-timing-function: var(--od-search-open-ease);
@@ -667,7 +668,7 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
       }
 
       &::placeholder {
-        color: var(--od-on-band-2);
+        color: var(--od-on-band-control-2);
       }
     }
 
@@ -679,7 +680,7 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
       border: none;
       border-radius: 50%;
       background: none;
-      color: var(--od-on-band-2);
+      color: var(--od-on-band-control-2);
       display: flex;
       align-items: center;
       justify-content: center;

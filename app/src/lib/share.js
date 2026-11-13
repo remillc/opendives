@@ -245,22 +245,22 @@ export function sheetHtml(dive, prefs, svg, anonymize = false) {
 * { box-sizing: border-box; }
 body { margin: 0; font-family: sans-serif; color: #1F2124; font-size: 10pt; line-height: 1.35; }
 header { display: flex; justify-content: space-between; gap: 16px; border-bottom: 1px solid #DADAD6; padding-bottom: 10px; }
-.over { font-size: 10pt; color: #4A4D52; } .over b { color: #1F2124; }
+.over { font-size: 10pt; color: #4B4A47; } .over b { color: #1F2124; }
 h1 { margin: 2px 0 2px; font-size: 22pt; line-height: 1.1; }
-.place { color: #4A4D52; }
+.place { color: #4B4A47; }
 .figures { display: flex; gap: 18px; text-align: right; }
-.figure b { display: block; font-size: 16pt; } .figure span { color: #4A4D52; font-size: 9pt; }
+.figure b { display: block; font-size: 16pt; } .figure span { color: #4B4A47; font-size: 9pt; }
 h2 { font-size: 11pt; margin: 14px 0 6px; }
-.legend { color: #4A4D52; font-size: 9pt; margin-top: 2px; }
+.legend { color: #4B4A47; font-size: 9pt; margin-top: 2px; }
 svg { width: 78%; height: auto; display: block; }
 .facts { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px 12px; margin: 0; }
-.kv { border-bottom: 1px solid #ECECEA; padding: 3px 0; } dt { color: #4A4D52; font-size: 8.5pt; } dd { margin: 0; font-weight: 600; }
-table { width: 100%; border-collapse: collapse; } th { text-align: left; color: #4A4D52; font-weight: normal; font-size: 8.5pt; border-bottom: 1px solid #DADAD6; padding: 3px 4px; }
+.kv { border-bottom: 1px solid #ECECEA; padding: 3px 0; } dt { color: #4B4A47; font-size: 8.5pt; } dd { margin: 0; font-weight: 600; }
+table { width: 100%; border-collapse: collapse; } th { text-align: left; color: #4B4A47; font-weight: normal; font-size: 8.5pt; border-bottom: 1px solid #DADAD6; padding: 3px 4px; }
 td { padding: 3px 4px; border-bottom: 1px solid #ECECEA; } td.n { font-variant-numeric: tabular-nums; }
 .two { display: grid; grid-template-columns: 1fr 1fr; gap: 0 24px; }
 .list { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 12px; margin: 6px 0 0; }
 .notes { white-space: pre-wrap; }
-footer { margin-top: 16px; border-top: 1px solid #DADAD6; padding-top: 6px; color: #4A4D52; font-size: 8.5pt; }
+footer { margin-top: 16px; border-top: 1px solid #DADAD6; padding-top: 6px; color: #4B4A47; font-size: 8.5pt; }
 </style></head><body>
 <header><div>
 <div class="over"><b>${esc(dive.number ? t('share.sheetNumber', { number: String(dive.number) }) : t('share.sheetDive'))}</b> · ${esc(formatFullDate(dive.date))}</div>
@@ -305,11 +305,11 @@ export function profileSvgFromSamples(dive, prefs) {
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
 <defs><linearGradient id="w" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#D4E2F2"/><stop offset="1" stop-color="#9EBAD8"/></linearGradient></defs>
 <path d="${water}" fill="url(#w)"/><path d="${line}" fill="none" stroke="#1F2124" stroke-width="2" stroke-linejoin="round"/>
-<line x1="${L}" x2="${W - 6}" y1="${H - B + 4}" y2="${H - B + 4}" stroke="#4A4D52"/>
-<text x="${L - 4}" y="12" font-size="10" text-anchor="end" fill="#4A4D52">0</text>
-<text x="${L - 4}" y="${(y(dMax) + 4).toFixed(1)}" font-size="10" text-anchor="end" fill="#4A4D52">${esc(formatDepth(dMax, prefs))}</text>
-<text x="${L}" y="${H - 6}" font-size="10" fill="#4A4D52">0</text>
-<text x="${W - 6}" y="${H - 6}" font-size="10" text-anchor="end" fill="#4A4D52">${minutes} min</text>
+<line x1="${L}" x2="${W - 6}" y1="${H - B + 4}" y2="${H - B + 4}" stroke="#4B4A47"/>
+<text x="${L - 4}" y="12" font-size="10" text-anchor="end" fill="#4B4A47">0</text>
+<text x="${L - 4}" y="${(y(dMax) + 4).toFixed(1)}" font-size="10" text-anchor="end" fill="#4B4A47">${esc(formatDepth(dMax, prefs))}</text>
+<text x="${L}" y="${H - 6}" font-size="10" fill="#4B4A47">0</text>
+<text x="${W - 6}" y="${H - 6}" font-size="10" text-anchor="end" fill="#4B4A47">${minutes} min</text>
 </svg>`;
 }
 
@@ -453,19 +453,19 @@ export function planSheetHtml(result, request, prefs, title) {
 @page { size: ${letterPaper() ? 'letter' : 'A4'}; margin: 14mm; }
 body { margin: 0; font-family: sans-serif; color: #1F2124; font-size: 10pt; line-height: 1.35; }
 h1 { margin: 0 0 2px; font-size: 20pt; } h2 { font-size: 11pt; margin: 14px 0 6px; }
-.sub { color: #4A4D52; } svg { width: 100%; height: auto; display: block; }
-table { width: 100%; border-collapse: collapse; } th { text-align: left; color: #4A4D52; font-weight: normal; font-size: 8.5pt; border-bottom: 1px solid #DADAD6; padding: 3px 4px; }
+.sub { color: #4B4A47; } svg { width: 100%; height: auto; display: block; }
+table { width: 100%; border-collapse: collapse; } th { text-align: left; color: #4B4A47; font-weight: normal; font-size: 8.5pt; border-bottom: 1px solid #DADAD6; padding: 3px 4px; }
 td { padding: 3px 4px; border-bottom: 1px solid #ECECEA; }
-footer { margin-top: 16px; border-top: 1px solid #DADAD6; padding-top: 6px; color: #4A4D52; font-size: 8.5pt; }
+footer { margin-top: 16px; border-top: 1px solid #DADAD6; padding-top: 6px; color: #4B4A47; font-size: 8.5pt; }
 .vol { margin: 0 0 10px; break-inside: avoid; }
-.tiles { display: flex; gap: 8px; margin: 10px 0 4px; } .tile { flex: 1; background: #F4F4F2; border-radius: 8px; padding: 6px 10px; } .tile span { display: block; color: #4A4D52; font-size: 8.5pt; } .tile b { font-size: 16pt; }
+.tiles { display: flex; gap: 8px; margin: 10px 0 4px; } .tile { flex: 1; background: #F5F4F0; border-radius: 8px; padding: 6px 10px; } .tile span { display: block; color: #4B4A47; font-size: 8.5pt; } .tile b { font-size: 16pt; }
 mark { background: #D4E2F2; color: #0B2440; border-radius: 4px; padding: 0 4px; } .ok { color: #2E7D32; }
 .vol-head { display: flex; justify-content: space-between; align-items: baseline; }
 .vol-total { font-size: 14pt; }
 .vol-bar { display: flex; height: 7px; margin-top: 4px; border-radius: 4px; overflow: hidden; background: #FBE3B2; }
 .vol-used { background: #B4530F; } .vol-gap { width: 1.5px; background: #FFFFFF; }
 .vol-reserve, .sw-reserve { flex: 1; background: repeating-linear-gradient(135deg, #FBE3B2 0 3px, #EDC691 3px 6px); }
-.vol-legend { margin-top: 4px; color: #4A4D52; font-size: 9pt; } .vol-legend span { margin-right: 14px; } .vol-legend b { color: #1F2124; }
+.vol-legend { margin-top: 4px; color: #4B4A47; font-size: 9pt; } .vol-legend span { margin-right: 14px; } .vol-legend b { color: #1F2124; }
 .sw { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 4px; vertical-align: middle; } .sw-used { background: #B4530F; }
 </style></head><body>
 <h1>${esc(title)}</h1><div class="sub">${esc(t('plan.shareHeadline', { depth: f.deepest, time: f.total }))}</div>

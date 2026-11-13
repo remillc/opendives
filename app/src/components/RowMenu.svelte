@@ -163,7 +163,7 @@
       background: transparent;
     }
 
-    /* 16 dp corners, surface #F4F4F2 (the page background), elevation level 2. */
+    /* 16 dp corners, surface #F5F4F0 (the page background), elevation level 2. */
     .od-row-menu {
       position: fixed;
       z-index: 14000;

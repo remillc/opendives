@@ -32,7 +32,7 @@ async function offlineStyle(channel) {
   const land = colour('--od-map-land') || '#F7F6F2';
   const landLow = colour('--od-map-land-low') || '#EDECE7';
   const road = colour('--od-map-road') || '#D9D3C4';
-  const outline = colour('--od-text-2') || '#4A4D52';
+  const outline = colour('--od-text-2') || '#4B4A47';
   const areas = {
     type: 'FeatureCollection',
     features: regions.map((r) => {
