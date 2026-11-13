@@ -57,6 +57,20 @@
     open = true;
     await tick();
     position();
+    // A long list opens on the current value (task 2026-11-13-92), or on the
+    // nearest preset when the value is not one.
+    await tick();
+    const at = active >= 0 ? active : nearest();
+    /** @type {HTMLElement|undefined} */ (menu?.children[at])?.scrollIntoView({ block: 'center' });
+  }
+
+  /** The index of the preset nearest the value. */
+  function nearest() {
+    let best = 0;
+    presets.forEach((p, i) => {
+      if (Math.abs(p - value) < Math.abs(presets[best] - value)) best = i;
+    });
+    return best;
   }
 
   function position() {

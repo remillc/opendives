@@ -248,10 +248,13 @@
     gfHighField = show(planner.deco.gfHigh);
     invalid = {};
   }
+  // Only on opening and when another plan is loaded: fillFields reads the plan,
+  // which typing changes, and rebuilding the fields under the finger replaced
+  // the focused input and closed the keyboard (Christian, 13 November 2026).
   $effect(() => {
     planner.loaded;
     ready;
-    fillFields();
+    untrack(fillFields);
   });
 
   /**
