@@ -69,7 +69,9 @@
     <div class="od-tools--surface" role="list">
       {#each group.rows as row (row.href)}
         <div role="listitem">
-          <a class="od-tools--row" class:od-tools--selected={selected === row.href} href={row.href} data-reload-detail="true" onclick={select}>
+          <!-- Only while the list and the tool are side by side: a large phone turned back
+               to portrait kept the planner's tint (Christian, 13 November 2026). -->
+          <a class="od-tools--row" class:od-tools--selected={layout.split && selected === row.href} href={row.href} data-reload-detail="true" onclick={select}>
             <span class="od-tools--icon"><Icon name={row.icon} /></span>
             <span class="od-tools--texts">
               <span class="od-tools--label">{row.name}</span>

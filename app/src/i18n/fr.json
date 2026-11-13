@@ -1600,6 +1600,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Outils et Statistiques : une ligne ne reste plus surlignée en gris après avoir tourné un grand téléphone.",
       "Planificateur : le résultat tient dans une carte, avec la durée totale et les paliers de déco en grand, puis les paliers ou « Remontée sans palier », les volumes et l’oxygène.",
       "Planificateur : dans le tableau des paliers, le gaz de départ est surligné comme un changement de gaz.",
       "Planificateur : l’exposition à l’oxygène suit la même présentation que les gaz (CNS en gros, limite et OTU sous la barre).",

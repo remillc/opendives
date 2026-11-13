@@ -184,6 +184,8 @@ in fewer words.
   is no longer cut in the middle of a number or word.
 - **Taps.** A tap that slid a little was sometimes ignored.
 - **Start-up.** The app no longer stays on a white screen before its look has loaded.
+- **Tools and Statistics.** A row no longer stays tinted grey after turning a large phone
+  to landscape and back.
 - **Units.** A single unit changed after "Imperial" or "Metric" is kept after a restart.
 - **Tablet.** After signing out, the last dive no longer stays beside the empty
   logbook; section headers have their wavy edge again.
