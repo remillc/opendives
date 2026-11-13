@@ -25,7 +25,7 @@ import {
 } from './format.js';
 import { t, tIfExists } from './i18n.js';
 import { settings } from './settings.svelte.js';
-import { bottomVolumeKey } from './reserve-factor.js';
+import { bottomVolumeKey, reserveLegendKey } from './reserve-factor.js';
 
 /** @typedef {import('opendives-core').DiveDetail} DiveDetail */
 /** @typedef {import('opendives-core').Prefs} Prefs */
@@ -377,6 +377,11 @@ function planFacts(result, request, prefs) {
         used: formatGasVolume(c.gasUsedMl, prefs),
         reserve: formatGasVolume(c.reserveMl, prefs),
       }),
+      // The bar and its legend, as in the planner (task 2026-11-13-93).
+      used: formatGasVolume(c.gasUsedMl, prefs),
+      reserve: c.reserveMl > 0 ? formatGasVolume(c.reserveMl, prefs) : '',
+      reserveLegend: t(reserveLegendKey(settings.reserveDivers, i === bottomIndex), { divers: String(settings.reserveDivers) }),
+      usedPercent: c.gasUsedMl + c.reserveMl > 0 ? (c.gasUsedMl / (c.gasUsedMl + c.reserveMl)) * 100 : 0,
     })),
     total: planMinutes(result.runtimeSeconds),
     deepest: formatDepth(result.maxDepthMm, prefs),
@@ -440,6 +445,14 @@ h1 { margin: 0 0 2px; font-size: 20pt; } h2 { font-size: 11pt; margin: 14px 0 6p
 table { width: 100%; border-collapse: collapse; } th { text-align: left; color: #4A4D52; font-weight: normal; font-size: 8.5pt; border-bottom: 1px solid #DADAD6; padding: 3px 4px; }
 td { padding: 3px 4px; border-bottom: 1px solid #ECECEA; }
 footer { margin-top: 16px; border-top: 1px solid #DADAD6; padding-top: 6px; color: #4A4D52; font-size: 8.5pt; }
+.vol { margin: 0 0 10px; break-inside: avoid; }
+.vol-head { display: flex; justify-content: space-between; align-items: baseline; }
+.vol-total { font-size: 14pt; }
+.vol-bar { display: flex; height: 7px; margin-top: 4px; border-radius: 4px; overflow: hidden; background: #FBE3B2; }
+.vol-used { background: #B4530F; } .vol-gap { width: 1.5px; background: #FFFFFF; }
+.vol-reserve, .sw-reserve { flex: 1; background: repeating-linear-gradient(135deg, #FBE3B2 0 3px, #EDC691 3px 6px); }
+.vol-legend { margin-top: 4px; color: #4A4D52; font-size: 9pt; } .vol-legend span { margin-right: 14px; } .vol-legend b { color: #1F2124; }
+.sw { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 4px; vertical-align: middle; } .sw-used { background: #B4530F; }
 </style></head><body>
 <h1>${esc(title)}</h1><div class="sub">${esc(t('plan.shareHeadline', { depth: f.deepest, time: f.total }))}</div>
 <h2>${esc(t('share.profile'))}</h2>${planSvg(result)}
@@ -447,8 +460,16 @@ ${f.levels.length ? `<h2>${esc(t('plan.levels'))}</h2><div>${esc(f.levels.join('
 <h2>${esc(t('plan.stop'))}</h2>
 ${f.stops.length ? `<table><thead><tr><th>${esc(t('plan.stop'))}</th><th>${esc(t('plan.duration'))}</th><th>${esc(t('plan.runtime'))}</th><th>${esc(t('plan.gasColumn'))}</th></tr></thead><tbody>${f.stops.map((s) => `<tr><td>${esc(s.depth)}</td><td>${esc(s.duration)}</td><td>${esc(s.runtime)}</td><td>${esc(s.gas)}</td></tr>`).join('')}</tbody></table>` : `<div>${esc(t('plan.noStop'))}</div>`}
 <h2>${esc(t('plan.volumes'))}</h2>
-<table><tbody>${f.gases.map((g) => `<tr><td>${esc(g.name)}</td><td>${esc(g.detail)}</td><td><b>${esc(g.total)}</b></td></tr>`).join('')}</tbody></table>
-<h2>${esc(t('plan.oxygen'))}</h2><div>${esc(f.oxygen)}</div>
+${f.gases
+  .map(
+    (g) => `<div class="vol"><div class="vol-head"><span>${esc(g.name)}</span><b class="vol-total">${esc(g.total)}</b></div>
+<div class="vol-bar"><span class="vol-used" style="width:${g.usedPercent.toFixed(1)}%"></span>${g.reserve ? '<span class="vol-gap"></span><span class="vol-reserve"></span>' : ''}</div>
+<div class="vol-legend"><span><i class="sw sw-used"></i>${esc(t('plan.legendUsed'))} <b>${esc(g.used)}</b></span>${g.reserve ? `<span><i class="sw sw-reserve"></i>${esc(g.reserveLegend)} <b>${esc(g.reserve)}</b></span>` : ''}</div></div>`,
+  )
+  .join('')}
+<div class="vol"><div class="vol-head"><h2 style="margin:0">${esc(t('plan.oxygen'))}</h2><b class="vol-total">${esc(t('plan.cnsValue', { cns: result.cns }))}</b></div>
+<div class="vol-bar"><span class="vol-used" style="width:${Math.min(result.cns, 100)}%"></span></div>
+<div class="vol-legend" style="display:flex;justify-content:space-between"><span>${esc(t('plan.cnsLimit'))}</span><span>${esc(t('plan.otuLabel'))} <b>${esc(String(result.otu))}</b></span></div></div>
 <footer>${esc(t('plan.note'))} ${esc(t('share.footer', { date: created }))}</footer>
 </body></html>`;
 }
