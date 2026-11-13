@@ -527,7 +527,7 @@
     },
     "extraConditions": {
       "label": "Surface waves, surge and chill",
-      "text": "Adds these three conditions when editing a dive"
+      "text": "Adds these three conditions to Edit the dive"
     },
     "salinity": {
       "label": "Choose the water type in the editor",
@@ -568,7 +568,7 @@
       "text": "Under the profile, shows which cylinder is in use at each moment"
     },
     "deco": {
-      "warning": "These settings change the stops and limits the app calculates. Badly chosen values expose you to decompression sickness. Only change them if you know what you are doing.",
+      "warning": "These settings change the stops and limits the app calculates. A wrong value exposes you to decompression sickness.",
       "model": "Model",
       "orVpmb": "Or VPM-B",
       "orBuehlmann": "Or Bühlmann ZH-L16",
@@ -616,7 +616,7 @@
     "logbookComputers": {
       "title": "Logbook dive computers",
       "rowText": "Rename, remove duplicates",
-      "intro": "The computers your dives come from. The name you choose shows in the logbook and the dive detail.",
+      "intro": "The name you choose shows in the logbook and the dive detail.",
       "empty": "No dive computer in this logbook.",
       "duplicate": "Possible duplicate",
       "hasDuplicate": "Has a duplicate",
@@ -661,7 +661,7 @@
       },
       "merged": "Merged with {name}",
       "remove": "Remove from the list",
-      "removeHelp": "Only the entry is removed. The dives keep their data, and it comes back if new dives come from it.",
+      "removeHelp": "Only the entry is removed. The dives keep their data. The entry comes back if this computer provides new dives.",
       "removed": "Computer removed from the list"
     },
     "computers": {
@@ -671,7 +671,7 @@
       "forgetOneTitle": "Forget {name}?",
       "forgetOneText": "It will no longer be offered for download. Dives already downloaded do not change.",
       "showAll": "Show all Bluetooth devices",
-      "showAllText": "Even those not recognised as dive computers",
+      "showAllText": "Also shows devices not recognised as dive computers",
       "forgetAll": {
         "one": "Forget the remembered computer",
         "other": "Forget the remembered computers"
@@ -724,7 +724,7 @@
       "intro": "Offered when choosing the type of a cylinder. Renaming a type also renames the cylinders of that type in the logbook. Changing its size or removing it does not change existing dives.",
       "yours": "Your types",
       "standard": "Standard",
-      "standardNote": "Tap a type to open its sheet (name, volume, working pressure). A standard type can be changed like the others.",
+      "standardNote": "Standard types can be changed like yours.",
       "hidden": "Standard sizes are hidden: the “Offer standard sizes” setting is off.",
       "add": "Add a type",
       "newTitle": "New type",
@@ -750,8 +750,8 @@
       "usedInNoDive": "used in no dive",
       "usedInOneDive": "used in 1 dive",
       "usedInDives": "used in {n} dives",
-      "noteStandard": "Standard type, {use}. Renaming it also renames the cylinders of this type in the logbook. Changing its size does not change existing dives.",
-      "noteYours": "Your own type, {use}. Renaming it also renames the cylinders of this type in the logbook. Changing its size does not change existing dives.",
+      "noteStandard": "Standard type, {use}. Renaming it also renames those cylinders in the logbook. Changing its size does not change existing dives.",
+      "noteYours": "Your own type, {use}. Renaming it also renames those cylinders in the logbook. Changing its size does not change existing dives.",
       "volumeNoteCuft": "The volume of gas at working pressure, in cubic feet. In metric units, you enter the water volume of the cylinder in litres.",
       "volumeNoteLitres": "The water volume of the cylinder, in litres. In imperial units, you enter the volume of gas at working pressure, in cubic feet. The working pressure is optional for a volume in litres."
     },
@@ -852,7 +852,7 @@
     "changePasswordText": "A link is sent to your email",
     "leaveGroup": "Leave",
     "signOut": "Sign out",
-    "signOutText": "Disconnect your app from the cloud. Your dives stay in the cloud and on this device.",
+    "signOutText": "Your dives stay in the cloud and on this device.",
     "delete": "Delete account",
     "deleteText": "Deletes the account and all its dives from the Subsurface cloud. Cannot be undone.",
     "server": "Connected through the {region} server ({host}).",
@@ -878,7 +878,7 @@
       "other": "Your {n} dives are added to the account's dives, without overwriting anything"
     },
     "notAvailable": "Not available yet",
-    "autoSyncOff": "Off: changes stay on this device, and those from other devices do not arrive, until you sync",
+    "autoSyncOff": "Off: nothing is sent or received until you sync.",
     "pending": "Changes not sent",
     "bandSignedIn": "Your logbook in the cloud",
     "bandNone": "No account connected",
@@ -913,8 +913,8 @@
     "title": "Sign out?",
     "textNone": "The logbook stays in the cloud. A copy stays on this device, not shown, and is used if you sign in again.",
     "textPending": {
-      "one": "{n} change is not sent to the cloud yet. If you sign out anyway, it will be sent the next time you sign in to this account, from this device.",
-      "other": "{n} changes are not sent to the cloud yet. If you sign out anyway, they will be sent the next time you sign in to this account, from this device."
+      "one": "{n} change is not sent yet. It will be sent the next time you sign in to this account from this device.",
+      "other": "{n} changes are not sent yet. They will be sent the next time you sign in to this account from this device."
     },
     "deleteCopy": "Also delete the copy on this device",
     "deleteCopyHint": "Possible once the changes are sent",
@@ -944,7 +944,7 @@
     "exportText": "A Subsurface file (.ssrf), to keep elsewhere",
     "password": "Account password",
     "passwordText": "To confirm that it is you",
-    "note": "Changes not sent yet will be synced first, so that the copy kept is complete. The account is only reported deleted if the server confirms it.",
+    "note": "Pending changes are sent first. The account is only deleted after the server confirms.",
     "confirm": "Delete the account permanently",
     "connectionNeeded": "Connection needed",
     "deleted": "The account was deleted.",
@@ -1042,7 +1042,7 @@
     "addCylinder": "Add a cylinder",
     "cylinderInUse": "A cylinder used in the profile cannot be removed. Nothing changed.",
     "gasGroup": "Gas",
-    "gasHelper": "Tap a cylinder to edit it, or the arrow for all the cylinders and the gas changes.",
+    "gasHelper": "Tap a cylinder to edit it. The arrow opens all the cylinders and the gas changes.",
     "gasCcrLabel": "Gas: rebreather with {list}. Open the details",
     "gasCcrDiluent": "diluent {gas}",
     "gasCcrOxygen": "oxygen",
@@ -1217,7 +1217,7 @@
     "profileComputer": "Computer: {model}",
     "noGps": "No GPS position recorded",
     "cleanupTitle": "Clean up the sites",
-    "cleanupIntro": "Imports sometimes create the same site several times. Merging keeps a single site, with all its dives. It can be undone.",
+    "cleanupIntro": "Merging keeps a single site, with all its dives. It can be undone.",
     "sameNameAt": "Same name apart from case, {n} m apart",
     "sameName": "Same name apart from case",
     "samePlace": "Same position, different names",
@@ -1234,8 +1234,8 @@
     "mergeText": "“{keep}” keeps all the dives of “{other}”, which goes away. It can be undone.",
     "unusedTitle": "Sites without dives",
     "unusedIntro": {
-      "one": "{n} site is not used by any dive. They often come from imports or deleted dives.",
-      "other": "{n} sites are not used by any dive. They often come from imports or deleted dives."
+      "one": "{n} site is not used by any dive.",
+      "other": "{n} sites are not used by any dive."
     },
     "selectAll": "Select all",
     "noDive": "No dive",
@@ -1419,8 +1419,7 @@
     "name": "Name",
     "nameHint": "Optional, proposed from the criteria.",
     "nameHintShort": "Optional. Proposed from the criteria",
-    "rulesValues": "The values are those found in your logbook.",
-    "rules": "Several checked values count the dives that have any of them. Several criteria count the dives that meet all of them."
+    "rules": "Several checked values: the dives that have any of them. Several criteria: the dives that meet all of them."
   },
   "tools": {
     "title": "Tools",
@@ -1553,7 +1552,7 @@
   "signIn": {
     "title": "Sign in",
     "heading": "Your Subsurface account",
-    "intro": "The same account as in Subsurface on the computer or in Subsurface-mobile. Your dives are read from the cloud, then a copy stays on this device.",
+    "intro": "The same account as in Subsurface on a computer. Your dives are downloaded, then a copy stays on this device.",
     "email": "Email address",
     "password": "Password",
     "passwordText": "Kept only in the secure storage of this device",
@@ -1601,6 +1600,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Interface texts: shorter and clearer.",
       "Rebreather: the bailout cylinders take the new shape, with shoulders and a neck, without the valve.",
       "Dive detail: no more ",
       "Rebreather: DIL, O₂ and BAILOUT are centred on their cylinders.",
@@ -1833,10 +1833,10 @@
     "signedInTitle": "Your account",
     "signedInIntro": "This account has no logbook yet. You can fill it right away with the dives you already have.",
     "heading": "Bring your logbook?",
-    "intro": "Your Subsurface account is ready. You can fill it right away with the dives you already have.",
+    "intro": "Add the dives you already have now.",
     "sourceLabel": "Source of the logbook",
     "divelogs": "From divelogs.de",
-    "divelogsText": "The dives are downloaded once, then saved in your Subsurface account. After that, divelogs.de and OpenDives do not sync: you can send dives back to it whenever you like.",
+    "divelogsText": "The dives are copied once into your account. divelogs.de and OpenDives do not stay in sync.",
     "user": "divelogs.de user name",
     "password": "divelogs.de password",
     "credentialsNote": "These credentials are only used for this download. OpenDives does not keep them.",
@@ -1923,7 +1923,7 @@
     "rowAscent": "Ascent",
     "rowStop": "Deco stop",
     "surface": "Surface",
-    "rowsNote": "Start and end in minutes since entering the water. ↓ descent, → planned level, ↑ ascent, – deco stop. Short ascents between stops are counted in the stop. The highlighted gas marks a gas change.",
+    "rowsNote": "Start and end in minutes since entering the water. ↓ descent, → planned level, ↑ ascent, – deco stop. Highlighted gas: gas change.",
     "gasColumn": "Gas",
     "noStop": "No mandatory decompression stop. The ascent stayed above the ceiling.",
     "ceilingLegend": "Decompression ceiling",
@@ -2222,7 +2222,7 @@
     },
     "permission": {
       "title": "Allow Bluetooth",
-      "text": "To find the dive computer and connect to it, Android asks for the \"Nearby devices\" permission (location before Android 12). OpenDives uses it for nothing else.",
+      "text": "Android asks for the \"Nearby devices\" permission to find the dive computer. OpenDives does not use it for anything else.",
       "button": "Allow"
     },
     "denied": {
@@ -2266,7 +2266,7 @@
     "checks": {
       "on": "The dive computer is on and in Bluetooth transfer mode.",
       "near": "It is less than a metre from the phone.",
-      "otherApp": "No other app (Subsurface-mobile, for example) is connected to the dive computer."
+      "otherApp": "No other app is connected to the dive computer."
     },
     "otherComputer": "Choose another dive computer",
     "retry": "Retry",
@@ -2373,7 +2373,7 @@
     "failed": "The choice could not be saved. Nothing changed.",
     "unknownDive": "Dive without a date",
     "titleMany": "{n} dives in conflict",
-    "introMany": "Changed here and in the cloud, from another device. For each one, touch the version to keep. Nothing is lost until you choose. ✕ closes without changing anything: you will choose later.",
+    "introMany": "Changed here and in the cloud, from another device. For each one, touch the version to keep. Nothing is lost until you choose. ✕ postpones the choice.",
     "allSame": "Same choice for all",
     "allSameText": "All this phone, or all the cloud",
     "phoneShort": "This phone",
@@ -2738,7 +2738,7 @@
       },
       "space": {
         "title": "Not enough space",
-        "text": "{name} can take up to {size}. Only {remaining} would be left free on the device. OpenDives always keeps at least {floor} free so that the phone keeps working well."
+        "text": "{name} can take up to {size}. Only {remaining} would be left, below the {floor} minimum OpenDives keeps free. Delete a region or free up space."
       },
       "manage": {
         "title": "Space on the device",
@@ -2752,7 +2752,7 @@
       },
       "replace": {
         "title": "Replace the map?",
-        "text": "Updating {name} can take up to {size} more during the download. To stay under the limit, the old map will be deleted first. {name} will be unavailable without a network until the end.",
+        "text": "The update can take up to {size} more. For lack of space, the old map is deleted first. {name} stays unavailable without a network until the download ends.",
         "confirm": "Replace"
       },
       "delete": {
@@ -2848,7 +2848,7 @@
     "print": "Printing",
     "sizeLabel": "Size",
     "fileLabel": "File",
-    "noteSheet": "Printed on one {paper} sheet, at actual size, with cut marks. The paper follows the region, see Settings › Language and formats.",
+    "noteSheet": "{paper} sheet, actual size, with cut marks. The paper size can be changed in Settings › Language and formats.",
     "noteImage": "The image shows the card alone, without margin.",
     "noteText": "The text holds the table, to paste in a note or a message.",
     "preview": "Preview",

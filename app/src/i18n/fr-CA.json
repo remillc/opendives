@@ -32,7 +32,7 @@
   },
   "account": {
     "cloudDives": "Plongées dans le nuage",
-    "signOutText": "Déconnecter votre app du nuage. Vos plongées restent dans le nuage et sur cet appareil.",
+    "signOutText": "Vos plongées restent dans le nuage et sur cet appareil.",
     "deleteText": "Supprime le compte et toutes ses plongées du nuage Subsurface. Irréversible.",
     "bandSignedIn": "Votre carnet dans le nuage"
   },
@@ -41,11 +41,7 @@
     "existingNote": "Sauvegardé dans le nuage, consultable hors ligne"
   },
   "signOut": {
-    "textNone": "Le carnet reste dans le nuage. Une copie reste sur cet appareil, non affichée, et sert si vous vous reconnectez.",
-    "textPending": {
-      "one": "{n} modification n'est pas encore envoyée au nuage. Si vous vous déconnectez quand même, elle sera envoyée à votre prochaine connexion à ce compte, depuis cet appareil.",
-      "other": "{n} modifications ne sont pas encore envoyées au nuage. Si vous vous déconnectez quand même, elles seront envoyées à votre prochaine connexion à ce compte, depuis cet appareil."
-    }
+    "textNone": "Le carnet reste dans le nuage. Une copie reste sur cet appareil, non affichée, et sert si vous vous reconnectez."
   },
   "deleteAccount": {
     "consequence": {
@@ -57,7 +53,6 @@
     "emailRow": "Courriel"
   },
   "signIn": {
-    "intro": "Le même compte que dans Subsurface sur l'ordinateur ou dans Subsurface-mobile. Vos plongées sont lues depuis le nuage, puis une copie reste sur cet appareil.",
     "email": "Adresse courriel"
   },
   "createAccount": {
@@ -81,7 +76,7 @@
     },
     "cloudCard": "Version du nuage",
     "keptCloud": "Version du nuage gardée",
-    "introMany": "Modifiées ici et dans le nuage, depuis un autre appareil. Pour chacune, touchez la version à garder. Rien n’est perdu tant que vous n’avez pas choisi. ✕ ferme sans rien changer : vous choisirez plus tard.",
+    "introMany": "Modifiées ici et dans le nuage, depuis un autre appareil. Pour chacune, touchez la version à garder. Rien n’est perdu tant que vous n’avez pas choisi. ✕ reporte le choix.",
     "allSameText": "Toutes ce téléphone, ou toutes le nuage",
     "cloudShort": "Nuage"
   },
