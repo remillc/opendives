@@ -2232,7 +2232,7 @@ Christian's decision of 13 November 2026 (TODOS: flight countdown). Mock-ups in 
 4. **Notification** (`notif-avion-android.dc.html`): when the switch is on, a local notification at the end of the wait: « Vous pouvez prendre l'avion », « L'attente de 18 h après vos plongées d'hier est terminée. » (the hours and the day follow the case). Tapping it opens the Désaturation tool. A new dive reschedules it.
 The wait is counted from the surfacing time of the last dive in the logbook. Times follow the device clock and the 24 h French format of the mock-ups. Tests for the wait rule (one dive, several dives the same day, fixed choices). Check on the phone emulator, including the notification.
 
-## [ ] 2026-11-13-99 Suggested weight and « Ce lest était »
+## [x] 2026-11-13-99 Suggested weight and « Ce lest était »
 
 Christian's decision of 13 November 2026 (TODOS #50). Mock-ups: `docs/mockups/android-edition.dc.html` (Équipement group) and `docs/mockups/detail3-android.dc.html` (Équipement section shown open). Colours: the theme of task 97.
 1. **Suggestion, in « Modifier la plongée »**, under the « Lest » heading of the Équipement group: a tonal card (secondary container, 12 dp corners) with a light-bulb icon, « Suggestion : 6 lb » (16 sp semibold), « Comme le 2 février 2013 » (13 sp) and a filled « Utiliser » button. « Utiliser » puts the weight in the dive's weights (same location as that earlier dive). Nothing is filled without the tap. Accessible name of the card: « Suggestion : 6 lb, comme le 2 février 2013 ».
@@ -2243,6 +2243,8 @@ Christian's decision of 13 November 2026 (TODOS #50). Mock-ups: `docs/mockups/an
    - in the dive detail, inside the **open** Équipement section (`EquipmentCard`): Combinaison, Lest with the total, then the weights by location, then « Ce lest était », then Ordinateur. Not shown in the closed card. No title inside the open card (the « Équipement » heading above it is enough): the chevron-up button sits at the right of the first row (accessible name ending « Masquer le détail »).
 3. **Storage, Subsurface compatible:** the choice is saved as a tag of the dive, always in English whatever the app language: `weight-too-light`, `weight-ok`, `weight-too-heavy`. Only one of the three at a time. These three tags are not shown in the dive's tag list or tag chips in OpenDives (they are shown by the buttons), but they stay in the file and Subsurface shows them as ordinary tags. Keep them out of tag suggestions and of the tag filter.
 Tests for the rule (match, no match, adjustment by tag, units) and for the tags (set, change, clear, kept on sync). Same on the tablet layouts. Check on the phone emulator.
+
+Done (merged earlier from feature/weight-suggestion; card fixed in fix/weight-suggestion-card: Framework7's unlayered button { width: 100% } stretched « Utiliser » over the texts). Checked on the phone emulator with the test logbook: in Modifier la plongée, a weight changed in the form (not saved) shows « Suggestion : 13,6 kg, comme le 31 octobre 2026 » on the tertiary container with « Utiliser »; « Ce lest était » under « Ajouter un lest »; in the dive detail, the open Équipement section lists Combinaison, Lest with the total, the weights by location, « Ce lest était », then Ordinateur. Rule and feedback adjustment covered by tests/app (weight-suggestion).
 
 ## [x] 2026-11-13-100 Side menu: match the mock-up (logo, « Messages »)
 

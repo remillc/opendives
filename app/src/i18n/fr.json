@@ -1693,6 +1693,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Correctif : dans « Modifier la plongée », le bouton « Utiliser » de la suggestion de lest ne recouvre plus le texte de la carte.",
       "Menu latéral, synchronisation manuelle : le menu de la flèche reste dans le menu latéral, ses lignes font 48 dp.",
       "Champs de recherche : un bouton pour effacer, avec l’icône « fermer », reste visible dès qu’il y a du texte (Réglages, Filtre, Carnet, Cartes hors ligne).",
       "Correctif : revenir au Carnet par le menu depuis une page ouverte par-dessus Réglages (À propos, une sous-page) ne laisse plus un écran vide ou décalé.",
