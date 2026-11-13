@@ -10,7 +10,7 @@ Rules (agreed between the design agent and the code agent, see `docs/agent-inbox
 - **Tag:** every item starts with `[design]` or `[code]` right after its number, set by the agent that adds it (`#4 [design] …`). `[design]` = mock-ups, visuals, screen texts, specification; `[code]` = everything else. When unsure, the agent asks Christian. The tag says who handles the item and lets Christian list one kind only. A second tag `[hors compat. SS]` may follow it, before the title, when the item would break compatibility with Subsurface (data Subsurface cannot read or keep); such an item needs Christian's explicit go-ahead before any code.
 - No other content in this file: no history, no checked boxes, no notes from agents.
 
-Next number: 46
+Next number: 53
 
 ## List
 
@@ -42,3 +42,4 @@ Next number: 46
 - #49 [design] [hors compat. SS] Analyse de gaz à la station de gonflage : pour chaque bouteille, le pourcentage d'oxygène (et d'hélium) mesuré, la MOD calculée et les initiales du plongeur. La valeur passe dans la plongée suivante. Vérifier ce que Subsurface peut garder (le mélange de la bouteille, oui ; l'analyse et les initiales, non).
 - #50 [design] Ajustement du lest : retenir le lest utilisé selon la combinaison, la bouteille et le type d'eau, et proposer cette valeur à la plongée suivante dans la même configuration. Données déjà dans le carnet.
 - #51 [design] [hors compat. SS] Validation d'une plongée par un compagnon ou un moniteur : signature à l'écran ou code QR scanné avec son téléphone. Même question de stockage que #47.
+- #52 [design] Dans « Utiliser mon serveur git », ajouter de la doc qui décrit comment créer un dépôt privé.
