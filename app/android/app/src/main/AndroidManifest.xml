@@ -24,6 +24,55 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
+            <!-- Deep links (lib/deep-link.js): opendives://sites/12 -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="opendives" />
+            </intent-filter>
+
+            <!-- Verified links (App Links): https://opendives.app/sites/12. The paths are those of the
+                 fallback page of the site (site/build.mjs); the fingerprints are in
+                 site/.well-known/assetlinks.json. -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" android:host="opendives.app" />
+                <data android:pathPrefix="/dives/at/" />
+                <data android:pathPrefix="/sites/" />
+                <data android:pathPrefix="/plan/" />
+                <data android:pathPrefix="/plans/" />
+                <data android:pathPrefix="/tools/" />
+                <data android:pathPrefix="/statistics/" />
+            </intent-filter>
+
+            <!-- "Open with OpenDives" on a logbook file. Mail and Drive often send a .ssrf as
+                 application/octet-stream: the app checks the contents (lib/deep-link.js), so
+                 anything else is refused with a message. -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="content" />
+                <data android:mimeType="application/xml" />
+                <data android:mimeType="text/xml" />
+                <data android:mimeType="application/octet-stream" />
+                <data android:mimeType="application/x-subsurface" />
+            </intent-filter>
+            <!-- A file manager that gives no usable type: the name ends in .ssrf. -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="content" />
+                <data android:host="*" />
+                <data android:mimeType="*/*" />
+                <data android:pathPattern=".*\\.ssrf" />
+                <data android:pathPattern=".*\\..*\\.ssrf" />
+                <data android:pathPattern=".*\\..*\\..*\\.ssrf" />
+            </intent-filter>
+
         </activity>
 
         <provider
