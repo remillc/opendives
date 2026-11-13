@@ -2301,3 +2301,11 @@ Done in fix/sync-label-stats-icon: syncNow is « Synchroniser » / “Sync” ev
 Christian's decision of 13 November 2026. The « Statistiques » icon (side menu, tablet rail, iOS menu) is redrawn as in `docs/mockups/appbar-tiroir-android-ouvert.dc.html`: a baseline and four bars of different heights, same 2 px stroke as the other icons. In `Icon.svelte`, `statistics` becomes `M3 20h18 M6 16v-4 M10.5 16V6 M15 16v-6 M19.5 16V9` (24 × 24, stroke, round caps). Use it wherever `statistics` is used. Check on the phone emulator next to the other menu icons.
 
 Done in fix/sync-label-stats-icon: `statistics` path replaced in Icon.svelte, checked on the phone emulator next to the other menu icons.
+
+## [ ] 2026-11-13-107 Logo: grey ring and blue bubbles in light mode
+
+Christian's decision of 13 November 2026. Reference: `docs/mockups/logo-bleu.dc.html` (proposal A, the one in use) and the line added to `docs/system-design.md`. In **light mode** only:
+- the lower half-circle under the waves (`M24 54 A30 30 0 0 0 84 54`, 3 px) becomes #C9C7C1 instead of #1F2124; in the app icon, the upper arc, which was #A3A5A8, becomes #C9C7C1 too, so the ring is one colour;
+- the two bubbles become #114477 instead of #1F2124.
+**Dark mode** does not change (half-circle and bubbles #F4F4F2, upper arc of the icon #6B6E72).
+Update every copy of the logo: `docs/brand/` (SVG and PNG exports), the Android adaptive icon and launcher icons, the iOS app icon, the splash screen, the welcome screen and the side-menu header (task 100 still applies: no white border). Check the icon at 24, 32, 48 and 64 px on a light launcher background and on the emulator.
