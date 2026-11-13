@@ -1690,6 +1690,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Correctif : revenir au Carnet par le menu depuis une page ouverte par-dessus Réglages (À propos, une sous-page) ne laisse plus un écran vide ou décalé.",
       "Réglages, Gaz et recycleur : « Afficher chaque capteur d’O₂ » et « Afficher la consigne » disent qu’ils agissent sur le graphique de pO₂.",
       "Réglages : une page d’aperçu en trois cartes (Général, Plongée, Appareils et données) résume les valeurs actuelles et ouvre une sous-page par groupe ; sur tablette, l’aperçu à gauche et la sous-page à droite.",
       "Réglages : « Affichage » vient en premier ; la ligne « Taille du texte » est retirée (l’app suit déjà la taille du texte de l’appareil).",

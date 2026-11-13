@@ -11,7 +11,7 @@ import { App as CapacitorApp } from '@capacitor/app';
 import { f7 } from 'framework7-svelte';
 import { OpenDivesCore } from 'opendives-core';
 import { logbook, importData } from './logbook.svelte.js';
-import { goToSection, openOver } from './navigation.svelte.js';
+import { goToSection, openOver, backToFirstScreen } from './navigation.svelte.js';
 import { anyDirty } from './leave-guard.js';
 import { checkSharedFile, importErrorKey, parseLink } from './deep-link.js';
 import { confirmAction } from './dialogs.js';
@@ -40,14 +40,9 @@ async function freshView(section) {
   goToSection(section);
   const view = f7.views.get(`#view-${section}`);
   const router = view?.router;
-  if (router && router.history.length > 1) {
-    router.back(router.history[0], { force: true, animate: false });
-    // The back is not over when it returns: a navigate made at once was dropped
-    // (a link from one tool to another left the Tools list). Wait for it.
-    const start = Date.now();
-    // `transitioning` is not in Framework7's types, hence the cast.
-    while ((router.history.length > 1 || /** @type {any} */ (router).transitioning) && Date.now() - start < 1500) await sleep(30);
-  }
+  // Waited for: a navigate made before the back is over is dropped (a link from one tool
+  // to another left the Tools list).
+  if (router && router.history.length > 1) await backToFirstScreen(router);
   return view;
 }
 
