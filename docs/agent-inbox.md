@@ -2287,3 +2287,7 @@ Christian's decision of 13 November 2026 (TODOS #20). Mock-ups: `docs/mockups/ap
    - at most once every 120 days (store the last request date on the device); the stores also apply their own quotas, so the dialog may not appear;
    - never on the first launch, after an error, a sync conflict or a failed download, nor in a build not installed from a store.
 No other change: no reminder, no badge. Tests for the conditions (dives count, age, interval, store build). Check on the phone emulator with the Play internal test track or the fake review manager.
+
+## [ ] 2026-11-13-105 « Synchroniser maintenant » becomes « Synchroniser »
+
+Christian's decision of 13 November 2026. The sync button label loses « maintenant »: fr `syncNow` « Synchroniser », en « Sync » (fr-CA follows fr). Everywhere it is used: side menu (plain and split button), Compte, Dépôt git, tablet layouts, and any help text or release note that quotes it (`syncButton` notes in the i18n files, the spec now says « Synchroniser »). Mock-ups in `docs/mockups/` updated. Keep the accessible name the same as the label. Check that the split button still fits on a small phone in fr and en.
