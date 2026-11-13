@@ -16,7 +16,8 @@
 
   /** @type {Record<string, string>} */
   const paths = {
-    logbook: 'M4 5.5C6.5 4.5 9.5 4.5 12 6c2.5-1.5 5.5-1.5 8-.5v13c-2.5-1-5.5-1-8 .5-2.5-1.5-5.5-1.5-8-.5zM12 6v13.5',
+    // A bound notebook, as the mock-ups draw it; its spine is an accent (see `accents`).
+    logbook: 'M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z',
     sites: 'M12 21s-6.5-6.2-6.5-11a6.5 6.5 0 0 1 13 0c0 4.8-6.5 11-6.5 11zM12 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z',
     statistics: 'M4 20h16M6.5 20v-6M11 20V8M15.5 20v-9M20 20V4',
     tools: 'M14.5 6.5a4 4 0 0 0 5 5L12 19a2.1 2.1 0 0 1-3-3l7.5-7.5a4 4 0 0 0-5-5l2.5 2.5-1 2-2 1z',
@@ -100,6 +101,13 @@
     settings:
       'M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4zM10.6 3h2.8l.4 2.3 1.6.9 2.2-.8 1.4 2.4-1.8 1.5v1.8l1.8 1.5-1.4 2.4-2.2-.8-1.6.9-.4 2.3h-2.8l-.4-2.3-1.6-.9-2.2.8-1.4-2.4 1.8-1.5v-1.8L4.8 7.8l1.4-2.4 2.2.8 1.6-.9z',
   };
+
+  // Lines drawn over the shape: when a filled icon is wanted (the active drawer row), the
+  // shape is filled and these stay visible in the background colour.
+  /** @type {Record<string, string>} */
+  const accents = {
+    logbook: 'M5 17a3 3 0 0 1 3-3h11',
+  };
 </script>
 
 <svg
@@ -116,6 +124,7 @@
   focusable="false"
 >
   <path d={paths[name]} />
+  {#if accents[name]}<path class="od-icon--accent" d={accents[name]} />{/if}
 </svg>
 
 <style>
