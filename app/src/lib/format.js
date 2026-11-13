@@ -400,6 +400,21 @@ export function formatTimeAgo(iso) {
 }
 
 /**
+ * Time since a recent local moment, for the sync state: "à l'instant", "il y a 2 min",
+ * "il y a 3 h", then days as `formatTimeAgo`.
+ * @param {string} iso local time without zone, as `localNowIso` writes it
+ * @param {string} [now]
+ */
+export function formatShortAgo(iso, now = localNowIso()) {
+  const minutes = Math.floor((toDate(now).getTime() - toDate(iso).getTime()) / 60000);
+  const rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'auto', style: 'short' });
+  if (minutes < 1) return rtf.format(0, 'second');
+  if (minutes < 60) return rtf.format(-minutes, 'minute');
+  if (minutes < 24 * 60) return rtf.format(-Math.floor(minutes / 60), 'hour');
+  return formatTimeAgo(iso);
+}
+
+/**
  * Date and time with relative days: "Aujourd'hui, 13:40", "Hier, 13:40"; older
  * dates as usual.
  * @param {string} iso

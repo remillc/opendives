@@ -189,6 +189,7 @@
       "failed": "Sync failed. Your changes stay on this device."
     },
     "cloud": "Synced with Subsurface cloud",
+    "syncedAgo": "Synced {ago}",
     "offline": "Offline: no changes waiting",
     "local": "Logbook stored on this device only",
     "manual": {
@@ -860,7 +861,7 @@
     "lastSyncNever": "Never",
     "todayAt": "today, {time}",
     "cloudDives": "Dives in the cloud",
-    "syncNow": "Sync now",
+    "syncNow": "Sync",
     "syncOptions": "More sync options",
     "syncGoAuto": "Switch to automatic sync",
     "syncShowPending": "See changes not sent yet",
@@ -1657,6 +1658,7 @@
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
       "Rate OpenDives: a row under “What’s new” opens the app’s page in Google Play (or the App Store); after a successful download from a dive computer, the app may ask for a rating with the system’s own window (at most once every 120 days). Outside a store, the row becomes “Give feedback”.",
+      "Side menu: the button is now ",
       "Side menu: dark text on the account card and the active row; the sync card and the logo match the mock-ups.",
       "Weights: Edit dive suggests a weight from the most recent dive with the same suit, cylinders and water type, adjusted by 2 lb (1 kg) if that weight was too light or too heavy; Use puts it in the dive. “This weight was” (Too light, Just right, Too heavy) is set in Edit dive and in the dive detail, under Equipment; the choice is saved as an English tag (weight-too-light, weight-ok, weight-too-heavy), which Subsurface also shows.",
       "Flying: the \"Wait before flying\" setting (based on the dives, 12, 18 or 24 h) counts from the last dive's exit from the water; the Logbook shows \"Flying in …\" during the wait and the app can notify you when it is over.",
@@ -1740,7 +1742,7 @@
       "“Edit dive”: the line under the title gives the date without the weekday or the time (“No. 5 · Lake Coleridge · April 2, 2014”), as in the mock-ups.",
       "Android: screens, the side menu, sheets and dialogs now move with springy motion (a slight bounce where it fits), and the dives of a trip you open slide into place. With “Remove animations” on, none of it moves.",
       "Android: exclusive choices (unit system, dive mode in the filter, Nitrox / Trimix and the fill order in the gas blender) are connected button groups, and every dropdown menu shows a downward chevron instead of a filled triangle.",
-      "Android: “Sync now” becomes a split button when synchronisation is manual (the chevron offers to switch to automatic sync or to see the changes not sent yet, which opens the Logbook filtered on the edited dives not sent yet); the Statistics and Tools headers shrink as you scroll, like the Logbook’s.",
+      "Android: “Sync” becomes a split button when synchronisation is manual (the chevron offers to switch to automatic sync or to see the changes not sent yet, which opens the Logbook filtered on the edited dives not sent yet); the Statistics and Tools headers shrink as you scroll, like the Logbook’s.",
       "Android: progress now shows as a wavy line (dive-computer download, offline maps download and update, sign-in), and the circular spinners are replaced by a small shape that morphs while it works (nearby computers, import step, “Connecting…” button). With “Remove animations” on, the wave and the shape stand still.",
       "Android: the actions of a dive (Edit, Share, Plan from this dive, and the ⋮ menu), of a trip (Edit, Add dives, ⋮), of a site (Edit, Open in Maps, ⋮) and of the Logbook’s selection (Create a trip, Export, Delete, ⋮) are in a floating toolbar at the bottom of the screen. A long press on a button shows its name. The bar hides when you scroll down and comes back when you scroll up. The Logbook’s “+” opens the same menu of choices as on tablets, instead of a bottom sheet.",
       "Planner: the Oxygen and Helium menus offer every value by 1 % (oxygen 5 to 100 %, helium 0 to 95 %), and “Other value…” is gone. A mix above 100 % is shown as an error on both fields.",

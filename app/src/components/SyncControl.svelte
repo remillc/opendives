@@ -1,6 +1,6 @@
 <script>
   // @ts-check
-  // "Sync now" as the side menu and Account offer it: the plain button while
+  // "Sync" as the side menu and Account offer it: the plain button while
   // sync is automatic; a split button while it is manual, whose chevron offers
   // to switch to automatic sync and to see the changes not sent yet: the
   // Logbook opens, filtered on the dives whose edits are not sent.

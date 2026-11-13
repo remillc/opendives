@@ -189,6 +189,7 @@
       "failed": "La synchronisation a échoué. Les modifications restent sur cet appareil."
     },
     "cloud": "Synchronisé avec le cloud Subsurface",
+    "syncedAgo": "Synchronisé {ago}",
     "offline": "Hors ligne : aucune modification en attente",
     "local": "Carnet enregistré sur cet appareil seulement",
     "manual": {
@@ -860,7 +861,7 @@
     "lastSyncNever": "Jamais",
     "todayAt": "aujourd’hui, {time}",
     "cloudDives": "Plongées dans le cloud",
-    "syncNow": "Synchroniser maintenant",
+    "syncNow": "Synchroniser",
     "syncOptions": "Autres options de synchronisation",
     "syncGoAuto": "Passer en synchronisation automatique",
     "syncShowPending": "Voir les modifications non envoyées",
@@ -1657,6 +1658,7 @@
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
       "Évaluer OpenDives : une ligne sous « Nouveautés » ouvre la page de l’app dans Google Play (ou l’App Store) ; après un téléchargement réussi depuis un ordinateur de plongée, l’app peut demander la note avec la fenêtre du système (au plus une fois tous les 120 jours). Hors d’un magasin, la ligne devient « Donner votre avis ».",
+      "Menu latéral : le bouton s’appelle « Synchroniser » et l’état dit depuis quand le carnet est synchronisé (« Synchronisé il y a 2 min »), avec l’icône du nuage ; nouvelle icône Statistiques.",
       "Menu latéral : carte du compte et ligne active en texte foncé, carte de synchronisation et logo conformes aux maquettes.",
       "Lest : « Modifier la plongée » suggère un lest d’après la plongée la plus récente avec la même combinaison, les mêmes bouteilles et le même type d’eau, corrigé de 2 lb (1 kg) selon que ce lest était trop léger ou trop lourd ; « Utiliser » le met dans la plongée. « Ce lest était » (Trop léger, Juste, Trop lourd) se choisit dans « Modifier la plongée » et dans le détail, sous Équipement ; le choix est enregistré comme une étiquette anglaise (weight-too-light, weight-ok, weight-too-heavy), que Subsurface affiche aussi.",
       "Avion : le réglage « Attente avant l’avion » (selon les plongées, 12, 18 ou 24 h) compte depuis la sortie de l’eau de la dernière plongée ; le Carnet affiche « Avion dans … » pendant l’attente et l’app peut vous prévenir quand elle est terminée.",
@@ -1740,7 +1742,7 @@
       "« Modifier la plongée » : la ligne sous le titre donne la date sans le jour de la semaine ni l’heure (« N° 5 · Lake Coleridge · 2 avril 2014 »), comme les maquettes.",
       "Android : les écrans, le menu latéral, les feuilles et les boîtes de dialogue bougent maintenant avec un mouvement à ressort (un léger rebond quand il convient), et les plongées d’une sortie que vous ouvrez glissent à leur place. Avec « Supprimer les animations », plus rien ne bouge.",
       "Android : les choix exclusifs (système d’unités, mode de plongée du filtre, Nitrox / Trimix et ordre de gonflage du mélangeur) sont des groupes de boutons connectés, et chaque menu déroulant montre un chevron vers le bas au lieu d’un triangle plein.",
-      "Android : « Synchroniser maintenant » devient un bouton scindé quand la synchronisation est manuelle (menu du chevron : passer en synchronisation automatique, voir les modifications non envoyées, qui ouvre le Carnet filtré sur les plongées modifiées pas encore envoyées) ; l’en-tête de Statistiques et d’Outils se réduit en défilant, comme celui du Carnet.",
+      "Android : « Synchroniser » devient un bouton scindé quand la synchronisation est manuelle (menu du chevron : passer en synchronisation automatique, voir les modifications non envoyées, qui ouvre le Carnet filtré sur les plongées modifiées pas encore envoyées) ; l’en-tête de Statistiques et d’Outils se réduit en défilant, comme celui du Carnet.",
       "Android : la progression s’affiche en ligne ondulée (téléchargement depuis l’ordinateur, téléchargement et mise à jour des cartes hors ligne, connexion), et les cercles qui tournent sont remplacés par une petite forme qui se transforme pendant l’attente (ordinateurs à proximité, étape de l’import, bouton « Connexion… »). Avec « Supprimer les animations », l’onde et la forme restent immobiles.",
       "Android : les actions d’une plongée (Modifier, Partager, Planifier depuis cette plongée et le menu ⋮), d’un voyage (Modifier, Ajouter des plongées, ⋮), d’un site (Modifier, Ouvrir dans Cartes, ⋮) et celles de la sélection du Carnet (Créer un voyage, Exporter, Supprimer, ⋮) sont dans une barre d’outils flottante au bas de l’écran. Un appui long sur un bouton affiche son nom. La barre se cache quand vous faites défiler vers le bas et revient quand vous remontez. Le « + » du Carnet ouvre le même menu de choix que sur tablette, à la place d’une feuille du bas.",
       "Planificateur : les menus Oxygène et Hélium proposent toutes les valeurs de 1 en 1 % (oxygène de 5 à 100 %, hélium de 0 à 95 %), et « Autre valeur… » disparaît. Un mélange qui dépasse 100 % est signalé en erreur sur les deux champs.",

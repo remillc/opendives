@@ -336,6 +336,11 @@
         color: var(--od-text-2);
       }
 
+      :global(.od-sync-status .od-icon) {
+        width: 20px;
+        height: 20px;
+      }
+
       :global(.od-sync-status.od-sync-status--pending) {
         color: var(--od-tertiary);
       }
