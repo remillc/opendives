@@ -99,9 +99,9 @@
     .od-section-band--wave {
       position: absolute;
       left: 0;
-      bottom: -2px;
+      bottom: -1px;
       width: 100%;
-      height: 20px;
+      height: 18px;
       display: block;
 
       path {
