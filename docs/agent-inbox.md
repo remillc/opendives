@@ -2076,3 +2076,12 @@ Christian's decision of 13 November 2026. The cylinder drawings of the gas card 
 - Make it one shared component so every screen uses the same drawing.
 
 Reference mock-ups: `detail3-android`, `detail3-android-sombre`, `android-edition`, `android-edition-bouteille`, `android-tablette-detail-menu-portrait`. Check light and dark on the phone emulator, and on a tablet layout.
+
+## [ ] 2026-11-13-86 Dive editing: gas card follows the dive mode
+
+Christian's decisions of 13 November 2026, on the Gaz card of the dive editing screen (phone and tablet).
+- **Open circuit** (`docs/mockups/android-edition.dc.html`): the "Mode de plongée" field reads "Circuit ouvert" and the summary card shows one cylinder per gas, as today (new cylinder shape from task 85).
+- **Rebreather** (`docs/mockups/android-edition-gaz-ccr.dc.html`): when the mode is "Recycleur (CCR)", the summary card shows the same drawing as the dive detail (task 84): the rebreather unit with its diluent and oxygen cylinders, and the bailout cylinder beside it, same height, bottoms aligned. Under it, one column per gas with the gas name and its end pressure. The chevron, the help line and the link to the gas detail are unchanged. Accessible name: "Gaz : recycleur avec diluant Trimix 16/45 et oxygène, secours à l'air. Ouvrir le détail" (built from the dive's data).
+- Share the drawing code with the detail screen. If pressures are missing, use the hatched no-pressure state of task 84.
+
+Check on the phone emulator with an open-circuit dive and a CCR dive, light and dark.
