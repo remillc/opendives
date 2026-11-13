@@ -4,6 +4,7 @@
 // translations live in src/i18n/<language>.json. French is the reference
 // language; an untranslated language falls back to English.
 // Diver data (site names, notes, tags) never goes through this module.
+import { keepUnits } from './nbsp.js';
 import fr from '../i18n/fr.json';
 import frCA from '../i18n/fr-CA.json';
 import en from '../i18n/en.json';
@@ -109,11 +110,14 @@ export function t(key, params = {}) {
     const n = typeof params.n === 'number' ? params.n : 0;
     value = value[plurals.select(n)] ?? value.other;
   }
-  return String(value).replace(/\{(\w+)\}/g, (whole, name) => {
-    if (!(name in params)) return whole;
-    const v = params[name];
-    return typeof v === 'number' ? numbers.format(v) : v;
-  });
+  // A number and its unit never part (docs/ui-writing.md): « 9 plongées », « 302 Mo ».
+  return keepUnits(
+    String(value).replace(/\{(\w+)\}/g, (whole, name) => {
+      if (!(name in params)) return whole;
+      const v = params[name];
+      return typeof v === 'number' ? numbers.format(v) : v;
+    }),
+  );
 }
 
 /**

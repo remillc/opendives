@@ -58,7 +58,7 @@
 
   /** Whole metres or feet: the core rounds the MOD to the metre. @param {number} mm */
   function wholeDepth(mm) {
-    return `${formatNumber(feet ? mm / 304.8 : mm / 1000, 0)} ${depthUnit(logbook.prefs)}`;
+    return `${formatNumber(feet ? mm / 304.8 : mm / 1000, 0)}\u00A0${depthUnit(logbook.prefs)}`;
   }
 
   const rows = $derived(

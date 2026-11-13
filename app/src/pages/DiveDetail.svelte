@@ -275,7 +275,7 @@
       // Always in mbar, as Subsurface shows it.
       [t('detail.surfacePressure'), dive.surfacePressureMbar > 0 && `${formatNumber(dive.surfacePressureMbar, 0)} mbar`],
       [t('detail.mode'), tIfExists(`detail.modes.${dive.divemode}`) ?? dive.divemode],
-      [t('detail.cns'), dive.cns > 0 && `${formatNumber(dive.cns, 0)} %`],
+      [t('detail.cns'), dive.cns > 0 && `${formatNumber(dive.cns, 0)}\u00A0%`],
       [t('detail.otu'), dive.otu > 0 && formatNumber(dive.otu, 0)],
     ];
     return list.filter(([, value]) => value).map(([label, value]) => ({ label, value: String(value) }));

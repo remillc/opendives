@@ -220,7 +220,7 @@
             class:od-number-combo--active={i === active}
             onmousedown={(e) => e.preventDefault()}
             onclick={() => pick(preset)}
-          >{presetText(preset)} {unit}</li>
+          >{presetText(preset)}&nbsp;{unit}</li>
         {/each}
       </ul>
     {/if}

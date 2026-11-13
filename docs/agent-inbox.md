@@ -2426,7 +2426,7 @@ The phone mock-up shows a second white card « Au repos, plus de 48 h après la 
 
 Done in feature/tissue-bars-scale: Desaturation.svelte draws each bar from surfaceGf clamped to 0..110 (height, colour, the « 90 % et plus » count and the accessible label), a bar at rest is a 2 dp line on the baseline; chart labels « 100 % · limite », « rapides → lents », « 0 % · repos »; the legend keeps only the red swatch; new text under the chart. The dive profile's tissue graph keeps Subsurface's scale (its fast/slow labels are kept). Checked on the phone emulator: at rest (every compartment at 0 %). Not seen on screen: bars above 0 %, which need a dive ended within the last hour or so.
 
-## [ ] 2026-11-13-116 Never break between a number and its unit
+## [x] 2026-11-13-116 Never break between a number and its unit
 
 Christian's decision of 13 November 2026, rule added to `docs/ui-writing.md`: in every language, a number and its unit are joined by a non-breaking space (U+00A0), so a line never breaks between them: « 27,6 m », « 1,6 bar », « 302 Mo », « 90 % », « 14 h 30 », « 9 plongées »; in English « 27.6 m », « 302 MB », « 55 min ». The canvas mock-ups were updated (213 of them).
 
@@ -2435,3 +2435,5 @@ Christian's decision of 13 November 2026, rule added to `docs/ui-writing.md`: in
 - Charts and SVG text: same rule in axis labels and tooltips.
 - Exports (PDF sheet, planner slate, shared text) follow the same rule.
 Add a unit test that formats a sample of values in fr, fr-CA and en and checks there is no plain space between digit and unit. Check on the phone emulator at the smallest width and largest text size: Carnet rows, Détail, Statistiques, Cartes hors ligne.
+
+Done in fix/nbsp-units: lib/nbsp.js keepUnits() puts U+00A0 between a number and the unit or noun after it, and inside « 14 h 30 » / « 1 min 05 s », keeping U+202F thousands separators; t() applies it to every catalog text (so every « {n} plongées », « {size} Mo », « {min} {unit} », charts, slate, PDF and shared texts made with t()), the time formatters too (« 9:35 AM »); the code joins of a number and a unit in templates (19 places: planner, slate, share, settings, profile axis, CNS, chart axis, combo fields…) use U+00A0. tests/app/nbsp.test.mjs formats a sample in fr, fr-CA and en and runs every catalog text filled with numbers. Checked on the phone emulator at font scale 1.3: Carnet, Détail, Statistiques, Cartes hors ligne, Désaturation have no breakable space between a number and its unit (the only one left is a cylinder name from the diver's data, « 80 cft Al », left as typed).

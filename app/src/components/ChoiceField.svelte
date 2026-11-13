@@ -46,7 +46,7 @@
   const current = $derived(parseNumber(value));
   const numbers = $derived(choiceValues(presets, current));
   const options = $derived([
-    ...numbers.map((n) => ({ value: String(n), label: `${formatNumber(n)} ${unit}` })),
+    ...numbers.map((n) => ({ value: String(n), label: `${formatNumber(n)}\u00A0${unit}` })),
     ...(value !== '' && !Number.isFinite(current) ? [{ value, label: value }] : []),
     ...(otherLabel ? [{ value: OTHER, label: otherLabel }] : []),
   ]);
