@@ -282,6 +282,7 @@
             <li
               id="{id}-o{i}"
               role="option"
+              data-value={option.value}
               aria-selected={option.value === value}
               class="od-select-field--option"
               class:od-select-field--active={i === active}

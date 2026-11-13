@@ -161,7 +161,7 @@
         <ul>
           {#each myStatistics.list as s (s.id)}
             {@const href = rowHref('mine', s.name, s.criteria)}
-            <li class:od-statistics--selected={selected === href}>
+            <li class:od-statistics--selected={layout.split && selected === href}>
               <a {href} data-reload-detail="true" class="item-link item-content" onclick={select}>
                 <div class="item-inner">
                   <div class="item-title-row"><div class="item-title">{s.name}</div></div>
@@ -199,7 +199,7 @@
           <ul class="od-statistics--rows">
             {#each rows as row (row.key)}
               {@const href = rowHref(key, row.title, row.criteria)}
-              <li class:od-statistics--selected={selected === href}>
+              <li class:od-statistics--selected={layout.split && selected === href}>
                 <a {href} data-reload-detail="true" class="od-statistics--row ripple" onclick={select}>
                   <div class="od-statistics--text">
                     <span class="od-statistics--title" class:od-value={row.numeric}>{row.title}</span>

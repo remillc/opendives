@@ -20,7 +20,7 @@ list(APPEND SOURCES
   "${COMPAT}/qthelper_compat.cpp"
   "${COMPAT}/notifier_compat.cpp"
   "${COMPAT}/cloud_compat.cpp"
-  "${COMPAT}/https_openssl.cpp"
+  "${COMPAT}/https_mbedtls.cpp"
   "${COMPAT}/bluetooth_compat.cpp"
   "${ROOT}/core/libopendives/opendives.cpp"
   "${ROOT}/core/libopendives/edit.cpp"
@@ -57,5 +57,6 @@ foreach(test plan_test plan_oracle)
   target_compile_options(${test} PRIVATE ${COMMON_COMPILE_OPTIONS})
   target_include_directories(${test} PRIVATE ${COMMON_INCLUDES})
   target_link_directories(${test} PRIVATE "${DEPS}/lib")
-  target_link_libraries(${test} PRIVATE divecomputer git2 ssl crypto zip xslt xml2 sqlite3 z m log)
+  # As libopendives.so: Mbed TLS replaced OpenSSL (native/CMakeLists.txt).
+  target_link_libraries(${test} PRIVATE divecomputer git2 mbedtls mbedx509 mbedcrypto zip xslt xml2 sqlite3 z m log)
 endforeach()

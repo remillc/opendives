@@ -27,8 +27,10 @@ if [ "${1:-}" != --no-build ]; then
   native/build-android.sh x86_64
   if grep -qi microsoft /proc/version 2>/dev/null; then
     # Under WSL the web build and Gradle run on Windows (AGENTS.md, "Android app"): JDK 21, the Windows Android SDK.
+    # --no-daemon: a Gradle daemon left running keeps PowerShell's output open, and the
+    # step never returned after "BUILD SUCCESSFUL" (13 November 2026).
     WINAPP=$(wslpath -w "$ROOT/app")
-    powershell.exe -NoProfile -Command "if (-not \$env:JAVA_HOME) { \$env:JAVA_HOME = 'C:\\Program Files\\Java\\jdk-21' }; if (-not \$env:ANDROID_HOME) { \$env:ANDROID_HOME = \"\$env:LOCALAPPDATA\\Android\\Sdk\" }; Set-Location '$WINAPP'; if (-not (Test-Path node_modules\\svelte)) { npm ci --no-audit --no-fund }; npm run android:sync; Set-Location android; .\\gradlew.bat assembleDebug; exit \$LASTEXITCODE"
+    powershell.exe -NoProfile -Command "if (-not \$env:JAVA_HOME) { \$env:JAVA_HOME = 'C:\\Program Files\\Java\\jdk-21' }; if (-not \$env:ANDROID_HOME) { \$env:ANDROID_HOME = \"\$env:LOCALAPPDATA\\Android\\Sdk\" }; Set-Location '$WINAPP'; if (-not (Test-Path node_modules\\svelte)) { npm ci --no-audit --no-fund }; npm run android:sync; Set-Location android; .\\gradlew.bat --no-daemon assembleDebug; exit \$LASTEXITCODE"
   else
     (cd app && { [ -d node_modules/svelte ] || npm ci --no-audit --no-fund; } && npm run android:sync && cd android && ./gradlew assembleDebug)
   fi
