@@ -1480,6 +1480,73 @@ class OpenDivesCorePlugin : Plugin() {
         }
     }
 
+    // --- A file sent to the app (deep links, "Open with OpenDives") ------------
+
+    /**
+     * Reads a file another app handed to OpenDives (a content:// address of an ACTION_VIEW
+     * intent). Resolves {name, data (base64), size}; the name
+     * is the provider's display name (OpenableColumns), "" when it gives none. The web layer
+     * decides whether it is a logbook (lib/deep-link.js). Rejects TOO_BIG above 100 MB,
+     * NOT_FOUND, FAILED. Not on the core thread: reading a file from Drive may take a while.
+     */
+    @PluginMethod
+    fun readSharedFile(call: PluginCall) {
+        val text = call.getString("uri")
+        if (text.isNullOrEmpty()) {
+            call.reject("Missing uri", "BAD_ARGUMENT")
+            return
+        }
+        Thread {
+            try {
+                val uri = Uri.parse(text)
+                // content:// only: a file:// address could point into the app's own private files.
+                if (uri.scheme != "content") {
+                    call.reject("Not a file", "BAD_ARGUMENT")
+                    return@Thread
+                }
+                var name = ""
+                try {
+                    context.contentResolver.query(uri, arrayOf(android.provider.OpenableColumns.DISPLAY_NAME), null, null, null)?.use { c ->
+                        if (c.moveToFirst()) name = c.getString(0).orEmpty()
+                    }
+                } catch (e: Exception) {
+                    // No display name: the web layer names the import from its contents.
+                }
+                if (name.isEmpty()) name = uri.lastPathSegment.orEmpty().substringAfterLast('/')
+                val input = context.contentResolver.openInputStream(uri)
+                if (input == null) {
+                    call.reject("Cannot open the file", "NOT_FOUND")
+                    return@Thread
+                }
+                val bytes = input.use { stream ->
+                    val out = java.io.ByteArrayOutputStream()
+                    val buffer = ByteArray(64 * 1024)
+                    while (true) {
+                        val n = stream.read(buffer)
+                        if (n < 0) break
+                        out.write(buffer, 0, n)
+                        if (out.size() > MAX_SHARED_FILE) {
+                            call.reject("The file is too big", "TOO_BIG")
+                            return@Thread
+                        }
+                    }
+                    out.toByteArray()
+                }
+                call.resolve(
+                    JSObject()
+                        .put("name", name)
+                        .put("size", bytes.size)
+                        .put("data", Base64.encodeToString(bytes, Base64.NO_WRAP)),
+                )
+            } catch (e: SecurityException) {
+                call.reject("Cannot open the file", "NOT_FOUND", e)
+            } catch (e: Exception) {
+                Log.e(TAG, "readSharedFile", e)
+                call.reject("Cannot read the file", "FAILED", e)
+            }
+        }.start()
+    }
+
     // --- Sharing a dive (spec, section 4, "Dive detail", "Partager") ---------
 
     /** A file to share (the profile image): written in the cache, shared through the FileProvider. */
@@ -1593,6 +1660,7 @@ class OpenDivesCorePlugin : Plugin() {
     private companion object {
         const val TAG = "OpenDives"
         const val SHARE_DIR = "share"
+        const val MAX_SHARED_FILE = 100 * 1024 * 1024
         const val XSLT_DIR = "xslt"
         const val CERTIFICATES_RECHECK_MS = 20_000L
         const val SAMPLE_ASSET = "SampleDivesV2.ssrf"

@@ -308,14 +308,24 @@ export async function savePlan(request, replaceId = 0, title = '') {
  * @returns {Promise<number>} the number of dives added to the logbook
  */
 export async function importFile(file) {
-  const before = logbook.dives.length;
   const data = await new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(String(reader.result).replace(/^data:[^,]*,/, ''));
     reader.onerror = () => reject(reader.error);
     reader.readAsDataURL(file);
   });
-  const result = await OpenDivesCore.importDives({ name: file.name, data });
+  return importData(file.name, String(data));
+}
+
+/**
+ * The same import from contents already read (a file another app sent, lib/open-link.js).
+ * @param {string} name the file's name; the core reads the format from its extension
+ * @param {string} data base64 contents
+ * @returns {Promise<number>} the number of dives added to the logbook
+ */
+export async function importData(name, data) {
+  const before = logbook.dives.length;
+  const result = await OpenDivesCore.importDives({ name, data });
   logbook.undoText = result.undo;
   logbook.redoText = result.redo ?? '';
   logbook.dives = await OpenDivesCore.listLoadedDives();

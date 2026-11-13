@@ -47,6 +47,58 @@
 	<true/>
 	<key>NSBluetoothAlwaysUsageDescription</key>
 	<string>OpenDives uses Bluetooth to download your dives from your dive computer.</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>org.opendives.app</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>opendives</string>
+			</array>
+		</dict>
+	</array>
+	<key>UTExportedTypeDeclarations</key>
+	<array>
+		<dict>
+			<key>UTTypeIdentifier</key>
+			<string>org.opendives.ssrf</string>
+			<key>UTTypeDescription</key>
+			<string>Subsurface logbook</string>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.xml</string>
+			</array>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>ssrf</string>
+				</array>
+				<key>public.mime-type</key>
+				<string>application/x-subsurface</string>
+			</dict>
+		</dict>
+	</array>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>Subsurface logbook</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>LSHandlerRank</key>
+			<string>Alternate</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>org.opendives.ssrf</string>
+				<string>public.xml</string>
+			</array>
+		</dict>
+	</array>
+	<!-- The file is copied into the app (Inbox) and read once; it is not edited in place. -->
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<false/>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>processing</string>

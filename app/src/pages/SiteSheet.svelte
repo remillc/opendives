@@ -6,6 +6,9 @@
   import { Page, Navbar, Link, List, Popover, f7, theme } from 'framework7-svelte';
   import FloatingToolbar from '../components/FloatingToolbar.svelte';
   import ChoiceDialog from '../components/ChoiceDialog.svelte';
+  import ShareSheet from '../components/ShareSheet.svelte';
+  import { shareLink } from '../lib/share.js';
+  import { siteLink } from '../lib/deep-link.js';
   import MenuItem from '../components/MenuItem.svelte';
   import { layout } from '../lib/layout.svelte.js';
   import { navigation } from '../lib/navigation.svelte.js';
@@ -41,6 +44,22 @@
   /** The "Merge with another site" choice is open; `others`: the sites it offers. */
   let choosingOther = $state(false);
   let others = $state(/** @type {{ uuid: number, name: string, dives: number }[]} */ ([]));
+
+  /** "Share" open: the sheet, then the system's share sheet (one row for now: the link). */
+  let sharing = $state(false);
+
+  async function shareSiteLink() {
+    sharing = false;
+    if (!site) return;
+    try {
+      await shareLink(siteLink(site.uuid), site.name || t('sites.title'));
+    } catch (e) {
+      // Closing the system's share sheet without choosing is not an error.
+      if (/cancel/i.test(String(/** @type {any} */ (e)?.message ?? ''))) return;
+      console.error('Share a site', e);
+      showSnackbar(t('share.siteFailed'));
+    }
+  }
 
   function edit() {
     f7router.navigate(`/sites/${uuid}/edit`);
@@ -115,6 +134,7 @@
     <!-- Android: the actions are in the floating toolbar; the top bar keeps only ←. -->
     {#snippet right()}
       {#if theme.ios}
+        <Link iconOnly onClick={() => (sharing = true)}><Icon name="share" weight={2.2} /><span class="od-sr-only">{t('share.title')}</span></Link>
         <Link iconOnly href="/sites/{uuid}/edit"><Icon name="edit" weight={2.2} /><span class="od-sr-only">{t('sites.edit')}</span></Link>
       {/if}
     {/snippet}
@@ -207,12 +227,20 @@
         actions={[
           { key: 'edit', icon: 'edit', label: t('sites.edit'), text: t('detail.edit'), onclick: edit },
           ...(site.hasLocation ? [{ key: 'maps', icon: /** @type {const} */ ('map'), label: t('sites.openInMaps'), onclick: openInMaps }] : []),
+          { key: 'share', icon: 'share', label: t('share.title'), onclick: () => (sharing = true) },
           { key: 'more', icon: 'more', label: t('sites.moreOptionsList'), menu: `#${menuId}` },
         ]}
       />
     {/if}
   {/snippet}
 </Page>
+
+{#if sharing}
+  <ShareSheet
+    rows={[{ id: 'link', icon: 'link', title: t('share.link'), text: t('share.siteLinkText'), onclick: shareSiteLink }]}
+    onclose={() => (sharing = false)}
+  />
+{/if}
 
 <style>
   @layer od.components {

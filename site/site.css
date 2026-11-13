@@ -103,3 +103,20 @@ li {
   font-size: 14px;
   color: var(--od-text-2);
 }
+
+.button {
+  display: inline-block;
+  padding: 10px 20px;
+  border-radius: 20px;
+  background: var(--od-text);
+  color: var(--od-surface);
+  font-family: system-ui, sans-serif;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+section + section {
+  margin-top: 32px;
+  padding-top: 8px;
+  border-top: 1px solid var(--od-separator);
+}
