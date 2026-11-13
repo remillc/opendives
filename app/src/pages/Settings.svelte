@@ -200,9 +200,9 @@
     seconds: () => `35° 26′ ${formatNumber(54.6, 1)}″ S, 174° 43′ ${formatNumber(54.1, 1)}″ E`,
   };
 
-  const depthPerMinute = $derived(p.length === 'ft' ? `${formatNumber(30)} ${t('units.feet')}/min` : `${formatNumber(9)} ${t('units.meters')}/min`);
+  const depthPerMinute = $derived(p.length === 'ft' ? `${formatNumber(30)}\u00A0${t('units.feet')}/min` : `${formatNumber(9)}\u00A0${t('units.meters')}/min`);
   const depthPerSecond = $derived(
-    p.length === 'ft' ? `${formatNumber(0.5, 1)} ${t('units.feet')}/s` : `${formatNumber(0.15, 2)} ${t('units.meters')}/s`,
+    p.length === 'ft' ? `${formatNumber(0.5, 1)}\u00A0${t('units.feet')}/s` : `${formatNumber(0.15, 2)}\u00A0${t('units.meters')}/s`,
   );
 
   /** @param {'mixed'|'minutes'} mode */
@@ -628,7 +628,7 @@
           kind: 'number',
           id: 'o2consumption',
           label: t('settings.rebreather.o2consumption'),
-          value: `${litres(p.o2ConsumptionMlMin)} ${t('units.litersPerMinute')}`,
+          value: `${litres(p.o2ConsumptionMlMin)}\u00A0${t('units.litersPerMinute')}`,
           dialogText: t('settings.rebreather.o2consumptionDialog'),
           wheels: () => [wheel(t('settings.rebreather.o2consumption'), range(100, 3000, 10), p.o2ConsumptionMlMin, defaults.o2ConsumptionMlMin, (v) => formatNumber(v / 1000, 3))],
           set: ([i]) => setCore({ o2ConsumptionMlMin: 100 + i * 10 }),
@@ -818,7 +818,7 @@
           id: 'tools',
           icon: 'M14 6l4 4 M4 20l8-8 M13 5l6 6-3 3-6-6z',
           href: '/settings/tools',
-          summary: [rowOf('defaultWater')?.value, t('settings.overview.altitude', { value: `${formatNumber(defaultAltitude)} ${depthUnit(p)}` })].join(' · '),
+          summary: [rowOf('defaultWater')?.value, t('settings.overview.altitude', { value: `${formatNumber(defaultAltitude)}\u00A0${depthUnit(p)}` })].join(' · '),
         },
       ],
     },
@@ -980,7 +980,7 @@
         value={defaultAltitude}
         feet={p.length === 'ft'}
         unit={depthUnit(p)}
-        ariaLabel={`${row.label}: ${formatNumber(defaultAltitude)} ${depthUnit(p)}`}
+        ariaLabel={`${row.label}: ${formatNumber(defaultAltitude)}\u00A0${depthUnit(p)}`}
         openLabel={t('plan.sacOpen')}
         onchange={(v) => setAppSetting('defaultAltitudeMm', depthToMm(v, p.length === 'ft'))}
       />

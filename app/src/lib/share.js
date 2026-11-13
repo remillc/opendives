@@ -363,7 +363,7 @@ export async function sharePdf(dive, prefs, svg) {
 export const planGas = (o2, he) => (he === 0 && o2 >= 1000 ? formatGasLong(o2, he) : formatMixName(o2, he));
 
 /** @param {number} seconds */
-const planMinutes = (seconds) => `${formatNumber(Math.floor((seconds + 30) / 60), 0)} ${t('units.minutes')}`;
+const planMinutes = (seconds) => `${formatNumber(Math.floor((seconds + 30) / 60), 0)}\u00A0${t('units.minutes')}`;
 
 /**
  * What a shared plan says, in the diver's units.

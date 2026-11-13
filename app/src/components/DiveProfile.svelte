@@ -315,7 +315,7 @@
         {#if tick.major}
           <line class="od-dive-profile--grid" x1={MARGIN_LEFT} x2={MARGIN_LEFT + plotWidth} y1={y(tick.mm)} y2={y(tick.mm)} />
           <text class="od-dive-profile--tick od-value" x={MARGIN_LEFT - 4} y={y(tick.mm) + 4} text-anchor="end"
-            >{tick.value === 0 ? `0 ${depthUnit(prefs)}` : tick.value}</text
+            >{tick.value === 0 ? `0\u00A0${depthUnit(prefs)}` : tick.value}</text
           >
         {:else}
           <line class="od-dive-profile--axis" x1={MARGIN_LEFT} x2={MARGIN_LEFT + 5} y1={y(tick.mm)} y2={y(tick.mm)} />
@@ -338,7 +338,7 @@
         <line class="od-dive-profile--axis" x1={tx} x2={tx} y1={MARGIN_TOP + plotHeight} y2={MARGIN_TOP + plotHeight + (tick.major ? 6 : 4)} />
         {#if tick.major}
           <text class="od-dive-profile--tick od-value" x={tx} y={MARGIN_TOP + plotHeight + 17} text-anchor="middle"
-            >{tick.m === timeTicks.lastMajor && tick.m > 0 ? `${tick.m} ${t('units.minutes')}` : tick.m}</text
+            >{tick.m === timeTicks.lastMajor && tick.m > 0 ? `${tick.m}\u00A0${t('units.minutes')}` : tick.m}</text
           >
         {/if}
       {/each}

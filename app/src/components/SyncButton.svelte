@@ -54,7 +54,7 @@
     {/if}
   {/if}
   <span class="od-sync-button--label">{t('account.syncNow')}</span>
-  {#if running}<span class="od-sr-only">, {known ? `${percent} %` : t('sync.syncing')}</span>{/if}
+  {#if running}<span class="od-sr-only">, {known ? `${percent}\u00A0%` : t('sync.syncing')}</span>{/if}
 </button>
 
 <style>

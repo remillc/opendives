@@ -88,7 +88,7 @@
   const scale = $derived(Math.min(1, PREVIEW_PX / (layout.widthMm * PX_PER_MM)));
 
   /** @param {number} seconds */
-  const minutesText = (seconds) => `${formatNumber(Math.round(seconds / 60), 0)} ${t('units.minutes')}`;
+  const minutesText = (seconds) => `${formatNumber(Math.round(seconds / 60), 0)}\u00A0${t('units.minutes')}`;
   const deepest = $derived(
     levels?.length ? levels.reduce((a, l) => (l.depthMm > a.depthMm ? l : a), levels[0]) : null,
   );

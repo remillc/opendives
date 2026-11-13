@@ -3,6 +3,7 @@
 // Values come from the core in integer SI units; conversion happens here, at
 // display time, never in the data.
 
+import { keepUnits } from './nbsp.js';
 import { t, locale } from './i18n.js';
 import { settings } from './settings.svelte.js';
 
@@ -236,13 +237,14 @@ export function formatDateChoice(date, choice) {
  * @param {'system'|'24'|'12'} choice
  */
 export function formatTimeChoice(date, choice) {
-  if (choice === 'system') return timeFormat.format(date);
-  return chosenFormat(`time${choice}`, { hour: 'numeric', minute: '2-digit', hour12: choice === '12' }).format(date);
+  // « 9:35 AM », « 14 h 30 »: the time and its AM/PM or « h » never part (lib/nbsp.js).
+  if (choice === 'system') return keepUnits(timeFormat.format(date));
+  return keepUnits(chosenFormat(`time${choice}`, { hour: 'numeric', minute: '2-digit', hour12: choice === '12' }).format(date));
 }
 
 /** Short date and time, for a list row, in the formats chosen in Settings. @param {string} iso */
 export function formatDateTime(iso) {
-  if (settings.dateFormat === 'system' && settings.timeFormat === 'system') return dateTimeFormat.format(toDate(iso));
+  if (settings.dateFormat === 'system' && settings.timeFormat === 'system') return keepUnits(dateTimeFormat.format(toDate(iso)));
   const date = toDate(iso);
   const day = settings.dateFormat === 'system' ? dateOnlyFormat.format(date) : formatDateChoice(date, settings.dateFormat);
   return `${day} ${formatTimeChoice(date, settings.timeFormat)}`;
@@ -266,7 +268,7 @@ export function formatLongDateTime(iso) {
 
 /** Duration in whole minutes, as in a site's dive rows: "104 min". @param {number} seconds */
 export function formatMinutes(seconds) {
-  return `${Math.round(seconds / 60)} ${t('units.minutes')}`;
+  return `${Math.round(seconds / 60)}${NBSP}${t('units.minutes')}`;
 }
 
 /**

@@ -202,12 +202,12 @@
 
   /** Whole metres or feet. @param {number} mm */
   function depthText(mm) {
-    return `${formatNumber(mmToDepth(mm, feet), 0)} ${depthUnit(prefs)}`;
+    return `${formatNumber(mmToDepth(mm, feet), 0)}\u00A0${depthUnit(prefs)}`;
   }
 
   /** Minutes rounded as Subsurface's plan table. @param {number} seconds */
   function minutes(seconds) {
-    return `${formatNumber(Math.floor((seconds + 30) / 60), 0)} ${t('units.minutes')}`;
+    return `${formatNumber(Math.floor((seconds + 30) / 60), 0)}\u00A0${t('units.minutes')}`;
   }
 
   /** The name of a gas: EAN32, Oxygène, (18/45). @param {number} o2 @param {number} he */
@@ -510,7 +510,7 @@
 
   /** A vertical speed in the planner's unit: "59 ft/min". @param {number} mmPerMin */
   function speedText(mmPerMin) {
-    return `${formatNumber(mmToDepth(mmPerMin, feet), 0)} ${depthUnit(prefs)}/${t('units.minutes')}`;
+    return `${formatNumber(mmToDepth(mmPerMin, feet), 0)}\u00A0${depthUnit(prefs)}/${t('units.minutes')}`;
   }
 
   /** Every row of the plan, from the core's waypoints. */
@@ -851,7 +851,7 @@
       <div class="od-planner--fields">
         <div class="od-planner--pair">
           <SelectField label={t('plan.waterType')} bind:value={water} options={waterOptions} />
-          <AltitudeField label={t('plan.altitude')} value={altitude} {feet} unit={depthUnit(prefs)} ariaLabel={t('plan.altitudeLong', { value: `${formatNumber(altitude)} ${depthUnit(prefs)}` })} openLabel={t('plan.sacOpen')} onchange={setAltitude} />
+          <AltitudeField label={t('plan.altitude')} value={altitude} {feet} unit={depthUnit(prefs)} ariaLabel={t('plan.altitudeLong', { value: `${formatNumber(altitude)}\u00A0${depthUnit(prefs)}` })} openLabel={t('plan.sacOpen')} onchange={setAltitude} />
         </div>
         <p class="od-planner--helper od-planner--inner">{t(planner.source ? 'plan.conditionsFromDive' : 'plan.conditionsDefault')}</p>
       </div>

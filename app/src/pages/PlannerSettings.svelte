@@ -143,7 +143,7 @@
             wheel: range(0, 9, 1),
             toUnit: (s) => s / 60,
             toStored: (v) => Math.round(v * 60),
-            show: (v) => `${formatNumber(v, 0)} ${t('units.minutes')}`,
+            show: (v) => `${formatNumber(v, 0)}\u00A0${t('units.minutes')}`,
             set: (s) => setSetting('minSwitchSeconds', s),
           },
         ],
@@ -183,7 +183,7 @@
             wheel: range(0, 10, 1),
             toUnit: (m) => m,
             toStored: (v) => Math.round(v),
-            show: (v) => `${formatNumber(v, 0)} ${t('units.minutes')}`,
+            show: (v) => `${formatNumber(v, 0)}\u00A0${t('units.minutes')}`,
             set: (m) => setSetting('problemSolvingMinutes', m),
           },
           {

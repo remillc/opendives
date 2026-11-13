@@ -62,7 +62,7 @@
   /** @param {number} value in the axis unit */
   const tickText = (value) => {
     const text = Number.isInteger(value) ? String(value) : value.toFixed(1);
-    return value === axis.ticks[axis.ticks.length - 1] && unit ? `${text} ${unit}` : text;
+    return value === axis.ticks[axis.ticks.length - 1] && unit ? `${text}\u00A0${unit}` : text;
   };
 
   /** Room on the left for the values of the y axis: the longest one, 10 px digits. */

@@ -1693,6 +1693,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Un nombre et son unité ne sont plus séparés en fin de ligne (« 27,6 m », « 14 h 30 », « 9 plongées »).",
       "Désaturation : les barres des tissus vont de 0 % au repos à 100 % à la limite, avec l’échelle sur le graphique.",
       "Pages sans bande (Réglages, À propos, éditeurs…) : la barre du haut prend la couleur de la page, sans ligne de séparation, et se teinte légèrement quand on fait défiler.",
       "Textes : « Noter une plongée à la main » et l’attente de la première synchronisation ne citent plus d’autre application.",
