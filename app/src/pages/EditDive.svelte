@@ -531,7 +531,7 @@
   /** The drawn levels: `ratio` is the end level, `startRatio` the start level (pale band). */
   const levelsOf = (/** @type {ReturnType<typeof cylinderValues>} */ own) => {
     const levels = fillLevels(own.startMbar, own.endMbar, own.workingPressureMbar);
-    return { ratio: levels.end, startRatio: levels.start };
+    return { ratio: levels.end, startRatio: levels.start, hatched: levels.hatched };
   };
   /** The cylinders listed (task 2026-11-12-56): all, or the core's rule with the setting off. */
   const includeUnused = $derived(prefs.includeUnusedTanks !== false);
@@ -546,7 +546,7 @@
           n: i + 1,
           gas: gasName(own.o2, own.he, gasWords),
           pressure: unused ? (unused.pressureMbar ? formatPressure(unused.pressureMbar, prefs) : t('edit.uses.not used')) : own.endMbar ? formatPressure(own.endMbar, prefs) : '',
-          ...(unused ? { ratio: 1, startRatio: null } : levelsOf(own)),
+          ...(unused ? { ratio: 1, startRatio: null, hatched: !unused.pressureMbar } : levelsOf(own)),
         };
       })
       .filter((item) => item.listed),

@@ -7,7 +7,7 @@
   // valves down. Other cylinders (bailout, stages) stand beside the unit,
   // open-circuit style, with their use written vertically. The fill marks are
   // those of CylinderDrawing: pale band between end and start, water gradient,
-  // dashed levels. A cylinder with no pressure at all is hatched in grey, with no
+  // dashed levels. A cylinder without both its start and end pressures is hatched in grey, with no
   // level (task 2026-11-13-84). Decorative: the card carries the accessible name.
   //
   // Sizes (task 2026-11-13-84, docs/mockups/detail3-android-ccr.dc.html): the
@@ -15,7 +15,7 @@
   // at 93.5 %, so that both are 134 tall with their bottoms aligned. The DIL and
   // O₂ marks stay outside the scaling, at their 11 px size.
 
-  /** @typedef {{ ratio: number, startRatio: number|null, noPressure?: boolean }} Fill */
+  /** @typedef {{ ratio: number, startRatio: number|null, hatched?: boolean }} Fill */
 
   /** @type {{ diluent?: Fill|null, oxygen?: Fill|null, others?: Fill[], marks: { diluent: string, oxygen: string, bailout: string } }} */
   let { diluent = null, oxygen = null, others = [], marks } = $props();
@@ -46,7 +46,7 @@
    */
   function shape(key, x, g, item, side) {
     const bottom = g.top + g.height;
-    const hatched = !!item?.noPressure;
+    const hatched = !!item?.hatched;
     const level = item && !hatched ? Math.min(1, Math.max(0, item.ratio)) : 0;
     const start = item && !hatched && item.startRatio !== null ? Math.min(1, Math.max(level, item.startRatio)) : null;
     /** @param {number} r */

@@ -14,13 +14,13 @@
   /**
    * @type {{
    *   label: string,
-   *   items: { gas: string, line: string, range: string, ratio: number, startRatio: number|null, noPressure?: boolean }[],
+   *   items: { gas: string, line: string, range: string, ratio: number, startRatio: number|null, hatched?: boolean, noPressure?: boolean }[],
    *   changes?: string,
    *   sac?: { label: string, value: string }|null,
    *   rebreather?: { diluent: number, oxygen: number, others: number[], marks: { diluent: string, oxygen: string, bailout: string } }|null,
    * }}
    * label: the accessible name of the group; range: "2 683 → 1 885 psi", empty when unknown;
-   * noPressure: the cylinder has no pressure at all (the rebreather drawing hatches it).
+   * hatched: start and end pressures not both known (the drawing is hatched); noPressure: none at all.
    */
   let { label, items, changes = '', sac = null, rebreather = null } = $props();
 
@@ -49,7 +49,7 @@
     <div class="od-gas-card--cylinders">
       {#each items as item, i (i)}
         <div class="od-gas-card--cylinder">
-          <CylinderDrawing ratio={item.ratio} startRatio={item.startRatio} />
+          <CylinderDrawing ratio={item.ratio} startRatio={item.startRatio} hatched={item.hatched} />
           <span class="od-gas-card--gas">{item.gas}</span>
           {#if item.line}<span class="od-gas-card--line">{item.line}</span>{/if}
           {#if item.range}<span class="od-gas-card--line od-value">{item.range}</span>{/if}

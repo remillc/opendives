@@ -349,7 +349,7 @@
       .filter((c) => cylinderListed(c, prefs.includeUnusedTanks !== false))
       .map((c) => {
         const unused = unusedShown(c);
-        const levels = unused ? { end: 1, start: null } : fillLevels(c.startMbar, c.endMbar, c.workingPressureMbar);
+        const levels = unused ? { end: 1, start: null, hatched: !unused.pressureMbar } : fillLevels(c.startMbar, c.endMbar, c.workingPressureMbar);
         const size = typeHelper(formatCylinderSize(c.sizeMl, c.workingPressureMbar, prefs), c.workingPressureMbar);
         const use = c.use === 'diluent' || c.use === 'oxygen' ? t(`detail.cylinderUseNames.${c.use}`) : rebreather ? t('detail.cylinderUseNames.bailout') : '';
         return {
@@ -369,7 +369,9 @@
                 : '',
           ratio: levels.end,
           startRatio: levels.start,
-          // No pressure at all (task 2026-11-13-84): the rebreather drawing hatches the cylinder.
+          // Start and end not both known: the drawing is hatched (13 November 2026).
+          hatched: levels.hatched,
+          // No pressure at all (task 2026-11-13-84): the accessible name says so.
           noPressure: !(c.startMbar > 0) && !(c.endMbar > 0) && !unused?.pressureMbar,
         };
       });
