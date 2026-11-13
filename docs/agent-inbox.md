@@ -2165,3 +2165,12 @@ Done in `feature/best-mix-tabs`: `GasBestMix.svelte` has the blender's ButtonGro
 Christian's decision of 13 November 2026. The SAC fields of the planner (at the bottom and during deco) open a list in steps of **0.01 cuft/min** (0,34 · 0,35 · 0,36 · 0,37 · 0,38 …), not 0.5. The list opens scrolled to the current value, which is highlighted (`aria-selected`, surface-container-highest). The diver can still type any value with two decimals. In litres per minute, keep the current step; if it seems wrong, ask Christian. Mock-up: `docs/mockups/android-planificateur-sac.dc.html` (its background and grey shades come from a theme trial not approved yet: keep the current theme colours). Check on the phone emulator.
 
 Done in `fix/planner-keyboard-sac`: `SAC_PRESETS_CUFT` is every 0.01 from 0 to 2 (201 entries), shown with two decimals ("0,36"); a typed two-decimal value is exactly a preset, so it is marked (tested). `NumberComboField` opens a long list scrolled to the current value, or to the nearest preset, centred. Litres per minute keep 10 to 30 by 5. Checked on the phone emulator: the bottom SAC list opens on 0.71, highlighted, with 0.68 to 0.74 around it.
+
+## [ ] 2026-11-13-93 Planner: clearer "Volume nécessaire par gaz" rows
+
+Christian's decision of 13 November 2026. Each gas row of « Volume nécessaire par gaz » in the planner result is laid out like this (mock-up: `docs/mockups/android-planificateur.dc.html`; its background and grey shades come from a theme trial not approved yet, keep the current theme colours):
+- first line: the gas name on the left (16 sp), the **total volume** on the right, large (22 sp bold), e.g. « 92 pi³ »;
+- the bar under it, 10 dp high: consumed part in the tertiary colour, then the reserve part hatched, as today;
+- a legend under the bar, 13 sp secondary text, with a small swatch for each part: « Consommé 52 pi³ » and « Réserve à deux 40 pi³ » (values in ink, semibold).
+- The long sentence « 52 pi³ consommés et 40 pi³ de réserve pour remonter à deux » is no longer shown; it stays as the row's accessible name, with the total.
+The row still opens the gas detail. Several gases: one such block each. Same layout on the tablet and in the shared plan. Check on the phone emulator.
