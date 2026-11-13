@@ -2405,3 +2405,23 @@ Done in fix/search-clear-button: components/SearchClear.svelte (Material close i
 Christian's decision of 13 November 2026. Rule added to `docs/system-design.md`, « Top app bar of pages without a band ». On Android today, the pages without the blue band keep Framework7's default white navbar (Réglages, Compte, Dépôt git, Cartes hors ligne, À propos, Bibliothèques libres, Plongées planifiées, editors and full-screen dialogs). Only `DiveDetail.svelte` and `StatisticsDives.svelte` set it by hand. Mock-ups (`docs/mockups/reglages-apercu-android.dc.html` and the other secondary pages) show the bar in the page colour.
 
 Fix it once, in `theme.css`, for every navbar that is not `.od-band-bar`: `--f7-navbar-bg-color: var(--od-background)`, no hairline (`--f7-navbar-hairline-color: transparent` or the md equivalent), no shadow. When the page content is scrolled (scrollTop > 0), the bar takes `--od-surface-container` with a 150 ms colour transition (MD3 « on scroll » state); a small shared helper on `page:init`/scroll is enough. Then remove the hand-made overrides in `DiveDetail.svelte` and `StatisticsDives.svelte` if they become redundant. Light and dark mode. iOS keeps its own bar. Check on the phone emulator: Réglages (top and scrolled), Compte, Cartes hors ligne, À propos.
+
+## [ ] 2026-11-13-115 Désaturation: tissue bars from 0 % at rest to 100 % at the limit, scale on the chart
+
+Christian's decision of 13 November 2026. Mock-ups: `docs/mockups/outils-desaturation-android.dc.html` (and `-terminee-`, `-rappel-`, `android-tablette-desaturation-paysage/portrait`).
+
+Today the bars use the scale of Subsurface's profile (`percent` from `tools.cpp`: 0 = no inert gas, 50 = ambient, 100 = M-value), so a fully desaturated diver sees 16 bars at about 37 %, which reads as « not at zero ». New scale: the bar is the surface gradient factor, `surfaceGf` (already in the JSON), clamped to 0 below zero and to 110 above: 0 % = tissue at rest, desaturated, 100 % = the limit. Desaturated, every bar is at 0 % and is drawn as a 2 dp line on the baseline (lightest blue). Use the same value for the colour and for the « 90 % et plus » alarm count and the accessible label.
+
+Chart labels, on the chart itself: « 100 % · limite » at the right end of the dashed top line, « rapides → lents » under the bars at the left, « 0 % · repos » at the right of the baseline. The legend under the chart keeps only the red swatch « 90 % et plus » (remove the 0–100 % gradient strip). The text under it becomes « Les 16 compartiments du modèle Bühlmann, des plus rapides aux plus lents. Au repos, désaturés, ils sont tous à 0 %. Facteurs de gradient 30 / 75, ceux du planificateur. » (gradient factors from the settings).
+
+The phone mock-up shows a second white card « Au repos, plus de 48 h après la dernière plongée » under the chart: it only illustrates the rest state for the review. The app shows one chart. Same change on the tablet layouts and in any other place that draws the tissue bars from `percent` (check `DiveProfile.svelte` and the flight banner, but leave the dive profile's own tissue graph on Subsurface's scale). Check on the phone emulator with a recent dive and with none in the last 48 h.
+
+## [ ] 2026-11-13-116 Never break between a number and its unit
+
+Christian's decision of 13 November 2026, rule added to `docs/ui-writing.md`: in every language, a number and its unit are joined by a non-breaking space (U+00A0), so a line never breaks between them: « 27,6 m », « 1,6 bar », « 302 Mo », « 90 % », « 14 h 30 », « 9 plongées »; in English « 27.6 m », « 302 MB », « 55 min ». The canvas mock-ups were updated (213 of them).
+
+- Use one shared formatter for every number with a unit (depth, pressure, volume, temperature, weight, time, duration, size, percent, counts with a noun), and make it emit U+00A0. `Intl.NumberFormat` with `style: 'unit'` gives U+00A0 in French but a plain or narrow space in some locales: normalise its output (any space inside the formatted value becomes U+00A0; keep the thousands separator U+202F as it is).
+- Search the i18n files and the templates for `{n} unit` patterns (`{count} plongées`, `{size} Mo`, `{min} min`, `h {m}`…) and put U+00A0 in the strings (or `&nbsp;` in markup).
+- Charts and SVG text: same rule in axis labels and tooltips.
+- Exports (PDF sheet, planner slate, shared text) follow the same rule.
+Add a unit test that formats a sample of values in fr, fr-CA and en and checks there is no plain space between digit and unit. Check on the phone emulator at the smallest width and largest text size: Carnet rows, Détail, Statistiques, Cartes hors ligne.
