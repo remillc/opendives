@@ -1721,13 +1721,14 @@
       gap: 8px;
     }
 
-    /* The suggested weight: a tonal card under "Lest". */
+    /* The suggested weight: a card under "Lest", in the tertiary role, what waits for
+       the diver (task 2026-11-13-103). */
     .od-edit-dive--suggestion {
       margin: 12px 16px 0;
       padding: 12px 12px 12px 16px;
       border-radius: 12px;
-      background: var(--od-secondary-container);
-      color: var(--od-on-secondary-container);
+      background: var(--od-tertiary-container);
+      color: var(--od-on-tertiary-container);
       display: flex;
       align-items: center;
       gap: 12px;
@@ -1736,6 +1737,7 @@
     .od-edit-dive--suggestion-icon {
       flex: none;
       display: flex;
+      color: var(--od-tertiary);
     }
 
     .od-edit-dive--suggestion-texts {
@@ -1761,8 +1763,8 @@
       padding: 0 16px;
       border: none;
       border-radius: 20px;
-      background: var(--od-secondary);
-      color: var(--od-on-secondary);
+      background: var(--od-tertiary);
+      color: var(--od-on-tertiary);
       font: inherit;
       font-size: 14px;
       font-weight: 500;
