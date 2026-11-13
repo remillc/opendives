@@ -19,6 +19,7 @@
   import MenuItem from '../components/MenuItem.svelte';
   import MenuButton from '../components/MenuButton.svelte';
   import SectionBand from '../components/SectionBand.svelte';
+  import FlightBanner from '../components/FlightBanner.svelte';
   import ActiveFilter from '../components/ActiveFilter.svelte';
   import RenumberDialog from '../components/RenumberDialog.svelte';
   import ExportSheet from '../components/ExportSheet.svelte';
@@ -1108,6 +1109,9 @@
       />
     {/if}
   </SectionBand>
+
+  <!-- A wait before flying is running (task 2026-11-13-98): under the search field. -->
+  <FlightBanner />
 
   <!-- While loading, the count and the status are not known yet: nothing is shown. -->
   {#if !logbook.loading && !logbook.error}

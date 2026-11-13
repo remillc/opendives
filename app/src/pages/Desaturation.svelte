@@ -9,9 +9,12 @@
   import { OpenDivesCore } from 'opendives-core';
   import Icon from '../components/Icon.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
+  import { settings } from '../lib/settings.svelte.js';
+  import { setFlightNotify } from '../lib/flight-reminder.svelte.js';
   import {
     formatDateTime,
     formatDepth,
+    formatDayAt,
     formatDuration,
     formatFullDate,
     formatLongDuration,
@@ -41,7 +44,7 @@
     if (!logbook.loading) load();
   });
 
-  const wait = $derived(desat ? flightWait(desat.dives, desat.now) : null);
+  const wait = $derived(desat ? flightWait(desat.dives, desat.now, settings.flightWait) : null);
 
   /** The last dive of the logbook before now, used or not by the calculation. */
   const lastDive = $derived.by(() => {
@@ -115,7 +118,7 @@
       <div class="od-desaturation--tiles">
         <div class="od-desaturation--tile">
           <span class="od-desaturation--tile-label">{t('desaturation.beforeFlying')}</span>
-          <span class="od-desaturation--tile-value od-value">
+          <span class="od-desaturation--tile-value od-value" class:od-desaturation--flight={!!wait}>
             {#if !wait}{t('desaturation.noWait')}{:else}{formatHoursMinutes(wait.remainingSeconds)}{/if}
           </span>
         </div>
@@ -126,10 +129,27 @@
           </span>
         </div>
       </div>
+      {#if wait}
+        <!-- The reminder (task 2026-11-13-98): the same setting as in Settings. -->
+        <label class="od-desaturation--notify">
+          <span class="od-desaturation--notify-text">
+            <span class="od-desaturation--notify-label">{t('settings.flight.notify')}</span>
+            {#if settings.flightNotify}
+              <span class="od-desaturation--notify-when">{t('desaturation.notifyAt', { when: formatDayAt(wait.endsAt, desat.now) })}</span>
+            {/if}
+          </span>
+          <span class="toggle">
+            <input type="checkbox" checked={settings.flightNotify} onchange={(e) => setFlightNotify(e.currentTarget.checked)} />
+            <span class="toggle-icon"></span>
+          </span>
+        </label>
+      {/if}
     {/if}
     <p class="od-desaturation--caption">
       {wait
-        ? t(wait.several ? 'desaturation.ruleSeveral' : 'desaturation.ruleSingle', { hours: wait.hours })
+        ? settings.flightWait !== 'auto'
+          ? t('desaturation.ruleFixed', { hours: wait.hours })
+          : t(wait.several ? 'desaturation.ruleSeveral' : 'desaturation.ruleSingle', { hours: wait.hours })
         : t('desaturation.atRest')}
     </p>
 
@@ -316,6 +336,41 @@
       :global(.ios) & {
         font-weight: 600;
       }
+    }
+
+    /* What waits for the diver: the tertiary role (docs/system-design.md). */
+    .od-desaturation--flight {
+      font-weight: 600;
+      color: var(--od-tertiary);
+    }
+
+    .od-desaturation--notify {
+      margin: 12px 16px 0;
+      padding: 12px 16px;
+      border-radius: 20px;
+      background: var(--od-surface);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .od-desaturation--notify-text {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .od-desaturation--notify-label {
+      font-size: 16px;
+      line-height: 24px;
+    }
+
+    .od-desaturation--notify-when {
+      font-size: 13px;
+      line-height: 18px;
+      color: var(--od-text-2);
     }
 
     .od-desaturation--section {
