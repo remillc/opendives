@@ -1,7 +1,27 @@
 // The rebreather drawing: which cylinder goes where, and the accessible name.
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { rebreatherLabel, rebreatherLayout } from '../../app/src/lib/rebreather-gas.js';
+import { rebreatherLabel, rebreatherLayout, rebreatherSummaryLabel } from '../../app/src/lib/rebreather-gas.js';
+
+const summaryWords = {
+  card: 'Gas: rebreather with {list}. Open the details',
+  diluent: 'diluent {gas}',
+  oxygen: 'oxygen',
+  and: ' and ',
+  bailout: 'bailout: {list}',
+  join: ', ',
+};
+
+test('the editing card names the unit and the bailout (task 86)', () => {
+  const items = [{ gas: 'Trimix 16/45' }, { gas: 'Oxygen' }, { gas: 'Air' }];
+  const layout = rebreatherLayout([{ use: 'diluent' }, { use: 'oxygen' }, { use: 'OC-gas' }]);
+  assert.equal(rebreatherSummaryLabel(items, layout, summaryWords), 'Gas: rebreather with diluent Trimix 16/45 and oxygen, bailout: air. Open the details');
+});
+
+test('the editing card without bailout or oxygen leaves those parts out', () => {
+  const items = [{ gas: 'Air' }];
+  assert.equal(rebreatherSummaryLabel(items, rebreatherLayout([{ use: 'diluent' }]), summaryWords), 'Gas: rebreather with diluent Air. Open the details');
+});
 
 test('diluent and oxygen go in the unit, the rest beside it', () => {
   const layout = rebreatherLayout([{ use: 'OC-gas' }, { use: 'oxygen' }, { use: 'diluent' }, { use: 'OC-gas' }]);

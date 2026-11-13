@@ -24,6 +24,25 @@ export function rebreatherLayout(cylinders) {
 }
 
 /**
+ * The accessible name of the editing screen's gas card in rebreather mode (task
+ * 2026-11-13-86): "Gas: rebreather with diluent Trimix 16/45 and oxygen, bailout:
+ * air. Open the details". A part is left out when the dive has no such cylinder.
+ * @param {{ gas: string }[]} items every cylinder, in the dive's order
+ * @param {{ diluent: number, oxygen: number, others: number[] }} layout
+ * @param {{ card: string, diluent: string, oxygen: string, and: string, bailout: string, join: string }} words
+ *   card: "Gas: rebreather with {list}. Open the details"; diluent: "diluent {gas}";
+ *   oxygen: "oxygen"; and: " and "; bailout: "bailout: {list}"; join: ", "
+ */
+export function rebreatherSummaryLabel(items, layout, words) {
+  const unit = [];
+  if (layout.diluent >= 0) unit.push(words.diluent.replace('{gas}', items[layout.diluent].gas));
+  if (layout.oxygen >= 0) unit.push(words.oxygen);
+  const parts = unit.length ? [unit.join(words.and)] : [];
+  if (layout.others.length) parts.push(words.bailout.replace('{list}', layout.others.map((i) => items[i].gas.toLocaleLowerCase()).join(words.join)));
+  return words.card.replace('{list}', parts.join(words.join));
+}
+
+/**
  * The accessible name: "Rebreather gas: diluent Trimix 16/45 from 2 683 to
  * 1 885 psi, oxygen from 2 756 to 1 885 psi. Bailout: air from 3 002 to 2 901
  * psi". A part is left out when the dive has no such cylinder.

@@ -2079,7 +2079,7 @@ Reference mock-ups: `detail3-android`, `detail3-android-sombre`, `android-editio
 
 Done in `feature/cylinder-shape`: `CylinderDrawing.svelte`, already the one drawing of the gas card (detail), the gas summary (editing), the cylinder cards and sheets, now draws the given path (filled, clip of the levels, then the round-joined outline) with no valve; the levels keep their scale (full at 12, empty at 74) and are clipped by the shape. Checked on the phone emulator (detail light, editing dark) and the tablet emulator (detail). Also: the rebreather drawing is now 140 px tall on every screen (on the tablet it grew with the pane's width).
 
-## [ ] 2026-11-13-86 Dive editing: gas card follows the dive mode
+## [x] 2026-11-13-86 Dive editing: gas card follows the dive mode
 
 Christian's decisions of 13 November 2026, on the Gaz card of the dive editing screen (phone and tablet).
 - **Open circuit** (`docs/mockups/android-edition.dc.html`): the "Mode de plongée" field reads "Circuit ouvert" and the summary card shows one cylinder per gas, as today (new cylinder shape from task 85).
@@ -2087,3 +2087,5 @@ Christian's decisions of 13 November 2026, on the Gaz card of the dive editing s
 - Share the drawing code with the detail screen. If pressures are missing, use the hatched no-pressure state of task 84.
 
 Check on the phone emulator with an open-circuit dive and a CCR dive, light and dark.
+
+Done in `feature/edit-gas-ccr`: in CCR mode `GasSummary.svelte` draws `RebreatherDrawing` (the detail's component, hatched when pressures are missing) with one column per gas (name, end pressure); the whole card is one button that opens the Gas page, with the chevron and the help line; its name comes from `rebreatherSummaryLabel` (tested): "Gaz : recycleur avec diluant Air et oxygène, secours : air. Ouvrir le détail" (the bailout part reads "secours : {gas}" so that it works for every gas name). **Christian's additions (13 November 2026):** freediving hides the Gas card of the editing screen (the mode field stays) and the Gas section of the detail; the editing screen no longer writes "Non utilisée" under an unused cylinder without pressure. Checked on the phone emulator: CCR light and dark, freediving (not saved), open circuit in task 85.
