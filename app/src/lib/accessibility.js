@@ -2,6 +2,7 @@
 // Framework7 keeps a view's previous page in the document, hidden under the
 // current one. Without "inert", TalkBack and VoiceOver can still reach it.
 import { f7, f7ready } from 'framework7-svelte';
+import { t } from './i18n.js';
 
 function update() {
   document.querySelectorAll('.page').forEach((page) => {
@@ -10,6 +11,18 @@ function update() {
     const hidden = !besideDetail && (page.classList.contains('page-previous') || page.classList.contains('page-next'));
     page.toggleAttribute('inert', hidden);
   });
+  nameClearButtons();
+}
+
+/**
+ * Framework7's search bars clear with a bare span: a button named « Effacer la recherche »
+ * for TalkBack and VoiceOver (task 2026-11-13-113), named at start and when a page shows.
+ */
+function nameClearButtons() {
+  document.querySelectorAll('.searchbar .input-clear-button:not([aria-label])').forEach((button) => {
+    button.setAttribute('role', 'button');
+    button.setAttribute('aria-label', t('searchField.clear'));
+  });
 }
 
 export function enableAccessibility() {
@@ -17,5 +30,7 @@ export function enableAccessibility() {
     f7.on('pageAfterIn', update);
     f7.on('pageAfterOut', update);
     f7.on('pageBeforeIn', update);
+    f7.on(/** @type {any} */ ('searchbarInit'), nameClearButtons);
+    nameClearButtons();
   });
 }

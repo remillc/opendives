@@ -1,4 +1,7 @@
 {
+  "searchField": {
+    "clear": "Clear search"
+  },
   "tabs": {
     "logbook": "Logbook",
     "sites": "Sites",
@@ -1690,6 +1693,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Search fields: a clear button with the « close » icon stays visible as soon as there is text (Settings, Filter, Logbook, Offline maps).",
       "Fix: going back to the Logbook from the menu, from a page opened over Settings (About, a subpage), no longer leaves a blank or shifted screen.",
       "Settings, Gases and rebreather: ",
       "Settings: an overview in three cards (General, Diving, Devices and data) sums up the current values and opens one subpage per group; on a tablet, the overview on the left and the subpage on the right.",
@@ -2926,7 +2930,6 @@
       "search": {
         "label": "Search for a place or a site",
         "offline": "Search unavailable without a network",
-        "clear": "Clear the search",
         "sites": "From your logbook",
         "places": "Places",
         "searchPlaces": "Search places for \"{query}\"",

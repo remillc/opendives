@@ -2379,7 +2379,7 @@ fr-CA follows fr. Applies in the Gaz et recycleur subpage of task 111 and on the
 
 Done in fix/rebreather-switch-labels: new labels and supporting lines for showCcrSensors and showCcrSetpoint (fr, en; fr-CA follows fr), same keys and behaviour. Checked on the phone emulator in the Gaz et recycleur subpage (the tablet uses the same page).
 
-## [ ] 2026-11-13-113 Search fields: a clear button, always visible, Material « close » icon
+## [x] 2026-11-13-113 Search fields: a clear button, always visible, Material « close » icon
 
 Christian's decision of 13 November 2026. The rule is in `docs/system-design.md`, « Search fields: the clear button ». Every search field shows a clear button as soon as it holds at least one character, visible whether it has the focus or not, with the Material « close » icon (`Icon name="close"`, 24 dp in a 48 dp target), never the « × » character. A tap empties the field and keeps the focus. Accessible name « Effacer la recherche » / « Clear search ».
 
@@ -2389,3 +2389,5 @@ Where it is missing or different today:
 - Cartes hors ligne, region search (`SettingsMapsArea.svelte`): the button is the « × » text character, use the `close` icon like Sites;
 - Carnet and Filtre (Framework7 `Searchbar`): check that the clear button stays visible when the field loses the focus with text in it, and that it uses the same icon.
 Sites already follows the rule. Do not rely on the WebView's native search cancel button: hide it (`::-webkit-search-cancel-button`) so there is only one. Same on the tablet layouts. Check on the phone emulator, Android and iPhone.
+
+Done in fix/search-clear-button: components/SearchClear.svelte (Material close icon, 24 dp in a 48 dp target, empties and keeps the focus, « Effacer la recherche ») in Réglages, the Android Filter field and the region search of Cartes hors ligne (the × character is gone); Framework7's search bars (Logbook, iPhone Filter) draw the same icon through theme.css and their clear span gets role button and the same name (lib/accessibility.js); the WebView's native cancel button is hidden. Checked on the phone emulator (Android): Logbook, Settings, Filter, region search, button visible after the field loses the focus. Not checked: the iPhone look (no iOS device or emulator).

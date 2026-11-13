@@ -8,6 +8,7 @@
   // keep the area between about 20 km across and the largest the limit allows
   // (lib/area-frame.js). The search floats on the map. Needs the network (the
   // map of the place is drawn from the online tiles).
+  import SearchClear from '../components/SearchClear.svelte';
   import { onMount, onDestroy } from 'svelte';
   import { Page, Navbar, Link } from 'framework7-svelte';
   import { OpenDivesCore } from 'opendives-core';
@@ -320,7 +321,7 @@
           aria-label={offlineMaps.online ? t('maps.area.search.label') : t('maps.area.search.offline')}
         />
         {#if query}
-          <button type="button" class="od-settings-maps-area--clear" aria-label={t('maps.area.search.clear')} onclick={() => (query = '')}>×</button>
+          <span class="od-settings-maps-area--clear"><SearchClear onclear={() => (query = '')} /></span>
         {/if}
       </form>
       {#if panelOpen}
@@ -452,20 +453,12 @@
       }
     }
 
+    /* The clear button (components/SearchClear.svelte), at the end of the field. */
     .od-settings-maps-area--clear {
       position: absolute;
-      top: 4px;
-      right: 4px;
-      width: 48px;
-      height: 48px;
-      padding: 0;
-      border: none;
-      border-radius: 50%;
-      background: transparent;
-      color: var(--od-text);
-      font-size: 24px;
-      line-height: 48px;
-      cursor: pointer;
+      top: 16px;
+      right: 16px;
+      display: flex;
     }
 
     .od-settings-maps-area--results {

@@ -18,6 +18,7 @@
   import { showSnackbar } from '../lib/snackbar.js';
   import { OpenDivesCore } from 'opendives-core';
   import RowMenu from '../components/RowMenu.svelte';
+  import SearchClear from '../components/SearchClear.svelte';
   import AltitudeField from '../components/AltitudeField.svelte';
   import ButtonGroup from '../components/ButtonGroup.svelte';
   import MenuButton from '../components/MenuButton.svelte';
@@ -1039,6 +1040,7 @@
     <div class="od-settings--search">
       <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6"></circle><path d="M15 15l5 5"></path></svg>
       <input type="search" bind:value={search} placeholder={t('settings.search')} aria-label={t('settings.search')} />
+      {#if search}<SearchClear onclear={() => (search = '')} />{/if}
     </div>
   {/if}
 
