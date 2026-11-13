@@ -2241,3 +2241,10 @@ Christian's decision of 13 November 2026 (TODOS #50). Mock-ups: `docs/mockups/an
    - in the dive detail, inside the **open** Équipement section (`EquipmentCard`): Combinaison, Lest with the total, then the weights by location, then « Ce lest était », then Ordinateur. Not shown in the closed card. The open section's header is the button « Équipement » with the chevron up (accessible name ending « Masquer le détail »).
 3. **Storage, Subsurface compatible:** the choice is saved as a tag of the dive, always in English whatever the app language: `weight-too-light`, `weight-ok`, `weight-too-heavy`. Only one of the three at a time. These three tags are not shown in the dive's tag list or tag chips in OpenDives (they are shown by the buttons), but they stay in the file and Subsurface shows them as ordinary tags. Keep them out of tag suggestions and of the tag filter.
 Tests for the rule (match, no match, adjustment by tag, units) and for the tags (set, change, clear, kept on sync). Same on the tablet layouts. Check on the phone emulator.
+
+## [ ] 2026-11-13-100 Side menu: match the mock-up (logo, « Messages »)
+
+Christian's remark of 13 November 2026, on the side menu of the app compared with `docs/mockups/appbar-tiroir-android-ouvert.dc.html` (`NavMenu.svelte`, `SyncControl.svelte`):
+1. **Logo:** the app draws a white border around the logo in the menu header. The mock-up has none: a white disc behind the three waves, the white lower arc and the two white bubbles, 44 dp, nothing around it. Draw it exactly as in the mock-up's SVG.
+2. **« Messages » under « Synchroniser maintenant »:** the app shows « Messages » there, the mock-up does not. Under the button there is only the status line (« Synchronisé il y a 2 min »). « Messages » is not an OpenDives string: find where it comes from (a sync or debug element, a default label, a system component) and remove it. If it leads to something useful, tell Christian in the « Done » note instead of moving it elsewhere.
+Check on the phone emulator, light and dark mode, next to the mock-up.
