@@ -2332,3 +2332,34 @@ Christian's decision of 13 November 2026. Mock-up: `docs/mockups/android-reglage
 - The « Affichage » group (Thème) becomes the **first** group of Réglages, before « Langue et formats » and « Unités ». The other groups keep their order.
 - The « Taille du texte » row (`settings.display.textSize`, read-only « Comme l’appareil ») is removed, with its strings: the app already follows the system text size. Update the release note that lists the settings menus if it names it.
 Same on the tablet layout. Check on the phone emulator.
+
+## [ ] 2026-11-13-111 Réglages: overview page and subpages
+
+Christian's decision of 13 November 2026. Réglages becomes an **overview page** that opens **one subpage per group**, as recommended by Material 3 for long settings. Task 110 (Affichage first, no « Taille du texte ») still applies inside this structure.
+
+Mock-ups in `docs/mockups/`:
+- overview: `reglages-apercu-android.dc.html`;
+- subpages: `reglages-affichage-android`, `reglages-langue-android`, `reglages-unites-android`, `reglages-carnet-android`, `reglages-equipement-android`, `reglages-profil-deco-android`, `reglages-gaz-android`, `reglages-outils-android`, `reglages-ordinateurs-telechargement-android`, `reglages-avance-android` (all `.dc.html`);
+- menus, dialogs and child screens of each subpage, `reglages2-*-android.dc.html`. The menu and dialog mock-ups show only the row and its menu, or the dialog alone, over the subpage they belong to.
+
+Overview page, three cards, each row is a link with an icon, a title, a one-line summary of the current values and a chevron:
+- **Général**: Affichage (« Thème : système »), Langue et formats (language · time format · paper), Unités (system and main units);
+- **Plongée**: Carnet, Équipement, Profil et décompression, Gaz et recycleur, Outils;
+- **Appareils et données**: Ordinateurs et téléchargement (remembered computer), Cartes hors ligne (regions and size, opens the existing offline-maps screen), Avancé.
+The summaries are built from the stored values and update when a value changes. Keep them short enough for one line on a small phone in fr and en, truncate with an ellipsis otherwise.
+
+Subpages: an app bar with a back arrow and the group name, then the rows of that group, unchanged in behaviour (same keys, same defaults). Rows move as follows:
+- Langue et formats: language, date format, time format, paper format;
+- Unités: Métrique / Impérial / Personnalisé, the six units, then ascent and descent speeds, duration, GPS coordinates;
+- Carnet: trips, invalid dives, surface conditions, photo and video fields, water type in the editor, water type of downloaded dives;
+- Équipement: cylinder types (opens the cylinder-type list), default cylinders for open circuit, diluent, oxygen, bailout, unused cylinders, standard sizes;
+- Profil et décompression: profile options, then decompression (warning text kept above the model);
+- Gaz et recycleur: partial-pressure thresholds, then rebreather;
+- Outils: water type and altitude for the tools, and the wait-before-flying setting (task 98, `reglages2-avion-android`);
+- Ordinateurs et téléchargement: logbook computers (opens the list, rename, merge), show all Bluetooth devices, remembered computer, forget it;
+- Avancé: reset all settings (alert dialog, `reglages2-avance-reinitialiser-android`).
+Menus open from the row, below it when there is room, above it otherwise (Material exposed menu). Dialogs and child screens are the ones already coded, only reached from the new subpage.
+
+Back from a subpage returns to the overview, with the scroll position kept. Deep links and any « open Réglages at X » call in the app (planner, offline maps, download screen) open the matching subpage directly. Search in settings, if any, still finds rows and opens their subpage.
+
+Tablet: the overview in the left pane, the selected subpage in the right pane (list-detail), first group selected by default. Check on the phone emulator and on the tablet emulator in portrait and landscape, fr and en.
