@@ -35,8 +35,10 @@
   const SIDE_SCALE = { x: 17.7, y: -41.8, k: 0.935 };
   /** Where a point of the unit lands once scaled. @param {number} x @param {number} y */
   const unitPoint = (x, y) => ({ x: UNIT_SCALE.x + x * UNIT_SCALE.k, y: UNIT_SCALE.y + y * UNIT_SCALE.k });
-  const dilMark = unitPoint(66, 112);
-  const oxyMark = unitPoint(152, 112);
+  // At the middle of their cylinder (48..84 and 134..170 wide, 6..170 tall),
+  // centred on the text (task 2026-11-13-88).
+  const dilMark = unitPoint(66, 88);
+  const oxyMark = unitPoint(152, 88);
   const width = $derived(rebreatherWidth(others.length));
 
   /**
@@ -127,8 +129,8 @@
     <rect x="86" y="24" width="46" height="18" rx="6" class="od-rebreather-drawing--head" />
     <rect x="103" y="66" width="12" height="20" rx="2" class="od-rebreather-drawing--display" />
   </g>
-  <text x={dilMark.x} y={dilMark.y} text-anchor="middle" class="od-rebreather-drawing--mark">{marks.diluent}</text>
-  <text x={oxyMark.x} y={oxyMark.y} text-anchor="middle" class="od-rebreather-drawing--mark">{marks.oxygen}</text>
+  <text x={dilMark.x} y={dilMark.y} text-anchor="middle" dominant-baseline="central" class="od-rebreather-drawing--mark">{marks.diluent}</text>
+  <text x={oxyMark.x} y={oxyMark.y} text-anchor="middle" dominant-baseline="central" class="od-rebreather-drawing--mark">{marks.oxygen}</text>
 
   <!-- The others beside the unit, valve on top. -->
   {#if sideShapes.length}
@@ -138,10 +140,11 @@
         <rect x={s.x + 14} y={s.top - 9} width="12" height="9" rx="2" class="od-rebreather-drawing--side-valve" />
         <text
           x={s.x + s.width / 2}
-          y={s.top + s.height / 2 - 6}
+          y={s.top + s.height / 2}
           text-anchor="middle"
+          dominant-baseline="central"
           class="od-rebreather-drawing--mark od-rebreather-drawing--mark-side"
-          transform="rotate(-90 {s.x + s.width / 2} {s.top + s.height / 2 - 6})">{marks.bailout}</text>
+          transform="rotate(-90 {s.x + s.width / 2} {s.top + s.height / 2})">{marks.bailout}</text>
       {/each}
     </g>
   {/if}

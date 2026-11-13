@@ -2097,6 +2097,8 @@ Follow-up to task 85, the small cylinder icon of the gas rows (20 × 32, in the 
 
 Done in `feature/small-cylinder-icon`: a new `CylinderIcon.svelte` (the given path, 1.5 ink outline, round joins) replaces the scaled-down drawing in `CylinderCard`, `CylinderSheet` and `CylinderDeleteDialog`; its fill is the token `--od-cylinder-icon`, #D4E2F2 light and #1E3552 dark (the secondary container). Checked on the phone emulator, gas page of the editing screen, light and dark.
 
-## [ ] 2026-11-13-88 Rebreather drawing: centre the labels on the cylinders
+## [x] 2026-11-13-88 Rebreather drawing: centre the labels on the cylinders
 
 Christian's request of 13 November 2026, for the rebreather drawing of tasks 84 and 86 (dive detail and dive editing). The labels drawn on the cylinders (DIL, O₂ and the vertical SECOURS) are centred on the middle of the text, not placed by their baseline: `dominant-baseline="central"` (or the equivalent), at the centre of each cylinder, horizontally and vertically. The rotated SECOURS label was about 4 dp off to one side. Mock-ups: `docs/mockups/detail3-android-ccr.dc.html`, `detail3-android-ccr-sans-pression.dc.html`, `android-edition-gaz-ccr.dc.html`. Check on the phone emulator.
+
+Done in `fix/ccr-label-centre`: DIL and O₂ at the middle of their cylinders, SECOURS at the middle of each bailout cylinder before its rotation, all with `dominant-baseline="central"` and `text-anchor="middle"`. Checked on the phone emulator: the centre of each label's box equals the centre of its cylinder's outline (to 0.1 px), in the detail; the editing card draws the same component.
