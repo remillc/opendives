@@ -2187,3 +2187,15 @@ Christian's decision of 13 November 2026, follow-up to task 93. The « Expositio
 The mock-up `android-planificateur` on the canvas also shows a new « Résultat » card around these rows; that card is not decided yet: do not build it. Same row layout on the tablet and in the shared plan. Check on the phone emulator.
 
 Done in `feature/planner-volume-rows`: « Exposition à l’oxygène » with « CNS 2 % » large, the 10 px bar, « Limite CNS 100 % » left and « OTU 0 » right; group name « Exposition à l’oxygène : CNS 2 % de la limite, 0 OTU ». Same block in the shared PDF. The « Résultat » card is not built. Checked on the phone emulator.
+
+## [ ] 2026-11-13-95 Planner: « Résultat » card
+
+Christian's decision of 13 November 2026, completing tasks 93 and 94. The planner result is grouped in one card. Mock-ups: `docs/mockups/android-planificateur.dc.html` (no deco) and `android-planificateur-nouveau.dc.html` (with deco). Their background and grey shades come from a theme trial not approved yet: keep the current theme colours.
+- **Title** « Résultat » (18 sp bold) above the card, replacing « Résultat, durée totale 61 min ».
+- **Card:** surface colour, corner radius 20 dp, one column:
+  1. two key-figure tiles side by side (page background colour, radius 12 dp, 12/16 dp padding): « Durée totale » with the total time large (24 sp bold) and « min », and « Paliers de déco » with the number of deco stops and, when there are stops, their total time in brackets, e.g. « 3 (8 min) »;
+  2. without deco: one status line with a green check icon, « Remontée sans palier, au-dessus du plafond » (replaces the two sentences of the old text). With deco: the stops table and its legend, inside the card under the tiles;
+  3. a divider, the small heading « Volume nécessaire par gaz », then one block per gas (task 93), separated by dividers;
+  4. a divider, then the oxygen exposure row (task 94).
+- Accessible name of the card: « Résultat du plan, durée totale N min ».
+Same card on the tablet layouts and in the shared plan. Check on the phone emulator with a plan without deco and a plan with deco.
