@@ -2302,10 +2302,12 @@ Christian's decision of 13 November 2026. The « Statistiques » icon (side menu
 
 Done in fix/sync-label-stats-icon: `statistics` path replaced in Icon.svelte, checked on the phone emulator next to the other menu icons.
 
-## [ ] 2026-11-13-107 Logo: grey ring and blue bubbles in light mode
+## [x] 2026-11-13-107 Logo: grey ring and blue bubbles in light mode
 
 Christian's decision of 13 November 2026. Reference: `docs/mockups/logo-bleu.dc.html` (proposal A, the one in use) and the line added to `docs/system-design.md`. In **light mode** only:
 - the lower half-circle under the waves (`M24 54 A30 30 0 0 0 84 54`, 3 px) becomes #C9C7C1 instead of #1F2124; in the app icon, the upper arc, which was #A3A5A8, becomes #C9C7C1 too, so the ring is one colour;
 - the two bubbles become #114477 instead of #1F2124.
 **Dark mode** does not change (half-circle and bubbles #F4F4F2, upper arc of the icon #6B6E72).
 Update every copy of the logo: `docs/brand/` (SVG and PNG exports), the Android adaptive icon and launcher icons, the iOS app icon, the splash screen, the welcome screen and the side-menu header (task 100 still applies: no white border). Check the icon at 24, 32, 48 and 64 px on a light launcher background and on the emulator.
+
+Done in fix/logo-ring-bubbles: light copies only (dark unchanged): lower half-circle #C9C7C1 (was #1F2124), upper grey arc of the small icons #C9C7C1 (was #A3A5A8), bubbles #114477 (was #1F2124), in docs/brand (3 light icons, light logo), app/public (favicon.svg light rules only, logo-light, logo-small-light), the Android ic_launcher_foreground and ic_splash_mark vectors, and re-rendered PNGs (launcher mipmaps, iOS AppIcon-1024 in app/ios and app/resources, apple-touch-icon, splash-light@1x/2x/3x) at the same sizes. logo-menu.svg is unchanged (white arc and bubbles, task 100). The welcome screen and About use logo-light.svg, so they follow. Checked the icon at 24, 32, 48 and 64 px on #F4F4F2 as rendered images; not checked on the emulator.
