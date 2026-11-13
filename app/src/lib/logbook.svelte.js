@@ -334,6 +334,27 @@ export async function importData(name, data) {
   return Math.max(0, logbook.dives.length - before);
 }
 
+/**
+ * A dive or a plan received by QR code (lib/qr-receive.svelte.js): its .ssrf text goes through the
+ * core's import, as a normal dive of the logbook (new number), one undoable step, saved and synced
+ * like any import.
+ * @param {string} xml
+ * @returns {Promise<{id: number, added: number}>} the first dive added (0 if none) and how many
+ */
+export async function importReceived(xml) {
+  const bytes = new TextEncoder().encode(xml);
+  let binary = '';
+  for (let i = 0; i < bytes.length; i += 0x8000) binary += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+  const before = logbook.dives.length;
+  const result = await OpenDivesCore.importDives({ name: 'opendives-qr.ssrf', data: btoa(binary) });
+  logbook.undoText = result.undo;
+  logbook.redoText = result.redo ?? '';
+  logbook.dives = await OpenDivesCore.listLoadedDives();
+  logbook.sitesVersion++;
+  await persistChanges();
+  return { id: result.list?.id ?? 0, added: Math.max(0, logbook.dives.length - before) };
+}
+
 /** Dives logged on this device without an account (0 when none, or unreadable). */
 export async function deviceDiveCount() {
   try {

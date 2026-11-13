@@ -53,6 +53,7 @@
   import NavMenu from './components/NavMenu.svelte';
   import SyncFailureSheet from './components/SyncFailureSheet.svelte';
   import ConflictHost from './components/ConflictHost.svelte';
+  import QrReceived from './components/QrReceived.svelte';
   import Welcome from './components/Welcome.svelte';
   import { layout, ios, listWidth, splitBreakpoint } from './lib/layout.svelte.js';
   import { trackSection, enableSectionSwipes, enableFullSwipeBack } from './lib/navigation.svelte.js';
@@ -275,6 +276,7 @@
   {#if layout.rail}<NavRail />{:else}<NavMenu />{/if}
   <SyncFailureSheet />
   <ConflictHost />
+  <QrReceived />
   <MapsDialogs />
   {#if showRoute}<RouteBadge />{/if}
   <Welcome />

@@ -12,7 +12,7 @@
 
   /**
    * @type {{
-   *   choices: { key: string, icon: 'download'|'file'|'edit', text: string }[],
+   *   choices: { key: string, icon: 'download'|'file'|'edit'|'qr', text: string }[],
    *   onchoose: (key: string) => void,
    * }}
    */

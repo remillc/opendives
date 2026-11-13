@@ -1485,6 +1485,13 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
         onCoreThread(call) { [self] in
             let file = shareDir.appendingPathComponent((name as NSString).lastPathComponent)
             try OpenDivesNative.exportDives(ids: numbers(ids), format: format, anonymize: anonymize, path: file.path)
+            if call.getBool("text", false) {
+                // The contents come back in the answer (the QR share): the file is not kept.
+                let text = try String(contentsOf: file, encoding: .utf8)
+                try? FileManager.default.removeItem(at: file)
+                call.resolve(["uri": "", "text": text])
+                return
+            }
             call.resolve(["uri": file.absoluteString])
         }
     }

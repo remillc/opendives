@@ -150,6 +150,20 @@ async function openFile(uri) {
   });
 }
 
+/** Opens a dive of the logbook by its identifier (after a dive received by QR code). @param {number} id */
+export async function openDiveById(id) {
+  clearOverlays();
+  const view = await freshView('logbook');
+  /** @type {any} */ (view?.router).navigate(`/dives/${id}`, { reloadDetail: true });
+}
+
+/** Opens the list of planned dives (after a plan received by QR code). */
+export async function openPlans() {
+  clearOverlays();
+  const view = await freshView('tools');
+  /** @type {any} */ (view?.router).navigate('/plans/', { reloadDetail: true });
+}
+
 /** One address at a time, and the same address twice in a row (launch URL and event) once. */
 let queue = Promise.resolve();
 let lastUrl = '';

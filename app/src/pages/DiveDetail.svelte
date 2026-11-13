@@ -24,6 +24,8 @@
   import MenuItem from '../components/MenuItem.svelte';
   import RenumberDiveDialog from '../components/RenumberDiveDialog.svelte';
   import ShareSheet from '../components/ShareSheet.svelte';
+  import QrShare from '../components/QrShare.svelte';
+  import { qrSummary } from '../lib/qr-send.js';
   import SiteHeaderImage from '../components/SiteHeaderImage.svelte';
   import { sharePdf, shareSummary, shareLink, shareTitle } from '../lib/share.js';
   import { diveLink } from '../lib/deep-link.js';
@@ -235,6 +237,7 @@
   }
 
   let sharing = $state(false);
+  let qrSharing = $state(false);
   /** @param {'pdf'|'summary'|'link'} kind */
   async function share(kind) {
     sharing = false;
@@ -717,7 +720,11 @@
 </Page>
 
 {#if sharing}
-  <ShareSheet onpdf={() => share('pdf')} onsummary={() => share('summary')} onlink={dive && diveLink(dive.date) ? () => share('link') : undefined} onclose={() => (sharing = false)} />
+  <ShareSheet onpdf={() => share('pdf')} onsummary={() => share('summary')} onlink={dive && diveLink(dive.date) ? () => share('link') : undefined} onqr={() => ((sharing = false), (qrSharing = true))} onclose={() => (sharing = false)} />
+{/if}
+
+{#if qrSharing && dive}
+  <QrShare id={dive.id} kind="d" summary={qrSummary(dive, prefs)} onclose={() => (qrSharing = false)} />
 {/if}
 
 {#if renumbering && dive}

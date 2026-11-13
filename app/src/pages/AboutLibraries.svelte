@@ -29,6 +29,7 @@
         ['Framework7', 'MIT', 'https://framework7.io'],
         ['Svelte', 'MIT', 'https://svelte.dev'],
         ['MapLibre GL JS', 'BSD-3-Clause', 'https://maplibre.org'],
+        ['qrcode-generator', 'MIT', 'https://github.com/kazuhikoarase/qrcode-generator'],
         ['Natural Earth (simplified world map)', 'Public domain', 'https://www.naturalearthdata.com'],
         ['Source Sans 3', 'SIL Open Font License 1.1', 'https://github.com/adobe-fonts/source-sans'],
       ],

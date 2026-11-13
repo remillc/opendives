@@ -205,3 +205,14 @@ test('the preview of a long dive: country, people, gases, thinned profile', () =
   assert.ok(p.profile.length / 2 <= 60);
   assert.equal(readPreview('<divelog></divelog>'), null);
 });
+
+test('every code of a long dive fits one QR code, medium correction, in a version a phone camera reads', async () => {
+  const { qrPath } = await import('../../app/src/lib/qr-draw.js');
+  const { chunks } = await encodeTransfer({ kind: 'd', label: 'Lake Coleridge', xml: longDiveXml() });
+  for (const c of chunks) {
+    const { size, d } = qrPath(c);
+    assert.ok((size - 17) % 4 === 0 && size <= 177, `size ${size}`);
+    assert.ok(size <= 145, `version too dense: ${size} modules for ${c.length} characters`);
+    assert.match(d, /^M\d+ \d+h\d+v1h-\d+z/);
+  }
+});

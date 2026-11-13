@@ -20,11 +20,11 @@
    * `title` as the sheet's own title when it is not "Partager".
    * @type {{
    *   onpdf?: () => void, onsummary?: () => void, onclose: () => void, pdfText?: string, summaryLabel?: string, summaryText?: string,
-   *   heading?: string, onlink?: () => void, linkText?: string,
+   *   heading?: string, onlink?: () => void, linkText?: string, onqr?: () => void,
    *   rows?: { id: string, icon: string, title: string, text: string, disabled?: boolean, onclick: () => void }[],
    * }}
    */
-  let { onpdf, onsummary, onclose, pdfText = t('share.pdfText'), summaryLabel = t('share.summary'), summaryText = t('share.summaryText'), heading = t('share.title'), rows = undefined, onlink = undefined, linkText = t('share.linkText') } = $props();
+  let { onpdf, onsummary, onclose, pdfText = t('share.pdfText'), summaryLabel = t('share.summary'), summaryText = t('share.summaryText'), heading = t('share.title'), rows = undefined, onlink = undefined, linkText = t('share.linkText'), onqr = undefined } = $props();
 </script>
 
 <Sheet opened swipeToClose backdrop class="od-share-sheet" style="height: auto" onSheetClosed={onclose}>
@@ -60,6 +60,12 @@
       <button type="button" class="od-share-sheet--row" onclick={onlink}>
         <span class="od-share-sheet--circle" aria-hidden="true"><Icon name="link" size={22} weight={2} /></span>
         <span class="od-share-sheet--texts"><span class="od-share-sheet--headline">{t('share.link')}</span><span class="od-share-sheet--supporting">{linkText}</span></span>
+      </button>
+    {/if}
+    {#if onqr}
+      <button type="button" class="od-share-sheet--row" onclick={onqr}>
+        <span class="od-share-sheet--circle" aria-hidden="true"><Icon name="qr" size={22} weight={2} /></span>
+        <span class="od-share-sheet--texts"><span class="od-share-sheet--headline">{t('share.qr')}</span><span class="od-share-sheet--supporting">{t('share.qrText')}</span></span>
       </button>
     {/if}
     {/if}

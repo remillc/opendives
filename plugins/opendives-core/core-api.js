@@ -676,7 +676,7 @@ import { registerPlugin } from '@capacitor/core';
  *   The dives of the log in memory, without loading anything.
  * @property {(options: {name: string, base64: string}) => Promise<{uri: string}>} writeShareFile
  *   A file to share (the profile image), written in the app's cache; its file URI.
- * @property {(options: {ids: number[], format: 'ssrf'|'uddf'|'csv'|'csvProfiles', anonymize: boolean, name: string}) => Promise<{uri: string}>} exportDives
+ * @property {(options: {ids: number[], format: 'ssrf'|'uddf'|'csv'|'csvProfiles', anonymize: boolean, name: string, text?: boolean}) => Promise<{uri: string, text?: string}>} exportDives
  *   The dives exported by the core (export_dives) into the app's cache; the logbook is not changed.
  * @property {(options: {uri: string, mime: string}) => Promise<{apps: number}>} grantShareFile
  *   Read access to a shared file for every app that can receive it (Gmail sends attachments later).

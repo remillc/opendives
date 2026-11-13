@@ -1659,6 +1659,13 @@ class OpenDivesCorePlugin : Plugin() {
         val dir = File(context.cacheDir, SHARE_DIR).apply { mkdirs() }
         val file = File(dir, File(name).name)
         NativeCore.exportDives(ids, format, call.getBoolean("anonymize", false) == true, file.absolutePath)
+        if (call.getBoolean("text", false) == true) {
+            // The contents come back in the answer (the QR share): the file is not kept.
+            val text = file.readText(Charsets.UTF_8)
+            file.delete()
+            call.resolve(JSObject().put("uri", "").put("text", text))
+            return@onCoreThread
+        }
         call.resolve(JSObject().put("uri", Uri.fromFile(file).toString()))
     }
 
