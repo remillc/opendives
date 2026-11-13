@@ -1105,9 +1105,12 @@
       {/if}
     {/if}
     {#if logbook.dives.length || logbook.loading}
+      <!-- No backdrop: the list filters as you type, and Framework7's veil stayed over the band
+           after the field lost the focus (bug of 13 November 2026). -->
       <Searchbar
         inline
         customSearch
+        backdrop={false}
         class="od-band-search"
         placeholder={t('logbook.search')}
         onSearchbarSearch={(/** @type {any} */ _sb, /** @type {string} */ q) => (query = q)}
