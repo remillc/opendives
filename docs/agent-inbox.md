@@ -2199,3 +2199,7 @@ Christian's decision of 13 November 2026, completing tasks 93 and 94. The planne
   4. a divider, then the oxygen exposure row (task 94).
 - Accessible name of the card: « Résultat du plan, durée totale N min ».
 Same card on the tablet layouts and in the shared plan. Check on the phone emulator with a plan without deco and a plan with deco.
+
+## [ ] 2026-11-13-96 Planner stops table: first gas highlighted
+
+Christian's decision of 13 November 2026. In the planner's stops table, the gas of the first row (the descent gas, EAN32 in the mock-up) is shown in the same highlight pill as the gas changes. The legend under the table becomes « Début et fin en minutes depuis la mise à l'eau. ↓ descente, → niveau prévu, ↑ remontée, – palier de déco. Gaz surligné : gaz de départ ou changement de gaz. » Same on the tablet and in the shared plan. Mock-up: `docs/mockups/android-planificateur-nouveau.dc.html` (keep the current theme colours). Check on the phone emulator.
