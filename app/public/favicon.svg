@@ -3,8 +3,8 @@
        grey arc of the small sizes,
        light or dark following the system. -->
   <style>
-    .bg { fill: #F4F4F2 } .disc { fill: #FFFFFF } .ink { fill: #1F2124 }
-    .ring { fill: none; stroke: #1F2124; stroke-width: 3; stroke-linecap: round } .grey { stroke: #A3A5A8 }
+    .bg { fill: #F4F4F2 } .disc { fill: #FFFFFF } .ink { fill: #114477 }
+    .ring { fill: none; stroke: #C9C7C1; stroke-width: 3; stroke-linecap: round } .grey { stroke: #C9C7C1 }
     .t1 { stop-color: #D4E2F2 } .b1 { stop-color: #BCD2EB } .t2 { stop-color: #8FB0D6 } .b2 { stop-color: #7199C2 } .t3 { stop-color: #3F6F9F } .b3 { stop-color: #2D5E90 }
     @media (prefers-color-scheme: dark) {
       .bg { fill: #121314 } .disc { fill: #1E2023 } .ink { fill: #F4F4F2 } .ring { stroke: #F4F4F2 } .grey { stroke: #6B6E72 }

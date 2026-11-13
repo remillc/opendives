@@ -54,16 +54,16 @@
     <!-- Above the water, the circle completed in grey: small sizes only (spec, "Logo", size rule). -->
     <path
         android:pathData="M24,54 A30,30 0 1,1 84,54"
-        android:strokeColor="#FFA3A5A8"
+        android:strokeColor="#FFC9C7C1"
         android:strokeWidth="3"
         android:strokeLineCap="round" />
     <!-- The ring, only under the water. -->
     <path
         android:pathData="M24,54 A30,30 0 0,0 84,54"
-        android:strokeColor="#FF1F2124"
+        android:strokeColor="#FFC9C7C1"
         android:strokeWidth="3"
         android:strokeLineCap="round" />
     <!-- Bubbles. -->
-    <path android:fillColor="#FF1F2124" android:pathData="M58.4,39a3.6,3.6 0,1 0,7.2 0a3.6,3.6 0,1 0,-7.2 0Z" />
-    <path android:fillColor="#FF1F2124" android:pathData="M53.9,30.8a2.6,2.6 0,1 0,5.2 0a2.6,2.6 0,1 0,-5.2 0Z" />
+    <path android:fillColor="#FF114477" android:pathData="M58.4,39a3.6,3.6 0,1 0,7.2 0a3.6,3.6 0,1 0,-7.2 0Z" />
+    <path android:fillColor="#FF114477" android:pathData="M53.9,30.8a2.6,2.6 0,1 0,5.2 0a2.6,2.6 0,1 0,-5.2 0Z" />
 </vector>
