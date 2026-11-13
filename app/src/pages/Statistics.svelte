@@ -32,6 +32,9 @@
   import { layout } from '../lib/layout.svelte.js';
   import { keepInSvelteRange } from '../lib/master-detail.js';
 
+  /** @type {{ f7router?: any }} */
+  let { f7router = undefined } = $props();
+
   let result = $state(/** @type {import('../lib/statistics.svelte.js').StatsResult|null} */ (null));
   /** Figures of each saved statistic, by its id. */
   let saved = $state(/** @type {Record<string, import('../lib/statistics.svelte.js').StatsFigures|null>} */ ({}));
@@ -68,6 +71,19 @@
   let selected = $state('');
   /** The "By …" sections opened, by title: all closed at first. */
   let openSections = $state(/** @type {Record<string, boolean>} */ ({}));
+  /**
+   * Opens or closes a « By … » section. Tablet (to-do #33): closing the section of the row shown
+   * beside the list empties the pane, back to its first view.
+   * @param {string} key @param {boolean} open whether the section is open now
+   */
+  function toggleSection(key, open) {
+    openSections[key] = !open;
+    if (!open || !layout.split || !selected.includes(`section=${key}&`)) return;
+    selected = '';
+    // Framework7 does not go back to the master alone in a list-detail pair: show the empty pane.
+    f7router?.navigate('/pane/empty', { reloadDetail: true, animate: false });
+  }
+
   /** @param {MouseEvent} e */
   function select(e) {
     if (!layout.split) return;
@@ -190,7 +206,7 @@
         {@const title = t(`stats.${key}`)}
         {@const open = !!openSections[key]}
         <h2 class="od-statistics--heading">
-          <button type="button" class="od-statistics--toggle" aria-expanded={open} onclick={() => (openSections[key] = !open)}>
+          <button type="button" class="od-statistics--toggle" aria-expanded={open} onclick={() => toggleSection(key, open)}>
             <span class="od-statistics--toggle-text">{title}</span>
             <span class="od-statistics--chevron" class:od-statistics--chevron-up={open}><Icon name="expand" size={24} /></span>
           </button>

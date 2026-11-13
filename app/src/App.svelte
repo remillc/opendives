@@ -10,6 +10,7 @@
   import DiveDetail from './pages/DiveDetail.svelte';
   import Placeholder from './pages/Placeholder.svelte';
   import Settings from './pages/Settings.svelte';
+  import PaneEmpty from './pages/PaneEmpty.svelte';
   import Account from './pages/Account.svelte';
   import DeleteAccount from './pages/DeleteAccount.svelte';
   import WelcomeStart from './pages/WelcomeStart.svelte';
@@ -175,9 +176,12 @@
    * tablet, and full screen otherwise. Only this view has it, before the
    * other routes; /dives/new comes first, or it would be taken for a dive.
    */
+  /** The detail pane emptied, back to its first view (pages/PaneEmpty.svelte, to-do #33). */
+  const PANE_EMPTY = { path: '/pane/empty', component: PaneEmpty };
+
   const logbookRoutes = [
     appRoutes[0],
-    { path: '/', component: Logbook, master: true, detailRoutes: [{ path: '/dives/:id', component: DiveDetail }] },
+    { path: '/', component: Logbook, master: true, detailRoutes: [{ path: '/dives/:id', component: DiveDetail }, PANE_EMPTY] },
     ...appRoutes,
   ];
 
@@ -193,6 +197,7 @@
       detailRoutes: [
         { path: '/statistics/result', component: StatisticsResult },
         { path: '/statistics/dives/', component: StatisticsDives },
+        PANE_EMPTY,
       ],
     },
     ...appRoutes,
