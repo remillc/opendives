@@ -393,6 +393,9 @@ function planFacts(result, request, prefs) {
       usedPercent: c.gasUsedMl + c.reserveMl > 0 ? (c.gasUsedMl / (c.gasUsedMl + c.reserveMl)) * 100 : 0,
     })),
     total: planMinutes(result.runtimeSeconds),
+    decoFigure: result.stops.length
+      ? t('plan.decoStopsValue', { n: String(result.stops.length), time: planMinutes(result.stops.reduce((sum, st) => sum + st.durationSeconds, 0)) })
+      : '0',
     deepest: formatDepth(result.maxDepthMm, prefs),
     oxygen: t('plan.oxygenValue', { cns: result.cns, otu: result.otu }),
   };
@@ -455,6 +458,8 @@ table { width: 100%; border-collapse: collapse; } th { text-align: left; color: 
 td { padding: 3px 4px; border-bottom: 1px solid #ECECEA; }
 footer { margin-top: 16px; border-top: 1px solid #DADAD6; padding-top: 6px; color: #4A4D52; font-size: 8.5pt; }
 .vol { margin: 0 0 10px; break-inside: avoid; }
+.tiles { display: flex; gap: 8px; margin: 10px 0 4px; } .tile { flex: 1; background: #F4F4F2; border-radius: 8px; padding: 6px 10px; } .tile span { display: block; color: #4A4D52; font-size: 8.5pt; } .tile b { font-size: 16pt; }
+mark { background: #D4E2F2; color: #0B2440; border-radius: 4px; padding: 0 4px; } .ok { color: #2E7D32; }
 .vol-head { display: flex; justify-content: space-between; align-items: baseline; }
 .vol-total { font-size: 14pt; }
 .vol-bar { display: flex; height: 7px; margin-top: 4px; border-radius: 4px; overflow: hidden; background: #FBE3B2; }
@@ -464,10 +469,11 @@ footer { margin-top: 16px; border-top: 1px solid #DADAD6; padding-top: 6px; colo
 .sw { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 4px; vertical-align: middle; } .sw-used { background: #B4530F; }
 </style></head><body>
 <h1>${esc(title)}</h1><div class="sub">${esc(t('plan.shareHeadline', { depth: f.deepest, time: f.total }))}</div>
+<div class="tiles"><div class="tile"><span>${esc(t('plan.totalTime'))}</span><b>${esc(f.total)}</b></div><div class="tile"><span>${esc(t('plan.decoStops'))}</span><b>${esc(f.decoFigure)}</b></div></div>
 <h2>${esc(t('share.profile'))}</h2>${planSvg(result)}
 ${f.levels.length ? `<h2>${esc(t('plan.levels'))}</h2><div>${esc(f.levels.join(', '))}</div>` : ''}
 <h2>${esc(t('plan.stop'))}</h2>
-${f.stops.length ? `<table><thead><tr><th>${esc(t('plan.stop'))}</th><th>${esc(t('plan.duration'))}</th><th>${esc(t('plan.runtime'))}</th><th>${esc(t('plan.gasColumn'))}</th></tr></thead><tbody>${f.stops.map((s) => `<tr><td>${esc(s.depth)}</td><td>${esc(s.duration)}</td><td>${esc(s.runtime)}</td><td>${esc(s.gas)}</td></tr>`).join('')}</tbody></table>` : `<div>${esc(t('plan.noStop'))}</div>`}
+${f.stops.length ? `<table><thead><tr><th>${esc(t('plan.stop'))}</th><th>${esc(t('plan.duration'))}</th><th>${esc(t('plan.runtime'))}</th><th>${esc(t('plan.gasColumn'))}</th></tr></thead><tbody>${f.stops.map((s, i, all) => `<tr><td>${esc(s.depth)}</td><td>${esc(s.duration)}</td><td>${esc(s.runtime)}</td><td>${i === 0 || s.gas !== all[i - 1].gas ? `<mark>${esc(s.gas)}</mark>` : esc(s.gas)}</td></tr>`).join('')}</tbody></table>` : `<div class="ok">✓ ${esc(t('plan.noStopShort'))}</div>`}
 <h2>${esc(t('plan.volumes'))}</h2>
 ${f.gases
   .map(

@@ -535,6 +535,14 @@
       : '',
   );
 
+  /** The "Paliers de déco" tile: the number of deco stops, with their total time when there are some ("3 (8 min)"). */
+  const decoFigure = $derived.by(() => {
+    const stops = result?.stops ?? [];
+    if (!stops.length) return '0';
+    const total = stops.reduce((sum, s) => sum + s.durationSeconds, 0);
+    return t('plan.decoStopsValue', { n: formatNumber(stops.length, 0), time: minutes(total) });
+  });
+
   /** "Volume nécessaire par gaz": what is breathed plus the reserve. */
   const volumeRows = $derived.by(() => {
     if (!result) return [];
@@ -865,9 +873,20 @@
       {#if failed}
         <p class="od-planner--note">{t('plan.failed')}</p>
       {:else if result}
-        <h2 class="od-planner--section-title">{t('plan.result', { time: minutes(result.runtimeSeconds) })}</h2>
-        <div class="od-planner--plan">
+        <!-- The result in one card (task 2026-11-13-95): key figures, stops or status, volumes, oxygen. -->
+        <h2 class="od-planner--result-title">{t('plan.resultTitle')}</h2>
+        <section class="od-planner--card" aria-label={t('plan.resultName', { time: minutes(result.runtimeSeconds) })}>
           {#if errorText}<p class="od-planner--error" role="alert">{errorText}</p>{/if}
+          <div class="od-planner--tiles">
+            <div class="od-planner--tile">
+              <span class="od-planner--tile-label">{t('plan.totalTime')}</span>
+              <span class="od-planner--tile-value od-value">{formatNumber(Math.round(result.runtimeSeconds / 60), 0)}<small>{t('units.minutes')}</small></span>
+            </div>
+            <div class="od-planner--tile">
+              <span class="od-planner--tile-label">{t('plan.decoStops')}</span>
+              <span class="od-planner--tile-value od-value">{decoFigure}</span>
+            </div>
+          </div>
           {#if rows.length}
             <table class="od-planner--rows od-value">
               <thead>
@@ -891,19 +910,18 @@
                     <td class="od-planner--num">{row.start}</td>
                     <td class="od-planner--num">{row.duration}</td>
                     <td class="od-planner--num od-planner--row-end">{row.end}</td>
-                    <td>{#if row.gasChange}<span class="od-planner--gas-chip">{row.gas}</span>{:else}{row.gas}{/if}</td>
+                    <!-- The starting gas is highlighted like a gas change (task 2026-11-13-96). -->
+                    <td>{#if row.gasChange || i === 0}<span class="od-planner--gas-chip">{row.gas}</span>{:else}{row.gas}{/if}</td>
                   </tr>
                 {/each}
               </tbody>
             </table>
             <p class="od-planner--rows-note">{t('plan.rowsNote')}</p>
           {:else}
-            <p class="od-planner--no-stop">{t('plan.noStop')}</p>
+            <p class="od-planner--no-stop"><Icon name="check" size={20} />{t('plan.noStopShort')}</p>
           {/if}
-        </div>
 
-        <h2 class="od-planner--section-title">{t('plan.volumes')}</h2>
-        <div class="od-planner--results" class:ios={theme.ios}>
+          <h3 class="od-planner--card-heading">{t('plan.volumes')}</h3>
           {#each volumeRows as row (row.key)}
             <!-- Gas and total, the bar, then the legend of its two parts (task 2026-11-13-93). -->
             <div class="od-planner--volume" role="group" aria-label={row.name}>
@@ -945,7 +963,7 @@
               <span>{t('plan.otuLabel')} <b class="od-value">{result.otu}</b></span>
             </div>
           </div>
-        </div>
+        </section>
         <p class="od-planner--note">{t(planner.source ? 'plan.noteFromDive' : 'plan.note')}</p>
       {:else}
         <div class="skeleton-block od-planner--loading" aria-busy="true" aria-label={t('plan.computing')}></div>
@@ -1387,16 +1405,6 @@
       }
     }
 
-    .od-planner--plan {
-      margin: 0 16px;
-      border-radius: 12px;
-      background: var(--od-surface);
-      overflow: hidden;
-
-      :global(.ios) & {
-        border-radius: 10px;
-      }
-    }
 
     table {
       width: 100%;
@@ -1498,6 +1506,78 @@
       white-space: nowrap;
     }
 
+    /* The result card (task 2026-11-13-95). */
+    .od-planner--result-title {
+      margin: 24px 16px 8px;
+      font-size: 18px;
+      line-height: 24px;
+      font-weight: 700;
+      color: var(--od-text);
+    }
+
+    .od-planner--card {
+      margin: 0 16px;
+      border-radius: 20px;
+      background: var(--od-surface);
+      overflow: hidden;
+
+      > .od-planner--volume,
+      > .od-planner--result {
+        border-top: 1px solid var(--od-separator);
+      }
+
+      /* The first gas sits right under its heading, which carries the divider. */
+      > .od-planner--card-heading + .od-planner--volume {
+        border-top: none;
+      }
+    }
+
+    .od-planner--tiles {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      padding: 12px 12px 4px;
+    }
+
+    .od-planner--tile {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      background: var(--od-background);
+    }
+
+    .od-planner--tile-label {
+      font-size: 13px;
+      line-height: 18px;
+      color: var(--od-text-2);
+    }
+
+    .od-planner--tile-value {
+      font-size: 24px;
+      line-height: 32px;
+      font-weight: 700;
+      color: var(--od-text);
+
+      small {
+        margin-left: 4px;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--od-text-2);
+      }
+    }
+
+    .od-planner--card-heading {
+      margin: 0;
+      padding: 16px 16px 4px;
+      border-top: 1px solid var(--od-separator);
+      font-size: 14px;
+      line-height: 20px;
+      font-weight: 500;
+      color: var(--od-text);
+    }
+
     .od-planner--no-stop,
     .od-planner--error {
       margin: 0;
@@ -1510,17 +1590,19 @@
       font-weight: 500;
     }
 
-    .od-planner--results {
+    /* No deco: one status line with a check (task 2026-11-13-95). */
+    .od-planner--no-stop {
       display: flex;
-      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      color: var(--od-text);
 
-      &.ios {
-        margin: 0 16px;
-        border-radius: 10px;
-        background: var(--od-surface);
-        overflow: hidden;
+      :global(svg) {
+        flex: none;
+        color: var(--od-status-ok);
       }
     }
+
 
     .od-planner--result {
       min-height: 72px;
