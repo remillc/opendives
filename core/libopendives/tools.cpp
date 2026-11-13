@@ -190,6 +190,14 @@ gasmix blend_gasmix(double o2, double he)
 
 double blend_z(double o2, double he, double bar)
 {
+	// The core reads an oxygen fraction of 0 as air (get_o2()), which is wrong for
+	// helium alone: Z is linear in the fractions, so extrapolate it from 1 and 2
+	// permille of oxygen (the nitrogen fraction goes slightly negative, which
+	// the core's linear formula accepts).
+	if (lrint(o2 * 1000) == 0 && lrint(he * 1000) > 0) {
+		gasmix g1 = blend_gasmix(0.001, he), g2 = blend_gasmix(0.002, he);
+		return 2.0 * gas_compressibility_factor(g1, bar) - gas_compressibility_factor(g2, bar);
+	}
 	return gas_compressibility_factor(blend_gasmix(o2, he), bar);
 }
 
