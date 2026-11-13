@@ -109,6 +109,8 @@
     /* A cylinder with no pressure data: grey diagonal hatching (task 2026-11-13-84). */
     --od-cylinder-no-pressure: #F1F1EF;
     --od-cylinder-no-pressure-stripe: #D9D9D5;
+    /* The small cylinder icon of the gas rows (task 2026-11-13-87). */
+    --od-cylinder-icon: #D4E2F2;
     /* Progress bars: the wavy indicator and its end dot, on the track. */
     --od-progress-active: #114477;
     --od-progress-track: #D4E2F2;
@@ -227,6 +229,7 @@
     --od-cylinder-level: #FF8A80;
     --od-cylinder-no-pressure: #1C1D1F;
     --od-cylinder-no-pressure-stripe: #3A3C40;
+    --od-cylinder-icon: #1E3552;
     --od-progress-active: #8FB6E6;
     --od-progress-track: #1E3552;
     --od-rebreather-canister: #3A3E43;
