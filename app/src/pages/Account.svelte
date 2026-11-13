@@ -334,7 +334,7 @@
       white-space: normal;
     }
 
-    /* "Sync now": a real button centred in its row (style: .od-tonal-button). */
+    /* "Sync": a real button centred in its row (style: .od-tonal-button). */
     .od-account--sync-now {
       padding: 12px 16px 14px;
       display: flex;

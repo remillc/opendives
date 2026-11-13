@@ -19,7 +19,7 @@
     // A bound notebook, as the mock-ups draw it; its spine is an accent (see `accents`).
     logbook: 'M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z',
     sites: 'M12 21s-6-5.3-6-10a6 6 0 0 1 12 0c0 4.7-6 10-6 10zM14 11a2 2 0 1 1-4 0 2 2 0 0 1 4 0z',
-    statistics: 'M5 20V11M12 20V5M19 20v-7',
+    statistics: 'M3 20h18M6 16v-4M10.5 16V6M15 16v-6M19.5 16V9',
     tools: 'M4 7h10M18 7h2M4 17h4M12 17h8M18 7a2 2 0 1 1-4 0 2 2 0 0 1 4 0zM12 17a2 2 0 1 1-4 0 2 2 0 0 1 4 0z',
     plus: 'M12 5v14M5 12h14',
     // Sharing and scanning by QR code: the three finder squares and the data blocks.

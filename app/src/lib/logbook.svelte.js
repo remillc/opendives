@@ -17,7 +17,7 @@ import { applyDeviceSettings, keepCylinderLibrary, keepDiveComputers, prefsAfter
  * - offline: the device's copy, the server did not answer;
  * - local: logbook on this device only (no account);
  * - manual: "Sync automatically" is off: nothing is sent or fetched until
- *   "Sync now" (spec, section 4, "Manual synchronisation").
+ *   "Sync" (spec, section 4, "Manual synchronisation").
  * @typedef {'syncing'|'cloud'|'offline'|'local'|'manual'} SyncState
  */
 
@@ -504,7 +504,7 @@ function undoCleared() {
 }
 
 /**
- * The outcome of a sync, for the message after "Sync now": done; offline
+ * The outcome of a sync, for the message after "Sync": done; offline
  * (the server did not answer); failed (it answered, the exchange stopped).
  * @typedef {'done'|'offline'|'failed'} SyncOutcome
  */
@@ -761,7 +761,7 @@ export function setAutoSync(value) {
 }
 
 /**
- * "Sync now", in either mode. A logbook already shown: the exchange of the
+ * "Sync", in either mode. A logbook already shown: the exchange of the
  * automatic synchronisation (send, fetch, merge; read again only when the
  * cloud brought changes), so that only the status line moves, not the list
  * nor the menu (to-do #2). Otherwise (no copy yet, an error): the full load.
@@ -870,7 +870,7 @@ function markSynced() {
  * it is read; when the server's head is the copy's, the log is up to date and
  * nothing else is done. Otherwise the core syncs and reads the log again.
  * With automatic synchronisation off, only the device's copy is read, unless
- * `force` ("Sync now") or there is no copy yet.
+ * `force` ("Sync") or there is no copy yet.
  * @param {boolean} force
  * @param {typeof early} [pre] answers of the calls sent at start (boot), for the first load
  * @returns {Promise<boolean>} false when no cloud account is configured
@@ -973,7 +973,7 @@ let loadStarted = false;
  * Loads the logbook: the cloud log when an account is configured, otherwise
  * the log on this device.
  * @param {{ force?: boolean }} [options] force: exchange with the server even
- *   with automatic synchronisation off ("Sync now")
+ *   with automatic synchronisation off ("Sync")
  */
 export async function loadLogbook({ force = false } = {}) {
   undoCleared();
@@ -987,7 +987,7 @@ export async function loadLogbook({ force = false } = {}) {
   try {
     if (await loadCloud(force, pre)) {
       // Manual synchronisation: the state says so at all times, after a
-      // "Sync now" too (spec, section 4).
+      // "Sync" too (spec, section 4).
       if (!logbook.autoSync) logbook.sync = 'manual';
       await countPending();
       await readConflicts();
