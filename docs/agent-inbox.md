@@ -2174,3 +2174,12 @@ Christian's decision of 13 November 2026. Each gas row of « Volume nécessaire 
 - a legend under the bar, 13 sp secondary text, with a small swatch for each part: « Consommé 52 pi³ » and « Réserve à deux 40 pi³ » (values in ink, semibold).
 - The long sentence « 52 pi³ consommés et 40 pi³ de réserve pour remonter à deux » is no longer shown; it stays as the row's accessible name, with the total.
 The row still opens the gas detail. Several gases: one such block each. Same layout on the tablet and in the shared plan. Check on the phone emulator.
+
+## [ ] 2026-11-13-94 Planner: oxygen exposure row like the gas rows
+
+Christian's decision of 13 November 2026, follow-up to task 93. The « Exposition à l'oxygène » row of the planner result takes the same layout as the gas rows:
+- first line: « Exposition à l'oxygène » on the left (16 sp), « CNS 18 % » on the right, large (22 sp bold);
+- the bar under it, 10 dp high, CNS fill in the tertiary colour on its container, as today;
+- under the bar, 13 sp secondary text: « Limite CNS 100 % » on the left, « OTU 41 » on the right (value in ink, semibold).
+- Accessible name of the group: « Exposition à l'oxygène : CNS 18 % de la limite, 41 OTU ».
+The mock-up `android-planificateur` on the canvas also shows a new « Résultat » card around these rows; that card is not decided yet: do not build it. Same row layout on the tablet and in the shared plan. Check on the phone emulator.
