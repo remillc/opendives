@@ -8,7 +8,6 @@ import App from './App.svelte';
 import { mark, observePaints } from './lib/perf.js';
 import { boot } from './lib/logbook.svelte.js';
 import { noteFirstOpen } from './lib/review-prompt.js';
-import './lib/paper-grain.svelte.js'; // TRIAL, task 2026-11-13-108
 import { releaseLaunchScreen } from './lib/launch.js';
 
 observePaints();
@@ -17,6 +16,12 @@ mark('main');
 // built: the settings of this device first, then the account and the device's
 // copy of the log (on a first launch, nothing is loaded until a choice).
 noteFirstOpen();
+// The paper grain trial's choice (task 2026-11-13-108): the grain is now always on (task 109).
+try {
+  localStorage.removeItem('od.paperGrain');
+} catch {
+  // Not fatal.
+}
 boot();
 
 Framework7.use(Framework7Svelte);

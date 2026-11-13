@@ -91,7 +91,6 @@
       "other": "Renuméroter les plongées cochées"
     },
     "menuRenumber": "Renuméroter les plongées",
-    "menuPaperGrain": "Grain papier (essai)",
     "selectionClose": "Quitter la sélection",
     "selectionActions": "Actions sur la sélection",
     "selectionMore": "Plus d’options : filtrer, renuméroter, ajouter à un voyage",
@@ -1658,7 +1657,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
-      "Essai : grain papier sur la bande d’en-tête des sections et du menu latéral ; l’élément « Grain papier (essai) » du menu ⋮ du Carnet l’active ou le retire.",
+      "Grain papier sur la bande d’en-tête des sections et du menu latéral.",
       "Logo, mode clair : le demi-cercle sous les vagues est gris clair et les deux bulles sont bleues ; dans l’icône de l’app, l’arc du haut a le même gris, donc l’anneau est d’une seule couleur. Le mode sombre ne change pas.",
       "Filtre, critère Voyage : les voyages sont triés par ordre alphabétique.",
       "Fiche d’une plongée : en faisant défiler, le nom du site s’affiche dans la barre du haut.",
