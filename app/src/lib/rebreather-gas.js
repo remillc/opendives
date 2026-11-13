@@ -5,6 +5,32 @@
 // name of the card.
 
 /**
+ * The drawing's layout, in its own units (1 unit = 1 px at its full 140 height):
+ * the unit takes 218, split at its centre into the diluent's and the oxygen's
+ * text columns; each cylinder beside it takes REBREATHER_COLUMN, centred on it.
+ */
+export const REBREATHER_UNIT = 218;
+export const REBREATHER_COLUMN = 108;
+
+/** The drawing's width with `others` cylinders beside the unit. @param {number} others */
+export const rebreatherWidth = (others) => REBREATHER_UNIT + REBREATHER_COLUMN * others;
+
+/**
+ * The text columns under the drawing, as CSS grid tracks: the two halves of the
+ * unit, then one track per cylinder beside it ("109fr 109fr 108fr").
+ * @param {number} others
+ */
+export const rebreatherTracks = (others) => `${REBREATHER_UNIT / 2}fr ${REBREATHER_UNIT / 2}fr${` ${REBREATHER_COLUMN}fr`.repeat(others)}`;
+
+/**
+ * The item shown in each text column, in the order of rebreatherTracks: the
+ * diluent, the oxygen, then the cylinders beside the unit; -1 leaves a column
+ * empty (no such cylinder, or the oxygen is the diluent).
+ * @param {{ diluent: number, oxygen: number, others: number[] }} layout
+ */
+export const rebreatherCells = (layout) => [layout.diluent, layout.oxygen === layout.diluent ? -1 : layout.oxygen, ...layout.others];
+
+/**
  * Split the cylinders of a CCR dive by their use. The first "diluent" goes on
  * the left of the unit, the first "oxygen" on the right; every other cylinder
  * (bailout, stages, a second diluent or oxygen) is drawn beside the unit, in

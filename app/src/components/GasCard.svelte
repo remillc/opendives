@@ -10,6 +10,7 @@
   // computes one. Nothing to tap.
   import CylinderDrawing from './CylinderDrawing.svelte';
   import RebreatherDrawing from './RebreatherDrawing.svelte';
+  import { rebreatherCells, rebreatherTracks, rebreatherWidth } from '../lib/rebreather-gas.js';
 
   /**
    * @type {{
@@ -24,26 +25,28 @@
    */
   let { label, items, changes = '', sac = null, rebreather = null } = $props();
 
-  /** In a rebreather view: diluent, oxygen, then the others, each present one a text column. */
-  const columns = $derived(rebreather ? [rebreather.diluent, ...(rebreather.oxygen === rebreather.diluent ? [] : [rebreather.oxygen]), ...rebreather.others].filter((i) => i >= 0) : []);
+  /** In a rebreather view: the diluent's and the oxygen's halves of the unit, then one column per cylinder beside it. */
+  const cells = $derived(rebreather ? rebreatherCells(rebreather) : []);
 </script>
 
 <div class="od-gas-card" role="group" aria-label={label}>
   {#if rebreather}
-    <!-- As wide as the drawing, so that each column stays under its cylinder on a wide pane. -->
-    <div class="od-gas-card--rebreather">
+    <!-- At most the drawing's own width, the text columns on the same grid as the drawing. -->
+    <div class="od-gas-card--rebreather" style:max-width="{rebreatherWidth(rebreather.others.length)}px">
       <RebreatherDrawing
         diluent={rebreather.diluent >= 0 ? items[rebreather.diluent] : null}
         oxygen={rebreather.oxygen >= 0 ? items[rebreather.oxygen] : null}
         others={rebreather.others.map((i) => items[i])}
         marks={rebreather.marks}
       />
-      <div class="od-gas-card--columns" style:grid-template-columns="repeat({columns.length}, 1fr)">
-        {#each columns as i (i)}
+      <div class="od-gas-card--columns" style:grid-template-columns={rebreatherTracks(rebreather.others.length)}>
+        {#each cells as i, n (n)}
           <div class="od-gas-card--cylinder">
-            <span class="od-gas-card--gas">{items[i].gas}</span>
-            {#if items[i].line}<span class="od-gas-card--line">{items[i].line}</span>{/if}
-            {#if items[i].range}<span class="od-gas-card--line od-value">{items[i].range}</span>{/if}
+            {#if i >= 0}
+              <span class="od-gas-card--gas">{items[i].gas}</span>
+              {#if items[i].line}<span class="od-gas-card--line">{items[i].line}</span>{/if}
+              {#if items[i].range}<span class="od-gas-card--line od-value">{items[i].range}</span>{/if}
+            {/if}
           </div>
         {/each}
       </div>
@@ -82,7 +85,6 @@
     }
 
     .od-gas-card--rebreather {
-      max-width: 360px;
       margin: 0 auto;
     }
 

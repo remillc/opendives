@@ -15,6 +15,8 @@
   // at 93.5 %, so that both are 134 tall with their bottoms aligned. The DIL and
   // O₂ marks stay outside the scaling, at their 11 px size.
 
+  import { REBREATHER_COLUMN, rebreatherWidth } from '../lib/rebreather-gas.js';
+
   /** @typedef {{ ratio: number, startRatio: number|null, hatched?: boolean }} Fill */
 
   /** @type {{ diluent?: Fill|null, oxygen?: Fill|null, others?: Fill[], marks: { diluent: string, oxygen: string, bailout: string } }} */
@@ -25,7 +27,9 @@
   // Cylinders in the unit: tall, valve at the bottom.
   const UNIT = { top: 6, height: 164, width: 36, rx: 17.3 };
   // Cylinders beside the unit: open-circuit style, valve on top.
-  const SIDE = { top: 58, height: 130, width: 40, rx: 19.2, x: 252, step: 64 };
+  // One step = REBREATHER_COLUMN once scaled: each cylinder beside the unit is
+  // centred in its own text column (lib/rebreather-gas.js).
+  const SIDE = { top: 58, height: 130, width: 40, rx: 19.2, x: 252, step: REBREATHER_COLUMN / 0.935 };
   // The two scalings, in the drawing's own units (the mock-up's values).
   const UNIT_SCALE = { x: 34.42, y: -0.1, k: 0.684 };
   const SIDE_SCALE = { x: 17.7, y: -41.8, k: 0.935 };
@@ -33,7 +37,7 @@
   const unitPoint = (x, y) => ({ x: UNIT_SCALE.x + x * UNIT_SCALE.k, y: UNIT_SCALE.y + y * UNIT_SCALE.k });
   const dilMark = unitPoint(66, 112);
   const oxyMark = unitPoint(152, 112);
-  const width = $derived(others.length === 0 ? 218 : Math.round(326 + SIDE.step * SIDE_SCALE.k * (others.length - 1)));
+  const width = $derived(rebreatherWidth(others.length));
 
   /**
    * One cylinder with its drawn levels: the end level (full gradient) and the
@@ -55,9 +59,10 @@
     /** @param {number} v */
     const lineY = (v) => Math.min(bottom - 0.75, Math.max(g.top + 0.75, v));
     return {
+      // The geometry first: SIDE has its own x (the first cylinder's), which must not win over this one's.
+      ...g,
       key,
       x,
-      ...g,
       bottom,
       side,
       hatched,
@@ -144,11 +149,12 @@
 
 <style>
   @layer od.components {
-    /* 140 tall on every screen (task 2026-11-13-84), centred in the card's width. */
+    /* As wide as its box, which the card keeps at most the drawing's own width
+       (140 tall, task 2026-11-13-84), so that the text columns line up with it. */
     .od-rebreather-drawing {
       display: block;
       width: 100%;
-      height: 140px;
+      height: auto;
     }
 
     .od-rebreather-drawing--hose {
