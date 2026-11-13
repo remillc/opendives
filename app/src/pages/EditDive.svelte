@@ -1853,4 +1853,10 @@
       flex: none;
     }
   }
+
+  /* The suggestion's « Utiliser » keeps its own width: Framework7's unlayered `button { width: 100% }`
+     would win over the layered rule and push it over the texts (bug of 13 November 2026). */
+  .od-edit-dive--suggestion-use {
+    width: auto;
+  }
 </style>
