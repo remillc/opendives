@@ -283,15 +283,15 @@
       flex: 1;
     }
 
-    /* Count of waiting map updates: white on the secondary role, a number and a name, not the colour alone. */
+    /* Count of waiting map updates: on the tertiary role (what waits for the diver), a number and a name, not the colour alone. */
     .badge {
       min-width: 24px;
       height: 24px;
       padding: 0 7px;
       box-sizing: border-box;
       border-radius: 12px;
-      background: var(--od-secondary);
-      color: var(--od-on-secondary);
+      background: var(--od-tertiary);
+      color: var(--od-on-tertiary);
       font-size: 12px;
       line-height: 24px;
       font-weight: 700;

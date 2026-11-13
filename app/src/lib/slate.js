@@ -256,7 +256,7 @@ export function cardHtml(card, layout) {
     + `<div style="margin-top:0.6em">${esc(card.note)}</div>`
     + `<div style="margin-top:0.4em">${esc(card.gasNeeded)}</div>`
     + `<div style="margin-top:0.4em">${esc(card.oxygen)}</div>`
-    + `<div style="margin-top:0.7em;font-size:${layout.footerPt}pt;color:#4A4D52">${esc(card.footer)}</div>`
+    + `<div style="margin-top:0.7em;font-size:${layout.footerPt}pt;color:#4B4A47">${esc(card.footer)}</div>`
     + `</div>`;
 }
 

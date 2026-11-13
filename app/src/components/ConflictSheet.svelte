@@ -327,7 +327,7 @@
         {#if detailItem}
           <button type="button" class="od-conflict-sheet--tonal od-conflict-sheet--wide" onclick={dismiss}>{t('conflict.back')}</button>
         {:else}
-          <button type="button" class="od-conflict-sheet--tonal od-conflict-sheet--wide" disabled={busy} onclick={choose}>{t('conflict.continue')}</button>
+          <button type="button" class="od-conflict-sheet--tonal od-conflict-sheet--continue od-conflict-sheet--wide" disabled={busy} onclick={choose}>{t('conflict.continue')}</button>
           <button type="button" class="od-conflict-sheet--later" disabled={busy} onclick={onlater}>{t('conflict.later')}</button>
         {/if}
       </div>
@@ -345,7 +345,7 @@
           {#if detailItem}
             <button type="button" class="od-conflict-sheet--tonal od-conflict-sheet--bar-action" onclick={dismiss}>{t('conflict.back')}</button>
           {:else}
-            <button type="button" class="od-conflict-sheet--tonal od-conflict-sheet--bar-action" disabled={busy} onclick={choose}>{t('conflict.continue')}</button>
+            <button type="button" class="od-conflict-sheet--tonal od-conflict-sheet--continue od-conflict-sheet--bar-action" disabled={busy} onclick={choose}>{t('conflict.continue')}</button>
           {/if}
         </div>
         <div class="od-conflict-sheet--full-body">
@@ -358,7 +358,7 @@
       <div class="od-conflict-sheet--md-body">{@render body()}</div>
       {#snippet actions()}
         <button type="button" disabled={busy} onclick={onlater}>{t('conflict.later')}</button>
-        <button type="button" class="od-conflict-sheet--tonal" disabled={busy} onclick={choose}>{t('conflict.continue')}</button>
+        <button type="button" class="od-conflict-sheet--tonal od-conflict-sheet--continue" disabled={busy} onclick={choose}>{t('conflict.continue')}</button>
       {/snippet}
     </Md3Dialog>
   {/if}
@@ -833,6 +833,12 @@
       margin: 12px 0 0;
       font-size: 14px;
       color: var(--od-alarm);
+    }
+
+    /* « Continuer »: on the tertiary container, what waits for the diver (task 2026-11-13-103). */
+    button.od-conflict-sheet--tonal.od-conflict-sheet--continue {
+      background: var(--od-tertiary-container);
+      color: var(--od-on-tertiary-container);
     }
 
     button.od-conflict-sheet--tonal.od-conflict-sheet--tonal {
