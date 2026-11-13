@@ -4,7 +4,12 @@
   // connected button group on Android (2 dp gaps, 40 dp high; unselected tonal
   // with 8 dp inner corners and fully rounded outer ends; selected filled with
   // the ink and fully rounded; no check mark), iOS segmented control on iOS.
+  // Option `clearable`: a tap on the selected button clears the choice (onchange
+  // gets ''). Option `marked`: a check icon on the selected button, in the
+  // secondary colour (the "Ce lest était" choice, docs/mockups/android-edition.dc.html).
   // Accessibility: a radio group, roving tabindex, arrow keys move the choice.
+
+  import Icon from './Icon.svelte';
 
   /**
    * @type {{
@@ -14,9 +19,11 @@
    *   ariaLabel?: string,
    *   ariaLabelledby?: string,
    *   class?: string,
+   *   clearable?: boolean,
+   *   marked?: boolean,
    * }}
    */
-  let { options, value, onchange, ariaLabel, ariaLabelledby, class: extra = '' } = $props();
+  let { options, value, onchange, ariaLabel, ariaLabelledby, class: extra = '', clearable = false, marked = false } = $props();
 
   /** @type {HTMLDivElement|undefined} */
   let group = $state();
@@ -33,7 +40,7 @@
   }
 </script>
 
-<div bind:this={group} class="od-button-group {extra}" role="radiogroup" aria-label={ariaLabel} aria-labelledby={ariaLabelledby}>
+<div bind:this={group} class="od-button-group {extra}" class:od-button-group--marked={marked} role="radiogroup" aria-label={ariaLabel} aria-labelledby={ariaLabelledby}>
   {#each options as option, i (option.value)}
     <button
       type="button"
@@ -42,9 +49,10 @@
       class:od-button-group--selected={value === option.value}
       aria-checked={value === option.value}
       tabindex={value === option.value || (!options.some((o) => o.value === value) && i === 0) ? 0 : -1}
-      onclick={() => value !== option.value && onchange(option.value)}
+      onclick={() => (value !== option.value ? onchange(option.value) : clearable && onchange(''))}
       onkeydown={(e) => key(e, i)}
     >
+      {#if marked && value === option.value}<Icon name="check" size={18} weight={2.4} />{/if}
       {option.label}
     </button>
   {/each}
@@ -75,6 +83,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      gap: 6px;
       text-align: center;
       cursor: pointer;
 
@@ -98,6 +107,12 @@
         outline: 2px solid var(--od-primary-action);
         outline-offset: 2px;
       }
+    }
+
+    /* The marked variant: secondary colour, with the check icon. */
+    .od-button-group--marked .od-button-group--button.od-button-group--selected {
+      background: var(--od-secondary);
+      color: var(--od-on-secondary);
     }
 
     /* iOS: a segmented control. */

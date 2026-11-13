@@ -417,6 +417,12 @@
     "tissuesLabel": "Tissue loading, from fast to slow compartments",
     "layers": "Curves shown"
   },
+  "weightFeedback": {
+    "title": "This weight was",
+    "tooLight": "Too light",
+    "ok": "Just right",
+    "tooHeavy": "Too heavy"
+  },
   "units": {
     "meters": "m",
     "feet": "ft",
@@ -1078,6 +1084,10 @@
     "weight": "Weight",
     "addWeight": "Add a weight",
     "removeWeight": "Remove this weight",
+    "weightSuggestion": "Suggestion: {weight}",
+    "weightSuggestionFrom": "Like on {date}",
+    "weightSuggestionLabel": "Suggestion: {weight}, like on {date}",
+    "weightUse": "Use",
     "air": "Air",
     "water": "Water",
     "waterType": "Water type",
@@ -1600,6 +1610,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Weights: Edit dive suggests a weight from the most recent dive with the same suit, cylinders and water type, adjusted by 2 lb (1 kg) if that weight was too light or too heavy; Use puts it in the dive. “This weight was” (Too light, Just right, Too heavy) is set in Edit dive and in the dive detail, under Equipment; the choice is saved as an English tag (weight-too-light, weight-ok, weight-too-heavy), which Subsurface also shows.",
       "Planner, in cubic feet: the SAC from Settings is used as set, not rounded to 0.01 cu ft/min; only a SAC measured on a dive is rounded.",
       "Tools and Statistics: a row no longer stays tinted grey after turning a large phone.",
       "Planner: the result fits in one card, with the total time and the deco stops in large type, then the stops or “Ascent with no stop”, the volumes and the oxygen.",

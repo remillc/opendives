@@ -30,11 +30,12 @@
   import { filter } from '../lib/filter.svelte.js';
   import { horizontalSwipe, swipeGoesThrough } from '../lib/swipe.js';
   import Stars from '../components/Stars.svelte';
-  import { logbook, deleteDive, tripChange } from '../lib/logbook.svelte.js';
+  import { logbook, deleteDive, saveDiveChanges, tripChange } from '../lib/logbook.svelte.js';
   import { layout } from '../lib/layout.svelte.js';
   import { shownTrip } from '../lib/trip-shown.js';
   import { settings } from '../lib/settings.svelte.js';
   import { offerUndo } from '../lib/undo.js';
+  import { feedbackOf, visibleTags, withFeedback } from '../lib/weight-feedback.js';
   import { confirmAction } from '../lib/dialogs.js';
   import { readySiteMap } from '../lib/site-image.js';
   import { forgetDive, keepDive, preloadDives, readyDive } from '../lib/dive-preload.js';
@@ -464,8 +465,26 @@
   const hasGas = $derived(dive?.divemode !== 'Freedive' && (gasCylinders.length > 0 || !!sac));
   const hasEquipment = $derived(!!dive?.suit || weights.length > 0 || computers.length > 0);
 
-  // Collapsed by default; a tap opens the weights by location.
+  // Collapsed by default; a tap opens the weights by location and "Ce lest était".
   let equipmentOpen = $state(false);
+  const feedback = $derived(feedbackOf(dive?.tags ?? []));
+
+  /**
+   * "Ce lest était": saved as a tag, one undoable step like an edit made in
+   * "Modifier la plongée" (the choice is cleared when it is tapped again).
+   * @param {string} value 'too-light', 'ok', 'too-heavy' or '' to clear
+   */
+  async function setFeedback(value) {
+    if (!dive) return;
+    try {
+      await saveDiveChanges(dive.id, { tags: withFeedback(dive.tags, /** @type {import('../lib/weight-feedback.js').WeightFeedback|''} */ (value)) });
+      offerUndo(t('edit.saved'), undefined, 6000);
+    } catch (e) {
+      const code = String(/** @type {any} */ (e)?.message ?? '');
+      console.error('Weight feedback', code);
+      showSnackbar(code.startsWith('WRITE_LOCKED') ? t('edit.writeLocked') : t('edit.failed'));
+    }
+  }
   const equipmentName = $derived(
     equipmentLabel(
       { suit: dive?.suit ?? '', weight: weights.length ? weightTotal : '', computer: computers[0]?.name ?? '', open: equipmentOpen, opens: equipmentOpens(weightEntries, computers.length) },
@@ -620,11 +639,11 @@
     {/if}
 
     <!-- Tags right under Notes (task 2026-11-12-66). -->
-    {#if dive.tags.length}
+    {#if visibleTags(dive.tags).length}
       <section class="od-dive-detail--section">
-        <h2 class="od-dive-detail--section-title">{t('detail.tags', { n: dive.tags.length })}</h2>
+        <h2 class="od-dive-detail--section-title">{t('detail.tags', { n: visibleTags(dive.tags).length })}</h2>
         <ul class="od-dive-detail--tags">
-          {#each dive.tags as tag (tag)}<li class="od-dive-detail--tag">{tag}</li>{/each}
+          {#each visibleTags(dive.tags) as tag (tag)}<li class="od-dive-detail--tag">{tag}</li>{/each}
         </ul>
       </section>
     {/if}
@@ -655,6 +674,8 @@
           opens={equipmentOpens(weightEntries, computers.length)}
           open={equipmentOpen}
           ontoggle={() => (equipmentOpen = !equipmentOpen)}
+          {feedback}
+          onfeedback={setFeedback}
         />
       </section>
     {/if}

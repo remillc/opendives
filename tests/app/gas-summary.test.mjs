@@ -113,10 +113,11 @@ test('the Equipment card name', () => {
   assert.equal(equipmentLabel({ suit: 'dry suit', weight: '', open: false }, w), 'Equipment: dry suit. Show details');
 });
 
-test('the Equipment card opens only when it would show more than the total', async () => {
+test('the Equipment card opens when it has a weight (the weights and "Ce lest était" are inside)', async () => {
   const { equipmentOpens, equipmentLabel } = await import('../../app/src/lib/gas-summary.js');
-  assert.equal(equipmentOpens([{ description: 'unknown' }]), false);
-  assert.equal(equipmentOpens([{ description: '' }]), false);
+  assert.equal(equipmentOpens([{ description: 'unknown' }]), true);
+  assert.equal(equipmentOpens([{ description: '' }]), true);
+  assert.equal(equipmentOpens([]), false);
   assert.equal(equipmentOpens([{ description: 'belt' }]), true);
   assert.equal(equipmentOpens([{ description: 'belt' }, { description: 'ankle' }]), true);
   const words = { both: '{suit}, {weight}', weightOnly: '{weight}', suitOnly: '{suit}', show: 'Show', hide: 'Hide' };
@@ -127,7 +128,7 @@ test('the Equipment card opens only when it would show more than the total', asy
 test('the Equipment card also opens with several dive computers, and its name adds the computer', async () => {
   const { equipmentOpens, equipmentLabel } = await import('../../app/src/lib/gas-summary.js');
   assert.equal(equipmentOpens([], 1), false);
-  assert.equal(equipmentOpens([{ description: 'unknown' }], 1), false);
+  assert.equal(equipmentOpens([{ description: 'unknown' }], 1), true);
   assert.equal(equipmentOpens([], 2), true);
   assert.equal(equipmentOpens([{ description: 'unknown' }], 2), true);
   const words = { both: 'Equipment: {suit}, weights {weight}', weightOnly: 'Equipment: weights {weight}', suitOnly: 'Equipment: {suit}', show: 'Show', hide: 'Hide', computer: ', computer {name}', computerOnly: 'Equipment: computer {name}' };

@@ -6,6 +6,8 @@
   // the weights by location, as the section did before. Role button with
   // aria-expanded.
   import Icon from './Icon.svelte';
+  import ButtonGroup from './ButtonGroup.svelte';
+  import { FEEDBACK_CHOICES } from '../lib/weight-feedback.js';
   import { t } from '../lib/i18n.js';
 
   /**
@@ -19,14 +21,24 @@
    *   open: boolean,
    *   opens?: boolean,
    *   ontoggle: () => void,
+   *   feedback?: string,
+   *   onfeedback?: (value: string) => void,
    * }}
    * label: the accessible name, "Equipment: dry suit, weights 35 lb. Show details";
    * weightTotal: empty when no weight is set; weights: one entry per location.
    * computer: the main computer's name (a third row); computers: all of them, listed when open;
    * opens: false when opening would show nothing more (one weight, no
    * location): a plain card, no chevron.
+   * Open, the order is: suit, weight total, weights by location, "Ce lest était"
+   * (feedback: 'too-light', 'ok', 'too-heavy' or '', when a weight is set and
+   * onfeedback is given), then the computer. Closed, the computer row is the third row.
    */
-  let { label, suit, weightTotal, weights, computer = '', computers = [], open, opens = true, ontoggle } = $props();
+  let { label, suit, weightTotal, weights, computer = '', computers = [], open, opens = true, ontoggle, feedback = '', onfeedback } = $props();
+
+  const spread = $derived(opens && open);
+  /** The computer row stays in the summary when closed, or when it is the only row. */
+  const computerInSummary = $derived(!spread || (!suit && !weightTotal));
+  const feedbackOptions = $derived(FEEDBACK_CHOICES.map((value) => ({ value, label: t(`weightFeedback.${value === 'too-light' ? 'tooLight' : value === 'ok' ? 'ok' : 'tooHeavy'}`) })));
 </script>
 
 <div class="od-equipment-card">
@@ -47,23 +59,34 @@
       {#if weightTotal}
         <span class="od-equipment-card--row"><span class="od-equipment-card--name">{t('detail.weights')}</span><span class="od-equipment-card--value od-equipment-card--strong od-value">{weightTotal}</span></span>
       {/if}
-      {#if computer}
+      {#if computer && computerInSummary}
         <span class="od-equipment-card--row"><span class="od-equipment-card--name">{t('detail.computerRow')}</span><span class="od-equipment-card--value">{computer}</span></span>
       {/if}
     </span>
     {#if opens}<span class="od-equipment-card--chevron" class:od-equipment-card--open={open}><Icon name="expand" size={24} weight={2} /></span>{/if}
   </svelte:element>
-  {#if opens && open && computers.length > 1}
-    <ul class="od-equipment-card--weights" aria-label={t('detail.computers')}>
-      {#each computers as c, i (i)}
-        <li><span>{c.name}</span>{#if c.main}<span>{t('detail.mainBadge')}</span>{/if}</li>
-      {/each}
-    </ul>
-  {/if}
-  {#if opens && open && weights.length}
+  {#if spread && weights.length}
     <ul class="od-equipment-card--weights" aria-label={t('detail.weightsByPlace')}>
       {#each weights as weight, i (i)}
         <li class="od-value"><span>{weight.place || t('detail.weights')}</span><span>{weight.weight}</span></li>
+      {/each}
+    </ul>
+  {/if}
+  {#if spread && weightTotal && onfeedback}
+    <div class="od-equipment-card--feedback">
+      <p class="od-equipment-card--feedback-title" id="od-weight-feedback-title">{t('weightFeedback.title')}</p>
+      <ButtonGroup options={feedbackOptions} value={feedback} onchange={(v) => onfeedback(v)} ariaLabelledby="od-weight-feedback-title" clearable marked />
+    </div>
+  {/if}
+  {#if spread && computer && !computerInSummary}
+    <div class="od-equipment-card--computer">
+      <span class="od-equipment-card--row"><span class="od-equipment-card--name">{t('detail.computerRow')}</span><span class="od-equipment-card--value">{computer}</span></span>
+    </div>
+  {/if}
+  {#if spread && computers.length > 1}
+    <ul class="od-equipment-card--weights" aria-label={t('detail.computers')}>
+      {#each computers as c, i (i)}
+        <li><span>{c.name}</span>{#if c.main}<span>{t('detail.mainBadge')}</span>{/if}</li>
       {/each}
     </ul>
   {/if}
@@ -139,6 +162,23 @@
       &.od-equipment-card--open {
         transform: rotate(180deg);
       }
+    }
+
+    /* "Ce lest était": its title, then the three buttons. */
+    .od-equipment-card--feedback {
+      padding: 12px 16px 16px;
+      border-top: 1px solid var(--od-separator);
+    }
+
+    .od-equipment-card--feedback-title {
+      margin: 0 0 8px;
+      font-size: 14px;
+      color: var(--od-text-2);
+    }
+
+    .od-equipment-card--computer {
+      padding: 0 16px;
+      border-top: 1px solid var(--od-separator);
     }
 
     /* The weights by location: one line each, as the section showed them. */
