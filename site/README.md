@@ -14,6 +14,19 @@ The pages of opendives.app, one folder per language: a home page and the privacy
 
 The former addresses `/privacy` and `/privacy/fr` are redirected to these (`_redirects`, 301).
 
+## Links that open the app
+
+The build also writes what the app's links need (decided on 13 November 2026):
+
+| File | Purpose |
+| --- | --- |
+| `.well-known/assetlinks.json` | Android App Links: the package `org.opendives.app` and the SHA-256 fingerprints of the signing keys (the debug key now). **Release key:** add its fingerprint to `RELEASE_FINGERPRINTS` in `build.mjs` before publishing the app. |
+| `.well-known/apple-app-site-association` | iOS Universal Links. `APPLE_TEAM_ID` in `build.mjs` is the placeholder `TEAMID`: replace it by the Team ID of the Apple developer account. |
+| `_headers` | serves both files as `application/json`; Cloudflare Pages does not redirect them |
+| `open.html`, `_redirects` | the page shown when an app link (`/dives/at/*`, `/sites/*`, `/plan/*`, `/plans/*`, `/tools/*`, `/statistics/*`) is opened in a browser: a 200 rewrite keeps the address; French and English; a button tries `opendives://` |
+
+The paths are the app's intent filters (`app/android/app/src/main/AndroidManifest.xml`) and, on iOS, `App.entitlements` (`applinks:opendives.app`). Check the files after publishing: `https://opendives.app/.well-known/assetlinks.json` must answer 200 with `application/json` and no redirect.
+
 Addresses follow the rule of the project: a resource (a page) has no trailing slash, a collection has one; the home page is `/`.
 
 ## Publishing on Cloudflare Pages

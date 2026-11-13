@@ -3,8 +3,9 @@
   // "Partager" (docs/mockups/partage-android.dc.html; spec, section 4,
   // "Dive detail"): an MD3 modal bottom sheet over the dive detail, with two
   // rows of 72 dp, each icon in a 40 dp circle of the water's top colour:
-  // the one-page PDF sheet, or a short text with the profile image. The
-  // system's share sheet follows.
+  // the one-page PDF sheet, or a short text with the profile image, then, when
+  // `onlink` is given, the https link that opens the dive in the app (deep
+  // links, 13 November 2026). The system's share sheet follows.
   import { Sheet } from 'framework7-svelte';
   import Icon from './Icon.svelte';
   import { t } from '../lib/i18n.js';
@@ -19,11 +20,11 @@
    * `title` as the sheet's own title when it is not "Partager".
    * @type {{
    *   onpdf?: () => void, onsummary?: () => void, onclose: () => void, pdfText?: string, summaryLabel?: string, summaryText?: string,
-   *   heading?: string,
+   *   heading?: string, onlink?: () => void, linkText?: string,
    *   rows?: { id: string, icon: string, title: string, text: string, disabled?: boolean, onclick: () => void }[],
    * }}
    */
-  let { onpdf, onsummary, onclose, pdfText = t('share.pdfText'), summaryLabel = t('share.summary'), summaryText = t('share.summaryText'), heading = t('share.title'), rows = undefined } = $props();
+  let { onpdf, onsummary, onclose, pdfText = t('share.pdfText'), summaryLabel = t('share.summary'), summaryText = t('share.summaryText'), heading = t('share.title'), rows = undefined, onlink = undefined, linkText = t('share.linkText') } = $props();
 </script>
 
 <Sheet opened swipeToClose backdrop class="od-share-sheet" style="height: auto" onSheetClosed={onclose}>
@@ -55,6 +56,12 @@
       <span class="od-share-sheet--circle" aria-hidden="true"><Icon name="image" size={22} weight={2} /></span>
       <span class="od-share-sheet--texts"><span class="od-share-sheet--headline">{summaryLabel}</span><span class="od-share-sheet--supporting">{summaryText}</span></span>
     </button>
+    {#if onlink}
+      <button type="button" class="od-share-sheet--row" onclick={onlink}>
+        <span class="od-share-sheet--circle" aria-hidden="true"><Icon name="link" size={22} weight={2} /></span>
+        <span class="od-share-sheet--texts"><span class="od-share-sheet--headline">{t('share.link')}</span><span class="od-share-sheet--supporting">{linkText}</span></span>
+      </button>
+    {/if}
     {/if}
   </div>
 </Sheet>

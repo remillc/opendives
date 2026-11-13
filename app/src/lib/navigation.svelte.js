@@ -75,7 +75,7 @@ export function goToSection(section) {
  * its list: it opens full width in the Account section instead.
  * @param {string} path
  */
-function openOver(path) {
+export function openOver(path) {
   let view = f7.views.current;
   if (view?.el?.classList.contains('view-master-detail')) {
     showSection('account');

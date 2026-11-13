@@ -25,7 +25,8 @@
   import RenumberDiveDialog from '../components/RenumberDiveDialog.svelte';
   import ShareSheet from '../components/ShareSheet.svelte';
   import SiteHeaderImage from '../components/SiteHeaderImage.svelte';
-  import { sharePdf, shareSummary } from '../lib/share.js';
+  import { sharePdf, shareSummary, shareLink, shareTitle } from '../lib/share.js';
+  import { diveLink } from '../lib/deep-link.js';
   import { filter } from '../lib/filter.svelte.js';
   import { horizontalSwipe, swipeGoesThrough } from '../lib/swipe.js';
   import Stars from '../components/Stars.svelte';
@@ -234,14 +235,15 @@
   }
 
   let sharing = $state(false);
-  /** @param {'pdf'|'summary'} kind */
+  /** @param {'pdf'|'summary'|'link'} kind */
   async function share(kind) {
     sharing = false;
     if (!dive) return;
     // The profile chart of this page (the current one in its view).
     const svg = /** @type {SVGSVGElement|null} */ (document.querySelector('.page-current .od-dive-profile--profile .od-dive-profile--frame svg'));
     try {
-      if (kind === 'pdf') await sharePdf(dive, prefs, svg);
+      if (kind === 'link') await shareLink(diveLink(dive.date) ?? '', shareTitle(dive));
+      else if (kind === 'pdf') await sharePdf(dive, prefs, svg);
       else await shareSummary(dive, prefs, svg);
     } catch (e) {
       // Closing the system's share sheet without choosing is not an error.
@@ -715,7 +717,7 @@
 </Page>
 
 {#if sharing}
-  <ShareSheet onpdf={() => share('pdf')} onsummary={() => share('summary')} onclose={() => (sharing = false)} />
+  <ShareSheet onpdf={() => share('pdf')} onsummary={() => share('summary')} onlink={dive && diveLink(dive.date) ? () => share('link') : undefined} onclose={() => (sharing = false)} />
 {/if}
 
 {#if renumbering && dive}
