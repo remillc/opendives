@@ -2111,7 +2111,7 @@ Christian's request of 13 November 2026. The bailout cylinder drawn beside the r
 
 Done in `feature/bailout-shape`: in `RebreatherDrawing.svelte` each cylinder beside the unit uses the given path (moved by one step per cylinder) for its fill, the hatching, the clip of the levels and the round-joined outline; the valve block is gone; the levels keep their scale (full at 58, empty at 188). BAILOUT is centred on the new outline (49 to 188): the centres of label and outline match on the emulator. Checked on the phone emulator, dive detail light and dark (two bailout cylinders); the editing card draws the same component.
 
-## [ ] 2026-11-13-90 Interface texts: review against the writing guide
+## [x] 2026-11-13-90 Interface texts: review against the writing guide
 
 Christian's decision of 13 November 2026. The French texts below were rewritten with `docs/ui-writing.md`. Find each one in `app/src/i18n/fr.json` (or wherever the text lives), replace it with the new wording, and update the English text in `en.json` to match the new meaning, following the same guide. A text that the app does not have yet is skipped. Keep the non-breaking spaces of French typography. The mock-ups on the canvas already use the new wording.
 
@@ -2145,3 +2145,5 @@ Christian's decision of 13 November 2026. The French texts below were rewritten 
 | 26 | Les valeurs sont celles qui existent dans votre carnet. Plusieurs valeurs cochées comptent les plongées qui ont l’une ou l’autre. Plusieurs critères comptent les plongées qui les remplissent tous. | Plusieurs valeurs cochées : les plongées qui ont l’une ou l’autre. Plusieurs critères : les plongées qui les remplissent tous. |
 
 Rows 11, 13, 17, 24 and 25 remove a sentence from a longer text: keep the rest of that text. Also: in the cylinder-types settings, the line under the type list (row 22), and in « Ordinateurs du carnet » the intro now reads « Le nom choisi s'affiche dans le carnet et le détail des plongées. » (the sentence before it is removed). Check the screens on the phone emulator.
+
+Done in `feature/ui-texts` (delegated to a sonnet agent): rows 2–6 and 8–26 and the « Ordinateurs du carnet » intro rewritten in fr.json and en.json (fr-CA overrides kept with « nuage » where they still differ, removed where the new wording no longer mentions the cloud); rows 1 and 7 are not in the app. Judgment calls: rows 2 and 3 keep « jusqu’à {size} » (the app gives a maximum); row 12 reads « à Modifier une plongée » as in the table (the screen title is « Modifier la plongée »); row 18 changes the cloud sign-out text only, not the git-repository one; row 22 has no count in the app, so it reads « Les types standard sont modifiables comme les vôtres. »; row 26 removes the key `stats.rulesValues` and its use in StatisticNew.svelte. Checked on the phone emulator: Settings (rows 12, 13, 14) and cylinder types (row 22).
