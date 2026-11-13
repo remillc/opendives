@@ -1,7 +1,7 @@
 // The reserve factor: stress x divers given to the core, and the migration (task 2026-11-12-74).
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { coreSacFactor, reserveSettings, bottomVolumeKey } from '../../app/src/lib/reserve-factor.js';
+import { coreSacFactor, reserveSettings, bottomVolumeKey, reserveLegendKey } from '../../app/src/lib/reserve-factor.js';
 
 test('the core receives the product, x100', () => {
   assert.equal(coreSacFactor(100, 1), 100);
@@ -41,4 +41,11 @@ test('result text: nothing more with one diver, two or N otherwise', () => {
   assert.equal(bottomVolumeKey(2), 'plan.volumeBottomTwo');
   assert.equal(bottomVolumeKey(3), 'plan.volumeBottomMany');
   assert.equal(bottomVolumeKey(4), 'plan.volumeBottomMany');
+});
+
+test('reserve legend: "à deux" or "à N" only for the bottom gas (task 93)', () => {
+  assert.equal(reserveLegendKey(2, true), 'plan.legendReserveTwo');
+  assert.equal(reserveLegendKey(4, true), 'plan.legendReserveMany');
+  assert.equal(reserveLegendKey(1, true), 'plan.legendReserve');
+  assert.equal(reserveLegendKey(2, false), 'plan.legendReserve');
 });

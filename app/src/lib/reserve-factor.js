@@ -56,3 +56,17 @@ export function bottomVolumeKey(divers) {
   if (divers === 2) return 'plan.volumeBottomTwo';
   return divers > 2 ? 'plan.volumeBottomMany' : 'plan.volumeDeco';
 }
+
+/**
+ * The i18n key of the reserve's legend under a gas bar (task 2026-11-13-93):
+ * "Réserve à deux" / "Réserve à N" for the bottom gas when the reserve is for
+ * several divers, "Réserve" otherwise.
+ * @param {number} divers
+ * @param {boolean} bottom whether the row is the bottom gas
+ * @returns {'plan.legendReserve'|'plan.legendReserveTwo'|'plan.legendReserveMany'}
+ */
+export function reserveLegendKey(divers, bottom) {
+  if (!bottom) return 'plan.legendReserve';
+  if (divers === 2) return 'plan.legendReserveTwo';
+  return divers > 2 ? 'plan.legendReserveMany' : 'plan.legendReserve';
+}

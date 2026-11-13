@@ -1600,6 +1600,8 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Planificateur : l’exposition à l’oxygène suit la même présentation que les gaz (CNS en gros, limite et OTU sous la barre).",
+      "Planificateur : chaque gaz montre son volume total en gros, puis la barre et sa légende (consommé, réserve).",
       "Mélangeur de gaz : l’étape d’hélium d’un trimix est corrigée (elle était trop courte d’environ 0,8 %, et l’oxygène d’autant trop long).",
       "Menus déroulants : à l’ouverture, la liste montre la valeur choisie.",
       "Planificateur : le clavier ne se ferme plus quand on tape dans un champ (niveaux, gaz, GF).",
@@ -1940,6 +1942,9 @@
     "volumeBar": "{used} consommés, {reserve} de réserve",
     "cnsBar": "CNS {cns} % de la limite",
     "cnsLimit": "Limite CNS 100 %",
+    "cnsValue": "CNS {cns} %",
+    "otuLabel": "OTU",
+    "oxygenName": "Exposition à l’oxygène : CNS {cns} % de la limite, {otu} OTU",
     "note": "Calculé par le planificateur de Subsurface. Un plan ne remplace ni la formation ni l'ordinateur de plongée.",
     "noteFromDive": "Calculé par le planificateur de Subsurface, avec la consommation mesurée sur la plongée de départ. Un plan ne remplace ni la formation ni l'ordinateur de plongée.",
     "computing": "Calcul du plan",
@@ -2013,7 +2018,11 @@
     "volumes": "Volume nécessaire par gaz",
     "volumeBottomTwo": "{used} consommés et {reserve} de réserve pour remonter à deux",
     "volumeBottomMany": "{used} consommés et {reserve} de réserve pour remonter à {divers}",
-    "volumeDeco": "{used} consommés et {reserve} de réserve"
+    "volumeDeco": "{used} consommés et {reserve} de réserve",
+    "legendUsed": "Consommé",
+    "legendReserve": "Réserve",
+    "legendReserveTwo": "Réserve à deux",
+    "legendReserveMany": "Réserve à {divers}"
   },
   "filter": {
     "title": "Filtrer",

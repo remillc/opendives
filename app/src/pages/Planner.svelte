@@ -40,7 +40,7 @@
   import { planShareRows, sharePlanFile, sharePlanTableImage } from '../lib/slate-share.js';
   import PlanSlate from '../components/PlanSlate.svelte';
   import { settings } from '../lib/settings.svelte.js';
-  import { bottomVolumeKey } from '../lib/reserve-factor.js';
+  import { bottomVolumeKey, reserveLegendKey } from '../lib/reserve-factor.js';
   import { MM_PER_FT, ML_PER_CUFT, O2_CHOICES, HE_CHOICES, depthToMm, gasTotalMl, gasValid, modAlarm, mmToDepth, roundSacMl } from '../lib/planner-rules.js';
 
   /**
@@ -544,14 +544,21 @@
       const reserve = formatGasVolume(c.reserveMl, prefs);
       const total = gasTotalMl(c);
       const whole = c.gasUsedMl + c.reserveMl;
+      const divers = formatNumber(settings.reserveDivers, 0);
+      const label = gasName(c.o2Permille, c.hePermille);
+      const value = formatGasVolume(total, prefs);
+      // The long sentence is no longer shown (task 2026-11-13-93): it names the row, with the total.
+      const hint = t(i === bottomIndex ? bottomVolumeKey(settings.reserveDivers) : 'plan.volumeDeco', { used, reserve, divers });
       return {
         key: i,
-        label: gasName(c.o2Permille, c.hePermille),
-        hint: t(i === bottomIndex ? bottomVolumeKey(settings.reserveDivers) : 'plan.volumeDeco', { used, reserve, divers: formatNumber(settings.reserveDivers, 0) }),
-        value: formatGasVolume(total, prefs),
+        label,
+        value,
+        name: `${label}, ${value}. ${hint}`,
+        used,
+        reserve,
+        reserveLegend: t(reserveLegendKey(settings.reserveDivers, i === bottomIndex), { divers }),
         usedPercent: whole > 0 ? (c.gasUsedMl / whole) * 100 : null,
         hasReserve: c.reserveMl > 0,
-        barLabel: t('plan.volumeBar', { used, reserve }),
       };
     });
   });
@@ -898,18 +905,24 @@
         <h2 class="od-planner--section-title">{t('plan.volumes')}</h2>
         <div class="od-planner--results" class:ios={theme.ios}>
           {#each volumeRows as row (row.key)}
-            <div class="od-planner--result">
-              <span class="od-planner--text">
+            <!-- Gas and total, the bar, then the legend of its two parts (task 2026-11-13-93). -->
+            <div class="od-planner--volume" role="group" aria-label={row.name}>
+              <div class="od-planner--volume-head" aria-hidden="true">
                 <span class="od-planner--label">{row.label}</span>
-                <span class="od-planner--hint">{row.hint}</span>
-                {#if row.usedPercent !== null}
-                  <span class="od-planner--bar" role="img" aria-label={row.barLabel}>
-                    <span class="od-planner--fill" style:width="{row.usedPercent}%"></span>
-                    {#if row.hasReserve}<span class="od-planner--gap"></span><span class="od-planner--reserve"></span>{/if}
-                  </span>
+                <span class="od-planner--volume-total od-value">{row.value}</span>
+              </div>
+              {#if row.usedPercent !== null}
+                <span class="od-planner--bar od-planner--volume-bar" aria-hidden="true">
+                  <span class="od-planner--fill" style:width="{row.usedPercent}%"></span>
+                  {#if row.hasReserve}<span class="od-planner--gap"></span><span class="od-planner--reserve"></span>{/if}
+                </span>
+              {/if}
+              <div class="od-planner--volume-legend" aria-hidden="true">
+                <span class="od-planner--legend-item"><span class="od-planner--legend-swatch od-planner--legend-used"></span>{t('plan.legendUsed')} <b class="od-value">{row.used}</b></span>
+                {#if row.hasReserve}
+                  <span class="od-planner--legend-item"><span class="od-planner--legend-swatch od-planner--legend-reserve"></span>{row.reserveLegend} <b class="od-value">{row.reserve}</b></span>
                 {/if}
-              </span>
-              <span class="od-planner--value od-value">{row.value}</span>
+              </div>
             </div>
           {/each}
           {#if modRow}
@@ -918,15 +931,19 @@
               <span class="od-planner--value od-value od-planner--alarm">{modRow.value}</span>
             </div>
           {/if}
-          <div class="od-planner--result od-planner--oxygen">
-            <span class="od-planner--text">
+          <!-- Laid out like the gas rows (task 2026-11-13-94). -->
+          <div class="od-planner--volume od-planner--oxygen" role="group" aria-label={t('plan.oxygenName', { cns: result.cns, otu: result.otu })}>
+            <div class="od-planner--volume-head" aria-hidden="true">
               <span class="od-planner--label">{t('plan.oxygen')}</span>
-              <span class="od-planner--bar" role="img" aria-label={t('plan.cnsBar', { cns: result.cns })}>
-                <span class="od-planner--fill" style:width="{Math.min(result.cns, 100)}%"></span>
-              </span>
-              <span class="od-planner--caption">{t('plan.cnsLimit')}</span>
+              <span class="od-planner--volume-total od-value">{t('plan.cnsValue', { cns: result.cns })}</span>
+            </div>
+            <span class="od-planner--bar od-planner--volume-bar" aria-hidden="true">
+              <span class="od-planner--fill" style:width="{Math.min(result.cns, 100)}%"></span>
             </span>
-            <span class="od-planner--value od-value">{t('plan.oxygenValue', { cns: result.cns, otu: result.otu })}</span>
+            <div class="od-planner--volume-legend od-planner--legend-split" aria-hidden="true">
+              <span>{t('plan.cnsLimit')}</span>
+              <span>{t('plan.otuLabel')} <b class="od-value">{result.otu}</b></span>
+            </div>
           </div>
         </div>
         <p class="od-planner--note">{t(planner.source ? 'plan.noteFromDive' : 'plan.note')}</p>
@@ -1513,11 +1530,6 @@
       align-items: center;
       gap: 16px;
 
-      &.od-planner--oxygen {
-        min-height: 56px;
-        border-top: 1px solid var(--od-separator);
-      }
-
       .od-planner--text {
         flex: 1;
         min-width: 0;
@@ -1550,6 +1562,81 @@
       }
     }
 
+    /* One gas of "Volume nécessaire par gaz" (task 2026-11-13-93). */
+    .od-planner--volume {
+      padding: 12px 24px 12px 16px;
+
+      .od-planner--label {
+        font-size: 16px;
+        line-height: 24px;
+        letter-spacing: 0.15px;
+      }
+    }
+
+    .od-planner--volume-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .od-planner--volume-total {
+      font-size: 22px;
+      line-height: 28px;
+      font-weight: 700;
+      color: var(--od-text);
+    }
+
+    .od-planner--bar.od-planner--volume-bar {
+      height: 10px;
+      border-radius: 5px;
+    }
+
+    .od-planner--volume-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px 16px;
+      margin-top: 8px;
+      font-size: 13px;
+      line-height: 18px;
+      color: var(--od-text-2);
+
+      b {
+        font-weight: 600;
+        color: var(--od-text);
+      }
+    }
+
+    /* The oxygen row: the limit on the left, the OTU on the right. */
+    .od-planner--legend-split {
+      justify-content: space-between;
+    }
+
+    .od-planner--volume.od-planner--oxygen {
+      border-top: 1px solid var(--od-separator);
+    }
+
+    .od-planner--legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .od-planner--legend-swatch {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      flex: none;
+    }
+
+    .od-planner--legend-used {
+      background: var(--od-tertiary);
+    }
+
+    .od-planner--legend-reserve {
+      background: repeating-linear-gradient(135deg, var(--od-tertiary-container) 0 2px, var(--od-tertiary-hatch) 2px 4px);
+    }
+
     .od-planner--bar {
       display: flex;
       height: 8px;
@@ -1571,13 +1658,6 @@
         flex: 1;
         background: repeating-linear-gradient(135deg, var(--od-tertiary-container) 0 4px, var(--od-tertiary-hatch) 4px 8px);
       }
-    }
-
-    .od-planner--caption {
-      margin-top: 4px;
-      font-size: 12px;
-      line-height: 16px;
-      color: var(--od-text-2);
     }
 
     .od-planner--note {

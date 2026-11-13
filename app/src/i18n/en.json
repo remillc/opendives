@@ -1600,6 +1600,8 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Planner: the oxygen exposure follows the gas rows’ layout (CNS in large type, limit and OTU under the bar).",
+      "Planner: each gas shows its total volume in large type, then the bar and its legend (used, reserve).",
       "Gas blender: the helium step of a trimix is corrected (it was about 0.8 % short, and the oxygen as much too long).",
       "Dropdown menus: when they open, the list shows the chosen value.",
       "Planner: the keyboard no longer closes while typing in a field (levels, gases, GF).",
@@ -1940,6 +1942,9 @@
     "volumeBar": "{used} consumed, {reserve} reserve",
     "cnsBar": "CNS {cns} % of the limit",
     "cnsLimit": "CNS limit 100 %",
+    "cnsValue": "CNS {cns} %",
+    "otuLabel": "OTU",
+    "oxygenName": "Oxygen exposure: CNS {cns} % of the limit, {otu} OTU",
     "note": "Calculated by the Subsurface planner. A plan replaces neither training nor the dive computer.",
     "noteFromDive": "Calculated by the Subsurface planner, with the consumption measured on the starting dive. A plan replaces neither training nor the dive computer.",
     "computing": "Calculating the plan",
@@ -2013,7 +2018,11 @@
     "volumes": "Volume needed per gas",
     "volumeBottomTwo": "{used} used and {reserve} reserve to ascend as two",
     "volumeBottomMany": "{used} used and {reserve} reserve to ascend as {divers}",
-    "volumeDeco": "{used} used and {reserve} reserve"
+    "volumeDeco": "{used} used and {reserve} reserve",
+    "legendUsed": "Used",
+    "legendReserve": "Reserve",
+    "legendReserveTwo": "Reserve for two",
+    "legendReserveMany": "Reserve for {divers}"
   },
   "filter": {
     "title": "Filter",

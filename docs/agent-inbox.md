@@ -2166,7 +2166,7 @@ Christian's decision of 13 November 2026. The SAC fields of the planner (at the 
 
 Done in `fix/planner-keyboard-sac`: `SAC_PRESETS_CUFT` is every 0.01 from 0 to 2 (201 entries), shown with two decimals ("0,36"); a typed two-decimal value is exactly a preset, so it is marked (tested). `NumberComboField` opens a long list scrolled to the current value, or to the nearest preset, centred. Litres per minute keep 10 to 30 by 5. Checked on the phone emulator: the bottom SAC list opens on 0.71, highlighted, with 0.68 to 0.74 around it.
 
-## [ ] 2026-11-13-93 Planner: clearer "Volume nécessaire par gaz" rows
+## [x] 2026-11-13-93 Planner: clearer "Volume nécessaire par gaz" rows
 
 Christian's decision of 13 November 2026. Each gas row of « Volume nécessaire par gaz » in the planner result is laid out like this (mock-up: `docs/mockups/android-planificateur.dc.html`; its background and grey shades come from a theme trial not approved yet, keep the current theme colours):
 - first line: the gas name on the left (16 sp), the **total volume** on the right, large (22 sp bold), e.g. « 92 pi³ »;
@@ -2175,7 +2175,9 @@ Christian's decision of 13 November 2026. Each gas row of « Volume nécessaire 
 - The long sentence « 52 pi³ consommés et 40 pi³ de réserve pour remonter à deux » is no longer shown; it stays as the row's accessible name, with the total.
 The row still opens the gas detail. Several gases: one such block each. Same layout on the tablet and in the shared plan. Check on the phone emulator.
 
-## [ ] 2026-11-13-94 Planner: oxygen exposure row like the gas rows
+Done in `feature/planner-volume-rows`: each gas is a group (its accessible name: the gas, the total and the old sentence) with the gas name and the total (22 px bold) on one line, the 10 px bar, and a legend with swatches « Consommé » / « Réserve à deux » (or « à N », or « Réserve » for other gases; `reserveLegendKey`, tested). The shared PDF draws the same blocks (the text summary keeps the sentence). Checked on the phone emulator; the tablet uses the same page.
+
+## [x] 2026-11-13-94 Planner: oxygen exposure row like the gas rows
 
 Christian's decision of 13 November 2026, follow-up to task 93. The « Exposition à l'oxygène » row of the planner result takes the same layout as the gas rows:
 - first line: « Exposition à l'oxygène » on the left (16 sp), « CNS 18 % » on the right, large (22 sp bold);
@@ -2183,3 +2185,5 @@ Christian's decision of 13 November 2026, follow-up to task 93. The « Expositio
 - under the bar, 13 sp secondary text: « Limite CNS 100 % » on the left, « OTU 41 » on the right (value in ink, semibold).
 - Accessible name of the group: « Exposition à l'oxygène : CNS 18 % de la limite, 41 OTU ».
 The mock-up `android-planificateur` on the canvas also shows a new « Résultat » card around these rows; that card is not decided yet: do not build it. Same row layout on the tablet and in the shared plan. Check on the phone emulator.
+
+Done in `feature/planner-volume-rows`: « Exposition à l’oxygène » with « CNS 2 % » large, the 10 px bar, « Limite CNS 100 % » left and « OTU 0 » right; group name « Exposition à l’oxygène : CNS 2 % de la limite, 0 OTU ». Same block in the shared PDF. The « Résultat » card is not built. Checked on the phone emulator.
