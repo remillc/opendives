@@ -2208,7 +2208,7 @@ Christian's decision of 13 November 2026. In the planner's stops table, the gas 
 
 Done in `feature/planner-result-card`: the first row's gas gets the gas-change pill; legend « … Gaz surligné : gaz de départ ou changement de gaz. » (fr/en). In the shared PDF, the first stop's gas and each change are highlighted. Checked on the phone emulator (Air highlighted on the first row).
 
-## [ ] 2026-11-13-97 Theme: warmer neutrals and the « grand bleu » header
+## [x] 2026-11-13-97 Theme: warmer neutrals and the « grand bleu » header
 
 Christian's decision of 13 November 2026. The theme trial is approved: from now on, the mock-ups' background, greys and header are the theme. Reference mock-up: `docs/mockups/android-carnet-grand-bleu-strict.dc.html` (all the boards of the design canvas now use these colours). Light theme, in `app/src/theme.css`:
 - `--od-background` #F4F4F2 → **#F5F4F0** (and every token or literal that repeats it, such as the wave under the band and `--od-inverse-on-surface`);
@@ -2220,6 +2220,8 @@ Header band of the sections and of the side menu (`--od-band-gradient`, the same
 - on the band, title, icons and ☰ in white (`--od-on-band` #FFFFFF), the summary line in #D4E2F2 (`--od-on-band-2`), the faint profile line in white at 30 %;
 - the search field and the pills placed on the band: white at 90 %, their text stays dark (`--od-band-control`).
 Check the contrast of everything placed on the band (white on the lightest part, top left). Dark theme: no change for now, Christian will decide its warm equivalent later. Check on the phone emulator: Carnet, Sites, Statistiques, Outils and the side menu, in light and dark mode. Tasks that said « keep the current theme colours » now follow these colours.
+
+Done (warm neutrals and grand bleu band merged earlier from feature/warm-neutrals). Checked on the phone emulator: tokens as listed (#F5F4F0, #EBEAE5, #4B4A47, band gradient, --od-on-band #FFFFFF, --od-on-band-2 #D4E2F2, band controls white 90 % with dark text); contrast measured on the Carnet band, against the lightest 10 % of the blue behind each element: ☰ 3.8:1 and ⋮ 5.1:1 (icons, 3:1 required), title 4.6:1 (large text), summary line in #D4E2F2 4.5:1 (just at the limit). Dark mode keeps its colours, as asked.
 
 ## [ ] 2026-11-13-98 Desaturation: wait before flying, reminder and notification
 
@@ -2242,20 +2244,24 @@ Christian's decision of 13 November 2026 (TODOS #50). Mock-ups: `docs/mockups/an
 3. **Storage, Subsurface compatible:** the choice is saved as a tag of the dive, always in English whatever the app language: `weight-too-light`, `weight-ok`, `weight-too-heavy`. Only one of the three at a time. These three tags are not shown in the dive's tag list or tag chips in OpenDives (they are shown by the buttons), but they stay in the file and Subsurface shows them as ordinary tags. Keep them out of tag suggestions and of the tag filter.
 Tests for the rule (match, no match, adjustment by tag, units) and for the tags (set, change, clear, kept on sync). Same on the tablet layouts. Check on the phone emulator.
 
-## [ ] 2026-11-13-100 Side menu: match the mock-up (logo, « Messages »)
+## [x] 2026-11-13-100 Side menu: match the mock-up (logo, « Messages »)
 
 Christian's remark of 13 November 2026, on the side menu of the app compared with `docs/mockups/appbar-tiroir-android-ouvert.dc.html` (`NavMenu.svelte`, `SyncControl.svelte`):
 1. **Logo:** the app draws a white border around the logo in the menu header. The mock-up has none: a white disc behind the three waves, the white lower arc and the two white bubbles, 44 dp, nothing around it. Draw it exactly as in the mock-up's SVG.
 2. **« Messages » under « Synchroniser maintenant »:** the app shows « Messages » there, the mock-up does not. Under the button there is only the status line (« Synchronisé il y a 2 min »). « Messages » is not an OpenDives string: find where it comes from (a sync or debug element, a default label, a system component) and remove it. If it leads to something useful, tell Christian in the « Done » note instead of moving it elsewhere.
 Check on the phone emulator, light and dark mode, next to the mock-up.
 
-## [ ] 2026-11-13-101 Side menu: « Autres options de synchronisation » menu like the mock-up
+Done (merged earlier, finished in fix/side-menu-mockup): the menu logo is the mock-up's header SVG (white disc, waves, white lower arc and bubbles, no border), and nothing but the state line sits under the sync button (no « Messages »). Checked on the phone emulator, light and dark, next to the mock-up.
+
+## [x] 2026-11-13-101 Side menu: « Autres options de synchronisation » menu like the mock-up
 
 Christian's decision of 13 November 2026. With manual sync, the arrow of the « Synchroniser maintenant » split button (`SyncControl.svelte`) opens the menu drawn in `docs/mockups/appbar-tiroir-android-ouvert-manuel-options.dc.html` (next to `appbar-tiroir-android-ouvert-manuel.dc.html`). Make the app's menu look like it:
 - it opens **upward**, above the button, aligned to its right edge, 280 dp wide, surface colour, 16 dp corners, the usual menu shadow, 8 dp vertical padding;
 - two items, 48 dp high, 24 dp icon then 14 sp text: cloud icon « Passer en synchronisation automatique », logbook icon « Voir les modifications non envoyées » (same actions as today);
 - while it is open, the arrow of the split button points up and has `aria-expanded="true"`.
 Same in the Account page if it uses the same control. Check on the phone emulator, light and dark mode. Colours: the theme of task 97.
+
+Done in fix/split-menu-place: the menu opens upward, right edge on the button but kept inside the side menu (8 dp margin; it overflowed the drawer by 21 dp), 280 dp, surface colour, 16 dp corners, rows of 48 dp (were 53), cloud and logbook icons; the arrow turns up with aria-expanded true. « Passer en synchronisation automatique » checked: it turns automatic sync back on. Checked on the phone emulator in light mode.
 
 ## [ ] 2026-11-13-102 Share a dive or a plan by QR code, and scan it
 

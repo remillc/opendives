@@ -34,7 +34,10 @@
     const el = popover?.el;
     const anchor = trigger?.closest('.od-split-button')?.getBoundingClientRect();
     if (!el || !anchor) return;
-    el.style.left = `${Math.max(8, anchor.right - el.offsetWidth)}px`;
+    // Inside the side menu (or the screen), 8 dp from its edges.
+    const box = trigger?.closest('.panel')?.getBoundingClientRect() ?? { left: 0, right: window.innerWidth };
+    const right = Math.min(anchor.right, box.right - 8);
+    el.style.left = `${Math.max(box.left + 8, right - el.offsetWidth)}px`;
     el.style.top = `${Math.max(8, anchor.top - el.offsetHeight - 8)}px`;
   }
 </script>
@@ -65,6 +68,7 @@
       open = true;
       place(popover);
     }}
+    onPopoverOpened={(/** @type {any} */ popover) => place(popover)}
     onPopoverClosed={() => (open = false)}
   >
     <List noChevron>{@render menu()}</List>
@@ -135,5 +139,12 @@
         transition: none;
       }
     }
+  }
+
+  /* Menu items: 48 dp (the mock-up), not the list's 53. Outside the layers: Framework7's
+     list padding is not in a layer and would win over a layered rule. */
+  :global(.md .od-split-button--menu .item-title) {
+    padding-top: 0;
+    padding-bottom: 0;
   }
 </style>
