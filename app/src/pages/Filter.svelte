@@ -250,6 +250,7 @@
     <Searchbar
       inline
       customSearch
+      backdrop={false}
       disableButton={false}
       placeholder={t('filter.searchCriterion')}
       onSearchbarSearch={(/** @type {any} */ _sb, /** @type {string} */ q) => (search = q)}

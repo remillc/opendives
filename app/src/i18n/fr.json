@@ -1693,6 +1693,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Correctif : après avoir touché la recherche du Carnet, la bande d’en-tête ne reste plus assombrie.",
       "Statistiques sur tablette : fermer le groupe de la ligne affichée à droite vide le panneau.",
       "Un nombre et son unité ne sont plus séparés en fin de ligne (« 27,6 m », « 14 h 30 », « 9 plongées »).",
       "Désaturation : les barres des tissus vont de 0 % au repos à 100 % à la limite, avec l’échelle sur le graphique.",
