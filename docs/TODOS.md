@@ -10,7 +10,7 @@ Rules (agreed between the design agent and the code agent, see `docs/agent-inbox
 - **Tag:** every item starts with `[design]` or `[code]` right after its number, set by the agent that adds it (`#4 [design] …`). `[design]` = mock-ups, visuals, screen texts, specification; `[code]` = everything else. When unsure, the agent asks Christian. The tag says who handles the item and lets Christian list one kind only. A second tag `[hors compat. SS]` may follow it, before the title, when the item would break compatibility with Subsurface (data Subsurface cannot read or keep); such an item needs Christian's explicit go-ahead before any code.
 - No other content in this file: no history, no checked boxes, no notes from agents.
 
-Next number: 46
+Next number: 53
 
 ## List
 
@@ -37,3 +37,8 @@ Next number: 46
 - #44 [code] Devrait-on générer les fichiers multilingues pour couvrir toutes les langues de SS? Notes : Subsurface a 36 fichiers de traduction (translations/subsurface_*.ts), soit 34 langues ou variantes : bg_BG, ca, cs, da_DK, de_CH, de_DE, el_GR, en_GB, en_US, es_ES, et_EE, fi_FI, fr_FR, he, hr_HR, hu, id, it_IT, ja_JP, ko_KR, lv_LV, nb_NO, nl_NL, pl_PL, pt_BR, pt_PT, ro_RO, ru_RU, sk_SK, sv_SE, tr, vi, zh_TW. OpenDives n'a que en, fr et fr-CA. Ces fichiers ne serviraient qu'aux mots communs aux deux apps (noms de champs, termes de plongée) : la plupart des textes d'OpenDives sont nouveaux et absents de Subsurface. Une seule langue de Subsurface se lit de droite à gauche : l'hébreu (he). L'ajouter demande d'afficher toute l'interface en miroir (flèche ← à droite, menus, listes et chevrons inversés), en gardant chiffres, unités et profils de gauche à droite. Framework7 et Android le gèrent, mais il faudrait vérifier chaque écran.
 - #45 [design] passer la couleur primaire au bleu — fait le 12 novembre 2026 (bleu océan-nuit, voir system-design.md), logo à ajuster
 - #46 [design] utiliser les vrais profils de chaque modèle de bouteille plutôt que d'utiliser une seule image générique
+- #47 [design] [hors compat. SS] Rappels d'entretien de l'équipement : date de la dernière révision du détendeur, de l'inspection visuelle et de l'épreuve hydraulique des bouteilles, avec un avertissement avant l'échéance. Décider où ranger ces données (fichier à part dans le dépôt ou appareil seulement).
+- #48 [design] [hors compat. SS] Portefeuille de brevets et de documents : cartes de certification (recto et verso), assurance plongée, certificat médical, avec leurs dates d'expiration, consultables hors ligne. Même question de stockage que #47.
+- #49 [design] [hors compat. SS] Analyse de gaz à la station de gonflage : pour chaque bouteille, le pourcentage d'oxygène (et d'hélium) mesuré, la MOD calculée et les initiales du plongeur. La valeur passe dans la plongée suivante. Vérifier ce que Subsurface peut garder (le mélange de la bouteille, oui ; l'analyse et les initiales, non).
+- #51 [design] [hors compat. SS] Validation d'une plongée par un compagnon ou un moniteur : signature à l'écran ou code QR scanné avec son téléphone. Même question de stockage que #47.
+- #52 [design] Dans « Utiliser mon serveur git », ajouter de la doc qui décrit comment créer un dépôt privé.

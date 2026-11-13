@@ -2207,3 +2207,52 @@ Done in `feature/planner-result-card`: « Résultat » (18 px bold) above one ca
 Christian's decision of 13 November 2026. In the planner's stops table, the gas of the first row (the descent gas, EAN32 in the mock-up) is shown in the same highlight pill as the gas changes. The legend under the table becomes « Début et fin en minutes depuis la mise à l'eau. ↓ descente, → niveau prévu, ↑ remontée, – palier de déco. Gaz surligné : gaz de départ ou changement de gaz. » Same on the tablet and in the shared plan. Mock-up: `docs/mockups/android-planificateur-nouveau.dc.html` (keep the current theme colours). Check on the phone emulator.
 
 Done in `feature/planner-result-card`: the first row's gas gets the gas-change pill; legend « … Gaz surligné : gaz de départ ou changement de gaz. » (fr/en). In the shared PDF, the first stop's gas and each change are highlighted. Checked on the phone emulator (Air highlighted on the first row).
+
+## [ ] 2026-11-13-97 Theme: warmer neutrals and the « grand bleu » header
+
+Christian's decision of 13 November 2026. The theme trial is approved: from now on, the mock-ups' background, greys and header are the theme. Reference mock-up: `docs/mockups/android-carnet-grand-bleu-strict.dc.html` (all the boards of the design canvas now use these colours). Light theme, in `app/src/theme.css`:
+- `--od-background` #F4F4F2 → **#F5F4F0** (and every token or literal that repeats it, such as the wave under the band and `--od-inverse-on-surface`);
+- surface greys #E8E8E5 → **#EBEAE5**: `--od-surface-2`, `--od-surface-container-high`, `--od-primary-container`, `--od-chart-grid`, the thumbnail squares, the « + » button;
+- `--od-text-2` #4A4D52 → **#4B4A47** (about 8:1 on the background);
+- `--od-text` (#1F2124), the white surface and the theme blues do not change.
+Header band of the sections and of the side menu (`--od-band-gradient`, the same in dark mode):
+- `radial-gradient(140% 115% at 38% -4%, #A9C4E2 0%, #7199C2 25%, #5584B5 37%, #2D5E90 59%, #114477 86%)`;
+- on the band, title, icons and ☰ in white (`--od-on-band` #FFFFFF), the summary line in #D4E2F2 (`--od-on-band-2`), the faint profile line in white at 30 %;
+- the search field and the pills placed on the band: white at 90 %, their text stays dark (`--od-band-control`).
+Check the contrast of everything placed on the band (white on the lightest part, top left). Dark theme: no change for now, Christian will decide its warm equivalent later. Check on the phone emulator: Carnet, Sites, Statistiques, Outils and the side menu, in light and dark mode. Tasks that said « keep the current theme colours » now follow these colours.
+
+## [ ] 2026-11-13-98 Desaturation: wait before flying, reminder and notification
+
+Christian's decision of 13 November 2026 (TODOS: flight countdown). Mock-ups in the canvas section « Android · Outils – Désaturation », copied to `docs/mockups/`. Colours: the theme of task 97.
+1. **Settings** (`reglages-avion-android.dc.html`), new group « Attente avant l'avion »: a choice « Selon les plongées » (12 h after one dive, 18 h after several dives in the day), « 12 h », « 18 h », « 24 h »; the note « Compté depuis la sortie de l'eau de la dernière plongée. Votre ordinateur de plongée fait foi. »; a switch « Me prévenir quand je peux prendre l'avion » with the sub-line « Après chaque plongée ». Default: « Selon les plongées », switch off.
+2. **Désaturation tool** (`outils-desaturation-rappel-android.dc.html`): under « Désaturation restante », a row « Avant de prendre l'avion » with the remaining wait (« 17 h 05 »), then the switch « Me prévenir quand je peux prendre l'avion » (same setting as above) and, when on, « Notification demain à 8 h 35 ». When the wait is over (`outils-desaturation-terminee-android.dc.html`): a status card « Vous pouvez prendre l'avion », « Attente terminée aujourd'hui, 8 h 35 ».
+3. **Logbook banner** (`android-carnet-avion.dc.html`): while a wait is running, a banner under the search field « Avion dans 17 h 05 » with « Permis demain à 8 h 35 ». It opens the Désaturation tool. It disappears when the wait is over.
+4. **Notification** (`notif-avion-android.dc.html`): when the switch is on, a local notification at the end of the wait: « Vous pouvez prendre l'avion », « L'attente de 18 h après vos plongées d'hier est terminée. » (the hours and the day follow the case). Tapping it opens the Désaturation tool. A new dive reschedules it.
+The wait is counted from the surfacing time of the last dive in the logbook. Times follow the device clock and the 24 h French format of the mock-ups. Tests for the wait rule (one dive, several dives the same day, fixed choices). Check on the phone emulator, including the notification.
+
+## [ ] 2026-11-13-99 Suggested weight and « Ce lest était »
+
+Christian's decision of 13 November 2026 (TODOS #50). Mock-ups: `docs/mockups/android-edition.dc.html` (Équipement group) and `docs/mockups/detail3-android.dc.html` (Équipement section shown open). Colours: the theme of task 97.
+1. **Suggestion, in « Modifier la plongée »**, under the « Lest » heading of the Équipement group: a tonal card (secondary container, 12 dp corners) with a light-bulb icon, « Suggestion : 6 lb » (16 sp semibold), « Comme le 2 février 2013 » (13 sp) and a filled « Utiliser » button. « Utiliser » puts the weight in the dive's weights (same location as that earlier dive). Nothing is filled without the tap. Accessible name of the card: « Suggestion : 6 lb, comme le 2 février 2013 ».
+   - **Rule:** the most recent other dive of the logbook with the same suit, the same cylinder type(s) and the same water type (salinity), that has a weight. Its total weight is the suggestion, adjusted by its feedback tag (below): « too light » adds 2 lb (1 kg), « too heavy » removes 2 lb (1 kg). Units follow the settings.
+   - The card is shown when the dive has no weight yet, or a total different from the suggestion. No matching dive: no card.
+2. **« Ce lest était »**, three connected buttons « Trop léger », « Juste », « Trop lourd », single choice, can be cleared by tapping the selected one again (check icon on the selected one, secondary colour):
+   - in « Modifier la plongée », under « Ajouter un lest »;
+   - in the dive detail, inside the **open** Équipement section (`EquipmentCard`): Combinaison, Lest with the total, then the weights by location, then « Ce lest était », then Ordinateur. Not shown in the closed card. The open section's header is the button « Équipement » with the chevron up (accessible name ending « Masquer le détail »).
+3. **Storage, Subsurface compatible:** the choice is saved as a tag of the dive, always in English whatever the app language: `weight-too-light`, `weight-ok`, `weight-too-heavy`. Only one of the three at a time. These three tags are not shown in the dive's tag list or tag chips in OpenDives (they are shown by the buttons), but they stay in the file and Subsurface shows them as ordinary tags. Keep them out of tag suggestions and of the tag filter.
+Tests for the rule (match, no match, adjustment by tag, units) and for the tags (set, change, clear, kept on sync). Same on the tablet layouts. Check on the phone emulator.
+
+## [ ] 2026-11-13-100 Side menu: match the mock-up (logo, « Messages »)
+
+Christian's remark of 13 November 2026, on the side menu of the app compared with `docs/mockups/appbar-tiroir-android-ouvert.dc.html` (`NavMenu.svelte`, `SyncControl.svelte`):
+1. **Logo:** the app draws a white border around the logo in the menu header. The mock-up has none: a white disc behind the three waves, the white lower arc and the two white bubbles, 44 dp, nothing around it. Draw it exactly as in the mock-up's SVG.
+2. **« Messages » under « Synchroniser maintenant »:** the app shows « Messages » there, the mock-up does not. Under the button there is only the status line (« Synchronisé il y a 2 min »). « Messages » is not an OpenDives string: find where it comes from (a sync or debug element, a default label, a system component) and remove it. If it leads to something useful, tell Christian in the « Done » note instead of moving it elsewhere.
+Check on the phone emulator, light and dark mode, next to the mock-up.
+
+## [ ] 2026-11-13-101 Side menu: « Autres options de synchronisation » menu like the mock-up
+
+Christian's decision of 13 November 2026. With manual sync, the arrow of the « Synchroniser maintenant » split button (`SyncControl.svelte`) opens the menu drawn in `docs/mockups/appbar-tiroir-android-ouvert-manuel-options.dc.html` (next to `appbar-tiroir-android-ouvert-manuel.dc.html`). Make the app's menu look like it:
+- it opens **upward**, above the button, aligned to its right edge, 280 dp wide, surface colour, 16 dp corners, the usual menu shadow, 8 dp vertical padding;
+- two items, 48 dp high, 24 dp icon then 14 sp text: cloud icon « Passer en synchronisation automatique », logbook icon « Voir les modifications non envoyées » (same actions as today);
+- while it is open, the arrow of the split button points up and has `aria-expanded="true"`.
+Same in the Account page if it uses the same control. Check on the phone emulator, light and dark mode. Colours: the theme of task 97.
