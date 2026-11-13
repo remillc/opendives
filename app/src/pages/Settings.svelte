@@ -675,7 +675,6 @@
             applyTheme(theme);
           },
         },
-        { kind: 'info', id: 'textSize', label: t('settings.display.textSize'), value: t('settings.display.textSizeValue') },
       ],
     },
     {
@@ -919,6 +918,8 @@
     <input type="search" bind:value={search} placeholder={t('settings.search')} aria-label={t('settings.search')} />
   </div>
 
+  <!-- Affichage first (task 2026-11-13-110), then Langue et formats and Unités. -->
+  {@render groupView('display')}
   {@render groupView('language')}
 
   <!-- Units: the system, the five units, then speeds, duration and coordinates. -->
@@ -1000,7 +1001,6 @@
     {/if}
   {/if}
 
-  {@render groupView('display')}
   {@render groupView('maps')}
 
   {#if advancedShown}
