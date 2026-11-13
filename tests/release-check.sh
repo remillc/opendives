@@ -12,7 +12,9 @@
 #   reference    the 17 cases of Subsurface's testplan.cpp through the façade (tests/plan_test.cpp)
 #   oracle       the independent ZH-L16C checker over a grid of 360 plans (tests/plan_oracle.cpp)
 #   app          the app chain: conversions, request, displayed values, alarms (tests/app, node:test)
-#   mutations    wrong inputs sent to each of the three: every one must make it fail
+#   tools        the Tools section through the façade (tests/tools_test.cpp): gas calculator by hand,
+#                gas blender against an exact real-gas reference, desaturation against a ZH-L16C replay
+#   mutations    wrong inputs sent to each of the four: every one must make it fail
 #   android      the first two compiled with the NDK and run on emulator-5554 (x86_64); arm64 compiled only
 #   e2e          the scenarios in the real app on the emulator (tests/e2e)
 #
@@ -108,7 +110,20 @@ mutations_js() {
   done
   return $bad
 }
-mutations() { local a=0 b=0; mutations_cpp || a=1; mutations_js || b=1; [ $a = 0 ] && [ $b = 0 ] && echo "all 19 mutations detected"; return $(( a | b )); }
+# The tools test takes a log and reads OD_TOOLS_MUTATE (a wrong input sent to the façade only).
+TOOLS_LOG=third_party/subsurface/dives/SampleDivesV2.ssrf
+mutations_tools() {
+  local bad=0
+  for m in calc desat blend; do
+    if OD_TOOLS_MUTATE=$m build/poc/tools "$TOOLS_LOG" >"$OUT/logs/mutation-tools-$m.log" 2>&1; then
+      echo "NOT DETECTED: tools with $m"; bad=1
+    else
+      echo "detected: tools with $m ($(grep -c '^FAIL' "$OUT/logs/mutation-tools-$m.log") failures)"
+    fi
+  done
+  return $bad
+}
+mutations() { local a=0 b=0 c=0; mutations_cpp || a=1; mutations_js || b=1; mutations_tools || c=1; [ $a = 0 ] && [ $b = 0 ] && [ $c = 0 ] && echo "all 22 mutations detected"; return $(( a | b | c )); }
 
 app_deps() { [ -d app/node_modules/svelte ] || (cd app && npm ci --no-audit --no-fund); }
 app_tests() { app_deps && "$NODE" --import ./tests/app/register.mjs --test tests/app/planner.test.mjs; }
@@ -118,6 +133,7 @@ step build poc/build.sh
 step reference bash -c 'set -o pipefail; build/poc/plan | tail -n 6'
 step oracle bash -c 'set -o pipefail; build/poc/plan-oracle | tail -n 12'
 step app app_tests
+step tools bash -c 'set -o pipefail; build/poc/tools third_party/subsurface/dives/SampleDivesV2.ssrf | tail -n 12'
 step mutations mutations
 
 if [ "$SCOPE" = full ]; then
