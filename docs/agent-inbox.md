@@ -2207,3 +2207,25 @@ Done in `feature/planner-result-card`: « Résultat » (18 px bold) above one ca
 Christian's decision of 13 November 2026. In the planner's stops table, the gas of the first row (the descent gas, EAN32 in the mock-up) is shown in the same highlight pill as the gas changes. The legend under the table becomes « Début et fin en minutes depuis la mise à l'eau. ↓ descente, → niveau prévu, ↑ remontée, – palier de déco. Gaz surligné : gaz de départ ou changement de gaz. » Same on the tablet and in the shared plan. Mock-up: `docs/mockups/android-planificateur-nouveau.dc.html` (keep the current theme colours). Check on the phone emulator.
 
 Done in `feature/planner-result-card`: the first row's gas gets the gas-change pill; legend « … Gaz surligné : gaz de départ ou changement de gaz. » (fr/en). In the shared PDF, the first stop's gas and each change are highlighted. Checked on the phone emulator (Air highlighted on the first row).
+
+## [ ] 2026-11-13-97 Theme: warmer neutrals and the « grand bleu » header
+
+Christian's decision of 13 November 2026. The theme trial is approved: from now on, the mock-ups' background, greys and header are the theme. Reference mock-up: `docs/mockups/android-carnet-grand-bleu-strict.dc.html` (all the boards of the design canvas now use these colours). Light theme, in `app/src/theme.css`:
+- `--od-background` #F4F4F2 → **#F5F4F0** (and every token or literal that repeats it, such as the wave under the band and `--od-inverse-on-surface`);
+- surface greys #E8E8E5 → **#EBEAE5**: `--od-surface-2`, `--od-surface-container-high`, `--od-primary-container`, `--od-chart-grid`, the thumbnail squares, the « + » button;
+- `--od-text-2` #4A4D52 → **#4B4A47** (about 8:1 on the background);
+- `--od-text` (#1F2124), the white surface and the theme blues do not change.
+Header band of the sections and of the side menu (`--od-band-gradient`, the same in dark mode):
+- `radial-gradient(140% 115% at 38% -4%, #A9C4E2 0%, #7199C2 25%, #5584B5 37%, #2D5E90 59%, #114477 86%)`;
+- on the band, title, icons and ☰ in white (`--od-on-band` #FFFFFF), the summary line in #D4E2F2 (`--od-on-band-2`), the faint profile line in white at 30 %;
+- the search field and the pills placed on the band: white at 90 %, their text stays dark (`--od-band-control`).
+Check the contrast of everything placed on the band (white on the lightest part, top left). Dark theme: no change for now, Christian will decide its warm equivalent later. Check on the phone emulator: Carnet, Sites, Statistiques, Outils and the side menu, in light and dark mode. Tasks that said « keep the current theme colours » now follow these colours.
+
+## [ ] 2026-11-13-98 Desaturation: wait before flying, reminder and notification
+
+Christian's decision of 13 November 2026 (TODOS: flight countdown). Mock-ups in the canvas section « Android · Outils – Désaturation », copied to `docs/mockups/`. Colours: the theme of task 97.
+1. **Settings** (`reglages-avion-android.dc.html`), new group « Attente avant l'avion »: a choice « Selon les plongées » (12 h after one dive, 18 h after several dives in the day), « 12 h », « 18 h », « 24 h »; the note « Compté depuis la sortie de l'eau de la dernière plongée. Votre ordinateur de plongée fait foi. »; a switch « Me prévenir quand je peux prendre l'avion » with the sub-line « Après chaque plongée ». Default: « Selon les plongées », switch off.
+2. **Désaturation tool** (`outils-desaturation-rappel-android.dc.html`): under « Désaturation restante », a row « Avant de prendre l'avion » with the remaining wait (« 17 h 05 »), then the switch « Me prévenir quand je peux prendre l'avion » (same setting as above) and, when on, « Notification demain à 8 h 35 ». When the wait is over (`outils-desaturation-terminee-android.dc.html`): a status card « Vous pouvez prendre l'avion », « Attente terminée aujourd'hui, 8 h 35 ».
+3. **Logbook banner** (`android-carnet-avion.dc.html`): while a wait is running, a banner under the search field « Avion dans 17 h 05 » with « Permis demain à 8 h 35 ». It opens the Désaturation tool. It disappears when the wait is over.
+4. **Notification** (`notif-avion-android.dc.html`): when the switch is on, a local notification at the end of the wait: « Vous pouvez prendre l'avion », « L'attente de 18 h après vos plongées d'hier est terminée. » (the hours and the day follow the case). Tapping it opens the Désaturation tool. A new dive reschedules it.
+The wait is counted from the surfacing time of the last dive in the logbook. Times follow the device clock and the 24 h French format of the mock-ups. Tests for the wait rule (one dive, several dives the same day, fixed choices). Check on the phone emulator, including the notification.
