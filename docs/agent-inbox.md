@@ -2056,7 +2056,7 @@ Christian's decisions of 12 November 2026.
 
 Done in `feature/detail-grid-fr-ca`: the grid starts after the three cells (phone, tablet and iOS share one list). Margins: Framework7's Material rule gives `li > .item-link` an 8 dp side margin that stayed on our rows, whose link is also the content (24 / 32 dp); reset for `.od-row` rows, now 16 / 24, checked on the emulator. Times: the format locale is now fr-CA whenever the interface is fr-CA, so times read "10 h 44" even with another device region (tested). Units: "pi" kept in all French as before; Claude Conception is standardising the fr-CA wording, and the unit labels will follow that work.
 
-## [ ] 2026-11-13-84 Rebreather gas card: cylinder sizes, no-pressure state
+## [x] 2026-11-13-84 Rebreather gas card: cylinder sizes, no-pressure state
 
 Christian's decisions of 13 November 2026, on the rebreather gas card of the dive detail.
 - **Sizes:** the rebreather unit (diluent and oxygen cylinders with the scrubber) and the bailout cylinder have the same total height, bottoms aligned, and both are smaller than today. The drawing area goes from 200 to 140 dp tall (viewBox 326 × 140). The unit is scaled to about 68 %, the bailout cylinder to about 93 %. The DIL and O₂ labels keep their 11 dp text size. Mock-up: `docs/mockups/detail3-android-ccr.dc.html`.
@@ -2064,3 +2064,5 @@ Christian's decisions of 13 November 2026, on the rebreather gas card of the div
 - Update the card's accessible name: say "aucune donnée de pression" instead of the pressures.
 
 Check light and dark on the phone emulator, with and without pressures.
+
+Done in `feature/ccr-gas-sizes`: the drawing is 140 tall (viewBox 326 × 140, 218 wide without bailout); the unit is drawn at 68.4 % and the cylinders beside it at 93.5 %, bottoms aligned, DIL and O₂ kept at 11 px outside the scaling (the mock-up's transforms). A cylinder with no pressure at all is hatched (tokens `--od-cylinder-no-pressure` #F1F1EF and `--od-cylinder-no-pressure-stripe` #D9D9D5; dark: #1C1D1F, the dark surface, and #3A3C40), with no level and no marks; the accessible name ends with "Aucune donnée de pression" when no cylinder has pressures, or names it after each cylinder that lacks them (tested). **Christian's addition (13 November 2026):** a cylinder with only one pressure (start or end) is drawn empty, in every cylinder drawing (`fillLevels`). Checked on the phone emulator, light and dark: hatched diluent and oxygen, a bailout with only a start pressure drawn empty. Not checked: a CCR dive with both pressures (none in the test log).

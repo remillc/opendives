@@ -14,12 +14,13 @@
   /**
    * @type {{
    *   label: string,
-   *   items: { gas: string, line: string, range: string, ratio: number, startRatio: number|null }[],
+   *   items: { gas: string, line: string, range: string, ratio: number, startRatio: number|null, noPressure?: boolean }[],
    *   changes?: string,
    *   sac?: { label: string, value: string }|null,
    *   rebreather?: { diluent: number, oxygen: number, others: number[], marks: { diluent: string, oxygen: string, bailout: string } }|null,
    * }}
-   * label: the accessible name of the group; range: "2 683 → 1 885 psi", empty when unknown.
+   * label: the accessible name of the group; range: "2 683 → 1 885 psi", empty when unknown;
+   * noPressure: the cylinder has no pressure at all (the rebreather drawing hatches it).
    */
   let { label, items, changes = '', sac = null, rebreather = null } = $props();
 

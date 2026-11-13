@@ -293,6 +293,7 @@
     "rebreatherOxygen": "oxygène {cylinder}",
     "rebreatherBailout": "Secours : {list}",
     "rebreatherRange": "de {start} à {end}",
+    "rebreatherNoPressure": "Aucune donnée de pression",
     "rebreatherMarks": { "diluent": "DIL", "oxygen": "O₂", "bailout": "SECOURS" },
     "gasChange": {
       "line": "Passage {list}.",
@@ -1595,6 +1596,8 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Bouteilles dessinées : une bouteille dont on ne connaît qu’une pression (début ou fin) est dessinée vide.",
+      "Détail de plongée, recycleur : le dessin est plus petit, l’appareil et la bouteille de secours ont la même hauteur ; une bouteille sans pressions est hachurée en gris, sans niveau.",
       "Thème bleu : les bandeaux et le menu latéral passent au bleu océan, tout comme l’eau du profil et des vignettes, les bouteilles dessinées, les sélections et les barres de progression. Le rouille et le sable marquent désormais les données comme la température de l’eau et les graphiques des statistiques. Les boutons principaux restent noirs. Sur le téléphone, le bouton de température indique « Temp. ».",
       "Icône, logo et écran de démarrage : les trois vagues passent en bleus au lieu du sable et de la rouille, avec le même dessin.",
       "Détail de plongée : la grille d’informations ne répète plus l’entrée, la sortie et la profondeur moyenne, déjà lues sur le profil ; elle commence par l’air.",
