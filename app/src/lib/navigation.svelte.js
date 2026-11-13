@@ -47,7 +47,26 @@ function closeOverPages(view) {
   // deeper (a page of Settings), straight back to the first screen. Without
   // animation Framework7 left the first screen shifted as a previous page.
   if (router.history.length === 2) router.back();
-  else router.back(router.history[0], { force: true });
+  else backToFirstScreen(router);
+}
+
+/**
+ * Back to a view's first screen, one page at a time and without animation. Not
+ * `router.back(first, { force: true })`: in a view with a list-detail pair (the Logbook,
+ * whose list is a master page, even on a phone), Framework7 then leaves the first screen
+ * marked as a previous page, shifted to the left, and a page opened next can be dropped
+ * while its route stays in the history (bug of 13 November 2026: the Logbook shifted, with
+ * a white band on the right, after leaving a Réglages subpage from the side menu).
+ * @param {any} router a Framework7 router
+ * @returns {Promise<void>} settled when the first screen is shown
+ */
+export async function backToFirstScreen(router) {
+  const start = Date.now();
+  while (router && router.history.length > 1 && Date.now() - start < 2000) {
+    // `transitioning` is not in Framework7's types: a back asked during a transition is dropped.
+    if (!router.transitioning) router.back({ animate: false });
+    await new Promise((resolve) => setTimeout(resolve, 30));
+  }
 }
 
 /**

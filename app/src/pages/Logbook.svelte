@@ -32,7 +32,7 @@
   import { shownTrip } from '../lib/trip-shown.js';
   import { filter, loadOptions, applyFilter, isEmpty } from '../lib/filter.svelte.js';
   import { layout } from '../lib/layout.svelte.js';
-  import { navigation } from '../lib/navigation.svelte.js';
+  import { navigation, backToFirstScreen } from '../lib/navigation.svelte.js';
   import { formatDateTime, formatLongDate, formatTimeAgo, localNowIso } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
   import { groupByMonth, stickyMonth } from '../lib/carnet-months.js';
@@ -777,7 +777,7 @@
   // no dive beside the list; the dive of the account that left must not stay.
   $effect(() => {
     if (!layout.split || logbook.loading || logbook.dives.length || navigation.dive === null) return;
-    f7router.back('/', { force: true, animate: false });
+    backToFirstScreen(f7router);
   });
 
   /**
