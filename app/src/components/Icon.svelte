@@ -18,9 +18,9 @@
   const paths = {
     // A bound notebook, as the mock-ups draw it; its spine is an accent (see `accents`).
     logbook: 'M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z',
-    sites: 'M12 21s-6.5-6.2-6.5-11a6.5 6.5 0 0 1 13 0c0 4.8-6.5 11-6.5 11zM12 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z',
-    statistics: 'M4 20h16M6.5 20v-6M11 20V8M15.5 20v-9M20 20V4',
-    tools: 'M14.5 6.5a4 4 0 0 0 5 5L12 19a2.1 2.1 0 0 1-3-3l7.5-7.5a4 4 0 0 0-5-5l2.5 2.5-1 2-2 1z',
+    sites: 'M12 21s-6-5.3-6-10a6 6 0 0 1 12 0c0 4.7-6 10-6 10zM14 11a2 2 0 1 1-4 0 2 2 0 0 1 4 0z',
+    statistics: 'M5 20V11M12 20V5M19 20v-7',
+    tools: 'M4 7h10M18 7h2M4 17h4M12 17h8M18 7a2 2 0 1 1-4 0 2 2 0 0 1 4 0zM12 17a2 2 0 1 1-4 0 2 2 0 0 1 4 0z',
     plus: 'M12 5v14M5 12h14',
     // Sharing and scanning by QR code: the three finder squares and the data blocks.
     qr: 'M4 4h6v6H4z M14 4h6v6h-6z M4 14h6v6H4z M14 14h2v2h-2z M18 18h2v2h-2z M18 14v2 M14 20v-2',
@@ -98,8 +98,7 @@
     // Two sliders: the planner's settings.
     tune: 'M4 7h9M17 7h3M15 5v4M4 17h3M11 17h9M9 15v4',
     simplifyProfile: 'M3 5l4 12h10l4-12',
-    settings:
-      'M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4zM10.6 3h2.8l.4 2.3 1.6.9 2.2-.8 1.4 2.4-1.8 1.5v1.8l1.8 1.5-1.4 2.4-2.2-.8-1.6.9-.4 2.3h-2.8l-.4-2.3-1.6-.9-2.2.8-1.4-2.4 1.8-1.5v-1.8L4.8 7.8l1.4-2.4 2.2.8 1.6-.9z',
+    settings: 'M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1',
   };
 
   // Lines drawn over the shape: when a filled icon is wanted (the active drawer row), the
