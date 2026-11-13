@@ -54,6 +54,11 @@ export function registerGuard(guard) {
   };
 }
 
+/** Whether a form on screen has unsaved changes (a link must not close it over the diver's head). */
+export function anyDirty() {
+  return guards.some((guard) => guard.dirty());
+}
+
 /**
  * The Android Back key: when the form shown has unsaved changes, asks and
  * returns true (Back is handled); otherwise false and Back goes on as usual.

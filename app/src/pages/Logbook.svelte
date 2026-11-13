@@ -23,6 +23,7 @@
   import RenumberDialog from '../components/RenumberDialog.svelte';
   import ExportSheet from '../components/ExportSheet.svelte';
   import { exportDives } from '../lib/share.js';
+  import { importErrorKey } from '../lib/deep-link.js';
   import { logbook, loadLogbook, importFile, undoLastChange, reopenConflict, deleteDives, tripChange } from '../lib/logbook.svelte.js';
   import { conflictDiveCount } from '../lib/conflict-choices.js';
   import { confirmAction } from '../lib/dialogs.js';
@@ -1047,14 +1048,7 @@
     } catch (e) {
       const code = String(/** @type {any} */ (e)?.message ?? '');
       console.error('Import a file', code);
-      const key = code.startsWith('NO_NEW_DIVES')
-        ? 'logbook.importNothingNew'
-        : code.startsWith('NO_DIVES')
-          ? 'logbook.importNoDives'
-          : code.startsWith('WRITE_LOCKED')
-            ? 'edit.writeLocked'
-            : 'logbook.importFailed';
-      f7.dialog.create({ title: t('logbook.importTitle'), text: t(key), buttons: [{ text: t('dialog.ok') }] }).open();
+      f7.dialog.create({ title: t('logbook.importTitle'), text: t(importErrorKey(code)), buttons: [{ text: t('dialog.ok') }] }).open();
     } finally {
       importing = false;
     }

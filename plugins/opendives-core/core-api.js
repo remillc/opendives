@@ -711,6 +711,9 @@ import { registerPlugin } from '@capacitor/core';
  *   The app's page of the system settings (a permission refused for good).
  * @property {(options: GaugeCameraOptions) => Promise<GaugeCameraResult>} gaugeCamera
  *   Android: the full-screen camera that reads cylinder pressures (see GaugeCameraResult).
+ * @property {(options: {uri: string}) => Promise<{name: string, size: number, data: string}>} readSharedFile
+ *   Reads a file another app handed over (Android content://, iOS file://): its name, its size in
+ *   bytes and its contents in base64. Rejects TOO_BIG (above 100 MB), NOT_FOUND, FAILED, BAD_ARGUMENT.
  * @property {() => Promise<void>} contentShown
  *   The first screen is drawn: the launch screen (splash) can go (Android; no effect elsewhere).
  * @property {(options?: {durationMs?: number}) => Promise<void>} startBluetoothScan
@@ -896,6 +899,7 @@ export const OpenDivesCore = {
   enableBluetooth: () => native.enableBluetooth(),
   openAppSettings: () => native.openAppSettings(),
   contentShown: () => native.contentShown(),
+  readSharedFile: (options) => native.readSharedFile(options),
   gaugeCamera: (options) => native.gaugeCamera(options),
   startBluetoothScan: (options = {}) => native.startBluetoothScan(options),
   stopBluetoothScan: () => native.stopBluetoothScan(),

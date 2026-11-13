@@ -81,6 +81,7 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "enableBluetooth", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "openAppSettings", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "contentShown", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "readSharedFile", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "startBluetoothScan", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "stopBluetoothScan", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "bluetoothModels", returnType: CAPPluginReturnPromise),
@@ -1356,6 +1357,44 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
     @objc func cancelDownload(_ call: CAPPluginCall) {
         OpenDivesNative.downloadCancel()
         call.resolve()
+    }
+
+    // MARK: - A file sent to the app (deep links, "Open in OpenDives")
+
+    /// Reads a file another app handed over (a file:// URL of the Inbox or of a provider):
+    /// its name, its size and its contents in base64. The web layer decides whether it is a
+    /// logbook (lib/deep-link.js). Rejects TOO_BIG above 100 MB, NOT_FOUND, FAILED.
+    @objc func readSharedFile(_ call: CAPPluginCall) {
+        guard let text = call.getString("uri"), !text.isEmpty else {
+            call.reject("Missing uri", "BAD_ARGUMENT")
+            return
+        }
+        guard let url = URL(string: text), url.isFileURL else {
+            call.reject("Not a file", "BAD_ARGUMENT")
+            return
+        }
+        DispatchQueue.global(qos: .userInitiated).async {
+            // A file opened in place (outside the app) needs its security scope.
+            let scoped = url.startAccessingSecurityScopedResource()
+            defer { if scoped { url.stopAccessingSecurityScopedResource() } }
+            do {
+                let size = (try url.resourceValues(forKeys: [.fileSizeKey]).fileSize) ?? 0
+                if size > 100 * 1024 * 1024 {
+                    call.reject("The file is too big", "TOO_BIG")
+                    return
+                }
+                let bytes = try Data(contentsOf: url)
+                call.resolve([
+                    "name": url.lastPathComponent,
+                    "size": bytes.count,
+                    "data": bytes.base64EncodedString(),
+                ])
+            } catch let error as NSError where error.code == NSFileReadNoSuchFileError {
+                call.reject("Cannot open the file", "NOT_FOUND")
+            } catch {
+                call.reject("Cannot read the file", "FAILED")
+            }
+        }
     }
 
     // MARK: - Sharing and export
