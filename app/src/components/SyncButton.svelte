@@ -1,6 +1,6 @@
 <script>
   // @ts-check
-  // "Sync now", wherever it is offered (side menu, Account): a tonal button
+  // "Sync", wherever it is offered (side menu, Account): a tonal button
   // whose background fills from left to right with the sync's progress
   // (lib/sync-progress.js), its label unchanged so that it keeps its size and
   // nothing around it moves; then a snackbar says it is done, or why not.
