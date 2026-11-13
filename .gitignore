@@ -32,3 +32,6 @@ local.properties
 plugins/opendives-core/ios/OpenDivesCore.xcframework/
 plugins/opendives-core/ios/include/
 plugins/opendives-core/ios/Resources/
+
+# Cloudflare wrangler local state (site deployment)
+.wrangler/

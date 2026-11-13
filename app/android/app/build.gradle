@@ -12,7 +12,7 @@ android {
         applicationId "org.opendives.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 2
+        versionCode 3
         versionName appVersion
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         // The core (libopendives.so) is built for these two ABIs only (native/build-android.sh),

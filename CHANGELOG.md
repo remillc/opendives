@@ -6,7 +6,7 @@ All notable changes to OpenDives are listed here, newest first. The format follo
 each release; the app's own "What's new" list (About) describes the current version
 in fewer words.
 
-## [0.3.0] - Unreleased
+## [0.3.0] - 2026-11-13
 
 ### Added
 
@@ -62,6 +62,40 @@ in fewer words.
   (units, request, displayed values, alarms), proof that wrong inputs make each fail, the
   same tests compiled with the NDK and run on the emulator, and planner scenarios in the
   real app.
+- **Reading a gauge with the camera (Android).** In "Edit dive", a camera button in the
+  Start and End fields of each cylinder reads the pressure on a digital gauge or dive
+  computer display (one or two gauges, bar or psi), or on a photo chosen with "Photos",
+  and fills the field to check. On-device text recognition; the photo is not kept. A
+  needle dial is not read yet.
+- **Rebreather dives.** The Gas section of a closed-circuit dive draws the rebreather
+  seen from the back, diluent on the left and oxygen on the right, with the bailout and
+  stage cylinders beside it; "Edit dive" draws the same unit. A cylinder without both
+  its pressures is hatched in grey.
+- **Water slate and plan sharing.** "Share plan" offers the water slate (a pocket card
+  to print at actual size with cut marks, with backup plans: 5 min more, 3 m / 10 ft
+  deeper or a lost deco gas, each calculated again), the PDF sheet, the table image, the
+  planned dive's .ssrf file and the text summary. Settings › Language and formats ›
+  Paper size: Automatic, Letter or A4.
+- **Links.** `opendives://` and `https://opendives.app/` addresses open a dive, a site,
+  the planner or a tool; a dive and a site can be shared as a link. A Subsurface
+  logbook file (.ssrf, .xml) sent from a mail or file app opens in OpenDives to be
+  imported, after a confirmation; any other file is refused.
+- **Leaving a form.** Leaving a form whose values changed (←, ✕, Android Back, the iOS
+  swipe) asks "Leave without saving?" with Stay, Save and Leave.
+- **Planner.** The result lists every row of the dive (descent, levels, ascents, stops,
+  the final ascent) with start, duration, end, speeds and gas; two SAC fields, "At the
+  bottom" and "During deco"; a reserve with a SAC factor under stress and a number of
+  divers; "Simplify profile" turns a measured profile into editable levels; "Save" asks
+  for a title.
+- **Best mix.** Two tabs, Nitrox and Trimix; the maximum END only applies to the trimix.
+- **Units.** A "Partial pressures" unit, bar or ATA; "Pressure" becomes "Cylinder
+  pressure".
+- **Settings.** "Show photo and video fields" (off by default); a "Download" group for
+  Bluetooth devices and remembered computers.
+- **Offline maps on iPhone and iPad.**
+- **Release check for the tools.** The gas calculator, the blender and the desaturation
+  are checked in `tests/release-check.sh`: the desaturation against an independent
+  ZH-L16C replay of real dives, the blender against an independent real-gas solution.
 
 ### Changed
 
@@ -94,6 +128,39 @@ in fewer words.
 - **Secure connections.** The OpenSSL library is replaced by Mbed TLS, compatible with
   the app's licence.
 - **What's new.** The version date next to its number.
+- **Blue theme.** Header bands, side menu, water of the profile and thumbnails, cylinder
+  drawings, selections and progress bars are ocean blue; rust and sand mark data such as
+  the water temperature and the statistics charts. The app icon, logo and splash screen
+  have blue waves.
+- **Material 3 Expressive (Android).** Springy motion; dates and times in the Material
+  date picker and clock; dropdown menus under their field instead of wheels and radio
+  buttons; connected button groups; large titles that shrink as you scroll; a floating
+  toolbar for the actions of a dive, a trip, a site and a selection; a split "Sync now";
+  a wavy progress line and a morphing loading shape.
+- **Dive page.** Gas and Equipment are two sections: a drawing of each cylinder with its
+  gas, use, size and pressures, and the gas changes in one line; the profile fills the
+  phone's width and shows the entry and exit times and the average depth; the info grid
+  no longer repeats them; the dive computers belong to the equipment; unused cylinders
+  show.
+- **Edit dive.** A Gas group with the dive mode and the cylinder drawings, each cylinder
+  in its own sheet or card with its gas in plain words and its size from the type;
+  cylinders can be reordered; deleting one asks first; Conditions start collapsed.
+- **Cylinder drawings.** A slimmer, more realistic shape with shoulders and a neck, no
+  valve, in every screen; a cylinder with only one or no pressure is hatched in grey.
+- **Planner result.** One "Result" card: the total time and the deco stops as key
+  figures, then the stops (the starting gas highlighted) or "Ascent with no stop", the
+  volume per gas (total in large type, a bar and its legend) and the oxygen exposure in
+  the same layout. The SAC list goes by 0.01 cu ft/min and every dropdown opens on its
+  value; oxygen, helium and altitude are dropdowns of the usual values.
+- **Account and first launch.** The sign-in, account creation, logbook import and git
+  repository screens take the layout of first launch on Android and iPhone; first launch
+  is simpler, and full screen on tablets.
+- **Tablets.** In portrait, no navigation rail (☰ and the floating "+" as on a phone);
+  the detail pane's back arrow only goes back inside the pane; Settings and About open
+  full width.
+- **Freediving.** No gas in the dive page or in "Edit dive".
+- **Interface texts.** Shorter and clearer, following the writing guide.
+- **Canadian French.** Times read "10 h 44" whatever the device region.
 
 ### Fixed
 
@@ -109,6 +176,17 @@ in fewer words.
   shows a trip.
 - **Tablet.** The Logbook opens the first dive when none is shown.
 - **What's new.** The list stopped after 20 entries.
+- **Gas blender.** The helium step of a trimix was about 0.8 % short (the core read
+  pure helium as air in its compressibility), and the oxygen step as much too long.
+- **Keyboard (planner).** It closed while typing in a level, gas or GF field.
+- **Logbook margins (Android).** Dive rows had 8 dp too much on each side.
+- **Statistics.** The dives behind a row open faster with far less memory, and a value
+  is no longer cut in the middle of a number or word.
+- **Taps.** A tap that slid a little was sometimes ignored.
+- **Start-up.** The app no longer stays on a white screen before its look has loaded.
+- **Units.** A single unit changed after "Imperial" or "Metric" is kept after a restart.
+- **Tablet.** After signing out, the last dive no longer stays beside the empty
+  logbook; section headers have their wavy edge again.
 
 ## [0.2.0] - 2026-11-08
 
@@ -187,4 +265,5 @@ First test version, for Android: logbook synced with the Subsurface cloud or kep
 the device only, dive pages with the profile, trips, sites on a map, download from the
 dive computer over Bluetooth, statistics, planner and gas tools.
 
+[0.3.0]: https://github.com/remillc/opendives/releases/tag/v0.3.0
 [0.2.0]: https://github.com/remillc/opendives/releases/tag/v0.2.0
