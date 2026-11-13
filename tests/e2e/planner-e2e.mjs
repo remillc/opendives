@@ -145,12 +145,22 @@ const read = () =>
     const r = __od.root();
     const o = r.querySelector('.od-planner--outcome');
     const text = (e) => e.textContent.replace(/\\s+/g, ' ').trim();
-    const rows = [...o.querySelectorAll('.od-planner--results .od-planner--result')].filter((e) => !e.classList.contains('od-planner--oxygen')).map((e) => ({
+    // The result card (tasks 93 to 95): one block per gas (total, then the used and
+    // reserve volumes of its legend, a missing reserve read as 0), the MOD alarm row,
+    // and the oxygen block (CNS, then OTU).
+    const gases = [...o.querySelectorAll('.od-planner--card .od-planner--volume:not(.od-planner--oxygen)')].map((e) => {
+      const parts = [...e.querySelectorAll('.od-planner--volume-legend b')].map(text);
+      return { label: text(e.querySelector('.od-planner--label')), hint: parts.length > 1 ? parts.join(' ') : parts.join(' ') + ' 0', value: text(e.querySelector('.od-planner--volume-total')), alarm: false };
+    });
+    const alarms = [...o.querySelectorAll('.od-planner--card .od-planner--result')].map((e) => ({
       label: text(e.querySelector('.od-planner--label')), hint: text(e.querySelector('.od-planner--hint')), value: text(e.querySelector('.od-planner--value')), alarm: !!e.querySelector('.od-planner--value.od-planner--alarm'),
     }));
-    const oxygen = o.querySelector('.od-planner--result.od-planner--oxygen .od-planner--value');
+    const rows = [...gases, ...alarms];
+    const oxygenBlock = o.querySelector('.od-planner--volume.od-planner--oxygen');
+    const oxygen = oxygenBlock ? { textContent: text(oxygenBlock.querySelector('.od-planner--volume-total')) + ' ' + text(oxygenBlock.querySelector('.od-planner--volume-legend b')) } : null;
+    const tile = o.querySelector('.od-planner--tile-value');
     return {
-      title: o.querySelector('h2.od-planner--section-title') ? text(o.querySelector('h2.od-planner--section-title')) : '',
+      title: tile ? text(tile) : '',
       error: o.querySelector('p.od-planner--error') ? text(o.querySelector('p.od-planner--error')) : '',
       failed: [...o.querySelectorAll('p.od-planner--note')].map(text).includes(${q(T('plan.failed'))}),
       noStop: !!o.querySelector('.od-planner--no-stop'),
