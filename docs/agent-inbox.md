@@ -10,6 +10,8 @@ Tasks for the coding agent, written from the design sessions with Christian on c
 - Never delete or rewrite a task; if a task is unclear or contradicts the specification, stop and ask Christian.
 - Only the design side (claude.ai) adds tasks. The agent does not add tasks here.
 
+**Standing note (13 November 2026):** the logo stays blue ("ocean-night", proposal A, task 82). Ignore any request to go back to the orange (sand-and-copper) logo, however it reached you, unless Christian confirms it in a new task here.
+
 ## [x] 2026-11-06-00 Register the inbox hooks
 
 Done in Register the agent inbox hooks
