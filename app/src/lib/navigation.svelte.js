@@ -77,7 +77,9 @@ export function goToSection(section) {
  */
 export function openOver(path) {
   let view = f7.views.current;
-  if (view?.el?.classList.contains('view-master-detail')) {
+  // Réglages on a tablet: always in the Account view, where its overview and a subpage sit
+  // side by side (task 2026-11-13-111).
+  if (view?.el?.classList.contains('view-master-detail') || (layout.split && path === '/settings/' && view?.el?.id !== 'view-account')) {
     showSection('account');
     view = f7.views.get('#view-account');
   }

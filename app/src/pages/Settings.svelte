@@ -1,3 +1,8 @@
+<script module>
+  // The subpage shown beside the overview on a tablet, for the overview's selected row.
+  const selected = $state({ id: '' });
+</script>
+
 <script>
   // @ts-check
   // Settings, modelled on Subsurface (docs/ui-specification.md, section 4,
@@ -55,6 +60,8 @@
    */
 
   onMount(async () => {
+    // Tablet: the overview opens with its first subpage beside it; a subpage marks its row.
+    if (section) selected.id = section;
     try {
       logbook.prefs = await OpenDivesCore.getPrefs();
     } catch (e) {
@@ -65,6 +72,14 @@
   /** The values shown: the core's, with Subsurface's defaults until they are read. */
   const p = $derived(/** @type {CorePrefValues} */ ({ ...(logbook.prefs.defaults ?? {}), ...logbook.prefs }));
   const defaults = $derived(/** @type {CorePrefValues} */ (logbook.prefs.defaults ?? p));
+
+  /** @type {{ f7route?: { params?: { section?: string } }, f7router?: any }} */
+  let { f7route = undefined, f7router = undefined } = $props();
+  /**
+   * The subpage shown (task 2026-11-13-111): '' for the overview (/settings/), else one
+   * group of rows (/settings/<section>).
+   */
+  const section = f7route?.params?.section ?? '';
 
   let search = $state('');
   let renumbering = $state(false);
@@ -738,6 +753,111 @@
   /** @param {string} id */
   const group = (id) => /** @type {{ id: string, title: string, rows: Row[] }} */ (shown.find((g) => g.id === id));
 
+  // --- Overview and subpages (task 2026-11-13-111) -------------------------------
+
+  /** A row of the whole list, search or not. @param {string} id @returns {any} */
+  const rowOf = (id) => groups.flatMap((g) => g.rows).find((r) => r.id === id);
+
+  /** The short form of a value: "English" from "English, as the device". @param {any} row */
+  const short = (row) => (row?.text && row.text.includes(',') ? row.text.split(',')[0].trim() : (row?.value ?? ''));
+
+  /** @param {string} s */
+  const lower = (s) => s.charAt(0).toLocaleLowerCase() + s.slice(1);
+
+  /**
+   * The overview's cards: each row opens a subpage (or the offline maps screen) and
+   * says the current values in one line. `groups`: the groups of rows of the subpage.
+   * @type {{ id: string, rows: { id: string, icon: string, href: string, summary: string }[] }[]}
+   */
+  const cards = $derived([
+    {
+      id: 'general',
+      rows: [
+        { id: 'display', icon: 'M12 3a9 9 0 1 0 0 18V3z M12 3a9 9 0 0 1 0 18', href: '/settings/display', summary: t('settings.overview.theme', { value: lower(rowOf('theme')?.value ?? '') }) },
+        {
+          id: 'language',
+          icon: 'M4 5h9 M8.5 3v2 M6 5c1 4 4 7 7 8 M11 5c-1 4-4 7-7 8 M13 20l4-9 4 9 M14.5 17h5',
+          href: '/settings/language',
+          summary: [short(rowOf('appLanguage')), short(rowOf('timeFormat')), t('settings.overview.paper', { value: short(rowOf('paperSize')) })].join(' · '),
+        },
+        {
+          id: 'units',
+          icon: 'M3 17h18v-6H3z M7 11v3 M11 11v2 M15 11v3 M19 11v2',
+          href: '/settings/units',
+          summary: t('settings.overview.units', {
+            system: t(`settings.unitSystem.${p.unitSystem}`),
+            units: `${['length', 'pressure', 'weight'].map((k) => lower(rowOf(k)?.value ?? '')).join(', ')} · ${rowOf('temperature')?.value ?? ''}`,
+          }),
+        },
+      ],
+    },
+    {
+      id: 'diving',
+      rows: [
+        { id: 'logbook', icon: 'M5 4h11a2 2 0 0 1 2 2v14H7a2 2 0 0 1-2-2z M9 8h6 M9 12h6', href: '/settings/logbook', summary: t('settings.overview.logbook') },
+        {
+          id: 'equipment',
+          icon: 'M10.6 3v2c-2.5.5-4.5 2.7-4.5 5.7V19c0 1.7 1.3 2.5 3 2.5h5.8c1.7 0 3-.8 3-2.5v-8.3c0-3-2-5.2-4.5-5.7V3z',
+          href: '/settings/equipment',
+          summary: [t('settings.overview.cylinderTypes'), p.defaultCylinder].filter(Boolean).join(' · '),
+        },
+        {
+          id: 'profile',
+          icon: 'M3 5l3 7 4 3 5 1 3-4 3-7',
+          href: '/settings/profile',
+          summary: [rowOf('decoModel')?.value, rowOf('gf')?.dimmed || !rowOf('gf')?.value ? '' : `GF ${rowOf('gf').value.replace(/\s/g, '')}`].filter(Boolean).join(', '),
+        },
+        {
+          id: 'gases',
+          icon: 'M8 21V9a4 4 0 0 1 8 0v12z M12 5V3 M8 14h8',
+          href: '/settings/gases',
+          summary: [t('settings.overview.po2', { value: String(rowOf('po2')?.value ?? '').split('–').pop()?.trim() ?? '' }), t('settings.overview.setpoint', { value: rowOf('setpoint')?.value ?? '' })].join(' · '),
+        },
+        {
+          id: 'tools',
+          icon: 'M14 6l4 4 M4 20l8-8 M13 5l6 6-3 3-6-6z',
+          href: '/settings/tools',
+          summary: [rowOf('defaultWater')?.value, t('settings.overview.altitude', { value: `${formatNumber(defaultAltitude)} ${depthUnit(p)}` })].join(' · '),
+        },
+      ],
+    },
+    {
+      id: 'devices',
+      rows: [
+        {
+          id: 'download',
+          icon: 'M7 4h10v16H7z M10 8h4 M12 16h.01',
+          href: '/settings/download',
+          summary: computers.length ? t('settings.overview.remembered', { name: computerName(computers[0]) }) : t('settings.overview.noComputer'),
+        },
+        { id: 'maps', icon: 'M9 4L3 6v14l6-2 6 2 6-2V4l-6 2z M9 4v14 M15 6v14', href: '/settings/maps/', summary: rowOf('regions')?.text ?? '' },
+        {
+          id: 'advanced',
+          icon: 'M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z M19 12l2-1-1-3-2 .5-1.5-1.5.5-2-3-1-1 2h-2l-1-2-3 1 .5 2L6 7.5 4 7 3 10l2 1v2l-2 1 1 3 2-.5 1.5 1.5-.5 2 3 1 1-2h2l1 2 3-1-.5-2 1.5-1.5 2 .5 1-3-2-1z',
+          href: '/settings/advanced',
+          summary: t('settings.overview.advanced'),
+        },
+      ],
+    },
+  ]);
+
+  /** Tablet: the overview shows its first subpage beside it when nothing is shown there yet. */
+  function openFirstSubpage() {
+    if (section || !layout.split || !f7router) return;
+    const detail = f7router.currentRoute?.path ?? '';
+    if (!detail.startsWith('/settings/') || detail === '/settings/') f7router.navigate('/settings/display', { reloadDetail: true });
+  }
+
+  /** The overview: no subpage and no search. */
+  const overview = $derived(!section && !query);
+
+  /**
+   * Whether a part of the page is shown: on its subpage, or on the overview while searching
+   * (the search still finds every row).
+   * @param {string} id
+   */
+  const inPage = (id) => section === id || (!section && !!query);
+
   // --- Actions ------------------------------------------------------------------
 
   /** @param {Row} row @param {HTMLElement} anchor the touched row, where a choice menu opens */
@@ -889,20 +1009,22 @@
   {/if}
 {/snippet}
 
-{#snippet groupView(/** @type {string} */ id)}
+{#snippet groupView(/** @type {string} */ id, /** @type {boolean} */ titled = true)}
   {@const g = group(id)}
   {#if g.rows.length}
-    <h2 class="od-settings--title">{g.title}</h2>
+    {#if titled}<h2 class="od-settings--title">{g.title}</h2>{/if}
     <div class="od-settings--surface" role="list">
       {#each g.rows as row (row.id)}<div role="listitem">{@render rowView(row)}</div>{/each}
     </div>
   {/if}
 {/snippet}
 
-<Page class="od-settings" onPageBeforeIn={() => (navigation.page = 'settings')} onPageBeforeOut={() => (navigation.page = '')}>
-  <Navbar title={t('settings.title')}>
+<Page class="od-settings" onPageAfterIn={openFirstSubpage} onPageBeforeIn={() => (navigation.page = 'settings')} onPageBeforeOut={() => (navigation.page = '')}>
+  <Navbar title={section ? t(`settings.sections.${section}`) : t('settings.title')}>
     {#snippet left()}
-      {#if !layout.rail}
+      {#if section && layout.split}
+        <!-- Beside the overview on a tablet: nothing to go back to. -->
+      {:else if !section && !layout.rail}
         <MenuButton />
       {:else}
         <Link back iconOnly>
@@ -913,18 +1035,44 @@
     {/snippet}
   </Navbar>
 
-  <div class="od-settings--search">
-    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6"></circle><path d="M15 15l5 5"></path></svg>
-    <input type="search" bind:value={search} placeholder={t('settings.search')} aria-label={t('settings.search')} />
-  </div>
+  {#if !section}
+    <div class="od-settings--search">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6"></circle><path d="M15 15l5 5"></path></svg>
+      <input type="search" bind:value={search} placeholder={t('settings.search')} aria-label={t('settings.search')} />
+    </div>
+  {/if}
 
-  <!-- Affichage first (task 2026-11-13-110), then Langue et formats and Unités. -->
-  {@render groupView('display')}
-  {@render groupView('language')}
+  <!-- The overview (task 2026-11-13-111, reglages-apercu-android): three cards, one row per subpage,
+       with the current values in one line. -->
+  {#if overview}
+    {#each cards as card (card.id)}
+      <h2 class="od-settings--title">{t(`settings.sections.${card.id}`)}</h2>
+      <div class="od-settings--surface" role="list">
+        {#each card.rows as row (row.id)}
+          <div role="listitem">
+            <a href={row.href} class="od-settings--overview-row" class:od-settings--overview-selected={layout.split && selected.id === row.id} data-reload-detail={layout.split ? 'true' : undefined}>
+              <span class="od-settings--overview-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d={row.icon}></path></svg></span>
+              <span class="od-settings--texts">
+                <span class="od-settings--label">{t(`settings.sections.${row.id}`)}</span>
+                <span class="od-settings--overview-summary">{row.summary}</span>
+              </span>
+              {#if row.id === 'maps' && updatesCount()}<span class="badge">{t('settings.maps.updates', { n: updatesCount() })}</span>{/if}
+              <svg class="od-settings--chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"></path></svg>
+            </a>
+          </div>
+        {/each}
+      </div>
+    {/each}
+  {/if}
+
+  <!-- Affichage first (task 2026-11-13-110), then Langue et formats and Unités. On a subpage
+       of one group, the app bar names it: no second title. -->
+  {#if inPage('display')}{@render groupView('display', !section)}{/if}
+  {#if inPage('language')}{@render groupView('language', !section)}{/if}
 
   <!-- Units: the system, the five units, then speeds, duration and coordinates. -->
-  {#if unitsShown || group('units').rows.length || group('units2').rows.length}
-    <h2 class="od-settings--title">{t('settings.groups.units')}</h2>
+  {#if inPage('units') && (unitsShown || group('units').rows.length || group('units2').rows.length)}
+    {#if !section}<h2 class="od-settings--title">{t('settings.groups.units')}</h2>{/if}
     {#if unitsShown}
       <div class="od-settings--segmented">
         <ButtonGroup ariaLabel={t('settings.unitSystem.label')} value={p.unitSystem} options={UNIT_SYSTEMS.map((system) => ({ value: system, label: t(`settings.unitSystem.${system}`) }))} onchange={(system) => setUnitSystem(/** @type {any} */ (system))} />
@@ -943,11 +1091,11 @@
     {/if}
   {/if}
 
-  {@render groupView('logbook')}
-  {@render groupView('equipment')}
-  {@render groupView('profile')}
+  {#if inPage('logbook')}{@render groupView('logbook', !section)}{/if}
+  {#if inPage('equipment')}{@render groupView('equipment', !section)}{/if}
+  {#if inPage('profile')}{@render groupView('profile')}{/if}
 
-  {#if decoWarningShown}
+  {#if inPage('profile') && decoWarningShown}
     <h2 class="od-settings--title">{t('settings.groups.deco')}</h2>
     <div class="od-settings--warning" role="note">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l9.5 17h-19z M12 10v4.5 M12 17.5v.01"></path></svg>
@@ -960,23 +1108,25 @@
   {/if}
 
   <!-- Used by the tools only (task 2026-11-12-47): after Décompression. -->
-  {#if group('conditions').rows.length}
+  {#if inPage('tools') && group('conditions').rows.length}
     {@render groupView('conditions')}
     <p class="od-settings--note">{t('settings.conditions.note')}</p>
   {/if}
 
-  {#if group('flight').rows.length}
+  {#if inPage('tools') && group('flight').rows.length}
     {@render groupView('flight')}
     <p class="od-settings--note">{t('settings.flight.note')}</p>
   {/if}
 
-  {@render groupView('partialPressures')}
-  {@render groupView('rebreather')}
+  {#if inPage('gases')}
+    {@render groupView('partialPressures')}
+    {@render groupView('rebreather')}
+  {/if}
 
-  {@render groupView('computers')}
+  {#if inPage('download')}{@render groupView('computers')}{/if}
 
   <!-- Téléchargement: the Bluetooth switch, then the remembered computers on their own card. -->
-  {#if group('download').rows.length || computersShown}
+  {#if inPage('download') && (group('download').rows.length || computersShown)}
     <h2 class="od-settings--title">{t('settings.groups.download')}</h2>
     {#if group('download').rows.length}
       <div class="od-settings--surface" role="list">
@@ -1001,10 +1151,11 @@
     {/if}
   {/if}
 
-  {@render groupView('maps')}
+  <!-- Offline maps: the overview opens their own screen; the search still lists the row. -->
+  {#if !section && query}{@render groupView('maps')}{/if}
 
-  {#if advancedShown}
-    <h2 class="od-settings--title">{t('settings.groups.advanced')}</h2>
+  {#if inPage('advanced') && advancedShown}
+    {#if !section}<h2 class="od-settings--title">{t('settings.groups.advanced')}</h2>{/if}
     <div class="od-settings--surface">
       <p class="od-settings--action-text">{t('settings.advanced.resetText')}</p>
       <div class="od-settings--action">
@@ -1014,7 +1165,7 @@
     <p class="od-settings--note">{t('settings.advanced.note')}</p>
   {/if}
 
-  {#if nothingShown}<p class="od-settings--note od-settings--empty">{t('settings.noResult', { text: search.trim() })}</p>{/if}
+  {#if !section && nothingShown}<p class="od-settings--note od-settings--empty">{t('settings.noResult', { text: search.trim() })}</p>{/if}
   <div class="od-settings--bottom"></div>
 </Page>
 
@@ -1192,6 +1343,55 @@
       font-size: 12px;
       line-height: 18px;
       font-weight: 600;
+    }
+
+    /* The overview's rows (reglages-apercu-android): a 40 dp icon disc, the subpage's name,
+       its values in one line, a chevron. */
+    .od-settings--overview-row {
+      box-sizing: border-box;
+      min-height: 72px;
+      padding: 8px 20px 8px 16px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      color: var(--od-text);
+      text-decoration: none;
+    }
+
+    /* Tablet: the subpage shown beside the overview. */
+    .od-settings--overview-selected {
+      background: var(--od-water-top);
+      color: var(--od-on-band-control);
+    }
+
+    .od-settings--overview-icon {
+      flex: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 20px;
+      background: var(--od-surface-container-high);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      svg {
+        width: 22px;
+        height: 22px;
+        fill: none;
+        stroke: var(--od-text);
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+    }
+
+    .od-settings--overview-summary {
+      font-size: 13px;
+      line-height: 18px;
+      color: var(--od-text-2);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .od-settings--chevron {

@@ -259,7 +259,8 @@ async function useUnits(sys) {
   const want = sys === 'metric' ? 'm' : 'ft';
   const prefs = await core('getPrefs');
   if (prefs.length === want && prefs.volume === (sys === 'metric' ? 'l' : 'cuft') && prefs.pressure === (sys === 'metric' ? 'bar' : 'psi')) return;
-  await go('/settings/');
+  // The unit system is on the Units subpage of Réglages (task 2026-11-13-111).
+  await go('/settings/units');
   await sleep(600);
   await click('[role=radio]', T(`settings.unitSystem.${sys}`));
   await sleep(500);

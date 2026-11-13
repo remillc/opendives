@@ -164,6 +164,8 @@
     { path: '/tools/ead-mod', component: GasEadMod },
     { path: '/tools/best-mix', component: GasBestMix },
     { path: '/tools/blender', component: GasBlender },
+    // A subpage of Réglages (task 2026-11-13-111): last, after every /settings/<name> route above.
+    { path: '/settings/:section', component: Settings },
   ];
 
   /**
@@ -192,6 +194,15 @@
         { path: '/statistics/dives/', component: StatisticsDives },
       ],
     },
+    ...appRoutes,
+  ];
+
+  /**
+   * The Account view's routes (tablet): Réglages opens there (lib/navigation.svelte.js,
+   * openOver), its overview the master, a subpage beside it (task 2026-11-13-111).
+   */
+  const accountRoutes = [
+    { path: '/settings/', component: Settings, master: true, detailRoutes: [{ path: '/settings/:section', component: Settings }] },
     ...appRoutes,
   ];
 
@@ -301,7 +312,7 @@
       masterDetailBreakpoint={splitBreakpoint}
       style="--f7-page-master-width: {toolsListWidth}px; --od-no-dive: '{t('tablet.noTool')}'"
     />
-    <View id="view-account" tab url="/account" />
+    <View id="view-account" tab url="/account" routes={accountRoutes} masterDetailBreakpoint={splitBreakpoint} />
   </Views>
 </App>
 

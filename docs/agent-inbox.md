@@ -2337,7 +2337,7 @@ Same on the tablet layout. Check on the phone emulator.
 
 Done in fix/settings-display-first: the Affichage group is rendered first (phone and tablet share Settings.svelte), the textSize row and its strings are removed, and the release note that listed the menus no longer names it. Checked on the phone emulator.
 
-## [ ] 2026-11-13-111 Réglages: overview page and subpages
+## [x] 2026-11-13-111 Réglages: overview page and subpages
 
 Christian's decision of 13 November 2026. Réglages becomes an **overview page** that opens **one subpage per group**, as recommended by Material 3 for long settings. Task 110 (Affichage first, no « Taille du texte ») still applies inside this structure.
 
@@ -2367,6 +2367,8 @@ Menus open from the row, below it when there is room, above it otherwise (Materi
 Back from a subpage returns to the overview, with the scroll position kept. Deep links and any « open Réglages at X » call in the app (planner, offline maps, download screen) open the matching subpage directly. Search in settings, if any, still finds rows and opens their subpage.
 
 Tablet: the overview in the left pane, the selected subpage in the right pane (list-detail), first group selected by default. Check on the phone emulator and on the tablet emulator in portrait and landscape, fr and en.
+
+Done in feature/settings-overview: Settings.svelte is both the overview (/settings/, three cards, a one-line summary per row built from the stored values) and each subpage (/settings/<display|language|units|logbook|equipment|profile|gases|tools|download|advanced>, rows unchanged); Cartes hors ligne opens /settings/maps/. Search stays on the overview and lists matching rows of every group. Tablet: Réglages always opens in the Account view, which gets a master-detail pair (overview left, subpage right, Affichage selected first, selected row tinted). tests/e2e/planner-e2e.mjs now sets the unit system on /settings/units. Checked on the phone emulator (en: every subpage, search) and the tablet emulator (fr, landscape and portrait). Not done: menus opening above or below the row were left as RowMenu places them.
 
 ## [ ] 2026-11-13-112 Gaz et recycleur: say that the two rebreather switches act on the pO₂ graph
 

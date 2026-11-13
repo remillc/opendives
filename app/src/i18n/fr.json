@@ -296,7 +296,11 @@
     "rebreatherBailout": "Secours : {list}",
     "rebreatherRange": "de {start} à {end}",
     "rebreatherNoPressure": "Aucune donnée de pression",
-    "rebreatherMarks": { "diluent": "DIL", "oxygen": "O₂", "bailout": "SECOURS" },
+    "rebreatherMarks": {
+      "diluent": "DIL",
+      "oxygen": "O₂",
+      "bailout": "SECOURS"
+    },
     "gasChange": {
       "line": "Passage {list}.",
       "item": "{to} à {depth}",
@@ -476,6 +480,35 @@
       "display": "Affichage",
       "maps": "Cartes hors ligne",
       "advanced": "Avancé"
+    },
+    "sections": {
+      "general": "Général",
+      "diving": "Plongée",
+      "devices": "Appareils et données",
+      "display": "Affichage",
+      "language": "Langue et formats",
+      "units": "Unités",
+      "logbook": "Carnet",
+      "equipment": "Équipement",
+      "profile": "Profil et décompression",
+      "gases": "Gaz et recycleur",
+      "tools": "Outils",
+      "download": "Ordinateurs et téléchargement",
+      "maps": "Cartes hors ligne",
+      "advanced": "Avancé"
+    },
+    "overview": {
+      "theme": "Thème : {value}",
+      "paper": "papier {value}",
+      "units": "{system} : {units}",
+      "logbook": "Voyages · champs affichés et masqués",
+      "cylinderTypes": "Types de bouteilles",
+      "po2": "pO₂ max {value}",
+      "setpoint": "consigne {value}",
+      "altitude": "altitude {value}",
+      "remembered": "{name} mémorisé",
+      "noComputer": "Aucun ordinateur mémorisé",
+      "advanced": "Réinitialiser tous les réglages"
     },
     "flight": {
       "label": "Durée de l’attente",
@@ -1655,6 +1688,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Réglages : une page d’aperçu en trois cartes (Général, Plongée, Appareils et données) résume les valeurs actuelles et ouvre une sous-page par groupe ; sur tablette, l’aperçu à gauche et la sous-page à droite.",
       "Réglages : « Affichage » vient en premier ; la ligne « Taille du texte » est retirée (l’app suit déjà la taille du texte de l’appareil).",
       "Grain papier sur la bande d’en-tête des sections et du menu latéral.",
       "Logo, mode clair : le demi-cercle sous les vagues est gris clair et les deux bulles sont bleues ; dans l’icône de l’app, l’arc du haut a le même gris, donc l’anneau est d’une seule couleur. Le mode sombre ne change pas.",
