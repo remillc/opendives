@@ -2055,3 +2055,12 @@ Christian's decisions of 12 November 2026.
 - **fr-CA formats:** in French (Canada), times use "10 h 44" and feet use "pi" (and other fr-CA unit labels). Check that every screen formats times and units through the locale, not with hard-coded "10:44" or "ft". The mock-ups will be updated to match.
 
 Done in `feature/detail-grid-fr-ca`: the grid starts after the three cells (phone, tablet and iOS share one list). Margins: Framework7's Material rule gives `li > .item-link` an 8 dp side margin that stayed on our rows, whose link is also the content (24 / 32 dp); reset for `.od-row` rows, now 16 / 24, checked on the emulator. Times: the format locale is now fr-CA whenever the interface is fr-CA, so times read "10 h 44" even with another device region (tested). Units: "pi" kept in all French as before; Claude Conception is standardising the fr-CA wording, and the unit labels will follow that work.
+
+## [ ] 2026-11-13-84 Rebreather gas card: cylinder sizes, no-pressure state
+
+Christian's decisions of 13 November 2026, on the rebreather gas card of the dive detail.
+- **Sizes:** the rebreather unit (diluent and oxygen cylinders with the scrubber) and the bailout cylinder have the same total height, bottoms aligned, and both are smaller than today. The drawing area goes from 200 to 140 dp tall (viewBox 326 × 140). The unit is scaled to about 68 %, the bailout cylinder to about 93 %. The DIL and O₂ labels keep their 11 dp text size. Mock-up: `docs/mockups/detail3-android-ccr.dc.html`.
+- **No pressure data:** when a cylinder has no start and end pressures, draw it filled with grey diagonal hatching (warm greys #D9D9D5 stripes on #F1F1EF, 45°, 8 dp period), with no gas level and no red dashed marks, so it does not read as an empty cylinder. Remove the "start → end psi" line under that gas. The mix, the cylinder name and size, and the switch-to-bailout line stay. Mock-up: `docs/mockups/detail3-android-ccr-sans-pression.dc.html`. Put the hatch colours in tokens (dark mode: pick matching dark greys and say which).
+- Update the card's accessible name: say "aucune donnée de pression" instead of the pressures.
+
+Check light and dark on the phone emulator, with and without pressures.
