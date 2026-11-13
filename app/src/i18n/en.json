@@ -454,6 +454,7 @@
   },
   "settings": {
     "title": "Settings",
+    "paperGrain": "Paper grain on the header (trial)",
     "search": "Search settings",
     "noResult": "No setting matches “{text}”",
     "system": "System",
@@ -1657,6 +1658,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Trial: paper grain on the header band of the sections and the side menu; a switch at the end of Settings removes it.",
       "Logo, light mode: the half-circle under the waves is light grey and the two bubbles are blue; in the app icon the upper arc is the same grey, so the ring is one colour. Dark mode is unchanged.",
       "Filter, Trip criterion: trips are sorted alphabetically.",
       "Dive page: when you scroll down, the site’s name shows in the top bar.",

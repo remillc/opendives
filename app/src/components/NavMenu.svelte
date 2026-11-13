@@ -165,7 +165,8 @@
       margin-bottom: 12px;
       padding: calc(var(--f7-safe-area-top) + 16px) 20px 40px;
       border-radius: 0 16px 0 0;
-      background-image: var(--od-band-gradient);
+      background-image: var(--od-band-grain), var(--od-band-gradient);
+      background-size: 256px 256px, auto;
       display: flex;
       flex-direction: column;
       gap: 18px;

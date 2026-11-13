@@ -8,6 +8,7 @@ import App from './App.svelte';
 import { mark, observePaints } from './lib/perf.js';
 import { boot } from './lib/logbook.svelte.js';
 import { noteFirstOpen } from './lib/review-prompt.js';
+import './lib/paper-grain.svelte.js'; // TRIAL, task 2026-11-13-108
 import { releaseLaunchScreen } from './lib/launch.js';
 
 observePaints();

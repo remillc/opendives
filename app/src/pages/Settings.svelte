@@ -11,6 +11,7 @@
   import { onMount } from 'svelte';
   import { Page, Navbar, Link, f7 } from 'framework7-svelte';
   import { showSnackbar } from '../lib/snackbar.js';
+  import { paperGrain, setPaperGrain } from '../lib/paper-grain.svelte.js'; // TRIAL, task 2026-11-13-108
   import { OpenDivesCore } from 'opendives-core';
   import RowMenu from '../components/RowMenu.svelte';
   import AltitudeField from '../components/AltitudeField.svelte';
@@ -1012,6 +1013,15 @@
       </div>
     </div>
     <p class="od-settings--note">{t('settings.advanced.note')}</p>
+  {/if}
+
+  <!-- TRIAL (task 2026-11-13-108): the paper grain on the header bands, to compare on a phone. -->
+  {#if !search.trim()}
+    <div class="od-settings--surface od-settings--trial" role="list">
+      <div role="listitem">
+        {@render rowView(/** @type {any} */ ({ kind: 'switch', id: 'paperGrain', label: t('settings.paperGrain'), checked: paperGrain.on, set: setPaperGrain }))}
+      </div>
+    </div>
   {/if}
 
   {#if nothingShown}<p class="od-settings--note od-settings--empty">{t('settings.noResult', { text: search.trim() })}</p>{/if}
