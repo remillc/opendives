@@ -102,7 +102,10 @@
       text-align: left;
     }
 
+    /* As wide as the drawing, so that each column stays under its cylinder on a wide pane. */
     .od-gas-summary--drawing {
+      max-width: 360px;
+      margin: 0 auto;
       padding-right: 28px;
     }
 
