@@ -42,6 +42,32 @@ test('the accessible name follows the spec', () => {
   );
 });
 
+test('no cylinder with pressures: the name ends with "No pressure data" (task 84)', () => {
+  const items = [
+    { gas: 'Trimix 16/45', start: '', end: '', noPressure: true },
+    { gas: 'Oxygen', start: '', end: '', noPressure: true },
+    { gas: 'air', start: '', end: '', noPressure: true },
+  ];
+  const layout = rebreatherLayout([{ use: 'diluent' }, { use: 'oxygen' }, { use: 'OC-gas' }]);
+  assert.equal(
+    rebreatherLabel(items, layout, { ...words, noPressure: 'No pressure data' }),
+    'Rebreather gas: diluent Trimix 16/45, oxygen. Bailout: air. No pressure data',
+  );
+});
+
+test('only some cylinders without pressures: each of them says so', () => {
+  const items = [
+    { gas: 'Trimix 16/45', start: '2 683', end: '1 885 psi' },
+    { gas: 'Oxygen', start: '', end: '', noPressure: true },
+    { gas: 'air', start: '', end: '', noPressure: true },
+  ];
+  const layout = rebreatherLayout([{ use: 'diluent' }, { use: 'oxygen' }, { use: 'OC-gas' }]);
+  assert.equal(
+    rebreatherLabel(items, layout, { ...words, noPressure: 'No pressure data' }),
+    'Rebreather gas: diluent Trimix 16/45 from 2 683 to 1 885 psi, oxygen, no pressure data. Bailout: air, no pressure data',
+  );
+});
+
 test('without pressures only the gas is named; no bailout part without bailout', () => {
   const items = [{ gas: 'Air', start: '', end: '' }, { gas: 'Oxygen', start: '', end: '' }];
   assert.equal(rebreatherLabel(items, rebreatherLayout([{ use: 'diluent' }, { use: 'oxygen' }]), words), 'Rebreather gas: diluent Air, oxygen');

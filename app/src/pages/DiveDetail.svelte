@@ -369,6 +369,8 @@
                 : '',
           ratio: levels.end,
           startRatio: levels.start,
+          // No pressure at all (task 2026-11-13-84): the rebreather drawing hatches the cylinder.
+          noPressure: !(c.startMbar > 0) && !(c.endMbar > 0) && !unused?.pressureMbar,
         };
       });
   });
@@ -391,7 +393,7 @@
       ...layout,
       marks: { diluent: t('detail.rebreatherMarks.diluent'), oxygen: t('detail.rebreatherMarks.oxygen'), bailout: t('detail.rebreatherMarks.bailout') },
       label: rebreatherLabel(
-        gasCylinders.map((c, i) => ({ gas: i === layout.diluent ? c.gas : c.gas.toLocaleLowerCase(), start: c.start, end: c.end })),
+        gasCylinders.map((c, i) => ({ gas: i === layout.diluent ? c.gas : c.gas.toLocaleLowerCase(), start: c.start, end: c.end, noPressure: c.noPressure })),
         layout,
         {
           group: t('detail.rebreatherGroup'),
@@ -402,6 +404,7 @@
           cylinderGas: t('detail.gasGroupCylinderGas'),
           range: t('detail.rebreatherRange'),
           join: t('detail.gasGroupJoin'),
+          noPressure: t('detail.rebreatherNoPressure'),
         },
       ),
     };
