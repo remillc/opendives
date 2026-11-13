@@ -412,10 +412,22 @@
     };
   });
 
+  /**
+   * The gas change events worth a line. On a rebreather dive a switch to the
+   * diluent or the oxygen is the unit itself, not a change the diver makes: it
+   * is left out; a switch to a bailout stays (Christian, 13 November 2026).
+   * @param {{ divemode?: string, events?: { type: string, timeSeconds: number, cylinder: number }[], cylinders: { use?: string }[] }} d
+   */
+  function unitSwitchesLeftOut(d) {
+    const events = d.events ?? [];
+    if (d.divemode !== 'CCR') return events;
+    return events.filter((e) => e.type !== 'gaschange' || !['diluent', 'oxygen'].includes(d.cylinders[e.cylinder]?.use ?? ''));
+  }
+
   /** The gas changes, in one plain line: "Switch to air at 222 ft." (nothing when there is none). */
   const gasChangesLine = $derived(
     dive
-      ? gasChangeLine(gasChanges(dive.events ?? [], dive.samples, dive.cylinders), (mm) => formatDepth(mm, prefs), {
+      ? gasChangeLine(gasChanges(unitSwitchesLeftOut(dive), dive.samples, dive.cylinders), (mm) => formatDepth(mm, prefs), {
           line: t('detail.gasChange.line'),
           item: t('detail.gasChange.item'),
           then: t('detail.gasChange.then'),
