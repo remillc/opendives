@@ -1657,6 +1657,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Filter, Trip criterion: trips are sorted alphabetically.",
       "Dive page: when you scroll down, the site’s name shows in the top bar.",
       "Rate OpenDives: a row under “What’s new” opens the app’s page in Google Play (or the App Store); after a successful download from a dive computer, the app may ask for a rating with the system’s own window (at most once every 120 days). Outside a store, the row becomes “Give feedback”.",
       "Side menu: the button is now ",
