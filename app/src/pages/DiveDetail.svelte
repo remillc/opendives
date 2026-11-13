@@ -228,11 +228,18 @@
     })(),
   );
   let scrolled = $state(false);
+  // The site's name moves into the top bar once the page's title has gone under it.
+  let titleInBar = $state(false);
   /** @param {HTMLElement} node */
   function watchScroll(node) {
     const scroller = node.closest('.page-content');
     if (!scroller) return;
-    const update = () => (scrolled = scroller.scrollTop > 12);
+    const update = () => {
+      scrolled = scroller.scrollTop > 12;
+      const title = node.querySelector('.od-dive-detail--site');
+      const bar = scroller.closest('.page')?.querySelector('.navbar');
+      titleInBar = !!title && !!bar && title.getBoundingClientRect().bottom <= bar.getBoundingClientRect().bottom;
+    };
     scroller.addEventListener('scroll', update, { passive: true });
     return { destroy: () => scroller.removeEventListener('scroll', update) };
   }
@@ -508,6 +515,12 @@
 <!-- no-swipeback: here a swipe to the right shows the previous dive. -->
 <Page onPageInit={watchSwipes} class="od-dive-detail no-swipeback {imageShown && !scrolled ? 'od-dive-detail--on-image' : ''} {slide ? `od-slide-${slide}` : ''}">
   <Navbar>
+    <!-- The site's name, shown once the page's own title has scrolled under the bar. -->
+    {#snippet title()}
+      {#if dive}
+        <span class="od-dive-detail--bar-title" class:od-dive-detail--bar-title-shown={titleInBar} aria-hidden={!titleInBar}>{dive.site || t('dive.siteNotSet')}</span>
+      {/if}
+    {/snippet}
     <!-- Named back link: in MD3, Framework7 hides its text and TalkBack would read "#". -->
     {#snippet left()}
       <Link back iconOnly>
@@ -1010,5 +1023,24 @@
 
   :global(.od-dive-detail.od-dive-detail--on-image > .navbar) {
     --f7-navbar-bg-color: transparent;
+  }
+
+  @layer od.components {
+    .od-dive-detail--bar-title {
+      display: block;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      opacity: 0;
+      transition: opacity 150ms ease-out;
+
+      &.od-dive-detail--bar-title-shown {
+        opacity: 1;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        transition: none;
+      }
+    }
   }
 </style>
