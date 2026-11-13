@@ -1600,6 +1600,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Planner, in cubic feet: the SAC from Settings is used as set, not rounded to 0.01 cu ft/min; only a SAC measured on a dive is rounded.",
       "Tools and Statistics: a row no longer stays tinted grey after turning a large phone.",
       "Planner: the result fits in one card, with the total time and the deco stops in large type, then the stops or “Ascent with no stop”, the volumes and the oxygen.",
       "Planner: in the stops table, the starting gas is highlighted like a gas change.",

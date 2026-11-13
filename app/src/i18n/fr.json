@@ -1600,6 +1600,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Planificateur, en pieds cubes : la consommation des Réglages est utilisée telle quelle, sans être arrondie à 0,01 pi³/min ; seule une consommation mesurée sur une plongée est arrondie.",
       "Outils et Statistiques : une ligne ne reste plus surlignée en gris après avoir tourné un grand téléphone.",
       "Planificateur : le résultat tient dans une carte, avec la durée totale et les paliers de déco en grand, puis les paliers ou « Remontée sans palier », les volumes et l’oxygène.",
       "Planificateur : dans le tableau des paliers, le gaz de départ est surligné comme un changement de gaz.",

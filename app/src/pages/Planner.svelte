@@ -231,9 +231,13 @@
 
   /** The fields from the plan: on opening, and when "Changer" brings another dive. */
   function fillFields() {
-    // A SAC measured on a dive is rounded to its step (two decimals in cuft/min) before it is shown or used.
-    planner.bottomSacMlMin = roundSacMl(planner.bottomSacMlMin, cuft);
-    planner.decoSacMlMin = roundSacMl(planner.decoSacMlMin, cuft);
+    // A SAC measured on a dive is rounded to its step (two decimals in cuft/min) before it is
+    // shown or used. Only that one: the SAC of Settings is used as it is (20 L/min stays
+    // 20 L/min, not 0.71 cuft/min = 20.1 L/min); the field merely shows it rounded.
+    if (planner.source) {
+      planner.bottomSacMlMin = roundSacMl(planner.bottomSacMlMin, cuft);
+      planner.decoSacMlMin = roundSacMl(planner.decoSacMlMin, cuft);
+    }
     levelFields = planner.levels.map((l) => ({
       key: nextKey++,
       depth: show(mmToDepth(l.depthMm, feet)),

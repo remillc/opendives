@@ -179,6 +179,8 @@ in fewer words.
 - **Gas blender.** The helium step of a trimix was about 0.8 % short (the core read
   pure helium as air in its compressibility), and the oxygen step as much too long.
 - **Keyboard (planner).** It closed while typing in a level, gas or GF field.
+- **SAC (planner, cubic feet).** The SAC from Settings was rounded to 0.01 cu ft/min before
+  the calculation (20 L/min became 20.1); only a SAC measured on a dive is rounded now.
 - **Logbook margins (Android).** Dive rows had 8 dp too much on each side.
 - **Statistics.** The dives behind a row open faster with far less memory, and a value
   is no longer cut in the middle of a number or word.
