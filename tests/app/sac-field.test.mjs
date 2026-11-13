@@ -3,19 +3,29 @@ import assert from 'node:assert/strict';
 import { ML_PER_CUFT } from '../../app/src/lib/planner-rules.js';
 import { parseSac, sacMax, sacPresets, sacPresetText, sacText } from '../../app/src/lib/sac-field.js';
 
-test('presets: 0 to 2 cuft/min by 0.5, 10 to 30 L/min by 5 (typing up to 60 L/min)', () => {
-  assert.deepEqual(sacPresets(true).map((p) => p.unit), [0, 0.5, 1, 1.5, 2]);
+test('presets: 0 to 2 cuft/min by 0.01, 10 to 30 L/min by 5 (typing up to 60 L/min)', () => {
+  const cuft = sacPresets(true).map((p) => p.unit);
+  assert.equal(cuft.length, 201);
+  assert.deepEqual(cuft.slice(34, 39), [0.34, 0.35, 0.36, 0.37, 0.38]);
+  assert.equal(cuft[0], 0);
+  assert.equal(cuft[200], 2);
   assert.deepEqual(sacPresets(false).map((p) => p.unit), [10, 15, 20, 25, 30]);
   assert.equal(sacPresets(false)[2].ml, 20000);
-  assert.equal(sacPresets(true)[1].ml, Math.round(0.5 * ML_PER_CUFT));
+  assert.equal(sacPresets(true)[50].ml, Math.round(0.5 * ML_PER_CUFT));
   assert.equal(sacMax(true), 2);
   assert.equal(sacMax(false), 60);
 });
 
-test('presets are shown with one decimal in cuft/min, whole in litres', () => {
-  assert.equal(sacPresetText(0.5, true, 'fr'), '0,5');
-  assert.equal(sacPresetText(0, true, 'fr'), '0,0');
-  assert.equal(sacPresetText(2, true, 'en'), '2.0');
+test('a typed two-decimal SAC is exactly a preset, so the list marks it', () => {
+  const ml = parseSac('0,36', true);
+  assert.equal(sacPresets(true).findIndex((p) => p.ml === ml), 36);
+});
+
+test('presets are shown with two decimals in cuft/min, whole in litres', () => {
+  assert.equal(sacPresetText(0.36, true, 'fr'), '0,36');
+  assert.equal(sacPresetText(0.5, true, 'fr'), '0,50');
+  assert.equal(sacPresetText(0, true, 'fr'), '0,00');
+  assert.equal(sacPresetText(2, true, 'en'), '2.00');
   assert.equal(sacPresetText(15, false, 'fr'), '15');
 });
 

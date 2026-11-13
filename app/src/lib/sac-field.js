@@ -5,7 +5,9 @@
 import { ML_PER_CUFT } from './planner-rules.js';
 
 // The presets, in the user's unit. Easy to change: this is the one place.
-export const SAC_PRESETS_CUFT = [0, 0.5, 1, 1.5, 2];
+// cuft/min: every 0.01 from 0 to 2 (Christian, 13 November 2026, task 92); the
+// list opens on the current value.
+export const SAC_PRESETS_CUFT = Array.from({ length: 201 }, (_, i) => i / 100);
 // Metric: the usual SAC of divers, 10 to 30 L/min by 5 (Christian, 12 November 2026).
 export const SAC_PRESETS_LITERS = [10, 15, 20, 25, 30];
 /** The largest SAC that can be typed, in the user's unit. */
@@ -55,12 +57,12 @@ export function sacText(ml, cuft, locale) {
 }
 
 /**
- * A preset as the list shows it: one decimal in cuft/min, whole litres.
+ * A preset as the list shows it: two decimals in cuft/min ("0,36"), whole litres.
  * @param {number} unit
  * @param {boolean} cuft
  * @param {string} locale
  */
 export function sacPresetText(unit, cuft, locale) {
-  const digits = cuft ? 1 : 0;
+  const digits = cuft ? 2 : 0;
   return new Intl.NumberFormat(locale, { minimumFractionDigits: digits, maximumFractionDigits: digits }).format(unit);
 }
