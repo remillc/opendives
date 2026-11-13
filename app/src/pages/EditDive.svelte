@@ -257,7 +257,14 @@
     id: /** @type {import('opendives-core').DiveDetail|null} */ (dive)?.id ?? -1,
     suit: f.suit ?? '',
     waterType: f.waterType || /** @type {import('opendives-core').DiveDetail|null} */ (dive)?.waterType || '',
-    cylinders: cylinders.map((c) => ({ description: c.f.description ?? '' })),
+    // Capacity, not name: the saved size while the size fields are untouched, else the typed size.
+    cylinders: cylinders.map((c) => {
+      const saved = c.index >= 0 ? /** @type {import('opendives-core').DiveDetail|null} */ (dive)?.cylinders[c.index] : undefined;
+      if (saved && c.f.size === c.initial.size && c.f.workingPressure === c.initial.workingPressure) return { sizeMl: saved.sizeMl };
+      const size = parseNumber(c.f.size ?? '');
+      const wp = c.f.workingPressure?.trim() ? pressureMbar(parseNumber(c.f.workingPressure)) : 0;
+      return { sizeMl: c.f.size?.trim() && Number.isFinite(size) ? sizeMl(size, wp) : 0 };
+    }),
   });
   const ruleKey = $derived(`${ruleDive.suit}|${ruleDive.waterType}|${cylinderKey(ruleDive.cylinders)}`);
   const SCAN_LIMIT = 300;
@@ -303,7 +310,7 @@
     if (key === ruleKey) sources = read;
   }
 
-  // One scan after each pause in the suit, water type or cylinder types.
+  // One scan after each pause in the suit, water type or cylinder sizes.
   $effect(() => {
     const key = ruleKey;
     if (!dive) return;

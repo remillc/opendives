@@ -1,7 +1,7 @@
 // @ts-check
 // The suggested weight (task 2026-11-13-99): the total weight of the most
-// recent other dive of the logbook with the same suit, the same cylinder
-// type(s) and the same water type that has a weight, adjusted by how that
+// recent other dive of the logbook with the same suit, the same cylinders
+// (by capacity, not by name) and the same water type that has a weight, adjusted by how that
 // weight felt ("Ce lest était"): too light adds 2 lb (1 kg), too heavy removes
 // 2 lb (1 kg). Pure: the dives are read by the caller.
 import { feedbackOf } from './weight-feedback.js';
@@ -26,16 +26,17 @@ export function sameWeight(a, b, unit) {
 }
 
 /**
- * The cylinder types of a dive, as a comparable key (order does not matter).
- * @param {{ description: string }[]} cylinders
+ * The cylinders of a dive, as a comparable key: water volumes rounded to 0.1 L,
+ * sorted (order does not matter); "AL80" and "Al 80" are both 11.1 L.
+ * @param {{ sizeMl: number }[]} cylinders
  */
-export const cylinderKey = (cylinders) => cylinders.map((c) => c.description.trim()).sort().join('\n');
+export const cylinderKey = (cylinders) => cylinders.map((c) => Math.round((c.sizeMl || 0) / 100)).sort((a, b) => a - b).join(',');
 
 /**
  * What a dive has to say for the rule.
  * @typedef {{
  *   id: number, number?: number, date: string, suit: string, waterType: string,
- *   cylinders: { description: string }[], tags: string[], weights: { grams: number, description: string }[],
+ *   cylinders: { sizeMl: number }[], tags: string[], weights: { grams: number, description: string }[],
  * }} WeightSource
  */
 
@@ -52,7 +53,7 @@ export const cylinderKey = (cylinders) => cylinders.map((c) => c.description.tri
 
 const total = (/** @type {{ grams: number }[]} */ weights) => weights.reduce((sum, w) => sum + Math.max(0, w.grams), 0);
 
-/** Whether a dive is a possible source for these. @param {WeightSource} dive @param {{ id: number, suit: string, waterType: string, cylinders: { description: string }[] }} current */
+/** Whether a dive is a possible source for these. @param {WeightSource} dive @param {{ id: number, suit: string, waterType: string, cylinders: { sizeMl: number }[] }} current */
 export const matches = (dive, current) =>
   dive.id !== current.id &&
   dive.suit.trim() === current.suit.trim() &&
@@ -65,7 +66,7 @@ export const mostRecentFirst = (a, b) => (a.date === b.date ? (b.number ?? 0) - 
 
 /**
  * The suggestion for a dive, or null.
- * @param {{ id: number, suit: string, waterType: string, cylinders: { description: string }[] }} current
+ * @param {{ id: number, suit: string, waterType: string, cylinders: { sizeMl: number }[] }} current
  * @param {WeightSource[]} dives candidates, any order
  * @param {'kg'|'lbs'} unit
  * @returns {WeightSuggestion|null}

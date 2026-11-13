@@ -13,7 +13,7 @@ import {
 } from '../../app/src/lib/weight-feedback.js';
 
 const LB = 453.59237;
-const AL80 = [{ description: 'AL80' }];
+const AL80 = [{ sizeMl: 11100 }];
 
 /** A dive for the rule; override what a case needs. */
 const dive = (over = {}) => ({
@@ -42,7 +42,7 @@ test('no matching dive: no suggestion', () => {
   assert.equal(suggestWeight(current, [], 'lbs'), null);
   assert.equal(suggestWeight(current, [dive({ suit: 'wetsuit' })], 'lbs'), null);
   assert.equal(suggestWeight(current, [dive({ waterType: 'fresh' })], 'lbs'), null);
-  assert.equal(suggestWeight(current, [dive({ cylinders: [{ description: 'AL63' }] })], 'lbs'), null);
+  assert.equal(suggestWeight(current, [dive({ cylinders: [{ sizeMl: 9000 }] })], 'lbs'), null);
   assert.equal(suggestWeight(current, [dive({ cylinders: [...AL80, ...AL80] })], 'lbs'), null);
   assert.equal(suggestWeight(current, [dive({ weights: [] })], 'lbs'), null);
   assert.equal(suggestWeight(current, [dive({ weights: [{ description: 'belt', grams: 0 }] })], 'lbs'), null);
@@ -50,7 +50,7 @@ test('no matching dive: no suggestion', () => {
 
 test('the dive itself is never its own source, and cylinder order does not matter', () => {
   assert.equal(suggestWeight(current, [dive({ id: 99 })], 'lbs'), null);
-  const two = [{ description: 'AL80' }, { description: 'AL40' }];
+  const two = [{ sizeMl: 11100 }, { sizeMl: 5700 }];
   const s = suggestWeight({ ...current, cylinders: [two[1], two[0]] }, [dive({ cylinders: two })], 'lbs');
   assert.ok(s);
 });
@@ -147,4 +147,14 @@ test('the three tags are English whatever the language, and hidden from lists', 
   assert.deepEqual(visibleTags(['a', 'weight-too-light', 'b', 'weight-ok', 'weight-too-heavy']), ['a', 'b']);
   assert.deepEqual(withoutFeedbackTags(['a', 'weight-ok', 'b']), ['a', 'b']);
   assert.deepEqual(withoutFeedbackTags([{ key: 'a', dives: 1 }, { key: 'weight-ok', dives: 3 }]), [{ key: 'a', dives: 1 }]);
+});
+
+test('cylinders are compared by capacity rounded to 0.1 L, not by name', () => {
+  // "AL80" and "Al 80" are the same 11.1 L; 11.14 L and 11.06 L both round to 11.1 L.
+  const named = (description, sizeMl) => [{ description, sizeMl }];
+  const a = suggestWeight({ ...current, cylinders: named('Al 80', 11140) }, [dive({ cylinders: named('AL80', 11060) })], 'lbs');
+  assert.ok(a);
+  // Two sizes that differ do not match, whatever their names.
+  assert.equal(suggestWeight({ ...current, cylinders: named('AL80', 11100) }, [dive({ cylinders: named('AL80', 12000) })], 'lbs'), null);
+  assert.equal(suggestWeight({ ...current, cylinders: named('AL80', 11100) }, [dive({ cylinders: named('AL80', 11300) })], 'lbs'), null);
 });
