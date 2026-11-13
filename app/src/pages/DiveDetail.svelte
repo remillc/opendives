@@ -454,7 +454,8 @@
       .map((dc, i) => ({ name: dc.nickname || dc.model, main: i === 0 })),
   );
 
-  const hasGas = $derived(gasCylinders.length > 0 || !!sac);
+  // A freediving dive has no Gas section (Christian, 13 November 2026).
+  const hasGas = $derived(dive?.divemode !== 'Freedive' && (gasCylinders.length > 0 || !!sac));
   const hasEquipment = $derived(!!dive?.suit || weights.length > 0 || computers.length > 0);
 
   // Collapsed by default; a tap opens the weights by location.

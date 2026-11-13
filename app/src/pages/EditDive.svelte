@@ -24,6 +24,7 @@
   import GaugeSheet from '../components/GaugeSheet.svelte';
   import CylinderDeleteDialog from '../components/CylinderDeleteDialog.svelte';
   import GasSummary from '../components/GasSummary.svelte';
+  import { rebreatherLayout, rebreatherSummaryLabel } from '../lib/rebreather-gas.js';
   import { cylinderListed, fillLevels, unusedShown } from '../lib/gas-summary.js';
   import { gaugeCameraAvailable, runGaugeCamera } from '../lib/gauge-photo.js';
   import { readGauges } from '../lib/gauge-reading.js';
@@ -545,12 +546,31 @@
           key: c.key,
           n: i + 1,
           gas: gasName(own.o2, own.he, gasWords),
-          pressure: unused ? (unused.pressureMbar ? formatPressure(unused.pressureMbar, prefs) : t('edit.uses.not used')) : own.endMbar ? formatPressure(own.endMbar, prefs) : '',
+          // An unused cylinder without pressure gets no line under it (Christian, 13 November 2026).
+          pressure: unused ? (unused.pressureMbar ? formatPressure(unused.pressureMbar, prefs) : '') : own.endMbar ? formatPressure(own.endMbar, prefs) : '',
           ...(unused ? { ratio: 1, startRatio: null, hatched: !unused.pressureMbar } : levelsOf(own)),
+          use: c.f.use,
         };
       })
       .filter((item) => item.listed),
   );
+  /** A rebreather dive: the gas card draws the unit, as the dive detail does (task 2026-11-13-86). */
+  const gasRebreather = $derived.by(() => {
+    if (f.divemode !== 'CCR' || gasItems.length === 0) return null;
+    const layout = rebreatherLayout(gasItems);
+    return {
+      ...layout,
+      marks: { diluent: t('detail.rebreatherMarks.diluent'), oxygen: t('detail.rebreatherMarks.oxygen'), bailout: t('detail.rebreatherMarks.bailout') },
+      label: rebreatherSummaryLabel(gasItems, layout, {
+        card: t('edit.gasCcrLabel'),
+        diluent: t('edit.gasCcrDiluent'),
+        oxygen: t('edit.gasCcrOxygen'),
+        and: t('edit.gasCcrAnd'),
+        bailout: t('edit.gasCcrBailout'),
+        join: t('detail.gasGroupJoin'),
+      }),
+    };
+  });
   const sheetIndex = $derived(sheetKey === null ? -1 : cylinders.findIndex((c) => c.key === sheetKey));
   const deleteIndex = $derived(deleteKey === null ? -1 : cylinders.findIndex((c) => c.key === deleteKey));
 
@@ -1122,7 +1142,10 @@
     <section class="card od-edit-dive--card">
       {@render header(t('edit.gasGroup'))}
       <SelectField label={t('edit.divemode')} bind:value={f.divemode} options={modeOptions} onchange={modeChanged} />
-      <GasSummary items={gasItems} onopen={openGas} onedit={(key) => (sheetKey = key)} />
+      <!-- A freediving dive has no gas: only the mode stays (Christian, 13 November 2026). -->
+      {#if f.divemode !== 'Freedive'}
+        <GasSummary items={gasItems} rebreather={gasRebreather} onopen={openGas} onedit={(key) => (sheetKey = key)} />
+      {/if}
     </section>
 
     <!-- Équipement -->
