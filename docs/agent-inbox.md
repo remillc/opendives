@@ -2148,7 +2148,7 @@ Rows 11, 13, 17, 24 and 25 remove a sentence from a longer text: keep the rest o
 
 Done in `feature/ui-texts` (delegated to a sonnet agent): rows 2–6 and 8–26 and the « Ordinateurs du carnet » intro rewritten in fr.json and en.json (fr-CA overrides kept with « nuage » where they still differ, removed where the new wording no longer mentions the cloud); rows 1 and 7 are not in the app. Judgment calls: rows 2 and 3 keep « jusqu’à {size} » (the app gives a maximum); row 12 reads « à Modifier une plongée » as in the table (the screen title is « Modifier la plongée »); row 18 changes the cloud sign-out text only, not the git-repository one; row 22 has no count in the app, so it reads « Les types standard sont modifiables comme les vôtres. »; row 26 removes the key `stats.rulesValues` and its use in StatisticNew.svelte. Checked on the phone emulator: Settings (rows 12, 13, 14) and cylinder types (row 22).
 
-## [ ] 2026-11-13-91 Best mix: Nitrox and Trimix tabs
+## [x] 2026-11-13-91 Best mix: Nitrox and Trimix tabs
 
 Christian's decisions of 13 November 2026, on the Best mix tool. Mock-ups: `docs/mockups/outils-meilleur-melange-android.dc.html` (Nitrox tab) and `outils-meilleur-melange-trimix-android.dc.html` (Trimix tab). Their background and grey shades come from a theme trial that is not approved yet: keep the current theme colours.
 - **Tabs:** the same Nitrox / Trimix segmented control as the gas blender, under the top bar. Nitrox is selected by default.
@@ -2157,3 +2157,5 @@ Christian's decisions of 13 November 2026, on the Best mix tool. Mock-ups: `docs
 - Each tab keeps its own values while the tool is open. Depth, water type and ppO₂ max are shared by the two tabs.
 
 Check on the phone emulator, and on a tablet layout.
+
+Done in `feature/best-mix-tabs`: `GasBestMix.svelte` has the blender's ButtonGroup (Nitrox by default, not remembered across openings); depth, water type and ppO₂ are shared, the max END is on the Trimix tab only (the nitrox query passes the Settings default, it does not affect best_o2); both rows sit on the same two half columns. New keys `tools.nitroxSub` and `tools.bestMixNoteNitrox`, `tools.maxEndHelp` shortened, `tools.nitroxEnd(Over)` removed. Checked on the phone emulator (both tabs) and the tablet emulator (Trimix).
