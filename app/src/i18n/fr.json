@@ -1693,6 +1693,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Textes : « Noter une plongée à la main » et l’attente de la première synchronisation ne citent plus d’autre application.",
       "Correctif : sur l’écran « Plongée reçue », le texte « Ajouter quand même » est centré dans son bouton.",
       "Partage par code QR : des codes plus petits, lisibles à distance normale, et une lecture en meilleure résolution.",
       "Correctif : dans « Modifier la plongée », le bouton « Utiliser » de la suggestion de lest ne recouvre plus le texte de la carte.",
@@ -2296,7 +2297,7 @@
   "addUnavailable": {
     "heading": "Pas encore disponible",
     "nothingChanged": "Aucune plongée n'a été modifiée.",
-    "meanwhileCloud": "En attendant, les plongées ajoutées avec Subsurface sur un ordinateur ou avec Subsurface-mobile arrivent ici à la prochaine synchronisation.",
+    "meanwhileCloud": "En attendant, les plongées ajoutées sur un ordinateur ou un autre téléphone arrivent ici à la prochaine synchronisation.",
     "download": {
       "title": "Télécharger",
       "text": "Le téléchargement depuis l'ordinateur de plongée par Bluetooth viendra dans une prochaine version."
@@ -2569,7 +2570,7 @@
     "duration": "Durée (min)",
     "depth": "Profondeur maximale ({unit})",
     "required": "Valeur requise",
-    "profileHint": "Un profil simple est tracé à partir de la profondeur et de la durée, comme dans Subsurface-mobile.",
+    "profileHint": "Un profil simple est tracé à partir de la profondeur et de la durée.",
     "site": "Site",
     "searchSite": "Chercher un site",
     "noSite": "Site à préciser",

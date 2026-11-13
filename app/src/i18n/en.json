@@ -1693,6 +1693,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Texts: ",
       "Fix: on the ",
       "QR share: smaller codes, readable from a normal distance, and the scanner reads at a higher resolution.",
       "Fix: in ",
@@ -2296,7 +2297,7 @@
   "addUnavailable": {
     "heading": "Not available yet",
     "nothingChanged": "No dive was changed.",
-    "meanwhileCloud": "Meanwhile, dives added with Subsurface on a computer or with Subsurface-mobile arrive here at the next synchronisation.",
+    "meanwhileCloud": "Meanwhile, dives added on a computer or another phone arrive here at the next synchronisation.",
     "download": {
       "title": "Download",
       "text": "Downloading from the dive computer over Bluetooth will come in a later version."
@@ -2569,7 +2570,7 @@
     "duration": "Duration (min)",
     "depth": "Maximum depth ({unit})",
     "required": "Value required",
-    "profileHint": "A simple profile is drawn from the depth and the duration, as in Subsurface-mobile.",
+    "profileHint": "A simple profile is drawn from the depth and the duration.",
     "site": "Site",
     "searchSite": "Search for a site",
     "noSite": "Site to be specified",
