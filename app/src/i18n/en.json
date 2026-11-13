@@ -296,7 +296,11 @@
     "rebreatherBailout": "Bailout: {list}",
     "rebreatherRange": "from {start} to {end}",
     "rebreatherNoPressure": "No pressure data",
-    "rebreatherMarks": { "diluent": "DIL", "oxygen": "O₂", "bailout": "BAILOUT" },
+    "rebreatherMarks": {
+      "diluent": "DIL",
+      "oxygen": "O₂",
+      "bailout": "BAILOUT"
+    },
     "gasChange": {
       "line": "Switch {list}.",
       "item": "{to} at {depth}",
@@ -476,6 +480,35 @@
       "display": "Display",
       "maps": "Offline maps",
       "advanced": "Advanced"
+    },
+    "sections": {
+      "general": "General",
+      "diving": "Diving",
+      "devices": "Devices and data",
+      "display": "Display",
+      "language": "Language and formats",
+      "units": "Units",
+      "logbook": "Logbook",
+      "equipment": "Equipment",
+      "profile": "Profile and decompression",
+      "gases": "Gases and rebreather",
+      "tools": "Tools",
+      "download": "Computers and download",
+      "maps": "Offline maps",
+      "advanced": "Advanced"
+    },
+    "overview": {
+      "theme": "Theme: {value}",
+      "paper": "{value} paper",
+      "units": "{system}: {units}",
+      "logbook": "Trips · fields shown and hidden",
+      "cylinderTypes": "Cylinder types",
+      "po2": "max pO₂ {value}",
+      "setpoint": "setpoint {value}",
+      "altitude": "altitude {value}",
+      "remembered": "{name} remembered",
+      "noComputer": "No computer remembered",
+      "advanced": "Reset all settings"
     },
     "flight": {
       "label": "Length of the wait",
@@ -1655,6 +1688,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Settings: an overview in three cards (General, Diving, Devices and data) sums up the current values and opens one subpage per group; on a tablet, the overview on the left and the subpage on the right.",
       "Settings: ",
       "Paper grain on the header band of the sections and the side menu.",
       "Logo, light mode: the half-circle under the waves is light grey and the two bubbles are blue; in the app icon the upper arc is the same grey, so the ring is one colour. Dark mode is unchanged.",
