@@ -2287,3 +2287,11 @@ Christian's decision of 13 November 2026 (TODOS #20). Mock-ups: `docs/mockups/ap
    - at most once every 120 days (store the last request date on the device); the stores also apply their own quotas, so the dialog may not appear;
    - never on the first launch, after an error, a sync conflict or a failed download, nor in a build not installed from a store.
 No other change: no reminder, no badge. Tests for the conditions (dives count, age, interval, store build). Check on the phone emulator with the Play internal test track or the fake review manager.
+
+## [ ] 2026-11-13-105 « Synchroniser maintenant » becomes « Synchroniser »
+
+Christian's decision of 13 November 2026. The sync button label loses « maintenant »: fr `syncNow` « Synchroniser », en « Sync » (fr-CA follows fr). Everywhere it is used: side menu (plain and split button), Compte, Dépôt git, tablet layouts, and any help text or release note that quotes it (`syncButton` notes in the i18n files, the spec now says « Synchroniser »). Mock-ups in `docs/mockups/` updated. Keep the accessible name the same as the label. Check that the split button still fits on a small phone in fr and en.
+
+## [ ] 2026-11-13-106 Statistics icon: baseline and four bars
+
+Christian's decision of 13 November 2026. The « Statistiques » icon (side menu, tablet rail, iOS menu) is redrawn as in `docs/mockups/appbar-tiroir-android-ouvert.dc.html`: a baseline and four bars of different heights, same 2 px stroke as the other icons. In `Icon.svelte`, `statistics` becomes `M3 20h18 M6 16v-4 M10.5 16V6 M15 16v-6 M19.5 16V9` (24 × 24, stroke, round caps). Use it wherever `statistics` is used. Check on the phone emulator next to the other menu icons.
