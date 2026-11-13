@@ -416,6 +416,20 @@ export function formatRelativeDateTime(iso, now = localNowIso(), capital = true)
 }
 
 /**
+ * A moment in the middle of a sentence, with the day in words: "demain à 8 h 35",
+ * "aujourd'hui à 8 h 35", "hier à 8 h 35"; another day as the date and time of a list row.
+ * @param {string} iso
+ * @param {string} [now]
+ */
+export function formatDayAt(iso, now = localNowIso()) {
+  const DAY = 86400000;
+  const days = Math.floor(toDate(now).getTime() / DAY) - Math.floor(toDate(iso).getTime() / DAY);
+  if (days < -1 || days > 1) return formatDateTime(iso);
+  const day = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' }).format(-days, 'day');
+  return t('flight.at', { day, time: formatTimeChoice(toDate(iso), settings.timeFormat) });
+}
+
+/**
  * A range of days, e.g. "2–4 février 2013" (device format, Intl.formatRange);
  * a single day when both are the same.
  * @param {string} isoStart

@@ -9,24 +9,72 @@ import { formatNumber } from './format.js';
 export const FLIGHT_WAIT_HOURS = { single: 12, several: 18 };
 
 /**
- * OpenDives' recommendation (not computed by the core): 18 hours after the
- * end of the last dive when the day of that dive had several dives, else 12
- * hours. A recommendation, never a guarantee.
- * @param {{date: string, endDate: string}[]} dives the dives the core used, oldest first
+ * The choices of the "Attente avant l'avion" setting (task 2026-11-13-98): "auto" is
+ * "Selon les plongées" (12 h after one dive, 18 h after several dives in the day), the
+ * others a fixed number of hours.
+ * @typedef {'auto'|'12'|'18'|'24'} FlightWaitMode
+ */
+/** @type {readonly FlightWaitMode[]} */
+export const FLIGHT_WAIT_MODES = ['auto', '12', '18', '24'];
+
+/** The name of a choice of the setting: "Selon les plongées", "12 h". @param {FlightWaitMode} mode */
+export function flightWaitName(mode) {
+  return mode === 'auto' ? t('settings.flight.auto') : t('settings.flight.hours', { h: mode });
+}
+
+/**
+ * OpenDives' recommendation (not computed by the core), counted from the end (surfacing)
+ * of the last dive. "Selon les plongées" (`mode` "auto"): 18 hours when the day of that
+ * dive had several dives, else 12 hours. "The same day" means the same calendar day of
+ * the dives' start (local wall-clock date): the dives that start the same day as the last
+ * one. A fixed mode ("12", "18", "24") gives that number of hours. A recommendation,
+ * never a guarantee.
+ * @param {{date: string, endDate: string}[]} dives the dives the calculation uses, oldest first
  * @param {string} now local time of the calculation (ISO, no time zone)
+ * @param {FlightWaitMode} [mode]
  * @returns {{hours: number, several: boolean, remainingSeconds: number, endsAt: string}|null} null without dives
  */
-export function flightWait(dives, now) {
+export function flightWait(dives, now, mode = 'auto') {
   if (!dives.length) return null;
   const last = dives[dives.length - 1];
   const day = last.date.slice(0, 10);
   const several = dives.filter((d) => d.date.slice(0, 10) === day).length > 1;
-  const hours = several ? FLIGHT_WAIT_HOURS.several : FLIGHT_WAIT_HOURS.single;
+  const fixed = Number(mode);
+  const hours = fixed > 0 ? fixed : several ? FLIGHT_WAIT_HOURS.several : FLIGHT_WAIT_HOURS.single;
   // Dive times are local wall-clock times: compare them as UTC, never shifted.
   const end = Date.parse(`${last.endDate}Z`);
   const endsAt = end + hours * 3600_000;
   const remaining = (endsAt - Date.parse(`${now}Z`)) / 1000;
   return { hours, several, remainingSeconds: Math.max(0, Math.round(remaining)), endsAt: new Date(endsAt).toISOString().slice(0, 19) };
+}
+
+/**
+ * The dives of the logbook that count for the wait before flying: the last dive that
+ * started before now (planned dives are not in the logbook's list) and the other dives
+ * that started the same calendar day, oldest first, with the end of each.
+ * @param {{date: string, durationSeconds: number}[]} logbookDives in any order
+ * @param {string} now local time (ISO, no time zone)
+ * @returns {{date: string, endDate: string}[]}
+ */
+export function flightDives(logbookDives, now) {
+  let latest = '';
+  for (const d of logbookDives) if (d.date <= now && d.date > latest) latest = d.date;
+  if (!latest) return [];
+  const day = latest.slice(0, 10);
+  return logbookDives
+    .filter((d) => d.date <= now && d.date.slice(0, 10) === day)
+    .sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0))
+    .map((d) => ({ date: d.date, endDate: new Date(Date.parse(`${d.date}Z`) + d.durationSeconds * 1000).toISOString().slice(0, 19) }));
+}
+
+/**
+ * The wait before flying counted from the logbook (the banner and the reminder).
+ * @param {{date: string, durationSeconds: number}[]} logbookDives
+ * @param {FlightWaitMode} mode
+ * @param {string} now local time (ISO, no time zone)
+ */
+export function flightWaitFor(logbookDives, mode, now) {
+  return flightWait(flightDives(logbookDives, now), now, mode);
 }
 
 /** A wait such as "17 h 05". @param {number} seconds */

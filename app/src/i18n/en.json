@@ -456,6 +456,7 @@
       "language": "Language and formats",
       "units": "Units",
       "conditions": "Tool conditions",
+      "flight": "Wait before flying",
       "logbook": "Logbook",
       "equipment": "Equipment",
       "profile": "Dive profile",
@@ -467,6 +468,15 @@
       "display": "Display",
       "maps": "Offline maps",
       "advanced": "Advanced"
+    },
+    "flight": {
+      "label": "Length of the wait",
+      "auto": "Based on the dives",
+      "autoText": "12 h after one dive, 18 h after several dives in the day",
+      "hours": "{h} h",
+      "note": "Counted from the last dive's exit from the water. Your dive computer prevails.",
+      "notify": "Notify me when I can fly",
+      "notifyText": "After each dive"
     },
     "language": {
       "label": "App language",
@@ -1516,6 +1526,8 @@
     "ago": "{time} ago",
     "ruleSingle": "Recommendation: {hours} hours after a single dive in the day.",
     "ruleSeveral": "Recommendation: {hours} hours after several dives in the day.",
+    "ruleFixed": "Setting: {hours} hours after the last dive.",
+    "notifyAt": "Notification {when}",
     "atRest": "No logbook dive in the last 48 hours: tissues are at rest.",
     "tissues": "Tissue saturation",
     "limit": "limit",
@@ -1535,7 +1547,33 @@
     "usedDives": "Calculated from",
     "noDives": "No logbook dive counts in this calculation.",
     "note": "This calculation only knows the dives in the logbook. A missing dive makes it wrong. Your dive computer prevails.",
-    "recommendation": "The wait before flying is an OpenDives recommendation, not a result of the model: 18 hours after several dives in a day, 12 hours after a single one. It is never a guarantee."
+    "recommendation": "The wait before flying is an OpenDives recommendation, not a result of the model: 18 hours after several dives in a day, 12 hours after a single one, or the length chosen in Settings. It is never a guarantee."
+  },
+  "flight": {
+    "at": "{day} at {time}",
+    "banner": {
+      "title": "Flying in {time}",
+      "allowed": "Allowed {when}"
+    },
+    "notice": {
+      "title": "You can fly",
+      "body": "The {hours} h wait after {dives} {when} is over.",
+      "single": "your dive",
+      "several": "your dives",
+      "today": "from today",
+      "yesterday": "from yesterday",
+      "date": "from {date}"
+    },
+    "channel": {
+      "name": "Wait before flying",
+      "description": "Tells you when you can fly after your dives."
+    },
+    "permission": {
+      "title": "Get a reminder for flying",
+      "text": "OpenDives can send you a notification when the wait before flying is over. Your phone will ask you to allow notifications.",
+      "action": "Continue",
+      "denied": "Notifications refused. Allow OpenDives notifications in the phone's settings to get the reminder."
+    }
   },
   "accountStep": {
     "back": "Back",
@@ -1600,6 +1638,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Flying: the \"Wait before flying\" setting (based on the dives, 12, 18 or 24 h) counts from the last dive's exit from the water; the Logbook shows \"Flying in …\" during the wait and the app can notify you when it is over.",
       "Planner, in cubic feet: the SAC from Settings is used as set, not rounded to 0.01 cu ft/min; only a SAC measured on a dive is rounded.",
       "Tools and Statistics: a row no longer stays tinted grey after turning a large phone.",
       "Planner: the result fits in one card, with the total time and the deco stops in large type, then the stops or “Ascent with no stop”, the volumes and the oxygen.",
