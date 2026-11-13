@@ -1657,6 +1657,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Fiche d’une plongée : en faisant défiler, le nom du site s’affiche dans la barre du haut.",
       "Évaluer OpenDives : une ligne sous « Nouveautés » ouvre la page de l’app dans Google Play (ou l’App Store) ; après un téléchargement réussi depuis un ordinateur de plongée, l’app peut demander la note avec la fenêtre du système (au plus une fois tous les 120 jours). Hors d’un magasin, la ligne devient « Donner votre avis ».",
       "Menu latéral : le bouton s’appelle « Synchroniser » et l’état dit depuis quand le carnet est synchronisé (« Synchronisé il y a 2 min »), avec l’icône du nuage ; nouvelle icône Statistiques.",
       "Menu latéral : carte du compte et ligne active en texte foncé, carte de synchronisation et logo conformes aux maquettes.",
