@@ -1600,6 +1600,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Gas blender: the helium step of a trimix is corrected (it was about 0.8 % short, and the oxygen as much too long).",
       "Dropdown menus: when they open, the list shows the chosen value.",
       "Planner: the keyboard no longer closes while typing in a field (levels, gases, GF).",
       "Planner: the SAC list goes in steps of 0.01 cu ft/min and opens on the current value.",
