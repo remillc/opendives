@@ -1596,7 +1596,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
-      "Bouteilles dessinées : une bouteille dont on ne connaît qu’une pression (début ou fin) est dessinée vide.",
+      "Bouteilles dessinées : une bouteille dont on ne connaît pas les deux pressions (début et fin) est hachurée en gris, sans niveau.",
       "Détail de plongée, recycleur : le dessin est plus petit, l’appareil et la bouteille de secours ont la même hauteur ; une bouteille sans pressions est hachurée en gris, sans niveau.",
       "Thème bleu : les bandeaux et le menu latéral passent au bleu océan, tout comme l’eau du profil et des vignettes, les bouteilles dessinées, les sélections et les barres de progression. Le rouille et le sable marquent désormais les données comme la température de l’eau et les graphiques des statistiques. Les boutons principaux restent noirs. Sur le téléphone, le bouton de température indique « Temp. ».",
       "Icône, logo et écran de démarrage : les trois vagues passent en bleus au lieu du sable et de la rouille, avec le même dessin.",

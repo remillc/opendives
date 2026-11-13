@@ -10,21 +10,21 @@ import { gasKind } from './cylinder-card.js';
  * The levels drawn in a cylinder, both relative to the working pressure and
  * capped at full (without a working pressure the start pressure stands in for
  * it). `end` is the top of the full water gradient, `start` the top of the pale
- * band (what was breathed). With only one of the two pressures known, the
- * cylinder is drawn empty: no level, no band, no line (Christian's decision of
- * 13 November 2026). The start is never drawn below the end.
+ * band (what was breathed). Without both pressures (one or none known), the
+ * cylinder is hatched in grey, with no level, no band and no line: `hatched`
+ * (Christian's decision of 13 November 2026). The start is never drawn below the end.
  * @param {number} startMbar
  * @param {number} endMbar
  * @param {number} workingPressureMbar
- * @returns {{ start: number|null, end: number }}
+ * @returns {{ start: number|null, end: number, hatched: boolean }}
  */
 export function fillLevels(startMbar, endMbar, workingPressureMbar) {
-  const full = workingPressureMbar > 0 ? workingPressureMbar : startMbar > 0 ? startMbar : endMbar > 0 ? endMbar : 0;
+  if (!(startMbar > 0) || !(endMbar > 0)) return { start: null, end: 0, hatched: true };
+  const full = workingPressureMbar > 0 ? workingPressureMbar : startMbar;
   /** @param {number} mbar */
-  const level = (mbar) => (mbar > 0 && full > 0 ? Math.min(1, mbar / full) : 0);
-  if (!(startMbar > 0) || !(endMbar > 0)) return { start: null, end: 0 };
+  const level = (mbar) => Math.min(1, mbar / full);
   const end = level(endMbar);
-  return { start: Math.max(end, level(startMbar)), end };
+  return { start: Math.max(end, level(startMbar)), end, hatched: false };
 }
 
 /**

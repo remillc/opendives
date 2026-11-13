@@ -4,27 +4,27 @@ import { test } from 'node:test';
 import { depthAt, equipmentLabel, fillLevels, gasChangeLine, gasChanges, gasGroupLabel } from '../../app/src/lib/gas-summary.js';
 
 test('levels are relative to the working pressure', () => {
-  assert.deepEqual(fillLevels(200000, 100000, 200000), { start: 1, end: 0.5 });
-  assert.deepEqual(fillLevels(150000, 50000, 200000), { start: 0.75, end: 0.25 });
+  assert.deepEqual(fillLevels(200000, 100000, 200000), { start: 1, end: 0.5, hatched: false });
+  assert.deepEqual(fillLevels(150000, 50000, 200000), { start: 0.75, end: 0.25, hatched: false });
 });
 
 test('levels are capped at full', () => {
-  assert.deepEqual(fillLevels(250000, 220000, 200000), { start: 1, end: 1 });
+  assert.deepEqual(fillLevels(250000, 220000, 200000), { start: 1, end: 1, hatched: false });
 });
 
 test('without a working pressure the start pressure stands in', () => {
-  assert.deepEqual(fillLevels(200000, 50000, 0), { start: 1, end: 0.25 });
+  assert.deepEqual(fillLevels(200000, 50000, 0), { start: 1, end: 0.25, hatched: false });
 });
 
-test('only one pressure known (start or end): the cylinder is drawn empty', () => {
-  assert.deepEqual(fillLevels(0, 100000, 200000), { start: null, end: 0 });
-  assert.deepEqual(fillLevels(200000, 0, 200000), { start: null, end: 0 });
-  assert.deepEqual(fillLevels(150000, 0, 200000), { start: null, end: 0 });
-  assert.deepEqual(fillLevels(0, 0, 0), { start: null, end: 0 });
+test('only one pressure known (start or end), or none: hatched, with no level', () => {
+  assert.deepEqual(fillLevels(0, 100000, 200000), { start: null, end: 0, hatched: true });
+  assert.deepEqual(fillLevels(200000, 0, 200000), { start: null, end: 0, hatched: true });
+  assert.deepEqual(fillLevels(150000, 0, 200000), { start: null, end: 0, hatched: true });
+  assert.deepEqual(fillLevels(0, 0, 0), { start: null, end: 0, hatched: true });
 });
 
 test('the start level is never below the end level', () => {
-  assert.deepEqual(fillLevels(100000, 150000, 200000), { start: 0.75, end: 0.75 });
+  assert.deepEqual(fillLevels(100000, 150000, 200000), { start: 0.75, end: 0.75, hatched: false });
 });
 
 const samples = { timeSeconds: [0, 60, 120, 180], depthMm: [0, 10000, 20000, 15000] };

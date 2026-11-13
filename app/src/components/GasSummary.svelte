@@ -11,7 +11,7 @@
 
   /**
    * @type {{
-   *   items: { key: number, n: number, gas: string, pressure: string, ratio: number, startRatio: number|null }[],
+   *   items: { key: number, n: number, gas: string, pressure: string, ratio: number, startRatio: number|null, hatched?: boolean }[],
    *   onopen: () => void,
    *   onedit: (key: number) => void,
    * }}
@@ -35,7 +35,7 @@
   <div class="od-gas-summary--cylinders">
     {#each items as item (item.key)}
       <button type="button" class="od-gas-summary--cylinder" data-key={item.key} aria-label={t('edit.cylinderOpen', { n: item.n, gas: item.gas })}>
-        <CylinderDrawing ratio={item.ratio} startRatio={item.startRatio} />
+        <CylinderDrawing ratio={item.ratio} startRatio={item.startRatio} hatched={item.hatched} />
         <span class="od-gas-summary--gas">{item.gas}</span>
         {#if item.pressure}<span class="od-gas-summary--pressure od-value">{item.pressure}</span>{/if}
       </button>
