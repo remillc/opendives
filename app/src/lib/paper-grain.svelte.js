@@ -1,8 +1,8 @@
 // @ts-check
 // TRIAL (inbox task 2026-11-13-108): a paper grain over the header bands, to judge on a
-// phone. On by default; the switch at the end of Réglages turns it off. To remove the trial:
-// delete this file, its import in main.js, the switch in Settings.svelte, the
-// `settings.paperGrain*` texts, the `--od-band-grain` token in theme.css and the
+// phone. On by default; the item « Grain papier (essai) » of the Logbook's ⋮ menu turns it
+// off and on. To remove the trial: delete this file, its import in main.js, the item in
+// Logbook.svelte, the `logbook.menuPaperGrain` texts, the `--od-band-grain` token in theme.css and the
 // `var(--od-band-grain)` layers of the bands.
 
 const KEY = 'od.paperGrain';
