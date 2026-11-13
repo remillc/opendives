@@ -2159,3 +2159,7 @@ Christian's decisions of 13 November 2026, on the Best mix tool. Mock-ups: `docs
 Check on the phone emulator, and on a tablet layout.
 
 Done in `feature/best-mix-tabs`: `GasBestMix.svelte` has the blender's ButtonGroup (Nitrox by default, not remembered across openings); depth, water type and ppO₂ are shared, the max END is on the Trimix tab only (the nitrox query passes the Settings default, it does not affect best_o2); both rows sit on the same two half columns. New keys `tools.nitroxSub` and `tools.bestMixNoteNitrox`, `tools.maxEndHelp` shortened, `tools.nitroxEnd(Over)` removed. Checked on the phone emulator (both tabs) and the tablet emulator (Trimix).
+
+## [ ] 2026-11-13-92 Planner SAC list: steps of 0.01 cuft/min
+
+Christian's decision of 13 November 2026. The SAC fields of the planner (at the bottom and during deco) open a list in steps of **0.01 cuft/min** (0,34 · 0,35 · 0,36 · 0,37 · 0,38 …), not 0.5. The list opens scrolled to the current value, which is highlighted (`aria-selected`, surface-container-highest). The diver can still type any value with two decimals. In litres per minute, keep the current step; if it seems wrong, ask Christian. Mock-up: `docs/mockups/android-planificateur-sac.dc.html` (its background and grey shades come from a theme trial not approved yet: keep the current theme colours). Check on the phone emulator.
