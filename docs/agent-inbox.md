@@ -2414,7 +2414,7 @@ Fix it once, in `theme.css`, for every navbar that is not `.od-band-bar`: `--f7-
 
 Done in fix/plain-top-bar: one rule in theme.css for every Android navbar that is not .od-band-bar (page colour, transparent hairline, no shadow, kept weak with :where() so pages with their own bar — the dive detail over its map, the editorial pages — still win), and lib/top-bar.js toggles .od-navbar-scrolled on scroll, which gives --od-surface-container (new token: #EEEEEC light, #1C1D1F dark) with a 150 ms transition (none with reduced motion). The hand-made overrides of DiveDetail.svelte (page colour) and StatisticsDives.svelte are removed. Checked on the phone emulator: Réglages and À propos at the top and scrolled, light and dark; Cartes hors ligne at the top (too short to scroll); Compte keeps its band. iOS unchanged.
 
-## [ ] 2026-11-13-115 Désaturation: tissue bars from 0 % at rest to 100 % at the limit, scale on the chart
+## [x] 2026-11-13-115 Désaturation: tissue bars from 0 % at rest to 100 % at the limit, scale on the chart
 
 Christian's decision of 13 November 2026. Mock-ups: `docs/mockups/outils-desaturation-android.dc.html` (and `-terminee-`, `-rappel-`, `android-tablette-desaturation-paysage/portrait`).
 
@@ -2423,6 +2423,8 @@ Today the bars use the scale of Subsurface's profile (`percent` from `tools.cpp`
 Chart labels, on the chart itself: « 100 % · limite » at the right end of the dashed top line, « rapides → lents » under the bars at the left, « 0 % · repos » at the right of the baseline. The legend under the chart keeps only the red swatch « 90 % et plus » (remove the 0–100 % gradient strip). The text under it becomes « Les 16 compartiments du modèle Bühlmann, des plus rapides aux plus lents. Au repos, désaturés, ils sont tous à 0 %. Facteurs de gradient 30 / 75, ceux du planificateur. » (gradient factors from the settings).
 
 The phone mock-up shows a second white card « Au repos, plus de 48 h après la dernière plongée » under the chart: it only illustrates the rest state for the review. The app shows one chart. Same change on the tablet layouts and in any other place that draws the tissue bars from `percent` (check `DiveProfile.svelte` and the flight banner, but leave the dive profile's own tissue graph on Subsurface's scale). Check on the phone emulator with a recent dive and with none in the last 48 h.
+
+Done in feature/tissue-bars-scale: Desaturation.svelte draws each bar from surfaceGf clamped to 0..110 (height, colour, the « 90 % et plus » count and the accessible label), a bar at rest is a 2 dp line on the baseline; chart labels « 100 % · limite », « rapides → lents », « 0 % · repos »; the legend keeps only the red swatch; new text under the chart. The dive profile's tissue graph keeps Subsurface's scale (its fast/slow labels are kept). Checked on the phone emulator: at rest (every compartment at 0 %). Not seen on screen: bars above 0 %, which need a dive ended within the last hour or so.
 
 ## [ ] 2026-11-13-116 Never break between a number and its unit
 

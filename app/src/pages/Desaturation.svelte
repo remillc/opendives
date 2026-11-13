@@ -72,12 +72,20 @@
   const GAP = 4;
   const BAR = (WIDTH - 15 * GAP) / 16;
 
-  /** @param {number} percent */
-  const barHeight = (percent) => (Math.max(0, Math.min(percent, 110)) / 100) * (BOTTOM - TOP);
+  /**
+   * A compartment's load on the Desaturation scale (task 2026-11-13-115): its surface gradient
+   * factor, 0 % at rest (desaturated) to 100 % at the limit, clamped to 0..110. Not the core's
+   * `percent` (Subsurface's profile scale, about 37 % at rest), which the dive profile keeps.
+   * @param {{ surfaceGf: number }} tissue
+   */
+  const restLoad = (tissue) => Math.round(Math.max(0, Math.min(tissue.surfaceGf, 110)));
+
+  /** A bar at rest is still drawn: a 2 dp line on the baseline. @param {number} value */
+  const barHeight = (value) => Math.max(2, (value / 100) * (BOTTOM - TOP));
 
   const chartLabel = $derived.by(() => {
     if (!desat) return '';
-    const values = desat.tissues.map((tissue) => tissue.percent);
+    const values = desat.tissues.map(restLoad);
     const high = values.filter((v) => v >= ALARM_PERCENT).length;
     const label = t('desaturation.chartLabel', { min: Math.min(...values), max: Math.max(...values) });
     return high ? `${label} ${t('desaturation.chartLabelHigh', { n: high })}` : label;
@@ -175,17 +183,14 @@
         <path class="od-desaturation--limit" d="M0 {TOP} H{WIDTH}" />
         <text class="od-desaturation--axis" x={WIDTH} y="12" text-anchor="end">{t('desaturation.limit')}</text>
         {#each desat.tissues as tissue, i (i)}
-          {@const h = barHeight(tissue.percent)}
-          <rect x={i * (BAR + GAP)} y={BOTTOM - h} width={BAR} height={h} rx="2" style:fill={barColor(tissue.percent)} />
+          {@const h = barHeight(restLoad(tissue))}
+          <rect x={i * (BAR + GAP)} y={BOTTOM - h} width={BAR} height={h} rx="1" style:fill={barColor(restLoad(tissue))} />
         {/each}
-        <text class="od-desaturation--axis" x="0" y="134">{t('desaturation.fast')}</text>
-        <text class="od-desaturation--axis" x={WIDTH} y="134" text-anchor="end">{t('desaturation.slow')}</text>
+        <text class="od-desaturation--axis" x="0" y="134">{t('desaturation.fastToSlow')}</text>
+        <text class="od-desaturation--axis" x={WIDTH} y="134" text-anchor="end">{t('desaturation.restZero')}</text>
       </svg>
     </div>
     <div class="od-desaturation--legend od-value" aria-hidden="true">
-      <span>{t('desaturation.legendZero')}</span>
-      <span class="od-desaturation--gradient"></span>
-      <span>{t('desaturation.legendFull')}</span>
       <span class="od-desaturation--alarm-swatch"></span>
       <span>{t('desaturation.legendAlarm')}</span>
     </div>
@@ -418,12 +423,6 @@
       color: var(--od-text-2);
     }
 
-    .od-desaturation--gradient {
-      flex: 1;
-      height: 8px;
-      border-radius: 4px;
-      background: linear-gradient(90deg, var(--od-water-top), var(--od-water-bottom));
-    }
 
     .od-desaturation--alarm-swatch {
       flex: none;
