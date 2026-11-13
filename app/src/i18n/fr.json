@@ -1649,6 +1649,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Menu latéral : carte du compte et ligne active en texte foncé, carte de synchronisation et logo conformes aux maquettes.",
       "Lest : « Modifier la plongée » suggère un lest d’après la plongée la plus récente avec la même combinaison, les mêmes bouteilles et le même type d’eau, corrigé de 2 lb (1 kg) selon que ce lest était trop léger ou trop lourd ; « Utiliser » le met dans la plongée. « Ce lest était » (Trop léger, Juste, Trop lourd) se choisit dans « Modifier la plongée » et dans le détail, sous Équipement ; le choix est enregistré comme une étiquette anglaise (weight-too-light, weight-ok, weight-too-heavy), que Subsurface affiche aussi.",
       "Avion : le réglage « Attente avant l’avion » (selon les plongées, 12, 18 ou 24 h) compte depuis la sortie de l’eau de la dernière plongée ; le Carnet affiche « Avion dans … » pendant l’attente et l’app peut vous prévenir quand elle est terminée.",
       "Code QR : une plongée, ou un plan enregistré, peut se partager en codes QR qui défilent à l’écran (Partager, puis Code QR), sans internet ; sur l’autre téléphone, « + » puis « Scanner un code QR » les lit et ajoute la plongée au carnet (ou le plan aux plongées planifiées). L’écran reste allumé à pleine luminosité pendant l’affichage des codes.",

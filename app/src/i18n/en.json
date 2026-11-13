@@ -1649,6 +1649,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Side menu: dark text on the account card and the active row; the sync card and the logo match the mock-ups.",
       "Weights: Edit dive suggests a weight from the most recent dive with the same suit, cylinders and water type, adjusted by 2 lb (1 kg) if that weight was too light or too heavy; Use puts it in the dive. “This weight was” (Too light, Just right, Too heavy) is set in Edit dive and in the dive detail, under Equipment; the choice is saved as an English tag (weight-too-light, weight-ok, weight-too-heavy), which Subsurface also shows.",
       "Flying: the \"Wait before flying\" setting (based on the dives, 12, 18 or 24 h) counts from the last dive's exit from the water; the Logbook shows \"Flying in …\" during the wait and the app can notify you when it is over.",
       "QR code: a dive, or a saved plan, can be shared as QR codes that scroll on the screen (Share, then QR code), without internet; on the other phone, “+” then “Scan a QR code” reads them and adds the dive to the logbook (or the plan to the planned dives). The screen stays on at full brightness while the codes show.",
