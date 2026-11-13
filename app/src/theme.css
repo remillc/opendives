@@ -59,6 +59,8 @@
     --od-selected-container: #E6EEF8;
     --od-tonal: var(--od-secondary-container);
     --od-oxygen: #2E7D32;
+    /* A safe outcome (the planner: no deco stop), in the oxygen green. */
+    --od-status-ok: var(--od-oxygen);
     --od-pending: #8A4B00;
     /* On the header band, whose colours stay light in dark mode too. */
     --od-band-pending: #8A4B00;
@@ -254,6 +256,7 @@
     --od-tint: var(--od-surface-2);
     --od-on-tint: var(--od-text);
     --od-oxygen: #7FD283;
+    --od-status-ok: var(--od-oxygen);
     --od-thumbnail-background: var(--od-surface-2);
     --od-drawer: var(--f7-md-surface-1);
     --od-dialog: var(--f7-md-surface-3);

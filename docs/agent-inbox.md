@@ -2188,7 +2188,7 @@ The mock-up `android-planificateur` on the canvas also shows a new « Résultat 
 
 Done in `feature/planner-volume-rows`: « Exposition à l’oxygène » with « CNS 2 % » large, the 10 px bar, « Limite CNS 100 % » left and « OTU 0 » right; group name « Exposition à l’oxygène : CNS 2 % de la limite, 0 OTU ». Same block in the shared PDF. The « Résultat » card is not built. Checked on the phone emulator.
 
-## [ ] 2026-11-13-95 Planner: « Résultat » card
+## [x] 2026-11-13-95 Planner: « Résultat » card
 
 Christian's decision of 13 November 2026, completing tasks 93 and 94. The planner result is grouped in one card. Mock-ups: `docs/mockups/android-planificateur.dc.html` (no deco) and `android-planificateur-nouveau.dc.html` (with deco). Their background and grey shades come from a theme trial not approved yet: keep the current theme colours.
 - **Title** « Résultat » (18 sp bold) above the card, replacing « Résultat, durée totale 61 min ».
@@ -2200,6 +2200,10 @@ Christian's decision of 13 November 2026, completing tasks 93 and 94. The planne
 - Accessible name of the card: « Résultat du plan, durée totale N min ».
 Same card on the tablet layouts and in the shared plan. Check on the phone emulator with a plan without deco and a plan with deco.
 
-## [ ] 2026-11-13-96 Planner stops table: first gas highlighted
+Done in `feature/planner-result-card`: « Résultat » (18 px bold) above one card (surface, 20 px corners, named « Résultat du plan, durée totale N min »): two tiles « Durée totale » and « Paliers de déco » (« 7 (103 min) », or 0), then the stops table and its legend, or the status line with a check in the new token `--od-status-ok` (the oxygen green), then a divider, « Volume nécessaire par gaz » and the gas blocks separated by dividers, then the oxygen row. The shared PDF gets the two tiles and the status line. Checked on the phone emulator without deco (22 min) and with deco (150 ft, 30 min: 7 stops). Not checked on a tablet: same page.
+
+## [x] 2026-11-13-96 Planner stops table: first gas highlighted
 
 Christian's decision of 13 November 2026. In the planner's stops table, the gas of the first row (the descent gas, EAN32 in the mock-up) is shown in the same highlight pill as the gas changes. The legend under the table becomes « Début et fin en minutes depuis la mise à l'eau. ↓ descente, → niveau prévu, ↑ remontée, – palier de déco. Gaz surligné : gaz de départ ou changement de gaz. » Same on the tablet and in the shared plan. Mock-up: `docs/mockups/android-planificateur-nouveau.dc.html` (keep the current theme colours). Check on the phone emulator.
+
+Done in `feature/planner-result-card`: the first row's gas gets the gas-change pill; legend « … Gaz surligné : gaz de départ ou changement de gaz. » (fr/en). In the shared PDF, the first stop's gas and each change are highlighted. Checked on the phone emulator (Air highlighted on the first row).
