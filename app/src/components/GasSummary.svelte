@@ -11,6 +11,7 @@
   import Icon from './Icon.svelte';
   import CylinderDrawing from './CylinderDrawing.svelte';
   import RebreatherDrawing from './RebreatherDrawing.svelte';
+  import { rebreatherCells, rebreatherTracks, rebreatherWidth } from '../lib/rebreather-gas.js';
   import { t } from '../lib/i18n.js';
 
   /**
@@ -26,8 +27,8 @@
    */
   let { items, rebreather = null, onopen, onedit } = $props();
 
-  /** In the rebreather view: diluent, oxygen, then the others, each present one a column. */
-  const columns = $derived(rebreather ? [rebreather.diluent, ...(rebreather.oxygen === rebreather.diluent ? [] : [rebreather.oxygen]), ...rebreather.others].filter((i) => i >= 0) : []);
+  /** In the rebreather view: the diluent's and the oxygen's halves of the unit, then one column per cylinder beside it. */
+  const cells = $derived(rebreather ? rebreatherCells(rebreather) : []);
 
   /** @param {MouseEvent} event */
   function click(event) {
@@ -42,19 +43,24 @@
   <!-- A rebreather dive: the whole card is one button that opens the Gas page. -->
   <button type="button" class="od-gas-summary od-gas-summary--rebreather" aria-label={rebreather.label} onclick={onopen}>
     <div class="od-gas-summary--drawing">
-      <RebreatherDrawing
-        diluent={rebreather.diluent >= 0 ? items[rebreather.diluent] : null}
-        oxygen={rebreather.oxygen >= 0 ? items[rebreather.oxygen] : null}
-        others={rebreather.others.map((i) => items[i])}
-        marks={rebreather.marks}
-      />
-      <div class="od-gas-summary--columns" style:grid-template-columns="repeat({columns.length}, 1fr)">
-        {#each columns as i (i)}
-          <div class="od-gas-summary--column">
-            <span class="od-gas-summary--gas">{items[i].gas}</span>
-            {#if items[i].pressure}<span class="od-gas-summary--pressure od-value">{items[i].pressure}</span>{/if}
-          </div>
-        {/each}
+      <!-- At most the drawing's own width, the text columns on the same grid as the drawing. -->
+      <div class="od-gas-summary--grid" style:max-width="{rebreatherWidth(rebreather.others.length)}px">
+        <RebreatherDrawing
+          diluent={rebreather.diluent >= 0 ? items[rebreather.diluent] : null}
+          oxygen={rebreather.oxygen >= 0 ? items[rebreather.oxygen] : null}
+          others={rebreather.others.map((i) => items[i])}
+          marks={rebreather.marks}
+        />
+        <div class="od-gas-summary--columns" style:grid-template-columns={rebreatherTracks(rebreather.others.length)}>
+          {#each cells as i, n (n)}
+            <div class="od-gas-summary--column">
+              {#if i >= 0}
+                <span class="od-gas-summary--gas">{items[i].gas}</span>
+                {#if items[i].pressure}<span class="od-gas-summary--pressure od-value">{items[i].pressure}</span>{/if}
+              {/if}
+            </div>
+          {/each}
+        </div>
       </div>
     </div>
     <span class="od-gas-summary--chevron" aria-hidden="true"><Icon name="chevron" /></span>
@@ -102,11 +108,12 @@
       text-align: left;
     }
 
-    /* As wide as the drawing, so that each column stays under its cylinder on a wide pane. */
     .od-gas-summary--drawing {
-      max-width: 360px;
-      margin: 0 auto;
       padding-right: 28px;
+    }
+
+    .od-gas-summary--grid {
+      margin: 0 auto;
     }
 
     .od-gas-summary--columns {
