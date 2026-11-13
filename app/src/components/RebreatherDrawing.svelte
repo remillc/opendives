@@ -30,6 +30,12 @@
   // One step = REBREATHER_COLUMN once scaled: each cylinder beside the unit is
   // centred in its own text column (lib/rebreather-gas.js).
   const SIDE = { top: 58, height: 130, width: 40, rx: 19.2, x: 252, step: REBREATHER_COLUMN / 0.935 };
+  // Their outline (task 2026-11-13-89), for the first one (x = 252), the others
+  // moved by a step: shoulders into a short neck, rounded bottom, no valve. The
+  // levels keep their scale (full at 58, empty at 188) and are clipped by it.
+  const SIDE_PATH = 'M267.5 49 L267.5 55 C259.5 56.5 254 63 254 73 L254 170 C254 181 262 188 272 188 C282 188 290 181 290 170 L290 73 C290 63 284.5 56.5 276.5 55 L276.5 49 Z';
+  // The middle of that outline, from the top of its neck to its bottom.
+  const SIDE_MIDDLE = (49 + 188) / 2;
   // The two scalings, in the drawing's own units (the mock-up's values).
   const UNIT_SCALE = { x: 34.42, y: -0.1, k: 0.684 };
   const SIDE_SCALE = { x: 17.7, y: -41.8, k: 0.935 };
@@ -80,8 +86,16 @@
   const shapes = $derived([...unitShapes, ...sideShapes]);
 </script>
 
+{#snippet outline(/** @type {ReturnType<typeof shape>} */ s, /** @type {string} */ cls, /** @type {string|null} */ fill)}
+  {#if s.side}
+    <path d={SIDE_PATH} transform="translate({s.x - SIDE.x} 0)" class={cls} style:fill={fill} />
+  {:else}
+    <rect x={s.x} y={s.top} width={s.width} height={s.height} rx={s.rx} class={cls} style:fill={fill} />
+  {/if}
+{/snippet}
+
 {#snippet cylinder(/** @type {ReturnType<typeof shape>} */ s)}
-  <rect x={s.x} y={s.top} width={s.width} height={s.height} rx={s.rx} class="od-rebreather-drawing--body" style:fill={s.hatched ? `url(#${id}-hatch)` : null} />
+  {@render outline(s, 'od-rebreather-drawing--body', s.hatched ? `url(#${id}-hatch)` : null)}
   {#if s.startY !== null}
     <rect x={s.x} y={s.startY} width={s.width} height={s.bottom - s.startY} class="od-rebreather-drawing--start-fill" clip-path="url(#{id}-{s.key})" />
     <line x1={s.x + 1} y1={s.lineStartY} x2={s.x + s.width - 1} y2={s.lineStartY} class="od-rebreather-drawing--level" clip-path="url(#{id}-{s.key})" />
@@ -92,7 +106,7 @@
       <line x1={s.x + 1} y1={s.lineEndY} x2={s.x + s.width - 1} y2={s.lineEndY} class="od-rebreather-drawing--level" clip-path="url(#{id}-{s.key})" />
     {/if}
   {/if}
-  <rect x={s.x} y={s.top} width={s.width} height={s.height} rx={s.rx} class="od-rebreather-drawing--outline" />
+  {@render outline(s, 'od-rebreather-drawing--outline', null)}
 {/snippet}
 
 <svg class="od-rebreather-drawing" viewBox="0 0 {width} {HEIGHT}" aria-hidden="true">
@@ -102,7 +116,13 @@
       <stop offset="1" class="od-rebreather-drawing--water-bottom" />
     </linearGradient>
     {#each shapes as s (s.key)}
-      <clipPath id="{id}-{s.key}"><rect x={s.x} y={s.top} width={s.width} height={s.height} rx={s.rx} /></clipPath>
+      <clipPath id="{id}-{s.key}">
+        {#if s.side}
+          <path d={SIDE_PATH} transform="translate({s.x - SIDE.x} 0)" />
+        {:else}
+          <rect x={s.x} y={s.top} width={s.width} height={s.height} rx={s.rx} />
+        {/if}
+      </clipPath>
     {/each}
     <!-- No pressure data: grey diagonal stripes, 8 wide, at 45°. -->
     <pattern id="{id}-hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
@@ -132,19 +152,18 @@
   <text x={dilMark.x} y={dilMark.y} text-anchor="middle" dominant-baseline="central" class="od-rebreather-drawing--mark">{marks.diluent}</text>
   <text x={oxyMark.x} y={oxyMark.y} text-anchor="middle" dominant-baseline="central" class="od-rebreather-drawing--mark">{marks.oxygen}</text>
 
-  <!-- The others beside the unit, valve on top. -->
+  <!-- The others beside the unit: the open-circuit cylinder shape, no valve (task 2026-11-13-89). -->
   {#if sideShapes.length}
     <g transform="translate({SIDE_SCALE.x} {SIDE_SCALE.y}) scale({SIDE_SCALE.k})">
       {#each sideShapes as s (s.key)}
         {@render cylinder(s)}
-        <rect x={s.x + 14} y={s.top - 9} width="12" height="9" rx="2" class="od-rebreather-drawing--side-valve" />
         <text
           x={s.x + s.width / 2}
-          y={s.top + s.height / 2}
+          y={SIDE_MIDDLE}
           text-anchor="middle"
           dominant-baseline="central"
           class="od-rebreather-drawing--mark od-rebreather-drawing--mark-side"
-          transform="rotate(-90 {s.x + s.width / 2} {s.top + s.height / 2})">{marks.bailout}</text>
+          transform="rotate(-90 {s.x + s.width / 2} {SIDE_MIDDLE})">{marks.bailout}</text>
       {/each}
     </g>
   {/if}
@@ -183,6 +202,7 @@
       fill: none;
       stroke: var(--od-text);
       stroke-width: 2;
+      stroke-linejoin: round;
     }
 
     .od-rebreather-drawing--valve {
@@ -195,10 +215,6 @@
       fill: var(--od-rebreather-hardware);
       stroke: var(--od-text);
       stroke-width: 1.5;
-    }
-
-    .od-rebreather-drawing--side-valve {
-      fill: var(--od-text);
     }
 
     .od-rebreather-drawing--canister {
