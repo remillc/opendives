@@ -6,5 +6,11 @@
   "appendUserAgent": "OpenDives",
   "ios": {
     "loggingBehavior": "debug"
+  },
+  "plugins": {
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_flight",
+      "iconColor": "#2D5E90"
+    }
   }
 }

@@ -57,6 +57,11 @@ const UNIT_KEYS = /** @type {const} */ (['length', 'temperature', 'pressure', 'v
  *   Per device, never in the logbook (task 2026-11-12-74)
  * @property {number} reserveDivers planner reserve: divers on the gas, 1 to 4. The core's sacfactor is
  *   stress x divers (reserve-factor.js)
+ * @property {'auto'|'12'|'18'|'24'} flightWait "Attente avant l'avion" (task 2026-11-13-98): "auto" is
+ *   "Selon les plongées" (12 h after one dive, 18 h after several dives in the day), else a fixed number
+ *   of hours. Counted from the surfacing time of the last dive. Per device
+ * @property {boolean} flightNotify "Me prévenir quand je peux prendre l'avion": a local notification at the
+ *   end of the wait (lib/flight-reminder.svelte.js). Per device
  */
 
 /** @type {AppSettings} */
@@ -82,6 +87,8 @@ const APP_DEFAULTS = {
   defaultBailout: [],
   stressFactor: DEFAULT_STRESS_FACTOR,
   reserveDivers: DEFAULT_DIVERS,
+  flightWait: 'auto',
+  flightNotify: false,
 };
 
 /**

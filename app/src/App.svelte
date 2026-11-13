@@ -60,6 +60,7 @@
   import { TAP_SLOP } from './lib/tap.js';
   import { enableBackButton } from './lib/back-button.js';
   import { enableDeepLinks } from './lib/open-link.js';
+  import { startFlightReminder } from './lib/flight-reminder.svelte.js';
   import { enableAccessibility } from './lib/accessibility.js';
   import { enableDetailPageCleanup } from './lib/detail-pages.js';
   import { enableModalCleanup } from './lib/modal-cleanup.js';
@@ -257,6 +258,7 @@
     applyMotionTokens();
     enableBackButton();
     enableDeepLinks();
+    startFlightReminder();
     enableAccessibility();
     enableDetailPageCleanup();
     enableModalCleanup();
