@@ -2370,9 +2370,11 @@ Tablet: the overview in the left pane, the selected subpage in the right pane (l
 
 Done in feature/settings-overview: Settings.svelte is both the overview (/settings/, three cards, a one-line summary per row built from the stored values) and each subpage (/settings/<display|language|units|logbook|equipment|profile|gases|tools|download|advanced>, rows unchanged); Cartes hors ligne opens /settings/maps/. Search stays on the overview and lists matching rows of every group. Tablet: Réglages always opens in the Account view, which gets a master-detail pair (overview left, subpage right, Affichage selected first, selected row tinted). tests/e2e/planner-e2e.mjs now sets the unit system on /settings/units. Checked on the phone emulator (en: every subpage, search) and the tablet emulator (fr, landscape and portrait). Not done: menus opening above or below the row were left as RowMenu places them.
 
-## [ ] 2026-11-13-112 Gaz et recycleur: say that the two rebreather switches act on the pO₂ graph
+## [x] 2026-11-13-112 Gaz et recycleur: say that the two rebreather switches act on the pO₂ graph
 
 Christian's decision of 13 November 2026. Mock-up: `docs/mockups/reglages-gaz-android.dc.html`. The two switches under « Recycleur » only change what the pO₂ graph of the profile shows, which their labels did not say. They stay under « Recycleur », same keys and behaviour, new label and a supporting line:
 - « Afficher les capteurs d’O₂ » becomes « Afficher chaque capteur d’O₂ », supporting line « Sur le graphique de pO₂, une courbe par cellule » (en: « Show each O₂ sensor » / « On the pO₂ graph, one line per cell »);
 - « Afficher les consignes » becomes « Afficher la consigne », supporting line « Sur le graphique de pO₂, la valeur visée » (en: « Show the setpoint » / « On the pO₂ graph, the target value »).
 fr-CA follows fr. Applies in the Gaz et recycleur subpage of task 111 and on the tablet layout.
+
+Done in fix/rebreather-switch-labels: new labels and supporting lines for showCcrSensors and showCcrSetpoint (fr, en; fr-CA follows fr), same keys and behaviour. Checked on the phone emulator in the Gaz et recycleur subpage (the tablet uses the same page).
