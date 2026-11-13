@@ -66,8 +66,18 @@ async function inject() {
       root() { const all = [...document.querySelectorAll('.od-planner')].filter((e) => e.offsetParent !== null); return all[all.length - 1] || null; },
       field(text, n = 0) {
         const r = this.root();
-        const l = r && [...r.querySelectorAll('label.od-text-field--label, label.od-select-field--label, label.od-combo-field--label, label.od-button-field--label')].filter((x) => x.textContent.trim() === text)[n];
+        const l = r && [...r.querySelectorAll('label.od-text-field--label, label.od-select-field--label, label.od-combo-field--label, label.od-number-combo--label, label.od-button-field--label')].filter((x) => x.textContent.trim() === text)[n];
         return l ? document.getElementById(l.htmlFor) : null;
+      },
+      // The value a field shows: a text field's value, or the number of a dropdown (Android's
+      // SelectField has no input: "50 %" reads "50").
+      shown(text, n = 0) {
+        const e = this.field(text, n);
+        if (e && 'value' in e && e.tagName !== 'BUTTON') return e.value;
+        const r = this.root();
+        const f = r && [...r.querySelectorAll('.od-select-field')].filter((x) => x.querySelector('.od-select-field--label')?.textContent.trim() === text)[n];
+        const v = f?.querySelector('.od-select-field--value')?.textContent ?? '';
+        return (v.match(/-?\\d+([.,]\\d+)?/) ?? [''])[0];
       },
       visible(sel, text) {
         // Only what is on the page being shown (earlier pages stay in the stack), or outside any page (menus, dialogs).
@@ -119,11 +129,23 @@ async function type(label, n, text, rounding = 0) {
   if (shown !== text) console.log(`note: ${text} typed in ${label}, the field reads ${shown}`);
   await sleep(120);
 }
-/** Chooses an option of a select. */
+/**
+ * Chooses an option of a dropdown by its value: a native select (iOS), or the
+ * Android menu of SelectField (and of the planner's ChoiceField), opened with
+ * its trigger and tapped on the option carrying that data-value.
+ */
 async function choose(label, n, value) {
-  const ok = await p.eval(`(() => { const e = __od.field(${q(label)}, ${n}); if (!e) return false; e.value = ${q(value)}; e.dispatchEvent(new Event('change', { bubbles: true })); return e.value === ${q(value)}; })()`);
+  const native = await p.eval(`(() => { const e = __od.field(${q(label)}, ${n}); if (!e || e.tagName !== 'SELECT') return null; e.value = ${q(value)}; e.dispatchEvent(new Event('change', { bubbles: true })); return e.value === ${q(value)}; })()`);
+  let ok = native;
+  if (native === null) {
+    const opened = await p.eval(`(() => { const r = __od.root(); const f = r && [...r.querySelectorAll('.od-select-field')].filter((x) => x.querySelector('.od-select-field--label')?.textContent.trim() === ${q(label)})[${n}]; const b = f?.querySelector('.od-select-field--trigger'); if (!b) return false; b.scrollIntoView({ block: 'center' }); b.click(); return true; })()`);
+    if (opened) {
+      await sleep(250);
+      ok = await p.eval(`(() => { const o = [...document.querySelectorAll('.od-select-field--menu [data-value]')].find((x) => x.dataset.value === ${q(value)}); if (!o) return false; o.click(); return true; })()`);
+    }
+  }
   if (!ok) throw new Error(`cannot choose ${value} in ${label}`);
-  await sleep(120);
+  await sleep(150);
 }
 /** Waits until the plan has been calculated again and shown (no new calculation for a moment). */
 async function settle() {
@@ -169,12 +191,13 @@ const read = () =>
       stops: [...o.querySelectorAll('table tbody tr')]
         .map((tr) => [...tr.children].map(text))
         .filter((cells) => cells[0] === '–')
-        .map((cells) => [cells[1], cells[3], cells[4], cells[5]]),
+        .map((cells) => [cells[1], cells[3], cells[4], cells[5], cells[2]]),
       rows,
       oxygen: oxygen ? text(oxygen) : '',
       helpers: [...r.querySelectorAll('.od-planner--gas .od-planner--helper')].map(text),
       saveDisabled: !!r.closest('.page')?.querySelector('.navbar .right a.disabled'),
-      invalid: [...r.querySelectorAll('.od-text-field--field.od-text-field--invalid label')].map(text),
+      // Oxygen and helium are dropdowns: their error shows on the select field.
+      invalid: [...r.querySelectorAll('.od-text-field--field.od-text-field--invalid label, .od-select-field--invalid .od-select-field--label')].map(text),
     };
   })()`);
 
@@ -195,12 +218,30 @@ async function check(name, sys, expected, { alarms } = {}) {
   const ui = await read();
   yes(`${name}: the core answered without error`, ref.error === '' && !ui.error && !ui.failed, `${ref.error} ${ui.error}`);
   same(`${name}: total time`, number(ui.title), minutes(ref.runtimeSeconds));
-  same(`${name}: number of stops`, ui.stops.length, ref.stops.length);
+  // The table follows Subsurface's plan notes (task 2026-11-12-34, core/plannernotes.cpp):
+  // the time shown advances by rounded minutes (line 404) and a row under 10 s after it
+  // is skipped (line 244), so a stop shorter than a minute can merge into its neighbour.
+  // Each stop of the core is matched, in order, with the table's row at its depth; one
+  // that is not shown must be under a minute. A row's duration is its rounded end minus
+  // the minutes already shown: within a minute of the stop's length, start + duration = end.
+  let at = 0;
+  let shown = 0;
   ref.stops.forEach((s, i) => {
-    const row = ui.stops[i] ?? [];
-    same(`${name}: stop ${i + 1} (${depthShown(s.depthMm, sys)})`, [number(row[0]), number(row[1]), number(row[2])], [depthShown(s.depthMm, sys), minutes(s.durationSeconds), minutes(s.runtimeSeconds)]);
+    const depth = depthShown(s.depthMm, sys);
+    const j = ui.stops.findIndex((r, k) => k >= at && number(r[0]) === depth);
+    if (j < 0) {
+      yes(`${name}: stop ${i + 1} (${depth}) not in the table: under a minute, merged by the notes' rounding`, s.durationSeconds < 60, `${s.durationSeconds} s`);
+      return;
+    }
+    at = j + 1;
+    shown++;
+    const row = ui.stops[j];
+    same(`${name}: stop ${i + 1} (${depth}) depth and end`, [number(row[0]), number(row[2])], [depth, minutes(s.runtimeSeconds)]);
+    same(`${name}: stop ${i + 1} start + duration = end`, number(row[4]) + number(row[1]), number(row[2]));
+    yes(`${name}: stop ${i + 1} duration within the rounding of Subsurface's notes`, Math.abs(number(row[1]) * 60 - s.durationSeconds) < 90, `${row[1]} min for ${s.durationSeconds} s`);
     same(`${name}: stop ${i + 1} gas`, row[3], ui.rows[s.cylinder]?.label);
   });
+  same(`${name}: every stop row of the table is a stop of the core`, ui.stops.length, shown);
   ref.cylinders.forEach((c, i) => {
     const row = ui.rows[i];
     const [used, reserve] = numbers(row?.hint ?? '');
@@ -280,8 +321,8 @@ async function run() {
   await openNew();
   await type(T('plan.depth'), 0, '45');
   await type(T('plan.duration'), 0, '25');
-  await type(T('plan.oxygenPercent'), 0, '21');
-  await type(T('plan.heliumPercent'), 0, '35');
+  await choose(T('plan.oxygenPercent'), 0, '21');
+  await choose(T('plan.heliumPercent'), 0, '35');
   await click('button.od-planner--add', T('plan.addGas'));
   await click('button.od-planner--add', T('plan.addGas'));
   const three = await check('3 three gases, 21/35 EAN50 O2', 'metric', {
@@ -296,7 +337,7 @@ async function run() {
   const dives = await core('listLoadedDives');
   const dive = dives.filter((d) => d.maxDepthMm > 12000 && d.durationSeconds > 1200).sort((a, b) => (a.date < b.date ? 1 : -1))[0];
   await go(`/plan/${dive.id}`);
-  await p.waitFor(`!!__od.root()?.querySelector('.od-planner--outcome .od-planner--plan')`, 'the plan from a dive');
+  await p.waitFor(`!!__od.root()?.querySelector('.od-planner--outcome .od-planner--card')`, 'the plan from a dive');
   await settle();
   const fromDive = await lastRequest();
   same('4 from a dive: the request names the dive', [fromDive.sourceDiveId, fromDive.levels], [dive.id, undefined]);
@@ -361,7 +402,7 @@ async function run() {
   await openNew();
   await type(T('plan.depth'), 0, '45');
   await type(T('plan.duration'), 0, '20');
-  await type(T('plan.oxygenPercent'), 0, '36');
+  await choose(T('plan.oxygenPercent'), 0, '36');
   const mod = await check('9a EAN36 at 45 m', 'metric', { ...base, levels: [{ depthMm: 45000, durationSeconds: 1200 }], cylinders: [{ o2Permille: 360, hePermille: 0 }] });
   const modRow = mod.ui.rows.find((r) => r.label === T('plan.modTitle'));
   const modMm = mod.ref.cylinders[0].bottomModMm;
@@ -414,8 +455,8 @@ async function run() {
   let r = await read();
   yes('11a a depth of 400 m is refused in the field', r.invalid.includes(T('plan.depth')) && r.saveDisabled, JSON.stringify({ invalid: r.invalid, save: r.saveDisabled }));
   await type(T('plan.depth'), 0, '30');
-  await type(T('plan.oxygenPercent'), 0, '80');
-  await type(T('plan.heliumPercent'), 0, '40');
+  await choose(T('plan.oxygenPercent'), 0, '80');
+  await choose(T('plan.heliumPercent'), 0, '40');
   r = await read();
   yes('11b oxygen + helium above 100 % is refused', r.invalid.includes(T('plan.oxygenPercent')) && r.saveDisabled, JSON.stringify(r.invalid));
   await openNew();
@@ -436,8 +477,8 @@ async function run() {
   await openNew();
   await type(T('plan.depth'), 0, '45');
   await type(T('plan.duration'), 0, '25');
-  await type(T('plan.oxygenPercent'), 0, '21');
-  await type(T('plan.heliumPercent'), 0, '35');
+  await choose(T('plan.oxygenPercent'), 0, '21');
+  await choose(T('plan.heliumPercent'), 0, '35');
   await click('button.od-planner--add', T('plan.addGas'));
   await click('button.od-planner--add', T('plan.addGas'));
   const saved = await check('12 the plan to save', 'metric', {
@@ -449,6 +490,8 @@ async function run() {
   const account = await p.eval(`document.querySelector('#view-account')?.textContent ?? ''`);
   if (!account.includes('roger.bourdieu')) throw new Error('not the test account: no save');
   await click('.page-current .navbar .right a, .navbar .right a', T('plan.save'));
+  // "Save" asks for a title first (task 2026-11-12-38): keep the proposed one.
+  await click('.od-plan-title-dialog button', T('plan.save'));
   await p.waitFor(`document.querySelectorAll('.list .od-plans--row').length >= 1`, 'the list of plans');
   let plans = await core('listPlans');
   created = plans.map((x) => x.id).filter((id) => !startPlans.includes(id));
@@ -476,10 +519,10 @@ async function run() {
   const setupBeforeReopen = await core('plannerSetup');
   await core('setPrefs', { changes: { descentMmMin: 3000, reserveMbar: 100000 } });
   await click('.list .od-plans--row a.od-plans--open');
-  await p.waitFor(`!!__od.root()?.querySelector('.od-planner--outcome .od-planner--plan')`, 'the reopened plan');
+  await p.waitFor(`!!__od.root()?.querySelector('.od-planner--outcome .od-planner--card')`, 'the reopened plan');
   await settle();
   const reopened = await read();
-  same('12 reopened after a reload: fields', await p.eval(`[__od.field(${q(T('plan.depth'))}, 0).value, __od.field(${q(T('plan.duration'))}, 0).value, __od.field(${q(T('plan.oxygenPercent'))}, 1).value]`), ['45', '25', '50']);
+  same('12 reopened after a reload: fields', await p.eval(`[__od.shown(${q(T('plan.depth'))}, 0), __od.shown(${q(T('plan.duration'))}, 0), __od.shown(${q(T('plan.oxygenPercent'))}, 1)]`), ['45', '25', '50']);
   same('12 reopened after a reload: the same result', [number(reopened.title), reopened.stops.length, reopened.oxygen], [minutes(saved.ref.runtimeSeconds), saved.ref.stops.length, saved.ui.oxygen]);
   same('12 reopened: the alarm is the same', reopened.rows.map((x) => x.alarm), saved.ui.rows.map((x) => x.alarm));
   await core('setPrefs', { changes: { descentMmMin: setupBeforeReopen.descentMmMin, reserveMbar: setupBeforeReopen.reserveMbar } });
