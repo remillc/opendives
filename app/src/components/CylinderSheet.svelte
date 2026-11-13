@@ -7,7 +7,7 @@
   // form state: nothing is saved before the edit task's Save. Moved under
   // <body> like Md3Dialog, so that it also opens inside the tablet's edit
   // dialog; Escape, the scrim and the system Back close it (lib/back-button.js).
-  import CylinderDrawing from './CylinderDrawing.svelte';
+  import CylinderIcon from './CylinderIcon.svelte';
   import { t } from '../lib/i18n.js';
   import { reducedMotion } from '../lib/reduced-motion.js';
   import { dismissesSheet, sheetOffset } from '../lib/sheet-drag.js';
@@ -166,7 +166,7 @@
     </button>
     <div class="od-cylinder-sheet--body">
       <div class="od-cylinder-sheet--head">
-        <CylinderDrawing {ratio} width={20} stroke={1.5} />
+        <CylinderIcon />
         <h2 {id} class="od-cylinder-sheet--title">{t('edit.cylinderTitle', { n })}</h2>
         <span class="od-cylinder-sheet--gas od-value">{gas}</span>
       </div>

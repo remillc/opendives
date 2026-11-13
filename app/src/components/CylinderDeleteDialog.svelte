@@ -7,7 +7,7 @@
   // When the core refuses (the profile uses the cylinder, CYLINDER_IN_USE) the
   // dialog says so and offers nothing destructive.
   import Md3Dialog from './Md3Dialog.svelte';
-  import CylinderDrawing from './CylinderDrawing.svelte';
+  import CylinderIcon from './CylinderIcon.svelte';
   import { t } from '../lib/i18n.js';
 
   /**
@@ -28,7 +28,7 @@
 <Md3Dialog title={t('edit.deleteCylinderTitle', { n })} role="alertdialog" class="od-cylinder-delete" {oncancel}>
   <div class="od-cylinder-delete--content">
     <div class="od-cylinder-delete--card">
-      <CylinderDrawing {ratio} width={20} stroke={1.5} />
+      <CylinderIcon />
       <span class="od-cylinder-delete--texts">
         <span class="od-cylinder-delete--gas od-value">{gas}</span>
         {#if line}<span class="od-cylinder-delete--line od-value">{line}</span>{/if}

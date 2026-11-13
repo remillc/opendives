@@ -1,7 +1,7 @@
 <script>
   // @ts-check
   import { t } from '../lib/i18n.js';
-  import CylinderDrawing from './CylinderDrawing.svelte';
+  import CylinderIcon from './CylinderIcon.svelte';
   // One cylinder of "Edit dive" as a card (docs/ui-specification.md, "Modifier une plongée",
   // Équipement): a small cylinder drawing (filled to the end pressure), "Cylinder N" with its
   // gas in plain words under it in the variant colour, and the drag handle on the
@@ -46,7 +46,7 @@
   bind:this={el}
 >
   <div class="od-cylinder-card--head">
-    <CylinderDrawing {ratio} width={20} stroke={1.5} />
+    <CylinderIcon />
     <span class="od-cylinder-card--titles">
       <h4 class="od-cylinder-card--title">{t('edit.cylinderTitle', { n })}</h4>
       <span class="od-cylinder-card--gas od-value">{gas}</span>
