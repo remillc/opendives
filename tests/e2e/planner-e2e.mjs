@@ -164,7 +164,12 @@ const read = () =>
       error: o.querySelector('p.od-planner--error') ? text(o.querySelector('p.od-planner--error')) : '',
       failed: [...o.querySelectorAll('p.od-planner--note')].map(text).includes(${q(T('plan.failed'))}),
       noStop: !!o.querySelector('.od-planner--no-stop'),
-      stops: [...o.querySelectorAll('table tbody tr')].map((tr) => [...tr.children].map(text)),
+      // The table lists every row of the dive (task 2026-11-12-34): its deco stops are the
+      // rows marked "–"; columns: kind, stop, start, duration, end, gas.
+      stops: [...o.querySelectorAll('table tbody tr')]
+        .map((tr) => [...tr.children].map(text))
+        .filter((cells) => cells[0] === '–')
+        .map((cells) => [cells[1], cells[3], cells[4], cells[5]]),
       rows,
       oxygen: oxygen ? text(oxygen) : '',
       helpers: [...r.querySelectorAll('.od-planner--gas .od-planner--helper')].map(text),
