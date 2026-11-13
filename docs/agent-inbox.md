@@ -2223,7 +2223,7 @@ Check the contrast of everything placed on the band (white on the lightest part,
 
 Done (warm neutrals and grand bleu band merged earlier from feature/warm-neutrals). Checked on the phone emulator: tokens as listed (#F5F4F0, #EBEAE5, #4B4A47, band gradient, --od-on-band #FFFFFF, --od-on-band-2 #D4E2F2, band controls white 90 % with dark text); contrast measured on the Carnet band, against the lightest 10 % of the blue behind each element: ☰ 3.8:1 and ⋮ 5.1:1 (icons, 3:1 required), title 4.6:1 (large text), summary line in #D4E2F2 4.5:1 (just at the limit). Dark mode keeps its colours, as asked.
 
-## [ ] 2026-11-13-98 Desaturation: wait before flying, reminder and notification
+## [x] 2026-11-13-98 Desaturation: wait before flying, reminder and notification
 
 Christian's decision of 13 November 2026 (TODOS: flight countdown). Mock-ups in the canvas section « Android · Outils – Désaturation », copied to `docs/mockups/`. Colours: the theme of task 97.
 1. **Settings** (`reglages-avion-android.dc.html`), new group « Attente avant l'avion »: a choice « Selon les plongées » (12 h after one dive, 18 h after several dives in the day), « 12 h », « 18 h », « 24 h »; the note « Compté depuis la sortie de l'eau de la dernière plongée. Votre ordinateur de plongée fait foi. »; a switch « Me prévenir quand je peux prendre l'avion » with the sub-line « Après chaque plongée ». Default: « Selon les plongées », switch off.
@@ -2231,6 +2231,8 @@ Christian's decision of 13 November 2026 (TODOS: flight countdown). Mock-ups in 
 3. **Logbook banner** (`android-carnet-avion.dc.html`): while a wait is running, a banner under the search field « Avion dans 17 h 05 » with « Permis demain à 8 h 35 ». It opens the Désaturation tool. It disappears when the wait is over.
 4. **Notification** (`notif-avion-android.dc.html`): when the switch is on, a local notification at the end of the wait: « Vous pouvez prendre l'avion », « L'attente de 18 h après vos plongées d'hier est terminée. » (the hours and the day follow the case). Tapping it opens the Désaturation tool. A new dive reschedules it.
 The wait is counted from the surfacing time of the last dive in the logbook. Times follow the device clock and the 24 h French format of the mock-ups. Tests for the wait rule (one dive, several dives the same day, fixed choices). Check on the phone emulator, including the notification.
+
+Done (merged earlier from feature/flight-wait). Checked on the phone emulator with a manual test dive added then deleted on the test account: Logbook banner « Avion dans 12 h 30 min », « Permis demain à 9 h 38 », opening the Désaturation tool; the tool's « Avant de prendre l’avion » value, the switch and « Notification demain à 9 h 38 »; Android scheduled the local notification for that time (inexact alarm, window up to 1 h); switch off and dive deletion cancel it, and the banner leaves with the dive. Réglages › Outils has the wait choice and the switch. Not seen: the notification firing (12 h later). Note for Christian: Android may deliver it up to one hour late (inexact alarm).
 
 ## [x] 2026-11-13-99 Suggested weight and « Ce lest était »
 
@@ -2275,7 +2277,7 @@ Christian's decision of 13 November 2026 (TODOS #53). Mock-ups in `docs/mockups/
 3. **Received dive** (`scanner-qr-recu-android`): « Plongée reçue » with a preview card (date and time, site, country, depth, time, minimum temperature, the profile, gases, people, « Profil : complet, N points »), the note « La plongée s’ajoute à votre carnet comme les autres… », « Annuler » and « Ajouter au carnet ». Added as a normal dive of the logbook (new dive number), then opened. If a dive at the same date and time is already in the logbook, say « Cette plongée est déjà dans votre carnet » with « Ajouter quand même » and « Annuler ». A received **plan** goes to Plongées planifiées, with the same kind of preview and « Ajouter aux plongées planifiées ».
 Tests: encode and decode round trip of a real dive (TestDiveDivelogsDE.xml) and of a plan, chunks out of order, a missing chunk, a foreign code. Check on two phones or the emulator and a phone.
 
-## [ ] 2026-11-13-103 Tertiary colour for what waits for the diver
+## [x] 2026-11-13-103 Tertiary colour for what waits for the diver
 
 Christian's decision of 13 November 2026. New rule in `docs/system-design.md` (« Tertiary for what waits for the diver »): the tertiary role (rust and sand) marks what waits for the diver. Mock-ups updated in `docs/mockups/` (they show the text on sand as #4A2A0A: use the token, #3D2200):
 - `android-edition`: the « Suggestion : 6 lb » card on `--od-tertiary-container`, text in the on-container colour, light-bulb icon in `--od-tertiary`, « Utiliser » filled in `--od-tertiary` with `--od-on-tertiary` (task 99 said secondary: this replaces it).
@@ -2284,6 +2286,8 @@ Christian's decision of 13 November 2026. New rule in `docs/system-design.md` (�
 - Sync conflicts (`android-etat-conflit`, `-ordinateurs`, `-plusieurs`): the « Continuer » button on the tertiary container.
 - Side menu, map update available (`appbar-tiroir-android-maj-cartes`): the count badge on Réglages in `--od-tertiary`.
 Add `--od-on-tertiary-container` to `theme.css` if it is missing (light #3D2200, dark #FBE3B2). Light and dark mode. Check on the phone emulator: contrast of every changed text (rust on white or on the light background is 4.6:1, keep it to short or semibold text).
+
+Done (merged earlier). Checked on the phone emulator: the weight suggestion card on --od-tertiary-container with « Utiliser » in --od-tertiary, the « Avion dans … » banner on the tertiary container with its plane icon in --od-tertiary, the Désaturation value in --od-tertiary semibold, and the side menu's manual-sync line « N modifications non envoyées » in --od-tertiary; --od-on-tertiary-container present (light #3D2200, dark #FBE3B2). Read in the code, not seen on screen: the pending line of DiveRow, the Compte row, the conflict « Continuer » button and the map-update badge use the tertiary tokens.
 
 ## [x] 2026-11-13-104 Rate the app in the store
 
