@@ -358,10 +358,11 @@
           line: typeLine(c.description, size, use),
           start: c.startMbar > 0 && c.endMbar > 0 ? pressureValue(c.startMbar) : '',
           end: c.endMbar > 0 ? formatPressure(c.endMbar, prefs) : '',
+          // An unused cylinder without pressure gets no line (Christian, 13 November 2026).
           range: unused
             ? unused.pressureMbar
               ? formatPressure(unused.pressureMbar, prefs)
-              : t('edit.uses.not used')
+              : ''
             : c.startMbar > 0 && c.endMbar > 0
               ? t('detail.pressureRange', { start: pressureValue(c.startMbar), end: formatPressure(c.endMbar, prefs) })
               : c.startMbar > 0
@@ -412,9 +413,12 @@
     };
   });
 
-  /** The gas changes, in one plain line: "Switch to air at 222 ft." (nothing when there is none). */
+  /**
+   * The gas changes, in one plain line: "Switch to air at 222 ft." (nothing when
+   * there is none). None on a rebreather dive (Christian, 13 November 2026).
+   */
   const gasChangesLine = $derived(
-    dive
+    dive && dive.divemode !== 'CCR'
       ? gasChangeLine(gasChanges(dive.events ?? [], dive.samples, dive.cylinders), (mm) => formatDepth(mm, prefs), {
           line: t('detail.gasChange.line'),
           item: t('detail.gasChange.item'),
