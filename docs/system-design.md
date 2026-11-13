@@ -333,6 +333,10 @@ No radio buttons on Android. A choice of one item among several uses `ChoiceRow`
 
 Every search field, on every platform, shows a clear button at its end as soon as it holds at least one character, and keeps it visible whether the field has the focus or not (the Framework7 searchbar hides it on blur: prevent that). The icon is the Material Symbols "close" (Rounded, 24 dp, the `close` icon of `Icon.svelte`), in a 48 dp touch target, never the "×" character. A tap empties the field, keeps the focus and shows the full list again. Accessible name "Effacer la recherche" (en "Clear search"). An empty field shows no clear button.
 
+### Top app bar of pages without a band (Android, decided on 13 November 2026)
+
+Pages that do not use the blue band (Réglages and its subpages, Compte, Dépôt git, Cartes hors ligne, À propos, Bibliothèques libres, Plongées planifiées, the editors) have an MD3 Small top app bar in the colour of the page (`--od-background`, light #F5F4F0, dark #121314), never the white default of Framework7. When the content scrolls under it, the bar takes `--od-surface-container` (MD3 "on scroll" state), with no divider line and no shadow.
+
 ### Snackbar
 
 Every snackbar in the app uses one style, the one of `docs/mockups/sites-nettoyer-pas-doublons-android.dc.html`:
