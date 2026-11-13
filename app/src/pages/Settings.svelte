@@ -620,8 +620,8 @@
           wheels: () => [wheel(t('settings.rebreather.setpoint'), range(0, 10000, 100), p.setpointMbar, defaults.setpointMbar, (v) => formatNumber(v / 1000, 1))],
           set: ([i]) => setCore({ setpointMbar: i * 100 }),
         },
-        { kind: 'switch', id: 'showCcrSensors', label: t('settings.rebreather.sensors'), checked: p.showCcrSensors, set: (v) => setCore({ showCcrSensors: v }) },
-        { kind: 'switch', id: 'showCcrSetpoint', label: t('settings.rebreather.setpoints'), checked: p.showCcrSetpoint, set: (v) => setCore({ showCcrSetpoint: v }) },
+        { kind: 'switch', id: 'showCcrSensors', label: t('settings.rebreather.sensors'), text: t('settings.rebreather.sensorsText'), checked: p.showCcrSensors, set: (v) => setCore({ showCcrSensors: v }) },
+        { kind: 'switch', id: 'showCcrSetpoint', label: t('settings.rebreather.setpoints'), text: t('settings.rebreather.setpointsText'), checked: p.showCcrSetpoint, set: (v) => setCore({ showCcrSetpoint: v }) },
         { kind: 'switch', id: 'allowOcGasAsDiluent', label: t('settings.rebreather.ocDiluent'), checked: p.allowOcGasAsDiluent, set: (v) => setCore({ allowOcGasAsDiluent: v }) },
         {
           kind: 'number',
