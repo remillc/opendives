@@ -1,4 +1,7 @@
 {
+  "searchField": {
+    "clear": "Effacer la recherche"
+  },
   "tabs": {
     "logbook": "Carnet",
     "sites": "Sites",
@@ -1690,6 +1693,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Champs de recherche : un bouton pour effacer, avec l’icône « fermer », reste visible dès qu’il y a du texte (Réglages, Filtre, Carnet, Cartes hors ligne).",
       "Correctif : revenir au Carnet par le menu depuis une page ouverte par-dessus Réglages (À propos, une sous-page) ne laisse plus un écran vide ou décalé.",
       "Réglages, Gaz et recycleur : « Afficher chaque capteur d’O₂ » et « Afficher la consigne » disent qu’ils agissent sur le graphique de pO₂.",
       "Réglages : une page d’aperçu en trois cartes (Général, Plongée, Appareils et données) résume les valeurs actuelles et ouvre une sous-page par groupe ; sur tablette, l’aperçu à gauche et la sous-page à droite.",
@@ -2926,7 +2930,6 @@
       "search": {
         "label": "Rechercher un lieu ou un site",
         "offline": "Recherche indisponible sans réseau",
-        "clear": "Effacer la recherche",
         "sites": "Dans votre carnet",
         "places": "Lieux",
         "searchPlaces": "Chercher « {query} » parmi les lieux",

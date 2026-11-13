@@ -14,6 +14,7 @@
   import { onMount } from 'svelte';
   import { Page, Navbar, Link, List, ListItem, Searchbar, f7, theme } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
+  import SearchClear from '../components/SearchClear.svelte';
   import ButtonGroup from '../components/ButtonGroup.svelte';
   import Md3Dialog from '../components/Md3Dialog.svelte';
   import TextField from '../components/TextField.svelte';
@@ -258,6 +259,7 @@
     <label class="od-filter--search">
       <Icon name="search" />
       <input type="search" aria-label={t('filter.searchCriterion')} placeholder={t('filter.searchCriterion')} bind:value={search} />
+      {#if search}<SearchClear onclear={() => (search = '')} />{/if}
     </label>
   {/if}
 

@@ -619,6 +619,39 @@ html.ios {
   }
 
   /*
+   * Search fields: the clear button (system design, « Search fields: the clear button »,
+   * task 2026-11-13-113). Framework7's search bars (Logbook, Filter on iPhone) draw the
+   * Material « close » icon, the one of components/SearchClear.svelte, 24 dp in their 48 dp
+   * target, not their circled cross; the WebView's own cancel button is hidden, so that
+   * a field has only one.
+   */
+  .md .searchbar .input-clear-button::after,
+  .ios .searchbar .input-clear-button::after {
+    content: '' / '';
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: 24px;
+    height: 24px;
+    background-color: currentColor;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M6 6l12 12M18 6L6 18'/%3E%3C/svg%3E") center / 24px 24px no-repeat;
+    opacity: 1;
+  }
+
+  .ios .searchbar .input-clear-button {
+    width: 48px;
+    height: 48px;
+    margin-top: -24px;
+    right: 0;
+  }
+
+  input[type='search']::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+    appearance: none;
+    display: none;
+  }
+
+  /*
    * Logbook rows (<DiveRow>, <TripRow>, the skeleton): thumbnail, then the
    * title with its lines right under it, then the values; all centred on the
    * row. Replaces Framework7's media-list layout, which pushed the date down
