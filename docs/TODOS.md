@@ -39,4 +39,3 @@ Next number: 54
 - #48 [design] [hors compat. SS] Portefeuille de brevets et de documents : cartes de certification (recto et verso), assurance plongée, certificat médical, avec leurs dates d'expiration, consultables hors ligne. Même question de stockage que #47.
 - #49 [design] [hors compat. SS] Analyse de gaz à la station de gonflage : pour chaque bouteille, le pourcentage d'oxygène (et d'hélium) mesuré, la MOD calculée et les initiales du plongeur. La valeur passe dans la plongée suivante. Vérifier ce que Subsurface peut garder (le mélange de la bouteille, oui ; l'analyse et les initiales, non).
 - #52 [design] Dans « Utiliser mon serveur git », ajouter de la doc qui décrit comment créer un dépôt privé.
-- #53 [design] Partager une plongée ou un plan de plongée via un code QR. Le récepteur du partage pourra ouvrir OpenDives et scanner le code.
