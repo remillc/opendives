@@ -130,8 +130,17 @@ export async function shareSummary(dive, prefs, svg) {
   await Share.share({ title: shareTitle(dive), text, files, dialogTitle: t('share.title') });
 }
 
+/**
+ * A link that opens a dive or a site in the app (lib/deep-link.js), through the system's share sheet.
+ * @param {string} url the https link
+ * @param {string} title the subject of a mail
+ */
+export async function shareLink(url, title) {
+  await Share.share({ title, url, dialogTitle: t('share.title') });
+}
+
 /** The subject of a mail: the site, else "Plongée n° 5". @param {DiveDetail} dive */
-function shareTitle(dive) {
+export function shareTitle(dive) {
   return dive.site || (dive.number ? t('share.sheetNumber', { number: String(dive.number) }) : t('share.sheetDive'));
 }
 

@@ -59,6 +59,7 @@
   import { applyMotionTokens } from './lib/motion.js';
   import { TAP_SLOP } from './lib/tap.js';
   import { enableBackButton } from './lib/back-button.js';
+  import { enableDeepLinks } from './lib/open-link.js';
   import { enableAccessibility } from './lib/accessibility.js';
   import { enableDetailPageCleanup } from './lib/detail-pages.js';
   import { enableModalCleanup } from './lib/modal-cleanup.js';
@@ -255,6 +256,7 @@
   onMount(() => {
     applyMotionTokens();
     enableBackButton();
+    enableDeepLinks();
     enableAccessibility();
     enableDetailPageCleanup();
     enableModalCleanup();
