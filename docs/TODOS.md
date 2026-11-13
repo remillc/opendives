@@ -10,7 +10,7 @@ Rules (agreed between the design agent and the code agent, see `docs/agent-inbox
 - **Tag:** every item starts with `[design]` or `[code]` right after its number, set by the agent that adds it (`#4 [design] …`). `[design]` = mock-ups, visuals, screen texts, specification; `[code]` = everything else. When unsure, the agent asks Christian. The tag says who handles the item and lets Christian list one kind only. A second tag `[hors compat. SS]` may follow it, before the title, when the item would break compatibility with Subsurface (data Subsurface cannot read or keep); such an item needs Christian's explicit go-ahead before any code.
 - No other content in this file: no history, no checked boxes, no notes from agents.
 
-Next number: 54
+Next number: 55
 
 ## List
 
@@ -38,3 +38,4 @@ Next number: 54
 - #48 [design] [hors compat. SS] Portefeuille de brevets et de documents : cartes de certification (recto et verso), assurance plongée, certificat médical, avec leurs dates d'expiration, consultables hors ligne. Même question de stockage que #47.
 - #49 [design] [hors compat. SS] Analyse de gaz à la station de gonflage : pour chaque bouteille, le pourcentage d'oxygène (et d'hélium) mesuré, la MOD calculée et les initiales du plongeur. La valeur passe dans la plongée suivante. Vérifier ce que Subsurface peut garder (le mélange de la bouteille, oui ; l'analyse et les initiales, non).
 - #52 [design] Dans « Utiliser mon serveur git », ajouter de la doc qui décrit comment créer un dépôt privé.
+- #54 [code] Identifiant pérenne des plongées et des sorties dans les adresses (/dives/:id, /dives/:id/edit, /trips/:trip, /trips/:trip/dives/:id) : l'id actuel est l'identifiant interne du cœur, attribué au chargement, qui change d'un démarrage ou d'une synchronisation à l'autre. Deux options : (1) l'heure de début de la plongée (sortie : celle de sa première plongée), suffixe ~2 si deux plongées commencent à la même seconde, rien d'écrit dans le carnet, un lien gardé à l'extérieur casse seulement si l'heure est modifiée ; (2) un id généré et enregistré dans les « extra data » (keyvalue) de l'ordinateur de plongée, conservées par Subsurface desktop (load-git.cpp:822, save-git.cpp:115) mais visibles dans son onglet Extra Info, attribué seulement aux plongées créées ou modifiées dans OpenDives (sinon 1 357 fichiers réécrits d'un coup), l'heure de début en repli ; dupliqué quand Subsurface coupe une plongée, doublé quand il en fusionne deux, perdu avec l'ordinateur qui le porte. Recommandation : (1).
