@@ -30,20 +30,23 @@
 
 <div class="od-gas-card" role="group" aria-label={label}>
   {#if rebreather}
-    <RebreatherDrawing
-      diluent={rebreather.diluent >= 0 ? items[rebreather.diluent] : null}
-      oxygen={rebreather.oxygen >= 0 ? items[rebreather.oxygen] : null}
-      others={rebreather.others.map((i) => items[i])}
-      marks={rebreather.marks}
-    />
-    <div class="od-gas-card--columns" style:grid-template-columns="repeat({columns.length}, 1fr)">
-      {#each columns as i (i)}
-        <div class="od-gas-card--cylinder">
-          <span class="od-gas-card--gas">{items[i].gas}</span>
-          {#if items[i].line}<span class="od-gas-card--line">{items[i].line}</span>{/if}
-          {#if items[i].range}<span class="od-gas-card--line od-value">{items[i].range}</span>{/if}
-        </div>
-      {/each}
+    <!-- As wide as the drawing, so that each column stays under its cylinder on a wide pane. -->
+    <div class="od-gas-card--rebreather">
+      <RebreatherDrawing
+        diluent={rebreather.diluent >= 0 ? items[rebreather.diluent] : null}
+        oxygen={rebreather.oxygen >= 0 ? items[rebreather.oxygen] : null}
+        others={rebreather.others.map((i) => items[i])}
+        marks={rebreather.marks}
+      />
+      <div class="od-gas-card--columns" style:grid-template-columns="repeat({columns.length}, 1fr)">
+        {#each columns as i (i)}
+          <div class="od-gas-card--cylinder">
+            <span class="od-gas-card--gas">{items[i].gas}</span>
+            {#if items[i].line}<span class="od-gas-card--line">{items[i].line}</span>{/if}
+            {#if items[i].range}<span class="od-gas-card--line od-value">{items[i].range}</span>{/if}
+          </div>
+        {/each}
+      </div>
     </div>
   {:else}
     <div class="od-gas-card--cylinders">
@@ -76,6 +79,11 @@
       display: flex;
       align-items: flex-start;
       gap: 4px;
+    }
+
+    .od-gas-card--rebreather {
+      max-width: 360px;
+      margin: 0 auto;
     }
 
     .od-gas-card--columns {
