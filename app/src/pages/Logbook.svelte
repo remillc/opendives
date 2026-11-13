@@ -18,6 +18,7 @@
   import { scanQr } from '../lib/qr-receive.svelte.js';
   import FloatingToolbar from '../components/FloatingToolbar.svelte';
   import MenuItem from '../components/MenuItem.svelte';
+  import { paperGrain, setPaperGrain } from '../lib/paper-grain.svelte.js'; // TRIAL, task 2026-11-13-108
   import MenuButton from '../components/MenuButton.svelte';
   import SectionBand from '../components/SectionBand.svelte';
   import FlightBanner from '../components/FlightBanner.svelte';
@@ -1252,6 +1253,8 @@
       {#if !selecting}
         <MenuItem icon="renumber" text={t('logbook.menuRenumber')} onclick={() => (renumbering = true)} />
         <MenuItem icon="computer" text={t('settings.logbookComputers.title')} link="/settings/computers/" />
+        <!-- TRIAL (task 2026-11-13-108): the paper grain on the header bands, on or off. -->
+        <MenuItem icon={paperGrain.on ? 'check' : 'blank'} text={t('logbook.menuPaperGrain')} onclick={() => setPaperGrain(!paperGrain.on)} />
       {:else}
         <MenuItem icon="renumber" text={t('logbook.menuRenumberChecked', { n: checkedCount })} onclick={() => (renumbering = true)} />
       {/if}
