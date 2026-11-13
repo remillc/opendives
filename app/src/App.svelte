@@ -60,6 +60,7 @@
   import { applyMotionTokens } from './lib/motion.js';
   import { TAP_SLOP } from './lib/tap.js';
   import { enableBackButton } from './lib/back-button.js';
+  import { enableTopBarScroll } from './lib/top-bar.js';
   import { enableDeepLinks } from './lib/open-link.js';
   import { startFlightReminder } from './lib/flight-reminder.svelte.js';
   import { enableAccessibility } from './lib/accessibility.js';
@@ -269,6 +270,7 @@
   onMount(() => {
     applyMotionTokens();
     enableBackButton();
+    enableTopBarScroll();
     enableDeepLinks();
     startFlightReminder();
     enableAccessibility();

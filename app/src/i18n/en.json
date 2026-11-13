@@ -1693,6 +1693,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Pages without a band (Settings, About, editors…): the top bar takes the page colour, with no divider, and is lightly tinted when you scroll.",
       "Texts: ",
       "Fix: on the ",
       "QR share: smaller codes, readable from a normal distance, and the scanner reads at a higher resolution.",

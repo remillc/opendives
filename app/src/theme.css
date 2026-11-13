@@ -81,6 +81,7 @@
     --od-surface: #FFFFFF;
     --od-surface-2: #EBEAE5;
     /* MD3 surface-container-high: the tonal buttons of a connected button group. */
+    --od-surface-container: #EEEEEC;
     --od-surface-container-high: #EBEAE5;
     /* MD3 surface-container-highest: the current value of an exposed dropdown menu. */
     --od-surface-container-highest: #E3E1DC;
@@ -211,6 +212,7 @@
     --od-background: #121314;
     --od-surface: #1C1D1F;
     --od-surface-2: #2E3033;
+    --od-surface-container: #1C1D1F;
     --od-surface-container-high: #2E3033;
     --od-surface-container-highest: #3A3C40;
     --od-fab-tonal: #3A3C40;
@@ -1346,3 +1348,31 @@ html[class*="with-modal"] .navbar.od-band-bar {
   }
 }
 
+
+/*
+ * Top app bar of pages without a band (system design, « Top app bar of pages without a band »,
+ * task 2026-11-13-114). Android: the page colour, no hairline, no shadow; once the content
+ * is scrolled (lib/top-bar.js), --od-surface-container, MD3's « on scroll » state. :where()
+ * keeps the rule weak, so a page that sets its own bar (a picture under it, an editorial
+ * page) still wins. iOS keeps its own bar.
+ */
+.md :where(.navbar:not(.od-band-bar)) {
+  --f7-navbar-bg-color: var(--od-background);
+  --f7-navbar-hairline-color: transparent;
+  --f7-navbar-shadow-image: none;
+}
+
+.md :where(.navbar:not(.od-band-bar)) .navbar-bg {
+  box-shadow: none;
+  transition: background-color 150ms linear;
+}
+
+.md :where(.navbar.od-navbar-scrolled:not(.od-band-bar)) {
+  --f7-navbar-bg-color: var(--od-surface-container);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .md :where(.navbar:not(.od-band-bar)) .navbar-bg {
+    transition: none;
+  }
+}
