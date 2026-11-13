@@ -144,10 +144,11 @@
 
 <style>
   @layer od.components {
+    /* 140 tall on every screen (task 2026-11-13-84), centred in the card's width. */
     .od-rebreather-drawing {
       display: block;
       width: 100%;
-      height: auto;
+      height: 140px;
     }
 
     .od-rebreather-drawing--hose {

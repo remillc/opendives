@@ -1,7 +1,7 @@
 <script>
   // @ts-check
-  // A drawn cylinder (docs/mockups/android-edition.dc.html, "Gaz"): the valve on
-  // top, an ink outline, and the body filled from the bottom with the water
+  // A drawn cylinder (docs/mockups/android-edition.dc.html, "Gaz"), the one used by
+  // every screen but the rebreather drawing: an ink outline, and the body filled from the bottom with the water
   // gradient up to `ratio` (end pressure over working pressure, 0..1). With
   // `startRatio` (the start pressure, same scale) a solid pale band shows what
   // was breathed between the end and the start level, and a dashed line marks
@@ -13,6 +13,11 @@
   let { ratio = 0, startRatio = null, hatched = false, width = 44, stroke = 2 } = $props();
 
   const id = `od-cylinder-drawing-${Math.random().toString(36).slice(2, 9)}`;
+  // The cylinder (task 2026-11-13-85): a slim body with shoulders narrowing into a
+  // short neck and a rounded bottom, no valve. Filled, used as the clip of the
+  // levels, then drawn again as the outline.
+  const SHAPE = 'M19 9 L19 13 C13.5 14 9 19 9 26 L9 63 C9 70 14 75 22 75 C30 75 35 70 35 63 L35 26 C35 19 30.5 14 25 13 L25 9 Z';
+  // The levels' scale is unchanged: full at 12, empty at 74, clipped by the shape.
   const BODY_TOP = 12;
   const BODY_HEIGHT = 62;
   const level = $derived(hatched ? 0 : Math.min(1, Math.max(0, ratio)));
@@ -30,14 +35,13 @@
       <stop offset="0" class="od-cylinder-drawing--water-top" />
       <stop offset="1" class="od-cylinder-drawing--water-bottom" />
     </linearGradient>
-    <clipPath id="{id}-clip"><rect x="6" y={BODY_TOP} width="32" height={BODY_HEIGHT} rx="14" /></clipPath>
+    <clipPath id="{id}-clip"><path d={SHAPE} /></clipPath>
     <pattern id="{id}-hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
       <rect width="8" height="8" class="od-cylinder-drawing--hatch-ground" />
       <rect width="4" height="8" class="od-cylinder-drawing--hatch-stripe" />
     </pattern>
   </defs>
-  <rect x="16" y="2" width="12" height="10" rx="2" class="od-cylinder-drawing--valve" />
-  <rect x="6" y={BODY_TOP} width="32" height={BODY_HEIGHT} rx="14" class="od-cylinder-drawing--body" style:fill={hatched ? `url(#${id}-hatch)` : null} />
+  <path d={SHAPE} class="od-cylinder-drawing--body" style:fill={hatched ? `url(#${id}-hatch)` : null} />
   {#if startLevel !== null && startLevel > 0}
     <rect x="6" y={startTop} width="32" height={BODY_TOP + BODY_HEIGHT - startTop} class="od-cylinder-drawing--start-fill" clip-path="url(#{id}-clip)" />
     <line x1="7" y1={lineY(startTop)} x2="37" y2={lineY(startTop)} class="od-cylinder-drawing--level" clip-path="url(#{id}-clip)" />
@@ -48,17 +52,13 @@
       <line x1="7" y1={lineY(fillTop)} x2="37" y2={lineY(fillTop)} class="od-cylinder-drawing--level" clip-path="url(#{id}-clip)" />
     {/if}
   {/if}
-  <rect x="6" y={BODY_TOP} width="32" height={BODY_HEIGHT} rx="14" class="od-cylinder-drawing--outline" stroke-width={stroke} vector-effect="non-scaling-stroke" />
+  <path d={SHAPE} class="od-cylinder-drawing--outline" stroke-width={stroke} vector-effect="non-scaling-stroke" />
 </svg>
 
 <style>
   @layer od.components {
     .od-cylinder-drawing {
       flex: none;
-    }
-
-    .od-cylinder-drawing--valve {
-      fill: var(--od-text);
     }
 
     .od-cylinder-drawing--body {
@@ -68,6 +68,7 @@
     .od-cylinder-drawing--outline {
       fill: none;
       stroke: var(--od-text);
+      stroke-linejoin: round;
     }
 
     .od-cylinder-drawing--hatch-ground {
