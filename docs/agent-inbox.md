@@ -2067,7 +2067,7 @@ Check light and dark on the phone emulator, with and without pressures.
 
 Done in `feature/ccr-gas-sizes`: the drawing is 140 tall (viewBox 326 × 140, 218 wide without bailout); the unit is drawn at 68.4 % and the cylinders beside it at 93.5 %, bottoms aligned, DIL and O₂ kept at 11 px outside the scaling (the mock-up's transforms). A cylinder with no pressure at all is hatched (tokens `--od-cylinder-no-pressure` #F1F1EF and `--od-cylinder-no-pressure-stripe` #D9D9D5; dark: #1C1D1F, the dark surface, and #3A3C40), with no level and no marks; the accessible name ends with "Aucune donnée de pression" when no cylinder has pressures, or names it after each cylinder that lacks them (tested). **Christian's addition (13 November 2026):** a cylinder with only one pressure (start or end) is drawn empty, in every cylinder drawing (`fillLevels`). Checked on the phone emulator, light and dark: hatched diluent and oxygen, a bailout with only a start pressure drawn empty. Not checked: a CCR dive with both pressures (none in the test log).
 
-## [ ] 2026-11-13-85 Open-circuit cylinder drawing: new shape
+## [x] 2026-11-13-85 Open-circuit cylinder drawing: new shape
 
 Christian's decision of 13 November 2026. The cylinder drawings of the gas card (dive detail, dive editing, cylinder editing, phone and tablet, light and dark) get a more realistic, slimmer shape. The rebreather drawing (task 84) does not change.
 - **Shape:** one closed path in the 44 × 76 box, filled with the card colour, used as the clip for the gas levels and drawn again on top as the 2 dp outline (round joins): `M19 9 L19 13 C13.5 14 9 19 9 26 L9 63 C9 70 14 75 22 75 C30 75 35 70 35 63 L35 26 C35 19 30.5 14 25 13 L25 9 Z`. Body 26 wide (was 32), shoulders that narrow into a short neck, rounded bottom.
@@ -2076,6 +2076,8 @@ Christian's decision of 13 November 2026. The cylinder drawings of the gas card 
 - Make it one shared component so every screen uses the same drawing.
 
 Reference mock-ups: `detail3-android`, `detail3-android-sombre`, `android-edition`, `android-edition-bouteille`, `android-tablette-detail-menu-portrait`. Check light and dark on the phone emulator, and on a tablet layout.
+
+Done in `feature/cylinder-shape`: `CylinderDrawing.svelte`, already the one drawing of the gas card (detail), the gas summary (editing), the cylinder cards and sheets, now draws the given path (filled, clip of the levels, then the round-joined outline) with no valve; the levels keep their scale (full at 12, empty at 74) and are clipped by the shape. Checked on the phone emulator (detail light, editing dark) and the tablet emulator (detail). Also: the rebreather drawing is now 140 px tall on every screen (on the tablet it grew with the pane's width).
 
 ## [ ] 2026-11-13-86 Dive editing: gas card follows the dive mode
 
