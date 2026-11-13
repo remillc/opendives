@@ -278,6 +278,12 @@
         :global(svg) {
           fill: currentColor;
         }
+
+        /* The notebook's spine, cut out of the filled shape in the pill's colour. */
+        :global(.od-icon--accent) {
+          fill: none;
+          stroke: var(--od-water-top);
+        }
       }
     }
 
