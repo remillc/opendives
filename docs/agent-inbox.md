@@ -2248,3 +2248,11 @@ Christian's remark of 13 November 2026, on the side menu of the app compared wit
 1. **Logo:** the app draws a white border around the logo in the menu header. The mock-up has none: a white disc behind the three waves, the white lower arc and the two white bubbles, 44 dp, nothing around it. Draw it exactly as in the mock-up's SVG.
 2. **« Messages » under « Synchroniser maintenant »:** the app shows « Messages » there, the mock-up does not. Under the button there is only the status line (« Synchronisé il y a 2 min »). « Messages » is not an OpenDives string: find where it comes from (a sync or debug element, a default label, a system component) and remove it. If it leads to something useful, tell Christian in the « Done » note instead of moving it elsewhere.
 Check on the phone emulator, light and dark mode, next to the mock-up.
+
+## [ ] 2026-11-13-101 Side menu: « Autres options de synchronisation » menu like the mock-up
+
+Christian's decision of 13 November 2026. With manual sync, the arrow of the « Synchroniser maintenant » split button (`SyncControl.svelte`) opens the menu drawn in `docs/mockups/appbar-tiroir-android-ouvert-manuel-options.dc.html` (next to `appbar-tiroir-android-ouvert-manuel.dc.html`). Make the app's menu look like it:
+- it opens **upward**, above the button, aligned to its right edge, 280 dp wide, surface colour, 16 dp corners, the usual menu shadow, 8 dp vertical padding;
+- two items, 48 dp high, 24 dp icon then 14 sp text: cloud icon « Passer en synchronisation automatique », logbook icon « Voir les modifications non envoyées » (same actions as today);
+- while it is open, the arrow of the split button points up and has `aria-expanded="true"`.
+Same in the Account page if it uses the same control. Check on the phone emulator, light and dark mode. Colours: the theme of task 97.
