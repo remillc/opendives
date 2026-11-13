@@ -1693,6 +1693,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Statistics on a tablet: closing the group of the row shown on the right empties the pane.",
       "A number and its unit are no longer split at the end of a line (",
       "Desaturation: the tissue bars go from 0 % at rest to 100 % at the limit, with the scale on the chart.",
       "Pages without a band (Settings, About, editors…): the top bar takes the page colour, with no divider, and is lightly tinted when you scroll.",
