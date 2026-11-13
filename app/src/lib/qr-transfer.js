@@ -23,8 +23,13 @@
 // parsing (QrScanActivity.parseChunk) in line with parseChunk below.
 
 export const QR_MAGIC = 'OD1';
-/** Bytes of the compressed stream per chunk: about 1 KB of text per code with the header. */
-export const CHUNK_BYTES = 700;
+/**
+ * Bytes of the compressed stream per chunk: about 400 characters per code with the header, a
+ * version 13 code (69 modules) at low error correction. Not 700 (about 1 KB, version 29,
+ * 133 modules): on 13 November 2026 such codes were read only with the phone held right
+ * against the screen.
+ */
+export const CHUNK_BYTES = 250;
 /** Longest label, in characters. */
 export const LABEL_MAX = 40;
 

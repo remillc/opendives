@@ -1693,6 +1693,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Partage par code QR : des codes plus petits, lisibles à distance normale, et une lecture en meilleure résolution.",
       "Correctif : dans « Modifier la plongée », le bouton « Utiliser » de la suggestion de lest ne recouvre plus le texte de la carte.",
       "Menu latéral, synchronisation manuelle : le menu de la flèche reste dans le menu latéral, ses lignes font 48 dp.",
       "Champs de recherche : un bouton pour effacer, avec l’icône « fermer », reste visible dès qu’il y a du texte (Réglages, Filtre, Carnet, Cartes hors ligne).",

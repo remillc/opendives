@@ -97,9 +97,10 @@ test('every code is printable ASCII and about 1 KB at most', async () => {
   assert.match(chunks[0], /^OD1~d~[0-9a-z]{6}~1~\d+~[0-9a-f]{8}~/);
 });
 
-test('a plan makes the round trip, in one code when it is short', async () => {
+test('a plan makes the round trip, in a few codes when it is short', async () => {
   const { chunks } = await encodeTransfer({ kind: 'p', label: 'Wreck trip', xml: planXml });
-  assert.equal(chunks.length, 1);
+  // Two codes since the codes were made smaller (CHUNK_BYTES 700 -> 250, 13 November 2026).
+  assert.ok(chunks.length <= 2, `${chunks.length} codes`);
   const back = await decodeTexts(chunks);
   assert.equal(back.kind, 'p');
   assert.equal(back.xml, planXml);
@@ -146,8 +147,9 @@ test('a code from another transfer is reported, then restarts the count when the
   assert.equal(receiver.parts.size, 1);
   assert.equal(receiver.transfer, a.transfer);
   restart(receiver);
-  const r = receive(receiver, b.chunks[0]);
+  let r = receive(receiver, b.chunks[0]);
   assert.equal(r.status, 'added');
+  for (const text of b.chunks.slice(1)) r = receive(receiver, text);
   assert.equal(r.complete, true);
   assert.equal(receiver.kind, 'p');
 });

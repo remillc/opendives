@@ -14,8 +14,8 @@
   import { qrPath } from '../lib/qr-draw.js';
   import { transferOf } from '../lib/qr-send.js';
 
-  /** Codes per second. */
-  const RATE = 3;
+  /** Codes per second: smaller codes, more of them (task 2026-11-13-102, 13 November 2026). */
+  const RATE = 4;
   /** Past this many codes the dots would be too small to read: the counter alone stays. */
   const MAX_DOTS = 16;
 

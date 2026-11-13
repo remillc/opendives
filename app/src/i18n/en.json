@@ -1693,6 +1693,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "QR share: smaller codes, readable from a normal distance, and the scanner reads at a higher resolution.",
       "Fix: in ",
       "Side menu, manual sync: the arrow's menu stays inside the side menu, its rows are 48 dp.",
       "Search fields: a clear button with the « close » icon stays visible as soon as there is text (Settings, Filter, Logbook, Offline maps).",
