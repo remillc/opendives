@@ -2322,9 +2322,11 @@ Same in dark mode. Build an APK (or the usual test build) for Christian's phone.
 
 Done in feature/paper-grain-trial: the filter is a 256 px SVG tile in the `--od-band-grain` token (theme.css), drawn once by the browser and repeated as a background layer above the gradient on every band (navbar band, BandBackdrop, SectionBand, side menu), so text and icons stay above it; dark mode uses the same band. Switch « Grain papier sur l’en-tête (essai) » at the end of Réglages (lib/paper-grain.svelte.js, on by default, `html.od-no-paper-grain` when off). Removal steps are listed at the top of lib/paper-grain.svelte.js. Checked on the phone emulator: grain on and off; scrolling the Logbook, 10.1 % janky frames with the grain, 9.6 % without, 90th percentile 18 ms in both.
 
-## [ ] 2026-11-13-109 Paper grain: kept, remove the trial switch
+## [x] 2026-11-13-109 Paper grain: kept, remove the trial switch
 
 Christian's decision of 13 November 2026, after seeing task 108 on his phone: the paper grain on the header band is **kept**. Remove the trial option from the three-dot menu (and any other place it was added, Réglages included), with its strings and stored preference, so the grain is always on. The rule is now in `docs/system-design.md` (« Paper grain on the header band »).
+
+Done in fix/paper-grain-kept: the trial module, its Logbook menu item and its strings are removed, the stored choice (od.paperGrain) is cleared at start, the grain token stays always on; release note reworded. Checked on the phone emulator: grain on the band, no item in the menu.
 
 ## [ ] 2026-11-13-110 Réglages: « Affichage » first, no « Taille du texte »
 
