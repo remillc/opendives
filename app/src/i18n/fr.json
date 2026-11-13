@@ -1601,6 +1601,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Recycleur : les bouteilles de secours prennent la nouvelle forme, avec épaules et col, sans robinet.",
       "Fiche de la plongée : plus de ligne « Passage à… » pour les plongées en recycleur, et plus de « Non utilisée » sous les bouteilles sans pression.",
       "Recycleur : DIL, O₂ et SECOURS sont centrés sur leur bouteille.",
       "Recycleur : les noms du diluant et de l’oxygène sont sous leur moitié de l’appareil, et chaque bouteille de secours est centrée au-dessus de son texte ; une deuxième bouteille de secours n’est plus cachée sous la première.",
