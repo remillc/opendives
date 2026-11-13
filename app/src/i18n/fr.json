@@ -417,6 +417,12 @@
     "tissuesLabel": "Saturation des tissus, des compartiments rapides aux lents",
     "layers": "Courbes affichées"
   },
+  "weightFeedback": {
+    "title": "Ce lest était",
+    "tooLight": "Trop léger",
+    "ok": "Juste",
+    "tooHeavy": "Trop lourd"
+  },
   "units": {
     "meters": "m",
     "feet": "pi",
@@ -1078,6 +1084,10 @@
     "weight": "Poids",
     "addWeight": "Ajouter un lest",
     "removeWeight": "Retirer ce lest",
+    "weightSuggestion": "Suggestion : {weight}",
+    "weightSuggestionFrom": "Comme le {date}",
+    "weightSuggestionLabel": "Suggestion : {weight}, comme le {date}",
+    "weightUse": "Utiliser",
     "air": "Air",
     "water": "Eau",
     "waterType": "Type d’eau",
@@ -1600,6 +1610,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Lest : « Modifier la plongée » suggère un lest d’après la plongée la plus récente avec la même combinaison, les mêmes bouteilles et le même type d’eau, corrigé de 2 lb (1 kg) selon que ce lest était trop léger ou trop lourd ; « Utiliser » le met dans la plongée. « Ce lest était » (Trop léger, Juste, Trop lourd) se choisit dans « Modifier la plongée » et dans le détail, sous Équipement ; le choix est enregistré comme une étiquette anglaise (weight-too-light, weight-ok, weight-too-heavy), que Subsurface affiche aussi.",
       "Planificateur, en pieds cubes : la consommation des Réglages est utilisée telle quelle, sans être arrondie à 0,01 pi³/min ; seule une consommation mesurée sur une plongée est arrondie.",
       "Outils et Statistiques : une ligne ne reste plus surlignée en gris après avoir tourné un grand téléphone.",
       "Planificateur : le résultat tient dans une carte, avec la durée totale et les paliers de déco en grand, puis les paliers ou « Remontée sans palier », les volumes et l’oxygène.",

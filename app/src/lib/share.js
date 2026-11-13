@@ -26,6 +26,7 @@ import {
 import { t, tIfExists } from './i18n.js';
 import { settings } from './settings.svelte.js';
 import { bottomVolumeKey, reserveLegendKey } from './reserve-factor.js';
+import { visibleTags } from './weight-feedback.js';
 
 /** @typedef {import('opendives-core').DiveDetail} DiveDetail */
 /** @typedef {import('opendives-core').Prefs} Prefs */
@@ -225,7 +226,7 @@ export function sheetHtml(dive, prefs, svg, anonymize = false) {
   const people = [
     [t('edit.guides'), dive.guides.join(', ')],
     [t('edit.buddies'), dive.buddies.join(', ')],
-    [t('edit.tags'), dive.tags.join(', ')],
+    [t('edit.tags'), visibleTags(dive.tags).join(', ')],
   ].filter(([, v]) => v);
   const conditions = [
     [t('edit.rating'), dive.rating ? stars(dive.rating) : ''],

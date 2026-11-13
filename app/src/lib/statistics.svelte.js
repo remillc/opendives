@@ -11,6 +11,7 @@ import { OpenDivesCore } from 'opendives-core';
 import { t, tIfExists } from './i18n.js';
 import { formatGasLong, formatTotalTime, formatLongDate, locale } from './format.js';
 import { filter } from './filter.svelte.js';
+import { withoutFeedbackTags } from './weight-feedback.js';
 
 /** @typedef {import('opendives-core').Dive} Dive */
 
@@ -101,7 +102,7 @@ export async function criterionValues(field, dives) {
   /** @type {{key: string, dives: number, location?: string}[]} */
   const values = await OpenDivesCore.statsQuery({ kind: 'values', field });
   const descending = field === 'year' || field === 'month' || field === 'rating' || field === 'trip';
-  return values
+  return (field === 'tag' ? withoutFeedbackTags(values) : values)
     .map((v) => ({
       key: v.key,
       label: field === 'trip' && v.key ? tripName({ start: v.key, location: v.location ?? '' }) : valueLabel(field, v.key, dives),

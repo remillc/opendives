@@ -8,6 +8,7 @@
 import { OpenDivesCore } from 'opendives-core';
 import { t } from './i18n.js';
 import { formatNumber } from './format.js';
+import { withoutFeedbackTags } from './weight-feedback.js';
 import { logbook } from './logbook.svelte.js';
 
 /** @typedef {import('opendives-core').FilterRule} FilterRule */
@@ -415,7 +416,9 @@ export function showUnsent(prefs) {
 /** Reads the values present in the logbook (after each load). */
 export async function loadOptions() {
   try {
-    filter.options = await OpenDivesCore.filterQuery({ kind: 'options' });
+    const options = await OpenDivesCore.filterQuery({ kind: 'options' });
+    // The "Ce lest était" tags are set by buttons, not filtered.
+    filter.options = options && Array.isArray(options.tags) ? { ...options, tags: withoutFeedbackTags(options.tags) } : options;
   } catch (e) {
     console.error('Reading the filter criteria', e);
     filter.options = null;

@@ -48,6 +48,9 @@
   import { deletionOutcome, fillRatio, gasChangeMoments, typeLine } from '../lib/gas-group.js';
   import { t, tIfExists } from '../lib/i18n.js';
   import LeaveGuard from '../components/LeaveGuard.svelte';
+  import ButtonGroup from '../components/ButtonGroup.svelte';
+  import { FEEDBACK_CHOICES, feedbackOf, isFeedbackTag, toggleFeedback, visibleTags, withFeedback } from '../lib/weight-feedback.js';
+  import { cylinderKey, matches, mostRecentFirst, showSuggestion, suggestWeight } from '../lib/weight-suggestion.js';
 
   /** @type {{ f7route: { params: { id: string } }, f7router: any }} */
   let { f7route, f7router } = $props();
@@ -131,6 +134,8 @@
   let buddies = $state([]);
   /** @type {string[]} */
   let tags = $state([]);
+  /** "Ce lest était": a tag of the dive, not a chip (lib/weight-feedback.js). @type {import('../lib/weight-feedback.js').WeightFeedback|''} */
+  let feedback = $state('');
   /** Site and trip, as typed or chosen; a new name creates a site or a trip on Save. */
   let siteName = $state('');
   let tripName = $state('');
@@ -209,7 +214,8 @@
       tripName = d.trip?.location ?? '';
       guides = [...d.guides];
       buddies = [...d.buddies];
-      tags = [...d.tags];
+      tags = visibleTags(d.tags);
+      feedback = feedbackOf(d.tags);
       stars = {
         rating: d.rating,
         visibility: d.visibility,
@@ -240,6 +246,84 @@
       .then((/** @type {{ types: { name: string, grams: number }[] }} */ list) => (weightTypes = list.types))
       .catch((/** @type {unknown} */ e) => console.error('Weight types', e));
   });
+
+  // --- Suggested weight (task 2026-11-13-99) -----------------------------------
+  /** Dives read for the rule, by identifier; a dive is read once. @type {Map<number, import('../lib/weight-suggestion.js').WeightSource>} */
+  const sourceCache = new Map();
+  /** The dives read so far, most recent first. @type {import('../lib/weight-suggestion.js').WeightSource[]} */
+  let sources = $state([]);
+  /** The dive as the rule sees it now: the form, not only the saved dive. */
+  const ruleDive = $derived({
+    id: /** @type {import('opendives-core').DiveDetail|null} */ (dive)?.id ?? -1,
+    suit: f.suit ?? '',
+    waterType: f.waterType || /** @type {import('opendives-core').DiveDetail|null} */ (dive)?.waterType || '',
+    cylinders: cylinders.map((c) => ({ description: c.f.description ?? '' })),
+  });
+  const ruleKey = $derived(`${ruleDive.suit}|${ruleDive.waterType}|${cylinderKey(ruleDive.cylinders)}`);
+  const SCAN_LIMIT = 300;
+
+  /** The dives that can match, most recent first, read until one matches. @param {string} key */
+  async function scanSources(key) {
+    if (!dive) return;
+    const current = ruleDive;
+    const here = dive.id;
+    /** @type {Set<number>|null} */
+    let ids = null;
+    if (current.suit.trim()) {
+      try {
+        const found = await OpenDivesCore.filterQuery({ kind: 'dives', rules: [{ type: 'suit', stringMode: 'exact', data: `${current.suit}\n` }] });
+        ids = new Set(found);
+      } catch (e) {
+        console.error('Weight suggestion', e);
+      }
+    }
+    const list = logbook.dives.filter((d) => d.id !== here && (!ids || ids.has(d.id))).sort(mostRecentFirst).slice(0, SCAN_LIMIT);
+    /** @type {import('../lib/weight-suggestion.js').WeightSource[]} */
+    const read = [];
+    for (let i = 0; i < list.length; i += 6) {
+      const chunk = await Promise.all(
+        list.slice(i, i + 6).map(async (d) => {
+          let source = sourceCache.get(d.id);
+          if (!source) {
+            try {
+              const detail = await OpenDivesCore.getDive({ id: d.id });
+              source = { id: d.id, number: d.number, date: detail.date, suit: detail.suit ?? '', waterType: detail.waterType ?? '', cylinders: detail.cylinders, tags: detail.tags, weights: detail.weights };
+              sourceCache.set(d.id, source);
+            } catch (e) {
+              console.error('Weight suggestion', e);
+            }
+          }
+          return source;
+        }),
+      );
+      for (const source of chunk) if (source) read.push(source);
+      if (key !== ruleKey) return; // the form moved on: a newer scan follows
+      if (read.some((d) => matches(d, current))) break;
+    }
+    if (key === ruleKey) sources = read;
+  }
+
+  // One scan after each pause in the suit, water type or cylinder types.
+  $effect(() => {
+    const key = ruleKey;
+    if (!dive) return;
+    const timer = setTimeout(() => scanSources(key), 300);
+    return () => clearTimeout(timer);
+  });
+
+  const suggestion = $derived(suggestWeight(ruleDive, sources, prefs.weight));
+  /** The dive's total weight now, in grams. */
+  const weightsNow = $derived(weights.reduce((sum, w) => sum + (Number.isFinite(gramsOf(w)) ? gramsOf(w) : 0), 0));
+  const suggestionShown = $derived(showSuggestion(suggestion, weightsNow, prefs.weight));
+  const suggestionTexts = $derived(
+    suggestion ? { weight: formatWeight(suggestion.grams, prefs), date: formatLongDate(suggestion.from.date) } : { weight: '', date: '' },
+  );
+
+  /** "Utiliser": the earlier dive's weights, adjusted, replace this dive's weights. */
+  function useSuggestion() {
+    if (!suggestion) return;
+    weights = suggestion.weights.map((w) => ({ description: w.description, weight: weightText(w.grams), grams0: w.grams, text0: weightText(w.grams) }));
+  }
 
   // --- Date and time ---------------------------------------------------------
   const two = (/** @type {number} */ n) => String(n).padStart(2, '0');
@@ -769,7 +853,9 @@
     if (isoDate !== initialDate) out.date = isoDate;
     if (!sameList(guides, dive.guides)) out.diveguide = [...guides];
     if (!sameList(buddies, dive.buddies)) out.buddies = [...buddies];
-    if (!sameList(tags, dive.tags)) out.tags = [...tags];
+    // The three "Ce lest était" tags are kept as they are unless the choice changed.
+    if (!sameList(tags, visibleTags(dive.tags)) || feedback !== feedbackOf(dive.tags))
+      out.tags = feedback === feedbackOf(dive.tags) ? [...tags, ...dive.tags.filter(isFeedbackTag)] : withFeedback(tags, feedback);
     if (changed('notes')) out.notes = f.notes;
     if (changed('suit')) out.suit = f.suit;
     if (changed('divemode')) out.divemode = f.divemode;
@@ -1154,6 +1240,16 @@
       <ComboField label={t('edit.suit')} bind:value={f.suit} options={known.suit} />
 
       <h3 class="od-edit-dive--sub">{t('edit.weightsTitle')}</h3>
+      {#if suggestion && suggestionShown}
+        <div class="od-edit-dive--suggestion" role="group" aria-label={t('edit.weightSuggestionLabel', suggestionTexts)}>
+          <span class="od-edit-dive--suggestion-icon"><Icon name="lightbulb" /></span>
+          <span class="od-edit-dive--suggestion-texts">
+            <span class="od-edit-dive--suggestion-title">{t('edit.weightSuggestion', suggestionTexts)}</span>
+            <span class="od-edit-dive--suggestion-from">{t('edit.weightSuggestionFrom', suggestionTexts)}</span>
+          </span>
+          <button type="button" class="od-edit-dive--suggestion-use" onclick={useSuggestion}>{t('edit.weightUse')}</button>
+        </div>
+      {/if}
       {#each weights as w, i (i)}
         <div class="od-edit-dive--row od-edit-dive--weight">
           <div class="od-edit-dive--grow">
@@ -1172,6 +1268,18 @@
       <button type="button" class="od-edit-dive--add" onclick={() => weights.push({ description: weightTypes[0]?.name ?? 'integrated', weight: weightText(weightTypes[0]?.grams ?? 0), grams0: -1, text0: '' })}>
         <Icon name="plus" />{t('edit.addWeight')}
       </button>
+
+      <p class="od-edit-dive--feedback-title" id="od-edit-weight-feedback">{t('weightFeedback.title')}</p>
+      <div class="od-edit-dive--feedback">
+        <ButtonGroup
+          options={FEEDBACK_CHOICES.map((value) => ({ value, label: t(`weightFeedback.${value === 'too-light' ? 'tooLight' : value === 'ok' ? 'ok' : 'tooHeavy'}`) }))}
+          value={feedback}
+          onchange={(v) => (feedback = toggleFeedback(feedback, /** @type {any} */ (v)))}
+          ariaLabelledby="od-edit-weight-feedback"
+          clearable
+          marked
+        />
+      </div>
 
       {#if dive.diveComputers.length}
         <h3 class="od-edit-dive--sub">{t('edit.computersGroup')}</h3>
@@ -1604,6 +1712,63 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
+    }
+
+    /* The suggested weight: a tonal card under "Lest". */
+    .od-edit-dive--suggestion {
+      margin: 12px 16px 0;
+      padding: 12px 12px 12px 16px;
+      border-radius: 12px;
+      background: var(--od-secondary-container);
+      color: var(--od-on-secondary-container);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .od-edit-dive--suggestion-icon {
+      flex: none;
+      display: flex;
+    }
+
+    .od-edit-dive--suggestion-texts {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .od-edit-dive--suggestion-title {
+      display: block;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .od-edit-dive--suggestion-from {
+      display: block;
+      font-size: 13px;
+      line-height: 18px;
+    }
+
+    .od-edit-dive--suggestion-use {
+      flex: none;
+      min-height: 40px;
+      padding: 0 16px;
+      border: none;
+      border-radius: 20px;
+      background: var(--od-secondary);
+      color: var(--od-on-secondary);
+      font: inherit;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .od-edit-dive--feedback-title {
+      margin: 20px 16px 8px;
+      font-size: 14px;
+      color: var(--od-text-2);
+    }
+
+    .od-edit-dive--feedback {
+      padding: 0 16px;
     }
 
     .od-edit-dive--sub {

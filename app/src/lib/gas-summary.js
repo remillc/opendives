@@ -143,12 +143,10 @@ export function unusedShown(cylinder) {
 }
 
 /**
- * Whether opening the Equipment card shows something more than the total
- * (Christian, 12 November 2026: no chevron when it would change nothing):
- * several weights, one whose location is known, or several dive computers
- * (task 2026-11-12-60: the open card lists them all).
+ * Whether opening the Equipment card shows something more than the rows
+ * (task 2026-11-13-99): a weight (the weights by location and "Ce lest
+ * était") or several dive computers (task 2026-11-12-60: all of them listed).
  * @param {{ description?: string }[]} weights the weights that are set
  * @param {number} [computers] how many dive computers the dive has
  */
-export const equipmentOpens = (weights, computers = 0) =>
-  weights.length > 1 || (weights.length === 1 && !!weights[0].description && weights[0].description !== 'unknown') || computers > 1;
+export const equipmentOpens = (weights, computers = 0) => weights.length > 0 || computers > 1;
