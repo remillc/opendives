@@ -462,6 +462,7 @@
       "language": "Langue et formats",
       "units": "Unités",
       "conditions": "Conditions des outils",
+      "flight": "Attente avant l’avion",
       "logbook": "Carnet",
       "equipment": "Équipement",
       "profile": "Profil de plongée",
@@ -473,6 +474,15 @@
       "display": "Affichage",
       "maps": "Cartes hors ligne",
       "advanced": "Avancé"
+    },
+    "flight": {
+      "label": "Durée de l’attente",
+      "auto": "Selon les plongées",
+      "autoText": "12 h après une plongée, 18 h après plusieurs plongées dans la journée",
+      "hours": "{h} h",
+      "note": "Compté depuis la sortie de l’eau de la dernière plongée. Votre ordinateur de plongée fait foi.",
+      "notify": "Me prévenir quand je peux prendre l’avion",
+      "notifyText": "Après chaque plongée"
     },
     "language": {
       "label": "Langue de l’app",
@@ -1526,6 +1536,8 @@
     "ago": "Il y a {time}",
     "ruleSingle": "Recommandation : {hours} heures après une seule plongée dans la journée.",
     "ruleSeveral": "Recommandation : {hours} heures après plusieurs plongées dans la journée.",
+    "ruleFixed": "Réglage : {hours} heures après la dernière plongée.",
+    "notifyAt": "Notification {when}",
     "atRest": "Aucune plongée du carnet dans les 48 dernières heures : les tissus sont au repos.",
     "tissues": "Saturation des tissus",
     "limit": "limite",
@@ -1545,7 +1557,33 @@
     "usedDives": "Calculé à partir de",
     "noDives": "Aucune plongée du carnet ne compte dans ce calcul.",
     "note": "Ce calcul ne connaît que les plongées du carnet. Une plongée manquante le fausse. Votre ordinateur de plongée fait foi.",
-    "recommendation": "L’attente avant l’avion est une recommandation d’OpenDives, pas un calcul du modèle : 18 heures après plusieurs plongées dans une journée, 12 heures après une seule. Ce n’est jamais une garantie."
+    "recommendation": "L’attente avant l’avion est une recommandation d’OpenDives, pas un calcul du modèle : 18 heures après plusieurs plongées dans une journée, 12 heures après une seule, ou la durée choisie dans les Réglages. Ce n’est jamais une garantie."
+  },
+  "flight": {
+    "at": "{day} à {time}",
+    "banner": {
+      "title": "Avion dans {time}",
+      "allowed": "Permis {when}"
+    },
+    "notice": {
+      "title": "Vous pouvez prendre l’avion",
+      "body": "L’attente de {hours} h après {dives} {when} est terminée.",
+      "single": "votre plongée",
+      "several": "vos plongées",
+      "today": "d’aujourd’hui",
+      "yesterday": "d’hier",
+      "date": "du {date}"
+    },
+    "channel": {
+      "name": "Attente avant l’avion",
+      "description": "Vous prévient quand vous pouvez prendre l’avion après vos plongées."
+    },
+    "permission": {
+      "title": "Être prévenu pour l’avion",
+      "text": "OpenDives peut vous envoyer une notification quand l’attente avant l’avion est terminée. Le téléphone va vous demander l’autorisation d’afficher des notifications.",
+      "action": "Continuer",
+      "denied": "Notifications refusées. Autorisez celles d’OpenDives dans les réglages du téléphone pour être prévenu."
+    }
   },
   "accountStep": {
     "back": "Retour",
@@ -1611,6 +1649,7 @@
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
       "Lest : « Modifier la plongée » suggère un lest d’après la plongée la plus récente avec la même combinaison, les mêmes bouteilles et le même type d’eau, corrigé de 2 lb (1 kg) selon que ce lest était trop léger ou trop lourd ; « Utiliser » le met dans la plongée. « Ce lest était » (Trop léger, Juste, Trop lourd) se choisit dans « Modifier la plongée » et dans le détail, sous Équipement ; le choix est enregistré comme une étiquette anglaise (weight-too-light, weight-ok, weight-too-heavy), que Subsurface affiche aussi.",
+      "Avion : le réglage « Attente avant l’avion » (selon les plongées, 12, 18 ou 24 h) compte depuis la sortie de l’eau de la dernière plongée ; le Carnet affiche « Avion dans … » pendant l’attente et l’app peut vous prévenir quand elle est terminée.",
       "Planificateur, en pieds cubes : la consommation des Réglages est utilisée telle quelle, sans être arrondie à 0,01 pi³/min ; seule une consommation mesurée sur une plongée est arrondie.",
       "Outils et Statistiques : une ligne ne reste plus surlignée en gris après avoir tourné un grand téléphone.",
       "Planificateur : le résultat tient dans une carte, avec la durée totale et les paliers de déco en grand, puis les paliers ou « Remontée sans palier », les volumes et l’oxygène.",

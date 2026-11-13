@@ -36,7 +36,8 @@
   import { formatNumber, formatDuration, formatDateChoice, formatTimeChoice, formatDepth, formatPartialPressure, ppUnitLabel, depthUnit } from '../lib/format.js';
   import { depthToMm, mmToDepth } from '../lib/planner-rules.js';
   import { regionUsesLetter } from '../lib/share.js';
-  import { waterTypeName, downloadWaterName } from '../lib/tools.js';
+  import { waterTypeName, downloadWaterName, FLIGHT_WAIT_MODES, flightWaitName } from '../lib/tools.js';
+  import { setFlightNotify } from '../lib/flight-reminder.svelte.js';
   import { cylinderChoices } from '../lib/cylinder-choices.js';
   import { visibleRegions, updatesCount } from '../lib/offline-maps.svelte.js';
 
@@ -374,6 +375,35 @@
           set: (v) => setAppSetting('defaultWater', /** @type {'fresh'|'salt'|'en13319'} */ (v)),
         },
         { kind: 'altitude', id: 'defaultAltitude', label: t('settings.conditions.altitude') },
+      ],
+    },
+    {
+      // The wait before flying (task 2026-11-13-98), used by the Desaturation tool, the logbook banner and the reminder.
+      id: 'flight',
+      title: t('settings.groups.flight'),
+      rows: [
+        {
+          kind: 'choice',
+          id: 'flightWait',
+          label: t('settings.flight.label'),
+          value: flightWaitName(settings.flightWait),
+          current: settings.flightWait,
+          options: () =>
+            FLIGHT_WAIT_MODES.map((mode) => ({
+              value: mode,
+              label: flightWaitName(mode),
+              example: mode === 'auto' ? t('settings.flight.autoText') : undefined,
+            })),
+          set: (v) => setAppSetting('flightWait', /** @type {import('../lib/tools.js').FlightWaitMode} */ (v)),
+        },
+        {
+          kind: 'switch',
+          id: 'flightNotify',
+          label: t('settings.flight.notify'),
+          text: t('settings.flight.notifyText'),
+          checked: settings.flightNotify,
+          set: (v) => setFlightNotify(v),
+        },
       ],
     },
     {
@@ -932,6 +962,11 @@
   {#if group('conditions').rows.length}
     {@render groupView('conditions')}
     <p class="od-settings--note">{t('settings.conditions.note')}</p>
+  {/if}
+
+  {#if group('flight').rows.length}
+    {@render groupView('flight')}
+    <p class="od-settings--note">{t('settings.flight.note')}</p>
   {/if}
 
   {@render groupView('partialPressures')}

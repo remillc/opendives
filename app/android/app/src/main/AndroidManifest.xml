@@ -90,6 +90,10 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- "Me prévenir quand je peux prendre l'avion": a local notification at the end of the wait
+         (lib/flight-reminder.svelte.js). Android 13 and later: asked when the diver turns the
+         switch on. Inexact on purpose: no SCHEDULE_EXACT_ALARM permission. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <!-- "Use my position" on the site edit screen. Asked only when the diver
          taps it (Capacitor's WebChromeClient requests it at that moment). -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
