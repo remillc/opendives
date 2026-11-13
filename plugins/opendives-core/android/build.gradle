@@ -58,4 +58,6 @@ dependencies {
     implementation "androidx.camera:camera-view:1.4.1"
     // Text recognition on the device (Latin), with its model inside the app: no download, no network.
     implementation "com.google.mlkit:text-recognition:16.0.1"
+    // The QR scanner (a dive or a plan received from another phone): the bundled model, QR codes only.
+    implementation "com.google.mlkit:barcode-scanning:17.3.0"
 }

@@ -58,6 +58,39 @@ import { registerPlugin } from '@capacitor/core';
  */
 
 /**
+ * Every visible text of the QR scanner (it is native: the app passes the translated texts).
+ * The panel counts the codes with the header of app/src/lib/qr-transfer.js.
+ * @typedef {Object} QrScanOptions
+ * @property {string} title "Scanner un code QR"
+ * @property {string} close accessible name of the close button
+ * @property {string} hint "Gardez la caméra sur l'autre écran. ..."
+ * @property {string} hintFirst shown before the first code: what to point the camera at
+ * @property {string} kindDive "Plongée" (the panel reads "Plongée · <site>")
+ * @property {string} kindPlan "Plan"
+ * @property {string} progress "{n} codes lus sur {total}": with the placeholders {n} and {total}
+ * @property {string} progressOne "1 code lu sur {total}"
+ * @property {string} progressBar accessible name of the segmented bar
+ * @property {string} foreign "Ce code QR ne vient pas d'OpenDives."
+ * @property {string} newerVersion an OpenDives code of a later format
+ * @property {string} otherTitle asked when a code of another transfer arrives
+ * @property {string} otherText
+ * @property {string} otherRestart
+ * @property {string} otherKeep
+ * @property {string} permissionReason
+ * @property {string} permissionButton
+ * @property {string} permissionDeniedTitle
+ * @property {string} permissionDenied
+ * @property {string} permissionSettings "Ouvrir les réglages"
+ * @property {string} cameraFailed
+ */
+
+/**
+ * How the QR scanner ended: closed, or every code of one transfer read (the raw texts of
+ * the codes, to be decoded by lib/qr-transfer.js).
+ * @typedef {{action: 'cancelled'} | {action: 'done', codes: string[]}} QrScanResult
+ */
+
+/**
  * A piece of text found in a picture; the box is in fractions (0 to 1) of the analysed picture.
  * @typedef {{text: string, left: number, top: number, right: number, bottom: number, confidence: number}} GaugeTextBlock
  */
@@ -711,6 +744,11 @@ import { registerPlugin } from '@capacitor/core';
  *   The app's page of the system settings (a permission refused for good).
  * @property {(options: GaugeCameraOptions) => Promise<GaugeCameraResult>} gaugeCamera
  *   Android: the full-screen camera that reads cylinder pressures (see GaugeCameraResult).
+ * @property {(options: QrScanOptions) => Promise<QrScanResult>} qrScan
+ *   The full-screen camera that reads the QR codes of a dive or a plan (see QrScanResult).
+ *   Android: ML Kit; iOS: AVFoundation. Asks the camera permission itself.
+ * @property {(options: {on: boolean}) => Promise<void>} keepScreenAwake
+ *   While on: the screen stays on and at full brightness (the QR sending screen); off restores both.
  * @property {(options: {uri: string}) => Promise<{name: string, size: number, data: string}>} readSharedFile
  *   Reads a file another app handed over (Android content://, iOS file://): its name, its size in
  *   bytes and its contents in base64. Rejects TOO_BIG (above 100 MB), NOT_FOUND, FAILED, BAD_ARGUMENT.
@@ -901,6 +939,8 @@ export const OpenDivesCore = {
   contentShown: () => native.contentShown(),
   readSharedFile: (options) => native.readSharedFile(options),
   gaugeCamera: (options) => native.gaugeCamera(options),
+  qrScan: (options) => native.qrScan(options),
+  keepScreenAwake: (options) => native.keepScreenAwake(options),
   startBluetoothScan: (options = {}) => native.startBluetoothScan(options),
   stopBluetoothScan: () => native.stopBluetoothScan(),
   async bluetoothModels() {

@@ -47,6 +47,8 @@
 	<true/>
 	<key>NSBluetoothAlwaysUsageDescription</key>
 	<string>OpenDives uses Bluetooth to download your dives from your dive computer.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>OpenDives uses the camera only to read the QR codes of a dive or a plan shared from another phone. Nothing is recorded.</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
