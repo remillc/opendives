@@ -74,6 +74,9 @@
     --od-map-land: #F7F6F2;
     --od-map-road: #D9D3C4;
 
+    /* QR codes (sharing by QR code): always black on white, whatever the mode, so that a camera reads them. */
+    --od-qr-paper: #FFFFFF;
+    --od-qr-ink: #000000;
     --od-background: #F5F4F0;
     --od-surface: #FFFFFF;
     --od-surface-2: #EBEAE5;

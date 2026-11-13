@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
 
   # Put in place by native/ios/prepare-app.sh.
   s.vendored_frameworks = 'ios/OpenDivesCore.xcframework'
-  s.frameworks = 'CoreBluetooth', 'BackgroundTasks', 'Network'
+  s.frameworks = 'CoreBluetooth', 'BackgroundTasks', 'Network', 'AVFoundation'
   s.libraries = 'z', 'iconv', 'c++'
   s.pod_target_xcconfig = {
     'CLANG_CXX_LANGUAGE_STANDARD' => 'c++20',

@@ -80,6 +80,8 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "requestBluetoothPermission", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "enableBluetooth", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "openAppSettings", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "qrScan", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "keepScreenAwake", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "contentShown", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "readSharedFile", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "startBluetoothScan", returnType: CAPPluginReturnPromise),
@@ -1242,6 +1244,47 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
         call.resolve()
     }
 
+    /// The QR scanner (QrScanController): the codes of a dive or a plan from another phone.
+    /// Resolves with {action: "cancelled"} or {action: "done", codes: [...]}.
+    @objc func qrScan(_ call: CAPPluginCall) {
+        let options = call.options as? [String: Any] ?? [:]
+        DispatchQueue.main.async { [self] in
+            guard let host = bridge?.viewController else {
+                call.reject("No screen to show the camera", "FAILED")
+                return
+            }
+            let scanner = QrScanController(options: options) { codes in
+                if let codes {
+                    call.resolve(["action": "done", "codes": codes])
+                } else {
+                    call.resolve(["action": "cancelled"])
+                }
+            }
+            host.present(scanner, animated: true)
+        }
+    }
+
+    /// The brightness the screen had before keepScreenAwake raised it.
+    private var savedBrightness: CGFloat?
+
+    /// The sending screen of a QR share: no auto-lock and full brightness while `on`; both
+    /// restored when it is off.
+    @objc func keepScreenAwake(_ call: CAPPluginCall) {
+        let on = call.getBool("on", false)
+        DispatchQueue.main.async { [self] in
+            if on {
+                if savedBrightness == nil { savedBrightness = UIScreen.main.brightness }
+                UIApplication.shared.isIdleTimerDisabled = true
+                UIScreen.main.brightness = 1
+            } else {
+                UIApplication.shared.isIdleTimerDisabled = false
+                if let saved = savedBrightness { UIScreen.main.brightness = saved }
+                savedBrightness = nil
+            }
+            call.resolve()
+        }
+    }
+
     @objc func openAppSettings(_ call: CAPPluginCall) {
         DispatchQueue.main.async {
             if let url = URL(string: UIApplication.openSettingsURLString) {
@@ -1442,6 +1485,13 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
         onCoreThread(call) { [self] in
             let file = shareDir.appendingPathComponent((name as NSString).lastPathComponent)
             try OpenDivesNative.exportDives(ids: numbers(ids), format: format, anonymize: anonymize, path: file.path)
+            if call.getBool("text", false) {
+                // The contents come back in the answer (the QR share): the file is not kept.
+                let text = try String(contentsOf: file, encoding: .utf8)
+                try? FileManager.default.removeItem(at: file)
+                call.resolve(["uri": "", "text": text])
+                return
+            }
             call.resolve(["uri": file.absoluteString])
         }
     }

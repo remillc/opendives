@@ -39,6 +39,8 @@
   import { sharePlanPdf, sharePlanSummary } from '../lib/share.js';
   import { planShareRows, sharePlanFile, sharePlanTableImage } from '../lib/slate-share.js';
   import PlanSlate from '../components/PlanSlate.svelte';
+  import QrShare from '../components/QrShare.svelte';
+  import { qrSummary } from '../lib/qr-send.js';
   import { settings } from '../lib/settings.svelte.js';
   import { bottomVolumeKey, reserveLegendKey } from '../lib/reserve-factor.js';
   import { MM_PER_FT, ML_PER_CUFT, O2_CHOICES, HE_CHOICES, depthToMm, gasTotalMl, gasValid, modAlarm, mmToDepth, roundSacMl } from '../lib/planner-rules.js';
@@ -62,6 +64,7 @@
   let choosing = $state(false);
   let sharing = $state(false);
   let slating = $state(false);
+  let qrSharing = $state(false);
   let slateRequest = $state(/** @type {import('opendives-core').PlanRequest|null} */ (null));
   let saving = $state(false);
   let titling = $state(false);
@@ -638,10 +641,14 @@
     }
   }
 
-  /** @param {'slate'|'pdf'|'image'|'ssrf'|'summary'} kind */
+  /** @param {'slate'|'pdf'|'image'|'ssrf'|'summary'|'qr'} kind */
   async function share(kind) {
     sharing = false;
     if (!result) return;
+    if (kind === 'qr') {
+      qrSharing = true;
+      return;
+    }
     if (kind === 'slate') {
       slateRequest = planRequest(); // the plan as it is now, for the time the slate is open
       slating = true;
@@ -1010,6 +1017,15 @@
 
 {#if sharing}
   <ShareSheet heading={t('plan.share')} rows={planShareRows(planner.planId > 0, share)} onclose={() => (sharing = false)} />
+{/if}
+
+{#if qrSharing && result}
+  <QrShare
+    id={planner.planId}
+    kind="p"
+    summary={qrSummary({ site: planner.title || (planner.source ? planner.source.site : ''), date: new Date(result.when * 1000).toISOString().slice(0, 19), maxDepthMm: result.maxDepthMm, durationSeconds: result.runtimeSeconds }, prefs)}
+    onclose={() => (qrSharing = false)}
+  />
 {/if}
 
 {#if slating && result && slateRequest}

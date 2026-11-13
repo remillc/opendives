@@ -211,7 +211,7 @@ export async function sharePlanFile(planId, title, result) {
 /**
  * The five rows of the plan's share sheet (spec, "Sharing a plan"), in order.
  * @param {boolean} saved whether the plan is a planned dive of the logbook (the .ssrf row needs it)
- * @param {(kind: 'slate'|'pdf'|'image'|'ssrf'|'summary') => void} choose
+ * @param {(kind: 'slate'|'pdf'|'image'|'ssrf'|'summary'|'qr') => void} choose
  */
 export function planShareRows(saved, choose) {
   return [
@@ -220,5 +220,7 @@ export function planShareRows(saved, choose) {
     { id: 'image', icon: 'image', title: t('planShare.image'), text: t('planShare.imageText'), onclick: () => choose('image') },
     { id: 'ssrf', icon: 'file', title: t('planShare.ssrf'), text: saved ? t('planShare.ssrfText') : t('planShare.ssrfUnsaved'), disabled: !saved, onclick: () => choose('ssrf') },
     { id: 'summary', icon: 'document', title: t('planShare.text'), text: t('planShare.textText'), onclick: () => choose('summary') },
+    // The same file as the .ssrf row, as QR codes: the plan has to be saved too.
+    { id: 'qr', icon: 'qr', title: t('planShare.qr'), text: saved ? t('planShare.qrText') : t('planShare.ssrfUnsaved'), disabled: !saved, onclick: () => choose('qr') },
   ];
 }

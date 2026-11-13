@@ -1250,6 +1250,52 @@ class OpenDivesCorePlugin : Plugin() {
         if (json == null) call.resolve(JSObject().put("action", "cancelled")) else call.resolve(JSObject(json))
     }
 
+    /**
+     * The QR scanner: a full-screen camera (QrScanActivity) that reads the codes of a dive or a
+     * plan from another phone. Every visible text comes in the call's data. Resolves with
+     * {action: "cancelled"} or {action: "done", codes: [...]}; the camera permission is asked there.
+     */
+    @PluginMethod
+    fun qrScan(call: PluginCall) {
+        val intent = Intent(context, QrScanActivity::class.java)
+        intent.putExtra("options", call.data.toString())
+        startActivityForResult(call, intent, "qrScanResult")
+    }
+
+    @ActivityCallback
+    private fun qrScanResult(call: PluginCall, result: ActivityResult) {
+        val json = result.data?.getStringExtra("result")
+        if (json == null) call.resolve(JSObject().put("action", "cancelled")) else call.resolve(JSObject(json))
+    }
+
+    /** The brightness the window had before keepScreenAwake raised it (null when it is not raised). */
+    private var savedBrightness: Float? = null
+
+    /**
+     * The sending screen of a QR share: the screen stays on and at full brightness while `on`,
+     * and both are restored when it is off (or the window changes). Only this window is touched,
+     * never the system setting.
+     */
+    @PluginMethod
+    fun keepScreenAwake(call: PluginCall) {
+        val on = call.getBoolean("on", false) == true
+        activity.runOnUiThread {
+            val window = activity.window
+            val attrs = window.attributes
+            if (on) {
+                if (savedBrightness == null) savedBrightness = attrs.screenBrightness
+                window.addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                attrs.screenBrightness = 1f
+            } else {
+                window.clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                attrs.screenBrightness = savedBrightness ?: android.view.WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
+                savedBrightness = null
+            }
+            window.attributes = attrs
+            call.resolve()
+        }
+    }
+
     /** The first screen is drawn: the launch screen can go (see SplashGate). */
     @PluginMethod
     fun contentShown(call: PluginCall) {
@@ -1613,6 +1659,13 @@ class OpenDivesCorePlugin : Plugin() {
         val dir = File(context.cacheDir, SHARE_DIR).apply { mkdirs() }
         val file = File(dir, File(name).name)
         NativeCore.exportDives(ids, format, call.getBoolean("anonymize", false) == true, file.absolutePath)
+        if (call.getBoolean("text", false) == true) {
+            // The contents come back in the answer (the QR share): the file is not kept.
+            val text = file.readText(Charsets.UTF_8)
+            file.delete()
+            call.resolve(JSObject().put("uri", "").put("text", text))
+            return@onCoreThread
+        }
         call.resolve(JSObject().put("uri", Uri.fromFile(file).toString()))
     }
 

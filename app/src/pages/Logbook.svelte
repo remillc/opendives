@@ -15,6 +15,7 @@
   import BandBackdrop from '../components/BandBackdrop.svelte';
   import Icon from '../components/Icon.svelte';
   import FabMenu from '../components/FabMenu.svelte';
+  import { scanQr } from '../lib/qr-receive.svelte.js';
   import FloatingToolbar from '../components/FloatingToolbar.svelte';
   import MenuItem from '../components/MenuItem.svelte';
   import MenuButton from '../components/MenuButton.svelte';
@@ -989,26 +990,28 @@
   });
 
   /**
-   * The three choices of the "+" button (spec, section 3). None can be done
-   * by this version yet: each opens a screen that says so.
-   * @type {{ key: string, icon: 'download'|'file'|'edit', text: string }[]}
+   * The choices of the "+" button (spec, section 3). The Android menu unfolds upwards, so the
+   * first of the list is the lowest: "Scanner un code QR" is last, at the top.
+   * @type {{ key: string, icon: 'download'|'file'|'edit'|'qr', text: string }[]}
    */
   const addChoices = [
     { key: 'download', icon: 'download', text: t('logbook.addDownload') },
     { key: 'import', icon: 'file', text: t('logbook.addImport') },
     { key: 'manual', icon: 'edit', text: t('logbook.addManual') },
+    { key: 'scan', icon: 'qr', text: t('logbook.addScan') },
   ];
 
   /**
    * The empty logbook (spec, section 6, "Empty"): pair a dive computer,
    * import a file, download from divelogs.de, log by hand.
-   * @type {{ key: string, icon: 'download'|'file'|'edit', text: string }[]}
+   * @type {{ key: string, icon: 'download'|'file'|'edit'|'qr', text: string }[]}
    */
   const emptyChoices = [
     { key: 'download', icon: 'download', text: t('logbook.emptyPair') },
     { key: 'import', icon: 'file', text: t('logbook.addImport') },
     { key: 'divelogs', icon: 'download', text: t('logbook.emptyDivelogs') },
     { key: 'manual', icon: 'edit', text: t('logbook.addManual') },
+    { key: 'scan', icon: 'qr', text: t('logbook.addScan') },
   ];
 
   /**
@@ -1024,6 +1027,7 @@
   /** @param {string} key download, import, manual, divelogs */
   function choose(key) {
     if (key === 'import') fileInput?.click();
+    else if (key === 'scan') scanQr();
     else f7router.navigate(routes[key]);
   }
 
@@ -1062,7 +1066,8 @@
         buttons: [
           [
             { text: t('logbook.add'), label: true },
-            ...addChoices.map((c) => ({ text: c.text, onClick: () => choose(c.key) })),
+            // "Scanner un code QR" first on iOS, where the list reads from the top.
+            ...[...addChoices].sort((a, b) => Number(b.key === 'scan') - Number(a.key === 'scan')).map((c) => ({ text: c.text, onClick: () => choose(c.key) })),
           ],
           [{ text: t('logbook.cancel'), bold: true }],
         ],
@@ -1220,6 +1225,7 @@
         <button type="button" class="od-outlined-button" onclick={() => choose('import')}>{t('logbook.addImport')}</button>
         <a href="/welcome/import" class="od-outlined-button">{t('logbook.emptyDivelogs')}</a>
         <a href="/dives/new" class="od-text-button">{t('logbook.addManual')}</a>
+        <button type="button" class="od-text-button" onclick={() => choose('scan')}>{t('logbook.addScan')}</button>
       </div>
     {/if}
     <p class="od-logbook--empty-note">{t('logbook.emptyNote')}</p>
