@@ -232,6 +232,8 @@
       font-weight: 500;
       display: inline-flex;
       align-items: center;
+      justify-content: center;
+      text-align: center;
     }
 
     :global(.od-qr-received--cancel) {
@@ -248,5 +250,11 @@
     .od-qr-received--add:disabled {
       opacity: 0.5;
     }
+  }
+
+  /* « Ajouter au carnet » / « Ajouter quand même » keeps its own width: Framework7's unlayered
+     `button { width: 100% }` would win over the layered rule (13 November 2026). */
+  .od-qr-received--add {
+    width: auto;
   }
 </style>
