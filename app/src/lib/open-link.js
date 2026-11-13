@@ -36,11 +36,18 @@ async function whenReady() {
  * The view of a section, back on its first screen.
  * @param {import('./deep-link.js').LinkSection} section
  */
-function freshView(section) {
+async function freshView(section) {
   goToSection(section);
   const view = f7.views.get(`#view-${section}`);
   const router = view?.router;
-  if (router && router.history.length > 1) router.back(router.history[0], { force: true, animate: false });
+  if (router && router.history.length > 1) {
+    router.back(router.history[0], { force: true, animate: false });
+    // The back is not over when it returns: a navigate made at once was dropped
+    // (a link from one tool to another left the Tools list). Wait for it.
+    const start = Date.now();
+    // `transitioning` is not in Framework7's types, hence the cast.
+    while ((router.history.length > 1 || /** @type {any} */ (router).transitioning) && Date.now() - start < 1500) await sleep(30);
+  }
   return view;
 }
 
@@ -56,8 +63,8 @@ function clearOverlays() {
  * @param {import('./deep-link.js').LinkSection} section the collection to show
  * @param {string} messageKey the short message saying why
  */
-function fallBackTo(section, messageKey) {
-  freshView(section);
+async function fallBackTo(section, messageKey) {
+  await freshView(section);
   showSnackbar(t(messageKey));
 }
 
@@ -68,7 +75,7 @@ async function openTarget(target) {
       openOver(target.path);
       return;
     }
-    const view = freshView(target.section);
+    const view = await freshView(target.section);
     const root = { logbook: '/', sites: '/sites/', statistics: '/statistics/', tools: '/tools/', account: '/account' }[target.section];
     if (target.path !== root) /** @type {any} */ (view?.router).navigate(target.path, { reloadDetail: true });
     return;
@@ -77,10 +84,10 @@ async function openTarget(target) {
     // The stable key is the start time (lib/deep-link.js); the id is only valid until the next load.
     const dive = logbook.dives.find((d) => d.date.slice(0, 19) === target.date);
     if (!dive) {
-      fallBackTo('logbook', 'link.diveNotFound');
+      await fallBackTo('logbook', 'link.diveNotFound');
       return;
     }
-    const view = freshView('logbook');
+    const view = await freshView('logbook');
     /** @type {any} */ (view?.router).navigate(`/dives/${dive.id}`, { reloadDetail: true });
     return;
   }
@@ -93,10 +100,10 @@ async function openTarget(target) {
       found = false;
     }
     if (!found) {
-      fallBackTo('sites', 'link.siteNotFound');
+      await fallBackTo('sites', 'link.siteNotFound');
       return;
     }
-    const view = freshView('sites');
+    const view = await freshView('sites');
     view?.router.navigate(`/sites/${target.uuid}`);
   }
 }
