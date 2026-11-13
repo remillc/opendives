@@ -1601,6 +1601,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Dive detail: no more ",
       "Rebreather: DIL, O₂ and BAILOUT are centred on their cylinders.",
       "Rebreather: the diluent’s and the oxygen’s names sit under their half of the unit, and each bailout cylinder is centred above its text; a second bailout cylinder is no longer hidden under the first.",
       "Gas lists: the small cylinder icon takes the new shape, without the valve.",
