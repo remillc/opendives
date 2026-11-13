@@ -1600,6 +1600,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Menus déroulants : à l’ouverture, la liste montre la valeur choisie.",
       "Planificateur : le clavier ne se ferme plus quand on tape dans un champ (niveaux, gaz, GF).",
       "Planificateur : la liste du CAS va de 0,01 en 0,01 pi³/min et s’ouvre sur la valeur actuelle.",
       "Meilleur mélange : deux onglets, Nitrox et Trimix ; l’END maximale ne sert plus qu’au trimix.",
