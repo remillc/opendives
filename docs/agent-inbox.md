@@ -2367,3 +2367,10 @@ Menus open from the row, below it when there is room, above it otherwise (Materi
 Back from a subpage returns to the overview, with the scroll position kept. Deep links and any « open Réglages at X » call in the app (planner, offline maps, download screen) open the matching subpage directly. Search in settings, if any, still finds rows and opens their subpage.
 
 Tablet: the overview in the left pane, the selected subpage in the right pane (list-detail), first group selected by default. Check on the phone emulator and on the tablet emulator in portrait and landscape, fr and en.
+
+## [ ] 2026-11-13-112 Gaz et recycleur: say that the two rebreather switches act on the pO₂ graph
+
+Christian's decision of 13 November 2026. Mock-up: `docs/mockups/reglages-gaz-android.dc.html`. The two switches under « Recycleur » only change what the pO₂ graph of the profile shows, which their labels did not say. They stay under « Recycleur », same keys and behaviour, new label and a supporting line:
+- « Afficher les capteurs d’O₂ » becomes « Afficher chaque capteur d’O₂ », supporting line « Sur le graphique de pO₂, une courbe par cellule » (en: « Show each O₂ sensor » / « On the pO₂ graph, one line per cell »);
+- « Afficher les consignes » becomes « Afficher la consigne », supporting line « Sur le graphique de pO₂, la valeur visée » (en: « Show the setpoint » / « On the pO₂ graph, the target value »).
+fr-CA follows fr. Applies in the Gaz et recycleur subpage of task 111 and on the tablet layout.
