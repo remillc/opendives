@@ -2328,12 +2328,14 @@ Christian's decision of 13 November 2026, after seeing task 108 on his phone: th
 
 Done in fix/paper-grain-kept: the trial module, its Logbook menu item and its strings are removed, the stored choice (od.paperGrain) is cleared at start, the grain token stays always on; release note reworded. Checked on the phone emulator: grain on the band, no item in the menu.
 
-## [ ] 2026-11-13-110 Réglages: « Affichage » first, no « Taille du texte »
+## [x] 2026-11-13-110 Réglages: « Affichage » first, no « Taille du texte »
 
 Christian's decision of 13 November 2026. Mock-up: `docs/mockups/android-reglages.dc.html`.
 - The « Affichage » group (Thème) becomes the **first** group of Réglages, before « Langue et formats » and « Unités ». The other groups keep their order.
 - The « Taille du texte » row (`settings.display.textSize`, read-only « Comme l’appareil ») is removed, with its strings: the app already follows the system text size. Update the release note that lists the settings menus if it names it.
 Same on the tablet layout. Check on the phone emulator.
+
+Done in fix/settings-display-first: the Affichage group is rendered first (phone and tablet share Settings.svelte), the textSize row and its strings are removed, and the release note that listed the menus no longer names it. Checked on the phone emulator.
 
 ## [ ] 2026-11-13-111 Réglages: overview page and subpages
 

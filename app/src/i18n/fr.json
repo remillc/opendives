@@ -712,9 +712,7 @@
       "theme": "Thème",
       "themeText": "Clair ou sombre, comme l’appareil",
       "light": "Clair",
-      "dark": "Sombre",
-      "textSize": "Taille du texte",
-      "textSizeValue": "Comme l’appareil"
+      "dark": "Sombre"
     },
     "maps": {
       "regions": "Régions téléchargées",
@@ -1657,6 +1655,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Réglages : « Affichage » vient en premier ; la ligne « Taille du texte » est retirée (l’app suit déjà la taille du texte de l’appareil).",
       "Grain papier sur la bande d’en-tête des sections et du menu latéral.",
       "Logo, mode clair : le demi-cercle sous les vagues est gris clair et les deux bulles sont bleues ; dans l’icône de l’app, l’arc du haut a le même gris, donc l’anneau est d’une seule couleur. Le mode sombre ne change pas.",
       "Filtre, critère Voyage : les voyages sont triés par ordre alphabétique.",
@@ -1730,7 +1729,7 @@
       "Réglages › Équipement : « Types de bouteilles » passe en tête du groupe.",
       "Réglages : nouveau groupe « Téléchargement » (appareils Bluetooth et ordinateurs mémorisés) ; « Ordinateurs de plongée » ne garde que les ordinateurs du carnet.",
       "Réglages › Unités : « Pression » devient « Pression des bouteilles » ; cette unité ne sert qu’aux bouteilles (la pression atmosphérique reste en mbar).",
-      "Réglages : chaque choix dans une courte liste (format de la date et de l’heure, durée, vitesses, coordonnées GPS, langue, thème, taille du texte, bouteilles par défaut, type d’eau des plongées téléchargées) s’ouvre en menu sur la ligne touchée, au lieu d’une boîte de dialogue à boutons radio. Touchez une valeur pour la choisir ; touchez à côté ou faites Retour pour fermer sans changer.",
+      "Réglages : chaque choix dans une courte liste (format de la date et de l’heure, durée, vitesses, coordonnées GPS, langue, thème, bouteilles par défaut, type d’eau des plongées téléchargées) s’ouvre en menu sur la ligne touchée, au lieu d’une boîte de dialogue à boutons radio. Touchez une valeur pour la choisir ; touchez à côté ou faites Retour pour fermer sans changer.",
       "Réglages › Équipement : « Proposer les tailles standard » est désactivé par défaut ; le choix du type de bouteille montre vos propres types et ceux du carnet.",
       "Réglages : le groupe « Conditions par défaut » devient « Conditions des outils » et passe après « Décompression ».",
       "Détail d’une plongée : « Gaz et équipement » devient deux sections. Gaz dessine chaque bouteille avec son gaz, son usage et sa taille, et sa pression du départ à la fin ; la partie entre la pression de fin et celle de départ est pâle, avec une ligne pointillée à chaque niveau. Sous les bouteilles, une ligne dit les changements de gaz et leur profondeur. Équipement est replié : la combinaison et le lest total ; touchez-le pour voir le lest par emplacement. « Modifier la plongée » montre le même dessin.",
