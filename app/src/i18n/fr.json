@@ -1693,6 +1693,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Pages sans bande (Réglages, À propos, éditeurs…) : la barre du haut prend la couleur de la page, sans ligne de séparation, et se teinte légèrement quand on fait défiler.",
       "Textes : « Noter une plongée à la main » et l’attente de la première synchronisation ne citent plus d’autre application.",
       "Correctif : sur l’écran « Plongée reçue », le texte « Ajouter quand même » est centré dans son bouton.",
       "Partage par code QR : des codes plus petits, lisibles à distance normale, et une lecture en meilleure résolution.",

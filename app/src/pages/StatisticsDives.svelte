@@ -121,11 +121,6 @@
 </Page>
 
 <style>
-  /* The top bar on the page background (mock-up). */
-  :global(.od-statistics-dives) {
-    --f7-navbar-bg-color: var(--od-background);
-  }
-
   @layer od.components {
     .od-statistics-dives--list {
       margin-top: 12px;

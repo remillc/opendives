@@ -1016,11 +1016,6 @@
     }
   }
 
-  /* Framework7's variable, outside the layers: the top bar is the page's colour on Android. */
-  :global(.md .od-dive-detail > .navbar) {
-    --f7-navbar-bg-color: var(--od-background);
-  }
-
   :global(.od-dive-detail.od-dive-detail--on-image > .navbar) {
     --f7-navbar-bg-color: transparent;
   }
