@@ -2290,7 +2290,7 @@ No other change: no reminder, no badge. Tests for the conditions (dives count, a
 
 ## [ ] 2026-11-13-105 « Synchroniser maintenant » becomes « Synchroniser »
 
-Christian's decision of 13 November 2026. The sync button label loses « maintenant »: fr `syncNow` « Synchroniser », en « Sync » (fr-CA follows fr). Everywhere it is used: side menu (plain and split button), Compte, Dépôt git, tablet layouts, and any help text or release note that quotes it (`syncButton` notes in the i18n files, the spec now says « Synchroniser »). Mock-ups in `docs/mockups/` updated. Keep the accessible name the same as the label. Check that the split button still fits on a small phone in fr and en.
+Christian's decision of 13 November 2026. The sync button label loses « maintenant »: fr `syncNow` « Synchroniser » (fr-CA follows fr); in English the label stays « Sync now » (Christian, 13 November 2026). Everywhere it is used: side menu (plain and split button), Compte, Dépôt git, tablet layouts, and any help text or release note that quotes it (`syncButton` notes in the i18n files, the spec now says « Synchroniser »). Mock-ups in `docs/mockups/` updated. Keep the accessible name the same as the label. Check that the split button still fits on a small phone in fr and en.
 
 ## [ ] 2026-11-13-106 Statistics icon: baseline and four bars
 
