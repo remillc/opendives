@@ -89,7 +89,9 @@
     await tick();
     position();
     if (searchLabel) search?.focus();
-    scrollToActive();
+    // The list opens on the chosen value, centred (Christian, 13 November 2026).
+    await tick();
+    scrollToActive('center');
   }
 
   /** Puts the menu under the field (above it when there is no room below), at the field's width. */
@@ -122,8 +124,14 @@
     if (refocus) trigger?.focus();
   }
 
-  function scrollToActive() {
-    root?.querySelector(`#${id}-o${active}`)?.scrollIntoView({ block: 'nearest' });
+  /**
+   * Brings the active option into view. The menu is portalled to the page's
+   * root, so it is looked up by id, not inside the field.
+   * @param {ScrollLogicalPosition} [block]
+   */
+  function scrollToActive(block = 'nearest') {
+    if (active < 0) return;
+    document.getElementById(`${id}-o${active}`)?.scrollIntoView({ block });
   }
 
   /** @param {string} chosen */

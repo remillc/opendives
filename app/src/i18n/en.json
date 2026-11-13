@@ -1600,6 +1600,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Dropdown menus: when they open, the list shows the chosen value.",
       "Planner: the keyboard no longer closes while typing in a field (levels, gases, GF).",
       "Planner: the SAC list goes in steps of 0.01 cu ft/min and opens on the current value.",
       "Best mix: two tabs, Nitrox and Trimix; the maximum END now only applies to the trimix.",

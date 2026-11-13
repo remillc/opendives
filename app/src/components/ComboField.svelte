@@ -39,7 +39,18 @@
     if (!open) return [];
     const words = typed ? fold(value.trim()).split(/\s+/).filter(Boolean) : [];
     // Each name once: several sites can share a name.
-    return [...new Set(options)].filter((o) => o && words.every((w) => fold(o).includes(w))).slice(0, 50);
+    const list = [...new Set(options)].filter((o) => o && words.every((w) => fold(o).includes(w))).slice(0, 50);
+    // On opening, the chosen value is always in the list, even beyond the first 50.
+    if (!typed && value && !list.includes(value) && options.includes(value)) list.unshift(value);
+    return list;
+  });
+
+  /** @type {HTMLUListElement|undefined} */
+  let menu = $state();
+  // The list opens on the chosen value (Christian, 13 November 2026).
+  $effect(() => {
+    if (!open || typed || !menu) return;
+    menu.querySelector('[aria-selected="true"]')?.scrollIntoView({ block: 'nearest' });
   });
   const isNew = $derived(open && value.trim() !== '' && !options.some((o) => fold(o) === fold(value.trim())));
 
@@ -104,7 +115,7 @@
     <span class="od-combo-field--arrow" class:od-combo-field--up={open}><DropdownArrow /></span>
   </div>
   {#if proposals.length || isNew}
-    <ul class="od-combo-field--menu" role="listbox" aria-label={label}>
+    <ul class="od-combo-field--menu" role="listbox" aria-label={label} bind:this={menu}>
       {#each proposals as o (o)}
         <li>
           <button type="button" role="option" aria-selected={o === value} onmousedown={(e) => e.preventDefault()} onclick={() => choose(o)}>
