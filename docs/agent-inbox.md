@@ -2277,7 +2277,7 @@ Christian's decision of 13 November 2026. New rule in `docs/system-design.md` (�
 - Side menu, map update available (`appbar-tiroir-android-maj-cartes`): the count badge on Réglages in `--od-tertiary`.
 Add `--od-on-tertiary-container` to `theme.css` if it is missing (light #3D2200, dark #FBE3B2). Light and dark mode. Check on the phone emulator: contrast of every changed text (rust on white or on the light background is 4.6:1, keep it to short or semibold text).
 
-## [ ] 2026-11-13-104 Rate the app in the store
+## [x] 2026-11-13-104 Rate the app in the store
 
 Christian's decision of 13 November 2026 (TODOS #20). Mock-ups: `docs/mockups/apropos-android.dc.html`, `docs/mockups/carnet-evaluation-android.dc.html`.
 1. **À propos › Projet:** a new row « Évaluer OpenDives », « Donner une note dans Google Play » (iOS: « … dans l’App Store »), with the external-link icon, just under « Nouveautés ». It opens the app's store page (Play: `market://details?id=…` with the https fallback; iOS: the App Store page with `action=write-review`). In a build not installed from a store (GitHub APK, later F-Droid), the row reads « Donner votre avis » and opens the project's GitHub page.
@@ -2287,6 +2287,8 @@ Christian's decision of 13 November 2026 (TODOS #20). Mock-ups: `docs/mockups/ap
    - at most once every 120 days (store the last request date on the device); the stores also apply their own quotas, so the dialog may not appear;
    - never on the first launch, after an error, a sync conflict or a failed download, nor in a build not installed from a store.
 No other change: no reminder, no badge. Tests for the conditions (dives count, age, interval, store build). Check on the phone emulator with the Play internal test track or the fake review manager.
+
+Done in feature/rate-app: About row (store row, or « Donner votre avis » to GitHub outside a store), review-prompt.js with its tests (count, age, interval, store build, error, conflict, failed download), plugin methods installSource, requestReview, openStorePage (Kotlin with Play In-App Review 2.0.2, Swift). Checked on the phone emulator: the GitHub-build row, installSource() = not a store, requestReview() answers. Not checked: the Play dialog itself (needs the internal test track) and iOS; the App Store id (Info.plist ODAppStoreId) is to add once the app exists in App Store Connect.
 
 ## [x] 2026-11-13-105 « Synchroniser maintenant » becomes « Synchroniser »
 

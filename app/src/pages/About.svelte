@@ -15,6 +15,7 @@
   import { logbook } from '../lib/logbook.svelte.js';
   import Icon from '../components/Icon.svelte';
   import { t } from '../lib/i18n.js';
+  import { OpenDivesCore } from 'opendives-core';
 
   /** The author's name: a proper name, not translated. */
   const AUTHOR = 'Christian Rémillard';
@@ -39,6 +40,16 @@
   const version = $derived(t('about.version', { version: appVersion }));
   App.getInfo()
     .then((info) => (appVersion = info.version))
+    .catch(() => {});
+
+  /**
+   * Installed from Google Play or the App Store (native installer check); false in a
+   * browser and in a build from GitHub or F-Droid, where the row asks for feedback instead.
+   */
+  let storeBuild = $state(false);
+  const platform = Capacitor.getPlatform();
+  OpenDivesCore.installSource()
+    .then((r) => (storeBuild = r?.store === true))
     .catch(() => {});
 
   /**
@@ -69,13 +80,24 @@
   }
 
   /**
-   * @type {{ title: string, rows: { key: string, text: string, sub: string, href: string, external?: boolean, mail?: boolean, onclick?: () => void }[] }[]}
+   * @type {{ title: string, rows: { key: string, text: string, sub: string, href: string, external?: boolean, opens?: string, mail?: boolean, onclick?: () => void }[] }[]}
    */
-  const groups = [
+  const groups = $derived([
     {
       title: t('about.project'),
       rows: [
         { key: 'notes', text: t('about.notes'), sub: t('about.notesText'), href: '/about/notes' },
+        storeBuild
+          ? {
+              key: 'rate',
+              text: t('about.rate'),
+              sub: t(platform === 'ios' ? 'about.rateTextIos' : 'about.rateTextAndroid'),
+              href: '#rate',
+              external: true,
+              opens: t(platform === 'ios' ? 'about.rateOpensIos' : 'about.rateOpensAndroid'),
+              onclick: () => OpenDivesCore.openStorePage().catch((e) => console.error('Store page', e)),
+            }
+          : { key: 'rate', text: t('about.feedback'), sub: t('about.feedbackText'), href: LINKS.source, external: true },
         { key: 'source', text: t('about.source'), sub: LINKS.source.replace('https://', ''), href: LINKS.source, external: true },
         ...(SUPPORT_EMAIL
           ? [{ key: 'issues', text: t('about.issues'), sub: t('about.issuesText'), href: '#report', mail: true, onclick: reportProblem }]
@@ -95,7 +117,7 @@
       title: t('about.privacy'),
       rows: [{ key: 'privacy', text: t('about.privacyPolicy'), sub: t('about.privacyText'), href: '/about/privacy' }],
     },
-  ];
+  ]);
 </script>
 
 <Page class="od-about" onPageBeforeIn={() => (navigation.page = 'about')} onPageBeforeOut={() => (navigation.page = '')}>
@@ -146,7 +168,7 @@
                   {#if row.sub}<div class="item-footer">{row.sub}</div>{/if}
                 </div>
                 {#if row.external}
-                  <div class="item-after"><Icon name="openInNew" size={24} /><span class="od-sr-only">{t('about.opensElsewhere')}</span></div>
+                  <div class="item-after"><Icon name="openInNew" size={24} /><span class="od-sr-only">{row.opens ?? t('about.opensElsewhere')}</span></div>
                 {:else if row.mail}
                   <div class="item-after"><Icon name="mail" size={24} /><span class="od-sr-only">{t('about.opensMail')}</span></div>
                 {/if}

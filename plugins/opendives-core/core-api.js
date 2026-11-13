@@ -749,6 +749,14 @@ import { registerPlugin } from '@capacitor/core';
  *   Android: ML Kit; iOS: AVFoundation. Asks the camera permission itself.
  * @property {(options: {on: boolean}) => Promise<void>} keepScreenAwake
  *   While on: the screen stays on and at full brightness (the QR sending screen); off restores both.
+ * @property {() => Promise<{store: boolean, installer: string}>} installSource
+ *   Whether the app was installed from Google Play (installer "com.android.vending") or the
+ *   App Store (not a TestFlight or development build); `installer` is the package name, "" on iOS.
+ * @property {() => Promise<{requested: boolean}>} requestReview
+ *   The system's in-app review dialog (Google Play In-App Review; iOS requestReview). The store
+ *   decides whether it shows: `requested` only says the request was made.
+ * @property {() => Promise<void>} openStorePage
+ *   The app's page in the store, to write a review (Android market://, with the https fallback; iOS action=write-review).
  * @property {(options: {uri: string}) => Promise<{name: string, size: number, data: string}>} readSharedFile
  *   Reads a file another app handed over (Android content://, iOS file://): its name, its size in
  *   bytes and its contents in base64. Rejects TOO_BIG (above 100 MB), NOT_FOUND, FAILED, BAD_ARGUMENT.
@@ -941,6 +949,9 @@ export const OpenDivesCore = {
   gaugeCamera: (options) => native.gaugeCamera(options),
   qrScan: (options) => native.qrScan(options),
   keepScreenAwake: (options) => native.keepScreenAwake(options),
+  installSource: () => native.installSource(),
+  requestReview: () => native.requestReview(),
+  openStorePage: () => native.openStorePage(),
   startBluetoothScan: (options = {}) => native.startBluetoothScan(options),
   stopBluetoothScan: () => native.stopBluetoothScan(),
   async bluetoothModels() {

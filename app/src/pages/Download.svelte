@@ -29,6 +29,7 @@
   import { downloadSalinity } from '../lib/tools.js';
   import { offerUndo } from '../lib/undo.js';
   import { errorCode } from '../lib/account.js';
+  import { askReviewAfterDownload } from '../lib/review-prompt.js';
   import { addressFor, keepReceived, lastAttempt, macOf } from '../lib/download.js';
   import { ProgressSmoother } from '../lib/progress-smoothing.js';
   import { formatDateTime, formatDepth, formatDuration } from '../lib/format.js';
@@ -201,6 +202,8 @@
       if (leaving) return;
       leaving = true;
       f7router.back();
+      // Back on the logbook after a successful download: the system may ask for a review.
+      if (result.downloaded) setTimeout(() => askReviewAfterDownload({ dives: logbook.dives.length, error: !!logbook.error, conflict: !!logbook.conflict }), 1500);
       if (result.downloaded) offerUndo(t('download.done', { n: result.downloaded }));
       else toast(t('download.noneNew', { computer: result.product || c.product }));
     } catch (e) {

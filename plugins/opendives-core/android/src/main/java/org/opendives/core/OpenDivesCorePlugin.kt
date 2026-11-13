@@ -1296,6 +1296,48 @@ class OpenDivesCorePlugin : Plugin() {
         }
     }
 
+    /** True when the installer is Google Play: the in-app review and the store page only make sense then. */
+    @PluginMethod
+    fun installSource(call: PluginCall) {
+        val pkg = context.packageName
+        val installer = try {
+            if (Build.VERSION.SDK_INT >= 30) context.packageManager.getInstallSourceInfo(pkg).installingPackageName
+            else @Suppress("DEPRECATION") context.packageManager.getInstallerPackageName(pkg)
+        } catch (e: Exception) {
+            null
+        }
+        call.resolve(JSObject().put("store", installer == "com.android.vending").put("installer", installer ?: ""))
+    }
+
+    /** The Play In-App Review flow; Google applies its own quota, so the dialog may not show. */
+    @PluginMethod
+    fun requestReview(call: PluginCall) {
+        activity.runOnUiThread {
+            val manager = com.google.android.play.core.review.ReviewManagerFactory.create(context)
+            manager.requestReviewFlow().addOnCompleteListener { request ->
+                if (!request.isSuccessful) {
+                    call.resolve(JSObject().put("requested", false))
+                    return@addOnCompleteListener
+                }
+                manager.launchReviewFlow(activity, request.result).addOnCompleteListener {
+                    call.resolve(JSObject().put("requested", true))
+                }
+            }
+        }
+    }
+
+    /** The app's Google Play page: market:// first, the https page when no store app answers. */
+    @PluginMethod
+    fun openStorePage(call: PluginCall) {
+        val id = context.packageName
+        try {
+            activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$id")))
+        } catch (e: Exception) {
+            activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=$id")))
+        }
+        call.resolve()
+    }
+
     /** The first screen is drawn: the launch screen can go (see SplashGate). */
     @PluginMethod
     fun contentShown(call: PluginCall) {

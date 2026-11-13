@@ -2,6 +2,7 @@
 import Capacitor
 import Foundation
 import Network
+import StoreKit
 import UIKit
 
 /// A call to reject with a given code (the JavaScript branches on the codes).
@@ -82,6 +83,9 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "openAppSettings", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "qrScan", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "keepScreenAwake", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "installSource", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "requestReview", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "openStorePage", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "contentShown", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "readSharedFile", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "startBluetoothScan", returnType: CAPPluginReturnPromise),
@@ -1282,6 +1286,36 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
                 savedBrightness = nil
             }
             call.resolve()
+        }
+    }
+
+    /// True for an App Store install: neither TestFlight (sandbox receipt) nor a development build (no receipt).
+    @objc func installSource(_ call: CAPPluginCall) {
+        let receipt = Bundle.main.appStoreReceiptURL?.lastPathComponent
+        call.resolve(["store": receipt == "receipt", "installer": ""])
+    }
+
+    /// The system review dialog; the App Store decides whether it shows.
+    @objc func requestReview(_ call: CAPPluginCall) {
+        DispatchQueue.main.async {
+            if let scene = UIApplication.shared.connectedScenes.first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene {
+                SKStoreReviewController.requestReview(in: scene)
+                call.resolve(["requested": true])
+            } else {
+                call.resolve(["requested": false])
+            }
+        }
+    }
+
+    /// The App Store page, on its review form. The numeric Apple ID is the Info.plist key ODAppStoreId.
+    @objc func openStorePage(_ call: CAPPluginCall) {
+        guard let id = Bundle.main.object(forInfoDictionaryKey: "ODAppStoreId") as? String, !id.isEmpty,
+              let url = URL(string: "https://apps.apple.com/app/id(id)?action=write-review") else {
+            call.reject("No App Store identifier", "NO_STORE_ID")
+            return
+        }
+        DispatchQueue.main.async {
+            UIApplication.shared.open(url) { _ in call.resolve() }
         }
     }
 
