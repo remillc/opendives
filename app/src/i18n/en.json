@@ -1601,6 +1601,7 @@
     "notes": "What's new",
     "notesText": "What changed in this version",
     "releaseNotes": [
+      "Rebreather dives: no more ",
       "Edit the dive, rebreather: the Gas card draws the rebreather as the dive detail does, with its bailout cylinder.",
       "Freediving: the dive detail and the dive editing no longer show gas.",
       "Cylinder drawings (open circuit): a more realistic, slimmer shape with shoulders and a neck, without the valve.",

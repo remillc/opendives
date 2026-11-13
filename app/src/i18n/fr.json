@@ -1601,6 +1601,7 @@
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
     "releaseNotes": [
+      "Plongées en recycleur : plus de ligne « Passage à… » pour le diluant ou l’oxygène de l’appareil ; les passages à une bouteille de secours restent.",
       "Modifier la plongée, recycleur : la carte Gaz dessine le recycleur comme la fiche de la plongée, avec sa bouteille de secours.",
       "Apnée : la fiche et la modification de la plongée n’affichent plus de gaz.",
       "Bouteilles dessinées (circuit ouvert) : une forme plus réaliste et plus fine, avec épaules et col, sans robinet.",
