@@ -6,23 +6,29 @@
 <script>
   // @ts-check
   // Best mix (docs/ui-specification.md, section 1, "Tools page and gas tools";
-  // docs/mockups/outils-meilleur-melange-android.dc.html). The nitrox, then
-  // the trimix, for a depth, a pO2 and a maximum END, from the core (toolQuery
-  // 'gas': best_o2 rounded down, best_he rounded up). The maximum END starts at
-  // the value of Settings, Décompression, and is changed for this calculation
-  // only.
+  // task 2026-11-13-91, docs/mockups/outils-meilleur-melange-android.dc.html and
+  // outils-meilleur-melange-trimix-android.dc.html). Two tabs, Nitrox by
+  // default: the best nitrox for a depth and a pO2, or the best trimix for a
+  // depth, a pO2 and a maximum END, from the core (toolQuery 'gas': best_o2
+  // rounded down, best_he rounded up). Depth, water type and pO2 are shared by
+  // the tabs; the maximum END, trimix only, starts at the value of Settings,
+  // Décompression, and is changed for this calculation only.
   import { Page, Navbar, Link } from 'framework7-svelte';
   import { OpenDivesCore } from 'opendives-core';
   import TextField from '../components/TextField.svelte';
   import SelectField from '../components/SelectField.svelte';
   import Po2Field from '../components/Po2Field.svelte';
   import GasResults from '../components/GasResults.svelte';
+  import ButtonGroup from '../components/ButtonGroup.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
   import { settings } from '../lib/settings.svelte.js';
   import { depthUnit, formatNumber } from '../lib/format.js';
   import { WATER_TYPES, waterTypeName, salinityOfWaterType, parseDecimal } from '../lib/tools.js';
   import { t } from '../lib/i18n.js';
 
+  const MODES = /** @type {const} */ (['nitrox', 'trimix']);
+  let mode = $state(/** @type {'nitrox'|'trimix'} */ ('nitrox'));
+  const trimix = $derived(mode === 'trimix');
   const feet = logbook.prefs.length === 'ft';
   const mmPerUnit = feet ? 304.8 : 1000;
   let po2 = $state(saved.po2);
@@ -41,7 +47,8 @@
 
   $effect(() => {
     Object.assign(saved, { po2, depth, water });
-    if (depthInvalid || endInvalid) {
+    // The maximum END only matters for the trimix.
+    if (depthInvalid || (trimix && endInvalid)) {
       result = null;
       return;
     }
@@ -52,7 +59,7 @@
       he: 0,
       po2,
       depth: Math.round(depthValue * mmPerUnit),
-      args: [Math.round(endValue * mmPerUnit), salinityOfWaterType(water)],
+      args: [trimix ? Math.round(endValue * mmPerUnit) : -1, salinityOfWaterType(water)],
     })
       .then((/** @type {import('opendives-core').GasResult} */ r) => {
         result = r;
@@ -63,31 +70,15 @@
       });
   });
 
-  /** @param {number} mm */
-  function wholeDepth(mm) {
-    return `${formatNumber(mm / mmPerUnit, 0)} ${depthUnit(logbook.prefs)}`;
-  }
-
+  /** One result row: the tab's mix. */
   const rows = $derived.by(() => {
-    if (!result) return [{ title: t('tools.nitrox'), sub: '', value: '—' }];
-    const over = result.nitroxEndMm > Math.round(endValue * mmPerUnit);
-    /** @type {{ title: string, sub: string, value: string, alarm?: boolean }[]} */
-    const list = [
-      {
-        title: t('tools.nitrox'),
-        sub: t(over ? 'tools.nitroxEndOver' : 'tools.nitroxEnd', { end: wholeDepth(result.nitroxEndMm) }),
-        value: `EAN${formatNumber(result.bestO2 / 10, 0)}`,
-        alarm: over,
-      },
-    ];
-    if (result.bestHe > 0) {
-      list.push({
-        title: t('tools.trimix'),
-        sub: t('tools.trimixSub', { o2: formatNumber(result.bestO2 / 10, 0), he: formatNumber(result.bestHe / 10, 0) }),
-        value: `${formatNumber(result.bestO2 / 10, 0)}/${formatNumber(result.bestHe / 10, 0)}`,
-      });
-    }
-    return list;
+    const title = t(trimix ? 'tools.trimix' : 'tools.nitrox');
+    if (!result) return [{ title, sub: '', value: '—' }];
+    const o2 = formatNumber(result.bestO2 / 10, 0);
+    const he = formatNumber(result.bestHe / 10, 0);
+    return trimix
+      ? [{ title, sub: t('tools.trimixSub', { o2, he }), value: `${o2}/${he}` }]
+      : [{ title, sub: t('tools.nitroxSub', { o2 }), value: `EAN${o2}` }];
   });
 </script>
 
@@ -101,22 +92,38 @@
     {/snippet}
   </Navbar>
 
+  <div class="od-gas-best-mix--modes">
+    <ButtonGroup ariaLabel={t('tools.blendMode')} value={mode} options={MODES.map((choice) => ({ value: choice, label: t(`tools.${choice}`) }))} onchange={(choice) => (mode = /** @type {any} */ (choice))} />
+  </div>
+
   <div class="od-gas-best-mix--pair">
-    <TextField label={t('tools.depth')} bind:value={depth} inputmode="decimal" invalid={depthInvalid} supporting={depthInvalid ? t('tools.depthInvalid') : ''}>
-      {#snippet trailing()}<span class="od-gas-best-mix--unit">{depthUnit(logbook.prefs)}</span>{/snippet}
-    </TextField>
-    <SelectField label={t('tools.waterType')} bind:value={water} options={WATER_TYPES.map((w) => ({ value: w.id, label: waterTypeName(w.id) }))} />
+    <div class="od-gas-best-mix--cell">
+      <TextField label={t('tools.depth')} bind:value={depth} inputmode="decimal" invalid={depthInvalid} supporting={depthInvalid ? t('tools.depthInvalid') : ''}>
+        {#snippet trailing()}<span class="od-gas-best-mix--unit">{depthUnit(logbook.prefs)}</span>{/snippet}
+      </TextField>
+    </div>
+    <div class="od-gas-best-mix--cell">
+      <SelectField label={t('tools.waterType')} bind:value={water} options={WATER_TYPES.map((w) => ({ value: w.id, label: waterTypeName(w.id) }))} />
+    </div>
   </div>
 
   <div class="od-gas-best-mix--gap"></div>
-  <Po2Field bind:value={po2} />
-
-  <TextField label={t('tools.maxEnd')} bind:value={maxEnd} inputmode="decimal" invalid={endInvalid} supporting={endInvalid ? t('tools.depthInvalid') : t('tools.maxEndHelp')}>
-    {#snippet trailing()}<span class="od-gas-best-mix--unit">{depthUnit(logbook.prefs)}</span>{/snippet}
-  </TextField>
+  <!-- The pO2 takes one column; the trimix adds the maximum END in the other. -->
+  <div class="od-gas-best-mix--pair">
+    <div class="od-gas-best-mix--cell"><Po2Field bind:value={po2} /></div>
+    <div class="od-gas-best-mix--cell">
+      {#if trimix}
+        <TextField label={t('tools.maxEnd')} bind:value={maxEnd} inputmode="decimal" invalid={endInvalid} supporting={endInvalid ? t('tools.depthInvalid') : t('tools.maxEndHelp')}>
+          {#snippet trailing()}<span class="od-gas-best-mix--unit">{depthUnit(logbook.prefs)}</span>{/snippet}
+        </TextField>
+      {/if}
+    </div>
+  </div>
 
   <GasResults title={t('tools.bestMixResults')} {rows} />
-  <p class="od-gas-best-mix--caption">{t(logbook.prefs.o2narcotic ? 'tools.bestMixNoteNarcotic' : 'tools.bestMixNoteNotNarcotic')}</p>
+  <p class="od-gas-best-mix--caption">
+    {t(trimix ? (logbook.prefs.o2narcotic ? 'tools.bestMixNoteNarcotic' : 'tools.bestMixNoteNotNarcotic') : 'tools.bestMixNoteNitrox')}
+  </p>
 </Page>
 
 <style>
@@ -133,6 +140,17 @@
         margin-left: 0;
         margin-right: 0;
       }
+    }
+
+    .od-gas-best-mix--modes {
+      margin: 8px 16px 0;
+    }
+
+    /* Each half of a row; the fields inside take its whole width. */
+    .od-gas-best-mix--cell {
+      flex: 1;
+      min-width: 0;
+      --od-field-margin: 0;
     }
 
     .od-gas-best-mix--gap {
