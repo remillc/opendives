@@ -11,6 +11,7 @@
   import AccountField from '../components/AccountField.svelte';
   import EditorialPage from '../components/EditorialPage.svelte';
   import { errorCode, finishAccount, showFailure, validEmail, validPassword } from '../lib/account.js';
+  import { liveError } from '../lib/live-validation.svelte.js';
   import { t } from '../lib/i18n.js';
 
   /** @type {{ f7router: any, welcome?: boolean, prefilledEmail?: string }} */
@@ -22,6 +23,18 @@
   let busy = $state(false);
   let emailError = $state('');
   let passwordError = $state('');
+  // Checked as the diver types; the password is only judged by the server (no hint on a wrong one).
+  const emailLive = liveError(() => email, (text) => (validEmail(text.trim()) ? '' : t('createAccount.invalidEmail')));
+  const emailShown = $derived(emailError || emailLive.error);
+  // An answer of the server stays until the field it is about changes.
+  $effect(() => {
+    email;
+    emailError = '';
+  });
+  $effect(() => {
+    password;
+    passwordError = '';
+  });
 
   async function signIn() {
     emailError = validEmail(email.trim()) ? '' : t('createAccount.invalidEmail');
@@ -60,7 +73,7 @@
       type="email"
       autocomplete="email"
       bind:value={email}
-      error={emailError}
+      error={emailShown}
       disabled={busy}
       position="first"
     />
@@ -72,8 +85,8 @@
       bind:value={password}
       supporting={t('signIn.passwordText')}
       error={passwordError}
-      footer={emailError || passwordError || t('signIn.passwordText')}
-      footerError={!!(emailError || passwordError)}
+      footer={emailShown || passwordError || t('signIn.passwordText')}
+      footerError={!!(emailShown || passwordError)}
       disabled={busy}
       position="last"
     />

@@ -12,6 +12,7 @@
   import EditorialPage from '../components/EditorialPage.svelte';
   import { notAvailableYet } from '../lib/not-available.js';
   import { accountFlow, errorCode, finishAccount, showFailure, validEmail, validPassword } from '../lib/account.js';
+  import { liveError } from '../lib/live-validation.svelte.js';
   import { t } from '../lib/i18n.js';
 
   /** @type {{ f7router: any, welcome?: boolean }} */
@@ -26,6 +27,20 @@
   let busy = $state(false);
   let emailError = $state('');
   let passwordError = $state('');
+  // Checked as the diver types (lib/account-validation.js): the rule under the field turns into the error.
+  const emailLive = liveError(() => email, (text) => (validEmail(text.trim()) ? '' : t('createAccount.invalidEmail')));
+  const passwordLive = liveError(() => password, (text) => (validPassword(text) ? '' : t('createAccount.passwordText')));
+  const emailShown = $derived(emailError || emailLive.error);
+  const passwordShown = $derived(passwordError || passwordLive.error);
+  // An answer of the server stays until the field it is about changes.
+  $effect(() => {
+    email;
+    emailError = '';
+  });
+  $effect(() => {
+    password;
+    passwordError = '';
+  });
 
   async function create() {
     if (confirmed) {
@@ -79,7 +94,7 @@
       type="email"
       autocomplete="email"
       bind:value={email}
-      error={emailError}
+      error={emailShown}
       disabled={busy || !!confirmed}
     />
     {#if !confirmed}
@@ -90,7 +105,7 @@
         autocomplete="new-password"
         bind:value={password}
         supporting={t('createAccount.passwordText')}
-        error={passwordError}
+        error={passwordShown}
         disabled={busy}
         required
       />

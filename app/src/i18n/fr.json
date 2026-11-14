@@ -1694,6 +1694,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Compte et dépôt git : les champs sont vérifiés pendant la saisie (adresse courriel, mot de passe, adresse du dépôt, nom d’utilisateur, jeton).",
       "Désaturation : si deux plongées se chevauchent dans le carnet, une note le dit, et la dernière plongée affiche le bon intervalle de surface.",
       "Correctif : après avoir touché la recherche du Carnet, la bande d’en-tête ne reste plus assombrie.",
       "Statistiques sur tablette : fermer le groupe de la ligne affichée à droite vide le panneau.",
@@ -2748,6 +2749,7 @@
     "tokenKeep": "Laissez vide pour garder le jeton enregistré",
     "tokenChecking": "Vérification du jeton…",
     "tokenDenied": "Accès refusé par le serveur. Vérifiez le jeton et son droit d’écriture sur ce dépôt.",
+    "tokenInvalid": "Un jeton ne contient ni espace ni lettre accentuée",
     "tokenHow": "Comment créer un jeton d’accès",
     "branch": "Branche",
     "branchWaiting": "Disponible une fois l’accès accepté",

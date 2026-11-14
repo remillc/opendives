@@ -1694,6 +1694,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Account and git repository: fields are checked as you type (email address, password, repository address, user name, token).",
       "Desaturation: when two dives overlap in the logbook, a note says so, and the last dive shows the right surface interval.",
       "Fix: after touching the Logbook search, the header band no longer stays darkened.",
       "Statistics on a tablet: closing the group of the row shown on the right empties the pane.",
@@ -2748,6 +2749,7 @@
     "tokenKeep": "Leave empty to keep the saved token",
     "tokenChecking": "Checking the token…",
     "tokenDenied": "Access refused by the server. Check the token and its write access to this repository.",
+    "tokenInvalid": "A token has no space or accented letter",
     "tokenHow": "How to create an access token",
     "branch": "Branch",
     "branchWaiting": "Available once access is accepted",
