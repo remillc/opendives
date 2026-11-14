@@ -2,7 +2,17 @@
 
 Christian's reflections and decision of 14 November 2026. This is not legal advice: the legal points below must be checked with someone qualified before the first paid release.
 
-## 1. The two constraints
+## 1. Why OpenDives exists
+
+Christian's motivations, as he states them:
+
+- **Frustration on the dive site.** With only a phone in hand, Subsurface-mobile could not do what he wanted to do.
+- **A companion app is a dead end.** The phone is the device divers have with them, so the mobile version should offer everything the desktop version does.
+- **A career's experience.** He wants to put what he learned as a web developer to work on Subsurface's user interface.
+- **Modern platform interfaces.** He wants the interface brought up to date with what Apple and Google prescribe for rich, modern apps: Material 3 Expressive on Android, the Human Interface Guidelines on iPhone and iPad.
+- **Contributing to Subsurface.** He wants to help improve the project, not only to build beside it (section 5).
+
+## 1a. The two constraints
 
 1. **Subsurface's licence must be respected.** OpenDives reuses Subsurface's core, so the whole distributed app is under GPLv2.
 2. **Christian wants to contribute to improving Subsurface's interface.** Monetising OpenDives must not get in the way of that, and should not be done behind the Subsurface project's back.
@@ -130,7 +140,7 @@ Christian's requirement of 14 November 2026: when the message goes out, the main
 >
 > My name is Christian Rémillard. I am a diver, a Subsurface user, and I have spent my career as a web developer.
 >
-> I started OpenDives out of frustration. On a dive site, with only my phone in hand, I could not do what I wanted to do with Subsurface-mobile. I have come to believe that a mobile app designed as a companion to the desktop app is a dead end: the phone is the device divers have with them, so the mobile version should offer everything the desktop version does. I also wanted to put the experience I have built over a career in web development to work on Subsurface's user interface.
+> I started OpenDives out of frustration. On a dive site, with only my phone in hand, I could not do what I wanted to do with Subsurface-mobile. I have come to believe that a mobile app designed as a companion to the desktop app is a dead end: the phone is the device divers have with them, so the mobile version should offer everything the desktop version does. I also wanted to put the experience I have built over a career in web development to work on Subsurface's user interface. And I wanted the interface to follow what Apple and Google now prescribe for rich, modern apps: Material 3 Expressive on Android and the Human Interface Guidelines on iPhone and iPad, so that the app feels at home on each platform.
 >
 > OpenDives is the result so far. It is a full dive log for Android first, with iPhone and tablets to follow. It reuses the Subsurface core as is, without Qt, through a small compatibility layer, and reads and writes the same git format: the round trip passes on 97 of your 98 sample logs. The interface is new, written with web technologies. The app is under GPLv2 and its source is public: https://github.com/remillc/opendives
 >
