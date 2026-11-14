@@ -430,16 +430,9 @@ int get_dive(int id, std::string &json, std::string &error)
 	json += ",\"current\":" + std::to_string(d->current);
 	json += ",\"surge\":" + std::to_string(d->surge);
 	json += ",\"chill\":" + std::to_string(d->chill) + '}';
-	// Water type from the salinity, with the thresholds of Subsurface's
-	// get_water_type_string() (core/string-format.cpp, Qt); empty when unknown.
-	{
-		int salinity = d->get_salinity();
-		const char *type = salinity <= 0 ? "" : salinity < 10050 ? "fresh" : salinity < 10190 ? "brackish"
-				 : salinity < 10210 ? "en13319" : "salt";
-		json += ",\"waterType\":\"";
-		json += type;
-		json += '"';
-	}
+	// The dive's salinity as the core works it out (the diver's choice, else the computer's);
+	// the water type is named from it in JavaScript (waterTypeOf, plugins/opendives-core/core-api.js).
+	json += ",\"salinity\":" + std::to_string(d->get_salinity());
 	// Surface pressure as stored, as dive::get_surface_pressure() picks it,
 	// but 0 instead of its default of one atmosphere when nothing is stored.
 	{
