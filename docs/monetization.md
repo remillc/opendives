@@ -158,6 +158,47 @@ How to read this:
 - At these volumes the revenue covers the project's costs and little more. It does not pay for the development time.
 - The price can go up later more easily than down: buyers of a cheaper version keep it.
 
+### An annual price instead of a one-time price
+
+Explored on 14 November 2026 at Christian's request. The decision of section 4 (one price paid once) stands until he changes it.
+
+**Why it is worth a look.** A one-time price pays once per diver and depends on new buyers every year. A logbook is used for decades and the app needs upkeep every year (new dive computers, new Android versions, the maps). An annual price matches that, and Google's cut is the same 15 %.
+
+**The constraint.** The source and a compiled version are always available (section 4), and the GPL forbids locking (section 2). An annual price can therefore never be enforced: the store version cannot stop working, and above all it must never keep a diver away from their own logbook when a payment lapses. Whatever the form, an annual price for OpenDives is a recurring contribution that the diver chooses, in exchange for convenience or for a service.
+
+**Three forms it can take:**
+
+| Form | What the diver pays for | What happens when the payment stops | Remark |
+| --- | --- | --- | --- |
+| A. Annual subscription to the store app | The store version: one-tap install, automatic updates | Nothing can be taken away without breaking the commitment: the app keeps working | In practice the same as form B, with a less honest label |
+| B. Annual support, optional | Nothing more than the free app: it funds the upkeep. The app is free on Google Play, with a "Support OpenDives" yearly subscription | Nothing | Honest and simple. Few people subscribe to what is free: expect a small share of users |
+| C. Annual service | Something with a real yearly cost: backup or sync on an OpenDives server, the pressure-gauge reading, map hosting | The service stops, the app and the logbook stay | Already in section 3. The only form where stopping the payment has a natural, fair effect |
+
+Forms B and C can be combined with a one-time price or replace it.
+
+**What it could bring.** Net of 15 %, per year, for as long as the subscribers stay:
+
+| Active subscribers | at $4.99 a year | at $9.99 a year | at $19.99 a year |
+| --- | --- | --- | --- |
+| 100 | $424 | $849 | $1,699 |
+| 500 | $2,121 | $4,246 | $8,496 |
+| 2,000 | $8,483 | $16,983 | $33,983 |
+
+How to read this next to the one-time table:
+
+- The amounts look the same as for a one-time price, but they come back every year from the same divers, instead of requiring that many new buyers every year.
+- A diver who stays two years at $4.99 a year has paid as much as a one-time $9.99; after that the annual price brings more.
+- The number of subscribers is the uncertain part. Fewer divers accept a yearly price than a one-time price, and divers tend to dislike subscriptions for a logbook they see as theirs. The one app found with a yearly price ($19.99) also sells a lifetime purchase ($39.99), which suggests its buyers ask for it.
+- With form B, the base is the number of people who use the free app, and only a small share of them will subscribe. With the commitment of section 4, this is also true of a one-time price: both are, in the end, voluntary.
+
+**What this changes for the decision.** Three coherent structures come out of it:
+
+1. One low price paid once, a service later (the current decision).
+2. A free app on Google Play with optional annual support (form B), a service later. Widest audience, the most in line with the commitment, the least predictable revenue.
+3. One low price paid once, plus optional annual support for those who want to keep funding the upkeep.
+
+Structure 2 also changes the question put to the Subsurface maintainers: a free app with optional support is closer to what they do themselves with their sponsor edition than a paid app is.
+
 ### A share for Subsurface
 
 The draft message offers part of the revenue towards the cost of the cloud. Ways to do it:
