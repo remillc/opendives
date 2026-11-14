@@ -24,13 +24,14 @@
   import SelectField from '../components/SelectField.svelte';
   import Icon from '../components/Icon.svelte';
   import { errorCode } from '../lib/account.js';
+  import { normaliseGitUrl, validGitToken, validGitUsername } from '../lib/account-validation.js';
+  import { liveError } from '../lib/live-validation.svelte.js';
   import { accountReady, logbook, repositoryChanged, syncNow } from '../lib/logbook.svelte.js';
   import { t } from '../lib/i18n.js';
 
   /** @type {{ f7router: any, welcome?: boolean, edit?: boolean }} */
   let { f7router, welcome = false, edit = false } = $props();
 
-  const USERNAME = /^[A-Za-z0-9._-]+$/;
 
   let url = $state('');
   let username = $state('');
@@ -59,8 +60,17 @@
           ? t('gitRepo.addressInvalid')
           : '',
   );
-  const usernameError = $derived(username && !USERNAME.test(username.trim()) ? t('gitRepo.usernameInvalid') : '');
-  const tokenError = $derived(accessState === 'denied' ? t('gitRepo.tokenDenied') : '');
+  // The form of each field is checked as the diver types (lib/account-validation.js); what
+  // only the server knows (the repository exists, the token is accepted) comes after.
+  const addressLive = liveError(
+    () => url,
+    (text) => (!/^https:\/\//i.test(text.trim()) ? t('gitRepo.addressNotHttps') : normaliseGitUrl(text) ? '' : t('gitRepo.addressInvalid')),
+  );
+  const addressShown = $derived(addressError || addressLive.error);
+  const usernameLive = liveError(() => username, (text) => (validGitUsername(text.trim()) ? '' : t('gitRepo.usernameInvalid')));
+  const usernameError = $derived(usernameLive.error);
+  const tokenLive = liveError(() => token, (text) => (validGitToken(text.trim()) ? '' : t('gitRepo.tokenInvalid')));
+  const tokenError = $derived(accessState === 'denied' ? t('gitRepo.tokenDenied') : tokenLive.error);
   const canConnect = $derived(accessState === 'ok' && !!branch && !busy);
 
   /** The address field lost its focus (or was filled): the anonymous question. */
@@ -108,7 +118,7 @@
     const name = username.trim();
     const secret = token.trim();
     if (addressFailed || addressState === 'idle' || addressState === 'checking') return;
-    if (!name || !USERNAME.test(name) || (!secret && !edit)) return;
+    if (!name || !validGitUsername(name) || (secret ? !validGitToken(secret) : !edit)) return;
     const mine = ++ticket;
     accessState = 'checking';
     try {
@@ -211,7 +221,7 @@
     label={t('gitRepo.address')}
     rowLabel={t('gitRepo.address')}
     bind:value={url}
-    error={addressError}
+    error={addressShown}
     disabled={busy}
     position="single"
     onchange={checkAddress}

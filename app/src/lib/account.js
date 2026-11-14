@@ -27,20 +27,9 @@ export function errorCode(e) {
   return String(err.message ?? '').split(':')[0].trim();
 }
 
-// Ported from core/cloudstorage.cpp (isValidEmail, isValidPassword).
-const EMAIL = /^[a-zA-Z0-9.+_-]+@[a-zA-Z0-9.+_-]+\.[a-zA-Z0-9+_-]{2,}$/;
-const PASSWORD = /^[a-zA-Z0-9@.+_-]+$/;
-
-/** @param {string} email */
-export function validEmail(email) {
-  const at = email.indexOf('@');
-  return email.length <= 254 && at <= 64 && EMAIL.test(email);
-}
-
-/** @param {string} password */
-export function validPassword(password) {
-  return PASSWORD.test(password);
-}
+// The e-mail and password rules (ported from core/cloudstorage.cpp) are in
+// lib/account-validation.js: the forms check them as the diver types.
+export { validCloudEmail as validEmail, validCloudPassword as validPassword } from './account-validation.js';
 
 /** @param {string} text */
 export function toast(text) {
