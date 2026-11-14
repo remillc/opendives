@@ -148,13 +148,7 @@ NS_ASSUME_NONNULL_BEGIN
 			      lat:(NSInteger)lat
 			      lon:(NSInteger)lon
 			    error:(NSError **)error NS_SWIFT_NAME(siteAction(_:uuid:other:uuids:field:value:lat:lon:));
-+ (nullable NSString *)toolQuery:(NSString *)kind
-			      o2:(NSInteger)o2
-			      he:(NSInteger)he
-			     po2:(NSInteger)po2
-			   depth:(NSInteger)depth
-			    args:(nullable NSArray<NSNumber *> *)args
-			   error:(NSError **)error NS_SWIFT_NAME(toolQuery(kind:o2:he:po2:depth:args:));
++ (nullable NSString *)toolQuery:(NSString *)kind error:(NSError **)error NS_SWIFT_NAME(toolQuery(kind:));
 + (NSString *)diveComputers;
 + (nullable NSString *)diveComputerAction:(NSString *)action
 				    model:(NSString *)model

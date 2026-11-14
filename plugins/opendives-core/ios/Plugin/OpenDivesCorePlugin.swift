@@ -460,13 +460,8 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
 
     @objc func toolQuery(_ call: CAPPluginCall) {
         let kind = call.getString("kind") ?? ""
-        let o2 = call.getInt("o2") ?? 0
-        let he = call.getInt("he") ?? 0
-        let po2 = call.getInt("po2") ?? 0
-        let depth = call.getInt("depth") ?? 0
-        let args = intList(call, "args").map(numbers)
         onCoreThread(call) {
-            let json = try OpenDivesNative.toolQuery(kind: kind, o2: o2, he: he, po2: po2, depth: depth, args: args)
+            let json = try OpenDivesNative.toolQuery(kind: kind)
             call.resolve(["json": json])
         }
     }

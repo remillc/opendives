@@ -738,17 +738,10 @@ class OpenDivesCorePlugin : Plugin() {
      */
     private fun PluginCall.uuid(name: String): Long = (data.opt(name) as? Number)?.toLong() ?: 0L
 
-    /** Read-only tools (see opendives.h): gas (calculator), cylinders (types), desaturation. */
+    /** Read-only tools (see opendives.h): cylinders (types), weights (types), desaturation. */
     @PluginMethod
     fun toolQuery(call: PluginCall) = onCoreThread(call) {
-        val json = NativeCore.toolQuery(
-            call.getString("kind").orEmpty(),
-            call.getInt("o2") ?: 0,
-            call.getInt("he") ?: 0,
-            call.getInt("po2") ?: 0,
-            call.getInt("depth") ?: 0,
-            call.getArray("args")?.toList<Int>()?.toIntArray(),
-        )
+        val json = NativeCore.toolQuery(call.getString("kind").orEmpty())
         call.resolve(JSObject().put("json", json))
     }
 

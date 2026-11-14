@@ -44,7 +44,7 @@ internal object NativeCore {
     external fun setRegionsFile(path: String)
     external fun setXsltDir(dir: String)
     external fun exportDives(ids: IntArray, format: String, anonymize: Boolean, path: String)
-    external fun toolQuery(kind: String, o2: Int, he: Int, po2: Int, depth: Int, args: IntArray?): String
+    external fun toolQuery(kind: String): String
     external fun tripAction(action: String, tripId: Int, diveId: Int, otherId: Int, diveIds: IntArray?, value: String): String
     external fun diveComputers(): String
     external fun diveComputerAction(action: String, model: String, serial: String, value: String, intoModel: String, intoSerial: String): String

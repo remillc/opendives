@@ -446,35 +446,6 @@ import { registerPlugin } from '@capacitor/core';
  */
 
 /**
- * Gas calculator result (gas_calculator in opendives.h): sea water, 1013 mbar.
- * @typedef {Object} GasResult
- * @property {number} o2 per mille
- * @property {number} he per mille
- * @property {number} po2Mbar
- * @property {number} modMm core's gas_mod, rounded to 1 m
- * @property {number} eadMm equivalent air depth at the MOD
- * @property {number} endMm equivalent narcotic depth at the MOD
- * @property {number} eadPlannedMm EAD at the planned depth
- * @property {number} endPlannedMm END at the planned depth
- * @property {boolean} o2Narcotic oxygen counted as narcotic in endMm (core preference)
- * @property {number} plannedDepthMm
- * @property {number} bestO2 per mille, best mix for the planned depth at po2Mbar
- * @property {number} bestHe per mille, for the core's best-mix END
- * @property {number} bestMixEndMm
- * @property {number} nitroxEndMm END of the best nitrox alone (no helium) at the planned depth
- */
-
-/**
- * Gas blender result (gas_blend in opendives.h).
- * @typedef {Object} GasBlend
- * @property {boolean} feasible
- * @property {''|'RESIDUAL_TOO_HIGH'|'TOPUP_TOO_RICH'} error
- * @property {number} startMbar
- * @property {number} [bleedToMbar] RESIDUAL_TOO_HIGH: bleed the cylinder down to this; the steps start from it
- * @property {{gas: 'he'|'o2'|'topup', toMbar: number, addedMbar: number, volumeMl: number}[]} steps
- */
-
-/**
  * @typedef {Object} GasCylinderTypes
  * @property {string} default the default cylinder preference; empty when none
  * @property {{name: string, ml: number, workingPressureMbar: number}[]} types
@@ -631,11 +602,8 @@ import { registerPlugin } from '@capacitor/core';
  *   within a metres of lat/lon (or null), possible duplicates (a: same name within a m,
  *   b: other names within b m), dives without a site, and place: {country, region, city,
  *   offline} at lat/lon in the language text (Nominatim, else offline Natural Earth), or null.
- * @property {(options: {kind: 'gas'|'blend'|'cylinders'|'weights'|'desaturation', o2?: number, he?: number, po2?: number, depth?: number, args?: number[]}) => Promise<any>} toolQuery
- *   Read-only tools (opendives.h): gas, a GasResult (o2, he per mille, po2 in mbar,
- *   planned depth in mm; args [best-mix END in mm or -1, water salinity in kg per 10000 l,
- *   10300 sea water]; rejects with BAD_REQUEST); blend, a GasBlend (o2, he: wanted mix per mille;
- *   args [final mbar, cylinder ml, start mbar, start o2, start he, top-up o2, optional 1 for oxygen first]); cylinders, the GasCylinderTypes;
+ * @property {(options: {kind: 'cylinders'|'weights'|'desaturation'}) => Promise<any>} toolQuery
+ *   Read-only tools (opendives.h): cylinders, the GasCylinderTypes;
  *   weights, {types: [{name, grams}]}: Subsurface's weight types (untranslated built-in names),
  *   each with the weight last used for it (0 when none); desaturation, the Desaturation now.
  * @property {(options: {kind: 'options'} | {kind: 'search', fulltext: string} | {kind: 'dives', fulltext?: string, mode?: string, rules: FilterRule[]}) => Promise<any>} filterQuery

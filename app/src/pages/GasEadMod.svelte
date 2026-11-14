@@ -7,10 +7,9 @@
   // @ts-check
   // EAD and MOD (docs/ui-specification.md, section 1, "Tools page and gas
   // tools"; docs/mockups/outils-ead-mod-android.dc.html). Every result comes
-  // from the core (toolQuery 'gas'): MOD for the pO2, EAD and END at the
+  // by lib/gas-calculator.js (the core's formulas in JavaScript): MOD for the pO2, EAD and END at the
   // planned depth. The water type changes every depth to pressure conversion.
   import { Page, Navbar, Link } from 'framework7-svelte';
-  import { OpenDivesCore } from 'opendives-core';
   import TextField from '../components/TextField.svelte';
   import SelectField from '../components/SelectField.svelte';
   import Po2Field from '../components/Po2Field.svelte';
@@ -19,6 +18,7 @@
   import { settings } from '../lib/settings.svelte.js';
   import { depthUnit, formatMixName, formatNumber, formatPartialPressure } from '../lib/format.js';
   import { WATER_TYPES, waterTypeName, salinityOfWaterType, parseDecimal } from '../lib/tools.js';
+  import { gasCalculator } from '../lib/gas-calculator.js';
   import { t } from '../lib/i18n.js';
 
   const feet = $derived(logbook.prefs.length === 'ft');
@@ -29,7 +29,7 @@
   // The water type of Settings, until changed here or in Settings.
   if (saved.waterDefault !== settings.defaultWater) saved.water = saved.waterDefault = settings.defaultWater;
   let water = $state(saved.water);
-  let result = $state(/** @type {import('opendives-core').GasResult|null} */ (null));
+  let result = $state(/** @type {import('../lib/gas-calculator.js').GasResult|null} */ (null));
 
   /** @param {string} text */
   const percent = (text) => (/^\s*\d{1,3}\s*$/.test(text) ? Number(text) : NaN);
@@ -46,17 +46,15 @@
       result = null;
       return;
     }
-    OpenDivesCore.toolQuery({ kind: 'gas', o2: o2Value * 10, he: heValue * 10, po2, depth: depthMm, args: [-1, salinityOfWaterType(water)] })
-      .then((/** @type {import('opendives-core').GasResult} */ r) => {
-        result = r;
-      })
-      .catch((e) => {
-        console.error('EAD and MOD', e);
-        result = null;
-      });
+    try {
+      result = gasCalculator(o2Value * 10, heValue * 10, po2, depthMm, logbook.prefs, -1, salinityOfWaterType(water));
+    } catch (e) {
+      console.error('EAD and MOD', e);
+      result = null;
+    }
   });
 
-  /** Whole metres or feet: the core rounds the MOD to the metre. @param {number} mm */
+  /** Whole metres or feet: the MOD is rounded to the metre. @param {number} mm */
   function wholeDepth(mm) {
     return `${formatNumber(feet ? mm / 304.8 : mm / 1000, 0)}\u00A0${depthUnit(logbook.prefs)}`;
   }
