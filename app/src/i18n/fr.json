@@ -362,11 +362,8 @@
       "chill": "Froid"
     },
     "starsLabel": "{name} : {n} sur 5",
-    "summaryItem": "{name} {n} sur 5",
-    "summaryMore": {
-      "one": "{list} et {n} autre",
-      "other": "{list} et {n} autres"
-    },
+    "conditionsAverage": "Moyenne des conditions : {n} sur 5",
+    "conditionsClosed": "Conditions, moyenne {n} sur 5. Afficher le détail",
     "people": "Personnes",
     "guideRow": {
       "one": "Guide de palanquée",
@@ -1694,6 +1691,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Fiche d’une plongée : la carte Conditions est fermée et montre la moyenne de ses étoiles.",
       "En-tête bleu : le titre de la page est sur la rangée du menu ☰ ; le résumé et la recherche remontent.",
       "Formulaires vérifiés pendant la saisie : noter une plongée à la main, coordonnées d’un site, taille d’un type de bouteille.",
       "Compte et dépôt git : les champs sont vérifiés pendant la saisie (adresse courriel, mot de passe, adresse du dépôt, nom d’utilisateur, jeton).",

@@ -2452,7 +2452,7 @@ Christian's decision of 14 November 2026, follows task 117. Mock-up: `docs/mocku
 
 Done with task 117 (feature/band-title-row): the band header is shared, and the ☰ / title / ⋮ row sits at the same place on Carnet, Sites, Statistiques and Outils (measured on the phone emulator: same top and same 116 px row with the status bar inset); the Carnet's extra space was the line of the 28 sp title, now removed.
 
-## [ ] 2026-11-14-119 Détail: Conditions closed by default, with the average of its stars
+## [x] 2026-11-14-119 Détail: Conditions closed by default, with the average of its stars
 
 Christian's decision of 14 November 2026. Mock-ups: the canvas board « Détail, équipement déplié · Android » (`detail3-android`, Conditions closed) and `docs/mockups/detail3-android-conditions.dc.html` (the section open).
 
@@ -2461,3 +2461,5 @@ Christian's decision of 14 November 2026. Mock-ups: the canvas board « Détail,
 - A tap on the header opens the card: the rows « Visibilité », « Vagues de surface », « Courant », « Froid »… with their own black stars, as today, and the chevron up. The open card does not repeat the average.
 - Open or closed is remembered for the session like the Équipement card.
 Same on the tablet detail. Check with a dive that has all four ratings, one with a single rating, and one with none.
+
+Done in feature/conditions-average: the closed Conditions card shows, before its chevron, five read-only grey stars (--od-star-summary, now #8A8D91 in light) giving the average of the ratings that have a value, filled by fractions (Stars, conditionsMean); the row's name « Conditions, moyenne 2,3 sur 5. Afficher le détail », the stars role img « Moyenne des conditions : 2,3 sur 5 »; the open card keeps its rows and does not repeat the average; no rating, no card (existing rule). The text summary it replaces is gone. Phone and tablet share DiveDetail.svelte. Checked on the phone emulator: a dive with one rating (3 stars) and one with none; the test logbook has no dive with four ratings, the fractional fill is covered by tests/app/conditions.test.mjs. Open or closed lasts while the page is open (same as Équipement).

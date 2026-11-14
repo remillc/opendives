@@ -362,11 +362,8 @@
       "chill": "Chill"
     },
     "starsLabel": "{name}: {n} of 5",
-    "summaryItem": "{name} {n} of 5",
-    "summaryMore": {
-      "one": "{list}, and {n} more",
-      "other": "{list}, and {n} more"
-    },
+    "conditionsAverage": "Average of the conditions: {n} of 5",
+    "conditionsClosed": "Conditions, average {n} of 5. Show the detail",
     "people": "People",
     "guideRow": {
       "one": "Dive guide",
@@ -1694,6 +1691,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Dive page: the Conditions card is closed and shows the average of its stars.",
       "Blue header: the page title sits on the ☰ menu row; the summary and the search move up.",
       "Forms checked as you type: log a dive manually, a site’s coordinates, a cylinder type’s size.",
       "Account and git repository: fields are checked as you type (email address, password, repository address, user name, token).",
