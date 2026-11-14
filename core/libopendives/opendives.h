@@ -435,9 +435,7 @@ int weight_types(std::string &json);
 // the current time), loaded by the core's init_decompression() with the
 // logbook dives before now, as the planner does for a new dive, with the
 // planner's model and gradient factors. Writes {"now", "surfaceSeconds" (since
-// the end of the last dive, -1 when no dive counts), "overlapAt" (the start of the
-// first dive that overlaps the one before it, where the core stops loading the
-// tissues, or null), "model", "gfLow", "gfHigh",
+// the last dive, -1 when no dive counts), "model", "gfLow", "gfHigh",
 // "vpmbConservatism", "dives": [{"id", "number", "date", "endDate", "site",
 // "maxDepthMm", "durationSeconds"}], "tissues": 16 × {"percent" (Subsurface's
 // tissue graph: 50 = ambient pressure, 100 = M-value), "surfaceGf", "n2Bar",

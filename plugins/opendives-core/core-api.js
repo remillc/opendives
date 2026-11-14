@@ -486,8 +486,6 @@ import { registerPlugin } from '@capacitor/core';
  * @typedef {Object} Desaturation
  * @property {string} now local time used
  * @property {number} surfaceSeconds since the end of the last dive; -1 when no dive counts
- * @property {string|null} overlapAt start of the first dive overlapping the one before it (the
- *   core stops loading the tissues there), or null
  * @property {'buehlmann'|'vpmb'|'recreational'} model planner model
  * @property {number} gfLow
  * @property {number} gfHigh
