@@ -559,7 +559,7 @@ Java_org_opendives_core_NativeCore_diveComputerAction(JNIEnv *env, jobject, jstr
 }
 
 // Read-only site queries: list, site, nearby, duplicates, without (dives without
-// a site), place (country, region and city at a position, in the language `text`).
+// a site).
 JNIEXPORT jstring JNICALL
 Java_org_opendives_core_NativeCore_siteQuery(JNIEnv *env, jobject, jstring kindIn, jlong uuid, jint lat, jint lon,
 					     jint a, jint b, jstring textIn)
@@ -575,8 +575,6 @@ Java_org_opendives_core_NativeCore_siteQuery(JNIEnv *env, jobject, jstring kindI
 		opendives::sites_duplicates(a, b, json);
 	else if (kind == "without")
 		opendives::dives_without_site(json);
-	else if (kind == "place")
-		opendives::place_at(lat, lon, to_string(env, textIn), json);
 	else
 		json = "null";
 	return env->NewStringUTF(json.c_str());
@@ -741,7 +739,8 @@ Java_org_opendives_core_NativeCore_resolveConflicts(JNIEnv *env, jobject, jstrin
 // One undoable site change: create, edit, geocode, merge, delete.
 JNIEXPORT jstring JNICALL
 Java_org_opendives_core_NativeCore_siteAction(JNIEnv *env, jobject, jstring actionIn, jlong uuid, jlong other,
-					      jlongArray uuidsIn, jstring fieldIn, jstring valueIn, jint lat, jint lon)
+					      jlongArray uuidsIn, jstring fieldIn, jstring valueIn, jint lat, jint lon, jstring countryIn,
+					      jstring regionIn, jstring countyIn, jstring cityIn)
 {
 	std::string action = to_string(env, actionIn), field = to_string(env, fieldIn), value = to_string(env, valueIn);
 	std::vector<uint32_t> uuids;
@@ -760,7 +759,8 @@ Java_org_opendives_core_NativeCore_siteAction(JNIEnv *env, jobject, jstring acti
 	else if (action == "edit")
 		ret = opendives::site_edit(static_cast<uint32_t>(uuid), field, value, lat, lon, json, error);
 	else if (action == "geocode")
-		ret = opendives::site_geocode(static_cast<uint32_t>(uuid), value, json, error);
+		ret = opendives::site_geocode(static_cast<uint32_t>(uuid), to_string(env, countryIn), to_string(env, regionIn),
+					      to_string(env, countyIn), to_string(env, cityIn), json, error);
 	else if (action == "merge")
 		ret = opendives::sites_merge(static_cast<uint32_t>(uuid), static_cast<uint32_t>(other), json, error);
 	else if (action == "delete")
@@ -822,12 +822,6 @@ Java_org_opendives_core_NativeCore_toolQuery(JNIEnv *env, jobject, jstring kindI
 		json = "null";
 	}
 	return env->NewStringUTF(json.c_str());
-}
-
-JNIEXPORT void JNICALL
-Java_org_opendives_core_NativeCore_setRegionsFile(JNIEnv *env, jobject, jstring path)
-{
-	opendives::set_regions_file(to_string(env, path));
 }
 
 JNIEXPORT void JNICALL

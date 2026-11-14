@@ -113,7 +113,7 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
     private let coreQueue = DispatchQueue(label: "org.opendives.core")
     /// Network only (probeCloud, gitCheck): runs while the core queue loads the log.
     private let networkQueue = DispatchQueue(label: "org.opendives.core.network")
-    /// Released once the core, the certificates and the regions are set up.
+    /// Released once the core and the certificates are set up.
     private let setupDone = DispatchGroup()
 
     private let resources = Bundle(for: OpenDivesCorePlugin.self)
@@ -175,9 +175,6 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
             } else {
                 CAPLog.print("OpenDives: cacert.pem is missing from the plugin's resources")
             }
-            if let regions = resources.path(forResource: "regions", ofType: "txt") {
-                OpenDivesNative.setRegionsFile(regions)
-            }
             if let root = resources.resourcePath {
                 OpenDivesNative.setXsltDir(root + "/xslt")
             }
@@ -196,7 +193,7 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
     }
 
     /// `afterSetup` false: the call neither reaches the network nor needs the
-    /// regions (the core's own set-up is always done first on this queue).
+    /// stylesheets (the core's own set-up is always done first on this queue).
     private func onCoreThread(_ call: CAPPluginCall, afterSetup: Bool = true, _ block: @escaping () throws -> Void) {
         coreQueue.async { [self] in
             if afterSetup { setupDone.wait() }
@@ -640,9 +637,14 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
         let value = call.getString("value") ?? ""
         let lat = call.getInt("lat") ?? 0
         let lon = call.getInt("lon") ?? 0
+        let country = call.getString("country") ?? ""
+        let region = call.getString("region") ?? ""
+        let county = call.getString("county") ?? ""
+        let city = call.getString("city") ?? ""
         onCoreThread(call) {
             let json = try OpenDivesNative.siteAction(
-                action, uuid: uuid, other: other, uuids: uuids, field: field, value: value, lat: lat, lon: lon
+                action, uuid: uuid, other: other, uuids: uuids, field: field, value: value, lat: lat, lon: lon,
+                country: country, region: region, county: county, city: city
             )
             call.resolve(["json": json])
         }

@@ -24,7 +24,6 @@ list(APPEND SOURCES
   "${COMPAT}/bluetooth_compat.cpp"
   "${ROOT}/core/libopendives/opendives.cpp"
   "${ROOT}/core/libopendives/edit.cpp"
-  "${ROOT}/core/libopendives/regions.cpp"
   "${ROOT}/core/libopendives/tools.cpp"
   "${ROOT}/core/libopendives/settings.cpp"
   "${ROOT}/core/libopendives/plan.cpp"

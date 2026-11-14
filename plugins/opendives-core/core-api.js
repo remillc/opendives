@@ -626,7 +626,7 @@ import { registerPlugin } from '@capacitor/core';
  *   the entries that have an index is the new order of those cylinders, and the dive's gas changes and
  *   tank-sensor mappings follow them (Subsurface's cylinder_renumber()). New cylinders stay at the end.
  * @property {(options?: {redo?: boolean}) => Promise<EditResult>} undo
- * @property {(options: {kind: 'list'|'site'|'nearby'|'duplicates'|'without'|'place', uuid?: number, lat?: number, lon?: number, a?: number, b?: number, text?: string}) => Promise<any>} siteQuery
+ * @property {(options: {kind: 'list'|'site'|'nearby'|'duplicates'|'without', uuid?: number, lat?: number, lon?: number, a?: number, b?: number, text?: string}) => Promise<any>} siteQuery
  *   Read-only site queries (opendives.h): list of SiteSummary, a SiteDetail, the site
  *   within a metres of lat/lon (or null), possible duplicates (a: same name within a m,
  *   b: other names within b m), dives without a site, and place: {country, region, city,
@@ -665,8 +665,11 @@ import { registerPlugin } from '@capacitor/core';
  *   values of one field in the log, [{key, dives, location?}]. Rejects with BAD_REQUEST.
  * @property {(options: {url: string}) => Promise<{status: number, body: string}>} placesSearch
  *   A Nominatim request sent with the app's User-Agent; only nominatim.openstreetmap.org addresses.
- * @property {(options: {action: 'create'|'edit'|'geocode'|'merge'|'delete'|'deleteSite', uuid?: number, other?: number, uuids?: number[], field?: string, value?: string, lat?: number, lon?: number}) => Promise<EditResult>} siteAction
- *   One undoable site change, as Subsurface's site commands.
+ * @property {(options: {action: 'create'|'edit'|'geocode'|'merge'|'delete'|'deleteSite', uuid?: number, other?: number, uuids?: number[], field?: string, value?: string, lat?: number, lon?: number, country?: string, region?: string, county?: string, city?: string}) => Promise<EditResult>} siteAction
+ *   One undoable site change, as Subsurface's site commands. "geocode" writes the place the
+ *   JavaScript found (place-lookup.js: Nominatim, else the offline file) in the site's taxonomy
+ *   (country, region, county, city; an empty one is left out), keeping a value the diver
+ *   corrected; it rejects with NO_RESULT when all four are empty.
  * @property {(options: {tripId: number}) => Promise<TripDetail>} getTrip
  *   "remove" takes diveId, or diveIds for several dives in one step.
  * @property {(options: {action: 'location'|'notes'|'remove'|'split'|'merge'|'add'|'ungroup'|'create'|'autogroup', tripId?: number, diveId?: number, otherId?: number, diveIds?: number[], value?: string}) => Promise<EditResult>} tripAction

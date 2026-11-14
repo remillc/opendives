@@ -147,11 +147,6 @@ static void send_sync_progress(const char *message)
 	return opendives::set_ca_file(str(path)) == 0;
 }
 
-+ (void)setRegionsFile:(NSString *)path
-{
-	opendives::set_regions_file(str(path));
-}
-
 + (void)setXsltDir:(NSString *)dir
 {
 	opendives::set_xslt_dir(str(dir));
@@ -503,8 +498,6 @@ static void send_sync_progress(const char *message)
 		opendives::sites_duplicates((int)a, (int)b, json);
 	else if (kind == "without")
 		opendives::dives_without_site(json);
-	else if (kind == "place")
-		opendives::place_at((int)lat, (int)lon, str(text), json);
 	else
 		json = "null";
 	return ns(json);
@@ -619,6 +612,10 @@ static void send_sync_progress(const char *message)
 		   value:(NSString *)valueIn
 		     lat:(NSInteger)lat
 		     lon:(NSInteger)lon
+		 country:(NSString *)country
+		  region:(NSString *)region
+		  county:(NSString *)county
+		    city:(NSString *)city
 		   error:(NSError **)error
 {
 	std::string action = str(actionIn), field = str(fieldIn), value = str(valueIn);
@@ -632,7 +629,7 @@ static void send_sync_progress(const char *message)
 	else if (action == "edit")
 		ret = opendives::site_edit(static_cast<uint32_t>(uuid), field, value, (int)lat, (int)lon, json, message);
 	else if (action == "geocode")
-		ret = opendives::site_geocode(static_cast<uint32_t>(uuid), value, json, message);
+		ret = opendives::site_geocode(static_cast<uint32_t>(uuid), str(country), str(region), str(county), str(city), json, message);
 	else if (action == "merge")
 		ret = opendives::sites_merge(static_cast<uint32_t>(uuid), static_cast<uint32_t>(other), json, message);
 	else if (action == "delete")

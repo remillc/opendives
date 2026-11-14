@@ -1741,140 +1741,32 @@ int site_edit(uint32_t uuid, const std::string &field, const std::string &value,
 	return -1;
 }
 
-// The first string value of "key" in a JSON text, from `from` on; JSON escapes
-// of quotes and backslashes are undone, \uXXXX are kept as they are.
-static std::string json_value(const std::string &text, const std::string &key, size_t from = 0)
-{
-	std::string pattern = "\"" + key + "\":\"";
-	size_t start = text.find(pattern, from);
-	if (start == std::string::npos)
-		return std::string();
-	start += pattern.size();
-	std::string out;
-	for (size_t i = start; i < text.size() && text[i] != '"'; i++) {
-		if (text[i] == '\\' && i + 1 < text.size())
-			i++;
-		out += text[i];
-	}
-	return out;
-}
-
-// Nominatim's usage policy (operations.osmfoundation.org/policies/nominatim):
-// an identifying User-Agent, at most one request per second, results cached.
-static const char *nominatim_user_agent = "OpenDives (dive log app; https://github.com/remillc/opendives)";
-static std::chrono::steady_clock::time_point last_nominatim_request;
-static std::map<std::string, taxonomy_data> nominatim_cache;
-
-// The first of these keys of Nominatim's "address" object that has a value.
-static std::string address_value(const std::string &body, size_t address, std::initializer_list<const char *> keys)
-{
-	for (const char *key: keys) {
-		std::string value = json_value(body, key, address);
-		if (!value.empty())
-			return value;
-	}
-	return std::string();
-}
-
-// Nominatim's reverse lookup. Returns 0 with the taxonomy filled in, 1 when
-// the server answered without a place (open sea), -1 when it did not answer.
-static int nominatim_lookup(location_t loc, const std::string &lang, taxonomy_data &taxonomy)
-{
-	char query[160];
-	snprintf(query, sizeof(query), "lat=%.6f&lon=%.6f", loc.lat.udeg / 1000000.0, loc.lon.udeg / 1000000.0);
-	std::string key = std::string(query) + "&" + lang;
-	auto cached = nominatim_cache.find(key);
-	if (cached != nominatim_cache.end()) {
-		taxonomy = cached->second;
-		return 0;
-	}
-	auto wait = last_nominatim_request + std::chrono::seconds(1) - std::chrono::steady_clock::now();
-	if (wait > std::chrono::steady_clock::duration::zero())
-		std::this_thread::sleep_for(wait);
-	last_nominatim_request = std::chrono::steady_clock::now();
-	std::string url = "https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=14&addressdetails=1&" +
-			  std::string(query) + "&accept-language=" + lang;
-	int status = 0;
-	std::string body;
-	if (opendives_https_get(url, nominatim_user_agent, 5, status, body) || status != 200)
-		return -1;
-	size_t address = body.find("\"address\":{");
-	if (address == std::string::npos)
-		return 1;
-	std::string country = json_value(body, "country", address);
-	std::string region = address_value(body, address, { "state", "province", "region", "state_district" });
-	std::string county = json_value(body, "county", address);
-	std::string town = address_value(body, address, { "city", "town", "village", "hamlet", "municipality" });
-	if (!country.empty())
-		taxonomy_set_country(taxonomy, country, GEOCODED);
-	if (!region.empty())
-		taxonomy_set_category(taxonomy, TC_ADMIN_L1, region, GEOCODED);
-	if (!county.empty())
-		taxonomy_set_category(taxonomy, TC_ADMIN_L2, county, GEOCODED);
-	if (!town.empty())
-		taxonomy_set_category(taxonomy, TC_LOCALNAME, town, GEOCODED);
-	nominatim_cache[key] = taxonomy;
-	return 0;
-}
-
-// In place of reverseGeoLookup() (core/divesitehelpers.cpp, Qt, GeoNames):
-// the same taxonomy categories, from Nominatim, else from the offline Natural
-// Earth file (country and region only).
-static int reverse_geo_lookup(location_t loc, const std::string &lang, taxonomy_data &taxonomy, std::string &error,
-			      bool *offline = nullptr)
-{
-	if (offline)
-		*offline = false;
-	if (nominatim_lookup(loc, lang, taxonomy) == 0 && !taxonomy.empty())
-		return 0;
-	taxonomy.clear();
-	if (offline)
-		*offline = true;
-	std::string country, region;
-	if (!offline_region(loc.lat.udeg, loc.lon.udeg, lang, country, region)) {
-		error = "NO_RESULT";
-		return -1;
-	}
-	taxonomy_set_country(taxonomy, country, GEOCODED);
-	if (!region.empty())
-		taxonomy_set_category(taxonomy, TC_ADMIN_L1, region, GEOCODED);
-	return 0;
-}
-
-int place_at(int lat_udeg, int lon_udeg, const std::string &lang, std::string &json)
-{
-	location_t loc;
-	loc.lat.udeg = lat_udeg;
-	loc.lon.udeg = lon_udeg;
-	taxonomy_data found;
-	std::string error;
-	bool offline = false;
-	if (reverse_geo_lookup(loc, lang, found, error, &offline)) {
-		json = "null";
-		return 0;
-	}
-	json = "{\"country\":";
-	append_json_string(json, taxonomy_get_country(found));
-	json += ",\"region\":";
-	append_json_string(json, taxonomy_get_value(found, TC_ADMIN_L1));
-	json += ",\"city\":";
-	append_json_string(json, taxonomy_get_value(found, TC_LOCALNAME));
-	json += ",\"offline\":";
-	json += offline ? "true}" : "false}";
-	return 0;
-}
-
-int site_geocode(uint32_t uuid, const std::string &lang, std::string &json, std::string &error)
+// The place found by the JavaScript (country, region, county, city: from
+// Nominatim, else the offline Natural Earth file; app/src/lib/place-lookup.js),
+// written in the site's taxonomy as Subsurface's reverseGeoLookup does. An
+// empty value is left out. A corrected value is never replaced (spec,
+// section 4, "Sites"). Error NO_RESULT when all four are empty.
+int site_geocode(uint32_t uuid, const std::string &country, const std::string &region, const std::string &county,
+		 const std::string &city, std::string &json, std::string &error)
 {
 	dive_site *ds = divelog.sites.get_by_uuid(uuid);
-	if (!ds || !has_location(&ds->location)) {
+	if (!ds) {
 		error = "NOT_FOUND";
 		return -1;
 	}
 	taxonomy_data found;
-	if (reverse_geo_lookup(ds->location, lang, found, error))
+	if (!country.empty())
+		taxonomy_set_country(found, country, GEOCODED);
+	if (!region.empty())
+		taxonomy_set_category(found, TC_ADMIN_L1, region, GEOCODED);
+	if (!county.empty())
+		taxonomy_set_category(found, TC_ADMIN_L2, county, GEOCODED);
+	if (!city.empty())
+		taxonomy_set_category(found, TC_LOCALNAME, city, GEOCODED);
+	if (found.empty()) {
+		error = "NO_RESULT";
 		return -1;
-	// A corrected value is never replaced (spec, section 4, "Sites").
+	}
 	taxonomy_data t = ds->taxonomy;
 	for (const taxonomy &entry: found) {
 		const taxonomy *old = find_taxonomy(t, entry.category);
