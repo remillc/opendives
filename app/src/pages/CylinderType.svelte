@@ -15,6 +15,7 @@
   import LeaveGuard from '../components/LeaveGuard.svelte';
   import { isDirty } from '../lib/leave-guard.js';
   import { t } from '../lib/i18n.js';
+  import { liveError } from '../lib/live-validation.svelte.js';
   import { logbook, renameCylinderType } from '../lib/logbook.svelte.js';
   import { keepCylinderLibrary } from '../lib/settings.svelte.js';
   import { confirmAction } from '../lib/dialogs.js';
@@ -66,6 +67,16 @@
       console.error('Reading the cylinder type', e);
     }
     opened = values();
+  });
+
+  // The size is checked as the diver types (forms are validated live): each field says what
+  // is wrong with its own value; the name's errors (missing, already used) come at « Enregistrer ».
+  const volumeLive = liveError(() => volume, (text) => (parse(text) > 0 ? '' : t('settings.cylinders.volumeInvalid')));
+  const pressureLive = liveError(() => pressure, (text) => (parse(text) >= 0 ? '' : t('settings.cylinders.pressureInvalid')));
+  // An error about the name leaves when the name changes.
+  $effect(() => {
+    name;
+    error = '';
   });
 
   /** The size typed, in ml and mbar; null with `error` set when invalid. */
@@ -168,10 +179,10 @@
   <div class="od-form-surface">
     <TextField label={t('settings.cylinders.name')} bind:value={name} supporting={error || t('settings.cylinders.nameHelp')} invalid={!!error} />
     <div class="od-cylinder-type--pair">
-      <TextField label={t('settings.cylinders.volume')} bind:value={volume} inputmode="decimal">
+      <TextField label={t('settings.cylinders.volume')} bind:value={volume} inputmode="decimal" invalid={!!volumeLive.error} supporting={volumeLive.error}>
         {#snippet trailing()}<span class="od-cylinder-type--unit">{t(cuft ? 'units.cubicFeet' : 'units.liters')}</span>{/snippet}
       </TextField>
-      <TextField label={t('settings.cylinders.pressure')} bind:value={pressure} inputmode="decimal">
+      <TextField label={t('settings.cylinders.pressure')} bind:value={pressure} inputmode="decimal" invalid={!!pressureLive.error} supporting={pressureLive.error}>
         {#snippet trailing()}<span class="od-cylinder-type--unit">{t(psi ? 'units.psi' : 'units.bar')}</span>{/snippet}
       </TextField>
     </div>

@@ -17,6 +17,7 @@
   import { logbook, saveDiveChanges } from '../lib/logbook.svelte.js';
   import { formatCoordinates, geocodeSite, parseCoordinates, siteChange } from '../lib/sites.svelte.js';
   import { language, t } from '../lib/i18n.js';
+  import { liveError } from '../lib/live-validation.svelte.js';
   import { confirmAction } from '../lib/dialogs.js';
   import LeaveGuard from '../components/LeaveGuard.svelte';
   import { isDirty } from '../lib/leave-guard.js';
@@ -107,6 +108,11 @@
     if (!country || country === autoCountry) country = autoCountry = place.country;
     if (!region || region === autoRegion) region = autoRegion = place.region;
   }
+
+  // Coordinates that cannot be read are told as the diver types, after a pause (forms are
+  // validated live); leaving the field then places the site (typedCoordinates).
+  const coordsLive = liveError(() => coordsText, (text) => (parseCoordinates(text) ? '' : 'invalid'));
+  const coordsBad = $derived(coordsError || !!coordsLive.error);
 
   function typedCoordinates() {
     if (!coordsText.trim()) {
@@ -265,8 +271,8 @@
       label={t('sites.coordinates')}
       bind:value={coordsText}
       onchange={typedCoordinates}
-      invalid={coordsError}
-      supporting={coordsError ? t('sites.coordinatesInvalid') : t('sites.coordinatesHint')}
+      invalid={coordsBad}
+      supporting={coordsBad ? t('sites.coordinatesInvalid') : t('sites.coordinatesHint')}
     >
       {#snippet trailing()}
         <button type="button" class="od-icon-button" onclick={useDevicePosition}>
