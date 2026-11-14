@@ -32,7 +32,27 @@ The services are the strongest source: a fork cannot copy a service. The tradema
 
 **Decided on 14 November 2026:** a low-priced app on Google Play, with the code public under GPLv2, and a paid service later.
 
-What follows from it:
+**The trajectory in two phases (stated by Christian on 14 November 2026):**
+
+| | Phase 1 | Phase 2 |
+| --- | --- | --- |
+| What the app is | Compatible with Subsurface: the logbook is the Subsurface logbook, synchronised with the Subsurface cloud or the diver's own git repository | The same, plus an OpenDives server with new functions that Subsurface does not have |
+| Price | A minimal price, paid once | An annual subscription |
+| What triggers the change | — | The arrival of the server and of its functions |
+
+The server is the moment the price model changes. It is also the first time a recurring price can hold: an account on a server can depend on a subscription, where nothing in the app itself can (sections 2 and 9).
+
+**To settle before phase 2:**
+
+1. **What the buyers of phase 1 keep.** They paid once for the Subsurface-compatible app. The fair reading, and the one that fits the commitment below, is that they keep it for good, and that the subscription covers only the server and its functions. Whether they also get a first year or a reduced price is to decide.
+2. **What a new diver pays in phase 2.** Either the app becomes free and only the server is paid, or the one-time price stays for the app and the subscription comes on top. The first is simpler to explain.
+3. **"Incompatible with Subsurface" must mean "unknown to Subsurface", never "breaks Subsurface".** The logbook itself stays readable and writable by Subsurface (golden rule of `AGENTS.md`). What Subsurface does not know (inventory, service history, signatures, certifications: to-do #61) lives on the server, outside the logbook.
+4. **What happens when a subscription stops.** The server functions stop. The app and the logbook stay. The diver can download what the server holds, in an open format (to-do #57: open data).
+5. **`AGENTS.md` changes at that point.** Today it says that the Subsurface cloud is the only synchronised data source and that OpenDives does not replace it. A server of its own revises that rule; it is a decision to write down when phase 2 starts.
+6. **The relationship with Subsurface changes too.** In phase 1 OpenDives depends on their cloud. In phase 2 it also offers its own paid server to the same divers. The message of section 8 speaks only of phase 1; phase 2 deserves to be told to them openly when it comes.
+7. **The server's code.** GPLv2 does not require publishing code that only runs on a server (section 2). Whether to publish it anyway is a choice, to make with the open-source statement of to-do #57 in mind.
+
+What follows from the decision today:
 
 - **Commitment (stated by Christian on 14 November 2026): the source of the app will always be available, and so will a compiled version of the apps.** The source stays public on GitHub and each release is tagged, so the store app and its source always match. Each release also comes with a compiled version: today the Android APK attached to the GitHub release, and for iPhone and iPad whatever form Apple's platform allows when those apps exist.
 - The price is therefore for the store version: installation in one tap, automatic updates, and a way to support the project. Building the app from source stays possible and free.
@@ -191,7 +211,7 @@ How to read this next to the one-time table:
 - The number of subscribers is the uncertain part. Fewer divers accept a yearly price than a one-time price, and divers tend to dislike subscriptions for a logbook they see as theirs. The one app found with a yearly price ($19.99) also sells a lifetime purchase ($39.99), which suggests its buyers ask for it.
 - With form B, the base is the number of people who use the free app, and only a small share of them will subscribe. With the commitment of section 4, this is also true of a one-time price: both are, in the end, voluntary.
 
-**What this changes for the decision.** Three coherent structures come out of it:
+**What this changes for the decision.** Christian's trajectory (section 4) answers part of it: a one-time price while the app is only Subsurface-compatible, then an annual subscription when the OpenDives server arrives, which is form C. The structures below remain as alternatives for phase 1:
 
 1. One low price paid once, a service later (the current decision).
 2. A free app on Google Play with optional annual support (form B), a service later. Widest audience, the most in line with the commitment, the least predictable revenue.
