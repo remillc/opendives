@@ -50,7 +50,7 @@ OpenDives' interface is written in Svelte with Framework7; Subsurface-mobile's i
 
 ## 6. Open points before the first paid release
 
-1. **Write to the Subsurface maintainers** (draft in section 8), once they can try the app (section 7). Their agreement matters on three points: a paid app using their free, donation-funded cloud; the wording "compatible with Subsurface"; publication on the App Store.
+1. **Write to the Subsurface maintainers** (draft in section 8), once they can try the app (section 7). Not in the short term (decided on 14 November 2026): the draft waits, and `AGENTS.md` keeps « Subsurface maintainers: no contact for now ». Their agreement matters on three points: a paid app using their free, donation-funded cloud; the wording "compatible with Subsurface"; publication on the App Store.
 2. **Check the licences of the dependencies.** GPLv2 is generally considered incompatible with Apache 2.0, which many Android libraries use. Not checked yet for OpenDives.
 3. **App Store.** The Free Software Foundation considers Apple's terms incompatible with the GPL. Subsurface-mobile is published there all the same; the maintainers' view is needed before OpenDives does the same.
 4. **Google Play rules.** Its commission and its in-app payment rules change often. To check when the price is set.
@@ -72,6 +72,8 @@ Christian's requirement of 14 November 2026: when the message goes out, the main
 5. Once the message is sent, update `AGENTS.md` (« Subsurface maintainers: no contact for now »).
 
 ## 8. Draft message to the Subsurface maintainers
+
+**Status: on hold.** Christian decided on 14 November 2026 not to write to the maintainers in the short term. The draft is kept for later; nothing is sent, and the steps of section 7 wait with it.
 
 **Where to send it:** Subsurface's contribution guide points new contributors to the User Forum (https://groups.google.com/g/subsurface-divelog) and to the bug tracker; the developer mailing list is closed to new subscribers. The User Forum is public, which suits this message. Dirk Hohndel maintains the project and runs the cloud.
 
