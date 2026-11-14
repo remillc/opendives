@@ -32,6 +32,7 @@
   import { filter } from '../lib/filter.svelte.js';
   import { horizontalSwipe, swipeGoesThrough } from '../lib/swipe.js';
   import Stars from '../components/Stars.svelte';
+  import { conditionsMean, roundHalfUp1 } from '../lib/conditions.js';
   import { logbook, deleteDive, saveDiveChanges, tripChange } from '../lib/logbook.svelte.js';
   import { layout } from '../lib/layout.svelte.js';
   import { shownTrip } from '../lib/trip-shown.js';
@@ -330,16 +331,13 @@
 
   let conditionsOpen = $state(false);
 
-  /** Collapsed summary: "Visibility 4 of 5, chill 3 of 5, and 2 more". */
-  const conditionsSummary = $derived.by(() => {
-    const shown = conditions.slice(0, 2).map((c, i) => {
-      const name = i === 0 ? c.name : c.name.toLocaleLowerCase();
-      return t('detail.summaryItem', { name, n: c.value });
-    });
-    const list = shown.join(', ');
-    const more = conditions.length - shown.length;
-    return more > 0 ? t('detail.summaryMore', { list, n: more }) : list;
-  });
+  /**
+   * The closed card shows the average of the ratings that have a value, as five grey stars
+   * filled by fractions (2.25: two stars and a quarter), not rounded (task 2026-11-14-119).
+   */
+  const conditionsAverage = $derived(conditionsMean(conditions.map((c) => c.value)) ?? 0);
+  /** The average as it is read out: one decimal, « 2,3 ». */
+  const conditionsAverageText = $derived(formatNumber(roundHalfUp1(conditionsAverage), 1));
 
   const gasWords = $derived({
     air: t('edit.gasName.air'),
@@ -701,11 +699,18 @@
       <!-- Collapsed by default, with a summary of the filled-in conditions. -->
       <section class="od-dive-detail--section">
         <div class="od-dive-detail--group">
-          <button type="button" class="od-dive-detail--disclosure" aria-expanded={conditionsOpen} onclick={() => (conditionsOpen = !conditionsOpen)}>
+          <button
+            type="button"
+            class="od-dive-detail--disclosure"
+            aria-expanded={conditionsOpen}
+            aria-label={conditionsOpen ? undefined : t('detail.conditionsClosed', { n: conditionsAverageText })}
+            onclick={() => (conditionsOpen = !conditionsOpen)}
+          >
             <span class="od-dive-detail--text">
               <span class="od-dive-detail--title">{t('detail.conditions')}</span>
-              {#if !conditionsOpen}<span class="od-dive-detail--summary">{conditionsSummary}</span>{/if}
             </span>
+            <!-- The open card does not repeat the average: each row has its own stars. -->
+            {#if !conditionsOpen}<Stars value={conditionsAverage} size={16} summary label={t('detail.conditionsAverage', { n: conditionsAverageText })} />{/if}
             <span class="od-dive-detail--arrow" class:od-dive-detail--open={conditionsOpen}><Icon name="expand" size={22} weight={2} /></span>
           </button>
           {#if conditionsOpen}
@@ -957,11 +962,6 @@
         font-weight: 600;
       }
 
-      .od-dive-detail--summary {
-        font-size: 13px;
-        line-height: 18px;
-        color: var(--od-text-2);
-      }
 
       .od-dive-detail--arrow {
         display: block;
