@@ -45,6 +45,17 @@
     if (!logbook.loading) load();
   });
 
+  // Read again when the app comes back to the screen (to-do #61): the tool was left open,
+  // the phone slept or another app was used; its « Au … », wait and tissues are then stale.
+  $effect(() => {
+    /** Reloads the calculation once the page is visible again. */
+    const comeBack = () => {
+      if (document.visibilityState === 'visible' && !logbook.loading) load();
+    };
+    document.addEventListener('visibilitychange', comeBack);
+    return () => document.removeEventListener('visibilitychange', comeBack);
+  });
+
   const wait = $derived(desat ? flightWait(desat.dives, desat.now, settings.flightWait) : null);
 
   /** Seconds since the end of the last dive, from the dives' own times (lib/desaturation.js). */
