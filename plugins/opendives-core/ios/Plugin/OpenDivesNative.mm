@@ -646,35 +646,11 @@ static void send_sync_progress(const char *message)
 	return edit_or_fail(ret, json, message, error);
 }
 
-// kind: gas, blend, cylinders, weights, desaturation; anything else gives "null".
-+ (NSString *)toolQuery:(NSString *)kindIn
-		     o2:(NSInteger)o2
-		     he:(NSInteger)he
-		    po2:(NSInteger)po2
-		  depth:(NSInteger)depth
-		   args:(NSArray<NSNumber *> *)argsIn
-		  error:(NSError **)error
+// kind: cylinders, weights, desaturation; anything else gives "null".
++ (NSString *)toolQuery:(NSString *)kindIn error:(NSError **)error
 {
-	std::string kind = str(kindIn), json, message;
-	std::vector<int> args = ints(argsIn);
-	if (kind == "gas") {
-		int end = args.size() > 0 ? args[0] : -1;
-		int salinity = args.size() > 1 ? args[1] : 10300;
-		if (opendives::gas_calculator((int)o2, (int)he, (int)po2, (int)depth, json, message, end, salinity)) {
-			fail(error, message);
-			return nil;
-		}
-	} else if (kind == "blend") {
-		if (args.size() < 6) {
-			fail(error, "BAD_REQUEST: blend needs six arguments");
-			return nil;
-		}
-		if (opendives::gas_blend((int)o2, (int)he, args[0], args[1], args[2], args[3], args[4], args[5], json, message,
-					 args.size() > 6 && args[6] != 0)) {
-			fail(error, message);
-			return nil;
-		}
-	} else if (kind == "cylinders") {
+	std::string kind = str(kindIn), json;
+	if (kind == "cylinders") {
 		opendives::gas_cylinder_types(json);
 	} else if (kind == "weights") {
 		opendives::weight_types(json);

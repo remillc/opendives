@@ -12,8 +12,9 @@
 #   reference    the 17 cases of Subsurface's testplan.cpp through the façade (tests/plan_test.cpp)
 #   oracle       the independent ZH-L16C checker over a grid of 360 plans (tests/plan_oracle.cpp)
 #   app          the app chain: conversions, request, displayed values, alarms (tests/app, node:test)
-#   tools        the Tools section through the façade (tests/tools_test.cpp): gas calculator by hand,
-#                gas blender against an exact real-gas reference, desaturation against a ZH-L16C replay
+#   tools        the Tools section: the gas calculator and the gas blender in JavaScript (tests/app/gas-tools.test.mjs:
+#                by hand, against Subsurface's compressibility factor and against an exact real-gas reference), and
+#                the desaturation through the façade (tests/tools_test.cpp) against a ZH-L16C replay
 #   mutations    wrong inputs sent to each of the four: every one must make it fail
 #   android      the first two compiled with the NDK and run on emulator-5554 (x86_64); arm64 compiled only
 #   e2e          the scenarios in the real app on the emulator (tests/e2e)
@@ -28,7 +29,7 @@ OUT=$ROOT/build/release-check
 # Under WSL, node is the Windows one, and a Windows program only sees the variables listed in WSLENV.
 NODE=$(command -v node || command -v node.exe || true)
 [ -n "$NODE" ] || { echo "node not found"; exit 2; }
-export WSLENV="${WSLENV:+$WSLENV:}OD_JS_MUTATE"
+export WSLENV="${WSLENV:+$WSLENV:}OD_JS_MUTATE:OD_TOOLS_MUTATE"
 # A git worktree made by Windows git has a .git file WSL's git cannot follow: use git.exe then.
 GIT=git
 git rev-parse HEAD >/dev/null 2>&1 || GIT=git.exe
@@ -111,14 +112,22 @@ mutations_js() {
   return $bad
 }
 # The tools test takes a log and reads OD_TOOLS_MUTATE (a wrong input sent to the façade only).
+# The gas tools are in JavaScript: tests/app/gas-tools.test.mjs reads the same variable.
 TOOLS_LOG=third_party/subsurface/dives/SampleDivesV2.ssrf
 mutations_tools() {
   local bad=0
-  for m in calc desat blend; do
+  for m in desat; do
     if OD_TOOLS_MUTATE=$m build/poc/tools "$TOOLS_LOG" >"$OUT/logs/mutation-tools-$m.log" 2>&1; then
       echo "NOT DETECTED: tools with $m"; bad=1
     else
       echo "detected: tools with $m ($(grep -c '^FAIL' "$OUT/logs/mutation-tools-$m.log") failures)"
+    fi
+  done
+  for m in calc blend; do
+    if OD_TOOLS_MUTATE=$m "$NODE" --import ./tests/app/register.mjs --test tests/app/gas-tools.test.mjs >"$OUT/logs/mutation-gas-tools-$m.log" 2>&1; then
+      echo "NOT DETECTED: gas tools (JavaScript) with $m"; bad=1
+    else
+      echo "detected: gas tools (JavaScript) with $m ($(grep -E '^ℹ fail ' "$OUT/logs/mutation-gas-tools-$m.log" | tr -d 'ℹ'))"
     fi
   done
   return $bad
@@ -127,13 +136,19 @@ mutations() { local a=0 b=0 c=0; mutations_cpp || a=1; mutations_js || b=1; muta
 
 app_deps() { [ -d app/node_modules/svelte ] || (cd app && npm ci --no-audit --no-fund); }
 app_tests() { app_deps && "$NODE" --import ./tests/app/register.mjs --test tests/app/planner.test.mjs; }
+# The gas tools (JavaScript), then the desaturation and the cylinder types through the façade.
+tools_tests() (
+  set -o pipefail
+  app_deps && "$NODE" --import ./tests/app/register.mjs --test tests/app/gas-tools.test.mjs | tail -n 8 &&
+    build/poc/tools "$TOOLS_LOG" | tail -n 12
+)
 summary_of() { grep -E '^(ℹ )?(pass|fail) ' "$1" 2>/dev/null | tr '\n' ' '; }
 
 step build poc/build.sh
 step reference bash -c 'set -o pipefail; build/poc/plan | tail -n 6'
 step oracle bash -c 'set -o pipefail; build/poc/plan-oracle | tail -n 12'
 step app app_tests
-step tools bash -c 'set -o pipefail; build/poc/tools third_party/subsurface/dives/SampleDivesV2.ssrf | tail -n 12'
+step tools tools_tests
 step mutations mutations
 
 if [ "$SCOPE" = full ]; then

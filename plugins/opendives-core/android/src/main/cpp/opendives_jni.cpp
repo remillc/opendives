@@ -778,41 +778,14 @@ Java_org_opendives_core_NativeCore_siteAction(JNIEnv *env, jobject, jstring acti
 	return edit_result(env, json);
 }
 
-// Read-only tools (tools.cpp): gas (calculator: o2, he in per mille, pO2 in
-// mbar, planned depth in mm), cylinders (cylinder types), desaturation (tissues
-// now, after the logbook dives), blend (gas blender: o2, he the wanted mix; args =
-// final mbar, cylinder ml, start mbar, start o2, start he, top-up o2, then
-// optional 1 for oxygen first; per mille, mbar or ml). For gas, args = [best-mix END in mm or -1, salinity in
-// kg per 10000 l], both optional.
+// Read-only tools (tools.cpp): cylinders (cylinder types), weights (weight
+// types), desaturation (tissues now, after the logbook dives). The gas calculator
+// and the gas blender are in JavaScript (app/src/lib/gas-calculator.js, gas-blend.js).
 JNIEXPORT jstring JNICALL
-Java_org_opendives_core_NativeCore_toolQuery(JNIEnv *env, jobject, jstring kindIn, jint o2, jint he, jint po2,
-					     jint depth, jintArray argsIn)
+Java_org_opendives_core_NativeCore_toolQuery(JNIEnv *env, jobject, jstring kindIn)
 {
-	std::string kind = to_string(env, kindIn), json, error;
-	std::vector<int> args;
-	if (argsIn) {
-		jsize n = env->GetArrayLength(argsIn);
-		args.resize(n);
-		if (n)
-			env->GetIntArrayRegion(argsIn, 0, n, args.data());
-	}
-	if (kind == "gas") {
-		int end = args.size() > 0 ? args[0] : -1;
-		int salinity = args.size() > 1 ? args[1] : 10300;
-		if (opendives::gas_calculator(o2, he, po2, depth, json, error, end, salinity)) {
-			throw_core_error(env, error);
-			return nullptr;
-		}
-	} else if (kind == "blend") {
-		if (args.size() < 6) {
-			throw_core_error(env, "BAD_REQUEST: blend needs six arguments");
-			return nullptr;
-		}
-		if (opendives::gas_blend(o2, he, args[0], args[1], args[2], args[3], args[4], args[5], json, error, args.size() > 6 && args[6] != 0)) {
-			throw_core_error(env, error);
-			return nullptr;
-		}
-	} else if (kind == "cylinders") {
+	std::string kind = to_string(env, kindIn), json;
+	if (kind == "cylinders") {
 		opendives::gas_cylinder_types(json);
 	} else if (kind == "weights") {
 		opendives::weight_types(json);
