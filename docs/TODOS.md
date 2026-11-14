@@ -10,7 +10,7 @@ Rules (agreed between the design agent and the code agent, see `docs/agent-inbox
 - **Tag:** every item starts with `[design]` or `[code]` right after its number, set by the agent that adds it (`#4 [design] …`). `[design]` = mock-ups, visuals, screen texts, specification; `[code]` = everything else. When unsure, the agent asks Christian. The tag says who handles the item and lets Christian list one kind only. A second tag `[hors compat. SS]` may follow it, before the title, when the item would break compatibility with Subsurface (data Subsurface cannot read or keep); such an item needs Christian's explicit go-ahead before any code.
 - No other content in this file: no history, no checked boxes, no notes from agents.
 
-Next number: 55
+Next number: 62
 
 ## List
 
@@ -43,3 +43,4 @@ Next number: 55
 - #58 [design] Carnet (et Sites ?) : quand on fait défiler vers le bas, la boîte de recherche se réduit puis se replie en une icône de recherche placée à droite dans l’en-tête, à gauche du ⋮. Un toucher sur l’icône rouvre la boîte avec le clavier ; en remontant en haut de la liste, la boîte revient. Vérifier le comportement de la barre de recherche Material 3 Expressive au défilement et garder le texte tapé (et son ×, règle de la tâche 113) quand elle est repliée.
 - #59 [design] Question : renommer l’app « SmartLog » ? Vérifié le 13 novembre 2026 : smartlog.app répond (domaine pris), « Smartlog® » (Safesmart, conformité) et « SmartLog® » (i-SENS, diabète, environ 300 000 installations Android) sont des marques en usage, et MacDive a une fonction « Smart Dive Logs ». Christian possède déjà opendives.app. Penche pour garder OpenDives ; à fermer si Christian le confirme.
 - #60 [design] [hors compat. SS] Inventaire de l’équipement : le plongeur ajoute ses pièces (détendeurs, ordinateurs, combinaisons, gilet, lampes, bouteilles à lui…) avec marque, modèle, numéro de série, date d’achat et photo, puis les choisit dans une plongée au lieu de les retaper. Lié à #42 (équipement arbitraire dans une plongée) et à #47 (rappels d’entretien, qui s’appuieraient sur cet inventaire). Même question de stockage : Subsurface ne connaît que les bouteilles, les lests et la combinaison ; décider où ranger l’inventaire (fichier à part dans le dépôt git, appareil seulement) sans casser un carnet lu par Subsurface. Les types de bouteilles des Réglages restent tels quels.
+- #61 [code] actualiser l'interface de /tools/desaturation lorsque l'on rappelle l'app : on visite la page /tools/desaturation, puis on quitte l'app ou ferme le téléphone. Plus tard, on rappelle l'app, les données qui s'y affichent devraient se mettre à jour.

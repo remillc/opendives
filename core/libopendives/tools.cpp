@@ -408,6 +408,21 @@ int desaturation(int64_t now, std::string &json)
 	}
 	std::reverse(used.begin(), used.end());
 
+	// The surface interval, from the dives' own times. init_decompression() returns a
+	// negative interval and stops loading the tissues when two dives overlap (13 November
+	// 2026: a dive received twice by QR code made the last dive read « over 48 h »); the
+	// first overlap is reported so that the screen can say why the tissues are short.
+	timestamp_t last_end = 0;
+	timestamp_t overlap_at = 0;
+	for (size_t i = 0; i < used.size(); i++) {
+		if (i && !overlap_at && used[i]->when < used[i - 1]->endtime())
+			overlap_at = used[i]->when;
+		last_end = std::max(last_end, used[i]->endtime());
+	}
+	if (surface_time < 0 && !overlap_at && !used.empty())
+		overlap_at = used.back()->when; // overlapping as the core counts them
+	int64_t surface_seconds = used.empty() ? -1 : std::max<int64_t>(0, now - last_end);
+
 	double surface_pressure = now_dive.get_surface_pressure().mbar / 1000.0;
 	if (used.empty()) {
 		// Tissues at rest. clear_deco() leaves tissue_inertgas_saturation at
@@ -419,7 +434,12 @@ int desaturation(int64_t now, std::string &json)
 
 	json = "{\"now\":";
 	tools_json_string(json, tools_iso(now));
-	json += ",\"surfaceSeconds\":" + std::to_string(used.empty() ? -1 : surface_time);
+	json += ",\"surfaceSeconds\":" + std::to_string(surface_seconds);
+	json += ",\"overlapAt\":";
+	if (overlap_at)
+		tools_json_string(json, tools_iso(overlap_at));
+	else
+		json += "null";
 	json += ",\"model\":\"";
 	json += deco_mode_name(pref_deco_mode(true));
 	json += "\",\"gfLow\":" + std::to_string(prefs.gflow) + ",\"gfHigh\":" + std::to_string(prefs.gfhigh);
