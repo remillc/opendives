@@ -1,8 +1,8 @@
 // @ts-check
 // Main sections and the side menu of the phone layout (spec, section 3).
 import { f7 } from 'framework7-svelte';
-import { layout } from './layout.svelte.js';
-import { horizontalSwipe, swipeGoesThrough } from './swipe.js';
+import { layout, bottomNav } from './layout.svelte.js';
+import { horizontalSwipe, swipeGoesThrough, settle } from './swipe.js';
 
 /** @typedef {'logbook'|'sites'|'statistics'|'tools'|'account'} Section */
 
@@ -178,7 +178,8 @@ export function restoreFocus() {
  */
 export function enableSectionSwipes() {
   /** The menu entries a swipe goes through, in order: the sections are tabs. */
-  const swipeOrder = [...sections, 'account'];
+  /** On Android phones Account is not a section: it opens from the account sheet. */
+  const swipeOrder = () => (bottomNav() ? [...sections] : [...sections, 'account']);
 
   /** Where the swipe started: a section's first screen, or the Settings page. */
   /** @type {null|{ kind: 'tab', section: string }|{ kind: 'settings' }} */
@@ -211,7 +212,7 @@ export function enableSectionSwipes() {
     if (!layout.phone || document.querySelector('.panel-in, .modal-in, .searchbar-enabled, .od-sites--search.od-sites--open, .od-logbook--selection-bar')) return null;
     const view = f7.views.current;
     const section = view?.el?.id?.replace('view-', '');
-    if (!swipeOrder.includes(section)) return null;
+    if (!swipeOrder().includes(section)) return null;
     if (view.router.history.length === 1) return { kind: 'tab', section };
     if (view.router.currentRoute?.path === '/settings/') return { kind: 'settings' };
     return null;
@@ -227,7 +228,8 @@ export function enableSectionSwipes() {
     if (!start) return null;
     if (start.kind === 'settings') return dx < 0 ? { route: '/about' } : null;
     if (dx < 0 && start.section === 'account') return { route: '/settings/' };
-    const next = swipeOrder[swipeOrder.indexOf(start.section) + (dx < 0 ? 1 : -1)];
+    const order = swipeOrder();
+    const next = order[order.indexOf(start.section) + (dx < 0 ? 1 : -1)];
     return next ? { tab: /** @type {Section} */ (next) } : null;
   }
 
@@ -280,17 +282,63 @@ export function enableSectionSwipes() {
     const { router, view, page } = push;
     push = null;
     const through = dx < 0 && swipeGoesThrough(dx, velocity, width);
+    const from = Math.min(dx, 0);
+    const { easing, ms } = settle(from, through ? -width : 0, from < 0 ? velocity : 0);
     settling = true;
+    view.style.setProperty('--od-push-ease', easing);
+    view.style.setProperty('--od-push-ms', `${ms}ms`);
     view.classList.add('od-push-settle');
     view.style.setProperty('--od-push-dx', through ? `${-width}px` : '0px');
     setTimeout(() => {
       if (!through) router.back({ animate: false });
       view.classList.remove('od-pushing', 'od-push-settle');
       view.style.removeProperty('--od-push-dx');
+      view.style.removeProperty('--od-push-ease');
+      view.style.removeProperty('--od-push-ms');
       page.classList.remove('od-push-from');
       settling = false;
-    }, SETTLE_MS);
+    }, ms);
   }
+
+  /**
+   * The hidden sections keep their layout (theme.css), but one never drawn yet
+   * costs a long frame the first time a swipe shows it (Sites and its map:
+   * about 400 ms on the emulator). Once the app is idle, each one is drawn
+   * once beside the screen, out of sight; content-visibility then keeps that
+   * rendering for the swipe.
+   */
+  function warmSections() {
+    if (!layout.phone) return;
+    const ids = swipeOrder().map((s) => `view-${s}`);
+    // Safari has no requestIdleCallback.
+    /** @param {() => void} f @param {{ timeout: number }} o */
+    const idle = (f, o) => (window.requestIdleCallback ? window.requestIdleCallback(f, o) : setTimeout(f, 300));
+    const next = () => {
+      const views = document.querySelector('.views');
+      const el = ids.map((id) => document.getElementById(id)).find((v) => v && !v.classList.contains('tab-active'));
+      if (!views || !el) return;
+      ids.splice(ids.indexOf(el.id), 1);
+      // Not under a finger or a settling swipe: try again at the next idle moment.
+      if (start || settling || views.classList.contains('od-tab-sliding')) {
+        ids.push(el.id);
+        idle(next, { timeout: 2000 });
+        return;
+      }
+      views.classList.add('od-tab-sliding');
+      el.classList.add('od-tab-peek');
+      el.style.transform = `translateX(${views.clientWidth}px)`;
+      requestAnimationFrame(() =>
+        requestAnimationFrame(() => {
+          // A swipe may have taken this section meanwhile: it is then its own.
+          if (neighbour !== el) release(el);
+          if (!from) views.classList.remove('od-tab-sliding');
+          idle(next, { timeout: 2000 });
+        }),
+      );
+    };
+    setTimeout(() => idle(next, { timeout: 4000 }), 1500);
+  }
+  warmSections();
 
   horizontalSwipe(document, {
     accept(e) {
@@ -347,8 +395,11 @@ export function enableSectionSwipes() {
       const coming = neighbour;
       const container = views;
       from = neighbour = views = null;
+      // From where the finger left the screen, at its speed (a third of both at the end of the menu).
+      const shown = coming ? dx : dx / 3;
+      const { easing, ms } = settle(shown, through ? (dx < 0 ? -width : width) : 0, coming ? velocity : velocity / 3);
       settling = true;
-      const transition = `transform ${SETTLE_MS}ms ease-out`;
+      const transition = `transform ${ms}ms ${easing}`;
       left.style.transition = transition;
       if (coming) coming.style.transition = transition;
       left.style.transform = through ? `translateX(${dx < 0 ? -width : width}px)` : '';
@@ -360,7 +411,7 @@ export function enableSectionSwipes() {
         release(coming);
         container.classList.remove('od-tab-sliding');
         settling = false;
-      }, SETTLE_MS);
+      }, ms);
     },
   });
 }
@@ -382,6 +433,3 @@ export function enableFullSwipeBack() {
     });
   });
 }
-
-/** Time for the sections to settle once the finger is lifted, in ms. */
-const SETTLE_MS = 180;

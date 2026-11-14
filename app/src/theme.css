@@ -1212,7 +1212,8 @@ html.md {
   }
 
   .view.od-push-settle > .page {
-    transition: transform 180ms ease-out;
+    /* The spring set by the swipe (lib/swipe.js, settle). */
+    transition: transform var(--od-push-ms, 180ms) var(--od-push-ease, ease-out);
   }
 }
 

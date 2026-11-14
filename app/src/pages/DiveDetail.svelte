@@ -30,7 +30,7 @@
   import { sharePdf, shareSummary, shareLink, shareTitle } from '../lib/share.js';
   import { diveLink } from '../lib/deep-link.js';
   import { filter } from '../lib/filter.svelte.js';
-  import { horizontalSwipe, swipeGoesThrough } from '../lib/swipe.js';
+  import { horizontalSwipe, swipeGoesThrough, settle } from '../lib/swipe.js';
   import Stars from '../components/Stars.svelte';
   import { conditionsMean, roundHalfUp1 } from '../lib/conditions.js';
   import { logbook, deleteDive, saveDiveChanges, tripChange } from '../lib/logbook.svelte.js';
@@ -113,12 +113,16 @@
       },
       end(dx, velocity) {
         const width = content.clientWidth;
-        const through = hasNeighbour(dx) && swipeGoesThrough(dx, velocity, width);
-        content.style.transition = 'transform 160ms ease-out, opacity 160ms ease-out';
+        const neighbour = hasNeighbour(dx);
+        const through = neighbour && swipeGoesThrough(dx, velocity, width);
+        // On from where the finger left it, at its speed (a third of both without a neighbour).
+        const shown = neighbour ? dx : dx / 3;
+        const { easing, ms } = settle(shown, through ? (dx < 0 ? -width : width) : 0, neighbour ? velocity : velocity / 3);
+        content.style.transition = `transform ${ms}ms ${easing}, opacity ${ms}ms ease-out`;
         if (through) {
           content.style.transform = `translateX(${dx < 0 ? -width : width}px)`;
           content.style.opacity = '0';
-          setTimeout(() => goTo(dx < 0 ? 1 : -1), 160);
+          setTimeout(() => goTo(dx < 0 ? 1 : -1), ms);
         } else {
           content.style.transform = '';
           content.style.opacity = '';
