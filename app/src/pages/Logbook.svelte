@@ -1094,7 +1094,7 @@
   </Navbar>
 
   {#if !theme.ios}<BandBackdrop pill={showPill} group={stickyGroup} />{/if}
-  <SectionBand tall pill={showPill} bare={!theme.ios} title={t('logbook.title')} summary={bandSummary}>
+  <SectionBand tall pill={showPill} bare={!theme.ios} summary={bandSummary}>
     {#if showPill}
       {#if conflictWaits}
         <SyncPill icon="sync" text={stoppedText} onclick={reopenConflict} />

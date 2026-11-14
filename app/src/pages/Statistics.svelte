@@ -144,7 +144,7 @@
   </Navbar>
 
   {#if !theme.ios}<BandBackdrop short />{/if}
-  <SectionBand bare={!theme.ios} title={t('stats.title')} summary={bandSummary} />
+  <SectionBand bare={!theme.ios} summary={bandSummary} />
 
   {#if !logbook.loading && !logbook.dives.length}
     <div class="od-statistics--empty">

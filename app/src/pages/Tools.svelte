@@ -62,7 +62,7 @@
   </Navbar>
 
   {#if !theme.ios}<BandBackdrop short />{/if}
-  <SectionBand bare={!theme.ios} title={t('tools.title')} summary={t('band.tools')} />
+  <SectionBand bare={!theme.ios} summary={t('band.tools')} />
 
   {#each groups as group (group.title)}
     <h2 class="od-tools--title">{group.title}</h2>

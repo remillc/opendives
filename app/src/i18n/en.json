@@ -1694,6 +1694,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Blue header: the page title sits on the ☰ menu row; the summary and the search move up.",
       "Forms checked as you type: log a dive manually, a site’s coordinates, a cylinder type’s size.",
       "Account and git repository: fields are checked as you type (email address, password, repository address, user name, token).",
       "Desaturation: when two dives overlap in the logbook, a note says so, and the last dive shows the right surface interval.",
