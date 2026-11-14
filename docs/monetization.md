@@ -51,6 +51,31 @@ The server is the moment the price model changes. It is also the first time a re
 5. **`AGENTS.md` changes at that point.** Today it says that the Subsurface cloud is the only synchronised data source and that OpenDives does not replace it. A server of its own revises that rule; it is a decision to write down when phase 2 starts.
 6. **The relationship with Subsurface changes too.** In phase 1 OpenDives depends on their cloud. In phase 2 it also offers its own paid server to the same divers. The message of section 8 speaks only of phase 1; phase 2 deserves to be told to them openly when it comes.
 7. **The server's code.** GPLv2 does not require publishing code that only runs on a server (section 2). Whether to publish it anyway is a choice, to make with the open-source statement of to-do #57 in mind.
+8. **Accounts and data at the switch.** See below.
+
+**Accounts and data when the server arrives (reflection of 14 November 2026).**
+
+Every diver will have to create an OpenDives account at some step. The Subsurface account cannot be taken over: it lives on Subsurface's server, and reusing its password on the OpenDives server would be bad practice. This step does not have to mean a new password:
+
+| Way to sign in | For the diver | Remark |
+| --- | --- | --- |
+| A code sent by email, no password | Types the email, receives a code, types it | The same gesture as confirming a Subsurface account, already in the mock-ups. Works on every phone |
+| Google or Apple account | One tap | Fast, but a phone that installed the compiled version by hand may have no Google services |
+| Email and password | Chooses and remembers one more password | The heaviest for the diver and for the server (resets, safe storage) |
+
+Proposed: the email code as the base, Google and Apple as shortcuts. Because a compiled version is always offered outside the stores (commitment above), sign-in must never depend on Google or Apple alone.
+
+The data can be moved by the phone itself. The app already holds a complete copy of the logbook, so nothing has to pass from server to server and the Subsurface password never leaves the device. What there is to move depends on what the server holds:
+
+- **The server holds only what is new** (inventory, service history, certifications). The logbook stays on the Subsurface cloud or in the diver's own git repository. Nothing is migrated: the OpenDives account is linked to the existing logbook. This is what point 3 assumes.
+- **The server also hosts the logbook.** After the account is created, the app sends its local copy. If the server keeps Subsurface's git format, desktop Subsurface can still read the logbook.
+
+To plan for:
+
+- A Google Play subscription belongs to the Google Play account, not to the OpenDives account. The purchase has to be linked to the account on the server.
+- Divers without an account, and divers with their own git repository, go through the same screen; otherwise they have no access to the server.
+- A server that keeps personal data changes the obligations: privacy policy, deletion of the account on request. The current rules of Google, of Apple and of Quebec's Law 25 have not been checked.
+- The screens of this step (create the OpenDives account, link or send the logbook, subscribe) are to design when phase 2 is planned.
 
 What follows from the decision today:
 
