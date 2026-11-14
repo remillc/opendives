@@ -5,15 +5,26 @@
   // 2026-11-06-02): the Subsurface cloud account, or the choices to get one.
   // Change password is shown but not wired yet. Create and sign in open the
   // screens of first launch, whose actions are not built yet.
-  import { Page, Navbar, f7 } from 'framework7-svelte';
+  import { Page, Navbar, Link, f7 } from 'framework7-svelte';
   import { showSnackbar } from '../lib/snackbar.js';
   import Icon from '../components/Icon.svelte';
   import SyncControl from '../components/SyncControl.svelte';
   import MenuButton from '../components/MenuButton.svelte';
+  import { bottomNav } from '../lib/layout.svelte.js';
   import SectionBand from '../components/SectionBand.svelte';
   import { OpenDivesCore } from 'opendives-core';
   import { logbook, setAutoSync, signOut, syncNow, deviceDiveCount } from '../lib/logbook.svelte.js';
   import { showSection } from '../lib/navigation.svelte.js';
+
+  /**
+   * Android phone: back to the page Compte was opened over (the account sheet opens it over a
+   * section); shown as a section itself (after signing in), back to the Carnet.
+   */
+  function leave() {
+    const router = f7.views.current?.router;
+    if (router && router.history.length > 1) router.back();
+    else showSection('logbook');
+  }
   import { formatDateTime, formatNumber, formatTimeOfDay } from '../lib/format.js';
   import { t, tIfExists } from '../lib/i18n.js';
 
@@ -123,7 +134,17 @@
 
 <Page class="od-account">
   <Navbar class="od-band-bar" title={t('account.title')}>
-    {#snippet left()}<MenuButton />{/snippet}
+    {#snippet left()}
+      {#if bottomNav()}
+        <!-- Android phone: Compte opens from the account sheet, over a section (task 2026-11-14-120). -->
+        <Link iconOnly onClick={leave}>
+          <i class="icon icon-back"></i>
+          <span class="od-sr-only">{t('detail.back')}</span>
+        </Link>
+      {:else}
+        <MenuButton />
+      {/if}
+    {/snippet}
   </Navbar>
 
   <SectionBand summary={t(signedIn ? (git ? 'account.bandGit' : 'account.bandSignedIn') : 'account.bandNone')} />

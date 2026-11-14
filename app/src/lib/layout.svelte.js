@@ -51,6 +51,14 @@ export const layout = $state({
 query?.addEventListener('change', (e) => {
   layout.phone = e.matches;
 });
+
+/**
+ * Android phone: the four sections are reached from the bottom navigation bar, and the top
+ * bars of the sections have no ☰ (task 2026-11-14-120). iPhone and tablets keep their menu,
+ * sidebar or rail.
+ * @returns {boolean}
+ */
+export const bottomNav = () => !ios && layout.phone;
 railQuery?.addEventListener('change', (e) => {
   layout.rail = e.matches;
 });

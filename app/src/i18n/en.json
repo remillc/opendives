@@ -1691,6 +1691,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Android phone: navigation bar at the bottom (Logbook, Sites, Statistics, Tools); the account, sync, Settings and About open from the avatar at the top right.",
       "Desaturation updates when you come back to the app.",
       "Dive page: the Conditions card is closed and shows the average of its stars.",
       "Blue header: the page title sits on the ☰ menu row; the summary and the search move up.",
@@ -3112,5 +3113,11 @@
     "footer": "Made with OpenDives on {date}. Check before the dive.",
     "filePrefix": "OpenDives-slate",
     "failed": "The slate could not be shared."
+  },
+  "nav": {
+    "accountLabel": "Account, sync, settings and about: {name}",
+    "accountSheet": "Account and options",
+    "manageAccount": "Manage the account",
+    "close": "Close"
   }
 }

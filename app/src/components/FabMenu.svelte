@@ -144,7 +144,8 @@
 <style>
   @layer od.components {
     .od-fab-menu {
-      --od-fab-edge: 24px;
+      /* 16 dp above the bottom navigation bar when it shows (task 2026-11-14-120). */
+      --od-fab-edge: calc(24px + var(--od-bottom-nav-room, 0px));
       --od-fab-size: 56px;
     }
 

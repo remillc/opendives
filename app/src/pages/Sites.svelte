@@ -11,6 +11,7 @@
   import { OpenDivesCore } from 'opendives-core';
   import Icon from '../components/Icon.svelte';
   import MenuButton from '../components/MenuButton.svelte';
+  import AccountAvatar from '../components/AccountAvatar.svelte';
   import SectionBand from '../components/SectionBand.svelte';
   import SiteMap from '../components/SiteMap.svelte';
   import MenuItem from '../components/MenuItem.svelte';
@@ -492,6 +493,7 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
     {#snippet left()}<MenuButton />{/snippet}
     <NavRight>
       <Link iconOnly onClick={openSearch}><Icon name="search" /><span class="od-sr-only">{t('sites.search')}</span></Link>
+      <AccountAvatar />
       <Link iconOnly popoverOpen=".od-sites-sort-menu">
         {#if theme.ios}<Icon name="moreCircle" />{:else}<Icon name="more" weight={4} />{/if}
         <span class="od-sr-only">{t('detail.moreOptions')}</span>

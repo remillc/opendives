@@ -1691,6 +1691,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Téléphone Android : barre de navigation en bas (Carnet, Sites, Statistiques, Outils) ; le compte, la synchronisation, Réglages et À propos s’ouvrent depuis l’avatar en haut à droite.",
       "Désaturation se met à jour quand on revient dans l’app.",
       "Fiche d’une plongée : la carte Conditions est fermée et montre la moyenne de ses étoiles.",
       "En-tête bleu : le titre de la page est sur la rangée du menu ☰ ; le résumé et la recherche remontent.",
@@ -3112,5 +3113,11 @@
     "footer": "Créé avec OpenDives le {date}. À vérifier avant la plongée.",
     "filePrefix": "OpenDives-ardoise",
     "failed": "L’ardoise n’a pas pu être partagée."
+  },
+  "nav": {
+    "accountLabel": "Compte, synchronisation, réglages et à propos : {name}",
+    "accountSheet": "Compte et options",
+    "manageAccount": "Gérer le compte",
+    "close": "Fermer"
   }
 }

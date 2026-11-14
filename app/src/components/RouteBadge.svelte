@@ -35,7 +35,7 @@
     .od-route-badge--route {
       position: fixed;
       left: 8px;
-      bottom: calc(4px + env(safe-area-inset-bottom));
+      bottom: calc(4px + env(safe-area-inset-bottom) + var(--od-bottom-nav-height, 0px));
       z-index: 20000;
       max-width: calc(100% - 16px);
       padding: 2px 8px;

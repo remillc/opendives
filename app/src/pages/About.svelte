@@ -8,7 +8,7 @@
   // external-link icon.
   import { Page, Navbar, Link } from 'framework7-svelte';
   import MenuButton from '../components/MenuButton.svelte';
-  import { layout } from '../lib/layout.svelte.js';
+  import { layout, bottomNav } from '../lib/layout.svelte.js';
   import { navigation } from '../lib/navigation.svelte.js';
   import { App } from '@capacitor/app';
   import { Capacitor } from '@capacitor/core';
@@ -123,7 +123,7 @@
 <Page class="od-about" onPageBeforeIn={() => (navigation.page = 'about')} onPageBeforeOut={() => (navigation.page = '')}>
   <Navbar title={t('about.title')}>
     {#snippet left()}
-      {#if !layout.rail}
+      {#if !layout.rail && !bottomNav()}
         <MenuButton />
       {:else}
         <Link back iconOnly>

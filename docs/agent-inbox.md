@@ -2464,7 +2464,7 @@ Same on the tablet detail. Check with a dive that has all four ratings, one with
 
 Done in feature/conditions-average: the closed Conditions card shows, before its chevron, five read-only grey stars (--od-star-summary, now #8A8D91 in light) giving the average of the ratings that have a value, filled by fractions (Stars, conditionsMean); the row's name « Conditions, moyenne 2,3 sur 5. Afficher le détail », the stars role img « Moyenne des conditions : 2,3 sur 5 »; the open card keeps its rows and does not repeat the average; no rating, no card (existing rule). The text summary it replaces is gone. Phone and tablet share DiveDetail.svelte. Checked on the phone emulator: a dive with one rating (3 stars) and one with none; the test logbook has no dive with four ratings, the fractional fill is covered by tests/app/conditions.test.mjs. Open or closed lasts while the page is open (same as Équipement).
 
-## [ ] 2026-11-14-120 Android phone: bottom navigation bar instead of the side menu
+## [x] 2026-11-14-120 Android phone: bottom navigation bar instead of the side menu
 
 Christian's decision of 14 November 2026, replacing the side menu decision of 6 November **for Android phones only** (Material 3 Expressive deprecates the navigation drawer). iPhone keeps the ☰ side menu for now; Android tablets are unchanged in this task (rail in landscape, ☰ menu in portrait) and will be reviewed separately. Mock-ups: `docs/mockups/nav-barre-android.dc.html` (reference), `android-sites`, `android-stats`, `android-outils` (each tab selected), `alarme-sombre-1` (dark), `nav-option-barre-compte-android.dc.html` (account sheet), `nav-option-barre-menu-android.dc.html` (Carnet ⋮), `compte-android-connecte.dc.html` (a secondary page).
 
@@ -2478,3 +2478,5 @@ Christian's decision of 14 November 2026, replacing the side menu decision of 6 
 - Update `docs/system-design.md` §7 (main navigation table row, the side menu paragraph, the pending badge that was on Réglages in the drawer now goes on the avatar) and `AGENTS.md` (Navigation rule) to match.
 
 Check on the phone emulator: each tab selected, light and dark, TalkBack on the bar and the avatar, the account sheet with and without an account, manual sync mode, and that Réglages and À propos open with a back arrow and no bar.
+
+Done in feature/bottom-nav-phone: NavigationBar, AccountAvatar and AccountSheet components on Android phones (bottomNav()); the side menu stays on iPhone and Android tablets in portrait, the rail in landscape. Compte, Réglages and À propos open over the section with a back arrow. Checked on emulator-5554: the four tabs, light and dark, TalkBack names, the sheet with and without an account, Compte and Réglages from the sheet.
