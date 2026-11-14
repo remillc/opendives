@@ -1223,22 +1223,9 @@ html.md {
   --od-band-h: calc(var(--f7-safe-area-top) + 190px);
 }
 
-/* Android: the band holds the 28/36 title (36 dp more) over the summary. */
-.navbar.od-band-bar.od-band-titled {
-  --od-band-h: calc(var(--f7-safe-area-top) + 156px);
-}
-
-.navbar.od-band-bar.od-band-titled.od-band-tall {
-  --od-band-h: calc(var(--f7-safe-area-top) + 226px);
-}
-
 /* A sync pill (40 dp and its margin) between the summary and the search bar. */
 .navbar.od-band-bar.od-band-pill {
   --od-band-h: calc(var(--f7-safe-area-top) + 242px);
-}
-
-.navbar.od-band-bar.od-band-titled.od-band-pill {
-  --od-band-h: calc(var(--f7-safe-area-top) + 278px);
 }
 
 .navbar.od-band-bar .navbar-bg {
@@ -1258,9 +1245,13 @@ html[class*="with-modal"] .navbar.od-band-bar {
 }
 
 /* The Logbook's search bar in its band: MD3, 56 dp, translucent white. */
-/* The bar's own title (22 sp) arrives as the 28 sp title of the band leaves. */
-.navbar.od-band-bar.od-band-titled .title {
-  opacity: calc(1 - var(--od-title-expanded, 1));
+/* The page title sits on the ☰ row (task 2026-11-14-117): MD3 top app bar title, 22/28,
+   weight 500, white, one line with an ellipsis; the band under it holds the summary. */
+.navbar.od-band-bar .title {
+  line-height: 28px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .searchbar.od-band-search {

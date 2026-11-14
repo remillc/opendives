@@ -1694,6 +1694,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "En-tête bleu : le titre de la page est sur la rangée du menu ☰ ; le résumé et la recherche remontent.",
       "Formulaires vérifiés pendant la saisie : noter une plongée à la main, coordonnées d’un site, taille d’un type de bouteille.",
       "Compte et dépôt git : les champs sont vérifiés pendant la saisie (adresse courriel, mot de passe, adresse du dépôt, nom d’utilisateur, jeton).",
       "Désaturation : si deux plongées se chevauchent dans le carnet, une note le dit, et la dernière plongée affiche le bon intervalle de surface.",

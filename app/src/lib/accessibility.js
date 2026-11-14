@@ -12,6 +12,18 @@ function update() {
     page.toggleAttribute('inert', hidden);
   });
   nameClearButtons();
+  nameTitles();
+}
+
+/**
+ * The title of a top bar is the page's heading, level 1, for TalkBack and VoiceOver
+ * (task 2026-11-14-117: the band's title is now the bar's own).
+ */
+function nameTitles() {
+  document.querySelectorAll('.navbar .title:not([role])').forEach((title) => {
+    title.setAttribute('role', 'heading');
+    title.setAttribute('aria-level', '1');
+  });
 }
 
 /**
@@ -32,5 +44,6 @@ export function enableAccessibility() {
     f7.on('pageBeforeIn', update);
     f7.on(/** @type {any} */ ('searchbarInit'), nameClearButtons);
     nameClearButtons();
+    nameTitles();
   });
 }
