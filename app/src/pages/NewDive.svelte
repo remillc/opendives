@@ -27,6 +27,7 @@
   import { parseNumber } from '../lib/filter.svelte.js';
   import { depthUnit, formatCylinderSize, formatLongDate, locale } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
+  import { liveError } from '../lib/live-validation.svelte.js';
   import { ios } from '../lib/layout.svelte.js';
   import LeaveGuard from '../components/LeaveGuard.svelte';
   import { isDirty } from '../lib/leave-guard.js';
@@ -122,6 +123,26 @@
   const gasOk = $derived(
     optionalOk(o2, 5, 100) && optionalOk(he, 0, 95) && (parseNumber(o2) || 21) + (parseNumber(he) || 0) <= 100,
   );
+
+  // The same rules shown as the diver types (lib/live-validation.svelte.js): a field with a
+  // wrong value says so after a pause in the typing; an empty required field waits for « Enregistrer ».
+  /** @param {() => string} text @param {() => boolean} ok */
+  const whileTyping = (text, ok) => liveError(text, () => (ok() ? '' : 'invalid'));
+  const live = {
+    duration: whileTyping(() => duration, () => durationOk),
+    depth: whileTyping(() => depth, () => depthOk),
+    water: whileTyping(() => water, () => waterOk),
+    start: whileTyping(() => startPressure, () => startOk),
+    end: whileTyping(() => endPressure, () => endOk),
+    o2: whileTyping(() => o2, () => gasOk),
+    he: whileTyping(() => he, () => gasOk),
+  };
+  const durationBad = $derived(tried ? !durationOk : !!live.duration.error);
+  const depthBad = $derived(tried ? !depthOk : !!live.depth.error);
+  const waterBad = $derived(tried ? !waterOk : !!live.water.error);
+  const startBad = $derived(tried ? !startOk : !!live.start.error);
+  const endBad = $derived(tried ? !endOk : !!live.end.error);
+  const gasBad = $derived(tried ? !gasOk : !!(live.o2.error || live.he.error));
 
   const pressureUnit = $derived(prefs.pressure === 'psi' ? t('units.psi') : t('units.bar'));
   const temperatureUnit = $derived(prefs.temperature === 'F' ? t('units.fahrenheit') : t('units.celsius'));
@@ -245,22 +266,22 @@
       label={t('newDive.duration')}
       bind:value={duration}
       inputmode="decimal"
-      invalid={tried && !durationOk}
-      supporting={tried && !durationOk ? t('newDive.required') : ''}
+      invalid={durationBad}
+      supporting={durationBad ? t(duration.trim() ? 'newDive.invalid' : 'newDive.required') : ''}
     />
     <TextField
       label={t('newDive.depth', { unit: depthUnit(prefs) })}
       bind:value={depth}
       inputmode="decimal"
-      invalid={tried && !depthOk}
-      supporting={tried && !depthOk ? t('newDive.required') : t('newDive.profileHint')}
+      invalid={depthBad}
+      supporting={depthBad ? t(depth.trim() ? 'newDive.invalid' : 'newDive.required') : t('newDive.profileHint')}
     />
     <TextField
       label={t('newDive.water', { unit: temperatureUnit })}
       bind:value={water}
       inputmode="decimal"
-      invalid={tried && !waterOk}
-      supporting={tried && !waterOk ? t('newDive.invalid') : ''}
+      invalid={waterBad}
+      supporting={waterBad ? t('newDive.invalid') : ''}
     />
   </div>
 
@@ -280,20 +301,20 @@
         label={t('newDive.startPressure', { unit: pressureUnit })}
         bind:value={startPressure}
         inputmode="decimal"
-        invalid={tried && !startOk}
+        invalid={startBad}
       />
       <TextField
         label={t('newDive.endPressure', { unit: pressureUnit })}
         bind:value={endPressure}
         inputmode="decimal"
-        invalid={tried && !endOk}
+        invalid={endBad}
       />
     </div>
     <div class="od-new-dive--pair">
-      <TextField label={t('newDive.o2')} bind:value={o2} inputmode="decimal" invalid={tried && !gasOk} />
-      <TextField label={t('newDive.he')} bind:value={he} inputmode="decimal" invalid={tried && !gasOk} />
+      <TextField label={t('newDive.o2')} bind:value={o2} inputmode="decimal" invalid={gasBad} />
+      <TextField label={t('newDive.he')} bind:value={he} inputmode="decimal" invalid={gasBad} />
     </div>
-    <p class="od-new-dive--note">{tried && !gasOk ? t('newDive.gasInvalid') : t('newDive.gasHint')}</p>
+    <p class="od-new-dive--note">{gasBad ? t('newDive.gasInvalid') : t('newDive.gasHint')}</p>
   </div>
 
   <h2 class="od-new-dive--group-title" id="od-new-site">{t('newDive.site')}</h2>

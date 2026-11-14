@@ -128,6 +128,11 @@
   let naming = $state(false);
   let presetName = $state('');
   let saveError = $state('');
+  // The error about the name leaves as soon as the name is typed again (forms are validated live).
+  $effect(() => {
+    presetName;
+    saveError = '';
+  });
 
   function startSaving() {
     presetName = filter.draft.preset?.name ?? '';

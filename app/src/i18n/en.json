@@ -1694,6 +1694,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Forms checked as you type: log a dive manually, a site’s coordinates, a cylinder type’s size.",
       "Account and git repository: fields are checked as you type (email address, password, repository address, user name, token).",
       "Desaturation: when two dives overlap in the logbook, a note says so, and the last dive shows the right surface interval.",
       "Fix: after touching the Logbook search, the header band no longer stays darkened.",
