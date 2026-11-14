@@ -55,7 +55,7 @@ OpenDives is a full dive log app for mobile. It improves on Subsurface-mobile, b
 - **Planner:** can start from a dive in the log (gases, measured SAC). Results are volumes per gas. Saved plans are planned dives of the logbook, listed by the planner only.
 - **States to build:** empty log, failed download, offline with pending changes, sync conflict (version choice: to be confirmed, an OpenDives addition).
 - **Log screen:** no permanent Download button; a "+" button opens download, import or manual entry.
-- **Navigation (decided on 6 November 2026):** no bottom bar on phones, on iOS or Android. A top bar with a ☰ button opens a side menu (Logbook, Sites, Statistics, Tools, then Account and Settings); see docs/system-design.md, section 7. Tablets keep the iPad sidebar and the Android navigation rail.
+- **Navigation:** on Android phones, a Material 3 Expressive bottom navigation bar (Logbook, Sites, Statistics, Tools) on those four pages only, an account avatar at the top right opening a sheet with the account, sync, Settings and About, and a back arrow on every other page (decided on 14 November 2026). iPhone keeps the top bar with a ☰ side menu (decided on 6 November 2026). Tablets keep the iPad sidebar and the Android navigation rail. See docs/system-design.md, section 7.
 - **divelogs.de:** one-off import of the log when creating an account; divelogs.de credentials are never stored.
 - **Scope of v1:** every function rated "essential" and "adapted", plus every mobile novelty (rating in the reverse-engineering document).
 
