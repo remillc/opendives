@@ -70,3 +70,38 @@ test('tokens are declared on Android only', () => {
   applyMotionTokens(/** @type {any} */ (md));
   assert.ok(md.set['--od-motion-spatial-fast']);
 });
+
+// A screen released by the finger (lib/swipe.js): the spring starts at the finger's speed.
+test('a spring released at rest is the same with velocity 0', () => {
+  assert.deepEqual(springEasing(800, 1, 0.005, 32, 0), springEasing(800, 1, 0.005, 32));
+  assert.deepEqual(springEasing(380, 0.8, 0.005, 32, 0), springEasing(380, 0.8, 0.005, 32));
+});
+
+test('a released spring starts at the given speed', () => {
+  for (const [stiffness, damping] of [[800, 1], [380, 0.8]]) {
+    for (const v of [5, 20, -4]) {
+      const { css, ms } = springEasing(stiffness, damping, 0.005, 400, v);
+      const p = points(css);
+      // Slope of the first segment, in distances per second.
+      const slope = p[1] / (ms / 1000 / 400);
+      assert.ok(Math.abs(slope - v) < Math.max(1, Math.abs(v) * 0.08), `${stiffness}/${damping} at ${v}: ${slope}`);
+      assert.equal(p.at(-1), 1);
+    }
+  }
+});
+
+test('settle: the anchored fast spring, from the finger, never past the target', async () => {
+  const { settle } = await import('../../app/src/lib/swipe.js');
+  assert.deepEqual(settle(100, 100.5, 3), { easing: 'linear', ms: 0 });
+  // A flick to the left far quicker than the spring: its speed is capped, no overshoot.
+  for (const [from, to, v] of [[-80, -400, -9], [-80, -400, -0.5], [-80, 0, -1], [40, 400, 2], [-80, 0, 0]]) {
+    const { easing, ms } = settle(from, to, v);
+    const p = points(easing);
+    assert.ok(Math.max(...p) <= 1.0001, `${from}→${to} at ${v}: ${Math.max(...p)}`);
+    assert.ok(ms > 0 && ms <= 400, `${ms} ms`);
+  }
+  // Towards the target, a quicker finger gives a steeper start.
+  const slow = points(settle(-80, -400, -0.5).easing)[1];
+  const fast = points(settle(-80, -400, -3).easing)[1];
+  assert.ok(fast > slow);
+});

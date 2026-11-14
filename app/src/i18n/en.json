@@ -1691,6 +1691,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Swiping between sections, between dives or to Settings and About: the screen follows the finger from the start and finishes at the finger’s speed.",
       "Android phone: navigation bar at the bottom (Logbook, Sites, Statistics, Tools); the account, sync, Settings and About open from the avatar at the top right.",
       "Desaturation updates when you come back to the app.",
       "Dive page: the Conditions card is closed and shows the average of its stars.",

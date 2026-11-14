@@ -1691,6 +1691,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Glisser entre les sections, entre les plongées ou vers Réglages et À propos : l’écran suit le doigt dès le début et finit son mouvement à la vitesse du doigt.",
       "Téléphone Android : barre de navigation en bas (Carnet, Sites, Statistiques, Outils) ; le compte, la synchronisation, Réglages et À propos s’ouvrent depuis l’avatar en haut à droite.",
       "Désaturation se met à jour quand on revient dans l’app.",
       "Fiche d’une plongée : la carte Conditions est fermée et montre la moyenne de ses étoiles.",
