@@ -4,6 +4,7 @@
 import { OpenDivesCore } from 'opendives-core';
 import { logbook, refreshAfterChange } from './logbook.svelte.js';
 import { language, tIfExists } from './i18n.js';
+import { placeAt } from './place-lookup.js';
 import { settings } from './settings.svelte.js';
 import { formatMinutes } from './format.js';
 import { isDismissed, parseMarks, withMark, withoutMark } from './site-dismissed.js';
@@ -47,17 +48,22 @@ export async function siteChange(options) {
 }
 
 /**
- * Country, region and city from GeoNames for the site's position; a value the
- * diver corrected is kept. Returns false when the lookup is not possible
- * (offline, no GeoNames account): the values stay as they are.
+ * Country, region and city for the site's position, from OpenStreetMap's Nominatim, else
+ * from the offline file (place-lookup.js); the core writes them in the site's taxonomy and
+ * keeps a value the diver corrected. Returns false when nothing is found (the values stay
+ * as they are).
  * @param {number} uuid
  */
 export async function geocodeSite(uuid) {
   try {
-    await siteChange({ action: 'geocode', uuid, value: language });
+    const site = await OpenDivesCore.siteQuery({ kind: 'site', uuid });
+    if (!site || site.hasLocation === false) return false;
+    const place = await placeAt(site.latUdeg, site.lonUdeg, language);
+    if (!place) return false;
+    await siteChange({ action: 'geocode', uuid, country: place.country, region: place.region, county: place.county, city: place.city });
     return true;
   } catch (e) {
-    console.info('GeoNames lookup not done', String(/** @type {any} */ (e)?.message ?? e));
+    console.info('Place lookup not done', String(/** @type {any} */ (e)?.message ?? e));
     return false;
   }
 }

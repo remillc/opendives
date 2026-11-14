@@ -16,5 +16,7 @@ export default defineConfig({
   resolve: { dedupe: ['@capacitor/core'] },
   base: './',
   define: { __APP_VERSION__: JSON.stringify(version), __APP_RELEASE_DATE__: JSON.stringify(releaseDate) },
+  // core/data/regions.txt (offline regions) is imported as an asset from outside app/.
+  server: { fs: { allow: ['..'] } },
   build: { outDir: 'dist', emptyOutDir: true },
 });

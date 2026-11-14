@@ -17,7 +17,6 @@ NS_ASSUME_NONNULL_BEGIN
 + (BOOL)initializeWithHome:(NSString *)home error:(NSError **)error;
 /** NO when libgit2 rejects the file. */
 + (BOOL)setCaFile:(NSString *)path NS_SWIFT_NAME(setCaFile(_:));
-+ (void)setRegionsFile:(NSString *)path;
 + (void)setXsltDir:(NSString *)dir;
 /** The messages of the cloud log's git work, on the thread doing the work; nil stops them. */
 + (void)setSyncProgress:(nullable void (^)(NSString *message))handler NS_SWIFT_NAME(setSyncProgress(_:));
@@ -147,7 +146,11 @@ NS_ASSUME_NONNULL_BEGIN
 			    value:(NSString *)value
 			      lat:(NSInteger)lat
 			      lon:(NSInteger)lon
-			    error:(NSError **)error NS_SWIFT_NAME(siteAction(_:uuid:other:uuids:field:value:lat:lon:));
+			  country:(NSString *)country
+			   region:(NSString *)region
+			   county:(NSString *)county
+			     city:(NSString *)city
+			    error:(NSError **)error NS_SWIFT_NAME(siteAction(_:uuid:other:uuids:field:value:lat:lon:country:region:county:city:));
 + (nullable NSString *)toolQuery:(NSString *)kind error:(NSError **)error NS_SWIFT_NAME(toolQuery(kind:));
 + (NSString *)diveComputers;
 + (nullable NSString *)diveComputerAction:(NSString *)action

@@ -16,6 +16,7 @@
   import SiteMap from '../components/SiteMap.svelte';
   import { logbook, saveDiveChanges } from '../lib/logbook.svelte.js';
   import { formatCoordinates, geocodeSite, parseCoordinates, siteChange } from '../lib/sites.svelte.js';
+  import { placeAt } from '../lib/place-lookup.js';
   import { language, t } from '../lib/i18n.js';
   import { liveError } from '../lib/live-validation.svelte.js';
   import { confirmAction } from '../lib/dialogs.js';
@@ -102,7 +103,7 @@
     const near = await OpenDivesCore.siteQuery({ kind: 'nearby', lat: p.latUdeg, lon: p.lonUdeg, a: 100 });
     nearby = near && near.uuid !== editing ? near : null;
     // Country and region of the new position, unless the diver corrected them.
-    const place = await OpenDivesCore.siteQuery({ kind: 'place', lat: p.latUdeg, lon: p.lonUdeg, text: language });
+    const place = await placeAt(p.latUdeg, p.lonUdeg, language);
     // Only the answer for the latest position counts.
     if (asked !== lookups || !place) return;
     if (!country || country === autoCountry) country = autoCountry = place.country;

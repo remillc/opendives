@@ -65,8 +65,8 @@ class OpenDivesCorePlugin : Plugin() {
     private var pendingAccount: Pair<String, String>? = null
 
     /**
-     * Released once the system certificate authorities and the offline regions
-     * are set up. Calls that can reach the network or use the regions wait for
+     * Released once the system certificate authorities and the XSLT stylesheets
+     * are set up. Calls that can reach the network wait for
      * it; the ones that start the logbook (see onCoreThread) do not, so that
      * the log is read while this work runs on its own thread.
      */
@@ -95,17 +95,6 @@ class OpenDivesCorePlugin : Plugin() {
                         Log.e(TAG, "Cannot export the certificate authorities", e)
                     }
                     try {
-                        // Copied once per app version: the core reads it as a file.
-                        val regions = File(context.filesDir, REGIONS_ASSET)
-                        val version = context.packageManager.getPackageInfo(context.packageName, 0).lastUpdateTime
-                        if (!regions.exists() || regions.lastModified() < version) {
-                            context.assets.open(REGIONS_ASSET).use { input -> regions.outputStream().use { input.copyTo(it) } }
-                        }
-                        NativeCore.setRegionsFile(regions.absolutePath)
-                    } catch (e: Exception) {
-                        Log.e(TAG, "Cannot install the offline regions", e)
-                    }
-                    try {
                         // Subsurface's XSLT stylesheets (exports), copied once per app version.
                         val dir = File(context.filesDir, XSLT_DIR)
                         val version = context.packageManager.getPackageInfo(context.packageName, 0).lastUpdateTime
@@ -122,7 +111,7 @@ class OpenDivesCorePlugin : Plugin() {
                     }
                 } finally {
                     setupDone.countDown()
-                    Log.i(TAG, "perf: certificates and regions set up in ${System.currentTimeMillis() - start} ms (file kept: $cached)")
+                    Log.i(TAG, "perf: certificates and stylesheets set up in ${System.currentTimeMillis() - start} ms (file kept: $cached)")
                 }
                 if (cached) {
                     // A system update or an authority installed by the diver changes the
@@ -1155,6 +1144,10 @@ class OpenDivesCorePlugin : Plugin() {
             call.getString("value").orEmpty(),
             call.getInt("lat") ?: 0,
             call.getInt("lon") ?: 0,
+            call.getString("country").orEmpty(),
+            call.getString("region").orEmpty(),
+            call.getString("county").orEmpty(),
+            call.getString("city").orEmpty(),
         )
         call.resolve(JSObject().put("json", json))
     }
@@ -1752,8 +1745,6 @@ class OpenDivesCorePlugin : Plugin() {
         const val XSLT_DIR = "xslt"
         const val CERTIFICATES_RECHECK_MS = 20_000L
         const val SAMPLE_ASSET = "SampleDivesV2.ssrf"
-        // Offline country and region (core/data/regions.txt, Natural Earth).
-        const val REGIONS_ASSET = "regions.txt"
         const val DEV_CREDENTIALS = "cloud-dev.env"
         const val TEST_ACCOUNT = "cloud-test.env"
         const val IMPORT_PREFIX = "import-"

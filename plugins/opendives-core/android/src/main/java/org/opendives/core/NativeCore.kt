@@ -40,8 +40,7 @@ internal object NativeCore {
     external fun cancelConflictResolution()
     external fun resolveConflicts(choices: String)
     external fun statsQuery(kind: String, text: String): String
-    external fun siteAction(action: String, uuid: Long, other: Long, uuids: LongArray?, field: String, value: String, lat: Int, lon: Int): String
-    external fun setRegionsFile(path: String)
+    external fun siteAction(action: String, uuid: Long, other: Long, uuids: LongArray?, field: String, value: String, lat: Int, lon: Int, country: String, region: String, county: String, city: String): String
     external fun setXsltDir(dir: String)
     external fun exportDives(ids: IntArray, format: String, anonymize: Boolean, path: String)
     external fun toolQuery(kind: String): String

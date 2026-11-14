@@ -116,9 +116,12 @@ const cache = new Map();
 /**
  * Waits for the next allowed request. The slot is reserved before waiting, so
  * that two requests cannot both fire after the same wait.
+
+ * Shared with the other Nominatim callers of the app (place-lookup.js): the
+ * policy's limit is for the whole app.
  * @param {() => number} now @param {(ms: number) => Promise<void>} sleep
  */
-async function takeSlot(now, sleep) {
+export async function takeSlot(now, sleep) {
   const wait = waitBeforeRequest(lastRequestMs, now());
   lastRequestMs = now() + wait;
   if (wait > 0) await sleep(wait);
