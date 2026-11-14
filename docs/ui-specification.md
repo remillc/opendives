@@ -206,7 +206,7 @@ Each screen reads and writes through the `libopendives` facade (via the `OpenDiv
 | Sites | Offline map (PMTiles), list, sites without position, dives without site | **`list_sites`** (name, position, number of dives, max depth) |
 | Statistics | Totals, ready-made charts, my statistics, by year, by mode, suit and buddy (no longer by dive computer); year detail; filtered result; new statistic. See "Statistics" in section 4 | **`stats`** on the current selection, based on `statistics.cpp` (yearly and monthly figures as in `yearlystatisticsmodel.cpp`) |
 | Free filter | All criteria, equipment included; saved filters | **`filter_apply`**, based on `filterconstraint.cpp` and `fulltext.cpp`, already compiled; **`list_filter_presets`** |
-| Tools, gas tools | EAD and MOD, best mix, gas blender (partial pressures, trimix) | **`gas_mod`**, **`gas_best_mix`**, **`gas_blend`** (based on `gas.cpp` and `gas-model.cpp`) |
+| Tools, gas tools | EAD and MOD, best mix, gas blender (partial pressures, trimix) | JavaScript (`app/src/lib/gas-calculator.js`, `gas-blend.js`), ported from `gas_mod`, `best_o2`, `best_he` and `gas_compressibility_factor` (`dive.cpp`, `gas-model.cpp`) |
 | Planner | New dive or from the logbook; plan, gases, reserve, CNS and OTU | **`plan_dive`** (based on `planner.cpp`, already tried in the proof of concept); **`plan_from_dive`** to reuse gas, cylinder, pressure and SAC |
 | Settings | Account, units one by one, appearance, offline maps, dive computers | **`get_prefs`** / **`set_prefs`** for units, saved in the logbook as Subsurface does |
 

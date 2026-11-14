@@ -19,8 +19,8 @@
   // Gas blender (docs/ui-specification.md, section 1, "Tools page and gas
   // tools"; docs/mockups/outils-melangeur-android.dc.html, outils-melangeur-
   // nitrox-android.dc.html): partial pressure blending of nitrox and trimix.
-  // Everything is computed by the core (toolQuery 'blend', gas_blend in
-  // opendives.h) with the real-gas compressibility; this screen only turns the
+  // Everything is computed by lib/gas-blend.js with the real-gas
+  // compressibility; this screen only turns the
   // units and writes the fill in order. Nitrox mode hides the helium fields and
   // the helium step. Nitrox by default; the last mode chosen is remembered on
   // the device.
@@ -32,6 +32,7 @@
   import { logbook } from '../lib/logbook.svelte.js';
   import { formatCylinderSize, formatGasVolume, formatNumber } from '../lib/format.js';
   import { parseDecimal } from '../lib/tools.js';
+  import { gasBlend } from '../lib/gas-blend.js';
   import { t } from '../lib/i18n.js';
 
   const prefs = logbook.prefs;
@@ -94,7 +95,7 @@
   let topUpO2 = $state(saved.topUpO2);
   /** @type {{ name: string, ml: number, workingPressureMbar: number }[]} */
   let cylinders = $state([]);
-  let result = $state(/** @type {import('opendives-core').GasBlend|null} */ (null));
+  let result = $state(/** @type {import('../lib/gas-blend.js').GasBlend|null} */ (null));
 
   // Read again when the logbook changes: its cylinders are part of the list.
   $effect(() => {
@@ -135,27 +136,22 @@
       result = null;
       return;
     }
-    OpenDivesCore.toolQuery({
-      kind: 'blend',
-      o2: Math.round(o2Value * 10),
-      he: Math.round(heValue * 10),
-      args: [
+    try {
+      result = gasBlend(
+        Math.round(o2Value * 10),
+        Math.round(heValue * 10),
         Math.round(finalValue * MBAR_PER_UNIT),
         cylinderMl,
         Math.round(insideValue * MBAR_PER_UNIT),
         Math.round(insideO2Value * 10),
         Math.round(insideHeValue * 10),
         Math.round(topUpO2Value * 10),
-        oxygenFirst ? 1 : 0,
-      ],
-    })
-      .then((/** @type {import('opendives-core').GasBlend} */ r) => {
-        result = r;
-      })
-      .catch((e) => {
-        console.error('Gas blender', e);
-        result = null;
-      });
+        oxygenFirst,
+      );
+    } catch (e) {
+      console.error('Gas blender', e);
+      result = null;
+    }
   });
 
   /** @param {number} mbar */

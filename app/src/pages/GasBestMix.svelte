@@ -9,12 +9,11 @@
   // task 2026-11-13-91, docs/mockups/outils-meilleur-melange-android.dc.html and
   // outils-meilleur-melange-trimix-android.dc.html). Two tabs, Nitrox by
   // default: the best nitrox for a depth and a pO2, or the best trimix for a
-  // depth, a pO2 and a maximum END, from the core (toolQuery 'gas': best_o2
+  // depth, a pO2 and a maximum END, by lib/gas-calculator.js (best_o2
   // rounded down, best_he rounded up). Depth, water type and pO2 are shared by
   // the tabs; the maximum END, trimix only, starts at the value of Settings,
   // Décompression, and is changed for this calculation only.
   import { Page, Navbar, Link } from 'framework7-svelte';
-  import { OpenDivesCore } from 'opendives-core';
   import TextField from '../components/TextField.svelte';
   import SelectField from '../components/SelectField.svelte';
   import Po2Field from '../components/Po2Field.svelte';
@@ -24,6 +23,7 @@
   import { settings } from '../lib/settings.svelte.js';
   import { depthUnit, formatNumber } from '../lib/format.js';
   import { WATER_TYPES, waterTypeName, salinityOfWaterType, parseDecimal } from '../lib/tools.js';
+  import { gasCalculator } from '../lib/gas-calculator.js';
   import { t } from '../lib/i18n.js';
 
   const MODES = /** @type {const} */ (['nitrox', 'trimix']);
@@ -38,7 +38,7 @@
   let water = $state(saved.water);
   // The Settings value, in the unit of the depth.
   let maxEnd = $state(formatNumber(logbook.prefs.bestMixEndMm / mmPerUnit, feet ? 0 : 1));
-  let result = $state(/** @type {import('opendives-core').GasResult|null} */ (null));
+  let result = $state(/** @type {import('../lib/gas-calculator.js').GasResult|null} */ (null));
 
   const depthValue = $derived(parseDecimal(depth));
   const depthInvalid = $derived(!(depthValue > 0 && depthValue < (feet ? 1000 : 300)));
@@ -53,21 +53,12 @@
       return;
     }
     // The gas only matters for the MOD, which is not shown here: air.
-    OpenDivesCore.toolQuery({
-      kind: 'gas',
-      o2: 210,
-      he: 0,
-      po2,
-      depth: Math.round(depthValue * mmPerUnit),
-      args: [trimix ? Math.round(endValue * mmPerUnit) : -1, salinityOfWaterType(water)],
-    })
-      .then((/** @type {import('opendives-core').GasResult} */ r) => {
-        result = r;
-      })
-      .catch((e) => {
-        console.error('Best mix', e);
-        result = null;
-      });
+    try {
+      result = gasCalculator(210, 0, po2, Math.round(depthValue * mmPerUnit), logbook.prefs, trimix ? Math.round(endValue * mmPerUnit) : -1, salinityOfWaterType(water));
+    } catch (e) {
+      console.error('Best mix', e);
+      result = null;
+    }
   });
 
   /** One result row: the tab's mix. */
