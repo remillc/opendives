@@ -443,13 +443,6 @@ int set_prefs(const std::string &changes_json, std::string &error)
 
 // --- Cylinder types ---------------------------------------------------------
 
-static bool name_less(const std::string &a, const std::string &b)
-{
-	return std::lexicographical_compare(a.begin(), a.end(), b.begin(), b.end(), [](char x, char y) {
-		return tolower(static_cast<unsigned char>(x)) < tolower(static_cast<unsigned char>(y));
-	});
-}
-
 namespace internal {
 
 bool cylinder_type_name_in_use(const std::string &name)
@@ -468,9 +461,8 @@ int cylinder_types(std::string &json)
 	std::vector<const tank_info *> sorted;
 	for (const tank_info &info: tank_info_table)
 		sorted.push_back(&info);
-	// TankInfoModel shows the table sorted by name, ignoring case.
-	std::stable_sort(sorted.begin(), sorted.end(),
-			 [](const tank_info *a, const tank_info *b) { return name_less(a->name, b->name); });
+	// In the table's order: the list is sorted by name for the screen in JavaScript
+	// (sortCylinderTypes, plugins/opendives-core/cylinder-sort.js).
 	// How many dives (plans left out) use each type: "Dans 12 plongées".
 	std::map<std::string, int> dives_using;
 	for (const auto &d: divelog.dives) {

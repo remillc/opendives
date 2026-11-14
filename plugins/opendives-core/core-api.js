@@ -3,6 +3,10 @@
 // All values are in integer SI units, as in the core:
 // mm, s, mK, mbar, ml, per mille. Conversion happens at display time.
 import { registerPlugin } from '@capacitor/core';
+import { waterTypeOf } from './water-type.js';
+import { sortCylinderTypes } from './cylinder-sort.js';
+
+export { waterTypeOf };
 
 /**
  * Trip identifiers change on every load: never store them.
@@ -164,7 +168,8 @@ import { registerPlugin } from '@capacitor/core';
  * @property {number} rating 0 to 5 stars; 0: not filled in
  * @property {number} visibility 0 to 5 stars; 0: not filled in
  * @property {{wavesize: number, current: number, surge: number, chill: number}} conditions 0 to 5 stars each
- * @property {''|'fresh'|'brackish'|'en13319'|'salt'} waterType from the salinity, Subsurface's thresholds; empty when unknown
+ * @property {number} salinity the dive's salinity as the core works it out (kg per 10000 L; the diver's choice, else the computer's); 0 when unknown
+ * @property {''|'fresh'|'brackish'|'en13319'|'salt'} waterType named from `salinity` by waterTypeOf, in JavaScript
  * @property {number} surfacePressureMbar as stored; 0 when not stored
  * @property {number} userSalinity water type chosen by the diver (kg per 10000 L); 0 when none
  * @property {boolean} invalid marked invalid
@@ -763,6 +768,7 @@ import { registerPlugin } from '@capacitor/core';
 /** @type {any} */
 const native = registerPlugin('OpenDivesCore');
 
+
 /**
  * The native side passes the lists as JSON text (`json`), parsed here once:
  * much faster than converting them into bridge objects.
@@ -879,14 +885,21 @@ export const OpenDivesCore = {
   async syncChanges() {
     return JSON.parse((await native.syncChanges()).json);
   },
-  getDive: (options) => native.getDive(options),
+  /** One dive in full; its water type is named here from the core's salinity. */
+  async getDive(options) {
+    const dive = await native.getDive(options);
+    return { ...dive, waterType: waterTypeOf(dive.salinity) };
+  },
   async getPrefs() {
     return JSON.parse((await native.getPrefs()).json);
   },
   setPrefs: (options) => native.setPrefs(options),
   async cylinderTypes(options) {
     const result = JSON.parse((await native.cylinderTypes(options)).json);
-    return { ...result.cylinderTypes, undo: result.undo, redo: result.redo };
+    const list = result.cylinderTypes ?? {};
+    // Sorted by name for the screen here, not in the façade (cylinder-sort.js).
+    if (Array.isArray(list.types)) list.types = sortCylinderTypes(list.types);
+    return { ...list, undo: result.undo, redo: result.redo };
   },
   async plannerSetup() {
     return JSON.parse((await native.plannerSetup()).json);
