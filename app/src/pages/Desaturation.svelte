@@ -24,6 +24,7 @@
   import { flightWait, formatHoursMinutes } from '../lib/tools.js';
   import { t } from '../lib/i18n.js';
   import { ALARM_PERCENT, tissueColor as barColor } from '../lib/tissues.js';
+  import { overlapStart, surfaceSeconds } from '../lib/desaturation.js';
 
   let desat = $state(/** @type {import('opendives-core').Desaturation|null} */ (null));
   let failed = $state(false);
@@ -45,6 +46,11 @@
   });
 
   const wait = $derived(desat ? flightWait(desat.dives, desat.now, settings.flightWait) : null);
+
+  /** Seconds since the end of the last dive, from the dives' own times (lib/desaturation.js). */
+  const sinceLastDive = $derived(desat ? surfaceSeconds(desat.dives, desat.now) : -1);
+  /** Where two dives overlap and the core stopped loading the tissues, or null. */
+  const overlapAt = $derived(desat ? overlapStart(desat.dives) : null);
 
   /** The last dive of the logbook before now, used or not by the calculation. */
   const lastDive = $derived.by(() => {
@@ -133,7 +139,7 @@
         <div class="od-desaturation--tile">
           <span class="od-desaturation--tile-label">{t('desaturation.lastDive')}</span>
           <span class="od-desaturation--tile-value od-value">
-            {desat.surfaceSeconds < 0 ? t('desaturation.noRecentDive') : t('desaturation.ago', { time: formatHoursMinutes(desat.surfaceSeconds) })}
+            {sinceLastDive < 0 ? t('desaturation.noRecentDive') : t('desaturation.ago', { time: formatHoursMinutes(sinceLastDive) })}
           </span>
         </div>
       </div>
@@ -195,11 +201,11 @@
       <span>{t('desaturation.legendAlarm')}</span>
     </div>
     <p class="od-desaturation--caption">{t('desaturation.chartText')} {modelText}</p>
-    {#if desat.overlapAt}
+    {#if overlapAt}
       <!-- Two dives overlap: the core stopped loading the tissues there (13 November 2026). -->
       <div class="od-desaturation--note" role="note">
         <span class="od-desaturation--note-icon"><Icon name="info" size={20} /></span>
-        <span>{t('desaturation.overlap', { date: formatDateTime(desat.overlapAt) })}</span>
+        <span>{t('desaturation.overlap', { date: formatDateTime(overlapAt) })}</span>
       </div>
     {/if}
 
