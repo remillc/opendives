@@ -1691,6 +1691,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Désaturation se met à jour quand on revient dans l’app.",
       "Fiche d’une plongée : la carte Conditions est fermée et montre la moyenne de ses étoiles.",
       "En-tête bleu : le titre de la page est sur la rangée du menu ☰ ; le résumé et la recherche remontent.",
       "Formulaires vérifiés pendant la saisie : noter une plongée à la main, coordonnées d’un site, taille d’un type de bouteille.",
