@@ -2480,3 +2480,24 @@ Christian's decision of 14 November 2026, replacing the side menu decision of 6 
 Check on the phone emulator: each tab selected, light and dark, TalkBack on the bar and the avatar, the account sheet with and without an account, manual sync mode, and that Réglages and À propos open with a back arrow and no bar.
 
 Done in feature/bottom-nav-phone: NavigationBar, AccountAvatar and AccountSheet components on Android phones (bottomNav()); the side menu stays on iPhone and Android tablets in portrait, the rail in landscape. Compte, Réglages and À propos open over the section with a back arrow. Checked on emulator-5554: the four tabs, light and dark, TalkBack names, the sheet with and without an account, Compte and Réglages from the sheet.
+
+## [ ] 2026-11-14-121 Réglages: the profile's display options move to Affichage, « Profil et décompression » becomes « Décompression »
+
+Christian's decision of 14 November 2026. Affichage now holds the theme and everything that only changes what the dive profile shows. No key, default or behaviour changes: rows move, one page is renamed, three supporting texts change. Mock-ups in `docs/mockups/`: `reglages-affichage-android`, `reglages-profil-deco-android` (now the Décompression page), `reglages-gaz-android`, `reglages-apercu-android`, and their iPhone versions `ios-reglages-affichage`, `ios-reglages-profil-deco`, `ios-reglages-gaz`, `ios-reglages-apercu` (all `.dc.html`).
+
+**Affichage** (`/settings/display`), three blocks in this order:
+1. The existing theme row, unchanged.
+2. « Profil de plongée »: every row of the « Profil de plongée » block of today's « Profil et décompression » page, in the same order (Profondeur moyenne, Plafond donné par l’ordinateur, Plafond en rouge, Plafond calculé, Bande des bouteilles, and any other row that block has in the app).
+3. « Graphique de pO₂ en recycleur »: the three switches « Afficher chaque capteur d’O₂ », « Afficher la consigne » and « pO₂ équivalente en circuit ouvert (pSCR) », taken out of the Recycleur block of « Gaz et recycleur ».
+
+**Texts that change** (fr; write the en equivalents the same way, `docs/ui-writing.md`):
+- « Plafond calculé », supporting text: « Selon le modèle choisi dans Réglages › Décompression » (it no longer sits above the model).
+- « Afficher chaque capteur d’O₂ »: « Une courbe par cellule ». « Afficher la consigne »: « La valeur visée ». The block title already names the pO₂ graph, so the « Sur le graphique de pO₂, » of task 112 goes.
+
+**« Profil et décompression » becomes « Décompression »**: the page title, its row in the overview, the search results, and the route (`/settings/decompression`; update every caller of `/settings/profile`). The page keeps only the decompression rows: it opens on the warning note, with no inner « Décompression » heading, then the model, gradient factors, VPM-B conservatism, oxygen narcotic, best-mix END and the footnote. Its overview summary keeps the model and gradient factors and drops « plafond calculé ».
+
+**Gaz et recycleur**: the Recycleur block keeps « Consigne par défaut (CCR) », « Gaz en circuit ouvert comme diluant », « Consommation métabolique d’O₂ (pSCR) » and « Rapport de dilution (pSCR) ».
+
+Do not copy from the mock-up: the value « 1 h 10 » shown for « Rapport de dilution (pSCR) » is a mock-up error; the app keeps its ratio format.
+
+Tablet: same pages in the right pane. Settings search still finds each moved row and opens Affichage. Update `docs/ui-specification.md` (Settings paragraph) where it lists the groups in detail. Check on the phone and tablet emulators, fr and en, that every moved switch still acts on the profile and on the pO₂ graph.
