@@ -2451,3 +2451,13 @@ Done in feature/band-title-row: the 28 sp title of the band is gone (SectionBand
 Christian's decision of 14 November 2026, follows task 117. Mock-up: `docs/mockups/android-carnet.dc.html`. The Carnet's blue band had 68 dp above the ☰ / title / ⋮ row; the other band pages (Outils, Statistiques, Sites…) have 40 dp. Use the same top spacing on the Carnet (the ☰ moves up with the row), so the band is 28 dp shorter and the list starts higher. If the band header is one shared component after task 117, this is just making the Carnet use its default spacing; check the Carnet and one other band page side by side on the phone emulator, with and without the status bar inset.
 
 Done with task 117 (feature/band-title-row): the band header is shared, and the ☰ / title / ⋮ row sits at the same place on Carnet, Sites, Statistiques and Outils (measured on the phone emulator: same top and same 116 px row with the status bar inset); the Carnet's extra space was the line of the 28 sp title, now removed.
+
+## [ ] 2026-11-14-119 Détail: Conditions closed by default, with the average of its stars
+
+Christian's decision of 14 November 2026. Mock-ups: the canvas board « Détail, équipement déplié · Android » (`detail3-android`, Conditions closed) and `docs/mockups/detail3-android-conditions.dc.html` (the section open).
+
+- In a dive's detail, the Conditions card is closed by default (chevron down). Its header row shows « Conditions » and, at the end before the chevron, five read-only stars giving the **average** of the condition ratings that have a value (visibility, surface waves, current, chill; and the others the dive has). Example: 4, 1, 1, 3 → 2.25 → two full stars and the third filled to a quarter (fractional fill, not rounded). The stars are grey (`--od-on-surface-variant` or #8A8D91 in light, its dark equivalent), fill and outline, 16 dp, not interactive. Accessible name of the row: « Conditions, moyenne 2,3 sur 5. Afficher le détail » (one decimal); stars `role="img"` with « Moyenne des conditions : 2,3 sur 5 ».
+- No star has a value: no average stars, the header shows only « Conditions » (and the card follows the existing rule for empty sections).
+- A tap on the header opens the card: the rows « Visibilité », « Vagues de surface », « Courant », « Froid »… with their own black stars, as today, and the chevron up. The open card does not repeat the average.
+- Open or closed is remembered for the session like the Équipement card.
+Same on the tablet detail. Check with a dive that has all four ratings, one with a single rating, and one with none.
