@@ -20,6 +20,7 @@ OpenDives is a full dive log app for mobile. It improves on Subsurface-mobile, b
 - **App:** Capacitor (hybrid).
 - **Web layer:** Svelte 5 + Framework7 v9, in **JavaScript with JSDoc**. No TypeScript.
 - **Business logic:** Subsurface's C++ core, reused as is, plus libdivecomputer. It is exposed to the web layer by a native Capacitor plugin (Swift / Kotlin + JNI).
+- **JavaScript first (decided on 14 November 2026):** OpenDives' own code is written in JavaScript wherever possible (`app/src/lib`, tested in `tests/app`). The C++ façade (`core/libopendives`) only gets what must call Subsurface's functions or read its internal structures (tissues, planner, reading and writing the log, libdivecomputer); logic that can work on the JSON the façade returns goes in JavaScript. Before adding C++, check whether the façade already returns the data.
 - **Offline maps:** self-hosted PMTiles built from OpenStreetMap data.
 
 ## Golden rule: Subsurface is never modified
