@@ -34,8 +34,8 @@ The services are the strongest source: a fork cannot copy a service. The tradema
 
 What follows from it:
 
-- The source stays public and each release is tagged, so the paid app and its source always match.
-- Building the app from source stays possible and free. The price is for the store version.
+- **Commitment (stated by Christian on 14 November 2026): the source of the app will always be available, and so will a compiled version of the apps.** The source stays public on GitHub and each release is tagged, so the store app and its source always match. Each release also comes with a compiled version: today the Android APK attached to the GitHub release, and for iPhone and iPad whatever form Apple's platform allows when those apps exist.
+- The price is therefore for the store version: installation in one tap, automatic updates, and a way to support the project. Building the app from source stays possible and free.
 - No feature of the app is locked behind a payment in the client code. What is paid later is a service (see section 3).
 - The OpenDives name and logo are the protection against copies: registering the trademark is worth considering before the first paid release.
 - iPhone comes later and depends on point 3 of section 6.
@@ -136,7 +136,7 @@ Two things stand out. Paid dive logs sit between $10 and $15 once, and they are 
 
 1. **The app, one price paid once on Google Play.** Three price points are compared below: $4.99 (low, under every paid competitor), $9.99 (MacDive's price), $14.99 (the top of the range).
 2. **No locked feature and no add-on per dive computer.** The GPL makes those pointless (section 2), and they are what divers complain about in the paid apps.
-3. **Free from source.** Anyone can build the app from GitHub. Like Subsurface's sponsor edition, the store price is partly a way to support the project.
+3. **Source and compiled version always available** (section 4). Anyone can build the app from GitHub or install the compiled version published with each release. Like Subsurface's sponsor edition, the store price is partly a way to support the project. This lowers the number of sales to expect: the scenarios below must be read with that in mind.
 4. **Later, a yearly service.** For example backup or sync on an OpenDives server, or the pressure-gauge reading. The only yearly price found in this market is $19.99; $14.99 a year is used below as an example.
 
 ### What it could bring in a year
