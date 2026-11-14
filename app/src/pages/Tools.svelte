@@ -3,8 +3,9 @@
   // Tools section (docs/ui-specification.md, section 1, "Tools page and gas
   // tools"; docs/mockups/android-outils.dc.html): only a list of links, in two
   // groups, on white surfaces like Settings. Each tool has its own screen.
-  import { Page, Navbar, theme } from 'framework7-svelte';
+  import { Page, Navbar, NavRight, theme } from 'framework7-svelte';
   import MenuButton from '../components/MenuButton.svelte';
+  import AccountAvatar from '../components/AccountAvatar.svelte';
   import SectionBand from '../components/SectionBand.svelte';
   import BandBackdrop from '../components/BandBackdrop.svelte';
   import Icon from '../components/Icon.svelte';
@@ -59,6 +60,7 @@
 <Page class="od-tools" onPageInit={keepInSvelteRange}>
   <Navbar class="od-band-bar{theme.ios ? '' : ' od-band-titled'}" title={t('tools.title')}>
     {#snippet left()}<MenuButton />{/snippet}
+    <NavRight><AccountAvatar /></NavRight>
   </Navbar>
 
   {#if !theme.ios}<BandBackdrop short />{/if}

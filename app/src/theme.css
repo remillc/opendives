@@ -99,6 +99,11 @@
     --od-on-primary-action: var(--od-on-action);
     --od-cursor: var(--od-action);
     --od-water-top: #D4E2F2;
+    /* The active item of the bottom navigation bar (task 2026-11-14-120): primary container and primary. */
+    --od-nav-active-container: #D4E2F2;
+    --od-nav-active: #114477;
+    /* The account avatar's initial, on the white 90 % circle of the band (the band stays blue in dark mode). */
+    --od-nav-avatar-ink: #114477;
     /* Header band of the sections and of the side menu, the same in dark mode: the « grand bleu »
        of task 2026-11-13-97, colours only (the band's drawing does not change). */
     --od-band-gradient: radial-gradient(140% 115% at 38% -4%, #A9C4E2 0%, #7199C2 25%, #5584B5 37%, #2D5E90 59%, #114477 86%);
@@ -234,6 +239,8 @@
     --od-on-action: #1F2124;
     --od-cursor: #F4F4F2;
     --od-water-top: #BFD6F0;
+    --od-nav-active-container: #1E3552;
+    --od-nav-active: #8FB6E6;
     --od-water-bottom: #4C8BD4;
     --od-loading-indicator-top: #BFD6F0;
     --od-loading-indicator-bottom: #4C8BD4;
@@ -1235,11 +1242,6 @@ html.md {
   background-color: transparent;
 }
 
-/* A dialog or sheet over a band: the ☰ button goes under its scrim. */
-html[class*="with-modal"] .navbar.od-band-bar {
-  z-index: 0;
-}
-
 .navbar.od-band-bar .navbar-bg::after {
   display: none;
 }
@@ -1282,7 +1284,7 @@ html[class*="with-modal"] .navbar.od-band-bar {
  */
 @layer od.components {
   .toast.od-snackbar {
-    --od-snackbar-bottom: 24px;
+    --od-snackbar-bottom: calc(24px + var(--od-bottom-nav-room, 0px));
     inset: auto 16px calc(var(--od-snackbar-bottom) + var(--f7-safe-area-bottom)) 16px;
     width: auto;
     max-width: 568px;
@@ -1301,7 +1303,7 @@ html[class*="with-modal"] .navbar.od-band-bar {
 
     /* A FAB is 56 dp at 16 dp from the bottom: 16 dp of air above it. */
     &.od-snackbar-above-fab {
-      --od-snackbar-bottom: 88px;
+      --od-snackbar-bottom: calc(88px + var(--od-bottom-nav-room, 0px));
     }
 
     .toast-content {
@@ -1366,4 +1368,32 @@ html[class*="with-modal"] .navbar.od-band-bar {
   .md :where(.navbar:not(.od-band-bar)) .navbar-bg {
     transition: none;
   }
+}
+
+/*
+ * The bottom navigation bar on screen (Android phone, task 2026-11-14-120): the first pages of the
+ * sections end above it; their « + » and the snackbar move up by the bar's room (64 dp of bar, they
+ * sat 24 dp from the screen's edge: 56 dp more keeps them 16 dp above it).
+ */
+html.od-bottom-nav-on {
+  --od-bottom-nav-room: 56px;
+  --od-bottom-nav-height: 64px;
+}
+
+html.od-bottom-nav-on .view.tab-active > .page-current > .page-content,
+html.od-bottom-nav-on .view.tab-active > .page-master > .page-content {
+  padding-bottom: calc(var(--od-bottom-nav-height) + var(--f7-safe-area-bottom, 0px));
+}
+
+html.od-bottom-nav-on .view.tab-active > .page-current .fab-right-bottom {
+  bottom: calc(var(--od-bottom-nav-room) + 24px + var(--f7-safe-area-bottom, 0px));
+}
+
+/* Android phone (bottom bar): a section's top bar has no ☰; its title starts 16 dp from the edge. */
+html.od-bottom-nav .navbar .left:not(:has(a, button)) {
+  display: none;
+}
+
+html.od-bottom-nav .navbar .left:not(:has(a, button)) + .title {
+  margin-left: 16px;
 }

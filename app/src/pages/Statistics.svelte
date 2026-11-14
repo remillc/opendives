@@ -12,6 +12,7 @@
   import { Page, Navbar, NavRight, Link, theme } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
   import MenuButton from '../components/MenuButton.svelte';
+  import AccountAvatar from '../components/AccountAvatar.svelte';
   import SectionBand from '../components/SectionBand.svelte';
   import BandBackdrop from '../components/BandBackdrop.svelte';
   import KeyFigures from '../components/KeyFigures.svelte';
@@ -140,6 +141,7 @@
       {:else}
         <Link class="od-statistics--filter-button" href="/filter"><Icon name="filter" size={18} weight={2} />{t('stats.freeFilter')}</Link>
       {/if}
+      <AccountAvatar />
     </NavRight>
   </Navbar>
 

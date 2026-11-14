@@ -19,6 +19,7 @@
   import FloatingToolbar from '../components/FloatingToolbar.svelte';
   import MenuItem from '../components/MenuItem.svelte';
   import MenuButton from '../components/MenuButton.svelte';
+  import AccountAvatar from '../components/AccountAvatar.svelte';
   import SectionBand from '../components/SectionBand.svelte';
   import FlightBanner from '../components/FlightBanner.svelte';
   import ActiveFilter from '../components/ActiveFilter.svelte';
@@ -1081,6 +1082,8 @@
   <Navbar large={theme.ios} class="od-band-bar od-band-tall{theme.ios ? '' : ' od-band-titled'} {showPill ? 'od-band-pill' : ''}" title={t('logbook.title')}>
     {#snippet left()}<MenuButton />{/snippet}
     <NavRight>
+      <!-- Android phone: the account, sync, Réglages and À propos (task 2026-11-14-120). -->
+      <AccountAvatar />
       {#if logbook.dives.length || logbook.preview}
         <Link iconOnly popoverOpen=".od-logbook-menu" class={logbook.dives.length ? '' : 'disabled'}>
           {#if theme.ios}<Icon name="moreCircle" />{:else}<Icon name="more" weight={4} />{/if}

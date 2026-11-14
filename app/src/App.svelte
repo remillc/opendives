@@ -52,11 +52,14 @@
   const showRoute = /** @type {any} */ (import.meta).env?.VITE_SHOW_ROUTE === '1';
   import Download from './pages/Download.svelte';
   import NavMenu from './components/NavMenu.svelte';
+  import NavigationBar from './components/NavigationBar.svelte';
+  import AccountSheet from './components/AccountSheet.svelte';
   import SyncFailureSheet from './components/SyncFailureSheet.svelte';
   import ConflictHost from './components/ConflictHost.svelte';
   import QrReceived from './components/QrReceived.svelte';
   import Welcome from './components/Welcome.svelte';
-  import { layout, ios, listWidth, splitBreakpoint } from './lib/layout.svelte.js';
+  import { layout, ios, listWidth, splitBreakpoint, bottomNav } from './lib/layout.svelte.js';
+  import { navigation } from './lib/navigation.svelte.js';
   import { trackSection, enableSectionSwipes, enableFullSwipeBack } from './lib/navigation.svelte.js';
   import { applyMotionTokens } from './lib/motion.js';
   import { TAP_SLOP } from './lib/tap.js';
@@ -272,6 +275,12 @@
     if (logbook.dives.length) schedulePreparingSiteMaps();
   });
 
+  // The bottom bar on screen: the content, the « + » and the snackbar make room for it (theme.css).
+  $effect(() => {
+    document.documentElement.classList.toggle('od-bottom-nav-on', bottomNav() && navigation.atRoot);
+    document.documentElement.classList.toggle('od-bottom-nav', bottomNav());
+  });
+
   onMount(() => {
     applyMotionTokens();
     enableBackButton();
@@ -293,7 +302,10 @@
 </script>
 
 <App {...f7params}>
-  {#if layout.rail}<NavRail />{:else}<NavMenu />{/if}
+  <!-- Tablet: the rail or sidebar. Android phone: the bottom bar and the account sheet (task
+       2026-11-14-120). iPhone and Android tablets in portrait: the ☰ side menu. -->
+  {#if layout.rail}<NavRail />{:else if bottomNav()}<AccountSheet />{:else}<NavMenu />{/if}
+  {#if bottomNav() && navigation.atRoot}<NavigationBar />{/if}
   <SyncFailureSheet />
   <ConflictHost />
   <QrReceived />

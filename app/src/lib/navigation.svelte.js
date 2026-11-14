@@ -23,7 +23,21 @@ export const navigation = $state({
   dive: /** @type {string|null} */ (null),
   /** Download pages open (Download, Download failed): the Logbook's floating + steps aside while one shows. */
   downloadPanes: 0,
+  /**
+   * The current section shows its first page (no page pushed over it): where the bottom
+   * navigation bar is shown (Android phone, task 2026-11-14-120).
+   */
+  atRoot: true,
+  /** The account sheet (Android phone): account, sync, Réglages and À propos. */
+  accountOpen: false,
 });
+
+/** Whether the current view shows its first page, for the bottom navigation bar. */
+function updateAtRoot() {
+  const view = f7.views.current;
+  const id = view?.el?.id?.replace('view-', '');
+  navigation.atRoot = sections.includes(/** @type {Section} */ (id)) && (view?.router?.history?.length ?? 1) <= 1;
+}
 
 /** Element that opened the menu; it gets the focus back on close. */
 /** @type {HTMLElement|null} */
@@ -121,7 +135,13 @@ export function trackSection() {
   f7.on('tabShow', (/** @type {HTMLElement} */ el) => {
     const section = /** @type {Section} */ (el.id?.replace('view-', ''));
     if (allSections.includes(section)) navigation.section = section;
+    updateAtRoot();
   });
+  // A page pushed or left in any view: whether the bottom bar shows.
+  f7.on('routeChanged', updateAtRoot);
+  f7.on('pageAfterIn', updateAtRoot);
+  f7.on('pageAfterOut', updateAtRoot);
+  updateAtRoot();
 }
 
 /** @param {HTMLElement|null} from */

@@ -22,7 +22,7 @@
   import AltitudeField from '../components/AltitudeField.svelte';
   import ButtonGroup from '../components/ButtonGroup.svelte';
   import MenuButton from '../components/MenuButton.svelte';
-  import { layout, ios } from '../lib/layout.svelte.js';
+  import { layout, ios, bottomNav } from '../lib/layout.svelte.js';
   import { navigation } from '../lib/navigation.svelte.js';
   import WheelDialog from '../components/WheelDialog.svelte';
   import RenumberDialog from '../components/RenumberDialog.svelte';
@@ -1025,7 +1025,7 @@
     {#snippet left()}
       {#if section && layout.split}
         <!-- Beside the overview on a tablet: nothing to go back to. -->
-      {:else if !section && !layout.rail}
+      {:else if !section && !layout.rail && !bottomNav()}
         <MenuButton />
       {:else}
         <Link back iconOnly>

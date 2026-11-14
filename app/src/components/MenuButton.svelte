@@ -4,12 +4,13 @@
   // sections 3 and 7). Pushed screens keep their Back button instead. Goes in the
   // Navbar's `left` snippet: Framework7 only places that one on the left.
   import Icon from './Icon.svelte';
-  import { layout } from '../lib/layout.svelte.js';
+  import { layout, bottomNav } from '../lib/layout.svelte.js';
   import { navigation, openMenu } from '../lib/navigation.svelte.js';
   import { t } from '../lib/i18n.js';
 </script>
 
-{#if !layout.rail}
+<!-- Android phone: no ☰, the sections are in the bottom bar (task 2026-11-14-120). -->
+{#if !layout.rail && !bottomNav()}
   <!-- Written by hand, like the "+" button: a real button name and state for screen readers. -->
   <a
     href="#menu"
