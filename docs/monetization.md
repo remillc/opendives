@@ -55,7 +55,7 @@ OpenDives' interface is written in Svelte with Framework7; Subsurface-mobile's i
 3. **App Store.** The Free Software Foundation considers Apple's terms incompatible with the GPL. Subsurface-mobile is published there all the same; the maintainers' view is needed before OpenDives does the same.
 4. **Google Play rules.** Its commission and its in-app payment rules change often. To check when the price is set.
 5. **Trademark.** Decide whether to register "OpenDives".
-6. **Cloud costs.** Decide whether part of the app's revenue goes to Subsurface's cloud (see the bracketed sentence in the draft).
+6. **Cloud costs.** Decide whether part of the app's revenue goes to Subsurface's cloud (see the bracketed sentence in the draft, and section 9 for what a share would amount to).
 
 ## 7. Letting the maintainers try the app
 
@@ -109,9 +109,82 @@ Christian's requirement of 14 November 2026: when the message goes out, the main
 >
 > Christian Rémillard
 
+## 9. Pricing and potential revenue (exploration)
+
+An exploration of 14 November 2026, not a forecast and not financial advice. Prices are in US dollars, before sales taxes and income tax. Every sales figure below is an assumption; the only measured numbers are the ones marked with a source.
+
+### What the market looks like
+
+| App | Price | Source |
+| --- | --- | --- |
+| Subsurface-mobile | Free; a "sponsor" edition, otherwise identical, exists for those who want to pay | Store description |
+| DiveMate (Android, iOS) | Free, with paid add-ons: Bluetooth pack £5.99, backups £9.99 | Divernet |
+| MacDive (iOS) | $9.99 once | Currents comparison |
+| Dive Log, G. McLaughlin (iOS) | $14.99 once, plus $2.99 per dive-computer brand | App Store |
+| Dive Log: Scuba Logbook (iOS) | $19.99 a year, $3.99 a month, or $39.99 once | App Store |
+| Diving Log (Windows) | €39 once; its Android app comes with the Windows licence | Currents comparison |
+
+Two things stand out. Paid dive logs sit between $10 and $15 once, and they are mostly on iOS: on Android the known apps are free or free with add-ons. And the audience is small: a third-party tracker counts about 30,000 installs of Subsurface-mobile on Google Play since 2016, and another counts 160,000 downloads for DiveMate in total, with 280 in the last 30 days. Those two apps are free; a paid app will reach fewer people.
+
+### Google Play's cut and the fixed costs
+
+- **Commission:** 15 % in practice on the first US$1 million a year. In the United States, the United Kingdom and the European Economic Area it has been split, since 30 June 2026, into a 10 % service fee and a 5 % billing fee; elsewhere the 15 % tier applies and the developer must enrol in it.
+- **Developer account:** US$25 once on Google Play. Apple's is US$99 a year, when iPhone comes.
+- **Not estimated here:** hosting of the offline maps, the opendives.app domain, a trademark registration, and the server of a future paid service.
+
+### Price structure explored
+
+1. **The app, one price paid once on Google Play.** Three price points are compared below: $4.99 (low, under every paid competitor), $9.99 (MacDive's price), $14.99 (the top of the range).
+2. **No locked feature and no add-on per dive computer.** The GPL makes those pointless (section 2), and they are what divers complain about in the paid apps.
+3. **Free from source.** Anyone can build the app from GitHub. Like Subsurface's sponsor edition, the store price is partly a way to support the project.
+4. **Later, a yearly service.** For example backup or sync on an OpenDives server, or the pressure-gauge reading. The only yearly price found in this market is $19.99; $14.99 a year is used below as an example.
+
+### What it could bring in a year
+
+Net of Google's 15 %, for the app paid once:
+
+| Sales in a year | at $4.99 | at $9.99 | at $14.99 |
+| --- | --- | --- | --- |
+| 100 (a few dozen divers a month find it) | $424 | $849 | $1,274 |
+| 500 | $2,121 | $4,246 | $6,371 |
+| 2,000 (more than half of DiveMate's yearly downloads, for a paid app) | $8,483 | $16,983 | $25,483 |
+
+For the service, at $14.99 a year, net of 15 %: 25 subscribers bring $319 a year, 100 bring $1,274, 400 bring $5,097. The service has its own running costs, not counted here.
+
+How to read this:
+
+- The first two rows are the plausible ones for a new paid app in a small market with free competitors. The third is an upper bound, not an expectation.
+- A one-time price pays once per diver: revenue follows new buyers and falls when the audience is reached. Only the service brings recurring revenue.
+- At these volumes the revenue covers the project's costs and little more. It does not pay for the development time.
+- The price can go up later more easily than down: buyers of a cheaper version keep it.
+
+### A share for Subsurface
+
+The draft message offers part of the revenue towards the cost of the cloud. Ways to do it:
+
+| Formula | Example at $9.99 | 100 sales | 500 sales | 2,000 sales |
+| --- | --- | --- | --- | --- |
+| A percentage of net revenue | 5 % | $42 | $212 | $849 |
+| | 10 % | $85 | $425 | $1,698 |
+| | 20 % | $170 | $849 | $3,397 |
+| A fixed amount per sale | $1 | $100 | $500 | $2,000 |
+| A fixed yearly donation | set each year | — | — | — |
+
+Points to weigh:
+
+- A percentage follows the revenue and never costs more than the app earns. A fixed amount per sale weighs more on a low price ($1 is 24 % of the net at $4.99, 12 % at $9.99).
+- The honest order of magnitude, in the plausible rows, is tens to a few hundred dollars a year. It is a gesture of support more than a funding source, and the message should not suggest otherwise.
+- What the cloud costs Subsurface is not known. Their answer may be a preference for a sponsorship through their existing channels (their sponsoring page, Ko-fi, GitHub Sponsors) rather than a formula.
+- If OpenDives later runs its own paid sync, it competes with their free cloud for the same divers: worth saying openly when the time comes.
+
 ## Sources
 
 - Selling Free Software, GNU Project: https://www.gnu.org/philosophy/selling
 - Subsurface contribution guide: `third_party/subsurface/CONTRIBUTING.md`
 - Subsurface cloud and project facts: [Analysis of the Subsurface project](subsurface-analysis.md)
 - Proof of concept and round-trip result: [poc/README.md](../poc/README.md)
+- Google Play service fees: https://support.google.com/googleplay/android-developer/answer/112622 and https://pricepush.app/blog/google-play-subscription-fees-2026-real-math
+- Developer account fees: https://tms-outsource.com/blog/posts/google-play-store-fees/
+- Dive log prices: https://www.trycurrents.app/blog/best-dive-log-apps-comparison, https://divernet.com/scuba-gear/finding-the-best-dive-logging-app/, https://apps.apple.com/us/app/dive-log/id301049600, https://apps.apple.com/us/app/dive-log-scuba-logbook/id6790093894
+- Install counts (third-party estimates): https://appwisp.com/app/android/org.subsurfacedivelog.mobile and https://www.appbrain.com/app/divemate-scuba-dive-log/com.confitek.divemateusb
+- Subsurface-mobile's sponsor edition: its Google Play description, as shown on https://similarweb.com/app/google/org.subsurfacedivelog.mobile
