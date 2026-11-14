@@ -1590,6 +1590,7 @@
       "other": "{n} compartments at 90 % or more."
     },
     "chartText": "The 16 compartments of the Bühlmann model, fastest to slowest. At rest, desaturated, they are all at 0 %.",
+    "overlap": "Two dives overlap in the logbook ({date}): the tissue calculation stops before them. Correct their times or delete the duplicate.",
     "modelGf": "Gradient factors {low}/{high}, the planner's.",
     "modelVpmb": "Planner model: VPM-B +{n}.",
     "usedDives": "Calculated from",
@@ -1693,6 +1694,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Desaturation: when two dives overlap in the logbook, a note says so, and the last dive shows the right surface interval.",
       "Fix: after touching the Logbook search, the header band no longer stays darkened.",
       "Statistics on a tablet: closing the group of the row shown on the right empties the pane.",
       "A number and its unit are no longer split at the end of a line (",

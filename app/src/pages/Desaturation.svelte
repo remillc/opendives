@@ -195,6 +195,13 @@
       <span>{t('desaturation.legendAlarm')}</span>
     </div>
     <p class="od-desaturation--caption">{t('desaturation.chartText')} {modelText}</p>
+    {#if desat.overlapAt}
+      <!-- Two dives overlap: the core stopped loading the tissues there (13 November 2026). -->
+      <div class="od-desaturation--note" role="note">
+        <span class="od-desaturation--note-icon"><Icon name="info" size={20} /></span>
+        <span>{t('desaturation.overlap', { date: formatDateTime(desat.overlapAt) })}</span>
+      </div>
+    {/if}
 
     {#if desat.dives.length}
       <h2 class="od-desaturation--section">{t('desaturation.usedDives')}</h2>

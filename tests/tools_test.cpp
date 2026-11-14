@@ -518,6 +518,7 @@ int main(int argc, char **argv)
 	long surface = number(json, "surfaceSeconds");
 	check_true("one hour after: surface interval about an hour", surface > 3000 && surface <= 3600);
 	check_true("one hour after: dives used", json.find("\"dives\":[{") != std::string::npos);
+	check_true("one hour after: no overlapping dives", json.find("\"overlapAt\":null") != std::string::npos);
 	// The last dive of the sample is 4 m deep for two hours. An hour later the
 	// fastest compartment (4 min) is back to rest in Subsurface's graph; the
 	// slowest (635 min) still holds more nitrogen than at rest (0.7422 bar).

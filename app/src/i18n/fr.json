@@ -1590,6 +1590,7 @@
       "other": "{n} compartiments à 90 % ou plus."
     },
     "chartText": "Les 16 compartiments du modèle Bühlmann, des plus rapides aux plus lents. Au repos, désaturés, ils sont tous à 0 %.",
+    "overlap": "Deux plongées se chevauchent dans le carnet ({date}) : le calcul des tissus s’arrête avant elles. Corrigez leurs heures ou supprimez le doublon.",
     "modelGf": "Facteurs de gradient {low} / {high}, ceux du planificateur.",
     "modelVpmb": "Modèle du planificateur : VPM-B +{n}.",
     "usedDives": "Calculé à partir de",
@@ -1693,6 +1694,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Désaturation : si deux plongées se chevauchent dans le carnet, une note le dit, et la dernière plongée affiche le bon intervalle de surface.",
       "Correctif : après avoir touché la recherche du Carnet, la bande d’en-tête ne reste plus assombrie.",
       "Statistiques sur tablette : fermer le groupe de la ligne affichée à droite vide le panneau.",
       "Un nombre et son unité ne sont plus séparés en fin de ligne (« 27,6 m », « 14 h 30 », « 9 plongées »).",
