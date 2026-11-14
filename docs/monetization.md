@@ -50,14 +50,28 @@ OpenDives' interface is written in Svelte with Framework7; Subsurface-mobile's i
 
 ## 6. Open points before the first paid release
 
-1. **Write to the Subsurface maintainers** (draft in section 7). Their agreement matters on three points: a paid app using their free, donation-funded cloud; the wording "compatible with Subsurface"; publication on the App Store.
+1. **Write to the Subsurface maintainers** (draft in section 8), once they can try the app (section 7). Their agreement matters on three points: a paid app using their free, donation-funded cloud; the wording "compatible with Subsurface"; publication on the App Store.
 2. **Check the licences of the dependencies.** GPLv2 is generally considered incompatible with Apache 2.0, which many Android libraries use. Not checked yet for OpenDives.
 3. **App Store.** The Free Software Foundation considers Apple's terms incompatible with the GPL. Subsurface-mobile is published there all the same; the maintainers' view is needed before OpenDives does the same.
 4. **Google Play rules.** Its commission and its in-app payment rules change often. To check when the price is set.
 5. **Trademark.** Decide whether to register "OpenDives".
 6. **Cloud costs.** Decide whether part of the app's revenue goes to Subsurface's cloud (see the bracketed sentence in the draft).
 
-## 7. Draft message to the Subsurface maintainers
+## 7. Letting the maintainers try the app
+
+Christian's requirement of 14 November 2026: when the message goes out, the maintainers must be able to try the app.
+
+**How:** the APK attached to the GitHub release, installed by sideloading. The message links to https://github.com/remillc/opendives/releases/latest, which always shows the newest release. This needs no store account and no review, and the maintainers are developers. Google Play testing (open or closed track) can come later, when the app is on Google Play. There is no iPhone build to share: the iOS build only runs in the GitHub workflow, and TestFlight needs an Apple developer account.
+
+**Before sending the message:**
+
+1. Publish the version to show. On 14 November 2026 the newest GitHub release is 0.2.0, while the app is at 0.3.0: release 0.3.0 or later first, with its green release report and its APK.
+2. Install that APK on a phone that never had the app, and go through the first launch with a test account, in English.
+3. Make sure the release notes say what works and what does not yet, so the maintainers do not report known gaps.
+4. Keep the warning in the message: OpenDives writes to the logbook, and this is an early version. The maintainers should try it with a test cloud account or without an account, not with their main logbook.
+5. Once the message is sent, update `AGENTS.md` (« Subsurface maintainers: no contact for now »).
+
+## 8. Draft message to the Subsurface maintainers
 
 **Where to send it:** Subsurface's contribution guide points new contributors to the User Forum (https://groups.google.com/g/subsurface-divelog) and to the bug tracker; the developer mailing list is closed to new subscribers. The User Forum is public, which suits this message. Dirk Hohndel maintains the project and runs the cloud.
 
@@ -72,6 +86,8 @@ OpenDives' interface is written in Svelte with Framework7; Subsurface-mobile's i
 > I started OpenDives out of frustration. On a dive site, with only my phone in hand, I could not do what I wanted to do with Subsurface-mobile. I have come to believe that a mobile app designed as a companion to the desktop app is a dead end: the phone is the device divers have with them, so the mobile version should offer everything the desktop version does. I also wanted to put the experience I have built over a career in web development to work on Subsurface's user interface.
 >
 > OpenDives is the result so far. It is a full dive log for Android first, with iPhone and tablets to follow. It reuses the Subsurface core as is, without Qt, through a small compatibility layer, and reads and writes the same git format: the round trip passes on 97 of your 98 sample logs. The interface is new, written with web technologies. The app is under GPLv2 and its source is public: https://github.com/remillc/opendives
+>
+> You can try it today on Android: the APK of the latest version is attached to the latest release (https://github.com/remillc/opendives/releases/latest) and installs by sideloading. It is an early version, and it reads and writes the logbook, so please try it with a test cloud account or without an account rather than with your main logbook. There is no iPhone build to share yet.
 >
 > I would like to contribute to Subsurface, and I would rather ask you how than guess. What I can offer today:
 >
